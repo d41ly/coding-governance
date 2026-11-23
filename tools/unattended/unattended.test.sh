@@ -21044,6 +21044,167 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# KICK-dKeptSession-25 — A QUESTION TO A BUILD ANSWERED, OR DEFAULTED PAST ITS DEADLINE. Unit 24's
+# lease fixture again: c1, RUN_CLAIMS on and USERNAME daily-agent, so its fleet tag is `a`, answering as
+# tFix, and c2, a second clone of the same origin, asking as fy; unit 24's `run_deadline_arm` drives
+# both. AC2: c2's question with `--default no`, answered by c1 with one `--cite` of a file c1's base
+# commit holds, posts an `answer` to build:fy answering it whose body carries the `cites` line, and the
+# sourced driver's `derive_mail_answer_outcome` prints `answered`; a second answer exits 1 naming the
+# state; a cite of a path the sha does not hold and one whose sha is `-x` each exit 2, the remote
+# unmoved; an id naming no question exits 2; `--mail read --cite` exits 2 with the read's form. AC3:
+# under `wait-ceiling = 30` (PINNED), a question no one answers whose line c1's feed planted an hour ago
+# reads `awaiting` and is the one `--open --ids` id; that same line re-planted 31 hours ago (PINNED) it
+# reads `defaulted`, `--open --ids` prints `none` and the read shows it `expired`, default `no`. RED,
+# observed at the close, is the base driver, which has no `answer` verb and no outcome. WHAT THIS BLOCK
+# DOES NOT DRIVE: the loop row, which the loop kit's three checks read over gov's composition (AC1).
+# ==================================================================================================
+LF=$(mktemp -d); write_lease_fixture
+git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null && git -C "$LF/c2" config user.email t@t.test \
+  && git -C "$LF/c2" config user.name t && git -C "$LF/c2" config core.autocrlf false
+printf 'an answer body\n' > "$LF/body.txt"
+ma_pid='s/^mail — posted \([0-9a-f]*\) · .*/\1/p'
+ma_sha=$(git -C "$LF/c1" rev-parse HEAD)
+# ---- AC2
+ma_q=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q answered' --default no "$LF/body.txt" | sed -n "$ma_pid")
+ma_out=$(run_deadline_arm c1 a1 answer tFix "${ma_q:-unposted}" "$LF/body.txt" --cite "memory/builds/tFix/README.md@$ma_sha"); ma_rc=$?
+ma_m=$(git --git-dir="$LF/origin.git" log -1 --format=%B refs/gov/mail/tFix/a/a1 -- 2>/dev/null)
+same "KDS25 AC2 the answer exits 0, posting kind answer to build:fy that answers the question, its body citing the file" \
+  "$ma_rc $(grep -c '^mail — posted ' <<<"$ma_out") $(grep -c '^kind: answer$' <<<"$ma_m") $(grep -c '^to: build:fy$' <<<"$ma_m") $(grep -c "^answers: ${ma_q:-unposted}$" <<<"$ma_m") $(grep -c "^cites memory/builds/tFix/README.md@$ma_sha$" <<<"$ma_m")" \
+  "0 1 1 1 1 1"
+ma_got=$( cd "$LF/c1" || exit 1; set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  GOV_RUNLOG=0 derive_mail_answer_outcome tFix "${ma_q:-unposted}" 2>/dev/null; printf 'rc %s' "$?" )
+same "KDS25 AC2 the sourced driver's derive_mail_answer_outcome prints answered, exit 0" "$(tr '\n' ' ' <<<"$ma_got")" "answered rc 0"
+ma_out=$(run_deadline_arm c1 a2 answer tFix "${ma_q:-unposted}" "$LF/body.txt"); ma_rc=$?
+same "KDS25 AC2 a second answer exits 1 naming the question answered" "$ma_rc [$ma_out]" "1 [answer — ${ma_q:-unposted} · answered]"
+ma_q2=$(run_deadline_arm c2 q2 post fy --to build:tFix --kind question --subject 'q cited' --default no "$LF/body.txt" | sed -n "$ma_pid")
+ma_n=$(read_mail_refs "$LF/origin.git"); ma_got=""
+for ma_c in "memory/builds/tFix/absent.md@$ma_sha|names no file this clone holds at that commit" \
+    "memory/builds/tFix/README.md@-x|--cite takes <path>@<sha>, not memory/builds/tFix/README.md@-x"; do
+  ma_out=$(run_deadline_arm c1 a3 answer tFix "${ma_q2:-unposted}" "$LF/body.txt" --cite "${ma_c%%|*}"); ma_got="$ma_got$? $(grep -cF -- "${ma_c#*|}" <<<"$ma_out");"
+done
+same "KDS25 AC2 a cite whose sha does not hold its path, and one whose sha is -x, each exit 2 naming the cite, the remote gaining no ref" \
+  "$ma_got $(read_mail_refs "$LF/origin.git")" "2 1;2 1; $ma_n"
+ma_out=$(run_deadline_arm c1 a4 answer tFix 000000000000 "$LF/body.txt"); ma_rc=$?
+same "KDS25 AC2 an id naming no question exits 2 saying so" "$ma_rc $(grep -c 'is no question addressed to tFix$' <<<"$ma_out")" "2 1"
+ma_out=$(run_deadline_arm c1 r1 read tFix --cite a@b); ma_rc=$?
+same "KDS25 AC2 --mail read with --cite exits 2 printing the read's form" "$ma_rc [$ma_out]" "2 [mail — not read · the form is --mail read <who> [--open] [--ids]]"
+# ---- AC3
+write_lease_policy '[flow]
+wait-ceiling = 30'
+git -C "$LF/c2" fetch -q origin 2>/dev/null
+run_deadline_arm c1 a5 ack tFix "${ma_q2:-unposted}" >/dev/null
+ma_q3=$(run_deadline_arm c2 q3 post fy --to build:tFix --kind question --subject 'q unanswered' --default no "$LF/body.txt" | sed -n "$ma_pid")
+ma_c=$(git --git-dir="$LF/origin.git" rev-parse --verify -q refs/gov/mail/fy/a/q3)
+add_claim_sighting "$LF/c1" refs/gov/mail/fy/a/q3 "$(git --git-dir="$LF/origin.git" mktree </dev/null)" "$ma_c" "$(derive_claim_ago 3600)"
+ma_got=$( cd "$LF/c1" || exit 1; set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  GOV_RUNLOG=0 derive_mail_answer_outcome tFix "${ma_q3:-unposted}" 2>/dev/null )
+same "KDS25 AC3 an unanswered question under deadline 30 sighted an hour ago reads awaiting, the one --open --ids id" \
+  "$ma_got $(run_deadline_arm c1 r1 read tFix --open --ids)" "awaiting ${ma_q3:-unposted}"
+ma_f="$(git -C "$LF/c1" rev-parse --path-format=absolute --git-common-dir)/gov-feed.log"
+awk -F'\t' -v OFS='\t' -v c="$ma_c" -v s="$(derive_claim_ago $((31 * 3600)))" '$5 == c { $6 = s } 1' "$ma_f" > "$ma_f.new" && mv "$ma_f.new" "$ma_f"
+ma_got=$( cd "$LF/c1" || exit 1; set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  GOV_RUNLOG=0 derive_mail_answer_outcome tFix "${ma_q3:-unposted}" 2>/dev/null )
+same "KDS25 AC3 its line planted 31 hours ago it reads defaulted, and --open --ids prints none" \
+  "$ma_got $(run_deadline_arm c1 r1 read tFix --open --ids)" "defaulted none"
+same "KDS25 AC3 ...and --mail read shows it expired, deadline 30, default no" \
+  "$(run_deadline_arm c1 r1 read tFix | awk -F'\t' -v q="${ma_q3:-unposted}" '$1 == q { print $4, $15, $16 }')" "expired 30 no"
+rm -rf "$LF"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
+# KICK-dKeptSession-25 — A BUILD WAITING ON A QUESTION KEEPS ITS LEASE. The run-claim block's fixture:
+# `build_claim_held` and the aged `mine` claim the landed `--beat` arm seeds, a `Gov-Transition` commit
+# of tRun on the branch, so the first beat creates the build lease with that transition as its
+# `witness`. Each later beat is made due by planting its tip's first sighting in this clone's feed a
+# third of the stale bound ago, and each question is a `--mail post` from fy to build:tRun under the
+# default `flow.wait-ceiling`, 72 hours (PINNED), its feed line re-planted 30 hours ago (PINNED). AC4:
+# with that question open, a due beat under the default `progress` writes `renews: yes`, keeps the
+# transition as its `witness` and ends ` · wait question <id>`, and a second due beat does the same;
+# RED, a scratch driver whose `read_lease_renewal` skips the question step, writes `renews: no`. AC5:
+# the question's line re-planted 73 hours ago (PINNED), it reads `defaulted` and the beat writes
+# `renews: no`, the witness unchanged and no wait named; a second question renews a beat, is answered
+# with `--mail answer`, and the next beat writes `renews: no`, where a scratch driver storing the
+# question's commit as the `witness` renews once more after the answer; a transition differing from the
+# witness, committed beside an open question, is the beat's `witness` and its line names no wait. Each
+# scratch driver's staging is asserted to have taken. WHAT THIS BLOCK DOES NOT DRIVE: `--lease renew
+# --witness`, whose question witness TOOL-dPlacedRequest-1's AC11 and AC12 arms hold.
+# ==================================================================================================
+build_claim_held
+seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+git commit -q --allow-empty -m move -m "Gov-Transition: planning -> designing · build=tRun · item=i · sha=abc" --no-verify
+kw_t=$(git rev-parse HEAD); kw_f="$TMP/.git/gov-feed.log"; kw_d=$(mktemp -d); printf 'a body\n' > "$kw_d/body.txt"
+kw_pid='s/^mail — posted \([0-9a-f]*\) · .*/\1/p'; kw_ren='s/^unattended: beat — tRun · renewed [^ ]*//p'
+out=$(run --beat tRun)
+same "KDS25 AC4 the first beat creates the build lease at epoch 1, its witness the newest transition" \
+  "$(grep -c '^unattended: beat — tRun · renewed ' <<<"$out") $(read_claim_field tRun epoch) $(read_claim_field tRun witness)" "1 1 $kw_t"
+# ---- AC4
+kw_q1=$(GOV_NODE=a CLAUDE_CODE_SESSION_ID=t1 bash "$SCRIPT" --mail post fy --to build:tRun --kind question --subject 'q one' --default no "$kw_d/body.txt" 2>/dev/null | sed -n "$kw_pid")
+GOV_NODE=a bash "$SCRIPT" --mail read tRun >/dev/null 2>&1
+kw_c=$(git --git-dir="$ORIGIN" rev-parse --verify -q refs/gov/mail/fy/a/t1)
+awk -F'\t' -v OFS='\t' -v c="$kw_c" -v s="$(derive_claim_ago $((30 * 3600)))" '$5 == c { $6 = s } 1' "$kw_f" > "$kw_f.new" && mv "$kw_f.new" "$kw_f"
+kw_got=""
+for kw_i in 1 2; do
+  awk -F'\t' -v OFS='\t' -v c="$(read_claim_ref tRun)" -v s="$(derive_claim_ago $((GH_BOUND / 3)))" '$5 == c { $6 = s } 1' "$kw_f" > "$kw_f.new" && mv "$kw_f.new" "$kw_f"
+  out=$(run --beat tRun)
+  kw_got="$kw_got$(read_claim_field tRun renews) $(read_claim_field tRun witness) [$(sed -n "$kw_ren" <<<"$out")];"
+done
+same "KDS25 AC4 two due beats during the wait each renew, keep the transition witness and name the question" \
+  "$kw_got" "yes $kw_t [ · wait question ${kw_q1:-unposted}];yes $kw_t [ · wait question ${kw_q1:-unposted}];"
+mkdir -p "$kw_d/skip" "$kw_d/store"; cp "$HERE/lib-unattended.sh" "$kw_d/skip/"; cp "$HERE/lib-unattended.sh" "$kw_d/store/"
+awk -v old='  rows=$(read_mailbox "$1" soft 2>/dev/null) || return 0' '$0 == old { print "  return 0"; next } 1' "$SCRIPT" > "$kw_d/skip/unattended.sh"
+KW_ADD='; LR_WITNESS=${q#*$'"'"'\t'"'"'}' awk 'index($0, "  LR_VERDICT=question; LR_WAIT=") == 1 { print $0 ENVIRON["KW_ADD"]; next } 1' "$SCRIPT" > "$kw_d/store/unattended.sh"
+same "KDS25 AC4 AC5 the two scratch drivers differ from the driver by their one staged line each" \
+  "$(diff "$SCRIPT" "$kw_d/skip/unattended.sh" | grep -c '^[<>]') $(diff "$SCRIPT" "$kw_d/store/unattended.sh" | grep -c '^> .*; LR_WITNESS=')" "2 1"
+awk -F'\t' -v OFS='\t' -v c="$(read_claim_ref tRun)" -v s="$(derive_claim_ago $((GH_BOUND / 3)))" '$5 == c { $6 = s } 1' "$kw_f" > "$kw_f.new" && mv "$kw_f.new" "$kw_f"
+out=$(bash "$kw_d/skip/unattended.sh" --beat tRun 2>&1)
+same "KDS25 AC4 RED: a scratch driver whose read_lease_renewal skips the question step writes renews: no" \
+  "$(grep -c '^unattended: beat — tRun · renewed ' <<<"$out") $(read_claim_field tRun renews)" "1 no"
+# ---- AC5
+awk -F'\t' -v OFS='\t' -v c="$kw_c" -v s="$(derive_claim_ago $((73 * 3600)))" '$5 == c { $6 = s } 1' "$kw_f" > "$kw_f.new" && mv "$kw_f.new" "$kw_f"
+kw_got=$( set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1; derive_mail_answer_outcome tRun "${kw_q1:-unposted}" 2>/dev/null )
+awk -F'\t' -v OFS='\t' -v c="$(read_claim_ref tRun)" -v s="$(derive_claim_ago $((GH_BOUND / 3)))" '$5 == c { $6 = s } 1' "$kw_f" > "$kw_f.new" && mv "$kw_f.new" "$kw_f"
+out=$(run --beat tRun)
+same "KDS25 AC5 the question sighted 73 hours ago reads defaulted, and a due beat writes renews: no, its witness kept and no wait named" \
+  "$kw_got $(grep -c '^unattended: beat — tRun · renewed ' <<<"$out") $(read_claim_field tRun renews) $(read_claim_field tRun witness) $(grep -c 'wait question' <<<"$out")" \
+  "defaulted 1 no $kw_t 0"
+kw_got=""
+for kw_i in 2 3; do
+  kw_drv=$SCRIPT; [ "$kw_i" = 2 ] || kw_drv="$kw_d/store/unattended.sh"
+  kw_q=$(GOV_NODE=a CLAUDE_CODE_SESSION_ID=t$kw_i bash "$SCRIPT" --mail post fy --to build:tRun --kind question --subject "q $kw_i" --default no "$kw_d/body.txt" 2>/dev/null | sed -n "$kw_pid")
+  GOV_NODE=a bash "$SCRIPT" --mail read tRun >/dev/null 2>&1
+  kw_c=$(git --git-dir="$ORIGIN" rev-parse --verify -q "refs/gov/mail/fy/a/t$kw_i")
+  awk -F'\t' -v OFS='\t' -v c="$kw_c" -v s="$(derive_claim_ago $((30 * 3600)))" '$5 == c { $6 = s } 1' "$kw_f" > "$kw_f.new" && mv "$kw_f.new" "$kw_f"
+  awk -F'\t' -v OFS='\t' -v c="$(read_claim_ref tRun)" -v s="$(derive_claim_ago $((GH_BOUND / 3)))" '$5 == c { $6 = s } 1' "$kw_f" > "$kw_f.new" && mv "$kw_f.new" "$kw_f"
+  out=$(bash "$kw_drv" --beat tRun 2>&1)
+  kw_got="$kw_got$(read_claim_field tRun renews) $(read_claim_field tRun witness) [$(sed -n "$kw_ren" <<<"$out")] "
+  GOV_NODE=a CLAUDE_CODE_SESSION_ID=u$kw_i bash "$SCRIPT" --mail answer tRun "${kw_q:-unposted}" "$kw_d/body.txt" >/dev/null 2>&1
+  awk -F'\t' -v OFS='\t' -v c="$(read_claim_ref tRun)" -v s="$(derive_claim_ago $((GH_BOUND / 3)))" '$5 == c { $6 = s } 1' "$kw_f" > "$kw_f.new" && mv "$kw_f.new" "$kw_f"
+  out=$(bash "$kw_drv" --beat tRun 2>&1)
+  kw_got="$kw_got$(read_claim_field tRun renews) $(grep -c 'wait question' <<<"$out");"
+  [ "$kw_i" = 2 ] && kw_q2=$kw_q || kw_c3=$kw_c
+done
+same "KDS25 AC5 a beat renews on an open question, and after its answer the next due beat writes renews: no" \
+  "${kw_got%%;*}" "yes $kw_t [ · wait question ${kw_q2:-unposted}] no 0"
+same "KDS25 AC5 RED: a scratch driver storing the question's commit as the witness renews once more after the answer" \
+  "${kw_got#*;}" "yes ${kw_c3:-unposted} [ · wait question ${kw_q:-unposted}] yes 0;"
+kw_q=$(GOV_NODE=a CLAUDE_CODE_SESSION_ID=t4 bash "$SCRIPT" --mail post fy --to build:tRun --kind question --subject 'q four' --default no "$kw_d/body.txt" 2>/dev/null | sed -n "$kw_pid")
+GOV_NODE=a bash "$SCRIPT" --mail read tRun >/dev/null 2>&1
+kw_c=$(git --git-dir="$ORIGIN" rev-parse --verify -q refs/gov/mail/fy/a/t4)
+awk -F'\t' -v OFS='\t' -v c="$kw_c" -v s="$(derive_claim_ago $((30 * 3600)))" '$5 == c { $6 = s } 1' "$kw_f" > "$kw_f.new" && mv "$kw_f.new" "$kw_f"
+git commit -q --allow-empty -m move -m "Gov-Transition: designing -> building · build=tRun · item=i · sha=def" --no-verify
+kw_t2=$(git rev-parse HEAD)
+awk -F'\t' -v OFS='\t' -v c="$(read_claim_ref tRun)" -v s="$(derive_claim_ago $((GH_BOUND / 3)))" '$5 == c { $6 = s } 1' "$kw_f" > "$kw_f.new" && mv "$kw_f.new" "$kw_f"
+out=$(run --beat tRun)
+same "KDS25 AC5 a transition differing from the witness beside an open question is the beat's witness, its line naming no wait" \
+  "$(grep -c '^unattended: beat — tRun · renewed ' <<<"$out") $(read_claim_field tRun renews) $(read_claim_field tRun witness) $(grep -c 'wait question' <<<"$out")" "1 yes $kw_t2 0"
+rm -rf "$kw_d"
+git for-each-ref --format='delete %(refname)' refs/gov/remote/mail | git update-ref --stdin
+remove_claim_refs; reset_tree
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-18 — THE CADENCE SEGMENT IS THE TAG GRAMMAR'S. The sourced driver's
 # `check_cadence_segment` over the spec's probe set, each refusal naming its rule (AC1); the playbook
 # kit's `parse_tag` over each `unit.<name>`, a name admitted there when the tag reads as namespace
@@ -24533,7 +24694,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # (AC1 4, AC2 3, AC3 2, AC4 2, AC5 2), each unconditional and outside any loop, off the diff's own
 # lines, less DPR1 AC11's retired absent-functions `same`; no skip branch. No suite ran, and its
 # RED-first observation is the close's.
-FLOOR_ASSERTIONS=4120
+# RAISED 4120 -> 4137 by KICK-dKeptSession-25 on 2026-11-23: the answer and wait blocks' 17 region-eight
+# `same` (AC2 6, AC3 3, AC4 4, AC5 4), each unconditional and outside any loop, off the diff's own lines;
+# no skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4137
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24824,7 +24988,8 @@ FLOOR_SHARD_7=311
 # RAISED 1312 -> 1317 by KICK-dKeptSession-23: the same 5 region-eight mail-feed assertions, see FLOOR_ASSERTIONS.
 # RAISED 1317 -> 1325 by KICK-dKeptSession-27: the same 8 region-eight session-order assertions, see FLOOR_ASSERTIONS.
 # RAISED 1325 -> 1337 by KICK-dKeptSession-24: the same 13 region-eight deadline assertions less 1 retired, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1337
+# RAISED 1337 -> 1354 by KICK-dKeptSession-25: the same 17 region-eight answer and wait assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1354
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

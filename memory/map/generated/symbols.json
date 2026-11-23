@@ -13148,6 +13148,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "derive_mail_answer_outcome",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_mail_ref",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -43289,6 +43294,11 @@
     },
     {
       "id": "write_mail_ack",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_mail_answer",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },

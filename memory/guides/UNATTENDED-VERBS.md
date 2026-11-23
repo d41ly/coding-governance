@@ -590,7 +590,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `register — not written · <why>`, `register — refused <subject|decision key> over <n> bytes
   encoded` or `register — off` (exit 2). Dark behind `RUN_CLAIMS` like every claim; no entry is
   ever deleted or rewritten. It takes no slug.
-- `--mail` — the mailbox per build, three verbs. `--mail post <slug> --to <recipient> --kind <kind>
+- `--mail` — the mailbox per build, four verbs. `--mail post <slug> --to <recipient> --kind <kind>
   --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>]
   [--default <text>] <body file>` appends ONE message to this session's own ref,
   `refs/gov/mail/<slug>/<fleet tag>/<session>`, the slug the sender's build, so writers never
@@ -639,10 +639,24 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   their ids on one line, or `none`. A failed fetch prints `mail — local copy: <why>` and reads the
   cache (exit 0); a refused read exits 2. `--mail ack <slug> <id>` posts an `ack` from `<slug>`
   answering `<id>` to its sender's build, with its subject and an empty body, exit 2 where `<id>` is
-  no row addressed to `<slug>`, else the post's exits. A build's transition is refused while a
+  no row addressed to `<slug>`, else the post's exits. `--mail answer <slug> <question id> <body file>
+  [--cite <path>@<sha>]...` answers a `question` addressed to `<slug>`, the answering build, the loop
+  kit's item `item.entry.mailbox-answer` while no `next` dispatches it: each `--cite` splits at its
+  last `@` into a non-empty path and a sha of 7 to 40 lower-case hex digits before anything is read,
+  else `mail — not written · --cite takes <path>@<sha>, not <value>`; one mailbox read; an id naming
+  no `question` row addressed to `<slug>` is `mail — not written · <id> is no question addressed to
+  <slug>`; a question reading `answered`, `acked` or `expired` prints `answer — <id> · <state>` (exit
+  1); a cite `git cat-file -e <sha>:<path>` does not find is `mail — not written · the cite
+  <path>@<sha> names no file this clone holds at that commit`, and an unreadable body file `mail —
+  not written · the body file cannot be read: <file>`. Then it posts as an ack does, of kind `answer`
+  to the asker's build with the question's subject, its body the file and one `cites <path>@<sha>`
+  line per cite in flag order, so the post's line and exits are the answer's. Each refusal exits 2
+  writing nothing. `--cite` with no value prints `mail — not written · --cite takes a value`, the
+  `post`, `read` and `ack` forms refuse it, and an `answer` with any other flag, or other than three
+  words, prints its form. A build's transition is refused while a
   message addressed to it reads `open`, and the move disposes each answered, acknowledged or expired
-  message once (the loop kit's `loop_transition.py`). Dark behind `RUN_CLAIMS`: a post or an ack prints
-  `mail — off` and exits 2, a read prints it and exits 0.
+  message once (the loop kit's `loop_transition.py`). Dark behind `RUN_CLAIMS`: a post, an ack or an
+  answer prints `mail — off` and exits 2, a read prints it and exits 0.
 - `--card-ref` — `--card-ref write <slug> --message <file>`, the build card's ref on the remote,
   written for the kickoff engine's `remote-ref` card store, which calls it bounded with the commit
   message it rendered in the file (TOOL-dPlacedRequest-33). Dark behind `RUN_CLAIMS`: while the
@@ -752,7 +766,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   git cannot read.
 - `--beat` — `--beat <slug>`, the resume tick's heartbeat for a run `--liveness` reads `LIVE` on this
   host: it renews that run's own claim when due and prints exactly one `beat —` line, `renewed` or
-  `skipped: <why>`. It writes only a claim that is absent or the run's own, and refuses nothing but a
+  `skipped: <why>`; a renewal resting on an open `question` to the build, under `leases.renewal:
+  progress` where no transition differing from the record's `witness` is found, ends `renewed <utc>
+  · wait question <id>`. It writes only a claim that is absent or the run's own, and refuses nothing but a
   missing record; `RUN_CLAIMS` off is a skip naming the switch.
 - `--feed` — this node's change feed, `<git-common-dir>/gov-feed.log`: one line per governance ref
   write the node made or saw, six TAB fields, `seq`, ref, kind, the commit's tree (`-` on a
