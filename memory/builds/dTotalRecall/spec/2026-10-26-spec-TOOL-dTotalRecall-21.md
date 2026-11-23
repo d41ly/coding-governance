@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-21 — memory-recall's FTS5 tables moved into the one index file, keyed by path and blob
 
-**Status:** INPROGRESS · rev-4 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-5 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0232@94a25816 whole
 
@@ -16,13 +16,17 @@
 | [2026-11-22-build-TOOL-dTotalRecall-21-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-21-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-21-2-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-21-2-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-21-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-21-reground-return.md) | research | — |
+| [2026-11-23-build-TOOL-dTotalRecall-21-divergence-2-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-21-divergence-2-return.md) | journal | — |
 | [2026-11-23-build-TOOL-dTotalRecall-21-divergence-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-21-divergence-return.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief-2.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief-2.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief-3.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief-3.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-21-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-21-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-21-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-21-reground-spec-writer.md) | log | — |
+| [2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-2-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-2-brief.md) | journal | — |
+| [2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-2-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-2-spec-writer.md) | log | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -92,10 +96,27 @@ stats)` for the HEAD tree and `build_overlay`, filling `tree_path` and this work
   `fts_supersession` edges with every served record id as defined. The index line, `--stats` (the tree,
   digest, counts, alias join counts and supersession counts as JSON), `zero_record_diagnosis` and
   `dead_alias_diagnosis` read counts from the served rows. The playbook kit is reached through
-  `resolve_kit_dir("playbook", "tag_index.py", here)`, `tools/memory-recall/kit.toml`'s `requires` gains
-  `playbook`, and the selftest's `make_repo` seeds the playbook kit beside memory-tree's python surface. A
-  `TagError` or `sqlite3.DatabaseError` exits 2 printing the message, which names the file, and that
-  removing it costs one rebuild; the query unlinks no file. Observed by AC2 to AC5.
+  `resolve_kit_dir("playbook", "tag_index.py", here)`, and `tools/memory-recall/kit.toml`'s `requires`
+  gains `playbook-render`, the govkit entry whose descriptor `tools/playbook/kit.toml` has home `playbook`
+  and ships `tag_index.py`, never the flat entry `playbook` (`tools/govkit/entries/playbook.kit.toml`),
+  which lands no file (F3). The selftest's `make_repo` seeds the playbook kit beside memory-tree's python
+  surface and commits its seed, since the query reads the HEAD tree. A `TagError` or
+  `sqlite3.DatabaseError` exits 2 printing the message, which names the file, and that removing it costs
+  one rebuild; the query unlinks no file. A repository with no commit has no tree for
+  `tag_index.py#load_view` to read (`git rev-parse HEAD^{tree}`), so `load_served_set` asks
+  `git rev-parse --verify -q HEAD` first and, where it fails, the query exits 2 naming the missing
+  commit and its remedy, a first commit, and never the index file's removal. Observed by AC2 to AC5.
+  **The deployer's own suite.** Once recall requires `playbook-render`, `govkit.py#cmd_apply` refuses
+  any selection `govkit.py#derive_unsatisfied_requires` finds unmet, and `playbook-render`'s own
+  `requires` names `playbook`, `memory-tree` and `policy`. So in `tools/govkit/selftest.py#main`, every
+  `apply --kits memory-recall,memory-tree` selection of the aRF-36 block and of the pin block around it
+  names the closure `memory-recall,memory-tree,playbook-render,playbook,policy`, and `pin_target`'s
+  deploy line `kits = ["memory-recall"]` names the same closure, so the target's declaration matches
+  what it installs. The block's `plan --kits memory-recall` arm is
+  unchanged: `govkit.py#cmd_plan` prints an unmet edge as an `UNMET` line and refuses nothing.
+  `tools/govkit/matrix.py` closes its install over `requires` already and is not touched; the registry's
+  `[selection] default` in `tools/govkit/registry.toml` already holds memory-recall and every kit of that closure, so
+  `govkit.py#selfcheck`'s closure check over the default set stays green. Observed by AC9.
 - **S5** — The whole-corpus digest and the per-worktree cache retired: `corpus_digest`, `cache_dir`,
   `ensure_cache` and its freshness clauses, `build_cache`, `_build_cache`, `_write_set`, `read_manifest`,
   `REBUILD_CAUSE`, `BUILD_MARKER`, `BUILD_TTL_S`, and `main`'s `PARTIAL RECALL` notices, which compare the
@@ -224,7 +245,11 @@ VERBS table. Retired: S5 to S7.
 
 The first query after landing extracts the HEAD tree's pairs once, a full extraction, and deletes nothing
 by itself. `<common>/recall/cache/` is left for its owner to remove; the README states the command. The
-query log `queries.jsonl` keeps its path.
+query log `queries.jsonl` keeps its path. The README's upgrade note says the conf's cache-budget setting
+is now read by nothing and may be deleted, describing the key and never spelling it, because AC6's grep
+covers every file under `tools/`, the README among them. An adopter whose receipt claims memory-recall
+without `playbook-render` is refused by `govkit.py#demand_claimed_requires` at `update`, which names the
+`apply --kits` that installs the missing kits; the README's upgrade note states that command too.
 
 ### Rollout
 
@@ -249,7 +274,9 @@ because the old cache's freshness is the clause's defect.
 - `tools/memory-recall/README.md`
 - `tools/memory-recall/SKILL.template.md`, and `.claude/skills/memory-recall/SKILL.md` rendered from it by
   the kit's adopter
-- `tools/memory-recall/kit.toml`
+- `tools/memory-recall/kit.toml`, its `requires` gaining `playbook-render`
+- `tools/govkit/selftest.py`, the aRF-36 block's selections and `pin_target`'s deploy line naming the
+  closure S4 states
 - `tools/lib/common_dir.py`
 - `.memory-tree.conf`
 - `memory/guides/SESSION-KICKOFF.md`, its `last-audit` re-stamped with a delta line, since `.memory-tree.conf`
@@ -288,11 +315,13 @@ because the old cache's freshness is the clause's defect.
   `sqlite3.DatabaseError` mid-query; the query refuses with exit 2 and deletes no file, since the file is
   shared. An unreadable namespace registry refuses the same way.
 - observability — the index line names the tree and the pairs extracted (S9).
-- risks — the recall kit now requires the playbook kit; an adopter installing recall alone is refused by
-  govkit's `requires` join, which §8 F3 accepts under the grant. A second worktree's untracked pairs are
+- risks — the recall kit now requires `playbook-render`, and through it `playbook` and `policy`; an
+  adopter installing recall alone is refused by govkit's `requires` join at `apply` and at `update`,
+  which §8 F3 accepts under the grant; the registry's default selection already holds the closure. The
+  query needs a born HEAD and refuses without one, naming the first commit (S4). A second worktree's untracked pairs are
   swept by the next call that extracts and re-extracted at that worktree's next query. A tag-index reset
   now drops recall's rows with the playbook kit's, so the next query pays one full extraction (S10).
-- testing — AC1 to AC7 by a pass; the arms of §7 at the close.
+- testing — AC1 to AC9 by a pass; the arms of §7 at the close.
 - migration — one cold extraction, as §4 says.
 - user docs — `tools/memory-recall/README.md` loses the cache and budget sections and states the index,
   `SKILL.template.md`'s `--rebuild` and `--stats` lines follow, and `help/tags.md` names recall's rows.
@@ -324,8 +353,11 @@ because the old cache's freshness is the clause's defect.
   the same query from worktree B does not; after A's commit lands on B's branch, B returns it.
   Red when: an untracked pair is served across worktrees, or untracked files are dropped from the corpus.
 - **AC5** — When the clone's index file has its leading SQLite header overwritten with zero bytes
-  and a query runs, it exits 2 naming the file and its removal as the remedy, and the file is still there.
-  Red when: the query deletes the shared file, as today's `shutil.rmtree(dirp)` deletes a cache.
+  and a query runs, it exits 2 naming the file and its removal as the remedy, and the file is still there;
+  and in a scratch `git init` repository holding the kits and one untracked record and no commit, a query
+  exits 2 naming the missing commit, its output never naming the index file's removal.
+  Red when: the query deletes the shared file, as today's `shutil.rmtree(dirp)` deletes a cache, or an
+  unborn HEAD reads as a corrupt index.
 - **AC6** — When `git grep -nE "corpus_digest|evict_dead_siblings|evict_over_budget|RECALL_CACHE_BUDGET_MB|cache_budget_mb|DEFAULT_CACHE_BUDGET_MB|def cache_dir|def ensure_cache|def build_cache|REBUILD_CAUSE|BUILD_MARKER" -- tools .memory-tree.conf`
   runs, it prints nothing, and `git grep -n "common_git_dir" -- tools/memory-recall` prints only calls
   through the `tag_index` module `query.py` imports.
@@ -340,12 +372,21 @@ because the old cache's freshness is the clause's defect.
   Red when: the reset drops a list of names read once, so the first DROP of an FTS5 table removes its
   shadow tables, the next DROP refuses `no such table: fts_record_data`, and the second reset refuses as
   the first did.
+- **AC9** — Over scratch targets under `%TEMP%`, each built by the `build_target` factory of
+  `tools/govkit/fixture_target.py` with the `DEPLOY_FULL` answers the deployer's own suite gives it: when
+  `python tools/govkit/govkit.py apply --target <t> --kits memory-recall,memory-tree,playbook` runs, it
+  exits nonzero printing `'memory-recall' requires 'playbook-render'` and the target gains no recall kit
+  directory; when the same apply runs with `--kits memory-recall,memory-tree,playbook-render,playbook,policy`
+  over a fresh target, it exits 0 and lands both recall's `query.py` and the playbook kit's `tag_index.py`
+  under the target's prefix.
+  Red when: the edge names the flat `playbook` entry, so the first apply exits 0 and lands a recall with
+  no `tag_index.py` beside it.
 
 ## 7. Gates
 
-`memory-recall kit selftest` · `recall floor` · `recall floor arms` · `memory-recall skill wiring` · `row-grammar selftest` · `hook destinations self-test` · `row-keyed merge driver replay` · `govkit acceptance matrix` · `playbook render selftest` · `kit/dogfood doc parity` · `straggler-guard arms` · `transition-audit arms` · `python resolver (behaviour + inline parity + idiom ban)` · `policy check` · `policy fixtures` · `check-wiring self-test` · `lexicon naming predicates` · `tags (the resolver's checks)` · `kickoff-manifest ratchet` · `record causes (causes and orphans over the legacy population)`
+`memory-recall kit selftest` · `recall floor` · `recall floor arms` · `memory-recall skill wiring` · `row-grammar selftest` · `hook destinations self-test` · `row-keyed merge driver replay` · `govkit acceptance matrix` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `playbook render selftest` · `kit/dogfood doc parity` · `straggler-guard arms` · `transition-audit arms` · `python resolver (behaviour + inline parity + idiom ban)` · `policy check` · `policy fixtures` · `check-wiring self-test` · `lexicon naming predicates` · `tags (the resolver's checks)` · `kickoff-manifest ratchet` · `record causes (causes and orphans over the legacy population)`
 
-New arm: tools/memory-recall/selftest.py · covers AC3 AC4 AC5 AC8 · the cache arms replaced by index arms: one-pair re-extraction, the conf digest, the worktree's untracked pair, the refused corrupt file and two resets over recall's tables, staged by a whole-corpus digest reinstated as the freshness rule and by `load_index`'s drop list read once · none
+New arm: tools/memory-recall/selftest.py · covers AC3 AC4 AC5 AC8 · the cache arms replaced by index arms: one-pair re-extraction, the conf digest, the worktree's untracked pair, the refused corrupt file, the unborn HEAD's refusal and two resets over recall's tables, staged by a whole-corpus digest reinstated as the freshness rule, by `load_index`'s drop list read once and by `load_served_set`'s HEAD check removed · none
 New arm: tools/memory-recall/test_recall_floor.py · covers AC7 · the floor arms over the index's served set, staged by `load_served_set` reading untracked files under `untracked=False` · none
 
 ## 8. Open questions
@@ -359,12 +400,15 @@ New arm: tools/memory-recall/test_recall_floor.py · covers AC7 · the floor arm
   (b) drop them, the index holding tracked blobs only. (b) loses a session's unrecorded records, which
   today's `include_untracked=True` serves. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the
   most capable option, AC4 holding it. widens: none · relaxes: none
-- **F3 — memory-recall writing through the playbook kit's index makes `playbook` a required kit of
-  recall; may it?** Options: (a) `requires` gains `playbook`, recall reaching `tag_index` through
-  `resolve_kit_dir`; (b) recall builds its own rows in a second file. (b) is the second file I11 and
-  NT-15 refuse. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3 under the grant, the clause naming
-  the one index file. grants: PLAY-dClosedLoop-3 the memory-recall kit requires the playbook kit ·
-  widens: none · relaxes: none
+- **F3 — memory-recall writing through the playbook kit's index makes `playbook-render`, the govkit
+  entry that ships `tag_index.py`, a required kit of recall; may it?** Options: (a) `requires` gains
+  `playbook-render`, recall reaching `tag_index` through `resolve_kit_dir`, and through that entry's own
+  `requires` the `playbook`, `memory-tree` and `policy` entries; (b) recall builds its own rows in a
+  second file. (b) is the second file I11 and NT-15 refuse. The flat `playbook` entry is no option: it
+  lands no file, so an edge to it installs recall without `tag_index.py`. RESOLVED (agent, 2026-11-23, delegated): (a),
+  rung 3 under the grant, the clause naming the one index file; rev-4 named the flat entry, corrected
+  per `2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-2-brief`. grants: PLAY-dClosedLoop-3 the
+  memory-recall kit requires the playbook-render kit · widens: none · relaxes: none
 - **F4 — Every surface this unit calls is specced and unbuilt at HEAD; whose spelling binds?**
   Options: (a) the parent specs' spellings as cited in §2, the build run re-grounding on the landed
   code and bumping this spec's rev before any code where they differ; (b) wait for the parents.
@@ -427,6 +471,14 @@ New arm: tools/memory-recall/test_recall_floor.py · covers AC7 · the floor arm
   selftest arm; Files touched gains `tag_index.py`, the kickoff manifest and the deviation records; AC3
   and AC4 write records naming a resolving cause; the leg line gains the tags, kickoff-manifest and
   record-causes legs.
+- rev-5 · 2026-11-23 · §2 · §4 · §5 · §6 · §7 · §8 · §10 · per
+  `2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-2-brief` and
+  `2026-11-22-build-TOOL-dTotalRecall-21-2-builder-return`: S4 and F3 re-point recall's new `requires` edge
+  from the flat `playbook` entry, which lands no file, to `playbook-render`, which ships `tag_index.py`,
+  observed by AC9; Files touched gains `tools/govkit/selftest.py`, whose recall selections name the
+  edge's closure, and the leg line gains `govkit selftest`, `govkit selfcheck` and `govkit refusal join`; S4 and AC5 refuse an
+  unborn HEAD naming a first commit; the README's upgrade note describes the retired budget key without
+  spelling it, under AC6's grep.
 
 ## 10. Reuse audit
 
@@ -444,7 +496,11 @@ places the freshness clauses at fixed lines, which have moved; read them in `que
 register's 478 MB is 1803 MB for four worktrees today (PINNED 2026-11-22). PLAY-dOrderedCharter-19 S5
 plans an overlay of tracked edits, and `build_overlay` landed it so, so F2's dirty rows cannot hold
 untracked files (F7). rev-3 read `load_index`'s reset as dropping recall's tables; the builder's probe
-showed it refuses on an FTS5 table's shadow tables (F8). The recall probe returned the brief's row, scout B's row, this spec's rev-2 and
+showed it refuses on an FTS5 table's shadow tables (F8). rev-4 named the flat `playbook` entry as
+recall's requirement; `tools/govkit/entries/playbook.kit.toml`'s `version_from` says it lands no file, and
+`tools/playbook/kit.toml` is the descriptor of `playbook-render`, the entry that ships `tag_index.py` (S4).
+The edge is the seam govkit already has, its `requires` join, read through `govkit.py#cmd_apply`,
+`#cmd_plan` and `#demand_claimed_requires`; no new install rule. The recall probe returned the brief's row, scout B's row, this spec's rev-2 and
 PLAY-dOrderedCharter-19's reuse audit, and rebuilt the per-worktree cache, cause `corpus digest`, the defect
 this unit retires.
 
