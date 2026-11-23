@@ -2384,3 +2384,280 @@ def resolve_cited_paths(text, kit_dir, target_root, workflows):
             continue
         found.append((m.group(0), path.as_posix()))
     return found
+
+
+# ------------------------------------------------------------------------- the composition (TOOL-dBoundRoles-20)
+#: The repository's overlay, whose `[[role]]` and `[[workflow]]` rows the playbook kit's `compose` verb reads at
+#: HEAD beside gov's; a repository row's `path` names it, since it has no role file.
+OVERLAY_FILE = ".governance/instructions.toml"
+#: The two row schemas beside this file, in the playbook kit's row grammar (S2): the role kind's, which
+#: check_roles.py's R2 joins to `role-schema.toml` both ways, and the workflow kind's, which R6 joins to its keys.
+ROLE_ROW_SCHEMA, WORKFLOW_ROW_SCHEMA = "role-row-schema.toml", "workflow-schema.toml"
+#: A `role-schema.toml` shape read as a row of the composition: these three a `set`, every other a `scalar`.
+SET_SHAPES = ("list", "entries", "class")
+#: The keys a composed row carries beside its fields: its tag, where it was read, and an edge's own keys.
+DERIVED_ROW_KEYS = ("tag", "origin", "source", "edges", "add", "remove")
+#: The core layer (TOOL-dBoundRoles-1's `layer.roles`), whose roles' write class `check_core_fields` holds.
+CORE_LAYER = "layer.roles"
+#: Where a composed role or workflow entry comes from, the first gov's own and never written to a render.
+ROW_ORIGINS = ("gov", "repository", "scenario")
+
+
+def read_head_text(root, rev, rel):
+    """The text of `rel` at the revision `rev` of the repository at `root`, through `git show`, its inherited
+    `GIT_` variables unset; None where git names no such blob or no repository answers."""
+    import os
+    import subprocess
+    try:
+        p = subprocess.run(["git", "-C", str(root), "show", "%s:%s" % (rev, rel)], capture_output=True,
+                           encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL,
+                           env={k: v for k, v in os.environ.items() if not k.startswith("GIT_")})
+    except OSError:
+        return None
+    return p.stdout if p.returncode == 0 else None
+
+
+def read_composition_demand(root, rev, kind):
+    """Whether the composition of `kind` at `rev` can differ from gov's own rows (S3, the migration's
+    "gov's rows compose to themselves with an empty overlay"): the overlay there holds a `[[<kind>]]` table,
+    or the policy file there sets `instructions.exclude`, whose exclusions and the refusals they meet the
+    verb alone reads. A file that does not parse demands the verb, which names the fault."""
+    for rel, path in ((OVERLAY_FILE, (kind,)), (EFFORT_POLICY_FILE, ("instructions", "exclude"))):
+        text = read_head_text(root, rev, rel)
+        try:
+            doc = tomllib.loads(text) if text else {}
+        except tomllib.TOMLDecodeError:
+            return True
+        value = doc.get(".".join(path))
+        for key in path if value is None else ():
+            doc = doc.get(key) if isinstance(doc, dict) else None
+        if value or (value is None and doc):
+            return True
+    return False
+
+
+def read_kind_composition(root, rev, kind, rows, kit_dir):
+    """`(exit, payload, lines)` of the playbook kit's `compose --kind <kind>` over `root` at `rev`, `rows` the
+    activated rows handed to `--rows -` or None, run through the loop kit's `composition.read_composition_at`,
+    the module found from `kit_dir` by `resolve_kit_dir` and imported inside this function, as
+    `read_workflow_order` imports `loop_lib` (section 8 F10); exit 2 with one line where the loop kit does not
+    resolve or import, or `rev` names no commit."""
+    import sys
+    try:
+        kit = str(resolve_kit_dir("loop", "composition.py", kit_dir))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import composition  # the loop kit's caller of the compose verb, found above
+    except (LookupError, ImportError) as exc:
+        return 2, None, ["no loop kit runs the compose verb: %s" % exc]
+    try:
+        return composition.read_composition_at(root, rev, kind, rows)
+    except ValueError as exc:
+        return 2, None, [str(exc)]
+
+
+def derive_repository_slot(tag):
+    """The slot or name a composed row's tag names: `role.<slot>` its `<slot>`, and a repository row's
+    `<word>.adopter.<name>` its `<name>`, the owner seat's `adopter` dropped."""
+    parts = str(tag or "").split(".")
+    return ".".join(parts[2:] if len(parts) > 2 and parts[1] == "adopter" else parts[1:])
+
+
+def derive_row_keys(row, shapes):
+    """A composed role row's front-matter keys RAW, as `parse_front_matter` keeps them: a `list` or `class`
+    list joined by `, `, an `entries` list by `; `, a boolean `true` or `false`, any other value its text;
+    `shapes` is `{key: role-schema.toml shape}`, and `DERIVED_ROW_KEYS` are left out."""
+    out = {}
+    for key, value in row.items():
+        if key in DERIVED_ROW_KEYS:
+            continue
+        if isinstance(value, list):
+            value = ("; " if shapes.get(key) == "entries" else ", ").join(str(v) for v in value)
+        elif isinstance(value, bool):
+            value = "true" if value else "false"
+        out[key] = str(value)
+    return out
+
+
+def compose_roles(root, rev="HEAD", kit_dir=None, rows=None, gov=None):
+    """`(roles, notes, refusals)` of the role kind composed at `rev` in the repository at `root` (S3): gov's
+    roles, `gov` where the caller parsed them else `load_roles(kit_dir)`, and the overlay's `[[role]]` rows,
+    `rows` the activated rows of the scenarios a build was placed under (S11, `scenario.read_activated_rows`'
+    `kind.role` list) handed after them, composed by the playbook kit's `compose` verb through
+    `read_kind_composition`. `roles` is `{slot: role}` in the shape `load_roles` returns, each role carrying
+    `origin`, one of ROW_ORIGINS, and `tag`: an excluded gov role is absent, a patched or replaced one keeps
+    its file's path and body with the composed keys, and a repository or scenario row's `path` is the overlay
+    with `#<tag>` behind it, so a defect names the row, its body empty, its slot `derive_repository_slot`'s. Where the overlay holds no row of the kind, no
+    exclusion is set and no rows are handed, gov's roles are returned and no verb runs. The verb answering
+    unarmed returns gov's roles with one note naming it; refusing, gov's roles with its lines as `refusals`;
+    composing, `check_core_fields`' refusals and one per repository slot a gov role already holds."""
+    kit_dir = pathlib.Path(kit_dir or pathlib.Path(__file__).absolute().parent)
+    own = load_roles(kit_dir) if gov is None else gov
+    own = {slot: dict(r, origin=ROW_ORIGINS[0], tag="role." + slot) for slot, r in own.items()}
+    if rows is None and not read_composition_demand(root, rev, "role"):
+        return own, [], []
+    code, payload, lines = read_kind_composition(root, rev, "role", rows, kit_dir)
+    if code == 2:
+        return own, ["the role composition is unarmed, so gov's roles are graded alone: %s" % " | ".join(lines)], []
+    if code:
+        return own, [], lines
+    shapes = {r["key"]: r["shape"] for r in load_role_schema()}
+    states, composed = payload.get("states") or {}, {r.get("tag"): r for r in payload.get("rows") or ()}
+    out, refusals = {}, check_core_fields(payload, own)
+    for slot, role in own.items():
+        state = states.get(role["tag"], "unchanged")
+        if state == "excluded":
+            continue
+        if state in ("amended", "replaced", "stale") and role["tag"] in composed:
+            role = dict(role, keys=derive_row_keys(composed[role["tag"]], shapes))
+        out[slot] = role
+    handed = {r.get("tag") for r in rows or () if isinstance(r, dict)}
+    for tag, row in composed.items():
+        if row.get("origin") != ROW_ORIGINS[1] or tag in states:
+            continue
+        slot = derive_repository_slot(tag)
+        if slot in out or slot in own:
+            refusals.append("%s · %s · its slot %s is a gov role's · remedy: name the row role.adopter.<another "
+                            "name>" % (OVERLAY_FILE, tag, slot))
+            continue
+        out[slot] = {"path": pathlib.Path(root) / ("%s#%s" % (OVERLAY_FILE, tag)), "body": "",
+                     "keys": derive_row_keys(row, shapes), "origin": ROW_ORIGINS[2] if tag in handed else ROW_ORIGINS[1], "tag": tag}
+    return out, [], refusals
+
+
+def compose_workflows(root, rev="HEAD", kit_dir=None, rows=None, gov=None):
+    """`(workflows, notes, refusals)` of the workflow kind composed at `rev` in the repository at `root` (S3),
+    as `compose_roles` composes the role kind: gov's `[[workflow]]` entries, `gov` where the caller read them
+    else `load_workflows(kit_dir)`, in table order, then each repository and scenario row. A gov entry
+    excluded is absent and one patched or replaced is the composed row, keyed as the table keys it; a
+    repository or scenario row carries `origin` and `tag` beside its keys, which a gov entry never does,
+    so gov's own entries reach every reader byte for byte."""
+    kit_dir = pathlib.Path(kit_dir or pathlib.Path(__file__).absolute().parent)
+    own = list(load_workflows(kit_dir) if gov is None else gov)
+    if rows is None and not read_composition_demand(root, rev, "workflow"):
+        return own, [], []
+    code, payload, lines = read_kind_composition(root, rev, "workflow", rows, kit_dir)
+    if code == 2:
+        return own, ["the workflow composition is unarmed, so gov's entries are graded alone: %s"
+                     % " | ".join(lines)], []
+    if code:
+        return own, [], lines
+    states, composed = payload.get("states") or {}, {r.get("tag"): r for r in payload.get("rows") or ()}
+    out = []
+    for entry in own:
+        tag = "workflow.%s" % entry.get("name")
+        state = states.get(tag, "unchanged")
+        if state == "excluded":
+            continue
+        if state in ("amended", "replaced", "stale") and tag in composed:
+            entry = {k: v for k, v in composed[tag].items() if k not in DERIVED_ROW_KEYS}
+        out.append(entry)
+    handed = {r.get("tag") for r in rows or () if isinstance(r, dict)}
+    for tag, row in composed.items():
+        if row.get("origin") == ROW_ORIGINS[1] and tag not in states:
+            out.append(dict({k: v for k, v in row.items() if k not in DERIVED_ROW_KEYS},
+                            origin=ROW_ORIGINS[2] if tag in handed else ROW_ORIGINS[1], tag=tag))
+    return out, [], []
+
+
+def check_core_fields(composition, gov):
+    """The refusals the row grammar cannot state (S5, section 4 "Why a core role's write class needs its own
+    check"), over the role `composition`, the compose verb's payload, and `gov`, `{slot: role}` of gov's own
+    roles: each classified operation on `writes` of a gov role whose `layer` is CORE_LAYER, naming the role,
+    the field and the overlay row; and each amends, supersedes or exclusion of a gov role whose `acts-as` is
+    `cycle`, naming the role, `acts-as` and the source. Both read the role's own front matter at check
+    time, so a `cycle` row a later build registers, the driver's, is fixed whole on arrival."""
+    by_tag = {"role." + slot: r for slot, r in gov.items()}
+    out = []
+    for op in composition.get("operations") or ():
+        role = by_tag.get(op.get("tag"))
+        if op.get("field") == "writes" and role is not None and role["keys"].get("layer") == CORE_LAYER:
+            out.append("%s · %s patches %s · field writes · a core role's write class is fixed, its layer %s · "
+                       "remedy: drop the field from the row" % (OVERLAY_FILE, op.get("row"), op.get("tag"), CORE_LAYER))
+    for tag, state in sorted((composition.get("states") or {}).items()):
+        role = by_tag.get(tag)
+        if role is None or role["keys"].get("acts-as") != "cycle" or state in ("unchanged", "orphaned"):
+            continue
+        how, source = {"excluded": ("excludes", "instructions.exclude"),
+                       "replaced": ("supersedes", OVERLAY_FILE)}.get(state, ("amends", OVERLAY_FILE))
+        out.append("%s · %s %s · acts-as cycle · a cycle role is fixed whole: no row amends, supersedes or "
+                   "excludes it · remedy: drop the row" % (source, how, tag))
+    return out
+
+
+def derive_role_kind(slot, workflows):
+    """The shape kind the role `slot` runs in (TOOL-dBoundRoles-16): the kind of the first stage row mapping
+    it, its row's own else its entry's, in the entry its `workflow` names first and then in table order; else
+    the `kind` of the first entry listing it; None where no entry lists it."""
+    listed = [w for w in workflows if isinstance(w.get("roles"), list) and slot in w["roles"]]
+    for w in listed:
+        for row in derive_stage_rows(w, {}):
+            if row.get("role") == slot and isinstance(row.get("kind"), str):
+                return row["kind"]
+    return next((w["kind"] for w in listed if isinstance(w.get("kind"), str)), None)
+
+
+def check_actor_patch(item, role, original, workflows=()):
+    """The refusals of one actor patch (S6, section 4 "The actor patch"; the main loop's decision of round two,
+    its fourth point): `item` the composed item row whose actor a pinned `amends` patched to the repository
+    role `role`, gov's row having named the role `original`, both roles as `compose_roles` returns them. A
+    role-acted item carries no `returns` nor `allowance`, both its role's, so the template is `original`'s
+    `return`, every row of which must be a row of `role`'s, the refusal arm both carry included; the ceiling
+    is `original`'s `writes`, every class of which must be one of `role`'s; and the shape kind the item runs
+    in, `derive_role_kind` of `original` over `workflows`, must be among `role`'s `shapes`. `[]` admits."""
+    name, tag = role.get("tag") or role["keys"].get("name"), item.get("tag")
+    out = []
+    try:
+        want = parse_return_template(original["keys"].get("return"))
+        have = set(parse_return_template(role["keys"].get("return")))
+    except RolesError as exc:
+        want, have = [], set()
+        out.append("role %s or item %s's original role carries a return that does not parse: %s" % (name, tag, exc))
+    lacking = [n for n, t, o in want if (n, t, o) not in have]
+    if lacking:
+        out.append("role %s lacks item %s's return template, the rows %s of %s's return"
+                   % (name, tag, ", ".join(lacking), original["keys"].get("name")))
+    held = {c.strip() for c in role["keys"].get("writes", "").split(",") if c.strip()}
+    for cls in [c.strip() for c in original["keys"].get("writes", "").split(",") if c.strip()]:
+        if cls not in held:
+            out.append("role %s's ceiling does not cover %s, the %s class item %s writes"
+                       % (name, WRITE_FOLDERS.get(cls, cls), cls, tag))
+    kind = derive_role_kind(original["keys"].get("name"), workflows)
+    if kind is not None and kind not in parse_role_shapes(role["keys"].get("shapes")):
+        out.append("role %s does not declare shape %s, the kind item %s runs in" % (name, kind, tag))
+    return out
+
+
+def check_role_acts(roles, items, workflows):
+    """The matrix arm "every core item role acts in at least one core item" over the composition (S7; the main
+    loop's decision of round two, its second point): one refusal per role of `roles`, composed, whose `acts-as`
+    is `item` that no composed `[[item]]` of `items` names as its `actor` and no composed entry of `workflows`
+    lists in its `roles`, gov's and the repository's alike. An actor `role:<slot>` or
+    `role:adopter.<name>` reads as the slot `derive_repository_slot` derives."""
+    acting = {s for w in workflows if isinstance(w.get("roles"), list) for s in w["roles"]}
+    for row in items or ():
+        actor = row.get("actor")
+        if isinstance(actor, str) and actor.startswith("role:"):
+            acting.add(derive_repository_slot("role." + actor[len("role:"):]))
+    return ["role %s acts as item and acts in no composed item or workflow entry · remedy: list it in an entry's "
+            "roles or name it an item's actor, or take it out with what left it idle" % slot
+            for slot, r in roles.items() if r["keys"].get("acts-as") == "item" and slot not in acting]
+
+
+def check_row_schema(kit_dir, name, keys):
+    """S2, the field join (section 8 F9): the defects of the row schema `name` beside `kit_dir` against
+    `keys`, `{key: "set" or "scalar"}` the kind's keys as the checker reads them: a `[[field]]` row naming no
+    such key, a key no row names, and a row whose `shape` is not the key's. A file that does not read is one
+    defect naming it."""
+    path = pathlib.Path(kit_dir) / name
+    try:
+        with open(path, "rb") as fh:
+            rows = tomllib.load(fh).get("field") or []
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        return ["%s does not read: %s" % (name, exc)]
+    fields = {r.get("name"): r.get("shape") for r in rows if isinstance(r, dict)}
+    out = ["%s field '%s' names no key the checker reads" % (name, f) for f in fields if f not in keys]
+    out += ["%s holds no [[field]] row for the key '%s'" % (name, k) for k in keys if k not in fields]
+    out += ["%s field '%s' is shaped %r, and its key reads as a %s" % (name, f, s, keys[f])
+            for f, s in fields.items() if f in keys and s != keys[f]]
+    return out

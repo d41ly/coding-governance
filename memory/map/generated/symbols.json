@@ -5493,6 +5493,16 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "check_actor_patch",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "check_actor_patch_file",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
+    },
+    {
       "id": "check_actor_patches",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
@@ -6206,6 +6216,11 @@
       "id": "check_copy",
       "kind": "function",
       "file": "tools/workflows/spec-audit-optin.test.sh"
+    },
+    {
+      "id": "check_core_fields",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "check_count_sources",
@@ -8823,6 +8838,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "check_role_acts",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_role_bindings",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
@@ -8911,6 +8931,11 @@
       "id": "check_row_owners",
       "kind": "function",
       "file": "tools/playbook/overlay_rows.py"
+    },
+    {
+      "id": "check_row_schema",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "check_rows",
@@ -10886,6 +10911,16 @@
       "id": "compliant",
       "kind": "function",
       "file": "tools/check-testsuite-counts.sh"
+    },
+    {
+      "id": "compose_roles",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "compose_workflows",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "compute_coverage",
@@ -13993,6 +14028,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "derive_repository_slot",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "derive_request_content_key",
       "kind": "function",
       "file": "tools/loop/request.py"
@@ -14088,6 +14128,11 @@
       "file": "tools/loop/loop_items.py"
     },
     {
+      "id": "derive_role_kind",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "derive_role_roster",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -14151,6 +14196,11 @@
       "id": "derive_row_identity",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "derive_row_keys",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "derive_row_kinds",
@@ -16068,6 +16118,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "extract_workflow",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "extract_workflow_harnesses",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -16961,6 +17016,11 @@
       "id": "load_class_callable",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "load_composition",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "load_conf",
@@ -20798,6 +20858,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_scenario_rows",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
+    },
+    {
       "id": "print_score",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
@@ -22363,6 +22428,11 @@
       "file": "tools/loop/composition.py"
     },
     {
+      "id": "read_composition_demand",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "read_computed_witnesses",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
@@ -23573,6 +23643,11 @@
       "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
+      "id": "read_head_text",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "read_header_edges",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
@@ -23898,6 +23973,11 @@
       "file": "tools/gate-lint/encoding_posture.py"
     },
     {
+      "id": "read_json_file",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
+    },
+    {
       "id": "read_jsonl",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -23936,6 +24016,11 @@
       "id": "read_keys",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "read_kind_composition",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "read_kind_members",
@@ -25908,6 +25993,11 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "read_role_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "read_role_rules",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
@@ -27541,6 +27631,11 @@
       "id": "read_work_order_legacy",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "read_workflow_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "read_workflow_order",
@@ -29311,11 +29406,6 @@
       "id": "render_clauses",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
-    },
-    {
-      "id": "render_closed_set",
-      "kind": "function",
-      "file": "tools/loop/factories.py"
     },
     {
       "id": "render_command",
@@ -33641,6 +33731,11 @@
       "id": "run_across_leg",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "run_actor_patch_check",
+      "kind": "function",
+      "file": "tools/loop/loop_items.py"
     },
     {
       "id": "run_adapt_plant",
@@ -44038,6 +44133,11 @@
       "file": "tools/loop/factories.py"
     },
     {
+      "id": "write_role_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "write_roles",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
@@ -44566,6 +44666,11 @@
       "id": "write_workflow",
       "kind": "function",
       "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "write_workflow_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "write_workflow_roles",

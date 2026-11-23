@@ -307,11 +307,14 @@ UNIT_EXTRACTORS = ("instruction_units:extract_unit", "instruction_units:extract_
 #: the one table-to-key map both TOML row readers read: a table absent here keys its rows on `tag`
 #: (PLAY-dOrderedCharter-40 S4, its section 8 F4)
 ROW_TAG_KEYS = {"reference": "registry", "key": "name", "command": "verb", "numbered_check": "id"}
+#: the repository's overlay, whose `[[workflow]]` rows `extract_workflow` reads as the repository's entries;
+#: `instruction_units.OVERLAY` spells it again, which this module does not import at its top
+OVERLAY_PATH = ".governance/instructions.toml"
 
 
-def read_toml_tags(text, table):
-    """(value, line, end_line) for each `[[table]]` row's string tag in TOML `text`, read under the table's
-    ROW_TAG_KEYS key, else `tag`, unfiltered: the shape
+def read_toml_tags(text, table, key=None):
+    """(value, line, end_line) for each `[[table]]` row's string tag in TOML `text`, read under `key` where
+    given, else the table's ROW_TAG_KEYS key, else `tag`, unfiltered: the shape
     check, never the extractor, refuses a malformed value. The nth parsed row is the nth `[[table]]` header,
     `line` the first `tag =` key line inside its span and `end_line` the span's last non-blank line before the
     next `[` header (PLAY-dOrderedCharter-70 S3). Where the header count is not the row count, a header inside
@@ -321,7 +324,7 @@ def read_toml_tags(text, table):
     except tomllib.TOMLDecodeError:
         return []
     lines = text.splitlines()
-    key = ROW_TAG_KEYS.get(table, "tag")
+    key = key or ROW_TAG_KEYS.get(table, "tag")
     key_line = re.compile(rf"^\s*{re.escape(key)}\s*=")
     heads = [i for i, ln in enumerate(lines, 1) if ln.strip() == f"[[{table}]]"]
     cuts = [i for i, ln in enumerate(lines, 1) if ln.lstrip().startswith("[")] + [len(lines) + 1]
@@ -340,11 +343,12 @@ def read_toml_tags(text, table):
     return out
 
 
-def derive_tag_rows(text, table):
-    """Each row's tag, its `tag =` line through its span's end, and that text, as `extract_doc` serves a section."""
+def derive_tag_rows(text, table, key=None):
+    """Each row's tag, its `tag =` line through its span's end, and that text, as `extract_doc` serves a
+    section; `key`, where given, the row key the tag is read under, as `read_toml_tags` takes it."""
     lines = text.splitlines()
     return [(val, "tag", n, end, "\n".join(lines[n - 1:end]) if lines else "")
-            for val, n, end in read_toml_tags(text, table)]
+            for val, n, end in read_toml_tags(text, table, key)]
 
 
 def _read_kit_file(ctx, path, name):
@@ -557,6 +561,19 @@ def extract_role(ctx, path, text=None):
         name = path[len(agents) + 1:] if path.startswith(agents + "/") else ""
         return "" if fnmatch.fnmatchcase(name, "*.agent.md") and "/" not in name else None
     return read_roles_tag_rows("role", path, text)
+
+
+def extract_workflow(ctx, path, text=None):
+    """The `workflow` namespace (TOOL-dBoundRoles-20 S1): `workflow.<name>` for each `[[workflow]]` entry of
+    gov's table, the roles kit's `workflows.toml` under the tool root, derived from the entry's `name` at
+    its `name =` line, never from a typed key; and each `[[workflow]]` row's `tag` in the overlay,
+    `OVERLAY_PATH`, a repository's entry, `workflow.adopter.<name>`. A file that does not parse names
+    nothing."""
+    if text is None:
+        return "" if _read_tool_file(ctx, path, "roles", "workflows.toml") or path == OVERLAY_PATH else None
+    if path == OVERLAY_PATH:
+        return derive_tag_rows(text, "workflow")
+    return [(f"workflow.{name}", *rest) for name, *rest in derive_tag_rows(text, "workflow", "name")]
 
 
 def extract_field(ctx, path, text=None):

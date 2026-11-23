@@ -309,6 +309,23 @@ def read_agent_members(root) -> set[str]:
             if p and (root / p).is_file()}
 
 
+def read_role_members(root) -> set[str]:
+    """The `role` class (TOOL-dBoundRoles-20 S9): `role.<name>` for each of gov's role rows the composition
+    reads, its tracked role files, so a member is the tag a change record ends and names a successor of."""
+    return {f"role.{name}" for name in read_agent_members(root)}
+
+
+def read_workflow_members(root) -> set[str]:
+    """The `workflow` class (TOOL-dBoundRoles-20 S9): `workflow.<name>` for each `[[workflow]]` entry of the
+    roles kit's tracked `workflows.toml`, its tag derived from its `name` as the composition derives it; an
+    empty set where the tree holds no such file."""
+    path = gk.resolve_tool_path(root, "roles", "workflows.toml")
+    if not path.is_file():
+        return set()
+    rows = tomllib.loads(path.read_text(encoding="utf-8")).get("workflow") or []
+    return {f"workflow.{r['name']}" for r in rows if isinstance(r, dict) and isinstance(r.get("name"), str)}
+
+
 def read_conf_members(root) -> set[str]:
     """Each `<conf file>#<KEY>` a descriptor's `[config]` declares required or defaulted."""
     out = set()
@@ -444,6 +461,31 @@ def write_agent_plant(clone) -> str:
     rel = gk.resolve_tool_path(clone, "roles", "agents").relative_to(clone).as_posix()
     run_git_staged(clone, "mv", f"{rel}/{names[0]}.agent.md", f"{rel}/{names[0]}-moved.agent.md")
     return f"agent:{names[0]}"
+
+
+def write_role_plant(clone) -> str:
+    """Removes one tracked role file of the roles kit, staged, so its `role.<name>` tag vanishes."""
+    clone = pathlib.Path(clone)
+    names = sorted(read_agent_members(clone))
+    if not names:
+        raise Refusal("the role plant found no tracked role file")
+    rel = gk.resolve_tool_path(clone, "roles", "agents").relative_to(clone).as_posix()
+    run_git_staged(clone, "rm", "-q", "--", f"{rel}/{names[0]}.agent.md")
+    return f"role:role.{names[0]}"
+
+
+def write_workflow_plant(clone) -> str:
+    """Takes the first `[[workflow]]` entry, its `[[workflow.stages]]` rows with it, out of the roles kit's
+    `workflows.toml` in the clone, staged, so its `workflow.<name>` tag vanishes."""
+    clone = pathlib.Path(clone)
+    rel = gk.resolve_tool_path(clone, "roles", "workflows.toml").relative_to(clone).as_posix()
+    entry = re.compile(r"^\[\[workflow\]\]\r?\n.*?(?=^\[\[workflow\]\]\r?\n|\Z)", re.M | re.S)
+    m = entry.search((clone / rel).read_bytes().decode("utf-8"))
+    if m is None:
+        raise Refusal(f"the workflow plant found no [[workflow]] entry in {rel}")
+    name = tomllib.loads(m.group(0).replace("\r\n", "\n"))["workflow"][0]["name"]
+    write_plant_edit(clone, rel, lambda t: entry.sub("", t, count=1))
+    return f"workflow:workflow.{name}"
 
 
 def write_conf_plant(clone) -> str:

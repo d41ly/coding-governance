@@ -19,6 +19,11 @@
     python handoff.py owner-question --kind <fork|owner-gate|ratification|owner-write|refusal> [--attended]
     python handoff.py route-refusal --return <return file> [--budget-spent]
 
+THE CATALOGUE `render`, `harness-args`, `stage-efforts`, `role-efforts` and `roster` read their roles and
+workflow entries from is the COMPOSITION (TOOL-dBoundRoles-20 S3), `load_composition`: gov's roles and table with the overlay's `[[role]]` and
+`[[workflow]]` rows at HEAD, through `roles_lib.compose_roles` and `compose_workflows`. `render` and
+`--for` refuse a repository row, which carries no body, and `roster` marks one as `(repository)`.
+
 `render` fills the work-order template, `templates/work-order.template.md` in this kit, whose slots are
 `role`, `roles_lib.render_role`'s output, closing with the role's `## Never`, `## Ceiling` and `## Return`
 sections, the ceiling's gate legs the merged grant, the role's `gates` field else the house file's
@@ -870,10 +875,10 @@ def render_for_work_order(root, memory_root, charter_path, dest, slug, unit, car
     template verbatim (TOOL-dBoundRoles-2). An item's work order carries its own five blocks. RolesError
     naming the slot for a role outside the catalogue or the prompt writer itself, and any refusal the
     destination's own render makes."""
-    roles = lib.load_roles(KIT_DIR)
-    if dest not in roles:
-        raise lib.RolesError("--for %s: no role '%s' in the catalogue; its slots are %s"
-                             % (dest, dest, ", ".join(roles)))
+    roles = load_composition(root)[0]
+    if dest not in roles or roles[dest].get("origin", "gov") != "gov":
+        raise lib.RolesError("--for %s: no role '%s' with a body in the catalogue; its slots are %s"
+                             % (dest, dest, ", ".join(s for s, r in roles.items() if r.get("origin", "gov") == "gov")))
     if dest == PROMPT_WRITER:
         raise lib.RolesError("--for %s: the prompt writer's own task is its driver's details rendered as they "
                              "are, and is framed by no prompt writer (TOOL-dBoundRoles-4 F3)" % dest)
@@ -1052,7 +1057,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     # TOOL-dBoundRoles-2 S6: the role closes with its never list, its ceiling and its return, the ceiling's
     # gate legs the policy's merged grant (TOOL-dBoundRoles-21 S6), loaded as `print_role_efforts` loads
     # it, so both routes render one block
-    roles = lib.load_roles(KIT_DIR)
+    roles, workflows = load_composition(root)
     doc = charter_path.relative_to(root).as_posix() if root in charter_path.parents else charter_path.as_posix()
     # TOOL-dBoundRoles-15 S6: the single carry, read once per render and checked before any file is written;
     # every route of today's one adapter is `static`, so no task carries the charter and `always` refuses
@@ -1062,7 +1067,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         notes.append(TASK_CHARTER_NOTE)
     kind, carrier = lib.derive_harness_kind(keys, stand_in, doc)
     lib.check_single_carry(carry, kind, role, carrier)
-    granted = lib.load_policy(KIT_DIR, roles, lib.load_workflows(KIT_DIR)).get("gates", {})
+    granted = lib.load_policy(KIT_DIR, roles, workflows).get("gates", {})
     role_text = lib.render_role(KIT_DIR, role, memory_root, granted.get(role, ()))
     charter_text = lib.load_text(charter_path)
     try:   # a doc that is no charter refuses where it always has, after the load set and the reads
@@ -1399,13 +1404,27 @@ def write_json_line(obj):
                                         ensure_ascii=False) + "\n").encode("utf-8"))
 
 
-def print_harness_args(harness):
+def load_composition(root):
+    """`(roles, workflows)` as `roles_lib.compose_roles` and `compose_workflows` compose gov's with the
+    overlay's rows at HEAD in the repository at `root` (TOOL-dBoundRoles-20 S3), the catalogue every verb
+    reading roles or workflow entries reads; each note goes to stderr, and a refused composition is a
+    RolesError naming each of its lines."""
+    roles, said, refused = lib.compose_roles(root, "HEAD", KIT_DIR)
+    workflows, wsaid, wrefused = lib.compose_workflows(root, "HEAD", KIT_DIR)
+    if refused or wrefused:
+        raise lib.RolesError("\n".join(["the role and workflow composition is refused:"] + refused + wrefused))
+    for line in said + wsaid:
+        print("handoff: note — %s" % line, file=sys.stderr)
+    return roles, workflows
+
+
+def print_harness_args(harness, root="."):
     """Print the union of the stage maps, `derive_stage_map` of each entry's stage rows
-    (TOOL-dBoundRoles-22 S2), of every workflow whose harness path ends in the script `harness` (its
-    file name without extension) as one line of sorted JSON; RolesError when no workflow's harness
+    (TOOL-dBoundRoles-22 S2), of every composed workflow whose harness path ends in the script `harness`
+    (its file name without extension) as one line of sorted JSON; RolesError when no workflow's harness
     carries it or one stage key maps to two roles."""
     union, hit = {}, False
-    for w in lib.load_workflows(KIT_DIR):
+    for w in load_composition(root)[1]:
         tokens = [t for t in str(w.get("harness", "")).split() if "/" in t]
         if not any(t.rsplit("/", 1)[-1].rsplit(".", 1)[0] == harness for t in tokens):
             continue
@@ -1427,8 +1446,8 @@ def print_stage_efforts(workflow, model, root):
     one role at two levels, which a union cannot carry. `model` goes to the resolver unchanged
     (TOOL-aProfiledEffort-2), and `root`, the repository whose policy keys it reads first
     (TOOL-dBoundRoles-21 S7)."""
-    workflows = lib.load_workflows(KIT_DIR)
-    policy = lib.load_policy(KIT_DIR, lib.load_roles(KIT_DIR), workflows)
+    roles, workflows = load_composition(root)
+    policy = lib.load_policy(KIT_DIR, roles, workflows)
     entry = next((w for w in workflows if w.get("name") == workflow), None)
     if entry is None:
         raise lib.RolesError("no workflow named %s in workflows.toml" % workflow)
@@ -1442,8 +1461,8 @@ def print_role_efforts(model, root):
     """Print the resolved level of every role whose `agent` is true as one line of sorted JSON
     (TOOL-aProfiledEffort-2), the policy keys of the repository at `root` read first
     (TOOL-dBoundRoles-21 S7); RolesError on a policy defect."""
-    roles = lib.load_roles(KIT_DIR)
-    policy = lib.load_policy(KIT_DIR, roles, lib.load_workflows(KIT_DIR))
+    roles, workflows = load_composition(root)
+    policy = lib.load_policy(KIT_DIR, roles, workflows)
     write_json_line({slot: lib.resolve_effort(policy, slot, model, root) for slot, role in roles.items()
                      if role["keys"].get("agent", "true") == "true"})
 
@@ -1458,12 +1477,12 @@ def print_roster(memory_root):
     repository. Under `warn` a line past it renders, and its `BUDGET WARN` line goes to stderr, never
     into the roster a render reads; under `refuse` it refuses as before, naming the rule."""
     from check_roles import NOT_MANDATORY_RE  # the checker's one reading of an optional role
-    roles = lib.load_roles(KIT_DIR)
+    roles, workflows = load_composition(".")
     if not roles:
         raise lib.RolesError("%s holds no role file, so the roster is empty"
                              % (KIT_DIR / "agents").as_posix())
     index = {}
-    for i, w in enumerate(lib.load_workflows(KIT_DIR)):
+    for i, w in enumerate(workflows):
         index.setdefault(w.get("name"), (i, w.get("roles") if isinstance(w.get("roles"), list) else []))
 
     def derive_rank(slot):
@@ -1489,7 +1508,9 @@ def print_roster(memory_root):
             when = "Optional, " + mandatory[len("no — "):]
         else:
             when = "Mandatory " + mandatory
-        line = ("- `%s`: %s %s. Output: %s." % (slot, keys["description"], when, output)).replace(
+        # a repository row of the composition is marked as the repository's (TOOL-dBoundRoles-20 S3)
+        mark = "" if roles[slot].get("origin", "gov") == "gov" else " (%s)" % roles[slot]["origin"]
+        line = ("- `%s`%s: %s %s. Output: %s." % (slot, mark, keys["description"], when, output)).replace(
             lib.MEMORY_ROOT_TOKEN, memory_root)
         if cap and len(line) > cap and mode == "warn":
             # The runner's `gate-warn` marker on the warning's next line, on its stream (TOOL-dWitnessedBar-29 S2, §8
@@ -2266,13 +2287,14 @@ def main(argv):
         ap.error("--model is empty: name the model id in use, or leave the flag off for the default levels")
     if a.verb in ("harness-args", "stage-efforts", "role-efforts"):
         try:
-            if a.verb == "harness-args":
-                print_harness_args(a.harness)
-                return 0
-            # the repository whose policy keys the levels read first (TOOL-dBoundRoles-21 S7): the
-            # working directory's toplevel, else the directory itself, where the reader refuses by name
+            # the repository whose policy keys the levels read first (TOOL-dBoundRoles-21 S7) and whose
+            # composition every verb reads (TOOL-dBoundRoles-20): the working directory's toplevel, else the
+            # directory itself, where the reader refuses by name
             g = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, encoding="utf-8")
             root = pathlib.Path(g.stdout.strip() if g.returncode == 0 and g.stdout.strip() else os.getcwd())
+            if a.verb == "harness-args":
+                print_harness_args(a.harness, root)
+                return 0
             if a.verb == "stage-efforts":
                 print_stage_efforts(a.workflow, a.model, root)
             else:
@@ -2367,9 +2389,12 @@ def main(argv):
         if a.verb == "facts":
             print_input_facts(root, memory_root, a.build, inputs)
             return 0
-        roles = lib.load_roles(KIT_DIR)
+        roles = load_composition(root)[0]
         if a.role not in roles:
             raise lib.RolesError("no role '%s' in the catalogue; its slots are %s" % (a.role, ", ".join(roles)))
+        if roles[a.role].get("origin", "gov") != "gov":   # TOOL-dBoundRoles-20: a repository row has no body
+            raise lib.RolesError("role '%s' is a %s row of %s and carries no body, so no handoff renders for it"
+                                 % (a.role, roles[a.role]["origin"], lib.OVERLAY_FILE))
         keys = roles[a.role]["keys"]
         read = {lib.parse_read_key(x)[0] for x in keys.get("reads", "").split(",") if x.strip()}
         # TOOL-dBoundRoles-4 S1: `--for` names the role whose work order fills `input:work-order`, so the inputs

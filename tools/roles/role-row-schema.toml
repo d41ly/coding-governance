@@ -1,0 +1,110 @@
+# role-row-schema.toml — the row schema of the `role` kind (TOOL-dBoundRoles-20 S2, S5): what a repository's
+# own `[[role]]` row in its overlay may hold, and which fields of gov's roles it may patch. Read by the
+# playbook kit's overlay_rows.py through the kinds register's `kind.role` row, in that kit's row grammar.
+# `role-schema.toml` beside this file stays roles_lib.load_role_schema's: its rows key the front matter, these
+# rows the composition, and check_roles.py's R2 joins the two both ways, so one `[[field]]` row here names
+# each front-matter key there and no other, a `list`, `entries` or `class` key a `set` and every other a
+# `scalar` (section 8 F9 of the spec).
+#
+# [kind]: `name`, the kind, and `owner-seat`, the tag segment a repository row holds `adopter` at, so a
+# repository role is tagged role.adopter.<name>.
+#
+# A field is open when it declares `widens`, fixed otherwise: by its `fixed-by` sources, or by its undeclared
+# class where it declares neither, so every key not opened below is fixed.
+#   return  fixed by the principle naming the typed return, so no row patches a role's return template
+#   tools, writes, gates, shapes   sets widening on `add`; `gates` carries `ref = "grants"`, so an
+#           `instructions.exclude` of a leg a role's grant names is refused naming the role
+#   budget  a scalar widening as it rises (`rises-only`), so a patch may raise a ceiling and never lower it
+# A core role's `writes` and every `acts-as = cycle` role whole are held by roles_lib.check_core_fields,
+# since this grammar fixes a field on every row or none, and a `[[fixed-row]]` is typed, never derived.
+
+[kind]
+name = "role"
+owner-seat = 1
+
+[[field]]
+name = "name"
+shape = "scalar"
+
+[[field]]
+name = "description"
+shape = "scalar"
+
+[[field]]
+name = "tools"
+shape = "set"
+widens = "add"
+
+[[field]]
+name = "model"
+shape = "scalar"
+
+[[field]]
+name = "maxTurns"
+shape = "scalar"
+
+[[field]]
+name = "workflow"
+shape = "scalar"
+
+[[field]]
+name = "layer"
+shape = "scalar"
+
+[[field]]
+name = "acts-as"
+shape = "scalar"
+
+[[field]]
+name = "shapes"
+shape = "set"
+widens = "add"
+
+[[field]]
+name = "reads"
+shape = "set"
+
+[[field]]
+name = "writes"
+shape = "set"
+widens = "add"
+
+[[field]]
+name = "rules"
+shape = "set"
+
+[[field]]
+name = "mandatory"
+shape = "scalar"
+
+[[field]]
+name = "output"
+shape = "scalar"
+
+[[field]]
+name = "never"
+shape = "set"
+
+[[field]]
+name = "return"
+shape = "scalar"
+fixed-by = ["principle=principle.p26"]
+
+[[field]]
+name = "agent"
+shape = "scalar"
+
+[[field]]
+name = "effort"
+shape = "scalar"
+
+[[field]]
+name = "gates"
+shape = "set"
+widens = "add"
+ref = "grants"
+
+[[field]]
+name = "budget"
+shape = "scalar"
+widens = "rises-only"

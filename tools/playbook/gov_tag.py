@@ -444,7 +444,8 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
           "positional-spec-revbump", "positional-bulk-move", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
-          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "role-rows", "role-binding", "field-rows")
+          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "role-rows", "role-binding", "field-rows",
+          "workflow-rows")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -570,6 +571,11 @@ SHAPE_PLANTS = {
         "tools/corekit/core.tags": "+practice.verify\npractice.yagni\n"}),
     "field-rows": (derive_fixture_row("field", "tag_index:extract_field"),
                    {"memory/guides/ALPHA.md": "+\nsee `field.task.title` and `field.task.titel`\n"}),
+    # TOOL-dBoundRoles-20 S1: the installed workflow table byte for byte beside an overlay holding one
+    # repository entry, and a guide citing one gov entry and a misspelling
+    "workflow-rows": (derive_fixture_row("workflow", "tag_index:extract_workflow"), {
+        ti.OVERLAY_PATH: '[[workflow]]\ntag = "workflow.adopter.triage"\nname = "triage"\n',
+        "memory/guides/ALPHA.md": "+\nsee `workflow.spec-write` and `workflow.spec-wrte`\n"}),
 }
 #: PLAY-dOrderedCharter-22's registry plants: each edits the base registry's first row, `doc`'s
 PURPOSE_PLANTS = {
@@ -735,6 +741,10 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         node = next(n for n in ast.parse("\n".join(lib)).body if isinstance(n, ast.Assign)
                     and any(getattr(t, "id", None) == "READ_FAMILIES" for t in n.targets))
         files[FIXTURE_ROLES_KIT["roles_lib.py"]] = "\n".join(lib[node.lineno - 1:node.end_lineno]) + "\n"
+    if plant == "workflow-rows":  # TOOL-dBoundRoles-20 S1: the installed workflow table, byte for byte
+        from policy_value import resolve_kit_dir
+        rel = FIXTURE_ROLES_KIT["workflows.toml"]
+        files[rel] = (resolve_kit_dir("roles", "workflows.toml", KIT_DIR) / "workflows.toml").read_bytes().decode("utf-8")
     if plant == "policy-catalogue":  # TOOL-dDeclaredLoop-18: the installed policy kit's catalogue, byte for byte
         from policy_value import resolve_kit_dir
         files[FIXTURE_CATALOGUE] = (resolve_kit_dir("policy", "catalogue.toml", KIT_DIR)
@@ -1266,7 +1276,7 @@ def run_plant(root, top, plant, sets) -> int:
                      "gov-builder cites yagni alone")
         say(f"with gov-builder citing yagni alone: rc={run_verb(root, 'check', None, sets=sets)}")
         return rc
-    if plant in ("pack-rows", "check-rows", "role-rows", "field-rows"):  # the members, then the check
+    if plant in ("pack-rows", "check-rows", "role-rows", "field-rows", "workflow-rows"):  # the members, then the check
         ns = plant.split("-")[0]
 
         def read_members(rows=False):  # the namespace's defined tags in the fixture's view, distinct or every row
@@ -1284,7 +1294,7 @@ def run_plant(root, top, plant, sets) -> int:
             every = read_members(rows=True)
             say(" · ".join(f"{t} {every.count(t)}" for t in ("field.task.title", "field.input.spec",
                                                             "field.stage.spec-writer", "field.stage.skeptic")))
-        if plant in ("role-rows", "field-rows"):  # TOOL-dBoundRoles-14 AC1 AC3: the check's own exit
+        if plant in ("role-rows", "field-rows", "workflow-rows"):  # TOOL-dBoundRoles-14 AC1 AC3, -20 AC1: the check's exit
             return checked
         if plant == "pack-rows":
             return 1 if checked or members != ["pack.ratchet", "pack.tags"] else 0

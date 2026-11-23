@@ -810,7 +810,8 @@ caller's index holding the written files, since it grades tracked fragments only
 `check_roles.py`, through its `--write` render, for a role and a workflow, the workflow's loop row also
 graded by `loop_lib.py --check`. A role carries its `--ceiling` as its `budget` front-matter key, the byte
 ceiling of its whole static block, `## Charter` included, which the roles checker's R5 grades; a workflow
-joins `WORKFLOW_NAMES`, the set the roles kit closes in code, by one anchored insertion. The preset kind is pending for
+is one entry and one loop row, the roles checker reading its names from the composed registry and from no
+closed set in code (TOOL-dBoundRoles-20 S4). The preset kind is pending for
 dKeptSession, and the stage kind for TOOL-dDeclaredLoop-25's repository stage. `--fixture --plant
 <case>` runs one of thirteen plants, each factory's instance green and a hand-made one red under the same
 gate plus the restore, in a scratch clone of the working tree the policy kit's `build_source_snapshot`

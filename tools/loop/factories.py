@@ -41,8 +41,9 @@ conforms, then runs the kind's gate over the whole population:
   the slot in its workflow's `roles`; and re-renders that kit's README catalogue region through
   `check_roles.py --write`, whose grade is the gate.
 - `workflow` appends a `[[workflow]]` row to the roles kit's `workflows.toml`, its `name`, `order` and
-  `step` row to the loop definition beside this file, and its name to the roles kit's `WORKFLOW_NAMES`,
-  then re-renders the README region; its gate is `check_roles.py --write`, then `loop_lib.py --check`.
+  `step` row to the loop definition beside this file, then re-renders the README region, the roles
+  checker reading the names from the composed registry and no closed set (TOOL-dBoundRoles-20 S4); its
+  gate is `check_roles.py --write`, then `loop_lib.py --check`.
 - `scenario` appends one gov `[[scenario]]` row to the pack `scenarios.toml` beside this file, `activates`
   and `then` empty, each `--admit` a value its fact admits; the name `adopter` is refused, a repository
   writing its own row in its overlay by hand. Its gate is `scenario.py check`, the `kind.scenario` row's
@@ -527,16 +528,6 @@ def render_front_matter(keys, values):
     return "---\n" + "".join("%s: %s\n" % (k, values[k]) for k in keys if k in values) + "---\n"
 
 
-def render_closed_set(text, anchor, close, insert):
-    """`text` with `insert` placed before the first `close` after `anchor`, which must occur exactly once."""
-    if text.count(anchor) != 1:
-        raise Refused("%r occurs %d time(s) in the roles kit's checker, not once" % (anchor, text.count(anchor)))
-    at = text.find(close, text.index(anchor))
-    if at < 0:
-        raise Refused("%r is not closed by %r in the roles kit's checker" % (anchor, close))
-    return text[:at] + insert + text[at:]
-
-
 def write_workflow_roles(text, workflow, slot):
     """workflows.toml's `text` with `slot` added to the `roles` of the row named `workflow`."""
     lines = text.splitlines(keepends=True)
@@ -604,7 +595,7 @@ def write_workflow(top, kit_rel, name, driver, harness, roles_csv, enforced_by, 
         check_one_line(flag, text)
     slots = [s.strip() for s in roles_csv.split(",") if s.strip()]
     roles = derive_roles_kit(top, kit_rel)
-    table, checker, loop = roles / "workflows.toml", roles / "check_roles.py", top / kit_rel / "loop.toml"
+    table, loop = roles / "workflows.toml", top / kit_rel / "loop.toml"
     by = json.dumps(enforced_by, ensure_ascii=False)
     # TOOL-dBoundRoles-16 §8 F8: an entry listing a slot owes its shape, written `single` with no checklist and
     # no orientation, whose `none` merge and `never` twin then apply; one listing none carries none of the three
@@ -613,11 +604,11 @@ def write_workflow(top, kit_rel, name, driver, harness, roles_csv, enforced_by, 
         json.dumps(name), json.dumps(driver), json.dumps(harness), ", ".join(json.dumps(s) for s in slots), shape,
         by if enforced_by.startswith("none — ") else "[%s]" % by, json.dumps(trigger, ensure_ascii=False))
     placed = "[[workflow]]\nname = %s\norder = %d\nstep = %s\n" % (json.dumps(name), order, json.dumps(step))
-    names = render_closed_set(read_text_exact(checker), "WORKFLOW_NAMES = (", ")", ", %s" % json.dumps(name))
+    # TOOL-dBoundRoles-20 S4: the roles checker reads its workflow names from the composed registry, so the
+    # factory writes the entry and its loop row and no closed set in code
     return write_kind_instance("workflow", name, top, kit_rel, [
         (table, render_row_after(read_text_exact(table), "workflow", row)),
-        (loop, render_row_after(read_text_exact(loop), "workflow", placed)),
-        (checker, names)], render=roles / "README.md")
+        (loop, render_row_after(read_text_exact(loop), "workflow", placed))], render=roles / "README.md")
 
 
 # ------------------------------------------------------------------------------------------- the fixture

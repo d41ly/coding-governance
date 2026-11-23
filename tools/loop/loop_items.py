@@ -26,9 +26,11 @@ composed item, gov's or the repository's, whose `role:<slot>` actor an expansion
 `layers.toml` registers, whose role's `layer` is no core row, or whose role acts as `cycle`; it prints
 `loop: item roles · <n> role item(s) graded`, or `unarmed` with no register or no role item. The schema
 opens a gov item's `actor` on the direction `changes`, so an actor patch passes the row checks, and
-`check_actor_patches`, the actor-patch seat, refuses each classified operation on `actor`: a repository
-role `role:adopter.<name>` because no actor-patch check answers in the kit, any other value because an
-actor patch names a repository role (TOOL-dBoundRoles-84). Last, `upstream.py`'s `check_upstream_rows` holds each composed row's `upstream`
+`check_actor_patches`, the actor-patch seat, judges each classified operation on `actor`: a value other
+than a repository role `role:adopter.<name>` is refused, since an actor patch names a repository role
+(TOOL-dBoundRoles-84), and one naming it is the roles kit's to judge, `check_roles.py --check-actor-patch`
+run as a subprocess with the composed row and gov's actor before the patch, each refusal it prints one
+here (TOOL-dBoundRoles-20 S6). Last, `upstream.py`'s `check_upstream_rows` holds each composed row's `upstream`
 field (TOOL-dDeclaredLoop-29). It prints `loop: items composed · <n> row(s) · <m> repository`, one `loop: patch <row> on
 <tag> · <field> <op> · <class>` line per classified patch operation, one `loop: record-version <kind> · <n>
 · <hash>` line per version row, `loop: record inputs · <n> joined`, `loop: upstream edges · <n> record · <m>
@@ -110,7 +112,8 @@ PLANTS = {
     "version-stale-input": "that bump, beside the produced item's input still at @1",
     "patch-witness": "an amends of item.test.select's witness",
     "patch-outcomes": "an amends adding an outcome to item.test.select",
-    "patch-actor-repo": "an amends of item.test.select's actor to the repository role role:adopter.triager",
+    "patch-actor-repo": "an amends of item.test.select's actor to the repository role role:adopter.triager, "
+                        "which the overlay does not hold, so the roles kit's actor-patch check refuses it",
     "patch-actor-gov": "an amends of item.test.select's actor to the gov role role:gov-builder",
     "patch-allowance": "an amends of item.test.select's allowance",
     "supersede-floor": "a supersedes of the floor item item.test.verdict",
@@ -140,7 +143,7 @@ CASES = (("check", 0, "loop: items composed", "row(s)"),
          ("version-stale-input", 1, "loop: refused", "layer.memory:record-kind.acceptance@1"),
          ("patch-witness", 1, "loop: refused", "principle=principle.p2"),
          ("patch-outcomes", 1, "loop: refused", "principle=principle.p24"),
-         ("patch-actor-repo", 1, "loop: refused", "actor-patch check"),
+         ("patch-actor-repo", 1, "loop: refused", "the composition holds no role for role:adopter.triager"),
          ("patch-actor-gov", 1, "loop: refused", "names a repository role"),
          ("patch-allowance", 1, "loop: refused", "field allowance · fixed by its undeclared class"),
          ("supersede-floor", 1, "loop: refused", "the fixed row item.test.verdict"),
@@ -332,20 +335,48 @@ def check_item_roles(items, roles, layers):
     return refusals
 
 
-def check_actor_patches(operations):
+def run_actor_patch_check(item, original, root):
+    """The roles kit's actor-patch check over one composed item row (TOOL-dBoundRoles-20 S6, its section 8
+    F3 and F7): `check_roles.py --check-actor-patch <file>`, found through `resolve_kit_dir` and run as a
+    subprocess, never an import, `<file>` a scratch JSON file holding `{"item": item, "original": original}`,
+    gov's actor before the patch, removed after the run. -> its refusal lines, `[]` where it exits 0; one line
+    naming the cause where the roles kit does not resolve or the check does not answer."""
+    try:
+        script = resolve_kit_dir("roles", "check_roles.py", KIT) / "check_roles.py"
+    except LookupError as e:
+        return ["no roles kit answers the actor-patch check: %s" % e]
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", prefix="actor-", delete=False) as fh:
+        json.dump({"item": item, "original": original}, fh, ensure_ascii=False)
+    try:
+        from loop_witness import read_clean_env   # read inside the function, as `read_composition` reads it
+        p = subprocess.run([sys.executable, "-B", str(script), "--root", str(root or KIT), "--check-actor-patch",
+                            fh.name], capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           timeout=300, env=read_clean_env(PYTHONIOENCODING="utf-8"))
+    except subprocess.TimeoutExpired:
+        return ["check_roles.py --check-actor-patch did not return within 300 s"]
+    finally:
+        pathlib.Path(fh.name).unlink(missing_ok=True)
+    if p.returncode == 0:
+        return []
+    return [ln for ln in (p.stdout + p.stderr).splitlines() if ln.strip()] or [
+        "check_roles.py --check-actor-patch exited %d" % p.returncode]
+
+
+def check_actor_patches(operations, rows=(), root=None):
     """The actor-patch seat (TOOL-dBoundRoles-84): one refusal per classified operation of the composition's
-    `operations` on the field `actor`, an `amends` and a `supersedes` alike. A value spelled `REPO_ROLE`'s
-    `role:adopter.<name>`, a repository role, is refused because no actor-patch check answers in the kit;
-    any other value because an actor patch names a repository role. Each names the item, the value and
-    the overlay row."""
-    out = []
+    `operations` on the field `actor`, an `amends` and a `supersedes` alike, whose value is not `REPO_ROLE`'s
+    `role:adopter.<name>`, since an actor patch names a repository role. A value naming one is judged by the
+    roles kit's actor-patch check, `run_actor_patch_check` over the composed row of `rows` the operation
+    patched and gov's actor before it, run in the repository at `root` (TOOL-dBoundRoles-20 S6): each of its
+    refusal lines is one refusal. Each names the item, the value and the overlay row."""
+    out, held = [], {r.get("tag"): r for r in rows or ()}
     for op in operations or ():
         if op.get("field") != "actor":
             continue
         where = "item %s · actor patched to %r by %s" % (op.get("tag"), op.get("value"), op.get("row"))
         if isinstance(op.get("value"), str) and op["value"].startswith(REPO_ROLE):
-            out.append(where + " · a repository role acts in a gov item once the roles kit's actor-patch check "
-                               "admits it, and none answers here")
+            item = held.get(op.get("tag")) or {"tag": op.get("tag"), "actor": op["value"]}
+            out += ["%s · %s" % (where, line) for line in run_actor_patch_check(item, op.get("gov"), root)]
         else:
             out.append(where + " · an actor patch names a repository role, %s<name>" % REPO_ROLE)
     return out
@@ -366,7 +397,7 @@ def read_layer_rows(kit_dir):
 
 
 def check_item_composition(data, where, rows, fixed, layers, roles, versions, stages=(), layer_rows=None,
-                           operations=None):
+                           operations=None, root=None):
     """`(lines, refusals)` of the composed `rows` held as `data`'s `[[item]]` table: `check_program`, which
     admits the items of the composed repository `stages`, `check_witness_classes` and
     `check_item_declarations`; `fixed`, the schema's `[[fixed-row]]` tags, joined
@@ -374,7 +405,8 @@ def check_item_composition(data, where, rows, fixed, layers, roles, versions, st
     needs closure returning that kind at that version, `versions` the pinned ones and 1 for any other.
     With `layer_rows`, the register's rows, `check_item_roles` grades every row's role actor
     (TOOL-dBoundRoles-1 S7). `operations`, the composition's classified patch operations, adds the
-    actor-patch seat's refusals, `check_actor_patches` (TOOL-dBoundRoles-84)."""
+    actor-patch seat's refusals, `check_actor_patches` (TOOL-dBoundRoles-84), the roles kit's check run in
+    the repository at `root` for each patch naming a repository role (TOOL-dBoundRoles-20)."""
     held = dict(data, item=rows)
     refusals = []
     try:
@@ -419,7 +451,7 @@ def check_item_composition(data, where, rows, fixed, layers, roles, versions, st
             else:
                 refusals.append("the item %s input %r reads %s@%d, which no item in its needs closure returns at "
                                 "that version" % (row.get("tag"), text, ref[0], want))
-    refusals += check_actor_patches(operations)
+    refusals += check_actor_patches(operations, rows, root)
     return ["%s: record inputs · %d joined" % (SAY, joined)], refusals
 
 
@@ -473,7 +505,7 @@ def run_check():
         return 1
     acting = sum(1 for r in rows if isinstance(r.get("actor"), str) and r["actor"].startswith("role:"))
     join_lines, more = check_item_composition(data, where, rows, fixed, layers, read_role_defaults(KIT), versions,
-                                              stages, layer_rows, operations=payload["operations"])
+                                              stages, layer_rows, operations=payload["operations"], root=root)
     join_lines.append("%s: item roles · %s" % (SAY, "unarmed · no layer register resolves" if layer_rows is None
                                                else "unarmed · no item names a role" if not acting
                                                else "%d role item(s) graded" % acting))
