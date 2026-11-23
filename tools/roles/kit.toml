@@ -204,3 +204,19 @@ stage = "build"
 role = "gov-builder"
 command = "python <prefix>/roles/handoff.py render --role gov-builder --build <slug> --unit <id>"
 when = "a unit whose spec is READY"
+
+# TOOL-dBoundRoles-18: TOOL-dBoundRoles-1 merged gov-spec-reviewer and gov-diff-reviewer into
+# gov-reviewer, and this step gives an adopter that merge. Its up re-keys the house file, the policy
+# file and the overlay, carries the old house texts, removes the two old role files an update left, and
+# runs the target's own render_agents.py, so it needs the target's code and runs attended. `surfaces`
+# names every member the step gate reads as vanished with the two role files. It sits after every other
+# [[upgrade]] row of this file. Once landed this row is frozen: a correction is a new step.
+[[upgrade]]
+id = "roles/reviewers-to-gov-reviewer"
+up = ["python", "{gov}/govkit/steps/reviewer_merge.py", "up", "{target}", "{prefix}"]
+down = ["python", "{gov}/govkit/steps/reviewer_merge.py", "down", "{target}", "{prefix}"]
+witness = ["python", "{gov}/govkit/steps/reviewer_merge.py", "witness", "{target}", "{prefix}"]
+surfaces = ["agent:gov-spec-reviewer", "agent:gov-diff-reviewer",
+            "installable:{prefix}/roles/agents/gov-spec-reviewer.agent.md",
+            "installable:{prefix}/roles/agents/gov-diff-reviewer.agent.md"]
+needs-target = true

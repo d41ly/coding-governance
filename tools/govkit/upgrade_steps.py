@@ -1433,21 +1433,32 @@ def render_toml_scalar(value) -> str:
     raise Refusal(f"no TOML scalar spelling for {value!r}")
 
 
-def render_policy_text(text: str | None, table: str, key: str, value) -> str:
+def render_policy_text(text: str | None, table: str, key: str, value, unset: bool = False) -> str:
     """`text`, a policy file's, with `key` set to `value` in `[table]`, every other byte kept.
 
     A line editor: the key's line in the table is rewritten, else one line is added after the
     table's last non-blank line, else the table is appended; the file's line ending and any BOM are
     kept. It refuses its own output unless tomllib reads `value` back at `table.key`, so a key held
     elsewhere (a dotted key, an inline table) is refused rather than shadowed. `table` may be a
-    dotted table name, `review.design`, read back segment by segment (TOOL-dDeclaredLoop-21)."""
+    dotted table name, `review.design`, read back segment by segment (TOOL-dDeclaredLoop-21). A
+    `value` may be a list of scalars, spelled on one line (TOOL-dBoundRoles-18: a `[gates]` row).
+
+    UNSET (TOOL-dBoundRoles-18 S2): `unset` takes the key's line out of `[table]` and ignores
+    `value`; a table left holding no key loses its header line too, its comments kept, so no empty
+    table still spells the name. It refuses its own output unless tomllib reads no `key` at `table`,
+    so a key held elsewhere is refused rather than left behind. A key the text does not hold is no
+    edit."""
     text = text or ""
     nl = "\r\n" if "\r\n" in text else "\n"
     kspell = key if re.fullmatch(r"[A-Za-z0-9_-]+", key) else json.dumps(key)
-    line = f"{kspell} = {render_toml_scalar(value)}"
     lines = text.splitlines(keepends=True)
     header = next((i for i, ln in enumerate(lines)
                    if re.fullmatch(rf"\ufeff?[ \t]*\[[ \t]*{re.escape(table)}[ \t]*\][ \t]*(?:#.*)?", ln.rstrip("\r\n"))), None)
+    if unset:
+        return render_policy_unset(text, lines, header, table, key)
+    spelled = ("[" + ", ".join(render_toml_scalar(v) for v in value) + "]" if isinstance(value, list)
+               else render_toml_scalar(value))
+    line = f"{kspell} = {spelled}"
     if header is None:
         if lines and not lines[-1].endswith("\n"):
             lines[-1] += nl
@@ -1474,8 +1485,34 @@ def render_policy_text(text: str | None, table: str, key: str, value) -> str:
     except (tomllib.TOMLDecodeError, AttributeError) as e:
         raise Refusal(f"setting {table}.{key} leaves text tomllib does not read: {e}") from None
     if got != value or type(got) is not type(value):
-        raise Refusal(f"setting {table}.{key} to {render_toml_scalar(value)} does not read back "
+        raise Refusal(f"setting {table}.{key} to {spelled} does not read back "
                       f"(tomllib reads {got!r}), so the edit is refused rather than written")
+    return out
+
+
+def render_policy_unset(text: str, lines: list[str], header: int | None, table: str, key: str) -> str:
+    """`render_policy_text`'s unset mode over `text` split into `lines`, `header` the index of the
+    `[table]` line or None: the key's line taken out, the header too where no key line is left in
+    the table, then read back so `key` is absent at `table`."""
+    if header is not None:
+        end = next((i for i in range(header + 1, len(lines)) if re.match(r"[ \t]*\[", lines[i])), len(lines))
+        keyed = re.compile(rf"[ \t]*(?:{re.escape(key)}|{re.escape(json.dumps(key))})[ \t]*=")
+        hit = next((i for i in range(header + 1, end) if keyed.match(lines[i])), None)
+        if hit is not None:
+            del lines[hit]
+            end -= 1
+            if not any(ln.strip() and not ln.lstrip().startswith("#") for ln in lines[header + 1:end]):
+                del lines[header]
+    out = "".join(lines)
+    try:
+        got = tomllib.loads(out.removeprefix("\ufeff"))
+        for seg in table.split("."):
+            got = got.get(seg, {}) if isinstance(got, dict) else {}
+    except tomllib.TOMLDecodeError as e:
+        raise Refusal(f"unsetting {table}.{key} leaves text tomllib does not read: {e}") from None
+    if isinstance(got, dict) and key in got:
+        raise Refusal(f"unsetting {table}.{key} leaves it set: the text holds it as a dotted key or an "
+                      f"inline table, not as a line of [{table}], so the edit is refused rather than written")
     return out
 
 

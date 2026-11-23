@@ -4244,6 +4244,237 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
           and (t / ".governance" / "policy.toml").read_bytes() == pol0, up.stdout + up.stderr)
 
 
+def check_reviewer_merge(tmp: pathlib.Path) -> None:
+    """TOOL-dBoundRoles-18 AC1 to AC6 and AC9, the `reviewer-merge-` cases — `steps/reviewer_merge.py`'s up,
+    down and witness argvs over scratch targets, each run under `-I` as the runner runs it. A target holds
+    copies of gov's roles and loop kits, the policy kit where a case reads a policy key, under the install
+    prefix, with a conf and gov's charter. The reviewers before the merge are planted from parts: the two
+    role files cut from `gov-reviewer`'s, the house seed holding both stems where it holds `gov-reviewer`,
+    and, where a case asks, the agent types and the index a render of that kit wrote, less the merged
+    type, as an install rendered before the update holds them."""
+    import tomllib  # noqa: PLC0415
+    step_py = HERE / "steps" / "reviewer_merge.py"
+    kit_dirs = dict(KIT_DIRS, loop=resolve_kit_dir("loop", "loop_lib.py", HERE))
+    merged = "gov-reviewer"
+    stems = ["gov-%s-reviewer" % lens for lens in ("spec", "diff")]
+    tags = ["role." + s for s in stems]
+    seed = (KIT_DIRS["roles"] / "house" / "policy.toml").read_text(encoding="utf-8")
+    seed_row = '%s = "medium"\n' % merged
+    role_text = (KIT_DIRS["roles"] / "agents" / (merged + ".agent.md")).read_text(encoding="utf-8")
+    index_rel = pathlib.PurePosixPath(".claude", "roles.json").as_posix()
+    image_rel = pathlib.PurePosixPath(".governance", "steps", "roles", "reviewers-to-gov-reviewer.before.json").as_posix()
+
+    def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t), PFX], capture_output=True,
+                              text=True, encoding="utf-8", errors="replace")
+
+    def read_tree(t: pathlib.Path) -> dict:
+        return {p.relative_to(t).as_posix(): p.read_bytes() for p in t.rglob("*") if p.is_file()
+                and not {".git", "__pycache__"} & set(p.relative_to(t).parts)}
+
+    def read_index(t: pathlib.Path) -> list:
+        p = t / index_rel
+        return list(json.loads(p.read_text(encoding="utf-8"))["roles"]) if p.is_file() else []
+
+    def read_house(t: pathlib.Path) -> dict:
+        return tomllib.loads((t / PFX / "roles" / "house" / "policy.toml").read_text(encoding="utf-8"))
+
+    def write_old_workflows(kit: pathlib.Path) -> None:
+        # the workflow table before the merge: each finder stage held its own reviewer
+        p = kit / "workflows.toml"
+        p.write_text(_re.sub(r'(key = "(spec|diff)Finder"\nrole = )"%s"' % merged, r'\1"gov-\2-reviewer"',
+                             p.read_text(encoding="utf-8")), encoding="utf-8", newline="\n")
+
+    def build_merge_target(tag: str, levels=("medium", "medium"), gates: str = "", house_stems: bool = True,
+                           texts: dict | None = None, files: dict | None = None, policy_kit: bool = False,
+                           render: bool = False, keep_roles: bool = True, old_workflows: bool = False) -> pathlib.Path:
+        t = build_target(tmp / tag, None, files={".gitignore": "__pycache__/\n", ".memory-tree.conf":
+                                                 "MEMORY_ROOT=memory\nCHARTER=AGENTS.md\n",
+                                                 "AGENTS.md": (GOV_ROOT / "AGENTS.md").read_bytes()})
+        for home in ("roles", "loop") + (("policy",) if policy_kit else ()):
+            shutil.copytree(kit_dirs[home], t / PFX / home, ignore=shutil.ignore_patterns("__pycache__"))
+        kit = t / PFX / "roles"
+        for s in stems:
+            (kit / "agents" / (s + ".agent.md")).write_text(role_text.replace("name: " + merged, "name: " + s, 1),
+                                                           encoding="utf-8", newline="\n")
+        house = seed.replace(seed_row, "".join('%s = "%s"\n' % (s, lv) for s, lv in zip(stems, levels))) \
+            if house_stems else seed
+        (kit / "house" / "policy.toml").write_text(house + gates, encoding="utf-8", newline="\n")
+        for s, body in (texts or {}).items():
+            (kit / "house" / (s + ".md")).write_text(body, encoding="utf-8", newline="\n")
+        for rel, body in (files or {}).items():
+            (t / rel).parent.mkdir(parents=True, exist_ok=True)
+            (t / rel).write_text(body, encoding="utf-8", newline="\n")
+        if old_workflows:
+            write_old_workflows(kit)
+        if render:
+            p = subprocess.run([sys.executable, str(kit / "render_agents.py"), "--write"], cwd=str(t),
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+            check("reviewer-merge-%s LIVENESS the render before the merge writes both old types" % tag,
+                  p.returncode == 0 and all((t / ".claude" / "agents" / (s + ".md")).is_file() for s in stems),
+                  (p.stdout + p.stderr)[-1500:])
+            (t / ".claude" / "agents" / (merged + ".md")).unlink(missing_ok=True)
+            idx = json.loads((t / index_rel).read_text(encoding="utf-8"))
+            idx["roles"].pop(merged, None)
+            (t / index_rel).write_text(json.dumps(idx, indent=2, sort_keys=True, ensure_ascii=True) + "\n",
+                                       encoding="utf-8", newline="\n")
+        if not keep_roles:
+            for s in stems:
+                (kit / "agents" / (s + ".agent.md")).unlink()
+        settle(t, "the reviewers before the merge")
+        return t
+
+    # ---- AC1: the rename and the re-render, with the kit's two old role files gone and with them left.
+    for tag, keep in (("rm-ac1", False), ("rm-ac1-kept", True)):
+        t = build_merge_target(tag, render=True, keep_roles=keep)
+        before = read_index(t)
+        w0, up, w1 = run_step("witness", t), None, None
+        up = run_step("up", t)
+        w1 = run_step("witness", t)
+        agents, after = t / ".claude" / "agents", read_index(t)
+        check("reviewer-merge-AC1 %s LIVENESS before the up the index lists both stems and not %s" % (tag, merged),
+              set(stems) <= set(before) and merged not in before, str(before))
+        check("reviewer-merge-AC1 %s the up writes %s.md, neither old type is left, and the index lists %s and "
+              "neither stem" % (tag, merged, merged),
+              up.returncode == 0 and (agents / (merged + ".md")).is_file()
+              and not any((agents / (s + ".md")).exists() for s in stems)
+              and merged in after and not set(stems) & set(after)
+              and not any((t / PFX / "roles" / "agents" / (s + ".agent.md")).exists() for s in stems),
+              up.stdout + up.stderr + str(after))
+        check("reviewer-merge-AC1 %s ...and the witness exits 1 before the up and 0 after it" % tag,
+              w0.returncode == 1 and w1.returncode == 0, w0.stdout + w1.stdout)
+    # ---- AC9: a second up over the applied target changes no byte; the row follows every other roles row.
+    settle(t, "the merge")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("reviewer-merge-AC9 a second up on an applied target exits 0 and changes no byte",
+          up.returncode == 0 and read_tree(t) == pre, up.stdout + up.stderr)
+    p = subprocess.run([sys.executable, str(HERE / "upgrade_steps.py"), "list"], capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    ids = [ln.split(" · ")[1] for ln in p.stdout.splitlines()
+           if ln.startswith("upgrade-steps: ") and ln.split(" · ")[-1].endswith("roles/kit.toml")]
+    check("reviewer-merge-AC9 upgrade_steps.py list orders roles/reviewers-to-gov-reviewer after every other row of "
+          "the roles descriptor", p.returncode == 0 and ids[-1:] == ["roles/reviewers-to-gov-reviewer"],
+          p.stdout[-1500:] + p.stderr)
+
+    # ---- AC2: every finder stage keeps its level, measured in the kit before the update and after the up.
+    def read_stage_efforts(t: pathlib.Path) -> dict:
+        out = {}
+        for wf in ("spec-review", "spec-write", "closing-review"):
+            p = subprocess.run([sys.executable, str(t / PFX / "roles" / "handoff.py"), "stage-efforts", wf],
+                               cwd=str(t), capture_output=True, text=True, encoding="utf-8", errors="replace")
+            out[wf] = json.loads(p.stdout) if p.returncode == 0 and p.stdout.strip() else p.stderr
+        return out
+
+    t = build_merge_target("rm-ac2", levels=("medium", "high"), old_workflows=True)
+    was = read_stage_efforts(t)
+    shutil.copyfile(KIT_DIRS["roles"] / "workflows.toml", t / PFX / "roles" / "workflows.toml")
+    settle(t, "the update's workflow table")
+    up = run_step("up", t)
+    now, house = read_stage_efforts(t), read_house(t)
+    check("reviewer-merge-AC2 LIVENESS before the up specFinder reads medium and diffFinder high",
+          was.get("spec-review", {}).get("specFinder") == "medium"
+          and was.get("closing-review", {}).get("diffFinder") == "high", str(was))
+    check("reviewer-merge-AC2 the up leaves every stage of spec-review, spec-write and closing-review at its level",
+          up.returncode == 0 and now == was, up.stdout + up.stderr + str(now))
+    check("reviewer-merge-AC2 ...the house file holding %s high, no old stem, and specFinder medium under both "
+          "spec tables" % merged,
+          house["effort"]["roles"].get(merged) == "high" and not set(stems) & set(house["effort"]["roles"])
+          and all(house["effort"]["stages"][wf].get("specFinder") == "medium" for wf in ("spec-review", "spec-write")),
+          str(house["effort"]))
+    t = build_merge_target("rm-ac2-seed", keep_roles=False)
+    up = run_step("up", t)
+    house = read_house(t)
+    check("reviewer-merge-AC2 both stems at medium end in one %s medium row and no stage row added" % merged,
+          up.returncode == 0 and house["effort"]["roles"].get(merged) == "medium"
+          and not set(stems) & set(house["effort"]["roles"])
+          and house["effort"]["stages"] == tomllib.loads(seed)["effort"]["stages"], up.stdout + up.stderr + str(house))
+
+    # ---- AC3: the policy file's role keys, effort by the stage rule and the model key moved whole.
+    pol = ('[roles.effort]\n%s = "xhigh"\n\n[roles.model.%s]\nclaude-code = "opus"\n\n[roles.model.%s]\n'
+           'claude-code = "opus"\n' % (stems[1], stems[0], stems[1]))
+    t = build_merge_target("rm-ac3", house_stems=False, keep_roles=False, policy_kit=True,
+                           files={".governance/policy.toml": pol})
+    up = run_step("up", t)
+    settle(t, "the merge")
+
+    def read_policy_key(key: str) -> str:
+        return subprocess.run([sys.executable, str(t / PFX / "policy" / "policy.py"), "get", key, "--rev", "HEAD"],
+                              cwd=str(t), capture_output=True, text=True, encoding="utf-8",
+                              errors="replace").stdout.strip()
+
+    held = (t / ".governance" / "policy.toml").read_text(encoding="utf-8")
+    check("reviewer-merge-AC3 the up keeps closing-review.diffFinder at xhigh, moves the model key to %s, and "
+          "leaves no old stem's key" % merged,
+          up.returncode == 0 and read_policy_key("roles.effort.closing-review.diffFinder") == "xhigh"
+          and read_policy_key("roles.model.%s.claude-code" % merged) == "opus" and not any(s in held for s in stems),
+          up.stdout + up.stderr + held)
+
+    # ---- AC4: a `[gates]` row the two stems hold differently stops the up with nothing written.
+    row = '%s = ["memory hygiene"]\n'
+    t = build_merge_target("rm-ac4", keep_roles=False, gates=row % stems[1])
+    up = run_step("up", t)
+    status = run_gov_git(t, "status", "--porcelain")
+    check("reviewer-merge-AC4 a [gates] row only the diff reviewer holds: the up exits 1 naming both stems, the "
+          "key and the remedy, and the target is clean, before-image included",
+          up.returncode == 1 and all(s in up.stderr for s in stems) and "[gates]" in up.stderr
+          and "remedy" in up.stderr and status == "", up.stdout + up.stderr + status)
+    t = build_merge_target("rm-ac4-equal", keep_roles=False, gates=row % stems[0] + row % stems[1])
+    up = run_step("up", t)
+    check("reviewer-merge-AC4 two equal [gates] rows move to one %s row, exit 0" % merged,
+          up.returncode == 0 and read_house(t).get("gates") == {merged: ["memory hygiene"]}, up.stdout + up.stderr)
+
+    # ---- AC5: the down restores every path the image names; an index edited after the up stops it.
+    t = build_merge_target("rm-ac5", render=True, texts={stems[1]: "Read each changed caller.\n"})
+    pre = read_tree(t)
+    up = run_step("up", t)
+    named = list(json.loads((t / image_rel).read_text(encoding="utf-8"))["paths"]) if (t / image_rel).is_file() else []
+    down = run_step("down", t)
+    check("reviewer-merge-AC5 LIVENESS the up's before-image names the house file, the index and the three types",
+          up.returncode == 0 and index_rel in named and len([n for n in named if n.startswith(".claude/agents/")]) == 3,
+          up.stdout + up.stderr + str(named))
+    check("reviewer-merge-AC5 a down after the up leaves every path byte-identical and the image gone",
+          down.returncode == 0 and read_tree(t) == pre and not (t / image_rel).exists(), down.stdout + down.stderr)
+    t = build_merge_target("rm-ac5-edit", render=True)
+    run_step("up", t)
+    (t / index_rel).write_bytes((t / index_rel).read_bytes() + b"\n")
+    mid = read_tree(t)
+    down = run_step("down", t)
+    check("reviewer-merge-AC5 a down over an index edited after the up exits 1 naming it and changes nothing",
+          down.returncode == 1 and index_rel in down.stderr and read_tree(t) == mid, down.stdout + down.stderr)
+
+    # ---- AC6: the overlay's values, an old-tag edge, and an old house text carried.
+    overlay = ('# %s is the spec lens, kept as written\n[[unit]]\ntag = "repo.review-lens"\nlevel = 5\n'
+               'type = "directive"\nscope = ["%s"]\ntrigger = "always"\ntext = "Read the spec whole."\n'
+               % (tags[0], tags[0]))
+    t = build_merge_target("rm-ac6", house_stems=False, keep_roles=False,
+                           files={".governance/instructions.toml": overlay})
+    w0 = run_step("witness", t)
+    up = run_step("up", t)
+    w1 = run_step("witness", t)
+    got = (t / ".governance" / "instructions.toml").read_text(encoding="utf-8")
+    check("reviewer-merge-AC6 the witness exits 1 while an overlay value is an old tag, and 0 after the up",
+          w0.returncode == 1 and w1.returncode == 0, w0.stdout + w1.stdout)
+    check("reviewer-merge-AC6 the up re-spells the unit's scope and leaves the comment line as it was",
+          up.returncode == 0 and tomllib.loads(got)["unit"][0]["scope"] == ["role." + merged]
+          and got.splitlines()[0] == overlay.splitlines()[0], up.stdout + up.stderr + got)
+    t = build_merge_target("rm-ac6-edge", house_stems=False, keep_roles=False, files={
+        ".governance/instructions.toml": '[[role]]\ntag = "repo.reviewer"\nedges = "amends=%s@0123abcd"\n' % tags[0]})
+    up = run_step("up", t)
+    status = run_gov_git(t, "status", "--porcelain")
+    check("reviewer-merge-AC6 an overlay [[role]] row whose edge amends an old tag stops the up, exit 1, naming "
+          "the row, with no byte written",
+          up.returncode == 1 and "[[role]] row 1" in up.stderr and status == "", up.stdout + up.stderr + status)
+    t = build_merge_target("rm-ac6-text", keep_roles=False, texts={stems[1]: "Read each changed caller.\n"})
+    up = run_step("up", t)
+    house_dir = t / PFX / "roles" / "house"
+    check("reviewer-merge-AC6 a non-empty old house text lands in %s.md under a line naming its stem, the old file "
+          "gone" % merged,
+          up.returncode == 0 and "Read each changed caller." in (house_dir / (merged + ".md")).read_text(encoding="utf-8")
+          and stems[1] in (house_dir / (merged + ".md")).read_text(encoding="utf-8")
+          and not (house_dir / (stems[1] + ".md")).exists(), up.stdout + up.stderr)
+
+
 def check_kickoff_facts_step() -> None:
     """TOOL-dPlacedRequest-9 AC1 AC3 AC4 AC5 AC6 AC7 AC9, and the step's and the verb's refusals — the step's `--fixture --plant <case>` for every
     case it declares, each under `-I` as the runner runs a step, each in its own throwaway repository: an
@@ -6692,6 +6923,7 @@ def main() -> int:
         check_upgrade_steps(tmp / "dsp")
         check_succession(tmp / "dsc")
         check_fanout_step(tmp / "dfs")
+        check_reviewer_merge(tmp / "drm")
         check_kickoff_facts_step()
         check_review_rounds_step(tmp / "drr")
         check_inherited_red_step(tmp / "dir")

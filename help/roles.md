@@ -492,3 +492,20 @@ needs the kickoff and memory-tree kits.
   template the renderer kit ships beside its engine, so an update brings them; a copy seeded earlier
   at `playbook_path` is no longer read. Without the playbook renderer,
   fill `{{ROLE_ROSTER}}` from `python <prefix>/roles/handoff.py roster`. <!-- usage: script:tools/roles/handoff.py#roster 739c5825 -->
+- The upgrade step `roles/reviewers-to-gov-reviewer` renames the `gov-spec-reviewer` and `gov-diff-reviewer` agents to `gov-reviewer`, and stops writing nothing where the two reviewers differ.
+  `govkit update` reaches it in an install older than the merge of the two reviewers. It needs the
+  repository's own roles kit, so the update stops before it and leaves an order under
+  `.governance/outbox/` naming the command to run by hand. The step stops, exit 1, with no file
+  changed, where the two reviewers hold a `[gates]` row or a policy key the catalogue names with a
+  `<role>` segment, such as `roles.model.<role>.<harness>`, differently, one of them unset included,
+  naming both and the key, though never for an effort level;
+  where an overlay row's `edges` names `role.gov-spec-reviewer` or `role.gov-diff-reviewer`, whose pin
+  you re-point at `role.gov-reviewer`; and where a file it would change is not committed. Otherwise
+  it keeps every stage at the level it ran at: in the house file and the policy file it writes one
+  `gov-reviewer` level, the higher of the two where both held one, and a stage entry wherever a
+  stage would move. It moves each `[gates]` row and policy key the two held alike, re-spells each
+  overlay value that was an old tag, appends a filled old house overlay to `house/gov-reviewer.md`
+  under a line naming it, removes the two old role files, and re-renders the agent types and
+  `.claude/roles.json`. Its down restores every file from the before-image under
+  `.governance/steps/`, and refuses one edited since. A session started before the step keeps the
+  old agent types until it restarts.
