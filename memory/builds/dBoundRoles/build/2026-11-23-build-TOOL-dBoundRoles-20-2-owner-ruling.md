@@ -12,7 +12,7 @@ land the five asks in their own kits first, or rule the forks to build those gap
 So TOOL-dBoundRoles-19 §8 F4 and TOOL-dBoundRoles-20 §8 F8 are ruled by the owner away from their delegated picks.
 F4's pick moves from (a), wait on the ask, to (c), the change made here; F8's from (a) to (b), the four behaviours
 built here. Each gap becomes a unit of this build with its own spec, ordered before the unit that needs it, so no
-unit grows past one mechanism (BUILD-METHOD M2) and each closes the ask the run filed for it:
+unit grows past one mechanism (`doc.build-method#m2-the-spec-set-decompose-detect-classify-act`) and each closes the ask the run filed for it:
 
 | Unit | The gap | Closes | Kit |
 |---|---|---|---|

@@ -6870,7 +6870,7 @@ memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-45-round2-fix-
 memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md	272 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md	339 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md	368 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	59 specs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dBoundRoles/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	64 specs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md	49152 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md	22 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md	26 specs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

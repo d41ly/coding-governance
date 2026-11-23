@@ -15,7 +15,7 @@ hold-run:
 hold-streak: 1 · at 5f1fd8b4
 resume-owed: none · owner
 held-at: 2026-11-23T09:32:15Z
-hold-reason: 38 of 59 units are built and CLOSED; 21 are deferred because units 19 and 20 wait on five asks (TOOL-dBoundRoles-77 to -80, TOOL-dDeclaredLoop-120) for row-grammar gaps in the playbook and loop kits, and the rest consume from them; units 42 and up were added by the landed spec run, so carry-forward cannot carry them. The closing diff review and the merge bar have not run over this branch.
+hold-reason: 38 of 59 units (DERIVED from `--plan`) are built and CLOSED; 21 are deferred because units 19 and 20 wait on five asks (TOOL-dBoundRoles-77 to -80, TOOL-dDeclaredLoop-120) for row-grammar gaps in the playbook and loop kits, and the rest consume from them; units 42 and up were added by the landed spec run, so carry-forward cannot carry them. The closing diff review and the merge bar have not run over this branch.
 hold-until: owner
 hold-code: owner-decision
 held-from: RUNNING
