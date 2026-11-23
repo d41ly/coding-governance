@@ -7658,6 +7658,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_mirror_inputs",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "check_mirror_render",
       "kind": "function",
       "file": "tools/policy/guard.py"
@@ -12923,6 +12928,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "derive_kit_imports",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "derive_kit_paths",
       "kind": "function",
       "file": "tools/lib/render-doc.sh"
@@ -13301,6 +13311,11 @@
       "id": "derive_mirror_inputs",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_mirror_plants",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_missing_script",

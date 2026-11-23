@@ -665,13 +665,16 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   mail refs, `refs/gov/mail/<slug>/`, whoever it was addressed to, each state read as in the build's
   own mailbox; a recipient form prints `mail — not read · --sent reads one build's own mail refs, and
   '<who>' is no build's slug` (exit 2), and `post`, `ack`, `answer` and `notice` refuse the flag.
-  `--mail ack <slug> <id> [<id> ...]` posts an `ack` from `<slug>`
+  `--mail ack <slug> [<id> ...]` posts an `ack` from `<slug>`
   answering each `<id>` to its sender's build, with its subject and an empty body, exit 2 where an
-  `<id>` is no row addressed to `<slug>`, before anything is written, an id named twice acked once;
-  every ack is one message of one chain on the session's ref, each parented on the one before, and
-  the chain lands in one ref update, so every ack is posted or none is, a duplicate, a refused record
-  or a lost update leaving every row open (KICK-dKeptSession-62); one id prints the post's lines and
-  exits, several print one line per ack and the post's exits. `--mail answer <slug> <question id> <body file>
+  `<id>` is no row addressed to `<slug>`, before anything is written, an id named twice acked once,
+  the first kept; an id whose row reads `acked` is skipped and named on stderr as `mail — already
+  acked <id>`, and a list given empty, or emptied by the skip, exits 0 and writes nothing
+  (KICK-dKeptSession-63); every ack is one message of one chain on the session's ref, each parented
+  on the one before, its `seq` one past the one before's, and the chain lands in one ref update, so
+  every ack is posted or none is, a duplicate, a refused record or a lost update leaving every row
+  open (KICK-dKeptSession-62), and a landed chain appends one feed line per ack, oldest first; one id
+  prints the post's lines and exits, several print one line per ack and the post's exits. `--mail answer <slug> <question id> <body file>
   [--cite <path>@<sha>]...` answers a `question` addressed to `<slug>`, the answering build, the loop
   kit's item `item.entry.mailbox-answer` while no `next` dispatches it: each `--cite` splits at its
   last `@` into a non-empty path and a sha of 7 to 40 lower-case hex digits before anything is read,
