@@ -34,8 +34,9 @@ is re-priced and the raise is not made here.
 
 The copy was every file of `tools/` at the working tree, with `write_dependency_notices`' post argv
 cut to seven values, `--pass` and its ordinal dropped. A copy outside any git repository records no
-move: each `record` printed `loop: unanswered · the scenario composition does not read: git rev-parse
---show-prefix failed: fatal: not a git repository`, exit 2, and no post ran. So the copy sat in a
+move: each `record` printed
+`loop: unanswered · the scenario composition does not read: git rev-parse --show-prefix failed: fatal: not a git repository`,
+exit 2, and no post ran. So the copy sat in a
 directory given `git init` under the host temp directory, beside the tree's `.unattended.conf`, which
 `write_transition_plant` copies from the kit's folder or a parent. There the plant exited 1 and printed,
 at the third Design exit:
