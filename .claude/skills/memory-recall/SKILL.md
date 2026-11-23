@@ -9,8 +9,8 @@ description: >-
   find the records that bind the change. Routes through python3 tools/memory-recall/query.py, which needs the question
   in plain English AND 8-14 --terms in this corpus's own jargon, which you write.
   Do NOT use for ordinary code search — a symbol, a caller, a config key, a filename or a string
-  in code. Grep and Glob own those, and this skill never replaces them: it ADDS retrieval as one
-  more way to find a record. While /session-kickoff is running, run the probes that skill itself
+  in code. Shell `grep` and `git grep`, run through Bash, own those, and this skill never
+  replaces them: it ADDS retrieval as one more way to find a record. While /session-kickoff is running, run the probes that skill itself
   asks for rather than pre-empting them.
 ---
 [.claude/skills/memory-recall/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
@@ -60,8 +60,8 @@ you act on it. Two tags, on a snippet or a pointer line, tell you a record has b
 
 **A miss is ordinary, and it is usually a vocabulary miss.** When the hits are thin or wrong,
 re-query ONCE with terms in the vocabulary the missing record would use: an id family, a flag
-or conf key, a file name. Only then fall back to `Grep` over `memory/`. That is not a
-failure mode, it is the other tool.
+or conf key, a file name. Only then fall back to shell `grep` or `git grep` over
+`memory/`, run through Bash. That is not a failure mode, it is the other tool.
 
 ## Record which hit you opened — one flag, and it is the point
 
