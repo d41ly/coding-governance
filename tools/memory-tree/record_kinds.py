@@ -92,8 +92,8 @@ parenthesized regex alternation, a key quoted on a module constant's assignment,
 `case` pattern, quoted or bare: a retired kind token compared raw, where `tree_lib.resolve_kind` is the one
 reader. A listed line is red unless the census marker on its line, `# census: kept alias-compare <reason>`
 (`//` in JavaScript, `id_grammar.read_kept_reason`), keeps it, printed `kept <reason>`. Then the build
-folders' Python scripts, each below its binding head, a hit kept only by its repository path in
-`ALIAS_COMPARE_KEPT`; a count line closes each walk. THE PENDING RULE reads `memory.map-purpose`
+folders' Python scripts, each below its binding head, a hit kept only by its file's path-keyed row of
+`tree_lib.CENSUS_KEPT_PATHS`; a count line closes each walk. THE PENDING RULE reads `memory.map-purpose`
 once through `tree_lib.read_policy_value` and grades each `pending` row by it: under `review` an open
 ask, a row of a tracked `<memory root>/builds/*/BACKLOG.md` no `CLOSED` or `WONTDO` row names; under
 `ledger` `purpose-pending` and the node a row of that `[[ledger]]` population, a listed node now
@@ -220,12 +220,6 @@ FACTORY_SOURCE = re.compile(r"(?:^|/)build_records\.py:KINDS\.([^.]+)\.required$
 GAP_KEY_RE = re.compile(r"gap-[a-z]+-\d{2,3}")
 FOLLOW_GAP = re.compile(r"^gap (\S+)")
 NOT_ARMED = 3
-#: TOOL-dTotalRecall-40 S2, narrowed by TOOL-dTotalRecall-53 S34 S22: a hit under the tool root is kept by the
-#: census marker on its line (`id_grammar.read_kept_reason`, census `alias-compare`), so this keys only a build
-#: folder's script, whose bytes no pass writes, by its repository path: `{<path>: <reason>}`, until
-#: TOOL-dTotalRecall-56 moves the row to the path-keyed table.
-ALIAS_COMPARE_KEPT = {"memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py":
-                      "pinned instrument"}
 ALIAS_COMPARE_CENSUS = "alias-compare"
 #: The fixture's census plants, under the fixture's tool root, each `(path, text)`, its red line named by line:
 #: a raw compare (TOOL-dTotalRecall-40), an awk alternation beside a bare `case` pattern (TOOL-dTotalRecall-53
@@ -1266,10 +1260,10 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
     JavaScript, `id_grammar.read_kept_reason`, TOOL-dTotalRecall-53 S34), keeps it, printed `kept <reason>`.
     Then the build folders' Python scripts, `<memory root>/builds/*/build/*.py`, each read below its
     `BIND_HEAD_LINES` binding head (TOOL-dTotalRecall-53 S22) by every form but the module constant, a hit
-    kept only where `ALIAS_COMPARE_KEPT`
-    keys its file by its repository path. A count line closes each walk. It reads, never writes."""
+    kept only where `tree_lib.read_kept_path` answers for its file's row of `CENSUS_KEPT_PATHS`, census
+    `check_alias_compares` (TOOL-dTotalRecall-56 S1). A count line closes each walk. It reads, never writes."""
     from id_grammar import read_kept_reason
-    from tree_lib import BIND_HEAD_LINES
+    from tree_lib import BIND_HEAD_LINES, read_kept_path
     paths = read_code_paths(root, tool_rel)
     lines, reds, kept = [], [], 0
     for path in paths:
@@ -1295,15 +1289,16 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
         for n, ln in enumerate(body[BIND_HEAD_LINES:], BIND_HEAD_LINES + 1):
             if not derive_alias_hit(ln, False, constant=False):   # a script's word list is no alias table
                 continue
-            if path in ALIAS_COMPARE_KEPT:
+            reason = read_kept_path("check_alias_compares", path)
+            if reason:
                 b_kept += 1
-                lines.append(f"alias-compare · {path}:{n} · kept {ALIAS_COMPARE_KEPT[path]}")
+                lines.append(f"alias-compare · {path}:{n} · kept {reason}")
                 continue
             b_red += 1
             lines.append(f"alias-compare · {path}:{n} · red")
             reds.append(f"alias-compare {path}:{n}: compares a retired kind token raw, {ln.strip()[:120]!r}; ask "
                         f"its owner to read the kind through tree_lib.resolve_kind, or key the file in "
-                        f"ALIAS_COMPARE_KEPT with its reason")
+                        f"tree_lib.CENSUS_KEPT_PATHS with its reason")
     lines.append(f"alias-compare · {len(scripts)} script(s) under {folder} · {b_kept + b_red} hits · {b_kept} kept · "
                  f"{b_red} red")
     return lines, reds
@@ -2014,7 +2009,11 @@ PLANTS = ("writer-missing", "check-unknown", "source-drift", "factory-kind-unrow
           "stream-fence-missing", "stream-validator-missing", "raw-alias-compare", "alias-compare-kept",
           "unarmed-reason", "unarmed-with-record", "unarmed-untyped", "home-slash", "home-directory", "shared-home",
           "homeless-record", "owner-graded", "bad-field-key", "stream-name-twice", "stream-foreign-unit",
-          "stream-two-fences", "unarmed-on-disallowed-form", "awk-regex-alias", "alias-constant", "homeless-empty")
+          "stream-two-fences", "unarmed-on-disallowed-form", "awk-regex-alias", "alias-constant", "homeless-empty",
+          "unkept-build-alias")
+#: TOOL-dTotalRecall-56 S1: `unkept-build-alias`'s build-folder script, its raw compare below the binding head and
+#: no `tree_lib.CENSUS_KEPT_PATHS` row for its path, since the table is the real module's
+FIXTURE_BUILD_ALIAS = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-07-build-TOOL-{FIXTURE_BUILD}-1-probe.py"
 #: TOOL-dTotalRecall-53 S23: the fixture's `not-records` glob, its project registry's files, which
 #: `homeless-empty` takes out of git's index, so the homeless arm's population is empty
 FIXTURE_NOT_RECORDS = "memory/project/**"
@@ -2235,7 +2234,11 @@ def build_fixture(tmp, plant: str | None = None):
             text = text.replace(":\n        return", f":  # census: kept {ALIAS_COMPARE_CENSUS} homonym: a planted "
                                                     f"mode\n        return", 1)
         write_fixture_file(f"{tool_rel}/{planted}" if tool_rel else planted, text)
-    fence = FIXTURE_FENCE.replace(*FIXTURE_STREAM_EDITS[plant], 1) if plant in FIXTURE_STREAM_EDITS else FIXTURE_FENCE
+    if plant == "unkept-build-alias":   # S1: the raw compare in a build folder's script, past its binding head
+        from tree_lib import BIND_HEAD_LINES, KIND_ALIASES
+        write_fixture_file(FIXTURE_BUILD_ALIAS, "# a build folder's probe\n" * BIND_HEAD_LINES
+                           + ALIAS_PLANTS["raw-alias-compare"][1].format(a=sorted(KIND_ALIASES)[0]))
+    fence =FIXTURE_FENCE.replace(*FIXTURE_STREAM_EDITS[plant], 1) if plant in FIXTURE_STREAM_EDITS else FIXTURE_FENCE
     if plant != "unarmed-reason":   # its stream-plan row carries the key and its home no plan
         write_fixture_file(FIXTURE_PLAN, f"**Serves:** stream-plan {unit} TOOL-{FIXTURE_BUILD}-2 TOOL-{FIXTURE_BUILD}-3\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                            f"# {unit} stream-plan 1 — the fixture's plan\n\n{fence}")
@@ -2350,6 +2353,7 @@ def remove_tree(path) -> None:
 def run_selftest() -> int:
     """Every plant red naming its subject, the green fixture and the green plants green with what each shows,
     `new`'s round trip and its refusals, and `--write` restoring an edited region."""
+    from tree_lib import BIND_HEAD_LINES   # unkept-build-alias's compare sits two lines past the binding head
     want = {"writer-missing": ("row deviation", "`writer`"), "check-unknown": ("row research", "no such leg"),
             "source-drift": ("row deviation", "Extra"), "factory-kind-unrowed": ("typed kind exception",),
             "field-missing": ("deviation-2.md", "**Caused-by:**"), "region-edited": ("region gen:record-kinds",),
@@ -2367,6 +2371,7 @@ def run_selftest() -> int:
             "raw-alias-compare": ("alias-compare", f"{ALIAS_COMPARE_PLANT}:2"),
             "awk-regex-alias": ("alias-compare", f"{ALIAS_PLANTS['awk-regex-alias'][0]}:2"),
             "alias-constant": ("alias-compare", f"{ALIAS_PLANTS['alias-constant'][0]}:1"),
+            "unkept-build-alias": ("alias-compare", f"{FIXTURE_BUILD_ALIAS}:{BIND_HEAD_LINES + 2}"),
             "unarmed-on-disallowed-form": ("row stream-plan", f"`{UNARMED}` on a 'header' row"),
             "homeless-empty": (HOMELESS, "the arm selects nothing"),
             "unarmed-with-record": ("row stream-plan", f"`{UNARMED}`"), "unarmed-untyped": ("row research", f"`{UNARMED}`"),

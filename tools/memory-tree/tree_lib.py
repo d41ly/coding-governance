@@ -670,6 +670,9 @@ CENSUS_KEPT_PATHS = (
      "outside the write set"),
     ("check_cause_writers", "memory/builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signer.py",
      "outside the write set"),
+    # TOOL-dTotalRecall-56 S2: the departures instrument's `journal` compare, drained by ask PLAY-dClosedLoop-1003
+    ("check_alias_compares", "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py",
+     "pinned instrument"),
 )
 
 
