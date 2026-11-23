@@ -302,7 +302,7 @@ enforces = ["practice.portable.paths"]
 name = "shell hygiene (a backslashed path handed to bash)"
 subject = "repo"
 purpose = "catches a backslashed Windows path handed to bash"
-argv = ["python3", "{kit}/sh_hygiene.py", "--path-literals", "", ".", ":!memory/"]
+argv = ["python3", "{kit}/sh_hygiene.py", "--path-literals", "", ".", ":!memory"]
 guard = []
 stage = ["step.test"]
 
@@ -320,7 +320,7 @@ enforces = ["practice.portable.quoting"]
 name = "shell hygiene (a quoting hazard)"
 subject = "repo"
 purpose = "catches a heredoc writing source and a tab-IFS read"
-argv = ["python3", "{kit}/sh_hygiene.py", "--quoting", "", ".", ":!memory/"]
+argv = ["python3", "{kit}/sh_hygiene.py", "--quoting", "", ".", ":!memory"]
 guard = []
 stage = ["step.test"]
 
@@ -340,7 +340,7 @@ enforces = ["practice.portable.language-roles"]
 name = "portability (shell lines only shrink)"
 subject = "repo"
 purpose = "holds each shell file's code lines on a shrink-only ledger"
-argv = ["python3", "{kit}/sh_hygiene.py", "--shell-role", "", ".", ":!memory/"]
+argv = ["python3", "{kit}/sh_hygiene.py", "--shell-role", "", ".", ":!memory"]
 guard = []
 stage = ["step.test"]
 

@@ -1,6 +1,6 @@
 # TOOL-aFlattenedSeed-3 — an adopter's ledger legs grade the population their seeds armed
 
-**Status:** CLOSED · rev-1 · 2026-11-23 · node a · Tier-1 · base 87c8a917 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-11-23 · node a · Tier-1 · base 87c8a917 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -24,7 +24,7 @@ home its seed armed, over the same population.
   `derive_default_registry`, as TOOL-dHomeGraded-1 S7 made the other four modes do. Observed by AC1
   and AC2.
 - **S2** — The gate-lint kit's adopter rows for the three shell legs pass the seed's population,
-  `. :!memory/`, after an empty registry argument, which S1 reads as the home. Observed by AC3.
+  `. :!memory`, after an empty registry argument, which S1 reads as the home. Observed by AC3.
 - **S3** — The `encoding-posture-sites` seed measures with `encoding_posture.py --measure`, as its
   `--stdout` and `--js` siblings do. Observed by AC3.
 
@@ -62,8 +62,7 @@ helper from `sh_hygiene.py` beside it rather than copying it.
   Observed red against S1 removed on 2026-11-23: exit 1.
 - **AC3** — When the adopter argvs grade inCMS at branch/eager-booth-8ad943, with its shell-role,
   quoting and path-literal homes seeded, every one of the three shell legs reads OK. Red when: any
-  reports a `memory/` file with no row. Observed 2026-11-23: 61 files at their rows, 6 quoting rows,
-  0 path-literal rows.
+  reports a `memory/` file with no row. Observed 2026-11-23 against inCMS d61dc604: each reads OK.
 
 ## 6. Gates
 
@@ -79,3 +78,4 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-23 · initial draft.
+- rev-2 · 2026-11-23 · S2 · AC3 · the bar's govkit selfcheck and writing-practice legs: the pathspec drops its slash, which selfcheck reads as a path no rule produces, and AC3 states no unpinned count.
