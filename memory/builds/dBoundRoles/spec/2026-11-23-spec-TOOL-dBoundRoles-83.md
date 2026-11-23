@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-83 — the exclusion walk reads a requirer's member in its own spelling, an actor's `role:<slot>` and a grant's leg name, as the tag it names
 
-**Status:** INPROGRESS · rev-1 · 2026-11-23 · node d · Tier-2 · base 318e20c9 · streams tooling · order 23 · closes TOOL-dBoundRoles-79
+**Status:** CLOSED · rev-1 · 2026-11-23 · node d · Tier-2 · base 318e20c9 · streams tooling · order 23 · closes TOOL-dBoundRoles-79
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 TOOL-dBoundRoles-81 TOOL-dBoundRoles-82 TOOL-dBoundRoles-84 TOOL-dBoundRoles-85 |
+| [2026-11-22-build-TOOL-dBoundRoles-83-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dBoundRoles-83-1-acceptance-ledger.md) | journal | — |
+| [2026-11-23-build-TOOL-dBoundRoles-83-deviation-831.md](../build/2026-11-23-build-TOOL-dBoundRoles-83-deviation-831.md) | deviation | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-83-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-83-build-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dBoundRoles-83-1-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-83-1-spec-writer.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dBoundRoles-83-spec-brief.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-83-spec-brief.md) | journal | — |

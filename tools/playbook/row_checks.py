@@ -14,7 +14,11 @@ row, the field where one applies and the sources; a refusal the classifier reads
 
 THE EXCLUSION WALK. An excluded tag another active row holds in a field whose `ref` role is `needs`,
 `actor` or `grants` refuses, naming that row and the field; one a tag-valued policy key's members name
-refuses, naming the key. `instructions.exclude` is never its own requirer.
+refuses, naming the key. `instructions.exclude` is never its own requirer. A ref field's member is read
+as the tag it names by `derive_ref_tag` (TOOL-dBoundRoles-83): `role:<slot>` as `role.<slot>`, and a
+leg's name, a trailing `?` aside, as its tag in the `legs` map `{name: tag}` the caller read from the
+leg manifest; the refusal adds the member as spelled where it differs from the tag. A tag-valued policy
+key's members are tags already and are compared as written.
 
 THE CLASSIFIER. `derive_patch_class` reads one operation against gov's value from the field's declared
 direction alone: `add` or `remove` on a set (the one equal to `widens` widens), a new value on a scalar
@@ -32,6 +36,7 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import re
 import sys
 
 KIT_DIR = pathlib.Path(os.path.abspath(__file__)).parent
@@ -44,6 +49,8 @@ SAY = "row-checks"
 REF_ROLES = ("needs", "actor", "grants")
 SCALAR_DIRECTIONS = ("rises-only", "changes")
 POLICY_SELF = "instructions.exclude"
+#: one tag segment, the tag grammar's `seg`, spelled here since this module imports no `tag_index`
+SEG_RE = re.compile(r"[a-z0-9][a-z0-9-]*")
 
 
 def derive_set_value(value) -> list:
@@ -51,6 +58,20 @@ def derive_set_value(value) -> list:
     if value is None:
         return []
     return list(value) if isinstance(value, list) else [value]
+
+
+def derive_ref_tag(value, legs):
+    """TOOL-dBoundRoles-83 S1: one member of a ref field read as the tag it names. A string
+    `<seg>:<rest>`, `<seg>` one tag segment and `<rest>` holding no space, reads `<seg>.<rest>`; a string
+    whose text before an optional trailing `?` is a key of `legs` (`{leg name: tag}`) reads that leg's
+    tag; any other value reads as itself. It reads the member and never writes it."""
+    if not isinstance(value, str):
+        return value
+    head, colon, rest = value.partition(":")
+    if colon and SEG_RE.fullmatch(head) and rest and " " not in rest:
+        return f"{head}.{rest}"
+    name = value[:-1] if value.endswith("?") else value
+    return (legs or {}).get(name, value)
 
 
 def derive_entry_ops(schema, row, etype, gov_row) -> tuple:
@@ -124,10 +145,12 @@ def derive_patch_class(decl, op, gov_value, value):
     return "widens" if order.index(value) > order.index(gov_value) else "narrows"
 
 
-def check_rows(schema, entries, rows, exclude, policy) -> tuple:
+def check_rows(schema, entries, rows, exclude, policy, legs=None) -> tuple:
     """S3 to S7 over one kind's composition. `entries` holds `(overlay row, edge type, gov's row, applied)`
     per pinned edge whose target gov ships; `rows` the composed rows; `exclude` the excluded tags; `policy`
-    `{tag-valued key: [member]}`. -> `(reds, checks)`, `checks` `{"operations": [...], "counts": {...}}`."""
+    `{tag-valued key: [member]}`; `legs` `{leg name: tag}`, which `derive_ref_tag` folds a ref member by
+    (TOOL-dBoundRoles-83), none folding no leg name. -> `(reds, checks)`, `checks` `{"operations": [...],
+    "counts": {...}}`."""
     decl, fixed_rows, reds, operations = schema["decl"], schema["fixed-rows"], [], []
     for row, etype, gov_row, applied in entries:
         otag, gtag = row.get("tag"), gov_row["tag"]
@@ -163,8 +186,9 @@ def check_rows(schema, entries, rows, exclude, policy) -> tuple:
     for tag in sorted(exclude):
         for row in rows:
             reds += [f"{SAY}: red · exclude · instructions.exclude lists {tag}, which {row.get('tag')} still "
-                     f"holds in its {refs[f]} field `{f}` · remedy: take {tag} from that field, or drop the exclusion"
-                     for f in refs if tag in derive_set_value(row.get(f))]
+                     f"holds in its {refs[f]} field `{f}`" + (f" as `{m}`" if m != tag else "")
+                     + f" · remedy: take {m} from that field, or drop the exclusion"
+                     for f in refs for m in derive_set_value(row.get(f)) if derive_ref_tag(m, legs) == tag]
         reds += [f"{SAY}: red · exclude · instructions.exclude lists {tag}, which the policy key {key} names · "
                  f"remedy: take {tag} from {key}, or drop the exclusion"
                  for key, members in sorted(policy.items()) if key != POLICY_SELF and tag in members]

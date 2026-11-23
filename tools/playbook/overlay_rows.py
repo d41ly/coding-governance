@@ -30,8 +30,9 @@ and its reds refuse before a `refuse` hold. It returns data and writes nothing.
 
 ONE KIND AT HEAD (TOOL-dDeclaredLoop-24). `derive_kind_composition(root, kind, exclude, records)` is the one
 per-kind body: the schema, gov's rows read at HEAD from the kind's namespace `source` through memory-tree's
-`tree_lib.read_blobs_at`, the overlay's rows, the tag-valued policy where an exclusion is set, and
-`derive_row_composition` under the stale mode `order`. It answers None, before any read grades, where the
+`tree_lib.read_blobs_at`, the overlay's rows, the tag-valued policy and the leg manifest's names
+(`read_leg_names`, TOOL-dBoundRoles-83) where an exclusion is set, and `derive_row_composition` under the
+stale mode `order`. It answers None, before any read grades, where the
 schema file is absent from `root`, so a target without the kit that ships it composes no row of the kind,
 and where HEAD is unborn or holds no blob at the `source`, so a first install's render, its rows staged and
 not committed, composes none either. `render_playbook.read_kind_rows` calls it per kind.
@@ -261,11 +262,13 @@ def set_row_patch(schema, gov_row, patch) -> tuple:
     return out, None
 
 
-def derive_row_composition(kind, schema, gov_rows, overlay_rows, exclude, stale_mode, records, policy) -> tuple:
+def derive_row_composition(kind, schema, gov_rows, overlay_rows, exclude, stale_mode, records, policy,
+                           legs=None) -> tuple:
     """`(rows, states, held, stale, orders, checks)` of `kind`: the composed rows, `{gov tag: state}` from
     STATES, the held patches' lines, the stale edges' lines, `[{kind, path, body}]` per order, and
     `row_checks.check_rows`'s `checks` over the edges and the composed rows, `policy` the tag-valued policy
-    keys' members its caller read once (PLAY-dOrderedCharter-36). One OverlayRefused names every refusal,
+    keys' members its caller read once (PLAY-dOrderedCharter-36) and `legs` the leg names `read_leg_names`
+    read, handed to the exclusion walk (TOOL-dBoundRoles-83). One OverlayRefused names every refusal,
     every red of the row checks, and every stale edge under `refuse`."""
     if stale_mode not in pins.STALE_MODES:
         check_reds([f"{SAY}: red · instructions.stale {stale_mode!r} is none of {', '.join(pins.STALE_MODES)}"])
@@ -352,7 +355,7 @@ def derive_row_composition(kind, schema, gov_rows, overlay_rows, exclude, stale_
                                    + (f"The patch is held: {why}.\n\n" if why else "The patch is applied over gov's "
                                       "new row.\n\n") + "Re-pin it with instructions.edit once it reads right.\n"})
     composed = list(rows.values()) + own
-    reds, checks = rc.check_rows(schema, entries, composed, exclude, policy)
+    reds, checks = rc.check_rows(schema, entries, composed, exclude, policy, legs=legs)
     check_reds(reds)
     if stale_mode == "refuse" and stale:
         check_reds([f"{SAY}: red · instructions.stale = refuse · the update is held until instructions.edit re-pins:",
@@ -388,6 +391,25 @@ def read_kind_source(root, kind) -> tuple:
     return schema_rel, source_rel, [{**r, "origin": kind, "source": source} for r in tomllib.loads(text).get(kind, [])]
 
 
+def read_leg_names(root) -> dict:
+    """TOOL-dBoundRoles-83 S3: `{name: tag}` of every row of the leg manifest, `{prefix}/gate-legs.json`,
+    at HEAD under `root` carrying a string `name` and a string `tag`, read as `read_kind_source` reads a
+    source; empty where HEAD is unborn, holds no manifest, or holds one that does not parse as a list."""
+    from tag_index import resolve_prefix_token
+    if not ov.check_born(root):
+        return {}
+    rel = resolve_prefix_token("{prefix}/gate-legs.json", iu.derive_kit_prefix())
+    iu.load_memory_tree_path()
+    from tree_lib import read_blobs_at
+    text = read_blobs_at(root, [("HEAD", rel)])[("HEAD", rel)]
+    try:
+        doc = json.loads(text) if text is not None else []
+    except ValueError:
+        return {}
+    return {r["name"]: r["tag"] for r in (doc if isinstance(doc, list) else [])
+            if isinstance(r, dict) and isinstance(r.get("name"), str) and isinstance(r.get("tag"), str)}
+
+
 def derive_kind_composition(root, kind, exclude, records, extra=None):
     """What `derive_row_composition` returns for `kind` composed at HEAD under `root`, or None where the
     kind's schema file is absent from `root`, or HEAD is unborn or holds no blob at its namespace `source`
@@ -400,8 +422,9 @@ def derive_kind_composition(root, kind, exclude, records, extra=None):
         return None
     schema = read_kind_schema(root, kind)
     policy = read_tag_policy(root, "HEAD") if exclude else {}
+    legs = read_leg_names(root) if exclude else {}
     return derive_row_composition(kind, schema, gov, read_overlay_rows(root).get(kind, []) + list(extra or []),
-                                  exclude, "order", records, policy)
+                                  exclude, "order", records, policy, legs=legs)
 
 
 def read_extra_rows(text) -> tuple:

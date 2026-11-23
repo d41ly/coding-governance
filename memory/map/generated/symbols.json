@@ -3573,6 +3573,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "build_leg_plant",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "build_leg_yield",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
@@ -13871,6 +13876,11 @@
       "id": "derive_ref_segment",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_ref_tag",
+      "kind": "function",
+      "file": "tools/playbook/row_checks.py"
     },
     {
       "id": "derive_refreshed_at",
@@ -24196,6 +24206,11 @@
       "id": "read_leg_manifest",
       "kind": "function",
       "file": "tools/unattended/fix_keeps.py"
+    },
+    {
+      "id": "read_leg_names",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
     },
     {
       "id": "read_leg_tests",
