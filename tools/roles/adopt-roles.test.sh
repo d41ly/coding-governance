@@ -2218,10 +2218,10 @@ rm -f "$FX/$FXK/handoff_a38.py"
 build_fixture; _rc39=$?
 A39P="$FX/$MR/builds/tFix/prompts"; A39S="$MR/builds/tFix/spec/2026-11-23-spec-TOOL-tFix-1.md"; A39E="$TMP_ROOT/a39.err"
 mkdir -p "$A39P" "$FX/$MR/builds/tFix/spec" && printf '# TOOL-tFix-1\n\nThe spec line one.\n' > "$FX/$A39S"
-printf 'See `blob:roles_lib.py@0123456789ab:1-4` for it.\n' > "$TMP_ROOT/anchor-nothing.md"
+printf 'See `blob:roles_lib.py@%s:1-4` for it.\n' 0123456789ab > "$TMP_ROOT/anchor-nothing.md"
 A39=$("$PY" -B -c 'import pathlib, sys; sys.path.insert(0, sys.argv[1]); import roles_lib as lib
 text = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8")
-span = "blob:roles_lib.py@0123456789ab:1-4"
+span = "blob:roles_lib.py@" + "0123456789ab:1-4"
 got = lib.check_anchors(text, set())
 print("nothing %d" % (len(got) == 1 and span in got[0] and got[0].endswith("resolves to no fact this work order hands")
                       and lib.check_anchors(text, {span}) == []))
