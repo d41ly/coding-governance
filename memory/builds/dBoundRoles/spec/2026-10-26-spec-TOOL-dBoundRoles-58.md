@@ -18,6 +18,8 @@
 | [2026-11-22-prompt-TOOL-dBoundRoles-20-spec-tokens-d-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-20-spec-tokens-d-brief.md) | journal | TOOL-dBoundRoles-20 TOOL-dBoundRoles-19 TOOL-dBoundRoles-18 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-50 TOOL-dBoundRoles-60 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-brief.md) | journal | TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md) | journal | TOOL-dBoundRoles-43 TOOL-dBoundRoles-50 TOOL-dBoundRoles-56 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-11-23-prompt-TOOL-dBoundRoles-58-2-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-58-2-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dBoundRoles-52-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-52-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 |
 
 <!-- /gen:spec-records -->
