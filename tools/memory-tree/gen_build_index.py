@@ -6879,13 +6879,16 @@ def test_forwarded_new_spec(arm) -> None:
         run("git", "add", "-A", cwd=seed)
         run("git", "commit", "-q", "-m", "seed", "--no-verify", cwd=seed)
         got = {}
+        # A hook's repository pointers and a shell's remote names are dropped, so each call reads its own
+        # clone and the forward's policy read is never refused by a variable this fixture did not set.
+        env = {k: v for k, v in _build_git_env().items() if k not in ("GOV_REMOTE", "GOV_DEFAULT_BRANCH")}
         for name, argv in (("fwd", [os.path.join(here, "gen_build_index.py"), "--new-spec"]),
                            ("door", [os.path.join(here, "gov_record.py"), "new", "spec"])):
             run("git", "clone", "-q", seed, name, cwd=tmp)
             t = os.path.join(tmp, name)
             p = subprocess.run([sys.executable, *argv, "TOOL-xNew-1", "--tier", "2", "--order", "3"], cwd=t,
                                capture_output=True, text=True, encoding="utf-8", errors="replace",
-                               stdin=subprocess.DEVNULL)
+                               stdin=subprocess.DEVNULL, env=env)
             specs = [s for s in run("git", "ls-files", "-o", "--exclude-standard", cwd=t).split("\n") if "-spec-" in s]
             journal = os.path.join(t, run("git", "rev-parse", "--git-path", "govkit/shim-calls.jsonl", cwd=t).strip())
             got[name] = {"rc": p.returncode, "err": p.stderr,
