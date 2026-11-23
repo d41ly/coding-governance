@@ -12518,6 +12518,11 @@
       "file": "tools/loop/position.py"
     },
     {
+      "id": "derive_frozen",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "derive_fx_composition",
       "kind": "function",
       "file": "tools/playbook/overlay.py"

@@ -428,7 +428,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "retired-section-aliased", "retired-section-reminted", "reference-row", "reference-no-h1",
           "foreign-native", "held-native", "positional-no-tree", "positional-absent", "dirty-revert",
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
-          "positional-spec-revbump", "positional-bulk-move", "queued-writers",
+          "positional-spec-revbump", "positional-bulk-move", "positional-archived", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
           "ns-word-leaf", "leg-rows", "pack-rows", "check-rows")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
@@ -1375,6 +1375,9 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         spec = "memory/builds/x/spec/spec.md"
         write_forked_record(root, kit, {spec: cite.format(1)})
         write_commit(root, {spec: cite.format(1) + cite.format(3)}, "the spec's rev bump cites a line")
+        return check()
+    if plant == "positional-archived":  # TOOL-aFlattenedSeed-4: archive/ is frozen as builds/ is
+        write_forked_record(root, kit, {"memory/archive/x/record.md": cite.format(1)})
         return check()
     if plant == "positional-bulk-move":  # PLAY-dOrderedCharter-55 S25: three records moved, a line edited in each
         filler = "".join(f"a line of record {{n}} that the move keeps, the {w}\n" for w in

@@ -292,7 +292,8 @@
       "memory/project/encoding-posture-sites.txt",
       ".",
       "{prefix}",
-      "skills"
+      "skills",
+      ":!memory"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -319,7 +320,8 @@
       "memory/project/encoding-stdout-sites.txt",
       ".",
       "{prefix}",
-      "skills"
+      "skills",
+      ":!memory"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -346,7 +348,8 @@
       "memory/project/encoding-js-sites.txt",
       ".",
       "{prefix}",
-      "skills"
+      "skills",
+      ":!memory"
     ],
     "chunk": "product",
     "subject": "repo",
