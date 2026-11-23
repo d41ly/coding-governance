@@ -1,6 +1,6 @@
 # KICK-dKeptSession-35 — every dependency notice posted per dependent and per Design exit, so each one lands as its own message
 
-**Status:** DEFERRED · rev-7 · 2026-11-23 · node a · Tier-2 · base 34dd4a35 · streams kickoff · order 25 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-7 · 2026-11-23 · node a · Tier-2 · base 34dd4a35 · streams kickoff · order 25 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -16,6 +16,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-26 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-7 KICK-dKeptSession-11 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 |
 | [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-35-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-35-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-build-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md) | research | KICK-dKeptSession-42 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 |
 | [2026-11-21-prompt-KICK-dKeptSession-7-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-7-precheck-brief.md) | research | KICK-dKeptSession-7 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-55 |
 | [2026-11-22-prompt-KICK-dKeptSession-35-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-35-reground-brief.md) | research | — |
