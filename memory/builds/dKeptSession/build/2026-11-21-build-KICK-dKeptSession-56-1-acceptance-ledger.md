@@ -106,7 +106,7 @@ registry's rows): they are the legs that run units 35, 36 and 42's plants in
 - AC5 — with `GOV_BASH` naming the System32 `bash.exe`, `loop_witness.resolve_bash` answered `None` and `scan_bash`'s refusal named `GOV_BASH` and `answered Linux` (DERIVED, that probe).
 - AC6 — the `presets-derived` case's `stage-default` plant read `arm_presets` naming `preset.standard · review.build`, `"off" is not the row's default "owed"`, and its unplanted run 0 findings; `presets.py check` over the shipped store exited 0, green (DERIVED, those runs).
 - AC7 — `KICK-dKeptSession-51` AC2: the squeezed guide holds the ninth-field sentence once, `seventh field` 0 times, and the template and the guide compare equal; AC3: `dWellOiledMachine`'s backlog names `derive_message_id` in its one ask row (DERIVED, those greps).
-- AC8 — `check_policy.py --fixture mirror-pre-unit-stale` read 0 wrong, the changed store answering `allowed` with its `mirror stale at` line (DERIVED, that run).
+- AC8 — `KICK-dKeptSession-49` AC1: `check_policy.py --fixture mirror-pre-unit-stale` read 0 wrong, the changed store answering `allowed` with its `mirror stale at` line (DERIVED, that run).
 - AC9 — over one `--orient` dir the `context-window-sibling` turn's orient row read `context=90%` and `runlog.py context` read `90%` (DERIVED, that probe).
 - AC10 — 22 orient rows on one model built by `build_orient_transcript` made 1 `derive_context_window` call through `measure_orient_tree` (DERIVED, that probe).
 - AC11 — `git show --stat 6178a65e` listed both `tools/memory-tree/build_records.py` and `tools/memory-tree/tree_lib.py` (DERIVED, that command).
@@ -114,25 +114,25 @@ registry's rows): they are the legs that run units 35, 36 and 42's plants in
 - AC13 — `KICK-dKeptSession-45` AC1's probe printed `(1000000, 'observed 900000 on fixture-model')` (DERIVED, that probe).
 - AC14 — the grep printed one line, inside `main` before its arm loop (DERIVED, that grep).
 - AC15 — the `derive_cli_line` range holds `read_claude_version` once and no `--version`; `^read_claude_version()` and `claude --version </dev/null` each count 1, the second inside `read_claude_version` (DERIVED, those greps).
-- AC16 — recorded under S19 above.
+- AC16 — the `grep -a -o` of the builder pattern piped into `wc -l` over PATH's 2.1.319 printed `2` (PINNED 2026-11-23, node d); the pinned 2.1.326's count is owed, as S19 above records.
 - AC17 — a Design exit whose parent README renders the no-edge sentence, and one whose region holds no `Child builds` line, each recorded with exit 0 and the launcher saw no post or check; `read_dependents` listed none for both and for an absent README (DERIVED, that probe).
 - AC18 — `grep -c 'SID_RE.fullmatch(p.name' tools/runlog/extract.py` printed 1, inside `derive_main_transcripts`, where the base printed 3 (DERIVED, those greps).
 - AC19 — `grep -c 'claude-code_\*' manifest-check.sh` printed 1, and `card-store.fixture.sh --plant fixture-cli-short` printed its row `held`, the `resume — resume recommended (resume.context: always-resume)` line; the sibling plants `fixture-cli-path-differs`, `fixture-cli-unknown`, `fixture-stale` and `context-always-resume` each printed every row `held` over the new compare (DERIVED, those runs).
 - AC20 — `node mail-notice.js` from a scratch install holding only the unattended kit's files exited 0 (DERIVED, that probe); the counts are reconciled above.
 - AC21 — a sourced `print_progress` over a stub starting a 30 s grandchild that holds its stdout returned in 0 s and printed its line, bounded and with `GATE_BOUND_LIVE=0`, where a `$( )` capture of the same stub waited 30 s (DERIVED, that probe); the `bash unattended.sh --landed <slug>` reading is the suite block's, owed.
-- AC22 — recorded under the legs above.
+- AC22 — `check-spec-tokens.py --legs-for` over each named unit's pass paths printed `policy fixtures` for every unit but 39, and `loop transition record`, unguarded, runs units 35, 36 and 42's plants at the close, one line per unit in the legs section above (DERIVED, that probe and the registry).
 - AC23 — `grep -c "render_scaffold(rows)" check_policy.py` printed 0, and `check_policy.py --fixture scaffold-preset` read 0 wrong (DERIVED, those runs).
 - AC24 — `policy.py mirror --check` in a scratch clone exited 0 at unit 41's closing commits `ce1a539e7` and `b9eae128f`, and exited 1 at unit 40's pass commit `f9e192e92`, naming `legacy_blobs`, and at unit 41's first commit `cca4b7039`, naming `catalogue_blob` (DERIVED, that probe). RED for those two commits: unit 40's pass moved a mirror input without re-rendering the mirror, which later fix commits re-stamped, and the mirror reads fresh at this pass's HEAD (DERIVED, that command). No later unit can rewrite those commits; the main loop owns the disposition.
 - AC25 — `KICK-dKeptSession-47` AC1: the `context-window` turn beside `context-window-compact-other` read `75%`, `observed 150000 on fixture-model` (DERIVED, that probe).
 - AC26 — the `presets-derived` case's `budget-cap` plant read `arm_presets` naming `preset.strict` and the census's first cap (DERIVED, that run).
 - AC27 — `loop_transition.py --fixture --plant acks-no-session` printed `refused — tFix · mail ack not posted: a1a2a3a4a5a6 · mail — not written: no session id`, the row read `open`, and `held` (DERIVED, that run).
 - AC28 — `--plant notices-reposted` printed `dA · confirmed pass 1`, `dB · confirmed pass 1`, its posts `build:dA rc 2 · build:dB rc 0 · build:dA rc 0`, so the second move posted to dA alone, and `held` (DERIVED, that run).
-- AC29 — recorded under S38 above.
+- AC29 — unit 34's AC2 is answered as a regression observation, and its AC1 by `KICK-dKeptSession-54` AC1's `preset-every-key`, as S38 above records (DERIVED, those runs).
 - AC30 — the import probe printed `True` (DERIVED, that command).
 - AC31 — the `derived` grep over `presets.py` printed nothing (DERIVED, that grep).
 - AC32 — `grep -n "GOV_BASH" loop.md` printed unit 36's sentence, `grep -n "skipped" orientation-card.md` unit 43's lines, and `grep -n "presets.toml" README.md` in the policy kit its store row (DERIVED, those greps).
-- AC33 — recorded under S43 above; this ledger cites the two rows by key and by no line.
-- AC34 — recorded under S45 above.
+- AC33 — this ledger cites `ARMS_FLOORS` and `REFUSAL_CEILINGS` by key and by no line, as S43 above records.
+- AC34 — `record` over the `notices-two-dependents` scratch with `loop_transition.read_transitions` rebound to raise `ValueError` and `breakpoints.run_sourced` wrapped exited 2, the wrapper recording no post (DERIVED, that probe), as S45 above records.
 - AC35 — `tr -s ' \r\n' ' '` over this ledger piped into `grep -c` reads each of the four quoted passages once, and `git diff --name-only <pass base> HEAD -- memory/builds/dKeptSession/build/` lists this ledger alone, both read at the closing commit, and the main loop confirms it.
 
 ## What the close owes
