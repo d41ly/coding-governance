@@ -50,12 +50,13 @@ per parent judged. Units 53 and 55 are CLOSED, so neither spec nor ledger of the
 
 **Evidences:** KICK-dKeptSession-61
 - AC1 — `chain-two-dependents` held, exit 0: it printed `loop: fixture · record · exit 0` for tFix's B4 and again for tTwo's, `loop: fixture · state <id> · acked` for each of the sent read's four rows, `a1a1a1a1a1a1`, `b1b1b1b1b1b1`, `a2a2a2a2a2a2` and `b2b2b2b2b2b2`, four `mail — acked` lines on stderr and `loop: fixture · chain-two-dependents · held` (DERIVED, that run; scratch ids).
-- AC2 — the same run printed `loop: fixture · chain tFix · a1a1a1a1a1a1 precedes a2a2a2a2a2a2 · sent yes · filtered no` (DERIVED, that run).
+- AC2 — the same run printed `loop: fixture · chain tFix · a1a1a1a1a1a1 precedes a2a2a2a2a2a2 · sent yes · filtered no` (DERIVED, that run): the chain line's `<a1> precedes <a2> · sent yes · filtered no`, not the copy's `sent no`.
 - AC3 — the same run printed `loop: fixture · sent fy · 4 row(s) · seq and after on 4` and `loop: fixture · sent build:fy · refused · mail unknown: --mail read build:fy exited 2: mail — not read · --sent reads one build's own mail refs, and 'build:fy' is no build's slug` (DERIVED, that run).
 - AC4 — this ledger quotes unit 53's and unit 55's passages in S3. The `tr` and `grep -c` pair and the `git diff --name-only 2e35be083 HEAD` over units 53 and 55's specs and ledgers are read at the commit, and the main loop confirms them.
 - AC5 — the probe printed `37` and the grep `plants=37`, and `chain-two-dependents` is a key of `PLANTS` (DERIVED, those commands at observation time).
 - AC6 — `docs_leg.py --fingerprints` printed `4c1a862e` for `verb:unattended.sh:--mail`, the fingerprint `help/loop.md`'s anchor now carries, re-stamped from `e05e3012` (DERIVED, that command and the grep); `script:tools/loop/loop_transition.py` stayed `930359dc` (DERIVED, that command). `grep -c -- '--sent'` printed at least 1 for `help/loop.md`, `tools/unattended/VERBS.template.md` and `tools/loop/README.md`, `chain-two-dependents` is in `help/loop.md`, and `cmp` of the template and `memory/guides/UNATTENDED-VERBS.md` printed nothing (DERIVED, those commands at observation time).
-- AC7, AC8 — the scratch probe ran the block's helpers and its lines verbatim, outside the suite: its four `same` held, `assertions 4 status 0` (DERIVED, that probe). The suite's own run is the close's.
+- AC7 — the scratch probe ran the block's helpers and its lines verbatim, outside the suite: sessions `s1` and `s2` of build `fx` post to `build:fy` and `build:fz`, and its `same` lines on `--mail read fy` and on the `--sent` read of `fx` held (DERIVED, that probe). The suite's own run is the close's.
+- AC8 — the same probe ran the block's `--mail read build:fx --sent` and `--sent` ack lines, and its four `same` held, `assertions 4 status 0` (DERIVED, that probe). The suite's own run is the close's.
 
 ## What the close owes
 
