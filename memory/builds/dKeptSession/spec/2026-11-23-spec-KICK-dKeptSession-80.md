@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-23-build-KICK-dKeptSession-80-close-bar-attribution.md](../build/2026-11-23-build-KICK-dKeptSession-80-close-bar-attribution.md) | research | — |
+| [2026-11-23-build-KICK-dKeptSession-80-close-debts.md](../build/2026-11-23-build-KICK-dKeptSession-80-close-debts.md) | research | KICK-dKeptSession-69 |
 | [2026-11-23-build-KICK-dKeptSession-80-widen-4.md](../build/2026-11-23-build-KICK-dKeptSession-80-widen-4.md) | widen | — |
 | [2026-11-21-prompt-KICK-dKeptSession-80-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-80-build-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-80-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-80-1-spec-writer.md) | journal | — |
