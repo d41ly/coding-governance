@@ -5608,6 +5608,11 @@
       "file": "tools/govkit/steps/conf_to_policy.py"
     },
     {
+      "id": "check_attendance_rows",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_attr_line",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -21511,6 +21516,11 @@
       "id": "read_at",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "read_attendance",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "read_attribution",

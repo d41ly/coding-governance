@@ -76,6 +76,30 @@ The unattended kit's `--mail post` runs that verb and refuses any other kind bef
 `mail-kinds-repeated` plant holds the grade. An `answer` or an `ack` is a reply: it decides another
 message's state and never waits itself.
 
+## The attendance rows
+
+`[[attendance]]` declares what each value of the `attendance` policy key adds (KICK-dKeptSession-17),
+one row per value, its keys exactly `value` and `adds`: `unattended` adds nothing; `announce` adds
+`announce` and `ask-live`; `confirm-steps` adds those and `confirm-step-exit`; `confirm-acts` adds those
+and `confirm-before-act`. Every member is one of `ATTENDANCE_INTERACTIONS`, the closed set of the
+owner's interactions typed in `loop_lib.py` and never in the definition, so a definition cannot widen
+what attendance may do: no member names an item, an actor, the driver or a binding.
+`check_attendance_rows` prints one `loop: attendance <value> · adds <members|none>` line per row and
+refuses a table that is no array of tables, a row with no value, a key but `value` and `adds`, an
+`adds` that is no list of strings, a member outside the set and a value given twice; `--check` runs it
+after the probe lines. `read_attendance` returns `{value: adds}` once the rows hold.
+
+`breakpoints.py` reads the key beside `autonomy` and hands the rows and the role items' tags to
+`derive_breakpoints`: `confirm-step-exit` places an owner gate at each step's `exit` item and
+`confirm-before-act` one before each item whose actor is a role, cause `attendance`, a position
+`autonomy` already gates keeping its gate, and a value no row declares refuses the list. Each gate is
+held until the owner's disposition record of its tag, as every owner gate is. Under an attended value
+`list` ends with `breakpoints: attendance · <value> · adds <members>`, naming `announce` a stand-in for
+dWellOiledMachine and `ask-live` one for dFurnishedOrders, whose builds change their entries in
+`ATTENDANCE_INTERACTIONS` when they land the mechanism. The plants `attendance-actor`,
+`attendance-member` and `attendance-twice` of `loop_lib.py`, and `attendance-values`,
+`attendance-missing` and `attendance-plan` of `breakpoints.py`, hold both halves.
+
 ## The item programs
 
 Each gov step is a program of items (TOOL-dDeclaredLoop-12): one `[[item]]` row per item, after every
@@ -1004,6 +1028,8 @@ python <prefix>/loop/factories.py --selftest
 | `resolve_item_declaration(item, roles)` | `{inputs, allowance, returns, source}` of one item row, a role item's absent fields its role's, `source` per field `item`, `role:<slot>`, `pending` or `unarmed` |
 | `check_item_declarations(items, roles, why)` | `(lines, refusals)`: one `loop: item` line per item and the count line, and a refusal per actor, missing field, copy or widened allowance |
 | `derive_item_scope(kit_dir, root, tags, units=None)` | one `loop: scope` line per item, its load set as `load_sets.py derive` lists it, or `unarmed` |
+| `check_attendance_rows(rows)` | `(lines, refusals)`: one `loop: attendance` line per `[[attendance]]` row, and a refusal per row shape that does not hold, a member outside `ATTENDANCE_INTERACTIONS` included |
+| `read_attendance(kit_dir)` | `{value: adds}` of the `[[attendance]]` rows once they hold; `LoopError` naming the first refusal, or a definition declaring no row |
 
 Each refuses a definition that does not hold with `LoopError`, a `ValueError` naming the file and
 the row: the gov steps missing, repeated or out of order; a workflow named twice; an `order` that is
@@ -1058,7 +1084,9 @@ drive rows by `order` and pick each role's practices by its reach word.
   loop: items · <n> read · <p> pending · <u> unarmed
   ```
 
-  Each item refusal prints `loop: refused · ...` beside the list's, exit 1. It is the
+  Then one `loop: attendance <value> · adds <members|none>` line per `[[attendance]]` row, before the
+  witness lines. Each item refusal and each attendance refusal prints `loop: refused · ...` beside the
+  list's, exit 1. It is the
   `loop definition` gate leg, and it runs no scope derivation.
 - `python loop_lib.py --scopes` reads and checks the definition as `--check` does, then prints
   `loop: scope <tag> · <derive's item line> · <the tags it lists, or none>` per item. Exit 0, every
@@ -1100,7 +1128,10 @@ drive rows by `order` and pick each role's practices by its reach word.
   conf by its literal name, through a module constant or through a local name, each exiting 1 naming
   it; `conf-route-opens-none` and `conf-openers-none` empty the route's body, or every declared
   opener's, each exiting 1 on `opens no conf` or `no conf opener found`; `conf-module-unparsable`
-  adds a definition that does not parse and exits 1 on `derive_conf_constants`' refusal. `CONF_PLANTS`
+  adds a definition that does not parse and exits 1 on `derive_conf_constants`' refusal.
+  `attendance-actor` (the `confirm-acts` attendance row given an `actor` key handing an item to the
+  owner), `attendance-member` (`driver:owner` added to its `adds`) and `attendance-twice` (a second
+  `confirm-acts` row) each exit 1 naming the row. `CONF_PLANTS`
   names the seven cases that read no definition. `PLANTS` names what each breaks. Nothing on disk
   changes but the scratch, which is removed after.
 - `python loop_lib.py --grade-site <site> <entry>...` grades one declaration site, `DOD_CORE` or

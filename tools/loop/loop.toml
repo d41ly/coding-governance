@@ -282,6 +282,25 @@ means = "continue"
 kinds = ["confirm-request", "confirmed", "changed", "overlap", "takeover", "landed", "question", "answer", "ack",
          "intake", "withdrawn", "superseded"]
 
+# What each value of the `attendance` policy key adds (KICK-dKeptSession-17 S2): one row per value, its keys
+# exactly `value` and `adds`, each member of `adds` one of loop_lib.py's closed ATTENDANCE_INTERACTIONS, owner
+# interactions only, so no row selects an actor, the driver or a binding; read through `read_attendance`.
+[[attendance]]
+value = "unattended"
+adds = []
+
+[[attendance]]
+value = "announce"
+adds = ["announce", "ask-live"]
+
+[[attendance]]
+value = "confirm-steps"
+adds = ["announce", "ask-live", "confirm-step-exit"]
+
+[[attendance]]
+value = "confirm-acts"
+adds = ["announce", "ask-live", "confirm-before-act"]
+
 [[checklist]]
 registry = "DOD_CORE"
 handle = "gates-green"

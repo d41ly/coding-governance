@@ -13,7 +13,11 @@ under `owed-above-tier` where some unit's spec header reads Tier-2; under `opt-i
 audit only where `--spec-audit` says the run pinned a dated opt-in, and nothing at the other four; `off`
 places nothing. `autonomy` places an owner gate at `item.plan.exit` under `plan-only`, its default; adds one
 at `item.design.exit` and one before `item.deploy.mandate` under `three-gates`; and adds one at each step's
-`exit` item under `every-stage`. Each member of `review.breakpoints`, read at the build's composition pin by
+`exit` item under `every-stage`. `attendance` adds only the owner's interactions its `[[attendance]]` row of
+the loop definition declares (KICK-dKeptSession-17): `confirm-steps` an owner gate at each step's `exit`
+item and `confirm-acts` one before each item whose actor is a role, cause `attendance`, a position
+`autonomy` already gates keeping that gate; `unattended`, its default, and `announce` place none. No value
+changes an item, its actor, the driver or a binding. Each member of `review.breakpoints`, read at the build's composition pin by
 `composition.py`'s `read_tag_policy`, places a reviewer `breakpoint` before it with cause `placement`. Under
 `decisions.major = "author-owner-ratifies"`, given `--delegated-fork`, the owner item sits at
 `item.build.ratify` with cause `ratification`. Each owner's request placed as a `breakpoint`
@@ -40,22 +44,26 @@ stays `held` and no commit adds that README, `list` ends with `breakpoints: held
 root from <.unattended.conf|.memory-tree.conf|default>`, the conf the root came from (TOOL-dDeclaredLoop-64,
 TOOL-dDeclaredLoop-75 S8, S30).
 
-THE READS. `autonomy`, `decisions.major` and the five `review.<stage>` keys at the landed revision, or at
-`--rev`, through the policy kit's `resolve_read` over one `read_revision`, the kit found by
+THE READS. `autonomy`, `attendance`, `decisions.major` and the five `review.<stage>` keys at the landed
+revision, or at `--rev`, through the policy kit's `resolve_read` over one `read_revision`, the kit found by
 `loop_parents.py`'s `read_policy_kit`; an unset `review.<stage>` reads the catalogue's derived default,
-`owed` for `build` and `opt-in` for the other four. The steps are `loop_lib.py`'s `read_steps`, the
-composed tags at the pin `loop_items.py`'s `read_composed_items`, and each unit's tier
+`owed` for `build` and `opt-in` for the other four, and an unset `attendance` its default `unattended`. The
+steps are `loop_lib.py`'s `read_steps`, the `[[attendance]]` rows its `read_attendance`, the composed tags
+at the pin and each role item among them `loop_items.py`'s `read_composed_items`, and each unit's tier
 `loop_transition.py`'s `read_build_headers`.
 
 Exit: `list` prints one line per breakpoint and exits 0,
 
     breakpoint: <name> · <before|at|after> <item tag> · <reviewer|owner> · <cause>[ · <release>]
 
+and, under an `attendance` value whose row adds a member, after them and before any `breakpoints: held`
+line, one `breakpoints: attendance · <value> · adds <members> · <member>: stand-in <owner>` line, one
+clause per member `ATTENDANCE_INTERACTIONS` answers as a stand-in; under `unattended` no such line prints.
 `stage` prints `breakpoints: stage <stage> · <value> · <owed|opt-in|not-owed>` and exits 0, `owed` under
 `owed` or under `owed-above-tier` where a unit reads Tier-2, `not-owed` under `off` or `owed-above-tier`
 with none, `opt-in` under `opt-in`. Both exit 2 printing `breakpoints: refused · <why>` on a policy refusal,
-a slug outside `[A-Za-z0-9_-]+`, a stage outside the five, a value outside its key's set or a position the
-composed rows do not declare, and `breakpoints: unarmed · <why>` where a kit does not resolve, never a
+a slug outside `[A-Za-z0-9_-]+`, a stage outside the five, a value outside its key's set, an `attendance`
+value no `[[attendance]]` row declares, or a position the composed rows do not declare, and `breakpoints: unarmed · <why>` where a kit does not resolve, never a
 default. `--fixture --plant <case>` builds a scratch repository under the host temp directory, runs the case
 and prints `held` or `MISSED`; `--selftest` runs every plant.
 
@@ -83,9 +91,9 @@ if str(KIT) not in sys.path:
 from adapt import read_disposition_release  # noqa: E402
 from composition import build_composition_base, read_step_composition, read_tag_policy  # noqa: E402
 from loop_items import read_composed_items  # noqa: E402
-from loop_lib import (SEG, LoopError, derive_conf_reads, derive_fixture_boundary, read_memory_tree,  # noqa: E402
-                      read_steps, resolve_kit_dir, resolve_memory_root, resolve_memory_root_source,
-                      run_selftest_cases)
+from loop_lib import (ATTENDANCE_INTERACTIONS, SEG, LoopError, derive_conf_reads,  # noqa: E402
+                      derive_fixture_boundary, read_attendance, read_items, read_memory_tree, read_steps,
+                      resolve_kit_dir, resolve_memory_root, resolve_memory_root_source, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (FX_BUILD, FX_SPEC, FX_UNIT, read_build_headers, read_build_specs,  # noqa: E402
                              read_transitions, write_transition_plant)
@@ -142,21 +150,35 @@ PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, 
                             "the list",
           "no-own-conf-read": "this module's own file graded on its syntax tree for a reader call or a conf name, "
                               "no scratch repository",
-          "readded": "the scratch kits' commit, then this module taken out of the scratch and committed back"}
+          "readded": "the scratch kits' commit, then this module taken out of the scratch and committed back",
+          "attendance-values": "no policy file, then attendance confirm-steps, every-stage beside confirm-steps, "
+                               "confirm-acts and announce",
+          "attendance-missing": "attendance confirm-steps with the loop definition's attendance rows read less "
+                                "the confirm-steps row",
+          "attendance-plan": "the driver's --plan under attendance confirm-steps, then the sourced "
+                             "check_phase_gates past item.design.exit"}
 
 
 # ------------------------------------------------------------------------------------------ the rule
 def derive_breakpoints(values, steps, tags, facts):
     """`[{name, relation, position, disposer, cause, release}]`: the breakpoints `values`, `{key: value}`,
     place over the gov `steps` and the composed `tags`, in composed order, given `facts`: `spec_audit` and
-    `delegated` true or false, `tiers` each unit's tier and `placed` the breakpoints the owner's requests
-    placed, `read_placed_breakpoints`' entries. An owner line's release is `authorization` at
-    the plan gate and `held` elsewhere. ValueError naming the key on a value outside its set, and on a
-    position `tags` lacks."""
+    `delegated` true or false, `tiers` each unit's tier, `placed` the breakpoints the owner's requests
+    placed, `read_placed_breakpoints`' entries, `attendance` the `{value: adds}` of the loop definition's
+    `[[attendance]]` rows and `acts` the tags whose actor is a role (KICK-dKeptSession-17 S4). After
+    `autonomy`'s gates, the `attendance` value's `confirm-step-exit` places an owner gate at each step's
+    exit and its `confirm-before-act` one before each tag of `acts`, cause `attendance`, a position
+    already gated keeping its gate. An owner line's release is `authorization` at the plan gate and
+    `held` elsewhere. ValueError naming the key on a value outside its set, an `attendance` value no row
+    declares included, and on a position `tags` lacks."""
     for key, allowed in [("autonomy", AUTONOMY_VALUES), ("decisions.major", MAJOR_VALUES)] + [
             ("review." + s, REVIEW_VALUES) for s in STAGE_REVIEWS]:
         if values.get(key) not in allowed:
             raise ValueError("%s is %r, none of %s" % (key, values.get(key), ", ".join(allowed)))
+    attended = facts.get("attendance") or {}
+    if values.get("attendance") not in attended:
+        raise ValueError("attendance is %r, which no [[attendance]] row of the loop definition declares"
+                         % values.get("attendance"))
     out = []
 
     def write_line(name, relation, position, disposer, cause, why):
@@ -187,6 +209,13 @@ def derive_breakpoints(values, steps, tags, facts):
     if autonomy == "every-stage":
         for step in steps:
             write_line("owner gate", "at", step["exit"], "owner", "autonomy", "autonomy")
+    adds = attended[values["attendance"]]
+    if "confirm-step-exit" in adds:   # KICK-dKeptSession-17 S4: the owner confirms each step's exit
+        for step in steps:
+            write_line("owner gate", "at", step["exit"], "owner", "attendance", "attendance")
+    if "confirm-before-act" in adds:   # and each role item, an act, before it runs
+        for tag in facts.get("acts") or ():
+            write_line("owner gate", "before", tag, "owner", "attendance", "attendance")
     for member in values.get("review.breakpoints") or ():
         if member not in tags:
             raise ValueError("review.breakpoints names %s, an item the composed rows at the build's pin do not "
@@ -209,8 +238,9 @@ def render_breakpoint_line(b):
 
 # ------------------------------------------------------------------------------------------ the reads
 def read_policy_values(root, rev=None):
-    """`{key: value}` of `autonomy`, `decisions.major` and the five `review.<stage>` keys at `rev`, else the
-    landed revision, over one policy read. ValueError on a refusal; LookupError where the kit does not resolve."""
+    """`{key: value}` of `autonomy`, `attendance`, `decisions.major` and the five `review.<stage>` keys at
+    `rev`, else the landed revision, over one policy read, `attendance` its catalogue default `unattended`
+    where the file sets none. ValueError on a refusal; LookupError where the kit does not resolve."""
     policy, _guard = read_policy_kit()
     try:
         read = policy.read_revision(str(root), rev)
@@ -228,7 +258,8 @@ def read_policy_values(root, rev=None):
             raise ValueError("%s does not resolve: %s" % (key, e)) from None
 
     # Each key a string literal at its read, the policy kit's reader coverage counting no other shape.
-    return {"autonomy": read_value("autonomy"), "decisions.major": read_value("decisions.major"),
+    return {"autonomy": read_value("autonomy"), "attendance": read_value("attendance"),
+            "decisions.major": read_value("decisions.major"),
             "review.plan": read_value("review.plan"), "review.design": read_value("review.design"),
             "review.build": read_value("review.build"), "review.test": read_value("review.test"),
             "review.deploy": read_value("review.deploy")}
@@ -298,16 +329,26 @@ def read_breakpoints(build, root, spec_audit=False, delegated=False):
     read: `passed before placement` on each owner gate of a build opened before this module was placed,
     else `released <stem> <word>` where the owner's disposition record of its tag answers. An owner gate
     still `held` where the opening read found no commit adding the README carries `unopened`, that path,
-    and `root_from`, the conf `resolve_memory_root_source` read the root from (TOOL-dDeclaredLoop-75 S8)."""
+    and `root_from`, the conf `resolve_memory_root_source` read the root from (TOOL-dDeclaredLoop-75 S8).
+    Under an `attendance` value whose `[[attendance]]` row adds a member, the plan gate's entry carries
+    `attended`, the `(value, adds)` pair `list` prints its attendance line from (KICK-dKeptSession-17 S6)."""
     check_slug(build)
     root = pathlib.Path(root).absolute()
     values = read_policy_values(root)
     values["review.breakpoints"] = read_tag_policy("review.breakpoints", root, build)
-    tags = [r.get("tag") for r in read_build_item_rows(build, root)]
+    rows = read_build_item_rows(build, root)
+    tags = [r.get("tag") for r in rows]
+    acts = [r.get("tag") for r in rows if str(r.get("actor", "")).startswith("role:")]
     tiers = [tier for _uid, _status, tier in read_build_headers(build, root)]
+    attendance = read_attendance(KIT)
     out = derive_breakpoints(values, read_steps(KIT), tags,
                              {"spec_audit": spec_audit, "delegated": delegated, "tiers": tiers,
-                              "placed": read_placed_breakpoints(build, root)})
+                              "placed": read_placed_breakpoints(build, root), "attendance": attendance,
+                              "acts": acts})
+    adds = attendance[values["attendance"]]
+    if adds:   # derive_breakpoints always writes the plan gate
+        next(b for b in out if (b["relation"], b["position"], b["disposer"]) == ("at", PLAN_GATE, "owner"))["attended"] = (
+            values["attendance"], adds)
     early, unopened, source = False, None, None
     if any(b["name"] == "owner gate" for b in out):   # TOOL-dDeclaredLoop-53: opened before the placement
         try:
@@ -458,8 +499,11 @@ def run_breakpoint_plant(case):
         gate = "breakpoint: owner gate · %s %s · owner · autonomy · held"
         owner = "breakpoint: owner item · at item.build.ratify · owner · ratification · "
         listed = ["list", "--build", FX_BUILD]
-        if case in ("values", "ratification", "stage", "confs-disagree"):
+        if case in ("values", "ratification", "stage", "confs-disagree", "attendance-values", "attendance-missing"):
             write_transition_plant(top, "default")
+        attended = "breakpoint: owner gate · %s %s · owner · attendance · held"
+        announced = ("%s: attendance · %%s · adds %%s · announce: stand-in dWellOiledMachine · ask-live: stand-in "
+                     "dFurnishedOrders" % SAY)
         if case == "values":   # AC1, AC7
             three = [plan, gate % ("at", "item.design.exit"), closing, gate % ("before", "item.deploy.mandate")]
             every = three[:3] + [gate % ("at", "item.build.exit"), gate % ("at", "item.test.exit"), three[3],
@@ -472,6 +516,41 @@ def run_breakpoint_plant(case):
                 rc, lines = run_verb(top, listed)
                 check(rc == 0 and lines == owed, "under %r the list read %s" % (policy, lines))
                 check_owner_lines(lines)
+        elif case == "attendance-values":   # KICK-dKeptSession-17 AC1 to AC4
+            every = [plan, gate % ("at", "item.design.exit"), closing, gate % ("at", "item.build.exit"),
+                     gate % ("at", "item.test.exit"), gate % ("before", "item.deploy.mandate"),
+                     gate % ("at", "item.deploy.close")]
+            steps = announced % ("confirm-steps", "announce ask-live confirm-step-exit")
+            confirmed = [plan, attended % ("at", "item.design.exit"), closing, attended % ("at", "item.build.exit"),
+                         attended % ("at", "item.test.exit"), attended % ("at", "item.deploy.close"), steps]
+            for policy, owed in ((None, [plan, closing]), ('attendance = "confirm-steps"\n', confirmed),
+                                 ('autonomy = "every-stage"\nattendance = "confirm-steps"\n', every + [steps]),
+                                 ('attendance = "announce"\n',
+                                  [plan, closing, announced % ("announce", "announce ask-live")])):
+                write_policy(top, policy, "the policy %r" % policy)
+                rc, lines = run_verb(top, listed)
+                check(rc == 0 and lines == owed, "under %r the list read %s" % (policy, lines))
+                check_owner_lines(lines)
+            write_policy(top, 'attendance = "confirm-acts"\n', "confirm-acts")
+            rc, lines = run_verb(top, listed)
+            roles = [r["tag"] for r in read_items(KIT) if str(r.get("actor", "")).startswith("role:")]
+            gated = [ln.split(" · ")[1] for ln in lines if ln.endswith(" · owner · attendance · held")]
+            print("%s: fixture · confirm-acts · %d attendance gate(s) · %d role item(s) read" % (
+                SAY, len(gated), len(roles)))
+            check(rc == 0 and sorted(gated) == sorted("before " + t for t in roles) and plan in lines
+                  and closing in lines
+                  and lines[-1] == announced % ("confirm-acts", "announce ask-live confirm-before-act"),
+                  "under confirm-acts the list gated %s over the role items %s" % (gated, roles))
+            check_owner_lines(lines)
+        elif case == "attendance-missing":   # KICK-dKeptSession-17 AC6: a value no row declares refuses the list
+            import unittest.mock
+            rows = {k: v for k, v in read_attendance(KIT).items() if k != "confirm-steps"}
+            write_policy(top, 'attendance = "confirm-steps"\n', "confirm-steps")
+            with unittest.mock.patch.object(sys.modules[__name__], "read_attendance", lambda _kit: rows):
+                rc, lines = run_verb(top, listed)
+            check(rc == 2 and len(lines) == 1 and lines[0].startswith("%s: refused · " % SAY)
+                  and "attendance" in lines[0] and "confirm-steps" in lines[0],
+                  "with no confirm-steps row the list read exit %d, %s" % (rc, lines))
         elif case == "placed":   # AC2, over a tree holding this tree's kits, whose tag resolver reads a member
             repo = build_composition_base()[0]
             try:
@@ -682,7 +761,29 @@ def run_breakpoint_plant(case):
                 fh.write('\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="off"\n')
                 if case == "driver-plan":   # TOOL-dDeclaredLoop-63 AC2: an adopter phase the loop kit has no row of
                     fh.write('PHASES_EXTRA="STAGING"\n')
-            if case == "driver-close":   # AC3
+
+            def check_sourced(call, owed, needle=""):
+                """A miss where the sourced `call`, given the slug, does not exit `owed`, or exits 1 naming no
+                `needle` in a check 82 refusal."""
+                call = call % FX_SLUG
+                rc, out = run_sourced(repo, "load_driver_conf && " + call)
+                print("%s: fixture · %s · exit %d · %s" % (SAY, call, rc, out.strip().replace("\n", " / ")[:600]))
+                check(rc == owed and (not owed or "UNATTENDED check 82 FAILED" in out and needle in out),
+                      "%s exited %d, owed %d naming %r" % (call, rc, owed, needle))
+
+            if case == "attendance-plan":   # KICK-dKeptSession-17 AC6: --plan relays the list, the --phase move held
+                write_policy(repo, 'attendance = "confirm-steps"\n', "confirm-steps")
+                out, rc = run_driver(repo, "--plan", FX_SLUG)
+                said = [ln.rstrip("\r") for ln in out.splitlines()]
+                print("%s: fixture · --plan · exit %d · %s" % (SAY, rc, " / ".join(said[-8:])))
+                at = next((n for n, ln in enumerate(said) if ln.startswith("frontier: ")), None)
+                _rc, lines = run_verb(repo, ["list", "--build", FX_SLUG])
+                gates = [ln for ln in lines if ln.startswith("breakpoint: owner gate · ") and " · attendance · " in ln]
+                check(rc == 0 and at is not None and said[at + 1:] == lines and len(gates) == 4
+                      and lines[-1].startswith("%s: attendance · confirm-steps · " % SAY),
+                      "--plan's lines after frontier: are not the list's, its four attendance gates and its line")
+                check_sourced("check_phase_gates %s SPECCING BUILDING", 1, "item.design.exit")
+            elif case == "driver-close":   # AC3
                 spec = repo / "memory" / "builds" / FX_SLUG / "spec" / ("2026-01-01-spec-%s.md" % FX_IDS[0])
                 text = spec.read_text(encoding="utf-8").replace(
                     "## 8. Open questions\nnone\n", "## 8. Open questions\n- **F1 — which way?** Options: (a) or (b). "
@@ -725,15 +826,6 @@ def run_breakpoint_plant(case):
                 out, rc = run_driver(repo, "--plan", FX_SLUG, "--paths")
                 check(rc == 0 and "breakpoint: " not in out, "--plan --paths printed a breakpoint: line")
                 # TOOL-dDeclaredLoop-52 AC5: the --phase hold reads only the gates at the exits a move crosses
-                def check_sourced(call, owed, needle=""):
-                    """A miss where the sourced `call`, given the slug, does not exit `owed`, or exits 1 naming no
-                    `needle` in a check 82 refusal."""
-                    call = call % FX_SLUG
-                    rc, out = run_sourced(repo, "load_driver_conf && " + call)
-                    print("%s: fixture · %s · exit %d · %s" % (SAY, call, rc, out.strip().replace("\n", " / ")[:600]))
-                    check(rc == owed and (not owed or "UNATTENDED check 82 FAILED" in out and needle in out),
-                          "%s exited %d, owed %d naming %r" % (call, rc, owed, needle))
-
                 check_sourced("check_phase_gates %s SPECCING BUILDING", 1, "item.design.exit")
                 check_sourced("check_phase_gates %s BUILDING VERIFYING", 0)
                 # TOOL-dDeclaredLoop-63 AC2: the conf's adopter phase STAGING, which no phase row reads, is
@@ -778,6 +870,12 @@ def main(argv):
             found = read_breakpoints(args.build, root, args.spec_audit, args.delegated_fork)
             for b in found:
                 print(render_breakpoint_line(b))
+            attended = next((b["attended"] for b in found if b.get("attended")), None)
+            if attended:   # KICK-dKeptSession-17 S6: what the attended value adds, each stand-in by its owner
+                value, adds = attended
+                print("%s: attendance · %s · adds %s%s" % (SAY, value, " ".join(adds), "".join(
+                    " · %s: %s" % (m, ATTENDANCE_INTERACTIONS[m]) for m in adds
+                    if ATTENDANCE_INTERACTIONS[m].startswith("stand-in "))))
             held = next((b for b in found if b.get("unopened")), None)
             if held:   # TOOL-dDeclaredLoop-64: its own head, never an owner line's bytes; 75 S8: the root's source
                 print("%s: held · no commit adds %s · root from %s" % (SAY, held["unopened"], held["root_from"]))
