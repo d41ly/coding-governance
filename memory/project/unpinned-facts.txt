@@ -11399,10 +11399,6 @@ memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-3.md	160 bytes
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	150000 tokens	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	900000 tokens	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-38.md	37 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	10 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	12 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	30 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	60 seconds	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-47.md	50000 tokens	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-5.md	6 commits	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	22 rows	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
