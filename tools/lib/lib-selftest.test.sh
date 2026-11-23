@@ -345,8 +345,8 @@ run_arms t"
 mkdir -p "$TMP/tr.sw"
 SELFTEST_TEMPLATE_ROOT=$TMP/tr.sw run_harness tshared "$SBODY" "$DEF"
 SELFTEST_TEMPLATE_ROOT=$TMP/tr.sw run_harness tpercase "$SBODY" "$PC"
-if diff <(grep -E '^(ok|FAIL) ' "$TMP/tshared.out" | grep -v 'read checkout') \
-        <(grep -E '^(ok|FAIL) ' "$TMP/tpercase.out") >/dev/null 2>&1 && grep -q '^FAIL  the red' "$TMP/tpercase.out"; then
+if diff <(grep -E '^(ok|FAIL)  ' "$TMP/tshared.out" | grep -v 'read checkout') \
+        <(grep -E '^(ok|FAIL)  ' "$TMP/tpercase.out") >/dev/null 2>&1 && grep -q '^FAIL  the red' "$TMP/tpercase.out"; then
   ok "the arm lines are identical under shared and per-case, the same arm red in both"
 else
   nope "an arm's result moved with the switch" "$(diff "$TMP/tshared.out" "$TMP/tpercase.out" | head -6)"

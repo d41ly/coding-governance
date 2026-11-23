@@ -100,7 +100,7 @@ derive_template_key() ( # <builder> [<input file>...] -> the key, 40 hex, from t
   { printf 'template-cache v1\nbash\n%s\n' "$_tc_b"
     declare -f "$_tc_b"
     printf 'input %s\n' "$@"
-    [ "$#" -eq 0 ] || printf '%s\n' "$@" | git hash-object --no-filters --stdin-paths
+    [ "$#" -eq 0 ] || git hash-object --no-filters -- "$@"
   } | git hash-object --stdin
 )
 resolve_template() ( # <root> <key> <builder> [<arg>...] -> <root>/<key>/repo, <key> folding the args; built once per root
