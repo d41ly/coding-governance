@@ -3828,6 +3828,22 @@ out=$("$_PY" "$HERE/record_causes.py" --fixture --plant backfill-refusals 2>&1);
 n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant backfill-refusals exited $_brc, expected 0"; st=1; }
 hit "not backfilled · $_bfr-deviation-1.md · typed kind"; hit "not backfilled · $_bfr-late.md · head window"
 miss 'fixture backfill-refusals · status'; hit 'record causes: fixture backfill-refusals · PASS'
+# --- TOOL-dTotalRecall-50 (AC2 AC3) — the pinned writer: a CAUSE_WRITER_PINNED row is red, named, once its
+# --- instrument spells the cause past its binding window and once its ask row leaves the backlog; a causeless
+# --- departures record its glob reads passes causes and orphans while the row stands, its cause its first Serves
+# --- unit, and is named once the row is cut. Red on the row's drain and filed-ask tests skipped and on S3's
+# --- interim read skipped.
+_pwr='CAUSE_WRITER_PINNED memory/builds/fRoot/build/2026-01-01-build-TOOL-fRoot-1-deviations.py (ask TOOL-fRoot-2)'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant pinned-writer-drained 2>&1); _brc=$?   # AC2
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant pinned-writer-drained exited $_brc, expected 0"; st=1; }
+hit "check 1 · record causes: RED cause-writer $_pwr: spells Caused-by past its binding window"
+hit "check 2 · record causes: RED cause-writer $_pwr: names ask TOOL-fRoot-2, which is not a filed ask"
+hit 'check 1 exit 1 · check 2 exit 1'; hit 'record causes: fixture pinned-writer-drained · PASS'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant departures-pinned 2>&1); _brc=$?   # AC3
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant departures-pinned exited $_brc, expected 0"; st=1; }
+hit 'check 1 · record causes: 0 causeless · 0 orphan(s)'
+hit 'check 2 · record causes: causes · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-departures-build.md · names no Caused-by'
+hit 'check 1 exit 0 · check 2 exit 1'; hit 'record causes: fixture departures-pinned · PASS'
 
 # --- TOOL-dTotalRecall-7 (AC4 AC5 AC6 AC7 AC10 AC11 AC12) — the ask door, `gov_record.py new ask`: the plant
 # --- runs the refuse, undeclared-family, file, replay, grade, refused-read and refused-filing-on-a-remote

@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-11-23, the newest record date in this tree (dTotalRecall).
+Dormant: no record dated within 21 days of 2026-11-23, the newest record date in this tree (dClosedLoop).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -18,6 +18,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 | 2026-11-22 | active | 0 |
 | [dBoundRoles](builds/dBoundRoles/README.md) | DEFERRED | d | 2026-10-21 | tooling | 76 | 2026-11-21 | active | 0 |
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | DEFERRED | d | 2026-10-21 | tooling | 56 | 2026-11-04 | active | 0 |
+| [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook | 41 | 2026-11-23 | active | 1 |
 | [dConvergedCharter](builds/dConvergedCharter/README.md) | DEFERRED | d | 2026-10-21 | playbook | 45 | 2026-11-22 | active | 0 |
 | [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 119 | 2026-11-19 | active | 0 |
 | [dFurnishedOrders](builds/dFurnishedOrders/README.md) | DEFERRED | d | 2026-10-21 | tooling | 62 | 2026-11-22 | active | 0 |
@@ -31,7 +32,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dScopedBuild](builds/dScopedBuild/README.md) | DEFERRED | d | 2026-10-21 | tooling | 43 | 2026-11-03 | active | 0 |
 | [dShippedRelease](builds/dShippedRelease/README.md) | DEFERRED | d | 2026-10-21 | deployer | 145 | 2026-11-12 | active | 0 |
 | [dTendedCadence](builds/dTendedCadence/README.md) | DEFERRED | d | 2026-10-21 | tooling | 74 | 2026-11-03 | active | 0 |
-| [dTotalRecall](builds/dTotalRecall/README.md) | INPROGRESS | d | 2026-10-21 | tooling | 110 | 2026-11-23 | active | 0 |
+| [dTotalRecall](builds/dTotalRecall/README.md) | DEFERRED | d | 2026-10-21 | tooling | 110 | 2026-11-23 | active | 0 |
 | [dWellOiledMachine](builds/dWellOiledMachine/README.md) | DEFERRED | d | 2026-10-21 | tooling | 132 | 2026-11-22 | active | 0 |
 | [dWitnessedBar](builds/dWitnessedBar/README.md) | DEFERRED | d | 2026-10-21 | tooling | 116 | 2026-11-22 | active | 0 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 | 2026-08-08 | dormant | 1 |
@@ -48,7 +49,6 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [aTunedCompass](builds/aTunedCompass/README.md) | BLOCKED | a | 2026-09-04 | tooling | 11 | 2026-09-05 | dormant | 0 |
 | [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 10 | 2026-08-18 | dormant | 0 |
 | [aWeighedCanon](builds/aWeighedCanon/README.md) | OPEN | a | 2026-09-04 | tooling | 2 | 2026-09-04 | dormant | 0 |
-| [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook | 40 | 2026-10-26 | dormant | 1 |
 | [dPinnedHandoff](builds/dPinnedHandoff/README.md) | SPECCED | d | 2026-09-22 | tooling | 3 | 2026-09-28 | dormant | 0 |
 | [dPromptedSeam](builds/dPromptedSeam/README.md) | DEFERRED | d | 2026-08-25 | tooling | 4 | 2026-08-25 | dormant | 0 |
 | [dRetiredFork](builds/dRetiredFork/README.md) | DEFERRED | d | 2026-09-02 | deployer+tooling | 56 | 2026-09-03 | dormant | 0 |

@@ -5568,6 +5568,11 @@
       "file": "tools/loop/placement.py"
     },
     {
+      "id": "check_ask_filed",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "check_ask_mandate",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -8091,6 +8096,11 @@
       "id": "check_pinned_handle",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "check_pinned_plant",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "check_pins",
@@ -22033,6 +22043,11 @@
       "file": "tools/gate-lint/fork-count.sh"
     },
     {
+      "id": "read_build_code_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "read_build_headers",
       "kind": "function",
       "file": "tools/loop/loop_transition.py"
@@ -25271,6 +25286,11 @@
       "id": "read_pinned_base",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_pinned_records",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "read_pl_exec_token",
@@ -30381,6 +30401,11 @@
       "id": "render_pin_rows",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "render_pinned_instrument",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "render_pins_rest",
