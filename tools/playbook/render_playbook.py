@@ -3158,6 +3158,15 @@ def run_selftest() -> int:
             (['exclude-needed', '--exclude', 'fixture.beta'], 1, ['which fixture.alpha still holds in its needs field']),
             (['exclude-actor'], 1, ['which fixture.adopter.actor still holds in its actor field']),
             (['exclude-granted'], 1, ['which fixture.adopter.granter still holds in its grants field']),
+            # TOOL-dBoundRoles-83 — a requirer's member read as the tag it names: `fixture:beta` as
+            # fixture.beta, a leg's name, its `?` aside, as its manifest tag; a leg no member names composes.
+            (['exclude-actor-spelled'], 1, ['row-checks: red · exclude · instructions.exclude lists fixture.beta, '
+                                            'which fixture.adopter.actor still holds in its actor field `actor` as '
+                                            '`fixture:beta`']),
+            (['exclude-leg-named'], 1, ['row-checks: red · exclude · instructions.exclude lists '
+                                        'leg.fixture.fixture-leg, which fixture.adopter.granter still holds in its '
+                                        'grants field `grants` as `fixture leg?`']),
+            (['exclude-leg-unnamed'], 0, ['row fixture.adopter.granter', 'check exclude · read 4']),
             (['exclude-policy', '--policy', 'fixture.pick=fixture.beta'], 1, ['the policy key fixture.pick names']),
             (['exclude-instance'], 1, ['the policy key roles.harness.builder names']),
             (['classify'], 0, ['grants add widens', 'needs remove widens', 'needs add narrows', 'ceiling low->high widens',
@@ -3195,6 +3204,8 @@ def run_selftest() -> int:
             ok = ok and len(re.findall(r'^row-kind: patch ', done.stdout, re.M)) == 5
         if argv == ['widenings']:
             ok = ok and len(re.findall(r'^row-kind: widening ', done.stdout, re.M)) == 2
+        if argv == ['exclude-leg-unnamed']:
+            ok = ok and 'row-checks: red · exclude' not in said
         if argv == ['rises-lower']:
             ok = ok and len(re.findall(r'· field reach · .*never lowered$', said, re.M)) == 2
         if argv == ['clean']:

@@ -440,7 +440,6 @@ Cite ids, never line numbers.
 | [TOOL-dBoundRoles-75](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE BREAKER'S BUDGET DRAW HAS NO DRAWER. cl-dClosedLoop-0327 has an act… |
 | [TOOL-dBoundRoles-76](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE. TOOL-dWitnessedBar-84 S9 put… |
 | [TOOL-dBoundRoles-77](../builds/dBoundRoles/BACKLOG.md) | SPECCED | MED | TOOL-dBoundRoles-81 | 2026-11-23 | THE COMPOSE VERB READS NO FRONT-MATTER KIND. TOOL-dBoundRoles-20 §8 F8… |
-| [TOOL-dBoundRoles-79](../builds/dBoundRoles/BACKLOG.md) | INPROGRESS | MED | TOOL-dBoundRoles-83 | 2026-11-23 | THE EXCLUSION WALK COMPARES TAGS THE REQUIRERS DO NOT SPELL.… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | DEFERRED | MED | TOOL-dCalibratedLens-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |

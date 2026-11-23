@@ -144,7 +144,11 @@ An exclusion is also refused while something still relies on the excluded tag: a
 kind holding it in a field whose schema `ref` role is `needs`, `actor` or `grants` (the refusal names the
 row and the field), or a tag-valued policy key naming it, such as `roles.harness.builder` (the refusal
 names the key). Take the tag from that row or key first, for example with an `amends` whose `remove`
-drops it from `needs`.
+drops it from `needs`. A requirer's member counts in its own spelling, read as the tag it names:
+`role:<slot>` as `role.<slot>`, so an item whose `actor` is `role:gov-builder` relies on an excluded
+`role.gov-builder`, and a leg's name, a trailing `?` aside, as its tag in the leg manifest
+`gate-legs.json`, so a role granting `lexicon naming predicates?` relies on
+`leg.lexicon.lexicon-naming-predicates`. The refusal then names the member as spelled.
 
 Every patch operation the composition applies is classified `widens` or `narrows` from the field's
 declared direction alone; a value equal to gov's is no operation. Where gov's own value sits outside

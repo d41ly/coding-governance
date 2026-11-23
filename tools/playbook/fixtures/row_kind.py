@@ -12,7 +12,9 @@ under a change record. It then composes the kind at HEAD through `overlay_rows` 
 each composed row, each gov row's state, each held patch, stale edge, order and journal line, each
 classified patch operation, each widening and the rows each row check read. `--exclude` commits
 `instructions.exclude` in the tree's policy file; `--stale` is `instructions.stale`; `--policy` sets a
-tag-valued policy key's one member over what `read_tag_policy` read.
+tag-valued policy key's one member over what `read_tag_policy` read. Where an exclusion is set the leg
+manifest's names are read by `read_leg_names` and handed on (TOOL-dBoundRoles-83); the `exclude-leg-`
+plants commit a manifest of LEG_ROWS.
 
 Exit 0 the composition held · 1 it was refused · 2 usage or a plant that could not be built.
 """
@@ -113,9 +115,9 @@ def write_change(top, tag, action, before_row, after_rows, successor=None, mark=
     iu.run_git(top, "add", "--", rel)
 
 
-def build_tree(top, gov=GOV, overlay="", schema=None, exclude=None, policy=""):
+def build_tree(top, gov=GOV, overlay="", schema=None, exclude=None, policy="", more=None):
     """Commit 1: the registers, gov's principle registry, this file, the schema, gov's pack, the overlay and
-    the policy file, `policy` text after its `instructions.exclude`."""
+    the policy file, `policy` text after its `instructions.exclude`, and `more`'s `{path: text}` beside."""
     files = {".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="play:PLAY"\n',
              f"memory/builds/{BUILD}/README.md": "# the fixture build\n",
              iu.derive_kit_file(".", "namespaces.toml").as_posix():
@@ -128,7 +130,7 @@ def build_tree(top, gov=GOV, overlay="", schema=None, exclude=None, policy=""):
              SCHEMA: schema or render_schema(), PACK: render_rows(gov), iu.OVERLAY: overlay}
     if exclude:
         files[".governance/policy.toml"] = f"[instructions]\nexclude = {render_value([exclude])}\n{policy}"
-    write_files(top, files)
+    write_files(top, {**files, **(more or {})})
     iu.run_commit(top, "the fixture")
 
 
@@ -171,6 +173,17 @@ def build_exclude_plant(top, a, overlay="", policy=""):
     needs, with `overlay`'s rows beside and `policy` text in the policy file."""
     build_tree(top, overlay="\n".join(o for o in (UNNEED, overlay) if o), exclude=a.exclude or "fixture.beta",
                policy=policy)
+
+
+LEGS = iu.derive_tool_rel("gate-legs.json")
+LEG_ROWS = [{"name": "fixture leg", "tag": "leg.fixture.fixture-leg"}, {"name": "other leg", "tag": "leg.fixture.other"}]
+
+
+def build_leg_plant(top, a, exclude):
+    """TOOL-dBoundRoles-83: a leg manifest of LEG_ROWS in the tree, an overlay row granting `fixture leg?`
+    by its leg name, and `--exclude`, `exclude` by default, in `instructions.exclude`."""
+    build_tree(top, overlay=render_rows([{"tag": "fixture.adopter.granter", "grants": ["fixture leg?"]}]),
+               exclude=a.exclude or exclude, more={LEGS: json.dumps(LEG_ROWS, indent=1) + "\n"})
 
 
 def build_semantic_plant(top, row=None):
@@ -280,6 +293,13 @@ PLANTS = {
     "exclude-actor": (1, "refused: fixture.adopter.actor still acts as the excluded tag",
                       lambda top, a: build_exclude_plant(top, a, render_rows(
                           [{"tag": "fixture.adopter.actor", "actor": "fixture.beta"}]))),
+    "exclude-actor-spelled": (1, "refused: fixture.adopter.actor acts as fixture:beta, the excluded tag spelled",
+                              lambda top, a: build_exclude_plant(top, a, render_rows(
+                                  [{"tag": "fixture.adopter.actor", "actor": "fixture:beta"}]))),
+    "exclude-leg-named": (1, "refused: fixture.adopter.granter grants fixture leg?, the excluded leg by its name",
+                          lambda top, a: build_leg_plant(top, a, "leg.fixture.fixture-leg")),
+    "exclude-leg-unnamed": (0, "leg.fixture.other excluded, a leg no member names, composes",
+                            lambda top, a: build_leg_plant(top, a, "leg.fixture.other")),
     "exclude-granted": (1, "refused: fixture.adopter.granter still grants the excluded tag",
                         lambda top, a: build_exclude_plant(top, a, render_rows(
                             [{"tag": "fixture.adopter.granter", "grants": ["fixture.beta"]}]))),
@@ -357,7 +377,7 @@ def run_plant(top, args) -> tuple[list, list, int]:
         policy.update({k: [t] for k, _, t in (p.partition("=") for p in args.policy or [])})
         rows, states, held, stale, orders, checks = orows.derive_row_composition(
             KIND, schema, gov, orows.read_overlay_rows(top).get(KIND, []), exclude,
-            args.stale, iu.read_change_records(top), policy)
+            args.stale, iu.read_change_records(top), policy, legs=orows.read_leg_names(top) if exclude else {})
     except ov.OverlayRefused as exc:
         return out + str(exc).splitlines() + [f"{SAY}: exit 1"], err, 1
     for r in rows:
