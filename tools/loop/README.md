@@ -400,9 +400,10 @@ from a `--field` as well, and `disposed`, the mail the move disposed, derived an
 **The mail guard** (KICK-dKeptSession-5 S9, S10). After the set is read and before `derive_move`, the
 writer runs the unattended kit's `--mail read <slug>` once, `read_mail_rows`, under
 `MAIL_GUARD_SECONDS`, its bash the inline resolver's. A row reading `open`, a message addressed to the
-build or one of its units neither answered nor acknowledged, raises `MailHeld`, a `TransitionRefused`
-printed `refused — <slug> · mail open <id> …`, exit 1, writing nothing; `claim.py` catches it before a
-row miss and prints `claim held`. `mail — off`, no unattended kit, or a repository with no
+build or one of its units neither answered, acknowledged nor past its deadline, raises `MailHeld`, a
+`TransitionRefused` printed `refused — <slug> · mail open <id> …`, exit 1, writing nothing; `claim.py`
+catches it before a row miss and prints `claim held`. A message this node first saw more than its
+`deadline` hours ago reads `expired` (KICK-dKeptSession-24) and holds nothing. `mail — off`, no unattended kit, or a repository with no
 `.unattended.conf` pass with one `loop: mail · unarmed · <why>` line; a driver no bash sees, a read
 silent within the bound, or a non-zero read with no row is `mail unknown`, exit 2. Past the guard each
 `answered`, `acked` or `expired` row no earlier move names is written into `disposed=<id>+<id>`, and
@@ -426,7 +427,9 @@ kit takes no edge to it. `--fixture --plant <case>` runs both over a scratch rep
 `backward-rows`, printing each trailer and read with its direction, and `skip-backward`, the newest
 record deleted so the check names the move back owing it; `descope-spent`, the move back refused on
 a spent rework budget, then a descope; `mail-open` and `mail-disposed`, the
-driver's conf and a bare remote holding an open question, then its `ack`; and the three over the
+driver's conf and a bare remote holding an open question, then its `ack`; `mail-expired`, that
+question carrying `deadline: 30`, first sighted 31 hours ago (PINNED) and never answered, disposed as
+`expired` (KICK-dKeptSession-24); and the three over the
 guard's launch, each rebinding the name the guard imports inside its function and restoring it:
 `mail-argv`, the mailbox read's argv recorded and held to the located driver and `resolve_bash`'s
 bash, `mail-no-driver`, the driver's locator over an empty directory, the move recorded unarmed, and

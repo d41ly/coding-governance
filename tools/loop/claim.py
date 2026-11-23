@@ -43,7 +43,7 @@ folder holds the owner's disposition record of `item.entry.claim` `ratified`, `r
 good; the unit id that record carries is `<FAMILY>-<slug>-1`, the family the README's `roster` names. An
 open message addressed to the build holds the first move too (KICK-dKeptSession-5 S9): `write_transition`'s
 mail guard raises `MailHeld`, caught before a row miss is, and RECORD prints `claim held — <slug> · mail
-open <id> …`, exit 1, until the message is answered or acknowledged.
+open <id> …`, exit 1, until the message is answered, acknowledged or past its deadline (KICK-dKeptSession-24).
 
 Exit 0 written or witnessed · 1 refused, named · 2 not written: a usage error, a kit that does not resolve
 or a read that did not answer. `--fixture --plant <case>` runs one case of `PLANTS` in a throwaway

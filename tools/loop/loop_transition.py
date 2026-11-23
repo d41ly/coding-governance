@@ -67,15 +67,18 @@ its `direction` derived over this kit's definition.
 
 THE MAIL GUARD (KICK-dKeptSession-5 S9, S10): after the set is read and before the table answers, `record`
 runs the unattended driver's `--mail read <slug>` once (`read_mail_rows`, under `MAIL_GUARD_SECONDS`). A
-row reading `open`, a message addressed to the build or one of its units neither answered nor
-acknowledged, refuses the move as `refused — <slug> · mail open <id> …`, exit 1, writing nothing
-(`MailHeld`). `mail — off`, no driver, or a root with no `.unattended.conf` passes with one `loop: mail ·
+row reading `open`, a message addressed to the build or one of its units neither answered, acknowledged
+nor past its deadline, refuses the move as `refused — <slug> · mail open <id> …`, exit 1, writing nothing
+(`MailHeld`); a message this node first saw more than its `deadline` hours ago reads `expired`
+(KICK-dKeptSession-24 S5), its asker's `default` the answer, and holds nothing. `mail — off`, no driver, or a root with no `.unattended.conf` passes with one `loop: mail ·
 unarmed · <why>` line; a driver no bash sees, a read silent within the bound, or a non-zero read with no
 row is `loop: unanswered · mail unknown: ...`, exit 2. Past the guard, each `answered`, `acked` or
 `expired` row no earlier move names is recorded in the derived field `disposed=<id>+<id>`, and where the
 set holds `log` one `mailbox-message` record per id is written after the move's own record and committed
 with it (`write_mail_records`). `--fixture --plant mail-open` holds the refusal over an open question on
-a bare remote, `mail-disposed` the disposal after its `ack` and a second move that disposes nothing.
+a bare remote, `mail-disposed` the disposal after its `ack` and a second move that disposes nothing, and
+`mail-expired` the disposal of a question carrying `deadline: 30`, first sighted 31 hours ago and never
+answered, its record's `State` reading `expired`.
 
 Exit: `record` 0 recorded, 1 refused by the table or held by open mail; `check` 0 clean, 1 on a finding, `pending` or
 `unstored`. Both exit 2 printing `loop: unanswered · <why>` on a value outside its grammar, a witness
@@ -127,7 +130,8 @@ BUDGET_FIELDS = ("budget", "draw")
 #: The extension fields a trailer and a record may carry after `build`, `item` and `sha`, in the order
 #: they are written; later units extend it. `composition`, `scenario`, `scenario-settled`, the
 #: `BUDGET_FIELDS` and `disposed`, the mail the move disposed (KICK-dKeptSession-5 S10), are derived by
-#: the writer, never given; the `mail-open` and `mail-disposed` plants hold the guard and the disposal.
+#: the writer, never given; the `mail-open` and `mail-disposed` plants hold the guard and the disposal,
+#: and `mail-expired` the disposal of a question past its deadline (KICK-dKeptSession-24 S5).
 TRANSITION_FIELDS = ("stand-in", "composition", "scenario", "scenario-settled") + BUDGET_FIELDS + ("tree", "disposed")
 #: The mail guard's bound in seconds on the unattended driver's `--mail read` (KICK-dKeptSession-5 S9),
 #: twice the kickoff engine's claims read, since the guard fetches every build's mail refs.
@@ -182,15 +186,20 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
                        "B4 refused naming it, no commit",
           "mail-disposed": "the same question and tFix's ack of it: B4 disposes it in one commit, its record read, "
                            "then B5 disposes nothing",
+          "mail-expired": "the same question with deadline: 30 and default: no, first sighted 31 hours ago and "
+                          "never answered: B4 disposes it as expired in one commit, its record read",
           "mail-argv": "the driver's conf with RUN_CLAIMS on and subprocess.run wrapped: B4's --mail read argv "
                        "recorded, answered zero rows, and held to the located driver and the bash that sees it",
           "mail-no-driver": "the driver's conf, the driver's locator run over an empty scratch directory: B4 "
                             "records with the mailbox unarmed",
           "mail-no-bash": "the driver's conf and resolve_bash answering None: B4 refused as mail unknown, no commit"}
 #: The mail plants' messages, each `(ref, build, id, to, kind, subject, answers)`, put straight on the fixture's
-#: remote; `mail-disposed` adds the ack.
+#: remote; `mail-disposed` adds the ack. `mail-expired` writes the question with `FX_DEADLINE`'s two keys and
+#: its first sighting `FX_SIGHTED_HOURS` back in the fixture's feed, past the 30-hour deadline.
 FX_QUESTION = ("refs/gov/mail/fy/z/s-other", "fy", "a1b2c3d4e5f6", "build:tFix", "question", "the fixture's question", "none")
 FX_ACK = ("refs/gov/mail/tFix/z/s-fx", "tFix", "0f1e2d3c4b5a", "build:fy", "ack", "the fixture's question", "a1b2c3d4e5f6")
+FX_DEADLINE = {"deadline": "30", "default": "no"}
+FX_SIGHTED_HOURS = 31
 #: The moves the backward plants record in order, each an argv tail for `record` before its witness.
 BACKWARD_MOVES = (("--from", "planning", "--item", "item.plan.exit", "--outcome", "recorded"),
                   ("--from", "designing", "--item", "item.design.exit", "--outcome", "recorded"),
@@ -442,12 +451,12 @@ def check_tree_verdict(root, tree):
 
 
 class MailHeld(TransitionRefused):
-    """A message addressed to the build is open, neither answered nor acknowledged (KICK-dKeptSession-5 S9);
-    the message names the build and every open id."""
+    """A message addressed to the build is open, neither answered, acknowledged nor past its deadline
+    (KICK-dKeptSession-5 S9, KICK-dKeptSession-24 S5); the message names the build and every open id."""
 
     def __init__(self, build, ids):
         Exception.__init__(self, "%s · mail open %s · a message addressed to the build holds its moves until it is "
-                                 "answered or acknowledged" % (build, " ".join(ids)))
+                                 "answered, acknowledged or past its deadline" % (build, " ".join(ids)))
 
 
 def read_mail_rows(root, build):
@@ -512,11 +521,13 @@ def write_mail_records(root, build, anchor, rows):
     return out
 
 
-def render_fixture_mail(build, mid, to, kind, subject, answers="none"):
-    """A mail commit's message as the driver's `--mail post` writes it, for a plant that puts one straight on its
-    remote: the header, the ten keys, `from-tag` `z` and `from-session` `s-other`, and a one-line body."""
+def render_fixture_mail(build, mid, to, kind, subject, answers="none", deadline=None, default=None):
+    """A mail commit's message as `KICK-dKeptSession-5`'s post recorded it, with no deadline, for a plant that puts
+    one straight on its remote: the header, the ten keys, `from-tag` `z` and `from-session` `s-other`, and a
+    one-line body; `deadline` and `default`, where given, append the two keys KICK-dKeptSession-24's post writes."""
     keys = (("id", mid), ("build", build), ("from-tag", "z"), ("from-session", "s-other"), ("to", to), ("kind", kind),
             ("item", "none"), ("pass", "none"), ("subject", subject), ("answers", answers))
+    keys += tuple((k, v) for k, v in (("deadline", deadline), ("default", default)) if v is not None)
     return "gov-mail %s/%s\n\n%s\nthe fixture's message\n" % (build, mid, "".join("%s: %s\n" % kv for kv in keys))
 
 
@@ -851,14 +862,28 @@ def write_transition_plant(top, case):
     write_fixture_files(top, files)
     run_fixture_git(top, "add", "-A")
     run_fixture_git(top, "commit", "-q", "-m", "fixture")
-    if case in ("mail-open", "mail-disposed"):   # a bare remote inside the git dir, so the scratch's removal takes it too
+    if case in ("mail-open", "mail-disposed", "mail-expired"):   # a bare remote inside the git dir, so the scratch's removal takes it too
         from placement import write_fixture_gov_ref
         origin = top / ".git" / "fx-origin.git"
         run_fixture_git(top, "init", "-q", "--bare", "--template=", str(origin))
         run_fixture_git(top, "remote", "add", FIXTURE_REMOTE, str(origin))
         run_fixture_git(top, "push", "-q", FIXTURE_REMOTE, "main")
         for ref, *mail in (FX_QUESTION, FX_ACK) if case == "mail-disposed" else (FX_QUESTION,):
-            write_fixture_gov_ref(top, ref, render_fixture_mail(*mail))
+            write_fixture_gov_ref(top, ref, render_fixture_mail(*mail, **(FX_DEADLINE if case == "mail-expired" else {})))
+        if case == "mail-expired":
+            # its first sighting, the six-field line `claim.py`'s stale-holder plant writes for a lease: the commit
+            # the remote holds, seen FX_SIGHTED_HOURS back. The driver's sightings walk appends its own line for
+            # the tip at the read, after this one, and the first line of a ref and commit is the one it ages
+            import datetime
+            ref = FX_QUESTION[0]
+            sha = run_fixture_git(top, "ls-remote", FIXTURE_REMOTE, ref).split("\t", 1)[0]
+            feed = pathlib.Path(run_fixture_git(top, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "gov-feed.log"
+            rows = feed.read_text(encoding="utf-8").splitlines() if feed.exists() else []
+            seq = max([int(r.split("\t", 1)[0]) for r in rows if r.split("\t", 1)[0].isdigit()] or [0]) + 1
+            ago = (datetime.datetime.now(datetime.timezone.utc)
+                   - datetime.timedelta(hours=FX_SIGHTED_HOURS)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            with feed.open("a", encoding="utf-8", newline="\n") as fh:
+                fh.write("%d\t%s\tmail\t%s\t%s\t%s\n" % (seq, ref, run_fixture_git(top, "rev-parse", sha + "^{tree}"), sha, ago))
     return run_fixture_git(top, "rev-parse", "HEAD")
 
 
@@ -912,11 +937,13 @@ def run_transition_fixture(case):
             rc = run_verb(b4)
             print("%s: fixture · commits %s" % (SAY, "unchanged" if read_count() == before else "changed"))
             return rc
-        if case == "mail-disposed":   # KICK-dKeptSession-5 AC6: B4 disposes the acknowledged question in one commit
+        if case in ("mail-disposed", "mail-expired"):   # KICK-dKeptSession-5 AC6: B4 disposes the acknowledged
+            # question in one commit; KICK-dKeptSession-24 AC2: B4 disposes the question past its deadline, never
+            # answered, as expired
             read_memory_tree("build_records.py")
             import build_records
             before = read_count()
-            run_verb(b4)
+            moved = run_verb(b4)
             files = [p for p in run_fixture_git(top, "show", "--format=", "--name-only", "HEAD").splitlines() if p]
             mails = [p for p in files if "-%s-" % MAIL_KIND in p]
             print("%s: fixture · commits %d · %d file(s) · %d %s record(s)" % (
@@ -933,6 +960,8 @@ def run_transition_fixture(case):
                 serves, state = (re.search(r"^%s$" % p, text, re.M) for p in (r"\*\*Serves:\*\* (.+)", r"- \*\*State:\*\* (.+)"))
                 print("%s: fixture · %s · read exit %d · Serves %s · State %s" % (
                     SAY, rel, rc, serves.group(1) if serves else "none", state.group(1) if state else "none"))
+            if case == "mail-expired":
+                return moved
             run_verb(["record", *at, *BACKWARD_MOVES[1][:6], "--witness", "HEAD"])
             value = run_fixture_git(top, "log", "-1", "--format=%%(trailers:key=%s,valueonly)" % TRAILER_KEY)
             print("%s: fixture · next move · %s" % (SAY, "disposes again: " + value if "disposed=" in value else "disposes nothing"))
@@ -1124,6 +1153,12 @@ def run_selftest():
               "%s-1.md · read exit 0 · Serves %s %s · State acked" % (MAIL_KIND, MAIL_KIND, FX_UNIT)),
              ("mail-disposed next", fx("mail-disposed"), 0, "%s: fixture · next move · disposes nothing" % SAY, ""),
              ("mail-disposed check", fx("mail-disposed"), 0, check, "· 0 finding(s)"),
+             ("mail-expired recorded", fx("mail-expired"), 0, "%s: recorded · planning -> designing" % SAY, ""),
+             ("mail-expired commit", fx("mail-expired"), 0, "%s: fixture · commits 1 · " % SAY,
+              "1 %s record(s)" % MAIL_KIND),
+             ("mail-expired trailer", fx("mail-expired"), 0, trailer, " · disposed=%s" % FX_QUESTION[2]),
+             ("mail-expired record", fx("mail-expired"), 0, "%s: fixture · memory/builds/%s/build/" % (SAY, FX_BUILD),
+              "%s-1.md · read exit 0 · Serves %s %s · State expired" % (MAIL_KIND, MAIL_KIND, FX_UNIT)),
              ("mail-argv", fx("mail-argv"), 0, "%s: fixture · mail-argv · held" % SAY, ""),
              ("mail-no-driver", fx("mail-no-driver"), 0,
               "%s: mail · unarmed · no unattended kit holding unattended.sh in this install" % SAY, ""),
