@@ -255,6 +255,10 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
                                     "confirmed and two changed to each, passes 1, 2 and 3, every post posted",
           "notices-refused": "the same two dependents and the post to dA answering 1: B5 records, printing "
                              "notice — not posted confirmed to build:dA · rc 1, and dB's post is posted",
+          "notices-repeat-key": "the driver's conf with RUN_CLAIMS on, a bare remote and dA alone naming tFix in "
+                                "parents: B4, then B5, B21, B5, B21 and B5, the spec edited after the first B21 "
+                                "alone, so the listings read A, B and B: one confirmed and two changed of one key, "
+                                "passes 1, 2 and 3, every post posted",
           "acks-landed": "the driver's conf with RUN_CLAIMS on and a bare remote holding fy's landed to build:tFix: "
                          "B4 acknowledges it and records, the read after it reading the row acked",
           "acks-confirmed": "fy's spec committed, its lease witnessing that commit and fy's confirmed keyed over its "
@@ -1218,8 +1222,10 @@ def write_transition_plant(top, case):
             raise LookupError("the mail plants copy .unattended.conf from this tree, which holds none")
         files[".unattended.conf"] = (src / ".unattended.conf").read_text(encoding="utf-8") + \
             '\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="on"\n'
-    # KICK-dKeptSession-7 AC7: the second build, its README naming tFix a parent; KICK-dKeptSession-35 AC1, AC3: two
-    for dependent in (FX_DEPENDENT,) if case == "deps-notices" else FX_DEPENDENTS if notices else ():
+    # KICK-dKeptSession-7 AC7: the second build, its README naming tFix a parent; KICK-dKeptSession-35 AC1, AC3: two;
+    # KICK-dKeptSession-52 S1: dA alone, since the id carries the recipient and a second one decides nothing
+    for dependent in ((FX_DEPENDENT,) if case == "deps-notices" else FX_DEPENDENTS[:1] if case == "notices-repeat-key"
+                      else FX_DEPENDENTS if notices else ()):
         files["memory/builds/%s/README.md" % dependent] = (
             "---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: TOOL\nids: TOOL-%s-1\nparents: %s\n"
             "---\n# %s\n" % (dependent, dependent, FX_BUILD, dependent))
@@ -1357,8 +1363,9 @@ def run_transition_fixture(case):
             misses = run_notice_plant(top, witness)
             print("%s: fixture · deps-notices · %s" % (SAY, "held" if not misses else "MISSED " + "; ".join(misses)))
             return 0 if not misses else 1
-        if case in ("notices-two-dependents", "notices-refused"):   # KICK-dKeptSession-35 AC1, AC3: each plant
-            # rebinds the launcher the writer imports inside its function, recording every post, and restores it
+        if case in ("notices-two-dependents", "notices-refused", "notices-repeat-key"):   # KICK-dKeptSession-35 AC1,
+            # AC3 and KICK-dKeptSession-52 S1: each plant rebinds the launcher the writer imports inside its
+            # function, recording every post, and restores it
             import os
             import breakpoints
             from placement import read_fleet_user
@@ -1382,16 +1389,32 @@ def run_transition_fixture(case):
             kept = {k: os.environ.get(k) for k in ("USERNAME", "CLAUDE_CODE_SESSION_ID")}
             os.environ.update(USERNAME=read_fleet_user(), CLAUDE_CODE_SESSION_ID=FX_SESSION)
             breakpoints.run_sourced = run_recorded_post
-            exits, rows = [], {}
+            exits, rows, notes, unread = [], {}, [], None
             try:
-                for n in range(2, 5 if case == "notices-two-dependents" else 3):   # each exit over a new spec
-                    if n > 2:   # B21, back into designing on an interface change
-                        exits.append(run_verb(b21))
-                    uid = "TOOL-%s-%d" % (FX_BUILD, n)
-                    write_fixture_files(top, {"memory/builds/%s/spec/2026-01-0%d-spec-%s.md" % (FX_BUILD, n, uid):
-                                              "# %s — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n" % uid})
-                    write_commit("a spec of %s" % uid)
-                    exits.append(run_verb(b5))
+                if case == "notices-repeat-key":   # B4, then three Design exits over the listings A, B and B
+                    exits.append(run_verb(b4))
+                    for n in range(3):
+                        if n:   # B21, back into designing on an interface change
+                            exits.append(run_verb(b21))
+                        if n == 1:   # the one edit, after the first B21 and none after the second
+                            write_fixture_files(top, {FX_SPEC: "# %s — a unit\n\n**Status:** INPROGRESS · rev-2 · "
+                                                               "2026-01-02\n" % FX_UNIT})
+                            write_commit("the spec of %s edited" % FX_UNIT)
+                        exits.append(run_verb(b5))
+                    try:   # the one read of dA's mailbox, its rows' pass and key read off their commits below
+                        notes, unread = read_mail_rows(top, FX_DEPENDENTS[0])
+                    except ValueError as e:
+                        unread = str(e)
+                else:
+                    for n in range(2, 5 if case == "notices-two-dependents" else 3):   # each exit over a new spec
+                        if n > 2:   # B21, back into designing on an interface change
+                            exits.append(run_verb(b21))
+                        uid = "TOOL-%s-%d" % (FX_BUILD, n)
+                        write_fixture_files(top, {"memory/builds/%s/spec/2026-01-0%d-spec-%s.md" % (FX_BUILD, n, uid):
+                                                  "# %s — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
+                                                  % uid})
+                        write_commit("a spec of %s" % uid)
+                        exits.append(run_verb(b5))
                 for dependent in FX_DEPENDENTS if case == "notices-two-dependents" else ():
                     _rc, out = real(top, '( load_driver_conf && main --mail read "$2" )', args=(dependent,),
                                     timeout=MAIL_GUARD_SECONDS)
@@ -1415,6 +1438,27 @@ def run_transition_fixture(case):
             print("%s: fixture · posts %d · %s" % (SAY, len(posts), " · ".join(
                 "%s rc %d" % (p[0][1], p[1]) for p in posts) or "none"))
             posted = [p for p in posts if any(ln.startswith("mail — posted ") for ln in p[2].splitlines())]
+            if case == "notices-repeat-key":   # KICK-dKeptSession-52 S1: each row's pass and key off its commit
+                bodies = [(r["kind"], run_fixture_git(top, "log", "-1", "--format=%B", r["commit"])) for r in notes
+                          if r["to"] == "build:%s" % FX_DEPENDENTS[0] and r["subject"] == "interfaces %s" % FX_BUILD]
+                notes = sorted(((kind,) + tuple((re.findall(r"^%s: (\S+)$" % k, body, re.M) or ["none"])[0]
+                                                for k in ("pass", "content-key")) for kind, body in bodies),
+                               key=lambda n: n[1])
+                for note in notes:
+                    print("%s: fixture · notice %s · pass %s · key %s" % ((SAY,) + note))
+                firsts = [([ln.rstrip("\r") for ln in p[2].splitlines() if ln.strip()] or ["no output"])[0] for p in posts]
+                owed = [("confirmed", "1"), ("changed", "2"), ("changed", "3")]
+                keys = [n[2] for n in notes]
+                checks = ((len(firsts) == 3 and all(ln.startswith("mail — posted ") for ln in firsts),
+                           "the posts' first lines read %s, owed three mail — posted" % (firsts,)),
+                          ([n[:2] for n in notes] == owed, "the rows of %s read %s, owed %s%s" % (
+                              FX_DEPENDENTS[0], [n[:2] for n in notes], owed,
+                              " · its mailbox unread: %s" % unread if unread else "")),
+                          (len(keys) == 3 and keys[1] == keys[2] != keys[0], "the keys read %s, owed the two changed "
+                           "equal and the confirmed another" % keys))
+                misses = [why for ok, why in checks if not ok]
+                print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "not held · " + misses[0]))
+                return 0 if not misses else 1
             if case == "notices-two-dependents":
                 owed = [("confirmed", "1"), ("changed", "2"), ("changed", "3")]
                 checks = ((exits == [0] * 5, "the five moves exited %s" % exits),
@@ -1820,6 +1864,7 @@ def run_selftest():
              ("notices-refused", fx("notices-refused"), 0, "%s: fixture · notices-refused · held" % SAY, ""),
              ("notices-refused line", fx("notices-refused"), 0,
               "notice — not posted confirmed to build:%s · rc 1 · " % FX_DEPENDENTS[0], "mail — duplicate"),
+             ("notices-repeat-key", fx("notices-repeat-key"), 0, "%s: fixture · notices-repeat-key · held" % SAY, ""),
              ("acks-landed", fx("acks-landed"), 0, "%s: fixture · acks-landed · held" % SAY, ""),
              ("acks-landed state", fx("acks-landed"), 0, "%s: fixture · state " % SAY, " · acked"),
              ("acks-confirmed", fx("acks-confirmed"), 0, "%s: fixture · acks-confirmed · held" % SAY, ""),

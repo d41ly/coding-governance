@@ -481,7 +481,9 @@ over the listing at the move's commit and a second exit posting `changed`; `noti
 two dependents and three exits from Design, back through B21 between them, each dependent reading one
 `confirmed` and two `changed` whose commits carry `pass:` 1, 2 and 3; and `notices-refused`, the post
 to the first dependent rebound to exit 1, the move still recording and printing its `notice — not
-posted` line; and the four over `write_consumed_acks`, each rebinding the launcher to record every ack
+posted` line; `notices-repeat-key`, one dependent and three exits from Design, the spec edited after
+the first exit alone, so the third repeats the second's listing, kind and key, its pass `3` alone
+telling it apart, and every notice still posted; and the four over `write_consumed_acks`, each rebinding the launcher to record every ack
 and restoring it: `acks-landed`, a parent's `landed` acknowledged by the move that records past it;
 `acks-confirmed`, a `confirmed` keyed over the parent's listing at its lease's witness, acknowledged
 over the real chain; `acks-superseded`, `check_parent_interfaces` stood in, a `confirmed` and the later
