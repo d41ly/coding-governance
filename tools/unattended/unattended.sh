@@ -51,6 +51,7 @@
 #   unattended.sh --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] [--default <text>] <body file>   # one message on this session's own mail ref; 0 posted, 1 duplicate or lost, 2 not written; `mail — off` exit 2 while RUN_CLAIMS is not on
 #   unattended.sh --mail read <who> [--open] [--ids]               # the mailbox of a build or a recipient, one TAB row per message; --open the open rows, --ids their ids on one line or none
 #   unattended.sh --mail ack <slug> <id>                           # an ack of a message addressed to <slug>, posted to its sender's build; the post's exits
+#   unattended.sh --mail answer <slug> <question id> <body file> [--cite <path>@<sha>]...   # an answer to a question addressed to <slug>, posted to its asker's build; 1 the question no longer open, else the post's exits
 #   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
 #   unattended.sh --card-ref lookup <slug>                         # that ref read into this node's cache, read-only: its commit and message, `card-ref — none` or `— off`; 0 read, 2 not read
 #   unattended.sh --request <file>                                 # an owner's request: its words kept on this node, refs/gov/requests/<content key> created on the remote
@@ -3599,6 +3600,8 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
 # host, through the none and `mine` rows of the holder column only, and print exactly one `beat —`
 # line. It reads the verdict `--liveness` prints and never re-derives it. It refuses nothing but a
 # missing record, because the tick is not the driver: the run's own next verb decides a lost claim.
+# A renewal resting on an open question to the build, `read_lease_renewal`'s question step, ends its
+# `renewed <utc>` line ` · wait question <id>` (KICK-dKeptSession-25 S4).
 # WHAT IT DOES NOT CHECK: it never writes a claim its run does not hold, and a skip is not a refusal.
 write_claim_beat() { # slug -> exactly one `beat —` line
   local slug="$1" rel f l verdict="" me ka
@@ -3623,9 +3626,9 @@ write_claim_beat() { # slug -> exactly one `beat —` line
     2) echo "unattended: beat — $slug · skipped: the beat is not yet due, a quarter of ${RESUME_STALE_BOUND}s"; return 0 ;;
     3) echo "unattended: beat — $slug · skipped: the claim is not this run's: $CW_WHO"; return 0 ;;
   esac
-  write_claim "$slug" live "$ka" quiet "$rel"
+  LR_WAIT=""; write_claim "$slug" live "$ka" quiet "$rel"
   case "$?" in
-    0) echo "unattended: beat — $slug · renewed $WC_BEAT" ;;
+    0) echo "unattended: beat — $slug · renewed $WC_BEAT${LR_WAIT:+ · wait question $LR_WAIT}" ;;
     1) echo "unattended: beat — $slug · skipped: the claim moved, so the run's own next verb decides it: $WC_WHY" ;;
     *) echo "unattended: beat — $slug · skipped: the write did not complete: $WC_WHY" ;;
   esac
@@ -3646,7 +3649,7 @@ write_claim_beat() { # slug -> exactly one `beat —` line
 # WHAT THIS DOES NOT CHECK: the queue is unlocked until TOOL-dPlacedRequest-24, so two writers
 # flushing one queue at once can push one line twice, the second losing its compare-and-swap.
 FLEET_TAG=""; LEASE_WHY=""; LP_VALUE=""; LP_SEEN=""; LP_NOTED=""; LB_VALUE=""
-LR_RENEWS=""; LR_WITNESS=""; LT_RECORD=""; LT_WHY=""; LT_SHA=""; LW_SHA=""; LW_VERDICT=""; GQ_PUSHED=""
+LR_RENEWS=""; LR_WITNESS=""; LR_WAIT=""; LT_RECORD=""; LT_WHY=""; LT_SHA=""; LW_SHA=""; LW_VERDICT=""; GQ_PUSHED=""
 
 # A LEGAL ONE-SEGMENT REF NAME, as `git check-ref-format` reads one, held in bash so no segment costs a
 # process: non-empty, no `/`, no leading `.`, no trailing `.` or `.lock`, no `..`, no `@{`, not `@`, and
@@ -3928,7 +3931,9 @@ check_mail_deadline() { # ref · commit · hours -> rc 0 passed, 1 not yet, 2 no
 # each `open` row `check_mail_deadline` judges past its own `deadline` over its ref and commit reads
 # `expired`, its `reply` kept `-`, the asker's `default` its answer; a row this node's feed has not
 # sighted, or one whose `deadline` is `-` or no number, stays `open`. Columns only append:
-# `check_lease_witness` reads 2, 4 and 10 by position. Under `soft` a failed fetch prints `mail — local
+# `check_lease_witness` reads 2, 4 and 10 by position, and KICK-dKeptSession-25's three readers,
+# `write_mail_answer`, `derive_mail_answer_outcome` and `read_lease_renewal`'s question step, read 1,
+# 2, 4, 6, 7 and 10. Under `soft` a failed fetch prints `mail — local
 # copy: <why>` on stderr and reads the cache; `strict` prints `mail — not read · <why>` and returns 2.
 # While RUN_CLAIMS is not `on` it reads nothing and prints no row. WHAT THIS DOES NOT CHECK: a
 # message's id against its fields; a clock offset between nodes, since each node judges a deadline by
@@ -4044,6 +4049,75 @@ write_mail_ack() { # slug · id -> the post's exits
   write_mail_post "$slug" "build:$fb" ack "$sub" none none "$id" "$f"; rc=$?
   rm -f "$f"
   return "$rc"
+}
+
+# --mail answer, AN ANSWER TO A QUESTION (KICK-dKeptSession-25 S2), the item `mailbox.answer`'s command
+# while no `next` dispatches it. <slug> is the answering build. In order: dark while RUN_CLAIMS is not
+# `on`; each `--cite` split at its last `@` into a non-empty path and a sha of 7 to 40 lower-case hex
+# digits, before any read; `read_mailbox <slug> soft` once; the row whose id is <id> and whose kind is
+# `question` is the question, and one reading `answered`, `acked` or `expired` prints `answer — <id> ·
+# <state>`, exit 1; each cite held by `git cat-file -e <sha>:<path>`; a scratch body, the body file and
+# one `cites <path>@<sha>` line per cite in flag order; then the post `write_mail_ack` makes, of kind
+# `answer`, so its line and exits are the answer's. Every other refusal is one `mail — not written ·
+# <why>` line, exit 2, writing nothing. WHAT THIS DOES NOT CHECK: that the answering session owns the
+# asked interface or item, `next`'s once dWellOiledMachine lands it; what a cited file says.
+write_mail_answer() { # slug · id · body file · [cite]... -> 0 posted, 1 no longer open, duplicate or lost, 2 not written
+  local slug="${1:-}" id="${2:-}" bf="${3:-}" rows fb="" sub="" st="" f rc line c p s
+  local -a row=() lines=() cites=()
+  [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 2; }
+  shift 3 2>/dev/null || shift $#
+  for c in "$@"; do
+    p=${c%@*}; s=${c##*@}
+    if [ "$p" = "$c" ] || [ -z "$p" ] || ! [[ $s =~ ^[0-9a-f]{7,40}$ ]]; then
+      echo "mail — not written · --cite takes <path>@<sha>, not $c"; return 2
+    fi
+    cites+=("$c")
+  done
+  rows=$(read_mailbox "$slug" soft) || { printf '%s\n' "$rows"; return 2; }
+  mapfile -t lines <<<"$rows"
+  for line in "${lines[@]}"; do
+    IFS=$'\t' read -r -a row <<<"$line"
+    [ "${row[0]:-}" = "$id" ] && [ "${row[1]:-}" = question ] || continue
+    st=${row[3]:-}; fb=${row[5]:-}; sub=${row[6]:-}; break
+  done
+  [ -n "$fb" ] || { echo "mail — not written · $id is no question addressed to $slug"; return 2; }
+  case "$st" in answered|acked|expired) echo "answer — $id · $st"; return 1 ;; esac
+  for c in ${cites[@]+"${cites[@]}"}; do
+    GIT cat-file -e "${c##*@}:${c%@*}" 2>/dev/null \
+      || { echo "mail — not written · the cite ${c%@*}@${c##*@} names no file this clone holds at that commit"; return 2; }
+  done
+  f=$(mktemp) || { echo "mail — not written · no scratch file for the answer's body"; return 2; }
+  if ! cat -- "$bf" >"$f" 2>/dev/null; then rm -f "$f"; echo "mail — not written · the body file cannot be read: $bf"; return 2; fi
+  for c in ${cites[@]+"${cites[@]}"}; do printf 'cites %s\n' "$c" >>"$f"; done
+  write_mail_post "$slug" "build:$fb" answer "$sub" none none "$id" "$f"; rc=$?
+  rm -f "$f"
+  return "$rc"
+}
+
+# THE ITEM `mailbox.answer`'s WITNESS (KICK-dKeptSession-25 S3), from `read_mailbox <slug> soft`'s rows
+# alone: the question <id> addressed to <slug> is `answered` when its state is, `defaulted` when it is
+# `expired`, its deadline passed, or `acked`, acknowledged with no answer, so the asker's default
+# stands (its section 8 F9), and `awaiting` while it is `open`. One word, exit 0. An id naming no
+# question addressed to <slug> prints `mail — not read · <id> is no question addressed to <slug>`, and a
+# refused read its line, each exit 2. While RUN_CLAIMS is not `on` the read holds no row, so every id
+# names no question.
+derive_mail_answer_outcome() { # slug · id -> answered|defaulted|awaiting on stdout; 2 not read
+  local slug="${1:-}" id="${2:-}" rows line st=""
+  local -a row=() lines=()
+  rows=$(read_mailbox "$slug" soft) || { printf '%s\n' "$rows"; return 2; }
+  mapfile -t lines <<<"$rows"
+  for line in "${lines[@]}"; do
+    IFS=$'\t' read -r -a row <<<"$line"
+    [ "${row[0]:-}" = "$id" ] && [ "${row[1]:-}" = question ] || continue
+    st=${row[3]:-}; break
+  done
+  case "$st" in
+    answered) echo answered ;;
+    expired|acked) echo defaulted ;;
+    open) echo awaiting ;;
+    *) echo "mail — not read · $id is no question addressed to $slug"; return 2 ;;
+  esac
+  return 0
 }
 
 # --mail read, THE MAILBOX AS A VERB (KICK-dKeptSession-5 S8): `read_mailbox <who> soft`, its rows as
@@ -4375,14 +4449,26 @@ derive_lease_renews() { # epoch read or empty · epoch written · policy · new|
 }
 
 # THE DRIVER'S OWN WITNESS VERDICT AND `witness` (S8): under `progress` the newest transition of the
-# build is a `new` verdict, and the witness stored, when it differs from the record's witness; every
-# other case, a refused read included, is `none` with the record's witness kept. `renews` is
-# `derive_lease_renews`'s, which `write_claim` calls with this verdict.
-read_lease_renewal() { # slug -> LR_VERDICT and LR_WITNESS
-  LR_VERDICT=none; LR_WITNESS=${CW_WIT:--}
+# build is a `new` verdict, and the witness stored, when it differs from the record's witness. Where
+# none does, THE QUESTION STEP (KICK-dKeptSession-25 S4): the oldest `question` row reading `open` in
+# `read_mailbox <slug> soft`, its stderr discarded, whose commit the one witness check
+# `check_lease_witness` answers `question`, is a `question` verdict, LR_WAIT its id, with the record's
+# witness KEPT, so a renewal resting on a wait never stores a commit the next transition would read as
+# differing (its section 8 F10). Every other case, a refused read and `question-closed` included, is
+# `none` with the record's witness kept. `renews` is `derive_lease_renews`'s, which `write_claim` calls
+# with this verdict.
+read_lease_renewal() { # slug -> LR_VERDICT, LR_WITNESS and LR_WAIT
+  local rows q
+  LR_VERDICT=none; LR_WITNESS=${CW_WIT:--}; LR_WAIT=""
   read_lease_policy leases.renewal >/dev/null || return 0
   [ "$LP_VALUE" = progress ] || return 0
-  if read_transition_witness "$1" && [ "$LT_SHA" != "$LR_WITNESS" ]; then LR_VERDICT=new; LR_WITNESS=$LT_SHA; fi
+  if read_transition_witness "$1" && [ "$LT_SHA" != "$LR_WITNESS" ]; then LR_VERDICT=new; LR_WITNESS=$LT_SHA; return 0; fi
+  rows=$(read_mailbox "$1" soft 2>/dev/null) || return 0
+  q=$(awk -F'\t' '{ sub(/\r$/, "") } $2 == "question" && $4 == "open" { print $1 "\t" $10; exit }' <<<"$rows")
+  [ -n "$q" ] || return 0
+  check_lease_witness "$1" "${q#*$'\t'}" >/dev/null 2>&1 || return 0
+  [ "$LW_VERDICT" = question ] || return 0
+  LR_VERDICT=question; LR_WAIT=${q%%$'\t'*}
   return 0
 }
 
@@ -19935,38 +20021,43 @@ while [ $# -gt 0 ]; do
     --register)     refuse_waive_unless_preflight --register
                     shift; write_register "$@"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # KICK-dKeptSession-5 - the mailbox: a post on this session's own mail ref, a read of a build's or a
-    # recipient's messages, an ack; no slug verb, because `post`, `read` or `ack` comes first.
+    # recipient's messages, an ack, an answer to a question (KICK-dKeptSession-25); no slug verb, because
+    # `post`, `read`, `ack` or `answer` comes first.
     --mail)         refuse_waive_unless_preflight --mail
                     shift; MV_ACT=${1:-}; [ $# -eq 0 ] || shift
-                    MV_POS=(); MV_TO=""; MV_KIND=""; MV_SUB=""; MV_ITEM=""; MV_PASS=""; MV_ANS=""; MV_IFC=""; MV_DEF=(); MV_OPEN=0; MV_IDS=0; MV_FLAGS=""; _rl_rc=""
+                    MV_POS=(); MV_TO=""; MV_KIND=""; MV_SUB=""; MV_ITEM=""; MV_PASS=""; MV_ANS=""; MV_IFC=""; MV_DEF=(); MV_CITE=(); MV_OPEN=0; MV_IDS=0; MV_FLAGS=""; _rl_rc=""
                     while [ $# -gt 0 ]; do
                       case "$1" in
-                        --to|--kind|--subject|--item|--pass|--answers|--interface|--default)
+                        --to|--kind|--subject|--item|--pass|--answers|--interface|--default|--cite)
                           if [ $# -lt 2 ]; then echo "mail — not written · $1 takes a value"; _rl_rc=2; break; fi
-                          case "$1" in --to) MV_TO=$2 ;; --kind) MV_KIND=$2 ;; --subject) MV_SUB=$2 ;; --item) MV_ITEM=$2 ;; --pass) MV_PASS=$2 ;; --interface) MV_IFC=$2 ;; --default) MV_DEF=("$2") ;; *) MV_ANS=$2 ;; esac
+                          case "$1" in --to) MV_TO=$2 ;; --kind) MV_KIND=$2 ;; --subject) MV_SUB=$2 ;; --item) MV_ITEM=$2 ;; --pass) MV_PASS=$2 ;; --interface) MV_IFC=$2 ;; --default) MV_DEF=("$2") ;; --cite) MV_CITE+=("$2") ;; *) MV_ANS=$2 ;; esac
                           MV_FLAGS="$MV_FLAGS $1"; shift 2 ;;
                         --open) MV_OPEN=1; MV_FLAGS="$MV_FLAGS $1"; shift ;;
                         --ids)  MV_IDS=1; MV_FLAGS="$MV_FLAGS $1"; shift ;;
-                        --*) echo "mail — not written · --mail takes --to, --kind, --subject, --item, --pass, --answers, --interface, --default, --open or --ids, not $1"; _rl_rc=2; break ;;
+                        --*) echo "mail — not written · --mail takes --to, --kind, --subject, --item, --pass, --answers, --interface, --default, --cite, --open or --ids, not $1"; _rl_rc=2; break ;;
                         *) MV_POS+=("$1"); shift ;;
                       esac
                     done
                     if [ -n "$_rl_rc" ]; then :
                     elif [ "$MV_ACT" = post ]; then
-                      if [ "${#MV_POS[@]}" != 2 ] || [ "$MV_OPEN$MV_IDS" != 00 ] || [[ " $MV_FLAGS " != *" --to "* ]] \
+                      if [ "${#MV_POS[@]}" != 2 ] || [ "$MV_OPEN$MV_IDS" != 00 ] || [ "${#MV_CITE[@]}" != 0 ] || [[ " $MV_FLAGS " != *" --to "* ]] \
                           || [[ " $MV_FLAGS " != *" --kind "* ]] || [[ " $MV_FLAGS " != *" --subject "* ]]; then
                         echo "mail — not written · the form is --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] [--default <text>] <body file>"; _rl_rc=2
                       else write_mail_post "${MV_POS[0]}" "$MV_TO" "$MV_KIND" "$MV_SUB" "${MV_ITEM:-none}" "${MV_PASS:-none}" "${MV_ANS:-none}" "${MV_POS[1]}" "${MV_IFC:-none}" ${MV_DEF[@]+"${MV_DEF[@]}"}; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = read ]; then
-                      if [ "${#MV_POS[@]}" != 1 ] || [ -n "$MV_TO$MV_KIND$MV_SUB$MV_ITEM$MV_PASS$MV_ANS$MV_IFC" ] || [ "${#MV_DEF[@]}" != 0 ]; then
+                      if [ "${#MV_POS[@]}" != 1 ] || [ -n "$MV_TO$MV_KIND$MV_SUB$MV_ITEM$MV_PASS$MV_ANS$MV_IFC" ] || [ "${#MV_DEF[@]}" != 0 ] || [ "${#MV_CITE[@]}" != 0 ]; then
                         echo "mail — not read · the form is --mail read <who> [--open] [--ids]"; _rl_rc=2
                       else print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS"; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = ack ]; then
                       if [ "${#MV_POS[@]}" != 2 ] || [ -n "${MV_FLAGS// /}" ]; then
                         echo "mail — not written · the form is --mail ack <slug> <id>"; _rl_rc=2
                       else write_mail_ack "${MV_POS[0]}" "${MV_POS[1]}"; _rl_rc=$?; fi
+                    elif [ "$MV_ACT" = answer ]; then
+                      if [ "${#MV_POS[@]}" != 3 ] || [ -n "${MV_FLAGS// --cite/}" ]; then
+                        echo "mail — not written · the form is --mail answer <slug> <question id> <body file> [--cite <path>@<sha>]..."; _rl_rc=2
+                      else write_mail_answer "${MV_POS[0]}" "${MV_POS[1]}" "${MV_POS[2]}" ${MV_CITE[@]+"${MV_CITE[@]}"}; _rl_rc=$?; fi
                     else
-                      echo "mail — not written · --mail takes post, read or ack, not ${MV_ACT:-nothing}"; _rl_rc=2
+                      echo "mail — not written · --mail takes post, read, ack or answer, not ${MV_ACT:-nothing}"; _rl_rc=2
                     fi
                     RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-dPlacedRequest-33 - the build card's remote ref, written for the kickoff engine; no slug
