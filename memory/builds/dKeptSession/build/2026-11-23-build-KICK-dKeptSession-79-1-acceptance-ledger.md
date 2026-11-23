@@ -79,46 +79,42 @@ owner's.
 ## Criteria
 
 **Evidences:** KICK-dKeptSession-79
-- AC1 — observed. `python tools/loop/position.py --fixture --plant mail-forged` printed the two
-  `FX_OPEN_LINES` lines for the fetching read and again for the local read, then
-  `position: fixture · mail-forged · held`, exit 0; no line held `IGNORE PRIOR RULES`, `obey-this`,
-  `1a1b1c1d1e1f` or `2a2b2c2d2e2f`. Its RED, the base reader, is the close's.
-- AC2 — observed. `grep -c 'loop_lib.py" --mail-kinds'` over the driver printed 1 (DERIVED); in p79's
-  clone the driver's `--mail post tFix --to build:fy --kind bogus --subject s <body file>` printed
-  `mail — not written · the kind 'bogus' is none of the closed set:` and the twelve kinds, exit 2. A
-  copy of the driver beside a loop kit whose `loop_lib.py` exits 3 printed `mail — not read · the loop
-  kit's mail kinds did not read:` for `--mail read tFix` and for `--mail read tFix --local`, exit 2 each.
-- AC3 — observed. `acks-refused-witness`, `acks-refused-field` and `acks-refused-scenario` each printed
-  its refusal, `loop: fixture · record · exit 2`, `loop: fixture · state a1a2a3a4a5a6 · open`,
-  `loop: fixture · acks none` and a line ending `· held`, exit 0. `acks-landed`, `acks-failed`,
-  `acks-withdrawn-question`, `mail-open` and the claim kit's `mail-held` plant, each run alone, still
-  read as before over the reorder.
-- AC4 — observed. `p79.sh` printed `failed · marker present 0s`, `local · marker absent` and
-  `refetched · marker absent`.
-- AC5 — observed. `p79.sh` printed `two calls · launches 0 0` and `aged marker · launches 1`.
-- AC6 — observed. `notify-composition-unread` printed B5's `progress — tFix · transition · designing →
-  building · item.design.exit` and `loop: composition · unread · the fixture's compose answered 1`, no
-  `loop: progress · unread` line, and `loop: fixture · notify-composition-unread · held`, exit 0.
-- AC7 — observed. `p79.sh` printed the `card` line holding
-  `"additionalContext":"mail — 1 unread for tFix · a1b2c3d4e5f6`, `other []` and `launches 0`, and
-  `grep -c '^same "KDS79 S5 '` over the driver suite printed 2 (DERIVED).
-- AC8 — observed. `p79.sh` printed `stale · spawn windowsHide=true detached=true · driver
-  tools/unattended/unattended.sh`, and `grep -c '^same "KDS79 S6 '` printed 1 (DERIVED).
-- AC9 — observed. `git grep -n 'share, tokens, source' -- tools` printed nothing, exit 1, and the
-  `(share, window, source)` count read 1 in each of the two files (DERIVED).
-- AC10 — observed. `grep -c 'only to cover the tools'` over the hook printed 0 and
-  `grep -c 'registered on every tool'` printed 1 (DERIVED).
-- AC11 — the two `--for-paths` reads observed: the first named `docstring-misnames-a-returned-value`
-  and the second `header-rationale-contradicts-the-registration`. `gotchas.py --check` and
-  `gen_map.py --check` are the close's legs; both renders ran with `--write` after `git add`.
-- AC12 — observed. `cmp` over the template and the verbs guide exited 0, and the plant-name count over
-  `help/loop.md` printed 3 (DERIVED).
-- AC13 — observed. The two floor greps printed 1 each and `grep -c '^same "KDS79 '` printed 6 (DERIVED).
-- AC14 — observed. The import probe printed `44 45` (DERIVED); the two rows carry `plants=44` and
-  `plants=45` and name this unit.
+- AC1 — observed: `python tools/loop/position.py --fixture --plant mail-forged` printed `FX_OPEN_LINES` for each read and `· mail-forged · held`, and no line held `IGNORE PRIOR RULES`, `obey-this`, `1a1b1c1d1e1f` or `2a2b2c2d2e2f`.
+  The fetching read and the local read each printed the two lines, exit 0. Its RED, the base reader,
+  is the close's.
+- AC2 — observed: `grep -c 'loop_lib.py" --mail-kinds' tools/unattended/unattended.sh` printed 1 (DERIVED), and in p79's clone `--mail post tFix --to build:fy --kind bogus --subject s <body file>` printed `mail — not written · the kind 'bogus' is none of the closed set:`, exit 2.
+  The twelve kinds followed it. A copy of the driver beside a loop kit whose `loop_lib.py` exits 3 printed `mail — not read · the loop kit's mail kinds did not read:` under `--mail read tFix` and under `--mail read tFix --local`, exit 2 each.
+- AC3 — observed: `acks-refused-witness`, `acks-refused-field` and `acks-refused-scenario` each printed `loop: fixture · acks none`, a state line ending `· open` and a line ending `· held`.
+  Each also printed its refusal and `loop: fixture · record · exit 2`, exit 0. The `acks-landed`,
+  `acks-failed`, `acks-withdrawn-question` and `mail-open` plants and the claim kit's `mail-held`
+  plant, each run alone, still read as before over the reorder.
+- AC4 — observed: `p79.sh` printed its `failed` line as `marker present 0s`, and its `local` and `refetched` lines as `marker absent`.
+- AC5 — observed: `p79.sh` printed its `two calls` line as `launches 0 0` and its `aged marker` line as `launches 1`.
+- AC6 — observed: `python tools/loop/loop_transition.py --fixture --plant notify-composition-unread` printed `progress — tFix · transition · ` once for B5, `loop: composition · unread · the fixture's compose answered 1`, no `loop: progress · unread` line, and ended `· held`.
+  B5's progress line reads `designing → building · item.design.exit` after that prefix, exit 0.
+- AC7 — observed: `p79.sh` printed its `card` line holding `"additionalContext":"mail — 1 unread for tFix · a1b2c3d4e5f6`, `other []` and `launches 0`, and `grep -c '^same "KDS79 S5 ' tools/unattended/unattended.test.sh` printed 2 (DERIVED).
+- AC8 — observed: `p79.sh` printed its `stale` line reading `spawn`, `windowsHide=true`, `detached=true` and driver `tools/unattended/unattended.sh`, and `grep -c '^same "KDS79 S6 ' tools/unattended/unattended.test.sh` printed 1 (DERIVED).
+- AC9 — observed: `git grep -n 'share, tokens, source' -- tools` printed nothing, exit 1, and `grep -c '(share, window, source)' tools/runlog/extract.py tools/runlog/README.md` printed 1 for each (DERIVED).
+- AC10 — observed: `grep -c 'only to cover the tools' tools/unattended/mail-notice.js` printed 0 and `grep -c 'registered on every tool' tools/unattended/mail-notice.js` printed 1 (DERIVED).
+- AC11 — the reads observed: `python tools/memory-tree/gotchas.py --for-paths tools/runlog/extract.py` named `docstring-misnames-a-returned-value`, and `--for-paths tools/unattended/mail-notice.js` named `header-rationale-contradicts-the-registration`.
+  `python tools/memory-tree/gotchas.py --check` and `python tools/codebase-map/gen_map.py --check` are
+  the close's legs; both renders ran with `--write` after `git add`, and the commit hook's codebase-map
+  freshness leg read ok.
+- AC12 — observed: `cmp tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md` exited 0, and `grep -c 'mail-forged\|acks-refused-witness\|notify-composition-unread' help/loop.md` printed 3 (DERIVED).
+- AC13 — observed: `grep -c '^FLOOR_ASSERTIONS=4223$' tools/unattended/unattended.test.sh` and `grep -c '^FLOOR_SHARD_8=1440$' tools/unattended/unattended.test.sh` printed 1 each, and `grep -c '^same "KDS79 ' tools/unattended/unattended.test.sh` printed 6 (DERIVED).
+- AC14 — observed: the import probe printed `44 45` (DERIVED), and the `loop transition record` and `loop position fixtures` rows carry `plants=44` and `plants=45` and name this unit.
 
 ## Owed to the close
 
 The six `New arm:` lines' RED-first observations, each on its staged break; the driver suite's shard 8
 with the six `KDS79` rows; `loop transition record` and `loop position fixtures` whole; and every leg
 §7 names, `gotchas selftest`, `codebase-map coverage + freshness` and `memory hygiene` among them.
+
+The bug-class checklist over this pass's commits named `fixture-passes-by-finding-nothing` for the two
+recorder rows that assert an empty launch log, `KDS79 S5 the card path launches nothing` and
+`KDS79 S3 two hook calls inside fetch-seconds launch nothing`: each would also read empty if the
+preload failed to load. The `KDS79 S6` row in the same block, under the same recorder, is their
+liveness, since it owes one recorded spawn. Adding the hook's own context line to each empty-log row
+was refused by scratch-guard once the spec read CLOSED, so it is the close's to add or leave.
+`refusal-branch-with-no-arm`: `read_mailbox`'s new `mail — not read · <why>` for a kind set that does
+not read has no suite arm; this pass reached it only by the scratch copy AC2 names.
