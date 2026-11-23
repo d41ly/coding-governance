@@ -9906,12 +9906,15 @@ check_keepalive_reaped() { # slug · run-state file -> 0 read back or announced 
 # THE LANDED NOTICE (KICK-dKeptSession-7 S5): at both of `verb_landed`'s success exits, one `landed`
 # message to each build whose README's `parents:` names <slug>, as the loop kit's
 # `loop_transition.py dependents` lists them, kind `landed`, subject `landing <slug>`, its body the
-# landed <sha>, posted through `( main --mail post … )` with the post's line printed. With RUN_CLAIMS
-# off it posts nothing; a dependents verb that does not answer prints `unattended: NOTE — no landed
-# notice: <why>`. It returns 0 whatever a post prints, so the landing's exit never moves.
+# landed <sha>, posted through `( main --mail post … --pass <sha8> )`, the sha's first eight hex, so a
+# re-landing after a revert is a new message and never a duplicate (KICK-dKeptSession-35 S2), with the
+# post's lines printed, and where the post exits non-zero one more, `notice — not posted landed to
+# build:<dependent> · rc <n> · <the post's first line>` (S3). With RUN_CLAIMS off it posts nothing; a
+# dependents verb that does not answer prints `unattended: NOTE — no landed notice: <why>`. It returns
+# 0 whatever a post prints, so the landing's exit never moves.
 # WHAT THIS DOES NOT CHECK: that a dependent reads the notice; that is unit 5's mailbox.
 write_landed_notices() { # slug · landed sha -> 0, one post's lines per dependent or one NOTE
-  local slug="${1:-}" sha="${2:-}" dep f
+  local slug="${1:-}" sha="${2:-}" dep f out rc
   local -a deps=()
   [ "$RUN_CLAIMS" = on ] || return 0
   if ! run_loop_verb loop_transition.py dependents "--build=$slug" || [ "$_bd_rc" != 0 ]; then
@@ -9922,8 +9925,11 @@ write_landed_notices() { # slug · landed sha -> 0, one post's lines per depende
     dep=${dep%$'\r'}; [ -n "$dep" ] || continue
     f=$(mktemp) || { echo "unattended: NOTE — no landed notice to $dep: no scratch file for its body"; continue; }
     printf '%s\n' "$sha" > "$f"
-    ( main --mail post "$slug" --to "build:$dep" --kind landed --subject "landing $slug" "$f" ) 2>&1
+    out=$( ( main --mail post "$slug" --to "build:$dep" --kind landed --subject "landing $slug" --pass "${sha:0:8}" "$f" ) 2>&1 ) && rc=0 || rc=$?
     rm -f "$f"
+    [ -z "$out" ] || printf '%s\n' "$out"
+    out=${out%%$'\n'*}
+    [ "$rc" = 0 ] || echo "notice — not posted landed to build:$dep · rc $rc · ${out:-no output}"
   done
   return 0
 }

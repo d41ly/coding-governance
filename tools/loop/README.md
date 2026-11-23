@@ -415,11 +415,16 @@ follow, `write_dependency_notices` posts the build's frozen interfaces to each b
 `loop_transition.py dependents --build <slug>` lists, every one whose README's `parents:` names it, read
 by the memory-tree kit's `parse_front_matter`: the unattended kit's `--mail post` of kind `confirmed`,
 subject `interfaces <slug>`, its interface `derive_interface_listing`'s bytes of `git ls-tree -r` over
-the build's `spec/` folder at the transition commit (HEAD where the set makes none) and its body that
-commit's sha; `changed` where `read_mail_rows` over the dependent already holds a `confirmed` of that
-subject from the build. A dependent whose mailbox does not read gets nothing and one `loop: notice ·
-unread · <dependent> · <why>` line; a failed post prints its line; neither fails the move. The
-unattended kit's `--landed` posts `landed` to the same list. The position engine's dependency gate
+the build's `spec/` folder at the transition commit (HEAD where the set makes none), its body that
+commit's sha and `--pass <n>`, `<n>` the Design-exit ordinal, one plus the moves from designing to
+building in the `read_transitions` result `write_transition` already holds (KICK-dKeptSession-35), so
+a later exit is a new message rather than a duplicate the mailbox refuses; `changed` where
+`read_mail_rows` over the dependent already holds a `confirmed` of that subject from the build. A
+dependent whose mailbox does not read gets nothing and one `loop: notice · unread · <dependent> · <why>`
+line; a failed post prints its line and, where it exits non-zero, `notice — not posted <kind> to
+build:<dependent> · rc <n> · <its first line>`; neither fails the move. The unattended kit's
+`--landed` posts `landed` to the same list with `--pass <sha8>`, the landed sha's first eight hex, and
+the same `notice — not posted` line for a refused post. The position engine's dependency gate
 reads the notices back through `check_parent_interfaces`, the confirmation that lets a dependent's Build
 run under `deps.early-build`'s default.
 
@@ -448,7 +453,11 @@ guard's launch, each rebinding the name the guard imports inside its function an
 bash, `mail-no-driver`, the driver's locator over an empty directory, the move recorded unarmed, and
 `mail-no-bash`, `resolve_bash` answering `None`, the move refused as `mail unknown`; and `deps-notices`,
 a dependent naming the build in `parents:`, the move out of Design posting it one `confirmed` keyed
-over the listing at the move's commit and a second exit posting `changed`. `check --selftest` holds the tree's own definition, then runs every plant, and
+over the listing at the move's commit and a second exit posting `changed`; `notices-two-dependents`,
+two dependents and three exits from Design, back through B21 between them, each dependent reading one
+`confirmed` and two `changed` whose commits carry `pass:` 1, 2 and 3; and `notices-refused`, the post
+to the first dependent rebound to exit 1, the move still recording and printing its `notice — not
+posted` line. `check --selftest` holds the tree's own definition, then runs every plant, and
 is gov's `loop transition record` leg.
 
 ```bash

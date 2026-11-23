@@ -639,10 +639,12 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   expired), `mail-argv` (the
   mailbox read's command line recorded and held to the located driver and the bash that sees it),
   `mail-no-driver` (no driver found, the move recorded with the mailbox unarmed), `mail-no-bash`
-  (no bash that sees the driver, the move refused as `mail unknown`) and `deps-notices` (a second
+  (no bash that sees the driver, the move refused as `mail unknown`), `deps-notices` (a second
   build naming `tFix` in `parents:`: the move out of Design posts it one `confirmed` keyed over the
   spec listing at the move's commit, and a second exit from Design posts `changed`, never a second
-  `confirmed`). `check --selftest` runs every case, and gov's own
+  `confirmed`), `notices-two-dependents` (two dependents and three exits from Design: each reads one
+  `confirmed` and two `changed`, passes `1`, `2` and `3`) and `notices-refused` (the post to one
+  dependent refused: the move still records and prints the refusal's line). `check --selftest` runs every case, and gov's own
   `loop transition record` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
@@ -1103,6 +1105,12 @@ The notices are mail, posted through the mailbox's own writer:
   `python tools/loop/loop_transition.py dependents --build <slug>` lists who those builds are. <!-- usage: script:tools/loop/loop_transition.py#dependents b7ddefe3 -->
 - **`landed`** — `--landed <parent>` posts `landing <parent>` with the landed sha to each of them,
   and a post that fails prints its line without failing the landing.
+
+Each notice names its pass, so a later one is a new message and never a repeat the mailbox refuses: a
+Design exit posts `--pass <n>`, `<n>` the parent's count of exits from Design, `1` for the first, and a
+landing posts `--pass <sha8>`, the landed sha's first eight hex, so a re-landing after a revert reaches
+each dependent too.
+A post the mailbox refuses anyway, whatever its `--pass`, prints `notice — not posted <kind> to build:<dependent> · rc <n> · <the post's first line>` and fails neither the move nor the landing.
 
 Under `confirmed-interfaces` the dependent reads the parent's lease witness with the driver's
 `--lease show build <parent>`, recomputes the key over the parent's `spec/` listing at that commit,
