@@ -415,3 +415,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T08:38:35Z brief · item TOOL-dBoundRoles-18 · reason 09d70f672cba memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-18-build-brief.md
 
 2026-11-23T09:27:50Z brief · item TOOL-dBoundRoles-18 · reason f9ad26d7d183 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-18-build-brief.md
+
+2026-11-23T09:30:23Z decision · item TOOL-dBoundRoles-19 waits on ask TOOL-dBoundRoles-80, and units 42, 44, 50, 51, 56 to 58, 60 and 62 to 69 consume from the deferred units · reason options: land the five asks in the playbook and loop kits and resume this build run, or rule F4 and F8 to build those gaps here; units 37 and up were added by the landed spec run, so carry-forward cannot carry them and the close hands the build to the owner
