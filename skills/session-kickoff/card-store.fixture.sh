@@ -704,6 +704,11 @@ case "$PLANT" in
     print_card_held "AC3 the crossing leaves the ref unchanged and rewrites the session card's item — line" \
       "$(grep -qxF "boundary — none → $K1" "$OUT" && [ "$(git -C "$O" rev-parse --verify -q "$REF")" = "$c1" ] \
         && read_card_section "$R/.git/orientation/t1.md" | grep -q "^item — $K1 · at "; echo $?)"
+    # KICK-dKeptSession-44 S10, AC8: the tree's card file, which KICK-dKeptSession-8's arm reads, is
+    # re-rendered at the same crossing, so under at-transitions it holds the new item too. Staged against a
+    # crossing that skips write_card_file, the row reds on the stale item.
+    print_card_held "AC8 the crossing re-renders the tree card file to item — $K1" \
+      "$(read_card_section "$R/.claude/orientation-card.md" | grep -q "^item — $K1 · at "; echo $?)"
     run_card_engine "$R" --card --follow --build tFix --to designing
     print_card_held "AC3 the follow re-renders the section with the stub's key" \
       "$(read_ref_card "$O" | head -n 1 | grep -q '^card — tFix · step designing ·' && read_ref_card "$O" | grep -q "^item — $K1 · at "; echo $?)" ;;
@@ -716,7 +721,25 @@ case "$PLANT" in
     pb=$(tr -d '\r' < "$S/card" | awk '/^## pockets$/ { p = 1 } /^recent —/ { p = 0 } p' | wc -c)
     CARD_CAP_BYTES=$((b - pb - sb / 2)) run_card_engine "$R" --card --pointers --build tFix --session t1
     print_card_held "AC6 under CARD_CAP_BYTES=$((b - pb - sb / 2)) the publish names the pointers not written" "$(grep -q '^card — pointers not written: [0-9]* bytes over the cap$' "$OUT"; echo $?)"
-    print_card_held "AC6 the ref is unchanged" "$([ "$(git -C "$O" rev-parse --verify -q "$REF")" = "$c1" ]; echo $?)" ;;
+    print_card_held "AC6 the ref is unchanged" "$([ "$(git -C "$O" rev-parse --verify -q "$REF")" = "$c1" ]; echo $?)"
+    # KICK-dKeptSession-44 S22, AC20: the base kinds' records and one record of every typed kind the
+    # memory-tree kit declares, read from its tree_lib; under the default cap the pointers publish, and the
+    # records — line names base kinds alone. Staged against a reader keeping typed kinds, the row reds.
+    tl=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file memory-tree tree_lib.py)
+    write_card_records
+    mapfile -t typed < <("$PY" -c 'import sys; sys.path.insert(0, sys.argv[1]); import tree_lib; print("\n".join(tree_lib.TYPED_RECORD_KINDS))' "${tl%/*}" | tr -d '\r')
+    base=$("$PY" -c 'import sys; sys.path.insert(0, sys.argv[1]); import tree_lib as t
+print("|".join(k for k in t.RECORD_KIND_TOKENS if k not in t.TYPED_RECORD_KINDS))' "${tl%/*}" | tr -d '\r')
+    for k in "${typed[@]}"; do
+      printf '**Serves:** %s TOOL-tFix-1\n\n# a %s record\n' "$k" "$k" > "$R/memory/builds/tFix/build/2026-01-03-build-TOOL-tFix-1-$k-1.md"
+    done
+    git -C "$R" add -A memory && git -C "$R" commit -q -m "fixture: a record of every typed kind"
+    run_card_engine "$R" --card --pointers --build tFix --session t1
+    read_ref_card "$O" > "$S/card"
+    read_card_section "$S/card" | sed -n 's/^records — //p' | sed 's/ · /\n/g' | awk '{ print $1 }' > "$S/kinds"
+    print_card_held "AC20 beside a record of each of the ${#typed[@]} typed kinds the pointers publish, the records — line naming base kinds alone" \
+      "$([ "${#typed[@]}" -gt 0 ] && ! grep -q 'pointers not written' "$OUT" && [ -s "$S/kinds" ] \
+        && [ -n "$base" ] && ! grep -qvxE "$base" "$S/kinds"; echo $?)" ;;
   pointers-replay)
     # KICK-dKeptSession-13 AC7: a compacted session's replay in a second clone, after a publish carrying
     # K1, prints the section the lookup re-keyed from the build card.
