@@ -140,7 +140,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +2 for arm 42 (TOOL-dBoundRoles-47).
 # +11 for arm 43 (TOOL-dBoundRoles-26).
 # +1 for arm 42's read check (TOOL-dBoundRoles-53).
-FLOOR_ASSERTIONS=184
+# +3 for arm 44 (TOOL-dBoundRoles-59).
+FLOOR_ASSERTIONS=187
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -2501,6 +2502,34 @@ check_arm "arm 43 AC5 under --budget-spent the owner refusal answers choose-endi
    "$([[ $A43 == *'spent 1'* ]] && echo 1 || echo 0)"
 [ "$A43" = $'rendered 1\nredeclared 1\nnobody 1\nempty 1\nplanted 1\nself 1\nproducer 1\ndriver 1\nowner 1\nbuild 1\nspent 1' ] \
    || printf '    %s\n' "${A43//$'\n'/$'\n'    }"
+
+# ---- arm 44 (TOOL-dBoundRoles-59 AC1 AC2): `check_role_reads` folds each `reads` entry through the installed kit's
+# ---- `roles_lib.parse_read_key`, so the fixture's gov-orienter, its `reads` line rewritten in turn, admits
+# ---- `input:question input:prompt` tag-spelled (`field.input.question, field.input.prompt?`) and native-spelled
+# ---- (`input:question, input:prompt?`) alike, and with `field.input.prompt?` cut from the tag-spelled line the call
+# ---- fails naming `input:prompt`. Each call runs in a subshell, so its own assertion is read here, never counted.
+# ---- The failing case, owed at the close and not observed by the pass that wrote this: the helper's slice restored
+# ---- to the raw split that strips a trailing `?`, under which the tag-spelled line fails naming `input:question`.
+# ---- WHAT IT DOES NOT CHECK: a role other than gov-orienter, or the render's own read set, which arm 42 renders.
+build_fixture; _rc44=$?
+A44F="$FX/$FXK/agents/gov-orienter.agent.md"; A44=""
+for _l in 'tag|field.input.question, field.input.prompt?' 'native|input:question, input:prompt?' 'cut|field.input.question'; do
+  _o=""; _r=unset
+  if "$PY" -B -c 'import pathlib, re, sys
+path = pathlib.Path(sys.argv[1]); text = path.read_bytes().decode("utf-8")
+text, hits = re.subn(r"(?m)^reads:[^\r\n]*", lambda m: "reads: " + sys.argv[2], text, count=1)
+path.write_bytes(text.encode("utf-8")); sys.exit(0 if hits == 1 else 1)' "$A44F" "${_l#*|}"; then
+    _o=$(check_role_reads gov-orienter input:question input:prompt); _r=$?
+  fi
+  _o=${_o//$'\r'/}; A44+="${_l%%|*} $_r ${_o//$'\n'/ }"$'\n'
+done
+check_arm "arm 44 AC1 the read check admits input:question input:prompt from gov-orienter's tag-spelled reads line" \
+   "$([ "$_rc44" = 0 ] && [[ $A44 == *'tag 0 ok '* ]] && echo 1 || echo 0)"
+check_arm "arm 44 AC2 ...and from its native-spelled line" \
+   "$([[ $A44 == *'native 0 ok '* ]] && echo 1 || echo 0)"
+check_arm "arm 44 AC2 ...and with field.input.prompt? cut from the tag-spelled line it fails naming input:prompt" \
+   "$([[ $A44 == *'cut 1 FAIL '*'gov-orienter does not read input:prompt'* ]] && echo 1 || echo 0)"
+[[ $A44 == *'tag 0 ok '*'native 0 ok '*'cut 1 FAIL '*'does not read input:prompt'* ]] || printf '    %s\n' "${A44//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
