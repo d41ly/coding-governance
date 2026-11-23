@@ -100,7 +100,7 @@ TEXT_MODE_FLAGS = ("text", "universal_newlines")
 #: with the arms; it may never be lowered to fit a regression.
 #: RAISED 26 -> 41 by TOOL-dWitnessedBar-24: seven stdout rows, six JavaScript rows and the two
 #: per-mode arm-set rows, 15 executed, every one unconditional.
-FLOOR_ASSERTIONS = 42
+FLOOR_ASSERTIONS = 43
 
 
 def read_kwarg(call: ast.Call, name: str) -> ast.expr | None:
@@ -486,6 +486,12 @@ def run_selftest() -> int:
         try:
             check("no registry argument reads <MEMORY_ROOT>/project/encoding-posture-sites.txt",
                   main(["encoding_posture.py"]), 0)
+            (tree / "records" / "b.py").write_text('open("y")\n', encoding="utf-8")  # a frozen record's site
+            subprocess.run(["git", "add", "-A"], cwd=str(tree), capture_output=True, check=True)
+            # TOOL-aFlattenedSeed-4: an empty registry argument is the home too, so an adopter's row can
+            # pass a population after it; the memory root's own site sits outside that population.
+            check("an empty registry argument reads the home over the pathspecs after it",
+                  main(["encoding_posture.py", "", ".", ":!records"]), 0)
         finally:
             os.chdir(here)
 
@@ -501,7 +507,8 @@ def main(argv: list[str]) -> int:
         return run_selftest()
     mode = next((flag for flag in MODES if flag and flag in argv), "")
     measure = "--measure" in argv
-    args = [arg for arg in argv[1:] if arg not in (mode, "--measure")]
+    # The default mode's flag is "", so an empty registry argument is never taken for it (TOOL-aFlattenedSeed-4).
+    args = [arg for arg in argv[1:] if arg != "--measure" and (not mode or arg != mode)]
     if measure:
         args = [None, *args]  # `--measure` reads no registry: its positionals open at the root
     suffix, _scan, arms = MODES[mode]
@@ -511,8 +518,9 @@ def main(argv: list[str]) -> int:
         return 2
     try:
         # TOOL-aFlattenedSeed-3: no registry argument reads the population's home, as an adopter's row names none.
-        default = None if measure or args else derive_default_registry(root, DEFAULT_HOMES[mode])
-        declared, malformed = resolve_declaration(args[0] if args else default, arms)
+        # TOOL-aFlattenedSeed-4: an empty one too, so a row can name the population after it.
+        default = None if measure or (args and args[0]) else derive_default_registry(root, DEFAULT_HOMES[mode])
+        declared, malformed = resolve_declaration(args[0] if args and args[0] else default, arms)
         hits, scanned = scan_tree(root, args[2:], mode)
     except OSError as exc:
         print(f"encoding-posture: {exc}", file=sys.stderr)
