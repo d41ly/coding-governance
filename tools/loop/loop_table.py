@@ -79,6 +79,17 @@ where that route names an item the row enters that item's step's state. An owed 
 route, or on one a build row covers, is stale. Each step's exit fires a build row out of its state, or
 stands on the owed list.
 
+The entry rows' join (KICK-dKeptSession-18) reads the claim's `FIRST_MOVES`, each disposition a claim
+admits and its first move from `none`, `(item, outcome)`, imported from `claim.py` inside
+`check_transition_tables`, and joins it with the graded build rows from `none` by `check_entry_rows`.
+A row fires a key's first move when its item and outcome are the move's and its `disposition`, where it
+carries one, is that key. Forward, each key is a member of `[dispositions]` and exactly one row fires its
+first move; backward, every build row from `none` fires a key's first move. `check` prints `loop: entry
+rows · <key> → <to> · ...`, each key sorted with the `to` of the row firing it, `?` where no single row
+does, and each refusal opens `entry rows · <key> · forward: ` or `entry rows · <disposition> · backward:
+`, `-` for a row carrying none; an import of `claim.py` that fails is the one refusal `entry rows ·
+FIRST_MOVES unread: <why>` and no line.
+
 WHAT THIS DOES NOT CHECK: whether a witness holds; whether a stand-in's owner has landed; that every row
 item owned by an unlanded build has a stand-in row; reachability, termination and counted edges; the
 feature rows' last-unit rule; the routes of the feature and unit rows, which the join reads for the build
@@ -87,7 +98,8 @@ which four are not yet; a phase row's qualifier value against the driver's halt 
 an explicit `--extra` is the driver's `PHASES_EXTRA`, which the caller passes and wins over the conf; that each
 member of a level's terminal set is a state of that level, or that a `-terminal` key names a level: a
 misspelt key leaves its level with no set, which `check` refuses, and a member no state reaches reds the
-termination check.
+termination check; an entry row's `to`, which the entry rows' line prints and the table's source rows
+decide.
 """
 import argparse
 import pathlib
@@ -154,7 +166,14 @@ PLANTS = {"bad-state": ("a unit row entering reviewing, no unit state", "reviewi
           "phase-twice": ("a second unqualified BUILDING phase row", "two unqualified rows"),
           "held-in-elsewhere": ("the BUILDING phase row given the step held-in", "(BUILDING) reads the step held-in"),
           "phase-row-unknown": ("a phase row for STAGING, an adopter phase, with no PHASES_EXTRA passed",
-                                "names no member of PHASES_CORE or PHASES_EXTRA")}
+                                "names no member of PHASES_CORE or PHASES_EXTRA"),
+          "entry-row-missing": ("the build row from none carrying repeat taken out",
+                                "entry rows · repeat · forward: no build row"),
+          "entry-set-missing": ("repeat taken out of [dispositions]", "entry rows · repeat · forward: no member"),
+          "entry-row-extra": ("a build row from none on item.entry.claim's claimed carrying ask, into planning",
+                              "entry rows · ask · backward: "),
+          "entry-row-twice": ("the build row from none carrying repeat appended a second time",
+                              "entry rows · repeat · forward: 2 build rows")}
 
 
 class TransitionRefused(Exception):
@@ -290,6 +309,34 @@ def derive_move(level, state, item, outcome, facts, tables=None):
     return row, to
 
 
+def check_entry_rows(rows, members, first_moves):
+    """`(line, refusals)` of the build rows from `none`, `rows` their `(n, row)` pairs as graded, joined both
+    ways with `first_moves`, the claim's `{disposition: (item, outcome)}`, and `members`, the
+    `[dispositions]` set: forward, each key is a member and exactly one row fires its first move, the row's
+    `disposition`, where it carries one, being that key; backward, every row fires the first move of a key.
+    Each key and each row draws at most one refusal; the line names each key, sorted, with the `to` of the
+    one row firing it, `?` where no single row does (KICK-dKeptSession-18)."""
+    said, refusals = [], []
+    for key in sorted(first_moves):
+        item, outcome = first_moves[key]
+        hits = [(n, r) for n, r in rows
+                if (r["item"], r["outcome"]) == (item, outcome) and r.get("disposition", key) == key]
+        said.append("%s → %s" % (key, hits[0][1]["to"] if len(hits) == 1 else "?"))
+        if key not in members:
+            refusals.append("entry rows · %s · forward: no member of [dispositions]" % key)
+        elif not hits:
+            refusals.append("entry rows · %s · forward: no build row from %s fires %s · %s" % (key, ENTRY, item, outcome))
+        elif len(hits) > 1:
+            refusals.append("entry rows · %s · forward: %d build rows from %s fire %s · %s: rows %s" % (
+                key, len(hits), ENTRY, item, outcome, ", ".join(str(n) for n, _r in hits)))
+    for n, r in rows:
+        if not any((r["item"], r["outcome"]) == tuple(move) and r.get("disposition", key) == key
+                   for key, move in first_moves.items()):
+            refusals.append("entry rows · %s · backward: build row %d (%s · %s) fires no first move of FIRST_MOVES" % (
+                r.get("disposition", "-"), n, r["item"], r["outcome"]))
+    return "%s: entry rows · %s" % (SAY, " · ".join(said)), refusals
+
+
 def check_transition_tables(data, where, items):
     """`(lines, refusals)` of the transition tables of a parsed definition, against `items`, the declared
     `[[item]]` rows. LoopError where a table does not read."""
@@ -400,6 +447,16 @@ def check_transition_tables(data, where, items):
                 i == exit_tag for i, _o in owed):
             refusals.append("the step %s exit %s fires no build row out of %s and stands on no owed row" % (
                 step["tag"], exit_tag, step["state"]))
+    # KICK-dKeptSession-18, the entry rows joined with the claim's first moves; imported here, since
+    # claim.py imports loop_parents.py, which imports this module at its top
+    try:
+        from claim import FIRST_MOVES
+    except Exception as e:   # any failure to read the admitted set is one refusal, never a pass
+        refusals.append("entry rows · FIRST_MOVES unread: %s" % e)
+    else:
+        line, more = check_entry_rows([(n, r) for n, r, f in build if ENTRY in f], members, FIRST_MOVES)
+        lines.append(line)
+        refusals += more
     # S8, the stand-ins
     row_items = {r.get("item") for r in t["transition"]}
     for k, row in enumerate(stand, 1):
@@ -580,6 +637,18 @@ def write_table_plant(case, data):
         next(r for r in data["phase"] if r.get("phase") == "BUILDING")["step"] = HELD_IN
     elif case == "phase-row-unknown":
         data["phase"].append({"phase": "STAGING", "state": "none"})
+    elif case in ("entry-row-missing", "entry-row-twice"):
+        repeat = next(r for r in rows if r.get("level") == "build" and ENTRY in r.get("from", [])
+                      and r.get("disposition") == "repeat")
+        if case == "entry-row-missing":
+            rows.remove(repeat)
+        else:
+            rows.append(dict(repeat))
+    elif case == "entry-set-missing":
+        data["dispositions"]["set"].remove("repeat")
+    elif case == "entry-row-extra":
+        rows.append({"level": "build", "from": [ENTRY], "item": "item.entry.claim", "outcome": "claimed",
+                     "disposition": "ask", "to": "planning", "witness": "planted"})
 
 
 def main(argv):
@@ -617,6 +686,9 @@ def main(argv):
                  ("owed place", ["check"], 0, "%s: owed item.plan.place · unplaced · dRankedPlan" % SAY, ""),
                  ("stand-in close", ["check"], 0, "%s: stand-in item.life.close · dWellOiledMachine" % SAY, "")]
         cases += [("phase join", ["check"], 0, "%s: phase join · " % SAY, "")]
+        # KICK-dKeptSession-18: the entry rows' join, each key's `to` read from the rows
+        cases += [("entry rows", ["check"], 0,
+                   "%s: entry rows · new → planning · patch → designing · repeat → designing" % SAY, "")]
         cases += [(p, ["--fixture", "--plant", p], 1, "%s: refused · " % SAY, PLANTS[p][1]) for p in PLANTS]
         cases += [("phase step", ["phase", "--from", "REVIEWING"], 0,
                    "phase REVIEWING · state designing · step step.design", ""),

@@ -6453,6 +6453,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_entry_rows",
+      "kind": "function",
+      "file": "tools/loop/loop_table.py"
+    },
+    {
       "id": "check_envelope",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"

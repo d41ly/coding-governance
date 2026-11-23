@@ -374,7 +374,19 @@ and builds.
   item that is no tag or resolves to nothing, an outcome outside its item's set, or a disposition
   outside the set. It also joins every item's cross-step routes, an outcome sent to `transition` or
   to an item of another step, with the build table both ways: a route with no row, a row on no
-  route, and a row entering another state than the routed item's step are each refused. It exits 2
+  route, and a row entering another state than the routed item's step are each refused. It joins the
+  build rows from `none` with the dispositions a claim admits and each one's first move, both ways:
+  each admitted disposition must be in the disposition set and have exactly one row firing its first
+  move, and every build row from `none` must fire the first move of an admitted disposition. It prints
+  the join as one line, each disposition with the state its row enters:
+
+  ```text
+  loop: entry rows · new → planning · patch → designing · repeat → designing
+  ```
+
+  A disposition no single row fires prints `?`, and each break is refused on a line opening `entry
+  rows · `. A `repeat` request names its playbook by path, a repo-relative path the placement check
+  holds, until the playbook record kind lands. It exits 2
   when the file holds no transition row, so it never admits a move over nothing. `check --selftest`
   runs `check`, every case below and each kind of answer, and the `loop transition tables` gate
   runs it on every push and landing.
@@ -396,12 +408,16 @@ and builds.
   stays), `unrouted-row` (a row on an outcome routed inside its own step), `owed-stale` (an owed row a
   build row covers), `stand-in` (a stale and a mis-owned stand-in row), `terminal-from` (a row leaving
   landed), `terminal-open` (landed added to the open states), `unit-terminal-from` (a unit row from
-  `@open`, so leaving deployed) and `level-no-terminal` (`unit-terminal` taken out of `[states]`). The
-  files on disk are never changed.
+  `@open`, so leaving deployed), `level-no-terminal` (`unit-terminal` taken out of `[states]`),
+  `entry-row-missing` (the `repeat` row from `none` deleted), `entry-set-missing` (`repeat` taken out
+  of the disposition set), `entry-row-extra` (a row from `none` on the claim carrying `ask`, which no
+  claim admits) and `entry-row-twice` (the `repeat` row from `none` written twice). The files on disk
+  are never changed.
 
 The tables do not judge whether a move's witness holds, which is the writer's precondition, or
 whether a state is reachable or a cycle terminates. The feature and unit rows are not joined to the
-routes, and a feature's state, its least-advanced unit's, is the mover's call.
+routes, and a feature's state, its least-advanced unit's, is the mover's call. An entry row's `to`,
+the state the entry rows' line prints, is not judged either: the table's own rows decide it.
 
 ## Which state and step each run phase reads
 

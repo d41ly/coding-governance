@@ -311,12 +311,25 @@ a row item that is no tag or resolves to neither an `[[item]]` row nor a stand-i
 its item's set, a disposition outside the set, and a stale or mis-owned stand-in. It joins every
 cross-step route, an outcome routed to `transition` or to an item of another step, with the build
 table both ways, an owed row standing for a row another unit writes and refused once a row covers it,
-and each step's exit to a build row out of its state. Both verbs exit 2 where the definition does not
+and each step's exit to a build row out of its state. It joins the build rows from `none` with the
+claim's `FIRST_MOVES`, each disposition a claim admits and its first move, through `check_entry_rows`
+(KICK-dKeptSession-18): forward, each disposition is a member of `[dispositions]` and exactly one row
+fires its first move, the row's `disposition`, where it carries one, being that disposition; backward,
+every build row from `none` fires a first move. It prints `loop: entry rows · new → planning · patch →
+designing · repeat → designing`, each `to` read from the rows, `?` where no single row fires a
+disposition, and each refusal opens `entry rows · `; `claim.py` is imported inside
+`check_transition_tables`, and an import that fails is one refusal, never a pass. The row's `to` is
+not judged: the table's source rows decide it. A `repeat` names its playbook by a repo-relative path
+until the playbook record kind lands. Both verbs exit 2 where the definition does not
 read or holds no transition row. `--fixture --plant <case>` runs `check` with one break of `PLANTS`
 made in memory by `write_table_plant`: `bad-state`, `two-rows`, `bad-exit`, `dropped-row`,
 `unrouted-row`, `owed-stale`, `stand-in`, `terminal-from` (a build row leaving landed),
 `terminal-open` (landed appended to the build's open states), `unit-terminal-from` (a unit row from
-`@open`, which holds deployed) and `level-no-terminal` (`unit-terminal` taken out of `[states]`). `check --selftest` runs `check`, every
+`@open`, which holds deployed), `level-no-terminal` (`unit-terminal` taken out of `[states]`),
+`entry-row-missing` (the build row from `none` carrying `repeat` taken out), `entry-set-missing`
+(`repeat` taken out of `[dispositions]`), `entry-row-extra` (a build row from `none` on
+`item.entry.claim`'s `claimed` carrying `ask`) and `entry-row-twice` (the `repeat` row appended a second
+time). `check --selftest` runs `check`, every
 plant, each kind of move and direction, and `direction-order`, the shipped rows with building's and
 testing's orders swapped, through `run_selftest_cases`, the case loop `loop_checklist.py` shares,
 and is the kit's `loop transition tables` gate leg.
