@@ -1,6 +1,6 @@
 # KICK-dKeptSession-52 — the per-exit pass observed on a repeated interface, so dropping `--pass` prints a duplicate
 
-**Status:** DEFERRED · rev-6 · 2026-11-23 · node a · Tier-2 · base 4eb48ae6 · streams kickoff · order 26 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-6 · 2026-11-23 · node a · Tier-2 · base 4eb48ae6 · streams kickoff · order 26 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-11-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-11-precheck-brief.md) | research | KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-53 KICK-dKeptSession-17 |
 | [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-26 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-11 KICK-dKeptSession-53 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 |
 | [2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md) | research | KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-53 KICK-dKeptSession-55 |
+| [2026-11-21-prompt-KICK-dKeptSession-52-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-52-build-brief.md) | research | — |
 | [2026-11-22-prompt-KICK-dKeptSession-52-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-52-reground-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-52-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-52-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
