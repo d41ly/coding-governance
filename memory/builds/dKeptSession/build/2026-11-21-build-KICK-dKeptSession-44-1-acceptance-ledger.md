@@ -114,8 +114,8 @@ re-read alone with the parent's region (PINNED 2026-11-23, node d, `EPOCHREALTIM
 (DERIVED, x1.5 rounded up) and its token `plants=38`, 294 s past the leg's 120 s ceiling (PINNED
 2026-11-23, `tools/gate-legs.json`), the owner's to raise, not made here. The orient probe read 22.8 s
 for the fixture and three runs (PINNED 2026-11-23, node d), so `runlog selftest` reads 116 (DERIVED,
-62 plus two thirds of 22.8, x1.5 rounded up). The driver probe read 16.8 s, 11 s of it the progress
-bound (PINNED 2026-11-23, node d), so shard 8/8 reads 6785 (DERIVED, 6690 plus 95, the note's sum).
+62 plus two thirds of 22.8, x1.5 rounded up). The driver probe read 16.8 s, 11 s (PINNED 2026-11-23, node d) of it the
+progress bound, so shard 8/8 reads 6785 (DERIVED, 6690 plus 95, the note's sum).
 
 The close owes: §7's legs; the suite's 7 new region-eight `same`, with `FLOOR_ASSERTIONS` 4187 and
 `FLOOR_SHARD_8` 1404 (DERIVED, plus 7 each); the two new `mail-read-crash` cases of `check --selftest`;
