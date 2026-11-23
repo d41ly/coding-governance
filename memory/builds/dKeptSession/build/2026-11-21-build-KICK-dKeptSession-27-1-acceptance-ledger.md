@@ -33,9 +33,10 @@ the dispatch rewords. The floors had moved past the spec's figures: unit 23 rais
 Every refusal the pass adds prints a line and `return`s from a function, and the one added line
 carrying `exit 1` opens `#`, so the census at the driver's ceiling (PINNED,
 `.memory-tree.conf#REFUSAL_CEILINGS`, 347) does not move; it is read at the close. A cache read the
-post cannot complete, a `rev-list --count` or the predecessor's `for-each-ref`, refuses as `mail —
-not written · the mail cache could not be read, …`, exit 2, where the spec names no outcome, so an
-unread order never writes a guessed `seq` or `after`. The new arm in
+post cannot complete, a `rev-list --count` or the predecessor's `for-each-ref`, refuses with a
+`mail — not written` line naming the mail cache, exit 2, where the spec names no outcome, so an
+unread order never writes a guessed `seq` or `after`; no arm reaches either line, nor the check's
+`interface — not read` line over a refused read. The new arm in
 `tools/unattended/unattended.test.sh` counts 8 region-eight `same` (DERIVED, the block's own lines),
 raising `FLOOR_ASSERTIONS` to 4108 and `FLOOR_SHARD_8` to 1325 (DERIVED, base plus 8), each with its
 `RAISED` line; its RED-first observation is the close's. `python tools/lexicon/lexicon.py` exited 1
