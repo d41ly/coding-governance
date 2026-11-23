@@ -76,6 +76,8 @@ owner = "dDeclaredLoop"
 name = "attendance"
 allowed = ["unattended", "announce", "confirm-steps", "confirm-acts"]
 default = "unattended"
+summary = "Whether the owner attends a run: the breakpoints placed for them and the questions asked live."
+usage = 'attendance = "confirm-steps"'
 owner = "dKeptSession"
 
 [[key]]
@@ -243,6 +245,8 @@ owner = "dPlacedRequest"
 name = "actions.free"
 allowed = ["read-only-probes", "item-reads-only", "recorded-anything"]
 default = "read-only-probes"
+summary = "What a tool call outside the item in flight may do: read-only probes, item reads only, or anything recorded."
+usage = 'actions.free = "item-reads-only"'
 owner = "dKeptSession"
 
 [[key]]
@@ -563,6 +567,8 @@ owner = "dWellOiledMachine"
 name = "notify.owner"
 allowed = ["turn-micro-formats", "park-and-landing", "every-transition", "park-only"]
 default = "turn-micro-formats"
+summary = "Which events report the build's progress to the owner as one progress line."
+usage = 'notify.owner = "park-and-landing"'
 owner = "dKeptSession"
 
 [[key]]
