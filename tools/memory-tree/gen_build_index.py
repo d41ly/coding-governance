@@ -2538,7 +2538,7 @@ def render_order(build: dict) -> str:
             ids = ", ".join(f"`{u['id']}`" for u in us)
             out.append(f"| {n} | {ids} | {derive_parallel_step(us)} |")
         # TOOL-dTotalRecall-53 S27: what the Parallel cell means, stated under the table it qualifies
-        out += ["", "A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences "
+        out += ["", "A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences "
                     "two of them whose write sets intersect at dispatch."]
         # RESIDUAL, stated rather than silently dropped: a unit with no verb is not ordered, and a
         # region that omitted it would read as a complete order while hiding a unit.
