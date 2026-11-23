@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-52 — the one legacy registration is keyed by path, section and check, absorbs its second population through a declared base re-key, and leaves no carrier of the old name
 
-**Status:** DEFERRED · rev-4 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -23,7 +23,7 @@
 The round-1 spec audit of units 36 to 43
 (`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md`)
 confirmed finding **id 37 at HIGH**, its item **H8**, alone in that item. `TOOL-dTotalRecall-43` S19
-folds the `[[ledger]]` population `legacy-records` (`TOOL-dTotalRecall-19` S7) into
+decides to fold the `[[ledger]]` population `legacy-records` (`TOOL-dTotalRecall-19` S7) into
 `record-kinds-legacy` (`TOOL-dTotalRecall-1` S8), both tables of `tools/govkit/registry.toml`, with a
 field `check` holding `kind-schema` or `causes`, under the one leg `record-kinds` and the one seed
 `record_kinds.py --seed-legacy` (unit 43 §8 F4). Both homes key a row by `path` and `section`: the kind
@@ -35,8 +35,9 @@ predicates"). And the old name's carriers stay uninventoried: the table and the 
 `why` in the registry, the home `memory/project/legacy-records.txt`, `.memory-tree.conf`'s
 `PROJECT_REGISTRY_EXTRA` entry, `record_causes.py#POPULATION`, the memory-tree README and one hygiene
 suite assertion, 18 lines in 6 files besides the home (DERIVED 2026-11-23, `git grep -c legacy-records`).
-Built as written, the merge loses a slice or is refused. This unit keys the merged registration by
-the triple, declares how its base is read, and clears the old name by value. It repairs
+Built as written, the merge loses a slice or is refused. This unit builds the fold (unit 43 §8 F6),
+keys the merged registration by the triple, declares how its base is read, and clears the old name
+by value. It repairs
 `TOOL-dTotalRecall-43`.
 
 At `55f322f29` the run's compare base, HEAD's merge-base with `origin/main` (`8b8b1374c`), holds
@@ -82,19 +83,24 @@ this pass (§3).
   `tools/memory-tree/check-memory-hygiene.test.sh` · by value: `check_causes` and `check_orphans` read
   the `causes` slice through `read_legacy_paths`, and `check_record_kinds` the `kind-schema` slice
   through `read_legacy_keys`.
+- **S4** — The fold, `TOOL-dTotalRecall-43` S19 (id 25), built here by that unit's §8 F6: the
+  `legacy-records` home's rows join `record-kinds-legacy`'s home as its `causes` slice, the kind rows
+  as its `kind-schema` slice, under the one leg `record-kinds` and the one seed
+  `record_kinds.py --seed-legacy` emitting both slices (unit 43 §8 F4). No row is lost. Not checked:
+  `ratchet.py` attributes a `causes` widen to `record-kinds`. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
 - The decision to keep one registration: `TOOL-dTotalRecall-43` S19's, for the round-1 audit's id 25.
 - The one leg and the one seed emitting both slices: unit 43 §8 F4's.
 - The ledger factory's other directions and fields: `TOOL-dWitnessedBar-13`'s.
-- The per-check row counts as a criterion of their own: the batch `TOOL-dTotalRecall-53` observes the
-  slices for ids 51 and 12.
+- The per-check row counts beyond S4's conservation count: the batch `TOOL-dTotalRecall-53` observes
+  the slices for ids 51 and 12.
 
 ### Edges
 
-- **consumes-from** `TOOL-dTotalRecall-43` — S19's merged `record-kinds-legacy` registration and its
-  `check` field, which this unit re-keys and carries past `shrink-only`
+- **consumes-from** `TOOL-dTotalRecall-43` — S19's fold into `record-kinds-legacy`, its one leg and
+  seed (§8 F4), which this unit builds keyed by the triple (unit 43 §8 F6)
 - **consumes-from** `TOOL-dTotalRecall-19` — the `legacy-records` population, its home and its
   `--population` call sites, which S3 clears by value
 - **consumes-from** external — `tools/lib/legacy_ledger.py`, `compare_to_base` and `carry_renames`
@@ -162,7 +168,7 @@ lexicon's closed set (function, type, file, constant); no function is minted.
 - observability — `compare_to_base` names each absorbed population it read; `record_causes.py
   --check` names the merged population on its first line.
 - risks — an `absorbs` row left after its base moved reads an empty union and changes nothing.
-- testing — AC1 to AC4 by the pass; the arm of §7 at the close.
+- testing — AC1 to AC5 by the pass; the arm of §7 at the close.
 - migration — the merged home's rows carry `check`; the old home is deleted in the same commit.
 - user docs — none under `help/`.
 
@@ -195,6 +201,10 @@ lexicon's closed set (function, type, file, constant); no function is minted.
   `kind-schema` rows; and `python tools/memory-tree/record_causes.py --fixture --plant none` prints
   `record causes: record-kinds-legacy · 2 record row(s) (-), 0 section row(s)`.
   Red when: a reader counts the other slice's rows, or unpacks a triple as a pair.
+- **AC5** — When a `tomllib` probe reads the `[[ledger]]` rows of `tools/govkit/registry.toml` at the
+  tip, one registration, `record-kinds-legacy`, holds the record rows, and its home's rows per `check`
+  value, `kind-schema` and `causes`, equal the two homes' row counts at the pass base.
+  Red when: the fold loses a row, or two registrations remain.
 
 ## 7. Gates
 
@@ -230,6 +240,10 @@ New arm: tools/lib/legacy_ledger.py · covers AC2 · an absorbed fixture populat
   and the old table's `verbatim`; the carriers re-derived; S1 and AC4 each reader's slice; S2 the
   factory's two inline copies; AC3's grep spares the ceiling evidence (§8 F2); the edge to
   `TOOL-dTotalRecall-62` reads `new at`, no first seed; S2 and AC2 left for that unit's amendment.
+- rev-5 · 2026-11-23 · §1 · §2 S4 added · §3 · §5 · §6 AC5 added · per
+  `2026-11-23-prompt-TOOL-dTotalRecall-43-divergence-fold-brief`: unit 43 §8 F6 moves its S19 fold and
+  AC19 here, as S4 and AC5, beside the triple key both homes' shared (path, section) pair needs; the
+  edge with unit 43 and the per-check non-goal re-read to match. No other item moved.
 
 ## 10. Reuse audit
 
