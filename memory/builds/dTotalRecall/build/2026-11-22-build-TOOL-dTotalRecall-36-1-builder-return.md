@@ -17,7 +17,7 @@ Pass commit 7ffe749aa on base 2e1da60d0. The two halves of AC4 passed, and AC1 t
 - AC3: `handoff.py render --stdout` prints the cause on line 2. A probe of write_agent_ledger in a %TEMP% folder (create, rewrite, re-insert) counts Caused-by 1 each time.
 - AC4: python -c probes of render_cause_line, check_cause_line and VIEW_HEAD. inspect shows neither function is wired in.
 - AC5: 0 causeless at base and at tip.
-- AC6: check_cause_writers over a %TEMP% clone with handoff.py's cause lines cut reports handoff.py's cause-line writer red. The tip reads 7 census files, 7 kept, 0 red. The alias-compare count line is the same at base and tip (385 files, 7 hits, 7 kept, 0 red). The writer-without-cause plant exits 1 and the legacy plant exits 0.
+- AC6: check_cause_writers over a %TEMP% clone with handoff.py's cause lines cut reports handoff.py's cause-line writer red. The tip reads 7 census files, 7 kept, 0 red. The alias-compare count line is the same at base and tip (385 files, 7 hits, 7 kept, 0 red; DERIVED, the builder's alias-compare probe). The writer-without-cause plant exits 1 and the legacy plant exits 0.
 - AC7: the census renders line 2 as the cause. The upstream fixture writes `**Caused-by:** FIX-dUpstream-1`. In a %TEMP% chain clone, --record-round writes the cause and --chain-verdict exits 0 with the same verdict with or without the line.
 
 These probes stand in for these gates: tier2-review self-test, unattended-build self-test, runlog selftest, record causes, record-kinds, memory-hygiene self-test, unattended kit gate, loop upstream fixtures and backlog migration selftest.
