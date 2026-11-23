@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-by: attended
+landed-derived: 50e8c5384cc1afe7a8cd03948fa13bcd19d00a52 525f3ab9766e1c117a600cfd756593de5b46a8b6
 asks-at-landing: TOOL-dQuietDisk-20=OPEN TOOL-dQuietDisk-21=OPEN TOOL-dQuietDisk-22=OPEN TOOL-dQuietDisk-23=OPEN TOOL-dQuietDisk-24=OPEN TOOL-dQuietDisk-25=OPEN TOOL-dQuietDisk-27=CLOSED TOOL-dQuietDisk-29=OPEN TOOL-dQuietDisk-30=OPEN TOOL-dQuietDisk-31=OPEN TOOL-dQuietDisk-32=OPEN TOOL-dQuietDisk-33=DEFERRED TOOL-dQuietDisk-34=OPEN TOOL-dQuietDisk-35=OPEN TOOL-dQuietDisk-38=OPEN TOOL-dQuietDisk-39=OPEN TOOL-dQuietDisk-40=OPEN TOOL-dQuietDisk-41=OPEN TOOL-dQuietDisk-42=OPEN TOOL-dQuietDisk-43=OPEN TOOL-dQuietDisk-44=OPEN TOOL-dQuietDisk-45=OPEN TOOL-dQuietDisk-46=OPEN TOOL-dQuietDisk-47=OPEN TOOL-dQuietDisk-48=OPEN TOOL-dQuietDisk-49=OPEN TOOL-dQuietDisk-50=OPEN TOOL-dQuietDisk-51=OPEN TOOL-dQuietDisk-52=OPEN
 units-at-landing: TOOL-dQuietDisk-1 TOOL-dQuietDisk-14 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-10 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-18 TOOL-dQuietDisk-28 TOOL-dQuietDisk-6 TOOL-dQuietDisk-11 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-26 TOOL-dQuietDisk-17 TOOL-dQuietDisk-9 TOOL-dQuietDisk-19 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37
 hold-run: 
@@ -22,8 +24,8 @@ held-from: VERIFYING
 gates-run: unattended-179540992358805920005-2030153 87fdd849
 refreshed-at: a315474f499e99df0c72b9df9204ed01194bf57b · handoff · 4 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 90563a6f5daed4d3e56a8cd0992538745f5f64ae
-phase: HELD
+witness: 50e8c5384cc1afe7a8cd03948fa13bcd19d00a52
+phase: LANDED
 may: none
 mode: prompt
 run-branch: refs/heads/branch/disk-churn-fixes-40450b
