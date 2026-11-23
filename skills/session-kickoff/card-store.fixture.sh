@@ -50,7 +50,7 @@ fixture-cli-path-differs fixture-cli-unknown pointers-render pointers-boundary p
 budget-open budget-spent budget-unfrozen budget-omitted budget-no-kit
 position-act position-awaiting position-disagrees position-skips lead-compact lead-resume
 fill-fresh-past fill-under fill-compact fill-replay fill-slow
-mail-open mail-none mail-off mail-boundary"
+mail-open mail-none mail-off mail-boundary mail-notice-boundary"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
 BRIEF=memory/builds/tFix/prompts/2026-01-01-prompt-TOOL-tFix-1-brief.md
@@ -943,5 +943,33 @@ case "$PLANT" in
     set_card_position mail-delay 0
     print_card_held "AC2 a crossing past CARD_CLAIMS_BOUND=2 prints the read passed its 2s bound" \
       "$(grep -qxF "boundary — $K2 → $K1" "$OUT" && tr -d '\r' < "$OUT" | grep -qxF 'interrupt — mailbox · unarmed · the read passed its 2s bound'; echo $?)" ;;
+  mail-notice-boundary)
+    # KICK-dKeptSession-21 AC3: the card moved to K1 by a first crossing, then fy's question to build:tFix
+    # set on the bare remote and a crossing to K2, the stub engine answering its planted `mail` line; the
+    # copied driver's `--mail notice` reads `mailbox.notice` as its default, since the stub policy kit
+    # refuses an unplanted key. Then the key held, no crossing; then `mailbox.notice` planted `off` and a
+    # crossing back to K1. Staged against the step left out of the boundary verb, the first row reds;
+    # against unit 10's read fetching after a fetched notice, the second.
+    run_card_append; set_card_position key "$K1"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    write_card_mail refs/gov/mail/fy/z/s-other fy a1b2c3d4e5f6 build:tFix question none
+    mail='interrupt — mailbox · a1b2c3d4e5f6 question from fy'
+    set_card_position key "$K2"; set_card_position mail "$mail"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    at=$(tr -d '\r' < "$OUT" | awk -v n="notice — mail — 1 unread for tFix · a1b2c3d4e5f6 · fetched · item $K2" -v m="$mail" \
+      '$0 == n && !x { x = NR } $0 == m && !y { y = NR } END { print x + 0, y + 0 }')
+    read -r l1 l2 <<<"$at"
+    print_card_held "AC3 a crossing prints the fetched notice naming the id, then the mailbox line, at lines $at" \
+      "$([ "$l1" -gt 0 ] && [ "$l1" -lt "$l2" ]; echo $?)"
+    print_card_held "AC3 after a fetched notice the stub's log records --mail-interrupts --local" \
+      "$([ "$(tail -n 1 "$CARD_STUB_POSITION.log" 2>/dev/null | tr -d '\r')" = 'tFix --mail-interrupts --local' ]; echo $?)"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC3 no crossing prints no notice — line" \
+      "$(grep -qxF "boundary — none crossed · item $K2" "$OUT" && ! grep -q '^notice — ' "$OUT"; echo $?)"
+    set_card_policy mailbox.notice off; set_card_position key "$K1"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC3 under mailbox.notice off a crossing prints no notice — line and the read fetches itself" \
+      "$(grep -qxF "boundary — $K2 → $K1" "$OUT" && ! grep -q '^notice — ' "$OUT" \
+        && [ "$(tail -n 1 "$CARD_STUB_POSITION.log" 2>/dev/null | tr -d '\r')" = 'tFix --mail-interrupts' ]; echo $?)" ;;
 esac
 exit "$MISSED"

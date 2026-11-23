@@ -5013,6 +5013,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkFetchDue",
+      "kind": "function",
+      "file": "tools/unattended/mail-notice.js"
+    },
+    {
       "id": "checkFile",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -18275,6 +18280,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/unattended/mail-notice.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/unattended/pass-tree.sh"
     },
     {
@@ -20418,6 +20428,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_mail_notice",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_mailbox",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -21036,6 +21051,11 @@
       "id": "readLiveness",
       "kind": "function",
       "file": "tools/unattended/stop-guard.js"
+    },
+    {
+      "id": "readMailNotice",
+      "kind": "function",
+      "file": "tools/unattended/mail-notice.js"
     },
     {
       "id": "readMemoryRoot",
@@ -28668,6 +28688,11 @@
       "file": "tools/workflows/drift-audit-state.template.js"
     },
     {
+      "id": "renderMailNotice",
+      "kind": "function",
+      "file": "tools/unattended/mail-notice.js"
+    },
+    {
       "id": "renderNote",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -33278,6 +33303,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "runDetachedFetch",
+      "kind": "function",
+      "file": "tools/unattended/mail-notice.js"
+    },
+    {
       "id": "runGit",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -35298,6 +35328,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "run_mail_notice",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "run_main",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -35441,6 +35476,16 @@
       "id": "run_normaliser",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "run_notice_arm",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_notice_hook",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_observation_probes",
@@ -43299,6 +43344,11 @@
     },
     {
       "id": "write_mail_answer",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_mail_notice",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
