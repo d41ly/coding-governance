@@ -24,6 +24,7 @@
 | [2026-11-22-prompt-TOOL-dTotalRecall-43-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-43-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-43-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-43-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-43-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-43-reground-spec-writer.md) | log | — |
+| [2026-11-23-prompt-TOOL-dTotalRecall-43-build-2-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-43-build-2-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-43-divergence-fold-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-43-divergence-fold-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-43-divergence-fold-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-43-divergence-fold-spec-writer.md) | log | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-brief.md) | journal | — |
