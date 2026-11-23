@@ -27,8 +27,9 @@ exits with `DP_LANDING` and `head`, rather than inline in `verb_landed`. So S2's
 first eight hex of the sha that function is given, S3's `echo` sits inside its loop, and S7's and AC7's
 "comment above the post loop" of `verb_landed` is the comment block above `write_landed_notices`. The
 pass rides the post argv as two more positional values, `"$7" "$8"` (`--pass` and the ordinal), the
-body moving to `"$9"`. A post that raises keeps unit 7's own `loop: notice · <dependent> · the post did
-not answer` line and adds no `notice — not posted` line, since it has no exit.
+body moving to `"$9"`. A post that raises keeps unit 7's own line,
+`loop: notice · <dependent> · the post did not answer`, and adds no `notice — not posted` line, since
+it has no exit.
 
 ## S4 — the answer to KICK-dKeptSession-7 AC7, superseded by AC1
 
@@ -49,8 +50,8 @@ this unit (F1).
 - AC6 — the probe printed `22` and the grep `plants=22`; `notices-two-dependents` and `notices-refused` are keys of `PLANTS` (DERIVED, those commands at observation time).
 - AC7 — the probe printed `True True`; the README grep piped into `sort -u` printed both plant names; the driver grep printed the comment line above `write_landed_notices` and its `echo` line (DERIVED, those commands at observation time).
 
-The two plants read 39.6 s and 7.8 s alone (PINNED 2026-11-23, `time`, node d), so the `loop transition
-record` row's proxy `r` is 127.5 s, over unit 7's 80.1 s (DERIVED, their sum), and its value 192
+The two plants read 39.6 s and 7.8 s alone (PINNED 2026-11-23, `time`, node d), so the
+`loop transition record` row's proxy `r` is 127.5 s, over unit 7's 80.1 s (DERIVED, their sum), and its value 192
 (DERIVED, x1.5 rounded up), 72 s past the leg's 120 s ceiling (PINNED 2026-11-23, `tools/gate-legs.json`):
 the raise is the owner's and is not made here. The real-driver probe's two landings read 6.6 s and 5.7 s
 (PINNED 2026-11-23, node d); the shard 8/8 row moves 6587 to 6669 as an ESTIMATE (DERIVED, x1.5 of
