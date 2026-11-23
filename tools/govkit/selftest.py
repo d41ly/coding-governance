@@ -3212,6 +3212,83 @@ def derive_seed_expected(target: pathlib.Path, descs: dict, selection: list[str]
     return [x for x in rows if x["kind"] == "write" and x["role"] == "seed" and not x["missing"]]
 
 
+#: TOOL-dBoundRoles-40 §4 Inventory: the recorded harness stage's run id and agent id, and the bound
+#: each replayed `SubagentStop` command runs under.
+STOP_RUN_ID, STOP_AGENT_ID, STOP_REPLAY_TIMEOUT = "wf_fixture-1", "afixture000001", 30
+
+
+def check_stop_replay(t: pathlib.Path) -> None:
+    """TOOL-dBoundRoles-40 S1 to S3: a recorded harness-stage stop replayed against every `SubagentStop`
+    command the default install `t` registers. S1 writes, under `t`, a session directory holding the
+    harness layout's agent transcript, its first `user` record a harness's computed task and its last an
+    assistant `StructuredOutput` call, and two payloads naming it, `stop_hook_active` false and true.
+    S2 reads the population from `t`'s `.claude/settings.json`, every command under `hooks.SubagentStop`
+    whatever its matcher, and an empty one is red. S3 runs each command once per payload through the
+    resolved bash, the payload on stdin, `t` the working directory and `CLAUDE_PROJECT_DIR`, under
+    `STOP_REPLAY_TIMEOUT` seconds: red on a non-zero exit, any stdout byte, a timeout, or a new path under
+    `t`'s `<git common dir>/return-check/`, the label naming the command, the payload and what it printed.
+    WHAT THIS DOES NOT CHECK: `SubagentStart` hooks (§3), stderr, which reaches no agent on exit 0, a
+    hook wired by hand outside every kit's fragment, or a direct spawn's stop, which the return check's
+    own plants grade."""
+    sdir = t / "fixture-sessions" / "fixture-session"
+    agent = sdir / "subagents" / "workflows" / STOP_RUN_ID / ("agent-%s.jsonl" % STOP_AGENT_ID)
+    agent.parent.mkdir(parents=True, exist_ok=True)
+    task = ("[Workflow harness — computed task] The task text below was computed at runtime by a workflow "
+            "script.\n  Build one unit from its brief and its spec, and return the shape the harness names.")
+    records = [
+        {"type": "user", "isSidechain": True, "agentId": STOP_AGENT_ID,
+         "message": {"role": "user", "content": task}},
+        {"type": "assistant", "isSidechain": True, "agentId": STOP_AGENT_ID,
+         "message": {"role": "assistant", "content": [
+             {"type": "tool_use", "id": "toolu_fixture000001", "name": "StructuredOutput",
+              "input": {"committed": False, "why": "a recorded fixture stop"}}]}},
+    ]
+    agent.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in records), encoding="utf-8",
+                     newline="\n")
+    parent = sdir.with_name(sdir.name + ".jsonl")
+    parent.write_text(json.dumps({"type": "user", "message": {"role": "user", "content": "build"}}) + "\n",
+                      encoding="utf-8", newline="\n")
+    base = {"session_id": sdir.name, "transcript_path": str(parent), "cwd": str(t),
+            "hook_event_name": "SubagentStop", "stop_hook_active": False,
+            "last_assistant_message": "The unit is built and committed.", "agent_id": STOP_AGENT_ID,
+            "agent_transcript_path": str(agent), "agent_type": "gov-builder"}
+    payloads = (("stop_hook_active false", base), ("stop_hook_active true", {**base, "stop_hook_active": True}))
+    try:
+        settings = json.loads((t / ".claude" / "settings.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        settings = {"unread": str(e)}
+    groups = (settings.get("hooks") or {}).get("SubagentStop") if isinstance(settings, dict) else None
+    commands = [h["command"] for g in (groups if isinstance(groups, list) else []) if isinstance(g, dict)
+                for h in (g.get("hooks") if isinstance(g.get("hooks"), list) else [])
+                if isinstance(h, dict) and isinstance(h.get("command"), str)]
+    check("[dBR-40 S2] the default install registers at least one SubagentStop command, never an empty "
+          "population", bool(commands), json.dumps(settings.get("hooks") if isinstance(settings, dict) else None))
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    env["CLAUDE_PROJECT_DIR"] = str(t)
+    common = subprocess.run(["git", "-C", str(t), "rev-parse", "--git-common-dir"], capture_output=True,
+                            text=True, encoding="utf-8", env=env).stdout.strip()
+    records_dir = (t / common if common else t / ".git") / "return-check"
+    for cmd in commands:
+        for name, payload in payloads:
+            held = set(records_dir.rglob("*")) if records_dir.is_dir() else set()
+            try:
+                p = subprocess.run([govkit_module().resolve_bash(), "-c", cmd], cwd=str(t), env=env,
+                                   input=json.dumps(payload, ensure_ascii=False), capture_output=True, text=True,
+                                   encoding="utf-8", errors="replace", timeout=STOP_REPLAY_TIMEOUT)
+                rc, out, err = p.returncode, p.stdout, p.stderr
+            except subprocess.TimeoutExpired as e:
+                rc = "a timeout after %ds" % STOP_REPLAY_TIMEOUT
+                out, err = (x.decode("utf-8", "replace") if isinstance(x, bytes) else (x or "")
+                            for x in (e.stdout, e.stderr))
+            left = sorted(x.relative_to(records_dir).as_posix() for x in
+                          (set(records_dir.rglob("*")) if records_dir.is_dir() else set()) - held)
+            red = rc != 0 or bool(out) or bool(left)
+            check("[dBR-40 S3] SubagentStop command %s over the %s payload exits 0, prints nothing on stdout and "
+                  "leaves no return-check record" % (cmd, name)
+                  + (" — it exited %s, printed %r and left %s" % (rc, out[:600], left or "nothing") if red else ""),
+                  not red, err[-1000:])
+
+
 def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = False) -> None:
     """TOOL-aOrientedCast-8 S10, AC4 and AC6: a DEFAULT apply into a scratch target renders the roles
     kit — the role index, one agent type per agent role, the seeded house overlays and the `/build`
@@ -3315,6 +3392,9 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
         check("OC13 AC4 ...and check_roles.py exits 0 with a note naming the lexicon leg",
               cr.returncode == 0 and any(ln.startswith("roles: note:") and "lexicon naming predicates" in ln
                                          for ln in cr.stdout.splitlines()), cr.stdout + cr.stderr)
+    else:
+        # TOOL-dBoundRoles-40: the default apply's whole `SubagentStop` population, replayed over a harness stop.
+        check_stop_replay(t)
     cw = t / PFX / "check-wiring.sh"
 
     def run_wiring():
