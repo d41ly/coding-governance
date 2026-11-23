@@ -21228,7 +21228,7 @@ same "KDS61 AC8 --mail read build:fx --sent exits 2 with S1's refusal" "$ms_rc [
   "2 [mail — not read · --sent reads one build's own mail refs, and 'build:fx' is no build's slug]"
 ms_out=$(run_mail_arm A s1 ack fx "${ms_1:-unposted1}" --sent); ms_rc=$?
 same "KDS61 AC8 --mail ack with --sent exits 2 printing the ack's form" "$ms_rc [$ms_out]" \
-  "2 [mail — not written · the form is --mail ack <slug> <id> [<id> ...]]"
+  "2 [mail — not written · the form is --mail ack <slug> [<id> ...]]"
 rm -rf "$mb_d"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -21473,11 +21473,14 @@ rm -rf "$LF"
 # ==================================================================================================
 # KICK-dKeptSession-62 AC13 (S15) — SEVERAL ACKS LAND TOGETHER OR NOT AT ALL. Unit 24's lease fixture
 # again, c2 asking as fy. a and b posted to build:tFix and a's ack posted by c1's session x1: `--mail
-# ack tFix a b` from x2 prints `mail — duplicate`, exits 1 and posts nothing, so b still reads open.
-# Then c and d posted, neither acked: `--mail ack tFix c d` from x3 prints two `mail — posted` lines
-# and exits 0, the session ref's tip the ack of d, parented on the ack of c, its `seq` one past. RED,
-# observed at the close: a driver posting each id in its own `write_mail_post`, under which b reads
-# acked. WHAT THIS BLOCK DOES NOT DRIVE: a lost ref update, whose line is the one-id post's branch.
+# ack tFix a b` from x2 skips a, whose row reads `acked`, naming it as `mail — already acked a`, and
+# posts b's ack alone, exit 0, so b reads acked (KICK-dKeptSession-63 S15 supersedes 62 AC13's
+# duplicate exit 1 here; RED, observed at the close: a driver without the skip, under which the
+# batch reads `mail — duplicate`, exit 1). Then c and d posted, neither acked: `--mail ack tFix c d`
+# from x3 prints two `mail — posted` lines and exits 0, the session ref's tip the ack of d, parented
+# on the ack of c, its `seq` one past. RED, observed at the close: a driver giving every chained
+# message the tip read's `seq`, under which c's and d's `seq` are equal. WHAT THIS BLOCK DOES NOT
+# DRIVE: a lost ref update, whose line is the one-id post's branch.
 # ==================================================================================================
 LF=$(mktemp -d); write_lease_fixture
 git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null && git -C "$LF/c2" config user.email t@t.test \
@@ -21488,10 +21491,10 @@ kd62_a=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subjec
 kd62_b=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q b' --default no "$LF/body.txt" | sed -n "$kd62_pid")
 run_deadline_arm c1 x1 ack tFix "${kd62_a:-unposted}" >/dev/null
 kd62_out=$(run_deadline_arm c1 x2 ack tFix "${kd62_a:-unposted}" "${kd62_b:-unposted}"); kd62_rc=$?
-same "KDS62 AC13 with a's ack already posted, --mail ack tFix a b prints mail — duplicate and exits 1, posting nothing" \
-  "$kd62_rc $(grep -c '^mail — duplicate ' <<<"$kd62_out") $(grep -c '^mail — posted ' <<<"$kd62_out")" "1 1 0"
-same "KDS62 AC13 ...and --mail read tFix shows b open" \
-  "$(run_deadline_arm c1 r1 read tFix | awk -F'\t' -v q="${kd62_b:-unposted}" '$1 == q { print $4 }')" "open"
+same "KDS62 AC13 KDS63 S15 with a's ack already posted, --mail ack tFix a b names a already acked, posts b's ack alone and exits 0" \
+  "$kd62_rc $(grep -c "^mail — already acked ${kd62_a:-unposted}$" <<<"$kd62_out") $(grep -c '^mail — posted ' <<<"$kd62_out")" "0 1 1"
+same "KDS62 AC13 KDS63 S15 ...and --mail read tFix shows b acked" \
+  "$(run_deadline_arm c1 r1 read tFix | awk -F'\t' -v q="${kd62_b:-unposted}" '$1 == q { print $4 }')" "acked"
 kd62_c=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q c' --default no "$LF/body.txt" | sed -n "$kd62_pid")
 kd62_d=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q d' --default no "$LF/body.txt" | sed -n "$kd62_pid")
 kd62_out=$(run_deadline_arm c1 x3 ack tFix "${kd62_c:-unposted}" "${kd62_d:-unposted}"); kd62_rc=$?
@@ -21501,6 +21504,54 @@ same "KDS62 AC13 with neither acked, --mail ack tFix c d prints two mail — pos
 same "KDS62 AC13 ...the session ref's tip answers d, its parent answers c, and its seq is one past the parent's" \
   "$(read_kd62_field refs/gov/mail/tFix/a/x3 answers) $(read_kd62_field 'refs/gov/mail/tFix/a/x3^' answers) $(read_kd62_field refs/gov/mail/tFix/a/x3 seq) $(read_kd62_field 'refs/gov/mail/tFix/a/x3^' seq)" \
   "${kd62_d:-unposted} ${kd62_c:-unposted} 2 1"
+
+# ==================================================================================================
+# KICK-dKeptSession-63 AC12 AC15 AC16 (S12, S15, S16) — A CHAINED ACK PAIR, ITS FEED LINES, AND THE
+# BATCH'S OWN LIST. The fixture above again, x3's session ref at depth 2 (the acks of c and d), and e,
+# f, g and h posted to build:tFix. AC12: `--mail ack tFix e f` from x3 lands two acks, e's at `seq` 3
+# and f's at 4 on top of it, and no `write_mail_` function but `write_mail_ref` builds or lands a
+# commit, the same read over every one of them counting `write_mail_ref`'s two lines as its liveness.
+# AC16: c1's feed holds a first sighting of both acks, the lower one too, and `--feed check` exits 0.
+# AC15: `--mail ack tFix g g` posts one ack of g and moves the tip; `--mail ack tFix g` again prints
+# `mail — already acked g` alone, exit 0; `--mail ack tFix` exits 0 printing nothing; and `--mail ack
+# tFix h 000000000000` exits 2 with h still open; none of the last three moves the tip. RED, observed
+# at the close: a scratch driver whose `write_mail_ref` names no lower commit, under which e's ack
+# reads `-` and `--feed check` exits 1. WHAT THIS BLOCK DOES NOT DRIVE: a chain's lost update, a lease
+# flush's queued chain, which names no lower commit, or two sessions acking one id at one instant.
+# ==================================================================================================
+kd63_e=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q e' --default no "$LF/body.txt" | sed -n "$kd62_pid")
+kd63_f=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q f' --default no "$LF/body.txt" | sed -n "$kd62_pid")
+kd63_g=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q g' --default no "$LF/body.txt" | sed -n "$kd62_pid")
+kd63_h=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q h' --default no "$LF/body.txt" | sed -n "$kd62_pid")
+kd63_r=refs/gov/mail/tFix/a/x3
+# ---- AC12
+kd63_out=$(run_deadline_arm c1 x3 ack tFix "${kd63_e:-unposted}" "${kd63_f:-unposted}"); kd63_rc=$?
+same "KDS63 AC12 on x3's ref at depth 2, --mail ack tFix e f exits 0, the tip's parent answering e at seq 3 and the tip f at seq 4" \
+  "$kd63_rc $(read_kd62_field "$kd63_r^" answers) $(read_kd62_field "$kd63_r^" seq) $(read_kd62_field "$kd63_r" answers) $(read_kd62_field "$kd63_r" seq)" \
+  "0 ${kd63_e:-unposted} 3 ${kd63_f:-unposted} 4"
+same "KDS63 AC12 no write_mail_ function but write_mail_ref builds or lands a commit, the same read over all of them counting write_mail_ref's two lines" \
+  "$(awk '/^write_mail_[a-z_]+\(\) \{/ && !/^write_mail_ref\(/,/^\}/' "$SCRIPT" | grep -c -E 'build_gov_commit|write_gov_ref') $(awk '/^write_mail_[a-z_]+\(\) \{/,/^\}/' "$SCRIPT" | grep -c -E 'build_gov_commit|write_gov_ref')" "0 2"
+# ---- AC16
+printf '%s\t%s\n%s\t%s\n' "$kd63_r" "$(git --git-dir="$LF/origin.git" rev-parse "$kd63_r^")" "$kd63_r" "$(git --git-dir="$LF/origin.git" rev-parse "$kd63_r")" > "$LF/kd63-pairs"
+kd63_seen=$( cd "$LF/c1" && set +u && . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1; read_first_seen <"$LF/kd63-pairs" )
+kd63_rc=0; ( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --feed check >/dev/null 2>&1 ) || kd63_rc=$?
+same "KDS63 AC16 c1's feed holds a first sighting of both chained acks, the lower one too, and --feed check exits 0" \
+  "$(grep -c -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}T' <<<"$kd63_seen") $kd63_rc" "2 0"
+# ---- AC15
+kd63_t0=$(git --git-dir="$LF/origin.git" rev-parse "$kd63_r")
+kd63_out=$(run_deadline_arm c1 x3 ack tFix "${kd63_g:-unposted}" "${kd63_g:-unposted}"); kd63_rc=$?
+kd63_t1=$(git --git-dir="$LF/origin.git" rev-parse "$kd63_r")
+same "KDS63 AC15 --mail ack tFix g g exits 0 posting one ack of g, and the tip moves" \
+  "$kd63_rc $(grep -c '^mail — posted ' <<<"$kd63_out") $(git --git-dir="$LF/origin.git" log --format=%B "$kd63_r" -- | grep -c "^answers: ${kd63_g:-unposted}$") $([ "$kd63_t0" = "$kd63_t1" ] && echo unmoved || echo moved)" \
+  "0 1 1 moved"
+kd63_out=$(run_deadline_arm c1 x3 ack tFix "${kd63_g:-unposted}"); kd63_rc=$?
+same "KDS63 AC15 a second --mail ack tFix g prints mail — already acked g alone and exits 0" "$kd63_rc [$kd63_out]" "0 [mail — already acked ${kd63_g:-unposted}]"
+kd63_out=$(run_deadline_arm c1 x3 ack tFix); kd63_rc=$?
+same "KDS63 AC15 --mail ack tFix with no id exits 0 printing nothing" "$kd63_rc [$kd63_out]" "0 []"
+kd63_out=$(run_deadline_arm c1 x3 ack tFix "${kd63_h:-unposted}" 000000000000); kd63_rc=$?
+same "KDS63 AC15 a batch holding an id addressed to no message exits 2, h stays open, and no call after the first moved the tip" \
+  "$kd63_rc $(run_deadline_arm c1 r1 read tFix | awk -F'\t' -v q="${kd63_h:-unposted}" '$1 == q { print $4 }') $(git --git-dir="$LF/origin.git" rev-parse "$kd63_r")" \
+  "2 open $kd63_t1"
 rm -rf "$LF"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -25325,7 +25376,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # edges-agreement block's 2 and the chained-ack block's 4 region-eight `same` (AC11 3, AC15 2, AC13 4),
 # each unconditional and outside any loop, off the diff's own lines; the KDS61 ack-form arm re-armed
 # for `[<id> ...]` adds none. No skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4199
+# RAISED 4199 -> 4206 by KICK-dKeptSession-63 on 2026-11-23: the chained-ack list block's 7
+# region-eight `same` (AC12 2, AC16 1, AC15 4), each unconditional and outside any loop, off the diff's
+# own lines; the KDS62 AC13 pair re-armed for the skip and the KDS61 ack-form arm re-armed for
+# `<slug> [<id> ...]` add none. No skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4206
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25626,7 +25681,8 @@ FLOOR_SHARD_7=311
 # RAISED 1397 -> 1404 by KICK-dKeptSession-44: the same 7 region-eight reply-verb, fetch and progress assertions, see FLOOR_ASSERTIONS.
 # RAISED 1404 -> 1407 by KICK-dKeptSession-56: the same 3 region-eight grandchild-progress assertions, see FLOOR_ASSERTIONS.
 # RAISED 1407 -> 1416 by KICK-dKeptSession-62: the same 9 region-eight unbounded-progress, edges-agreement and chained-ack assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1416
+# RAISED 1416 -> 1423 by KICK-dKeptSession-63: the same 7 region-eight chained-ack list assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1423
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

@@ -51,7 +51,7 @@
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
 #   unattended.sh --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] [--default <text>] <body file>   # one message on this session's own mail ref; 0 posted, 1 duplicate or lost, 2 not written; `mail — off` exit 2 while RUN_CLAIMS is not on
 #   unattended.sh --mail read <who> [--open] [--ids] [--local] [--sent]   # the mailbox of a build or a recipient, one TAB row per message; --open the open rows, --ids their ids on one line or none, --local the node's cache with no fetch, --sent a build's own sent messages, whoever they were addressed to
-#   unattended.sh --mail ack <slug> <id> [<id> ...]                # an ack of each message addressed to <slug>, posted to its sender's build, every ack landing in one ref update or none; the post's exits
+#   unattended.sh --mail ack <slug> [<id> ...]                     # an ack of each message addressed to <slug>, posted to its sender's build, every ack landing in one ref update or none; an already-acked id skipped on stderr, an empty list 0 writing nothing; else the post's exits
 #   unattended.sh --mail answer <slug> <question id> <body file> [--cite <path>@<sha>]...   # an answer to a question addressed to <slug>, posted to its asker's build; 1 the question no longer open, else the post's exits
 #   unattended.sh --mail notice <slug> [--item <instance key>] [--local] [--ring <ref> <id>]   # the build's unread mail as mailbox.notice says, one line, its stamp rewritten after a fetch; 0 shown, off or the local copy, 2 not read
 #   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
@@ -3021,7 +3021,12 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # THE ONE SUCCESS EXIT JOINS THE FEED (TOOL-dPlacedRequest-13 S3): it calls `write_feed_success` from
 # the `gov_feed_sh` block every carrier of this one carries beside it (TOOL-dPlacedRequest-34 S5), which
 # sets this node's cache ref `refs/gov/remote/<tail>` to what it wrote, or clears it on a deletion, and
-# appends the event. A lost or uncompleted write appends nothing.
+# appends the event. A lost or uncompleted write appends nothing. A CHAIN'S LOWER COMMITS
+# (KICK-dKeptSession-63 S16): a caller that built several commits and lands them in this one write
+# names those below the source as trailing arguments, oldest first, and on rc 0 each is appended with
+# `add_feed_event` in the order given before the source's own event, so this node's feed holds a first
+# sighting of every commit the write landed. Nothing is walked: a caller naming none appends the one
+# event, whatever history lies under its source.
 # WHAT THIS DOES NOT CHECK: a token written in the stamp's own filesystem tick reads as stale and is
 # omitted; a token another push wrote during this call reads as fresh and is printed beside this
 # push's own cause, never as it.
@@ -3034,8 +3039,8 @@ build_gov_commit() { # tip read or empty · message -> prints the commit; rc 1 w
     git commit-tree "$t" "${p[@]}" -m "$2" 2>/dev/null) && [ -n "$c" ] || return 1
   printf '%s\n' "$c"
 }
-write_gov_ref() {    # ref · expected sha or empty · src -> 0 written, 1 lost, 2 not completed; GOVREF_WHY
-  local ref="$1" exp="$2" src="$3" s f rc l line rf="" tok="" hd=""
+write_gov_ref() {    # ref · expected sha or empty · src · [lower commit ...] -> 0 written, 1 lost, 2 not completed; GOVREF_WHY
+  local ref="$1" exp="$2" src="$3" s f rc l line rf="" tok="" hd="" lc
   GOVREF_WHY=""
   if [ -z "$src" ] && [ "${FUNCNAME[1]:-}" != remove_gov_ref ]; then GOVREF_WHY="no source"; return 2; fi
   s=$(mktemp) || { GOVREF_WHY="cannot create a scratch file to bound the push"; return 2; }
@@ -3065,6 +3070,7 @@ write_gov_ref() {    # ref · expected sha or empty · src -> 0 written, 1 lost,
   fi
   rm -f "$s" "$f"
   [ "$rc" = 0 ] || return "$rc"
+  for lc in "${@:4}"; do add_feed_event "$ref" "$lc"; done
   write_feed_success "$ref" "$src"
   return 0
 }
@@ -3782,17 +3788,22 @@ derive_mail_ref() { # slug · tag · session -> the ref on stdout and in MAIL_RE
 # writer, and the verbs below keep calling it by this name. SEVERAL MESSAGES (KICK-dKeptSession-62
 # S15) land as one chain: the first commit parented on the tip read, each later one on the commit
 # before it, and the last written by ONE `write_gov_ref` against that tip, so all land or none does.
+# Message k's `seq` is its caller's to derive, that tip's first-parent count plus k, chain commit k-1
+# being message k's tip read (KICK-dKeptSession-63 S12). THE CHAIN'S FEED LINES (S16): the commits
+# below the last are named to `write_gov_ref`, oldest first, whose success exit appends one feed line
+# per landed commit, the last's after them; this writer appends none of its own.
 write_mail_ref() { # ref · tip read or empty · message [message ...] -> 0 written, 1 lost, 2 not completed with GOVREF_WHY
   local c="${2:-}" m
-  local -a msgs=("${@:3}")
+  local -a msgs=("${@:3}") made=()
   GOVREF_WHY=""
   [ "${#msgs[@]}" -gt 0 ] || msgs=("")
   for m in "${msgs[@]}"; do
     c=$(build_gov_commit "$c" "$m") || { GOVREF_WHY="the commit could not be built in this clone"; return 2; }
+    made+=("$c")
   done
   [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
   GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
-  write_gov_ref "${1:-}" "${2:-}" "$c"
+  write_gov_ref "${1:-}" "${2:-}" "$c" "${made[@]:0:${#made[@]}-1}"
 }
 
 # --mail post, ONE MESSAGE ON THIS SESSION'S OWN MAIL REF (KICK-dKeptSession-5 S5), in this order: the
@@ -4102,28 +4113,33 @@ read_mailbox() { # who · soft|strict|local · [sent] -> 0 with one TAB row per 
 # holds, else `mail — not written · <id> is no message addressed to <slug>`, exit 2; the ack is then a
 # post of kind `ack` from <slug>, answering <id>, to `build:<from-build>` of that row, with its subject
 # and an empty body, so the post's exits are the ack's. Dark while RUN_CLAIMS is not `on`.
-# SEVERAL IDS (KICK-dKeptSession-62 S15), `<id> [<id> ...]`: the mailbox is read once and every id
-# must name one of its rows before anything is written, an id named twice acked once; the acks are
-# then ONE chained post, `write_mail_post`'s, all landing in one ref update or none, so a duplicate, a
-# refused record or a lost update leaves every row open. One id prints exactly the lines it did.
-write_mail_ack() { # slug · id [id ...] -> the post's exits
-  local slug="${1:-}" id rows fb sub f rc line
+# SEVERAL IDS (KICK-dKeptSession-62 S15), `[<id> ...]`: the mailbox is read once and every id must
+# name one of its rows before anything is written; the acks are then ONE chained post,
+# `write_mail_post`'s, every id's message id and duplicate check derived before any commit is built,
+# all landing in one ref update or none, so a duplicate, a refused record or a lost update leaves
+# every row open. THE BATCH'S OWN LIST (KICK-dKeptSession-63 S15): an id named twice is acked once,
+# the first kept; an id whose row already reads `acked` is skipped, named on stderr as `mail — already
+# acked <id>`, before the addressed-to check of the others; and a list given empty, or emptied by the
+# skip, exits 0 and writes nothing. One open id prints exactly the lines it did.
+write_mail_ack() { # slug · [id ...] -> the post's exits; 0 with nothing written where no id is left to ack
+  local slug="${1:-}" id rows fb sub st f rc line
   local -a row=() lines=() posts=() seen=() want=("${@:2}")
-  [ "${#want[@]}" -gt 0 ] || want=("")
   [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 2; }
   rows=$(read_mailbox "$slug" soft) || { printf '%s\n' "$rows"; return 2; }
   mapfile -t lines <<<"$rows"
-  for id in "${want[@]}"; do
+  for id in ${want[@]+"${want[@]}"}; do
     case " ${seen[*]:-} " in *" $id "*) continue ;; esac
-    fb=""; sub=""
+    seen+=("$id"); fb=""; sub=""; st=""
     for line in "${lines[@]}"; do
       IFS=$'\t' read -r -a row <<<"$line"
       [ "${row[0]:-}" = "$id" ] || continue
-      fb=${row[5]:-}; sub=${row[6]:-}; break
+      st=${row[3]:-}; fb=${row[5]:-}; sub=${row[6]:-}; break
     done
+    [ "$st" != acked ] || { echo "mail — already acked $id" >&2; continue; }
     [ -n "$fb" ] || { echo "mail — not written · $id is no message addressed to $slug"; return 2; }
-    seen+=("$id"); posts+=("build:$fb" "$sub" "$id")
+    posts+=("build:$fb" "$sub" "$id")
   done
+  [ "${#posts[@]}" -gt 0 ] || return 0
   f=$(mktemp) || { echo "mail — not written · no scratch file for the ack's empty body"; return 2; }
   write_mail_post "$slug" "${posts[0]}" ack "${posts[1]}" none none "${posts[2]}" "$f" none ack ${posts[3]+"${posts[@]:3}"}; rc=$?
   rm -f "$f"
@@ -20357,8 +20373,8 @@ while [ $# -gt 0 ]; do
                       elif [ "$MV_LOCAL" = 1 ]; then print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS" local "$MV_SENT"; _rl_rc=$?
                       else print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS" soft "$MV_SENT"; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = ack ]; then
-                      if [ "${#MV_POS[@]}" -lt 2 ] || [ -n "${MV_FLAGS// /}" ]; then
-                        echo "mail — not written · the form is --mail ack <slug> <id> [<id> ...]"; _rl_rc=2
+                      if [ "${#MV_POS[@]}" -lt 1 ] || [ -n "${MV_FLAGS// /}" ]; then
+                        echo "mail — not written · the form is --mail ack <slug> [<id> ...]"; _rl_rc=2
                       else write_mail_ack "${MV_POS[@]}"; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = answer ]; then
                       if [ "${#MV_POS[@]}" != 3 ] || [ -n "${MV_FLAGS// --cite/}" ]; then
