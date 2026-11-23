@@ -243,7 +243,7 @@ Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 81 spec(s) at 
 | 26 | `TOOL-dRankedPlan-77` | no |
 | 27 | `TOOL-dRankedPlan-81` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 
 Unordered: `TOOL-dRankedPlan-82`, `TOOL-dRankedPlan-83`.
 <!-- /gen:build-order -->

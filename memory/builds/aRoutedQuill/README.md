@@ -118,7 +118,7 @@ Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carr
 | 5 | `PLAY-aRoutedQuill-1`, `TOOL-aRoutedQuill-5` | yes |
 | 6 | `TOOL-aRoutedQuill-10`, `TOOL-aRoutedQuill-11`, `TOOL-aRoutedQuill-12`, `TOOL-aRoutedQuill-6`, `TOOL-aRoutedQuill-7`, `TOOL-aRoutedQuill-9` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -307,7 +307,7 @@ Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 93 spec(s) a
 | 50 | `TOOL-dWitnessedBar-97` | no |
 | 51 | `TOOL-dWitnessedBar-106`, `TOOL-dWitnessedBar-107`, `TOOL-dWitnessedBar-108`, `TOOL-dWitnessedBar-109`, `TOOL-dWitnessedBar-110` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

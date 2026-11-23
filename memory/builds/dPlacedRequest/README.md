@@ -254,7 +254,7 @@ Coverage of dPlacedRequest's 21 clause(s) and 37 owned node(s), over 69 spec(s) 
 | 37 | `TOOL-dPlacedRequest-95`, `TOOL-dPlacedRequest-96`, `TOOL-dPlacedRequest-97`, `TOOL-dPlacedRequest-98`, `TOOL-dPlacedRequest-99` | no |
 | 38 | `TOOL-dPlacedRequest-100` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

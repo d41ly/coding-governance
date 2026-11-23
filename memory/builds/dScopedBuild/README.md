@@ -174,7 +174,7 @@ Coverage of dScopedBuild's 15 clause(s) and 23 owned node(s), over 34 spec(s) at
 | 19 | `TOOL-dScopedBuild-42` | no |
 | 20 | `TOOL-dScopedBuild-43` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

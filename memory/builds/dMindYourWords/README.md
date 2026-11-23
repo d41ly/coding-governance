@@ -198,7 +198,7 @@ Coverage of dMindYourWords's 17 clause(s) and 6 owned node(s), over 48 spec(s) a
 | 21 | `TOOL-dMindYourWords-37`, `TOOL-dMindYourWords-43`, `TOOL-dMindYourWords-44`, `TOOL-dMindYourWords-45`, `TOOL-dMindYourWords-46`, `TOOL-dMindYourWords-47`, `TOOL-dMindYourWords-48`, `TOOL-dMindYourWords-49`, `TOOL-dMindYourWords-50` | no |
 | 22 | `TOOL-dMindYourWords-52` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -314,7 +314,7 @@ Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 80 spec(s) at 
 | 33 | `TOOL-dGroundRules-86` | no |
 | 34 | `TOOL-dGroundRules-87`, `TOOL-dGroundRules-88` | yes |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

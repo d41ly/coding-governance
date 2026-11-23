@@ -180,7 +180,7 @@ Coverage of dTrueNorth's 6 clause(s) and 1 owned node(s), over 30 spec(s) at or 
 | 15 | `TOOL-dTrueNorth-32` | no |
 | 16 | `TOOL-dTrueNorth-33` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

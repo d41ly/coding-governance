@@ -110,7 +110,7 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 | 1 | `KICK-aBlindedTrial-1`, `TOOL-aBlindedTrial-1`, `TOOL-aBlindedTrial-2`, `TOOL-aBlindedTrial-7`, `TOOL-aBlindedTrial-8` | unknown |
 | 2 | `TOOL-aBlindedTrial-3`, `TOOL-aBlindedTrial-4`, `TOOL-aBlindedTrial-5` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

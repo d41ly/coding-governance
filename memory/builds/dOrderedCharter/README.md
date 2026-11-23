@@ -290,7 +290,7 @@ Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 80 spec(s)
 | 48 | `PLAY-dOrderedCharter-87` | no |
 | 49 | `PLAY-dOrderedCharter-88` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

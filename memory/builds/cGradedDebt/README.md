@@ -90,7 +90,7 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 | 1 | `TOOL-cGradedDebt-1` | no |
 | 2 | `TOOL-cGradedDebt-2` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

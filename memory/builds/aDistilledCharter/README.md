@@ -137,7 +137,7 @@ Ids whose spec moved past its audited revision: none — 0 of 18 unit id(s) carr
 | 14 | `TOOL-aDistilledCharter-9` | no |
 | 18 | `PLAY-aDistilledCharter-6` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

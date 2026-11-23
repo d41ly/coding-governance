@@ -126,7 +126,7 @@ Ids whose spec moved past its audited revision: none — 0 of 19 unit id(s) carr
 | 7 | `TOOL-aFrugalTurnstile-13`, `TOOL-aFrugalTurnstile-15` | no |
 | 8 | `TOOL-aFrugalTurnstile-16` | no |
 
-A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
