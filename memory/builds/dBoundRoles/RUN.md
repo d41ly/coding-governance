@@ -9,7 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
+refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · park · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 phase: RUNNING
@@ -363,3 +363,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T07:42:42Z dispatch · item e00bf176 TOOL-dBoundRoles-59 · reason tools/roles/adopt-roles.test.sh memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-53.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-53-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-59-deviation-593.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-59-1-acceptance-ledger.md memory/map/generated/symbols.json
 
 2026-11-23T07:42:43Z brief · item TOOL-dBoundRoles-59 · reason 4d9d417b0aa8 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-59-build-brief.md
+
+2026-11-23T08:04:03Z decision · item TOOL-dBoundRoles-20, -25 and -43 wait on asks TOOL-dBoundRoles-77 to -79 and TOOL-dDeclaredLoop-120 · reason options: build the four row-mechanism gaps in the playbook and loop kits here, or land them in their own builds first; unit 20 section 8 F8 picked the asks, and the build-level rules refuse a deferral
