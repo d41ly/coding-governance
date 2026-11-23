@@ -367,3 +367,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T14:43:44Z brief · item KICK-dKeptSession-57 · reason 79d7930e2f42 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-57-build-brief.md
 
 2026-11-23T14:46:39Z dispatch · item 4580ab42 KICK-dKeptSession-57 · reason .governance/policy.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-57-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T15:04:16Z brief · item KICK-dKeptSession-62 · reason 631c3b33d042 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-62-build-brief.md
+
+2026-11-23T15:07:01Z dispatch · item df77c676 KICK-dKeptSession-62 · reason tools/runlog/extract.py tools/runlog/selftest.py tools/runlog/fixtures/transcripts.json tools/runlog/README.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/unattended/mail-notice.js tools/hooks/scratch-guard.js tools/lib/resolve-python.test.sh tools/memory-tree/design_lib.py tools/loop/loop_transition.py tools/loop/README.md tools/policy/policy-mirror.js tools/policy/check_policy.py tools/policy/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-62-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
