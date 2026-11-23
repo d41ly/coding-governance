@@ -12,19 +12,19 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 asks-at-landing: TOOL-dBoundRoles-27=DEFERRED TOOL-dBoundRoles-28=OPEN TOOL-dBoundRoles-29=DEFERRED TOOL-dBoundRoles-30=OPEN TOOL-dBoundRoles-31=OPEN TOOL-dBoundRoles-32=OPEN TOOL-dBoundRoles-33=DEFERRED TOOL-dBoundRoles-34=OPEN TOOL-dBoundRoles-35=OPEN TOOL-dBoundRoles-36=OPEN TOOL-dBoundRoles-70=OPEN TOOL-dBoundRoles-71=OPEN TOOL-dBoundRoles-72=OPEN TOOL-dBoundRoles-73=OPEN TOOL-dBoundRoles-74=OPEN TOOL-dBoundRoles-75=OPEN TOOL-dBoundRoles-76=OPEN TOOL-dBoundRoles-77=OPEN TOOL-dBoundRoles-78=OPEN TOOL-dBoundRoles-79=OPEN TOOL-dBoundRoles-80=OPEN
 units-at-landing: TOOL-dBoundRoles-14 TOOL-dBoundRoles-2 TOOL-dBoundRoles-1 TOOL-dBoundRoles-21 TOOL-dBoundRoles-37 TOOL-dBoundRoles-22 TOOL-dBoundRoles-49 TOOL-dBoundRoles-16 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-6 TOOL-dBoundRoles-13 TOOL-dBoundRoles-3 TOOL-dBoundRoles-38 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-48 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-7 TOOL-dBoundRoles-5 TOOL-dBoundRoles-10 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-4 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-12 TOOL-dBoundRoles-41 TOOL-dBoundRoles-11 TOOL-dBoundRoles-47 TOOL-dBoundRoles-26 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-20 TOOL-dBoundRoles-59 TOOL-dBoundRoles-19 TOOL-dBoundRoles-61 TOOL-dBoundRoles-18 TOOL-dBoundRoles-25 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69
 hold-run: 
-hold-streak: 1 · at 5f1fd8b4
+hold-streak: 1 · at 760ca206
 resume-owed: none · owner
-held-at: 2026-11-23T09:32:15Z
-hold-reason: 38 of 59 units (DERIVED from `--plan`) are built and CLOSED; 21 are deferred because units 19 and 20 wait on five asks (TOOL-dBoundRoles-77 to -80, TOOL-dDeclaredLoop-120) for row-grammar gaps in the playbook and loop kits, and the rest consume from them; units 42 and up were added by the landed spec run, so carry-forward cannot carry them. The closing diff review and the merge bar have not run over this branch.
+held-at: 2026-11-23T20:40:23Z
+hold-reason: the owner moves this run to node a: resume it there with --resume after the take-over; units 51 of 64 closed, unit 56 at order 31 is next and not yet dispatched
 hold-until: owner
-hold-code: owner-decision
+hold-code: host-owner-action
 held-from: RUNNING
 parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 318e20c9165fdceb2afe66b47d42c5f884d559c1
-phase: RUNNING
+witness: 760ca206c03ebef3ad175da9e0f6942201e1f8be
+phase: HELD
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
@@ -528,3 +528,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T20:17:57Z dispatch · item 32fadf43 TOOL-dBoundRoles-51 · reason tools/memory-recall/SKILL.template.md .claude/skills/memory-recall/SKILL.md .governance/policy.json memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-51-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-25-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-42-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-44-2-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-51-deviation-512.md
 
 2026-11-23T20:18:04Z brief · item TOOL-dBoundRoles-51 · reason 24975578914a memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-51-build-brief.md
+
+2026-11-23T20:40:25Z hold · item host-owner-action · reason until owner · reaped 675b83bc · resume none(owner)
