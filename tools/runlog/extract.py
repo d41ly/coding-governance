@@ -1172,11 +1172,19 @@ def _read_peak_bytes() -> int | None:
     return int(peak) if sys.platform == "darwin" else int(peak) * 1024
 
 
+def derive_main_transcripts(root) -> list:
+    """The main session transcripts under a projects root, sorted: each `<project>/<session id>.jsonl`
+    whose stem `SID_RE` fullmatches, so an agent file or a stray name is never one (KICK-dKeptSession-56
+    S21). The one population `measure_tree`, `measure_ready_tree` and `derive_context_window` read;
+    `scan_preflights` keeps its own `_check_inside` walk. Reads no file."""
+    return sorted(p for p in pathlib.Path(root).glob("*/*.jsonl") if SID_RE.fullmatch(p.name[:-len(".jsonl")]))
+
+
 def measure_tree(root) -> dict:
     """Stream every session under a projects root through the extractor and REPORT: bytes, records,
     events, the rate and this process's peak working set. Writes nothing and grades nothing."""
     root = pathlib.Path(root)
-    mains = sorted(p for p in root.glob("*/*.jsonl") if SID_RE.fullmatch(p.name[:-len(".jsonl")]))
+    mains = derive_main_transcripts(root)
     sessions = records = events = size = 0
     t0 = time.perf_counter()
     for main in mains:
@@ -1250,7 +1258,7 @@ def measure_ready_tree(root) -> dict:
     requests and summed tokens over every source, and the main context at its first request and its
     last before READY; plus the sessions scanned and the count per witness. Writes nothing."""
     root = pathlib.Path(root)
-    mains = sorted(p for p in root.glob("*/*.jsonl") if SID_RE.fullmatch(p.name[:-len(".jsonl")]))
+    mains = derive_main_transcripts(root)
     out = {"sessions": 0, "ready": 0, "card": 0, "text": 0, "rows": []}
     for main in mains:
         tree = build_session_tree(main)
@@ -1318,11 +1326,14 @@ def derive_context_window(model, root=None, held=None) -> tuple:
     path's parse where it is among them. An unreadable transcript is skipped. No transcript record
     names the window, so every session of a model observed past 200000 under the root reads the 1M
     rung, a 200k session of that model included; that session's override is
-    `CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000`, rung 1 (KICK-dKeptSession-48 S1)."""
+    `CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000`, rung 1 (KICK-dKeptSession-48 S1). The harness honours that
+    variable only where its own gate passes, never for a first-party model, so for a model id starting
+    `claude-` rung 1 still answers, as the owner's declaration, and its source reads `env, advisory`: the
+    window the session was declared to run, not one the harness enforces (KICK-dKeptSession-56 S14)."""
     # The harness's own variable for a model's real window: read here, never written.
     raw = os.environ.get("CLAUDE_CODE_MAX_CONTEXT_TOKENS", "").strip()
     if re.fullmatch(r"[0-9]+", raw) and int(raw) > 0:
-        return int(raw), "env"
+        return int(raw), "env, advisory" if str(model or "").startswith("claude-") else "env"
     if root is None:
         try:
             root = resolve_projects_root()
@@ -1332,9 +1343,7 @@ def derive_context_window(model, root=None, held=None) -> tuple:
     held_path, held_events = held if held else (None, None)
     held_key = None if held_path is None else os.path.normcase(os.path.abspath(held_path))
     found = []
-    for p in root.glob("*/*.jsonl"):
-        if not SID_RE.fullmatch(p.name[:-len(".jsonl")]):
-            continue
+    for p in derive_main_transcripts(root):
         try:
             found.append((p.stat().st_mtime, p))
         except OSError:

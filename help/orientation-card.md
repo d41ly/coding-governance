@@ -245,7 +245,9 @@ node's observed usage: `CLAUDE_CODE_MAX_CONTEXT_TOKENS` where the harness sets i
 context this node's recent transcripts show on that model, rounded up to the 200k or the 1M window.
 No transcript names the window a session runs, so on a node that runs one model at both windows a
 200k session reads its fill against the 1M window unless the owner starts it with
-`CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000` set.
+`CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000` set. The harness honours that variable only where its own gate
+passes, never for a first-party `claude-` model, so for such a model the card still takes the figure
+as your declaration of the window and names its source `env, advisory`.
 A subagent's requests never count. The `context.on-full` policy key decides what a filling window leads to, and
 `context.threshold` where it starts: <!-- usage: policy:context.on-full 50e931f0 --> <!-- usage: policy:context.threshold ba7d79dc -->
 

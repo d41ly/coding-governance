@@ -13213,6 +13213,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "derive_main_transcripts",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "derive_manifest_kind",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
