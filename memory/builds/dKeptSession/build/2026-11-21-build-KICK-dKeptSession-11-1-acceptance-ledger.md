@@ -24,10 +24,10 @@ closing its two `phase LANDED · witness` lines, each ahead of `write_landed_not
 `notify.owner` and the charter's fence stood as S1 and S6 state. `PLANTS` held 26 (DERIVED,
 `len(PLANTS)` at `0b4ff26da`), the count §4 expects once units 24, 7, 35 and 42 land.
 
-How the build reconciled the spec's text with what landed: the bare-verb refusal read `a verb, record,
-check or dependents, or --fixture --plant <case>` once unit 7 landed, so it now reads `a verb, record,
-check, dependents or progress, or --fixture --plant <case>`; no arm greps it (DERIVED, a grep of the
-tree). The budget row read proxy `r` 172.8 s and 260 (PINNED in the row's note, by unit 42) where §4's
+How the build reconciled the spec's text with what landed: the bare-verb refusal read
+`a verb, record, check or dependents, or --fixture --plant <case>` once unit 7 landed, so it now reads
+`a verb, record, check, dependents or progress, or --fixture --plant <case>`; no arm greps it
+(DERIVED, a grep of the tree). The budget row read proxy `r` 172.8 s and 260 (PINNED in the row's note, by unit 42) where §4's
 table summed 141.3 s and 235, so it was re-read from unit 42's reading. The floors read 4173 and 1390
 (DERIVED, the last assignment of each at `0b4ff26da`) where §4 read 4108 and 1325. `print_progress`
 drops each carriage return of `_bd_out`, since a Windows python writes `\r\n` into the command
