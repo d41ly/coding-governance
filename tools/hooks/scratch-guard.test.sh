@@ -1914,6 +1914,56 @@ case "$(<"$sgib/out-ctx")" in
 esac
 for sgib_i in 1 2 3 4 5 6 7 8; do [ -f "$sgib/done-stale" ] && [ -f "$sgib/done-bare" ] && break; sleep 1; done
 
+# ---- KICK-dKeptSession-8 AC1-AC4, AC6, AC7: the actions.free arm over each value and pointer ----
+# Each case of actions-free.fixture.sh, beside this file, builds its own scratch repository holding
+# copies of this kit's hooks, a card file whose ## pointers the case writes, and stubs of the policy
+# reader and the kickoff checker, then prints one line per call: `<case> · <value> · <call> · exit
+# <code> · <stderr>`. Each row reads one line. Staged against the base hook, which admits a Bash write
+# with no item in flight, every refusal row exits 0 and reds, and the unarmed rows print no line.
+# WHAT THIS DOES NOT CHECK: the real policy reader, the real kickoff checker, or a card file the card
+# engine wrote; rule 9's spawn rows are agent-cap.test.sh's.
+sgaf="$TMP/sgaf"; mkdir -p "$sgaf"
+for sgaf_p in probes-none probes-item reads-none anything-none no-pointers no-route other-owner throw no-helper refusal; do
+  bash "$HERE/actions-free.fixture.sh" --plant "$sgaf_p" > "$sgaf/$sgaf_p" 2>&1
+done
+# check_free_line <name> <case> <value> <call> <what follows the call: exit <code>, or the log's count> [needle ...]:
+# every needle present, a `!needle` absent
+check_free_line() {
+  local name=$1 out="$sgaf/$2" pre="$2 · $3 · $4 · " want=$5 line ok=1 nd; shift 5
+  line=$(grep -F -- "$pre" "$out" | head -n 1)
+  case $line in "$pre$want · "*) ;; *) ok=0 ;; esac
+  for nd in "$@"; do
+    case $nd in
+      '!'*) case $line in *"${nd#!}"*) ok=0 ;; esac ;;
+      *) case $line in *"$nd"*) ;; *) ok=0 ;; esac ;;
+    esac
+  done
+  if [ "$ok" = 1 ]; then echo "ok   $name"; pass=$((pass+1))
+  else echo "FAIL $name: ${line:-no line for $pre in $(head -c 400 "$out")}"; fail=$((fail+1)); fi
+}
+check_free_line "KICK-dKeptSession-8 AC1 git status at item none under read-only-probes is admitted" probes-none read-only-probes 'git status' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC1 echo x > f is refused, class write" probes-none read-only-probes 'echo x > f' "exit 2" 'actions.free (read-only-probes)' 'this Bash write' 'item — none'
+check_free_line "KICK-dKeptSession-8 AC1 git commit is refused, class commit" probes-none read-only-probes 'git commit -m x' "exit 2" 'actions.free (read-only-probes)' 'this Bash commit' 'item — none'
+check_free_line "KICK-dKeptSession-8 AC1 git push is refused, class push" probes-none read-only-probes 'git push' "exit 2" 'actions.free (read-only-probes)' 'this Bash push' 'item — none'
+check_free_line "KICK-dKeptSession-8 AC1 an Edit the route admits is refused, class write" probes-none read-only-probes 'Edit src/a.js' "exit 2" 'actions.free (read-only-probes)' 'this Edit write' 'item — none'
+for sgaf_v in read-only-probes item-reads-only recorded-anything; do
+  for sgaf_c in 'echo x > f' 'git commit -m x' 'git push' 'Edit src/a.js'; do
+    check_free_line "KICK-dKeptSession-8 AC2 $sgaf_c inside the item in flight is admitted under $sgaf_v" probes-item "$sgaf_v" "$sgaf_c" "exit 0" '(empty stderr)'
+  done
+done
+check_free_line "KICK-dKeptSession-8 AC3 git status at item none under item-reads-only is refused, class read" reads-none item-reads-only 'git status' "exit 2" 'actions.free (item-reads-only)' 'this Bash read'
+check_free_line "KICK-dKeptSession-8 AC3 the position engine's --boundary is admitted" reads-none item-reads-only 'position.py --boundary' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC3 the kickoff checker's --card --boundary is admitted" reads-none item-reads-only 'manifest-check.sh --card --boundary' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC4 echo x > f under recorded-anything is admitted" anything-none recorded-anything 'echo x > f' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC4 git status under recorded-anything is admitted" anything-none recorded-anything 'git status' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC4 the log holds one line, the write, naming the session" anything-none recorded-anything 'log' '1 line(s)' ' · tFixSession-1 · write · Bash · item none' '!· read ·'
+check_free_line "KICK-dKeptSession-8 AC6 a card file with no ## pointers adds no arm and prints nothing" no-pointers read-only-probes 'echo x > f' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC6 pointers and no route admit with the unarmed line" no-route read-only-probes 'echo x > f' "exit 0" 'scratch-guard: actions.free unarmed — ' 'routes no build'
+check_free_line "KICK-dKeptSession-8 AC6 pointers owned by another session admit with the unarmed line" other-owner read-only-probes 'echo x > f' "exit 0" 'scratch-guard: actions.free unarmed — ' 'tFixOther-2'
+check_free_line "KICK-dKeptSession-8 AC6 a card file that does not read refuses, naming the arm" throw read-only-probes 'echo x > f' "exit 2" 'the actions.free arm threw'
+check_free_line "KICK-dKeptSession-8 AC7 no policy reader reads the default, refusing with one NOTE" no-helper '(no policy reader)' 'echo x > f' "exit 2" 'actions.free (read-only-probes) refuses this Bash write' 'NOTE — no policy kit resolves beside this hook, so actions.free reads read-only-probes'
+check_free_line "KICK-dKeptSession-8 AC7 a refused read reads the default, refusing with one NOTE" refusal '(a PolicyRefusal)' 'echo x > f' "exit 2" 'actions.free (read-only-probes) refuses this Bash write' 'NOTE — actions.free could not be read (' ', so it reads read-only-probes'
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
@@ -1963,8 +2013,10 @@ n=$((pass+fail))
 # its run_card row and its marker row), counted by hand under the same rule.
 # 401 = 400 + the every-host TOOL-dPlacedRequest-34 AC28 row, left out of the count until TOOL-dPlacedRequest-99 S7;
 # AC28's MSYS-fold row runs on a MINGW, MSYS or CYGWIN host alone, and its skip elsewhere keeps it out.
+# 430 = 401 + the 29 check_free_line rows KICK-dKeptSession-8 added (5 for AC1, 12 for AC2, 3 for AC3,
+# 3 for AC4, 4 for AC6 and 2 for AC7), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=401
+FLOOR_ASSERTIONS=430
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

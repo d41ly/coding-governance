@@ -2613,6 +2613,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "buildGitShaped",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "buildHeredocView",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -5043,6 +5048,11 @@
       "file": "tools/workflows/spec-audit-optin.js"
     },
     {
+      "id": "checkFreeAction",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkGateLeg",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -6726,6 +6736,11 @@
       "id": "check_fragments",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_free_line",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "check_frozen",
@@ -11076,6 +11091,11 @@
       "id": "demand_writable_target",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "deriveActClass",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "deriveAddressKey",
@@ -21058,6 +21078,11 @@
       "file": "tools/process-monitor/procmon-hook.js"
     },
     {
+      "id": "readItemPointer",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "readJournalAgents",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
@@ -21126,6 +21151,11 @@
       "id": "readPolicy",
       "kind": "function",
       "file": "tools/policy/policy-mirror.js"
+    },
+    {
+      "id": "readPolicyValue",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "readQuotedSubstitutions",
@@ -33343,6 +33373,11 @@
       "file": "tools/unattended/mail-notice.js"
     },
     {
+      "id": "runFreeAction",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "runGit",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -34401,6 +34436,16 @@
       "id": "run_fixture",
       "kind": "function",
       "file": "tools/unattended/fix_keeps.py"
+    },
+    {
+      "id": "run_fixture_acts",
+      "kind": "function",
+      "file": "tools/hooks/actions-free.fixture.sh"
+    },
+    {
+      "id": "run_fixture_call",
+      "kind": "function",
+      "file": "tools/hooks/actions-free.fixture.sh"
     },
     {
       "id": "run_fixture_child",
@@ -42783,6 +42828,11 @@
       "file": "tools/run-gates/leg_factory.py"
     },
     {
+      "id": "write_fixture_card",
+      "kind": "function",
+      "file": "tools/hooks/actions-free.fixture.sh"
+    },
+    {
       "id": "write_fixture_claim_commit",
       "kind": "function",
       "file": "tools/loop/claim.py"
@@ -42881,6 +42931,11 @@
       "id": "write_fixture_tree",
       "kind": "function",
       "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
+      "id": "write_fixture_value",
+      "kind": "function",
+      "file": "tools/hooks/actions-free.fixture.sh"
     },
     {
       "id": "write_flake_ask",
