@@ -309,3 +309,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T06:52:02Z brief · item KICK-dKeptSession-42 · reason 1f72228d919e memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-42-build-brief.md
 
 2026-11-23T06:54:46Z dispatch · item 7ebc3364 KICK-dKeptSession-42 · reason tools/loop/loop_transition.py tools/loop/README.md tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json help/loop.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-42-1-acceptance-ledger.md
+
+2026-11-23T07:18:00Z brief · item KICK-dKeptSession-8 · reason 6deda691deba memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-8-build-brief.md
+
+2026-11-23T07:20:53Z dispatch · item 3bb09d88 KICK-dKeptSession-8 · reason tools/hooks/scratch-guard.js tools/hooks/agent-cap.js tools/hooks/actions-free.fixture.sh tools/hooks/kit.toml tools/hooks/scratch-guard.test.sh tools/hooks/agent-cap.test.sh tools/hooks/README.md tools/workflows/README.md tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json help/orientation-card.md memory/project/docs-undocumented.txt memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-8-1-acceptance-ledger.md
