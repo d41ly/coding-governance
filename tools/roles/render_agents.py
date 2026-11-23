@@ -763,6 +763,38 @@ def check_no_spawn_arm(state, roles):
             handoff.KIT_DIR, handoff.WORK_ORDER, lib.read_policy_setting = saved[:3]
 
 
+def run_handoff_render(handoff, args):
+    """`(rc, stdout, stderr)` of `handoff.py render --build fx --unit PLAY-fx-1 <args>` run in process through
+    the imported module `handoff`, its two streams captured as UTF-8 bytes."""
+    out = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
+    err = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
+    with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+        rc = handoff.main(["render", "--build", "fx", "--unit", "PLAY-fx-1"] + list(args))
+        sys.stdout.flush()
+        sys.stderr.flush()
+    return rc, out.buffer.getvalue().decode("utf-8"), err.buffer.getvalue().decode("utf-8")
+
+
+def build_session_fixture(root, sid):
+    """The `subagents` folder of a fixture session `sid` under `<root>/cfg`, the `CLAUDE_CONFIG_DIR` the framing
+    arms name, with the session file beside it, as `handoff.resolve_session_file` finds one."""
+    sub = pathlib.Path(root) / "cfg" / "projects" / "p" / sid / "subagents"
+    sub.mkdir(parents=True)
+    (sub.parent.parent / (sid + ".jsonl")).write_text("{}\n", encoding="utf-8")
+    return sub
+
+
+def write_agent_transcript(sub, aid, kind, task, ret):
+    """An agent `aid`'s transcript under `sub`, its first record `task` and its last a fenced json block of `ret`,
+    with its `.meta.json` naming the type `kind`, as `handoff.read_framing` reads a prompt writer's return."""
+    (sub / ("agent-%s.jsonl" % aid)).write_text("\n".join(json.dumps(r) for r in (
+        {"type": "user", "message": {"role": "user", "content": task}},
+        {"type": "assistant", "message": {"content": [{"type": "text", "text":
+                                                       "```json\n%s\n```" % json.dumps(ret)}]}})) + "\n",
+        encoding="utf-8")
+    (sub / ("agent-%s.meta.json" % aid)).write_text(json.dumps({"agentType": kind}), encoding="utf-8")
+
+
 def check_framing_arm(state):
     """Arm 24 (TOOL-dBoundRoles-4 AC1, AC2): `handoff.py render --for` and `--framed-by` run in process over a git
     fixture whose kit holds a `gov-prompt-writer` carrying the kit's own `return` template and a `gov-builder`
@@ -797,13 +829,7 @@ def check_framing_arm(state):
         handoff.KIT_DIR, handoff.WORK_ORDER = kit, KIT_DIR / lib.WORK_ORDER_REL
 
         def run_render(*args):
-            out = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
-            err = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
-            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-                rc = handoff.main(["render", "--build", "fx", "--unit", "PLAY-fx-1"] + list(args))
-                sys.stdout.flush()
-                sys.stderr.flush()
-            return rc, out.buffer.getvalue().decode("utf-8"), err.buffer.getvalue().decode("utf-8")
+            return run_handoff_render(handoff, args)
 
         try:
             os.chdir(root)
@@ -820,21 +846,14 @@ def check_framing_arm(state):
             check_arm(state, 24, rc == 1 and "input:work-order" in said and "--for" in said,
                       "for-builder with no --for exited %d with %r, not 1 naming input:work-order and --for" % (rc, said))
             marker = lib.extract_prompt_marker(task)
-            sub = root / "cfg" / "projects" / "p" / sid / "subagents"
-            sub.mkdir(parents=True)
-            (sub.parent.parent / (sid + ".jsonl")).write_text("{}\n", encoding="utf-8")
+            sub = build_session_fixture(root, sid)
             job, nostop = "Build PLAY-fx-1 as the spec says.", "Stop once it is committed."
             for aid, kind, ret in (("pw1", handoff.PROMPT_WRITER, {"outcome": "framed", "job": job, "nostop": nostop}),
                                    ("pw2", handoff.PROMPT_WRITER, {"outcome": "framed", "job": job}),
                                    ("pw3", handoff.PROMPT_WRITER, {"outcome": "framed", "job": job, "nostop": nostop,
                                                                    "extra": "x"}),
                                    ("rs1", "gov-researcher", {"outcome": "framed", "job": job, "nostop": nostop})):
-                (sub / ("agent-%s.jsonl" % aid)).write_text("\n".join(json.dumps(r) for r in (
-                    {"type": "user", "message": {"role": "user", "content": task}},
-                    {"type": "assistant", "message": {"content": [{"type": "text", "text":
-                                                                   "```json\n%s\n```" % json.dumps(ret)}]}})) + "\n",
-                    encoding="utf-8")
-                (sub / ("agent-%s.meta.json" % aid)).write_text(json.dumps({"agentType": kind}), encoding="utf-8")
+                write_agent_transcript(sub, aid, kind, task, ret)
             rc, out, said = run_render("--role", "gov-builder", "--input", "spec=spec.md", "--framed-by", "pw1",
                                        "--stdout")
             framed_by = "Framed by: %s task-sha=%s" % (marker.group("path"), marker.group("task_sha")) if marker else "?"
@@ -858,6 +877,172 @@ def check_framing_arm(state):
                     os.environ.pop(k, None)
                 else:
                     os.environ[k] = v
+
+
+#: Arm 25's frame (TOOL-dBoundRoles-23 AC1): the headings after the task's opening line, in skeleton order, of a
+#: framed item's work order handed inputs, an allowance and upstream rows; the `### inputs` block's own sub-heading
+#: is left out of the comparison.
+FRAME_ORDER = ("### item", "### framing:job", "### input:spec", "### inputs", "### allowance",
+               "### framing:population", "### upstream:rows", "### row contract", "### framing:added",
+               "### framing:no-stop", "### return", "### witness")
+
+
+def check_frame_arm(state):
+    """Arm 25 (TOOL-dBoundRoles-23 AC1-AC4, AC6): the frame and the effort floor, `handoff.py render` run in process
+    over a git fixture whose `gov-builder` reads `upstream:rows?` and returns a `checks` list, its item's declaration
+    bound in place of the loop kit's verb, and a prompt writer's session as arm 24 writes it. `frame-order`: a
+    render with `--item`, `--upstream` and `--framed-by` runs `FRAME_ORDER`, the return contract last.
+    `frame-no-slot`: `roles_lib.derive_frame` over a block of slot `misc` raises naming it. `frame-no-population`:
+    `--item` framed by a return with no `population` exits 1 naming `framing:population`, writing nothing.
+    `population-over-bound`: thirty members render twelve and `… and 18 more`, and the return states `at most 30
+    entries`. `return-over-bound`: an unframed item states `at most 12 entries`, and `check_return` refuses a
+    `checks` of thirteen naming it and the bound, passing twelve. `house-low`: a house `gov-builder = "low"`
+    raises R12 naming the floor, and a stage whose one level is a house `low` refuses naming its source;
+    `role-declared-low`: R2 reports a role declaring `effort: low` and not one declaring `medium`.
+    `policy-low-owner`: `lib.read_policy_setting` bound to answer `roles.effort.default = "low"`, the stage takes
+    `low` under `policy-file.guard = owner-only` and refuses naming the guard under `agents-with-reason`. Staged
+    against a `derive_frame` keeping arrival order and a `check_effort_floor` passing every level, `frame-order`,
+    `house-low`, `role-declared-low` and `policy-low-owner` red. WHAT IT DOES NOT CHECK: the real policy reader
+    over a committed policy file, nor the guard that decides who writes it (TOOL-dBoundRoles-23 AC5)."""
+    import handoff
+    import check_roles
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    template = lib.load_roles(KIT_DIR)[handoff.PROMPT_WRITER]["keys"]["return"]
+    returns = "outcome:committed|returned, checks:list"
+    roles = {handoff.PROMPT_WRITER: ("workflow: w4\nreads: input:question, input:work-order\nwrites: none\n"
+                                     "return: %s\n" % template, ""),
+             "gov-builder": ("workflow: w1\nreads: input:spec, upstream:rows?\nwrites: product\n"
+                             "return: %s\n" % returns, "")}
+    declaration = {"tag": "item.build.unit", "actor": "role:gov-builder", "step": "build", "inputs": ["input:spec"],
+                   "outcomes": ["committed", "returned"], "allowance": "spec", "returns": returns,
+                   "witness": {"class": "witnessed", "by": "the fixture"}}
+    sid = "0123abcd-0000-4000-8000-00000000f4f5"
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+        root = pathlib.Path(tmp)
+        subprocess.run(["git", "init", "-q", str(root)], capture_output=True, text=True, encoding="utf-8",
+                       env=env, stdin=subprocess.DEVNULL)
+        kit, _tool_root = build_fixture(root, roles)
+        (root / "spec.md").write_text("The fixture spec.\n", encoding="utf-8")
+        (root / "rows.txt").write_text("- row-1 · keep the seam\n- row-2 · one sort\n", encoding="utf-8")
+        prompts = root / "mem" / "builds" / "fx" / "prompts"
+        prompts.mkdir(parents=True)
+        saved = (handoff.KIT_DIR, handoff.WORK_ORDER, handoff.read_item_declaration, os.getcwd(),
+                 {k: os.environ.get(k) for k in ("CLAUDE_CONFIG_DIR", "CLAUDE_CODE_SESSION_ID")})
+        handoff.KIT_DIR, handoff.WORK_ORDER = kit, KIT_DIR / lib.WORK_ORDER_REL
+        handoff.read_item_declaration = lambda item, role: dict(declaration)
+        item = ("--role", "gov-builder", "--input", "spec=spec.md", "--item", "item.build.unit")
+        try:
+            os.chdir(root)
+            os.environ["CLAUDE_CONFIG_DIR"], os.environ["CLAUDE_CODE_SESSION_ID"] = str(root / "cfg"), sid
+            _rc, task, _said = run_handoff_render(handoff, ("--role", handoff.PROMPT_WRITER, "--for", "gov-builder",
+                                                            "--input", "question=q", "--input", "spec=spec.md",
+                                                            "--part", "task"))
+            sub = build_session_fixture(root, sid)
+            members = "".join("- m%d\n" % n for n in range(1, 31))
+            for aid, ret in (("pw1", {"outcome": "framed", "job": "Build it.", "population": "The members.\n" + members,
+                                      "added": "Hunt one more.", "nostop": "Stop once committed."}),
+                             ("pw2", {"outcome": "framed", "job": "Build it.", "nostop": "Stop once committed."})):
+                write_agent_transcript(sub, aid, handoff.PROMPT_WRITER, task, ret)
+            rc, out, said = run_handoff_render(handoff, item + ("--upstream", "rows.txt", "--framed-by", "pw1",
+                                                                "--stdout"))
+            body = out[out.find("This handoff is for"):]
+            heads = [ln for _n, ln in lib.read_unfenced_lines(body) if ln and ln.startswith("### ")
+                     and ln != "### field.input.spec"]
+            check_arm(state, 25, rc == 0 and tuple(heads) == FRAME_ORDER,
+                      "frame-order exited %d with the headings %r, not %r: %s" % (rc, heads, FRAME_ORDER, said[-300:]))
+            # S4: the return restates the upstream rule in the one spelling the rows block closes with
+            ret = body[body.rfind("\n### return\n"):body.rfind("\n### witness\n")]
+            check_arm(state, 25, handoff.UPSTREAM_CONTRACT in ret and "`committed`, `returned`" in body,
+                      "frame-order's return does not restate UPSTREAM_CONTRACT, or its row contract names no outcome "
+                      "set: %r" % ret[:300])
+            entries = [ln for ln in body.split("\n") if re.fullmatch(r"- m[0-9]+", ln)]
+            check_arm(state, 25, entries == ["- m%d" % n for n in range(1, 13)]
+                      and re.search(r"\n… and 18 more; the full list is [^\n]*/subagents/agent-pw1\.jsonl\n", body)
+                      and "\nchecks: at most 30 entries\n" in body,
+                      "population-over-bound rendered %r and no overflow line naming 18 more and the transcript, or "
+                      "no bound of 30 on checks" % entries)
+            try:
+                lib.derive_frame([("role", "### item\n\nx"), ("misc", "### odd\n\nx")])
+                said = "no refusal"
+            except lib.RolesError as e:
+                said = str(e)
+            check_arm(state, 25, "### odd" in said and "misc" in said,
+                      "frame-no-slot read %r, not a refusal naming the block and its slot" % said)
+            before = sorted(p.name for p in prompts.glob("*.md"))
+            rc, out, said = run_handoff_render(handoff, item + ("--framed-by", "pw2"))
+            check_arm(state, 25, rc == 1 and "framing:population" in said
+                      and sorted(p.name for p in prompts.glob("*.md")) == before,
+                      "frame-no-population exited %d with %r, not 1 naming framing:population and nothing written"
+                      % (rc, said[-300:]))
+            rc, out, said = run_handoff_render(handoff, item)
+            rel = out.strip().split("\n")[-1] if rc == 0 else ""
+            text = (root / rel).read_text(encoding="utf-8") if rel and (root / rel).is_file() else ""
+            marker = lib.extract_prompt_marker(text[text.find("<!-- gov:handoff"):]) if text else None
+            order = (marker.group("path"), marker.group("task_sha")) if marker else (rel, "0" * 12)
+            got = [lib.check_return("gov-builder", "```json\n%s\n```" % json.dumps(
+                {"outcome": "returned", "checks": ["c"] * n}), root, order) for n in (12, 13)]
+            check_arm(state, 25, "\nchecks: at most 12 entries\n" in text and got[0] == [] and len(got[1]) == 1
+                      and got[1][0].startswith("checks — 13 entries") and "bound of 12" in got[1][0],
+                      "return-over-bound stated %r and check_return read %r, not 12 entries and one refusal naming "
+                      "checks and the bound" % (text[text.rfind("### return"):][:200], got))
+        finally:
+            os.chdir(saved[3])
+            handoff.KIT_DIR, handoff.WORK_ORDER, handoff.read_item_declaration = saved[:3]
+            for k, v in saved[4].items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
+    # The floor (AC4, AC6): the house file, a role's declaration, and the policy file under two guard values
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        kit, _tool_root = build_fixture(root, {"r-one": ("workflow: w1\nreads: input:spec\nwrites: product\n"
+                                                         "effort: low\n", ""),
+                                               "r-two": ("workflow: w1\nreads: input:spec\nwrites: product\n"
+                                                         "effort: medium\n", "")},
+                                        FIXTURE_POLICY + '\n[effort.roles]\nr-one = "low"\n')
+        with open(kit / "workflows.toml", "a", encoding="utf-8") as fh:
+            fh.write('\n[[workflow]]\nname = "w5"\ndriver = "workflow"\nharness = "%s"\n\n[[workflow.stages]]\n'
+                     'key = "k1"\nrole = "r-one"\nfan = 1\ncap = 1\nreceives = []\nreturns = []\n' % FIXTURE_HARNESS)
+        cat_roles, workflows = lib.load_roles(kit), lib.load_workflows(kit)
+        try:
+            lib.load_policy(kit, cat_roles, workflows)
+            said = "no refusal"
+        except lib.RolesError as e:
+            said = str(e)
+        check_arm(state, 25, " R12 — effort.roles.r-one — " in said and "below the floor %s" % lib.EFFORT_FLOOR in said,
+                  "house-low read %r, not R12 naming effort.roles.r-one and the floor" % said)
+        w5 = workflows[-1]
+        house = {"effort": {"default": "low", "roles": {}, "stages": {}, "profiles": {}}, "declared": {}}
+        try:
+            said = lib.resolve_stage_efforts(house, w5, None, root)
+        except lib.RolesError as e:
+            said = str(e)
+        check_arm(state, 25, isinstance(said, str) and "the house file's effort.default" in said,
+                  "house-low: a stage whose one level is the house file's low read %r, not a refusal naming its "
+                  "source" % (said,))
+        (kit / "house" / "policy.toml").write_text(FIXTURE_POLICY, encoding="utf-8")
+        try:
+            defects = check_roles.check_roles(root, kit)[0]
+        except lib.RolesError as e:
+            defects = ["raised %s" % e]
+        floor = [d for d in defects if " R2 — " in d and "below the floor" in d]
+        check_arm(state, 25, len(floor) == 1 and "r-one.agent.md" in floor[0],
+                  "role-declared-low read %r, not one R2 defect for r-one's declared low" % floor)
+        reader = lib.read_policy_setting
+        policy = {"declared": {}}
+        try:
+            for guard, want in (("owner-only", {"k1": "low"}), ("agents-with-reason", lib.EFFORT_GUARD_KEY)):
+                answers = {"roles.effort.default": "low", lib.EFFORT_GUARD_KEY: guard}
+                lib.read_policy_setting = lambda key, at, with_default=False, a=answers: a.get(key)
+                try:
+                    got = lib.resolve_stage_efforts(policy, w5, None, root)
+                except lib.RolesError as e:
+                    got = str(e)
+                ok = got == want if isinstance(want, dict) else isinstance(got, str) and want in got
+                check_arm(state, 25, ok, "policy-low-owner under %s read %r, not %r" % (guard, got, want))
+        finally:
+            lib.read_policy_setting = reader
 
 
 def read_return_dir():
@@ -977,12 +1162,13 @@ def run_selftest():
             check_arm(state, 8, rc == 2, "a zero-role catalogue under --%s exited %d, not 2" % (mode, rc))
     with tempfile.TemporaryDirectory() as tmp:
         root = pathlib.Path(tmp)
-        policy = '[effort]\ndefault = "low"\n\n[effort.roles]\nr-one = "high"\n'
+        # TOOL-dBoundRoles-23 S7: the default at `max`, a level at the floor or above that no fallback holds
+        policy = '[effort]\ndefault = "max"\n\n[effort.roles]\nr-one = "high"\n'
         kit, tool_root = build_fixture(root, {s: roles[s] for s in ("r-one", "r-two")}, policy)
         agents = root / ".claude" / "agents"
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             rc = run_mode("write", kit, tool_root, root)
-        for slot, level in (("r-one", "high"), ("r-two", "low")):
+        for slot, level in (("r-one", "high"), ("r-two", "max")):
             p = agents / (slot + ".md")
             head = p.read_text(encoding="utf-8").split("\n") if p.is_file() else []
             at = head.index("omitClaudeMd: true") if "omitClaudeMd: true" in head else 0
@@ -1208,7 +1394,8 @@ def run_selftest():
     # the resolve side by its second word and on the defect side by a second word `fam` holds.
     with tempfile.TemporaryDirectory() as tmp:
         root = pathlib.Path(tmp)
-        base = ('[effort]\ndefault = "low"\n\n[effort.roles]\nr-one = "high"\n\n'
+        # TOOL-dBoundRoles-23 S7: every house level at the floor or above; the floor plant is arm 25's `house-low`
+        base = ('[effort]\ndefault = "medium"\n\n[effort.roles]\nr-one = "high"\n\n'
                 '[effort.stages.w5]\nk2 = "high"\n')
         fam = base + ('\n[effort.profiles.fam]\nmatch = ["fam"]\ndefault = "max"\n\n'
                       '[effort.profiles.fam.roles]\nr-two = "xhigh"\n\n'
@@ -1217,7 +1404,8 @@ def run_selftest():
         kit, tool_root = build_fixture(root, roles, fam)
         with open(kit / "workflows.toml", "a", encoding="utf-8") as fh:
             # Two stage rows (TOOL-dBoundRoles-22 S2), each declaring `low`, a level no expected stage
-            # map below holds, so a resolver reading a row's effort before the house file reds 19a.
+            # map below holds and below the floor, so a resolver reading a row's effort before the house
+            # file refuses or returns it, and either reds 19a.
             fh.write('\n[[workflow]]\nname = "w5"\ndriver = "workflow"\nharness = "%s"\n'
                      % FIXTURE_HARNESS + "".join(
                          '\n[[workflow.stages]]\nkey = "%s"\nrole = "%s"\nfan = 1\ncap = 1\neffort = "low"\n'
@@ -1226,11 +1414,11 @@ def run_selftest():
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             rc = run_mode("write", kit, tool_root, root)
         before = {p: p.read_bytes() for p in (root / ".claude").rglob("*") if p.is_file()}
-        for slot, level in (("r-one", "high"), ("r-two", "low")):
+        for slot, level in (("r-one", "high"), ("r-two", "medium")):
             p = root / ".claude" / "agents" / (slot + ".md")
             check_arm(state, 19, rc == 0 and p in before and "effort: %s" % level in before[p].decode(
                 "utf-8").split("\n"), "19b: %s does not carry the default tables' effort: %s" % (slot, level))
-        plain = ("high", "low", {"k1": "high", "k2": "high"})
+        plain = ("high", "medium", {"k1": "high", "k2": "high"})
         for row, text, model, want in (
                 ("19a", base, "vendor-fam-9", plain), ("19a", base, None, plain),
                 ("19c", fam, "vendor-fam-9", ("max", "xhigh", {"k1": "medium", "k2": "xhigh"})),
@@ -1254,21 +1442,23 @@ def run_selftest():
                 continue
             check_arm(state, 19, got == want, "%s: the model %r read %r, not %r" % (row, model, got, want))
         for lines, key in (
-                ('match = ["x"]\ndefault = "low"\nextra = 1\n', "x.extra"),
+                ('match = ["x"]\ndefault = "medium"\nextra = 1\n', "x.extra"),
                 ('match = ["x"]\ndefault = "extra"\n', "x.default"),
                 ('match = ["x"]\n', "x.default"),
-                ('match = ["x"]\ndefault = "low"\n\n[effort.profiles.x.roles]\nr-nobody = "low"\n', "x.roles.r-nobody"),
-                ('match = ["x"]\ndefault = "low"\n\n[effort.profiles.x.roles]\nr-off = "low"\n', "x.roles.r-off"),
-                ('match = ["x"]\ndefault = "low"\n\n[effort.profiles.x.stages.w5]\nk9 = "low"\n', "x.stages.w5.k9"),
-                ('match = ["x"]\ndefault = "low"\n\n[effort.profiles.x.stages.w3]\nk1 = "low"\n', "x.stages.w3"),
-                ('default = "low"\n', "x.match"),
-                ('match = "x"\ndefault = "low"\n', "x.match"),
-                ('match = []\ndefault = "low"\n', "x.match"),
-                ('match = ["vendor-x"]\ndefault = "low"\n', "x.match"),
-                ('match = ["fam"]\ndefault = "low"\n', "x.match"),
-                ('match = ["x", "fam"]\ndefault = "low"\n', "x.match"),
+                ('match = ["x"]\ndefault = "medium"\n\n[effort.profiles.x.roles]\nr-nobody = "medium"\n',
+                 "x.roles.r-nobody"),
+                ('match = ["x"]\ndefault = "medium"\n\n[effort.profiles.x.roles]\nr-off = "medium"\n', "x.roles.r-off"),
+                ('match = ["x"]\ndefault = "medium"\n\n[effort.profiles.x.stages.w5]\nk9 = "medium"\n',
+                 "x.stages.w5.k9"),
+                ('match = ["x"]\ndefault = "medium"\n\n[effort.profiles.x.stages.w3]\nk1 = "medium"\n', "x.stages.w3"),
+                ('default = "medium"\n', "x.match"),
+                ('match = "x"\ndefault = "medium"\n', "x.match"),
+                ('match = []\ndefault = "medium"\n', "x.match"),
+                ('match = ["vendor-x"]\ndefault = "medium"\n', "x.match"),
+                ('match = ["fam"]\ndefault = "medium"\n', "x.match"),
+                ('match = ["x", "fam"]\ndefault = "medium"\n', "x.match"),
                 (None, "x")):
-            row = '\n[effort.profiles]\nx = "low"\n' if lines is None else "\n[effort.profiles.x]\n" + lines
+            row = '\n[effort.profiles]\nx = "medium"\n' if lines is None else "\n[effort.profiles.x]\n" + lines
             (kit / "house" / "policy.toml").write_text(fam + row, encoding="utf-8")
             err = io.StringIO()
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
@@ -1284,6 +1474,7 @@ def run_selftest():
     check_return_arm(state)
     check_no_spawn_arm(state, roles)
     check_framing_arm(state)
+    check_frame_arm(state)
     lib.read_policy_setting = own_reader
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)

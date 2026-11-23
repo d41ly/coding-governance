@@ -51,7 +51,8 @@ later key is one row there.
   the kind of its `--workflow` entry, and refuses, writing nothing, where that entry carries none.
   The role index, `.claude/roles.json`, lists each role's `shapes`.
 - `effort` is the role's declared reasoning effort, one of the five levels under "The effort
-  policy", required on every agent role and graded by R2 (TOOL-dBoundRoles-21). It is the last step
+  policy" at or above the floor `medium`, required on every agent role and graded by R2
+  (TOOL-dBoundRoles-21, TOOL-dBoundRoles-23). It is the last step
   of the effort order, read only where no policy key is set and no house file is present, so a role
   file of your own that lacks it is an R2 defect on update; `core.py new role` writes `medium`. No
   role file may be named `default`: that slot is reserved, since `roles.effort.default` is the
@@ -236,6 +237,29 @@ prompt writer, and `--for` naming it, refuse: its own task is the driver's detai
 key `prompts.author` is `prompt-writer`, the hooks kit's spawn guard admits a spawn of any other role only
 with that framing (its `checkFraming`). WHAT THIS DOES NOT CHECK: that the framing says anything the work
 order supports, which TOOL-dBoundRoles-24's anchor check grades, nor a forged line inside a framing field.
+THE FRAME (TOOL-dBoundRoles-23): the work-order template's `reads` fill is one frame, aScoutedSeam's prompt
+skeleton. `roles_lib.FRAME_SLOTS` names its nine slots in order, `role`, `material`, `boundaries`,
+`population`, `upstream`, `contract`, `added`, `no-stop` and `return`; every block the render adds carries
+one, `handoff.FRAME_BLOCK_SLOTS` naming each fixed block's (`### item` and `### framing:job` in `role`, each
+`reads` block and `### inputs` in `material`, `### upstream:rows` in `upstream`, `### allowance` in
+`boundaries`, `### return` and `### witness` in `return`), and `roles_lib.derive_frame` sorts the fill by
+slot, stably, so blocks of one slot keep their arrival order and the return contract is last. A block with
+no slot, or one outside `FRAME_SLOTS`, is a RolesError naming it; a slot with no block renders nothing. The
+practices, the card's block and the opening line stay ahead of the frame in their own template slots and
+carry none. THE BOUNDS: `roles_lib.FRAME_LIST_BOUND` is 12, pinned from the night pass two's "at most twelve
+seams". `### framing:population`'s entries are its lines opening with `- `; past the bound it renders its
+text up to the thirteenth entry and closes with `… and <n> more; the full list is <the prompt writer's
+transcript>`. A population adds `### row contract` (per member, id, evidence of search, a verdict from the
+role's `outcome` set or the escape `undecided`, a reason) and a line defining "incomplete" against it at the
+end of `### framing:no-stop`. An item's `### return` closes with `<field>: at most <n> entries`
+(`roles_lib.RETURN_BOUND_LINE`) for each `list` field of the role's template, `n` the population's entry
+count where it has entries, else the bound; then the `answers` value's shape; then, with rows handed,
+`UPSTREAM_CONTRACT` again, the one spelling of the `## Upstream` rule. `roles_lib.check_return`, given a work
+order, reads those lines back from the work order's last `### return` block (`read_return_bounds`) and
+refuses a longer list, naming the field and the bound. `--item` with `--framed-by` refuses a framing with no
+`population`, naming `framing:population`: no item declares a population lister, so the prompt writer's
+needs-then-sketch steps are the population. WHAT THIS DOES NOT CHECK: a bound in a work order cut for no
+item, which carries no `### return` block, nor a lister an item declares, which no loop kit schema holds.
 `python handoff.py check <file>` re-derives both hashes and the marker's path, then
 grades the envelopes: every one opened closes, and their levels never decrease down the `## Role` part
 or the `## Task` part, each failure naming the envelope; it prints each part's levels in order, and a
@@ -435,6 +459,18 @@ A role's level and model are read in this order (TOOL-dBoundRoles-21), the first
 
 Step 5 is read only where no key is set and no house file is present, since the house file's
 `default` gives every stage a level; step 6 remains for a role's own agent type, which has no stage.
+
+THE FLOOR (TOOL-dBoundRoles-23): `roles_lib.EFFORT_FLOOR` is `medium`, beside `EFFORT_LEVELS`, and
+`roles_lib.check_effort_floor(level, source, root)` holds every level `resolve_effort` and
+`resolve_stage_efforts` take to it, by its source. A level from steps 1 to 3, a `roles.effort.*` key of
+`.governance/policy.toml`, passes below the floor only while `policy-file.guard`, read the same way, is
+`owner-only`, under which the owner's terminal commit writes that file; under `agents-with-reason` or
+`agents-within-mandate` it refuses, naming the guard. A level below the floor from any other source
+refuses, naming the level, its source, the floor and the owner, who sets the key instead: the house file
+(R12, `load_policy`'s `check_level`, every profile's levels included), a role's declared `effort` (R2), and
+a stage row's own `effort` at resolve. WHAT THE FLOOR DOES NOT CHECK: whose commit wrote a policy-file level.
+The guard admits a live run's change on that run's branch under every `policy-file.guard` value, and a floor
+reading provenance from the file alone cannot tell it from the owner's; closing that path is the guard's.
 
 The keys are read through the policy kit's one reader, `policy.py get <key> --json`, run by
 `roles_lib.read_policy_setting` in the repository at its landed revision, so an uncommitted edit of

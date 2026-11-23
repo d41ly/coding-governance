@@ -91,11 +91,23 @@ exit 1, writing nothing, naming each failed condition: an id off `PATH_ID_RE`, n
 `agent-<id>.jsonl` in its `subagents` folder, a `.meta.json` type other than `gov-prompt-writer`, a first record
 opening with no marker of a `gov-prompt-writer` work order of this build, no return text, a return
 `roles_lib.check_return` refuses, an outcome other than `framed`, and a return lacking `job` or `nostop`. The
-task's `reads` fill then closes with `render_framing_blocks`: `### framing:job`, `### framing:population`,
+task's `reads` fill then carries `render_framing_blocks`: `### framing:job`, `### framing:population`,
 `### framing:added` and `### framing:no-stop`, one per field the return carries, each verbatim, the first
 closing with `Framed by: <the prompt writer's prompt path> task-sha=<12hex>`, inside the bytes `task-sha`
 covers. The prompt writer's own task is framed by no prompt writer: `--framed-by` on it and `--for` naming it
 refuse.
+THE FRAME (TOOL-dBoundRoles-23): every block of the `reads` fill carries a slot of `roles_lib.FRAME_SLOTS`,
+`FRAME_BLOCK_SLOTS` naming each fixed block's, and `roles_lib.derive_frame` sorts the fill by them, stably:
+`role` (`### item`, `### framing:job`), `material` (the `reads` blocks, `### inputs`), `boundaries`
+(`### allowance`), `population` (`### framing:population`), `upstream` (`### upstream:rows`), `contract`
+(`### row contract`, with a population), `added`, `no-stop`, then `return` (`### return`, `### witness`)
+last; a slot with no block renders nothing. A population lists at most `roles_lib.FRAME_LIST_BOUND` entries,
+its lines opening with `- `, then `… and <n> more; the full list is <the prompt writer's transcript>`. An
+item's `### return` states `<field>: at most <n> entries` for each `list` field, `n` the population's entry
+count or the bound, which `roles_lib.check_return` reads back; with rows handed, it restates
+`UPSTREAM_CONTRACT`. `--item` with `--framed-by` refuses a framing carrying no `population`, naming
+`framing:population`: no item hands a population lister, so the prompt writer's needs-then-sketch steps are
+the population.
 The marker carries two hashes, each the first 12 hex digits of the SHA-256 of one section's bytes
 with CRLF folded to LF: `## Role` up to the byte before the `## Task` line, and `## Task` to the end
 of the file. `check` re-derives both and compares the marker's `path` with the file's own, and for a
@@ -260,6 +272,23 @@ WORK_ORDER_KEY = "input:work-order"
 FRAMING_FIELDS = (("job", "framing:job"), ("population", "framing:population"), ("added", "framing:added"),
                   ("nostop", "framing:no-stop"))
 FRAMED_BY_LEAD = "Framed by:"
+#: The frame (TOOL-dBoundRoles-23 §4 "The slots"): each fixed block's slot, keyed by its heading; a `reads`
+#: block takes `material`, the rows file's `upstream`. `lib.derive_frame` sorts the `reads` fill by them.
+ROW_CONTRACT_HEAD = "### row contract"
+FRAME_BLOCK_SLOTS = {**dict(zip(lib.WORK_ORDER_BLOCKS, ("role", "material", "boundaries", "return", "return"))),
+                     "### framing:job": "role", "### framing:population": "population",
+                     "### framing:added": "added", "### framing:no-stop": "no-stop",
+                     ROW_CONTRACT_HEAD: "contract", "### " + UPSTREAM_KEY: "upstream"}
+#: A population entry is a line opening with this (main-loop decision 2026-11-23, item 1); past
+#: `lib.FRAME_LIST_BOUND` entries the block closes with the overflow line, naming where the full list is.
+POPULATION_ENTRY = "- "
+POPULATION_OVERFLOW = "… and %d more; the full list is %s"
+#: The row contract's escape verdict, beside the closed set the role's `outcome` declares (S1, slot 6).
+ROW_ESCAPE = "undecided"
+INCOMPLETE_LINE = ("Incomplete means a member of the population, its full list included, left with no row: the "
+                   "task is not done while one is left.")
+ANSWERS_LINE = ("answers: the path and task-sha this work order's marker line names, as `<path> "
+                "task-sha=<12 hex>`")
 PLACEHOLDERS =("…", "...", "tbd", "todo", "n/a", "none", "-", "?")
 KICKOFF_HOME, KICKOFF_CHECKER = "session-kickoff", "manifest-check.sh"
 CHECKER_BOUND_S = 30
@@ -714,19 +743,47 @@ def read_item_declaration(item, role):
     return declaration
 
 
-def render_work_order_blocks(item, declaration, prefixes, inputs):
+def render_work_order_blocks(item, declaration, prefixes, inputs, contract=()):
     """The five blocks an item's work order closes its task with, `lib.WORK_ORDER_BLOCKS` in order
     (TOOL-dBoundRoles-3 S2, §4 "The blocks"): the tag, its step and its outcome set; `inputs`, the rendered
     sub-blocks, or `none`; the allowance's `prefixes` as one `- <path>` line each, or `none`; the declaration's
-    `returns`; and its witness's class and `by`. A field the declaration leaves empty reads `none`."""
+    `returns`, then each paragraph of `contract`, `render_return_contract`'s (TOOL-dBoundRoles-23 S3, S4); and
+    its witness's class and `by`. A field the declaration leaves empty reads `none`."""
     witness = declaration.get("witness") if isinstance(declaration.get("witness"), dict) else {}
     bodies = ("%s · %s · outcomes: %s" % (item, declaration.get("step") or "none",
                                           ", ".join(declaration.get("outcomes") or ()) or "none"),
               "\n\n".join(inputs) or "none",
               "\n".join("- " + p for p in prefixes) or "none",
-              declaration.get("returns") or "none",
+              "\n\n".join([declaration.get("returns") or "none"] + list(contract)),
               "%s · %s" % (witness.get("class") or "none", witness.get("by") or "none"))
     return ["%s\n\n%s" % (head, body) for head, body in zip(lib.WORK_ORDER_BLOCKS, bodies)]
+
+
+def render_return_contract(template, bound, upstream):
+    """The paragraphs a work order's `### return` block closes with (TOOL-dBoundRoles-23 S3, S4, slot 9): one
+    line per `list` field of the role's parsed return `template`, `lib.RETURN_BOUND_LINE` at `bound`, with
+    `ANSWERS_LINE` after them; then, where `upstream` is true, the `## Upstream` answer rule, `UPSTREAM_CONTRACT`
+    itself, the text the `### upstream:rows` block closes with, so it has no second spelling."""
+    lines = [lib.RETURN_BOUND_LINE % (name, bound) for name, kind, _optional in template if kind == "list"]
+    return ["\n".join(lines + [ANSWERS_LINE])] + ([UPSTREAM_CONTRACT] if upstream else [])
+
+
+def render_row_contract(template):
+    """The `### row contract` block (TOOL-dBoundRoles-23 §4 slot 6): per member of the population, one row of
+    id, evidence of search, a verdict from the closed set the role's `outcome` declares in its parsed return
+    `template`, or `ROW_ESCAPE`, and a one-line reason."""
+    outcomes = next((kind for name, kind, _o in template if name == "outcome" and isinstance(kind, tuple)), ())
+    said = ", ".join("`%s`" % v for v in outcomes)
+    return ("%s\n\nPer member of the population, in its order, one row: `<member id> · <evidence of search> · "
+            "<verdict> · <one-line reason>`. The verdict is one of %s, the set your return's `outcome` declares, "
+            "or `%s`, the escape, where your evidence of search decides none of them."
+            % (ROW_CONTRACT_HEAD, said or "your return's `outcome` values", ROW_ESCAPE))
+
+
+def measure_population_entries(text):
+    """The line indexes of the entries of a `population` text, each a line opening with `POPULATION_ENTRY`, in
+    order (TOOL-dBoundRoles-23 S3; main-loop decision 2026-11-23, item 1)."""
+    return [n for n, line in enumerate(str(text).split("\n")) if line.startswith(POPULATION_ENTRY)]
 
 
 def derive_block_extents(section, lead, opening, blocks, handed):
@@ -813,7 +870,9 @@ def read_framing(root, slug, agent_id):
     record opening with the marker of a `gov-prompt-writer` work order of build `slug`, read by
     `lib.extract_prompt_marker`; and its last assistant text, `read_agent_turns`', passing `lib.check_return`
     against that work order with `outcome` `framed` and both `job` and `nostop`. `fields` is the return object,
-    `framed_by` the `<prompt path> task-sha=<12hex>` of that marker. RolesError naming each failed condition."""
+    `framed_by` the `<prompt path> task-sha=<12hex>` of that marker, and the third item the agent transcript's
+    path, where a bounded population's full list stays (TOOL-dBoundRoles-23 S3). RolesError naming each failed
+    condition."""
     if not PATH_ID_RE.match(agent_id):
         raise lib.RolesError("--framed-by '%s' is not an agent id of letters, digits, '_' and '-'" % agent_id[:80])
     session, why = resolve_session_file(root, None)
@@ -853,19 +912,29 @@ def read_framing(root, slug, agent_id):
     if lacking:
         raise lib.RolesError("--framed-by %s: the prompt writer's framed return lacks %s, which every framing "
                              "carries" % (agent_id, " and ".join(lacking)))
-    return fields, lib.derive_answers_value(*work_order)
+    return fields, lib.derive_answers_value(*work_order), path.as_posix()
 
 
-def render_framing_blocks(fields, framed_by):
+def render_framing_blocks(fields, framed_by, transcript=None):
     """One `### <block key>` block per `FRAMING_FIELDS` field `fields` carries, in that order, each holding the
     field's text verbatim, its trailing newlines dropped, and `### framing:job` closing with the line
-    `Framed by: <framed_by>` (TOOL-dBoundRoles-4 S3). The blocks are authored text, unfenced."""
+    `Framed by: <framed_by>` (TOOL-dBoundRoles-4 S3). The blocks are authored text, unfenced.
+    TOOL-dBoundRoles-23 S3: `### framing:population` past `lib.FRAME_LIST_BOUND` entries renders its text up to
+    the entry after the bound and closes with `POPULATION_OVERFLOW`, naming `transcript`, where the full list
+    stays; and with a population, `### framing:no-stop` closes with `INCOMPLETE_LINE`."""
     out = []
     for field, head in FRAMING_FIELDS:
         if field in fields:
             text = str(fields[field]).replace("\r\n", "\n").rstrip("\n")
             if field == "job":
                 text += "\n\n%s %s" % (FRAMED_BY_LEAD, framed_by)
+            entries = measure_population_entries(text) if field == "population" else []
+            if len(entries) > lib.FRAME_LIST_BOUND:
+                text = "\n".join(text.split("\n")[:entries[lib.FRAME_LIST_BOUND]]).rstrip("\n")
+                text += "\n\n" + POPULATION_OVERFLOW % (len(entries) - lib.FRAME_LIST_BOUND,
+                                                        transcript or "the prompt writer's return")
+            if field == "nostop" and "population" in fields:
+                text += "\n\n" + INCOMPLETE_LINE
             out.append("### %s\n\n%s" % (head, text))
     return out
 
@@ -882,8 +951,11 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     `lib.derive_allowance`'s over `allowance`, the paths `--allowance` grants. With `for_role`, `--for`'s
     destination (TOOL-dBoundRoles-4 S1), `input:work-order` is `render_for_work_order`'s, the item and the
     allowance are the destination's, and this marker carries `item=-`. With `framed_by`, `--framed-by`'s agent
-    id (S3), the task's `reads` fill closes with `render_framing_blocks` over `read_framing`'s return. `ranked`
-    False renders every block unranked, as with no playbook kit, and prints no note of it."""
+    id (S3), the task's `reads` fill carries `render_framing_blocks` over `read_framing`'s return. `ranked`
+    False renders every block unranked, as with no playbook kit, and prints no note of it. The `reads` fill is
+    the frame, `lib.derive_frame` over every block's slot (TOOL-dBoundRoles-23 S1): an item's return states its
+    list bounds, a population adds `### row contract`, and `item` with `framed_by` refuses a framing with no
+    `population` (S2)."""
     if item is not None and not lib.ITEM_VALUE_RE.match(item):
         raise lib.RolesError("--item '%s' is not an item tag item.<step>.<name>, each segment lowercase "
                              "letters, digits and '-'" % item)
@@ -891,12 +963,19 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
     # TOOL-dBoundRoles-4 S3 F3: the prompt writer's own task is the driver's details, rendered unframed
-    framing = []
+    framing, bound = [], lib.FRAME_LIST_BOUND
     if framed_by is not None:
         if role == PROMPT_WRITER:
             raise lib.RolesError("--framed-by %s: %s's own task is its driver's details rendered as they are, "
                                  "and is framed by no prompt writer (TOOL-dBoundRoles-4 F3)" % (framed_by, role))
-        framing = render_framing_blocks(*read_framing(root, slug, framed_by))
+        fields, answers, transcript = read_framing(root, slug, framed_by)
+        # TOOL-dBoundRoles-23 S2: no item hands a population lister, so an item's framing carries the population
+        if item is not None and for_role is None and "population" not in fields:
+            raise lib.RolesError("--framed-by %s: the item %s's work order hands no population lister, so its "
+                                 "framing carries framing:population, the needs-then-sketch steps, and the "
+                                 "prompt writer's return holds no population" % (framed_by, item))
+        framing = render_framing_blocks(fields, answers, transcript)
+        bound = len(measure_population_entries(fields.get("population", ""))) or bound
     # TOOL-dBoundRoles-3 S1 S3: the item's declaration and its allowance, refused before any value is read;
     # under `--for` both are the destination's, read by its own render
     declaration = prefixes = None
@@ -1054,9 +1133,14 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
                     values[k.rstrip("?")] = section
     sources = {"task": ("card", card), "card": ("card", card), "brief": ("brief record", brief),
                "input": ("arguments", None), "upstream": ("arguments", None)}
-    # TOOL-dBoundRoles-48 S2: `handed` maps a block's index in `blocks` to `(line offset, fence)` of each handed
-    # block it holds, so the extents are the render's own; a block appended with no entry is checked as authored
-    blocks, absent, reasons, handed = [], [], [], {}
+    # TOOL-dBoundRoles-48 S2: each block is `(slot, text, handed)`, `handed` the `(line offset, fence)` of each
+    # handed block it holds, so the extents are the render's own; a block with None is checked as authored. Its
+    # slot is the frame's (TOOL-dBoundRoles-23 S1), and the role's parsed return template feeds slots 6 and 9.
+    blocks, absent, reasons = [], [], []
+    try:
+        template = lib.parse_return_template(keys.get("return"))
+    except lib.RolesError:   # the catalogue checker's R2 names it; the frame then states no bound and no set
+        template = []
     for k in reads:
         key = k.rstrip("?")
         v = BLANK_EDGES_RE.sub("", values.get(key, ""))
@@ -1069,10 +1153,11 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             typed = key.startswith("input:") and key[6:] in TYPED_INPUTS
             if typed:
                 refusals += lib.check_authored_lines(v, key)
-            else:
-                handed[len(blocks)] = [(0, lib.render_handed_fence(v))]
-            blocks.append("### %s\n\n%s\n\n%s" % (key, lib.render_fact_line(fact, root),
-                                                  v if typed else handed[len(blocks)][0][1]))
+            fence = None if typed else lib.render_handed_fence(v)
+            # TOOL-dBoundRoles-23 S1: each block carries its frame slot and its handed fences
+            blocks.append((FRAME_BLOCK_SLOTS.get("### " + key, "material"),
+                           "### %s\n\n%s\n\n%s" % (key, lib.render_fact_line(fact, root), v if typed else fence),
+                           None if typed else [(0, fence)]))
             continue
         src, path = sources[key.split(":")[0]]
         what = ("no %s: %s" % (src, why[src])) if why.get(src) else (
@@ -1107,16 +1192,25 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         for sub, fence in zip(subs, fences):
             offsets.append((at, fence))
             at += sub.count("\n") + 2
-        handed[len(blocks) + lib.WORK_ORDER_BLOCKS.index("### inputs")] = offsets
-        blocks += render_work_order_blocks(item, declaration, prefixes, subs)
-    # TOOL-dBoundRoles-4 S3 F5: the prompt writer's framing closes the `reads` fill, authored text inside the bytes
-    # the task-sha covers, checked by the fence walk below as every authored block is
-    blocks += framing
+        # TOOL-dBoundRoles-23 S3 S4: the return states each list field's bound, and restates the upstream rule
+        # where the rows are handed
+        contract = render_return_contract(template, bound, any(b[0] == "upstream" for b in blocks))
+        blocks += [(FRAME_BLOCK_SLOTS.get(head), text, offsets if head == "### inputs" else None) for head, text in
+                   zip(lib.WORK_ORDER_BLOCKS, render_work_order_blocks(item, declaration, prefixes, subs, contract))]
+    # TOOL-dBoundRoles-4 S3 F5: the prompt writer's framing, authored text inside the bytes the task-sha covers,
+    # checked by the fence walk below as every authored block is; with a population, the row contract
+    blocks += [(FRAME_BLOCK_SLOTS.get(text.split("\n", 1)[0]), text, None) for text in framing]
+    if any(b[0] == "population" for b in blocks):
+        blocks.append((FRAME_BLOCK_SLOTS[ROW_CONTRACT_HEAD], render_row_contract(template), None))
     if charter_error is not None:
         raise charter_error
     refusals += tag_refusals
     if refusals:
         raise lib.RolesError("\n".join(refusals))
+    # TOOL-dBoundRoles-23 S1: the frame, one stable sort by slot, and each handed block's fences at its new index
+    frame = lib.derive_frame(blocks)
+    blocks = [b[1] for b in frame]
+    handed = {i: b[2] for i, b in enumerate(frame) if b[2] is not None}
     opening = ("This handoff is for build `%s`, unit `%s`." % (slug, unit_id) if unit
                else "This handoff is for build `%s`, and names no single unit." % slug)
     if missing:

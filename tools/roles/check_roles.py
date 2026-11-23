@@ -27,7 +27,7 @@ grades nothing: the seed the memory-tree kit's `legacy_ledger.py seed --home` ru
       invalid schema exit 2 (`rules` may be empty; `mandatory`, `output`, `never` and `return` may
       not, on any role); `name` not the file stem; `writes` outside its set; `agent` not
       true/false; `tools`, `model` or `effort` absent on an agent role, or an `effort` outside the
-      five levels; a role file whose slot is `default`, reserved for the blanket key
+      five levels or below the floor `medium` (TOOL-dBoundRoles-23 S5); a role file whose slot is `default`, reserved for the blanket key
       `roles.effort.default` (TOOL-dBoundRoles-21 S3, S4); a `gates` field on an `agent: false`
       role or naming a leg as R12 grades a `[gates]` row; a `return` template
       `parse_return_template` refuses, a required `outcome` of a closed set among what it owes
@@ -94,7 +94,8 @@ grades nothing: the seed the memory-tree kit's `legacy_ledger.py seed --home` ru
   R12 a `house/policy.toml` defect, one line per line of `roles_lib.load_policy`'s refusal: the file
       unreadable or not TOML, an absent file being an empty fallback that no defect names, since each
       level then falls to the policy keys and the role's declared `effort` (TOOL-dBoundRoles-21 S7);
-      an unknown key, no `default`, a level outside the five, a role entry
+      an unknown key, no `default`, a level outside the five or below the floor `medium`
+      (TOOL-dBoundRoles-23 S5), a role entry
       naming no role file or an `agent: false` role, a stages table naming no workflow or a
       workflow with no stage rows, or a stage key that workflow's rows do not hold; under
       `effort.profiles`, a profile that is not a table, any of those defects in its own `default`,
@@ -456,6 +457,12 @@ def check_roles(root, kit_dir, write=False):
         # `roles.effort.default` is the blanket level that `roles.effort.<role>` would read as a role
         if keys.get("effort") and keys["effort"] not in lib.EFFORT_LEVELS:
             add_defect(p, "R2", "effort '%s' is not one of %s" % (keys["effort"], " ".join(lib.EFFORT_LEVELS)))
+        elif keys.get("effort"):
+            # TOOL-dBoundRoles-23 S5: no role declares a level below the floor
+            try:
+                lib.check_effort_floor(keys["effort"], "the role %s's declared effort" % slot)
+            except lib.RolesError as e:
+                add_defect(p, "R2", str(e))
         if slot == "default":
             add_defect(p, "R2", "the slot 'default' is reserved: roles.effort.default is the blanket level, so "
                        "roles.effort.<role> would read a role of that name as the blanket")
