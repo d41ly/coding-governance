@@ -481,8 +481,11 @@ needs the kickoff and memory-tree kits.
 - `/build`'s harnesses ship in the `review-harness` kit, which is not a default. Without it the role
   agents and handoffs still work, and three tools print a note naming the missing harness: the
   catalogue checker `check_roles.py`, `render_agents.py`, and check-wiring's session-start report.
+  `roles.json` lists only the harnesses the install holds, so the spawn guard never admits a path
+  that does not exist; an index naming one the install lacks reads out of sync under
+  `adopt-roles.sh --check` until `--scaffold` renders it again.
   `render_agents.py`, run by `adopt-roles.sh --check` and the `roles render wiring` leg, is the one
-  reader that prints `misplaced`. It does so for a harness the index lists where it is absent, while
+  reader that prints `misplaced`. It does so for a harness absent where the resolver looks, while
   a file of its name sits directly inside a directory under the tool root beside the harness's
   template or a `kit.toml` declaring its home: its kit holds it elsewhere, and the leg fails on it.
   A harness its kit ships with no template, `unattended-unit.js`, is marked by `kit.toml` alone. A
@@ -509,3 +512,50 @@ needs the kickoff and memory-tree kits.
   `.claude/roles.json`. Its down restores every file from the before-image under
   `.governance/steps/`, and refuses one edited since. A session started before the step keeps the
   old agent types until it restarts.
+
+## Adding your own role or workflow
+
+A role or workflow of your own is a row in your overlay, `.governance/instructions.toml`, never a file
+under the kit's `agents/` or a line in its `workflows.toml`: the kit's files are replaced on every
+update, and your row is not. Every reader takes the composition of gov's rows and yours at HEAD, so
+commit the row before you check it: `check_roles.py`, `render_agents.py` (the agent types and
+`.claude/roles.json`) and `handoff.py` read it, each through the playbook kit's
+`overlay_rows.py compose --kind role` and `--kind workflow`, run by the loop kit's `composition.py`.
+See [overlay rows](overlay-rows.md) for the edge grammar, pins and exclusions every kind shares.
+
+- **Your own role** is a `[[role]]` row tagged `role.adopter.<name>`, its `name` that `<name>`. It
+  carries every key a role file's front matter carries, each a TOML value: `tools`, `shapes`, `reads`,
+  `rules`, `writes` and `never` as lists, the rest as strings, `budget` among them. The catalogue
+  checker grades it by every field rule gov's roles meet, the shape kinds of `shapes` included, and the
+  role index lists it with `origin: repository`. A row holds no body, so no agent type renders for it,
+  no handoff renders it, and R5's body and static-block arms pass it over with one note; a role that
+  needs a body stays a file under the kit's `agents/` until it moves.
+- **Your own workflow** is a `[[workflow]]` row tagged `workflow.adopter.<name>`, its `name` that
+  `<name>`, carrying the keys a `workflows.toml` entry carries. Its roles are gov's slots or yours, and
+  no loop row places it. The tag index reads it as a member of the `workflow` namespace beside gov's
+  entries, each `workflow.<name>`.
+- **A scenario's rows.** A scenario that activates `kind.role` or `kind.workflow` rows reaches the
+  composition only for the build placed under it:
+  `python tools/roles/check_roles.py --scenario-rows <file>` grades the composition with the rows
+  `<file>` holds, `{kind tag: [row]}`, and prints each composed tag with its `origin`, `scenario` for
+  those rows.
+- **Acting in one of gov's items.** Your role acts in a gov item only through a pinned `amends` of
+  that item's `actor` to `role:adopter.<name>`. The loop kit's item check runs
+  `python tools/roles/check_roles.py --check-actor-patch <file>` for it, `<file>` holding the composed
+  item and gov's actor, and admits the patch only where your role's `return` holds every row of the
+  gov role's `return`, its `writes` holds the gov role's class, and its `shapes` holds the shape kind
+  the item runs in. Each refusal names the role, the item and what is missing.
+
+What is fixed. The role kind's row schema, `tools/roles/role-row-schema.toml`, opens `tools`,
+`writes`, `gates` and `shapes` to widening by `add`, and `budget` to rising only; every other key is
+fixed, `return` by the typed-record principle. A core role's `writes`, a role whose `layer` is
+`layer.roles`, is fixed besides, and a role acting as `cycle` is fixed whole: no row amends,
+supersedes or excludes it. The workflow kind's schema, `tools/roles/workflow-schema.toml`, opens
+`roles` to `add` and fixes every other key, `driver` among them. An `instructions.exclude` of a leg a
+role's `gates` names is refused naming the role, and one of a role an active item names as its actor
+is refused naming the item. A role acting as `item` that no composed entry lists and no composed item
+names reds the catalogue check, unless you take it out with what left it idle.
+
+How a widening is reported: each `amends` that widens an open field is a classified operation of the
+composition, printed by `overlay_rows.py compose` under `operations` and by `govkit update`'s delta
+report, as every kind's widening is.

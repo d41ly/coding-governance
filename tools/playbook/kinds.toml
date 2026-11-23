@@ -78,6 +78,7 @@ binds = ["principle.p16"]
 population = "{prefix}/roles/agents/*.agent.md"
 factory = "python {prefix}/loop/factories.py role"
 gate = "roles catalogue"
+schema = "{prefix}/roles/role-row-schema.toml"
 summary = "A role an agent takes in the loop: a role file of the roles kit, listed by its workflow and priced by its body ceiling."
 usage = "python {prefix}/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --never <entries> --return <template> --output <text> --ceiling <bytes> --layer <layer tag> --acts-as item|cycle"
 
@@ -88,6 +89,7 @@ binds = ["principle.p16"]
 population = "{prefix}/roles/workflows.toml"
 factory = "python {prefix}/loop/factories.py workflow"
 gate = "roles catalogue"
+schema = "{prefix}/roles/workflow-schema.toml"
 summary = "A workflow the loop runs: a [[workflow]] row of the roles kit's table, placed by its row of the loop definition."
 usage = "python {prefix}/playbook/core.py new workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>"
 

@@ -32,7 +32,8 @@ the playbook kit's layer check reads as data (TOOL-dBoundRoles-1 S6), its `shape
 kinds it runs in (TOOL-dBoundRoles-16 S5), its `role-sha`, `roles_lib.derive_section_sha` of the `## Role`
 section `roles_lib.render_role_section` composes, the hash a handoff's marker carries and the hooks kit's
 spawn guard compares (TOOL-dBoundRoles-6 S5), `harnesses`, the repo-relative
-scripts of every workflow whose `driver` is `workflow`, `classes`, each write class's folder as
+scripts of every workflow whose `driver` is `workflow` that this install holds, an unheld one printed and
+left out so the guard never admits a path that does not exist (TOOL-dBoundRoles-20 S8), `classes`, each write class's folder as
 `roles_lib.WRITE_FOLDERS` spells it, which scratch-guard.js reads to place a `review` role's write
 (TOOL-dBoundRoles-9 S2), and `gates.manifest`, the repo-relative path of
 the tool root's gate manifest or null when no file is there (TOOL-aOrientedCast-11; scratch-guard.js reads
@@ -40,6 +41,11 @@ both to refuse a role agent a gate), and `effort`, the resolved role and stage l
 tables and of every profile (TOOL-aGuardedEffort-1; agent-cap.js grades a spawn's level against
 them). Everything is rendered in memory first, so a role, overlay or
 rule tag that fails to resolve writes nothing.
+
+THE COMPOSITION (TOOL-dBoundRoles-20 S3). The roles and the workflow entries are the composition of gov's
+with the overlay's `[[role]]` and `[[workflow]]` rows at HEAD, `roles_lib.compose_roles` and
+`compose_workflows`; a refused composition refuses the render. A repository row is listed in the index
+with `origin: repository` and renders no agent type, since it carries no body, one note naming it.
 
 OWNERSHIP. The renderer owns the agent types its catalogue names plus every name the on-disk index
 lists, which is exactly the set a previous render wrote. `--write` unlinks an owned file the
@@ -151,8 +157,13 @@ def derive_tool_root(script_dir):
 
 
 def load_catalogue(kit_dir, target_root):
-    """The roles, the workflow table, MEMORY_ROOT and the parsed governing doc, through the library."""
-    roles = lib.load_roles(kit_dir)
+    """The roles, the workflow table, MEMORY_ROOT and the parsed governing doc, through the library: the
+    roles and the entries as `roles_lib.compose_roles` and `compose_workflows` compose gov's with the
+    overlay's rows at HEAD (TOOL-dBoundRoles-20 S3), a refused composition a RolesError naming each line."""
+    roles, said, refused = lib.compose_roles(target_root, "HEAD", kit_dir)
+    workflows, wsaid, wrefused = lib.compose_workflows(target_root, "HEAD", kit_dir)
+    if refused or wrefused:
+        raise lib.RolesError("\n".join(["the composition is refused:"] + refused + wrefused))
     if not roles:
         raise lib.RolesError("%s holds zero roles, and a render of nothing compares clean against an "
                              "empty directory" % (pathlib.Path(kit_dir) / "agents").as_posix())
@@ -164,8 +175,11 @@ def load_catalogue(kit_dir, target_root):
     doc = pathlib.Path(os.path.relpath(str(charter_path), str(target_root))).as_posix()
     charter_text = lib.load_text(charter_path)
     charter = lib.parse_charter(charter_text, doc)
-    workflows = lib.load_workflows(kit_dir)
-    notes = [lib.LEGACY_NOTE % doc] if charter["shape"] == "legacy" else []
+    notes = ([lib.LEGACY_NOTE % doc] if charter["shape"] == "legacy" else []) + said + wsaid
+    # a repository row carries no body, so no agent type renders for it; the index lists it (the main loop's
+    # decision of round two, its third point)
+    notes += ["%s#%s is a %s row and carries no body, so no agent type renders for it; the index lists it"
+              % (lib.OVERLAY_FILE, r["tag"], r["origin"]) for r in roles.values() if r.get("origin") != "gov"]
     return {"roles": roles, "workflows": workflows, "memory_root": memory_root,
             "policy": lib.load_policy(kit_dir, roles, workflows, notes),
             "notes": notes, "charter": charter, "charter_doc": doc, "charter_text": charter_text}
@@ -190,14 +204,15 @@ def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort, 
 
 
 def derive_harness_paths(workflows, tool_root, target_root):
-    """`(harnesses, absent)`: each `workflow`-driver harness resolved, repo-relative, sorted and unique."""
+    """`(harnesses, absent)`, each `workflow`-driver harness resolved, repo-relative, sorted and unique: the
+    harnesses `roles_lib.resolve_harness_path` holds in this install, and apart the ones it does not, spelled
+    at its guessed path, which the index never lists (TOOL-dBoundRoles-20 S8), so the spawn guard admits no
+    path the install lacks."""
     found, absent = set(), set()
     for harness in lib.extract_workflow_harnesses(workflows):
         path, held = lib.resolve_harness_path(tool_root, harness)
         rel = pathlib.Path(os.path.relpath(str(path), str(target_root))).as_posix()
-        found.add(rel)
-        if not held:
-            absent.add(rel)
+        (found if held else absent).add(rel)
     return sorted(found), sorted(absent)
 
 
@@ -274,18 +289,22 @@ def render_roles_index(roles, harnesses, policy, manifest, effort, role_shas):
     (TOOL-dBoundRoles-1 S6), `shapes`, the kinds it runs in, a list (TOOL-dBoundRoles-16 S5), and
     `role-sha`, its value in `role_shas` (TOOL-dBoundRoles-6 S5), the harness list, the gate manifest's
     path, `derive_effort_index`'s `effort`, and `classes`, each write class's folder as the library's
-    `WRITE_FOLDERS` spells it, token and placeholder kept (TOOL-dBoundRoles-9 S2)."""
+    `WRITE_FOLDERS` spells it, token and placeholder kept (TOOL-dBoundRoles-9 S2). A repository or scenario
+    row of the composition carries `origin` beside them, `repository` or `scenario`, and an empty `role-sha`,
+    since it renders no `## Role` section; gov's carry no `origin` (TOOL-dBoundRoles-20 S3)."""
     allow = policy.get("gates", {})
     obj = {"classes": dict(lib.WRITE_FOLDERS),
            "effort": effort, "gates": {"manifest": manifest}, "harnesses": harnesses,
-           "roles": {slot: {"acts-as": r["keys"].get("acts-as", ""),
-                            "agent": r["keys"].get("agent", "true") == "true",
-                            "gates": list(allow.get(slot, [])),
-                            "layer": r["keys"].get("layer", ""),
-                            "role-sha": role_shas[slot],
-                            "shapes": lib.parse_role_shapes(r["keys"].get("shapes")),
-                            "workflow": r["keys"].get("workflow", ""),
-                            "writes": r["keys"].get("writes", "")} for slot, r in roles.items()}}
+           "roles": {slot: dict({"acts-as": r["keys"].get("acts-as", ""),
+                                 "agent": r["keys"].get("agent", "true") == "true",
+                                 "gates": list(allow.get(slot, [])),
+                                 "layer": r["keys"].get("layer", ""),
+                                 "role-sha": role_shas[slot],
+                                 "shapes": lib.parse_role_shapes(r["keys"].get("shapes")),
+                                 "workflow": r["keys"].get("workflow", ""),
+                                 "writes": r["keys"].get("writes", "")},
+                                **({"origin": r["origin"]} if r.get("origin", "gov") != "gov" else {}))
+                     for slot, r in roles.items()}}
     return json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=True) + "\n"
 
 
@@ -343,7 +362,8 @@ def run_mode(mode, kit_dir, tool_root, target_root):
     """Render the catalogue at kit_dir into target_root and `--write` or `--check` it; the exit code."""
     try:
         cat = load_catalogue(kit_dir, target_root)
-        agents = [slot for slot, role in cat["roles"].items() if role["keys"].get("agent", "true") == "true"]
+        agents = [slot for slot, role in cat["roles"].items()
+                  if role["keys"].get("agent", "true") == "true" and role.get("origin", "gov") == "gov"]
         # each role's legs, which its rendered ceiling names: the merged grant, its field else its house row
         granted = cat["policy"].get("gates", {})
         try:
@@ -376,7 +396,7 @@ def run_mode(mode, kit_dir, tool_root, target_root):
         # carries, so the spawn guard compares a handoff with the role text its agent type was rendered from
         role_shas = {slot: lib.derive_section_sha(lib.render_role_section(
             kit_dir, slot, cat["memory_root"], cat["charter_text"], granted.get(slot, ()), rows))
-            for slot in cat["roles"]}
+            if r.get("origin", "gov") == "gov" else "" for slot, r in cat["roles"].items()}
         rendered[INDEX_REL] = render_roles_index(
             cat["roles"], harnesses, cat["policy"], manifest,
             derive_effort_index(cat["policy"], cat["roles"], cat["workflows"], tool_root, target_root), role_shas)
@@ -1143,8 +1163,9 @@ def run_selftest():
         index = json.loads((root / ".claude" / "roles.json").read_text(encoding="utf-8"))
         check_arm(state, 10, rc == 0 and (NOTE_LINE % missing) in out.getvalue(),
                   "an absent harness did not print its note line, or the write did not exit 0")
-        check_arm(state, 10, missing in index.get("harnesses", []),
-                  "an absent harness is not listed in harnesses at the resolver's path")
+        # TOOL-dBoundRoles-20 S8: the index lists only the harnesses this install holds
+        check_arm(state, 10, missing not in index.get("harnesses", []),
+                  "an absent harness is listed in harnesses, which lists only the harnesses the install holds")
         check_arm(state, 10, all((agents / (s + ".md")).is_file() for s in ("r-one", "r-two")),
                   "a write noting an absent harness did not write every type")
         # Arm 20 (TOOL-aGuardedEffort-2 S3): `w5` above is a driven workflow with no stage rows.

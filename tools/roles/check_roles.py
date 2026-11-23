@@ -5,6 +5,21 @@
     python check_roles.py [--root <dir>] --legacy-rows --out <path>
     python check_roles.py --print-tag-rows role|stage < <a role file or workflows.toml>
     python check_roles.py --print-rows role|workflow < <a role file or workflows.toml>
+    python check_roles.py [--root <dir>] --check-actor-patch <file>
+    python check_roles.py [--root <dir>] --scenario-rows <file>
+
+THE COMPOSITION (TOOL-dBoundRoles-20). Every rule from R2 on grades the role and workflow kinds as
+`roles_lib.compose_roles` and `compose_workflows` compose them: gov's role files and table with the
+overlay's `[[role]]` and `[[workflow]]` rows at HEAD, through the playbook kit's `compose` verb, so a
+repository's own role or entry, tagged `role.adopter.<name>` or `workflow.adopter.<name>`, is graded by
+the rules gov's are and no closed population of slots or names sits in this file. A repository row
+carries no body: R5's body and static-block arms pass it over with one note, its `budget` still read. A
+refused composition is a defect per line; an unarmed one a note, gov's rows graded alone. The README's
+catalogue region renders gov's own rows. `--check-actor-patch <file>` reads `{"item", "original"}`, the
+composed item row whose actor an `amends` patched to a repository role and gov's original actor, and prints
+each refusal of `roles_lib.check_actor_patch`, exit 1, or exits 0; the loop kit's item check runs it by
+subprocess. `--scenario-rows <file>` reads `{kind tag: [row]}`, a build's activated scenario rows, grades
+the composition they join and prints each composed tag with its `origin`.
 
 The kit directory is this script's own directory and the tool root its parent; `--root` defaults to
 the git toplevel of the working directory. One line per defect, `roles: <path>: <rule> — <what>`,
@@ -38,7 +53,10 @@ grades nothing: the seed the memory-tree kit's `legacy_ledger.py seed --home` ru
       playbook kit's `layers.toml`, joined only where that register resolves and a `roles: note:`
       otherwise; an `acts-as` other than `item` or `cycle`. The summary counts the roles per layer
       and per `acts-as` value (TOOL-dBoundRoles-1). A `shapes` value that is no list of distinct
-      kinds of `roles_lib.WORKFLOW_KINDS` (TOOL-dBoundRoles-16 S5)
+      kinds of `roles_lib.WORKFLOW_KINDS` (TOOL-dBoundRoles-16 S5). THE FIELD JOIN (TOOL-dBoundRoles-20
+      S2): a `[[field]]` row of `role-row-schema.toml` naming no key here, a key no row names, or a row
+      shaped other than its key, a `list`, `entries` or `class` key a `set`; a repository row whose
+      `name` is not its tag's name; and the role composition's refusals, `check_core_fields`' among them
   R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` or `upstream:rows` without `?`,
       each entry read through `parse_read_key`, so `task:title` and its tag `field.task.title` are one key
   R4  a `rules` entry that is not a lowercase tag optionally ending in `?`, a tag named twice, or a
@@ -56,16 +74,21 @@ grades nothing: the seed the memory-tree kit's `legacy_ledger.py seed --home` ru
       with no `budget`, or one that is no decimal integer, names the slot. The budget half obeys
       the policy kit's size switch for the family cap `role-body` (TOOL-dGroundRules-9): under `warn` it prints a `BUDGET WARN` line and
       is no defect; with no policy kit, or a refusing reader, it is a defect as before
-  R6  a workflow entry with an unknown, missing or repeated key or name, a missing name of the twelve,
-      an unknown `driver`, or a `trigger` carrying a newline; a workflow no `[[workflow]]` row of
-      the loop definition places, a loop row naming no workflow here, or a loop definition that
-      does not read, one line (TOOL-dDeclaredLoop-1): a workflow's order and step are the loop
+  R6  a workflow entry with an unknown, missing or repeated key or name, an unknown `driver`, or a
+      `trigger` carrying a newline; a gov workflow no `[[workflow]]` row of the loop definition places,
+      a loop row naming no workflow here that `instructions.exclude` did not take out, the one walk a
+      missing gov entry reds by, or a loop definition that does not read, one line
+      (TOOL-dDeclaredLoop-1); a repository entry whose `name` is not its tag's, the workflow
+      composition's refusals, and `workflow-schema.toml`'s field join to the entry keys
+      (TOOL-dBoundRoles-20 S2, S4): a workflow's order and step are the loop
       definition's, so a `stage` or `step` key here is an unknown key. An entry may omit
       `stages`, `merge`, `twin`, `of` and `experiment`, and one listing no role `kind`, `checklist`
       and `orientation` too (TOOL-dBoundRoles-16 S2)
   R7  a role whose `workflow` names no entry, or whose entry does not list it
   R8  a `roles` entry naming no role file; an agent or workflow driver with no role; a role file no
-      entry lists
+      entry lists; and THE MATRIX ARM (TOOL-dBoundRoles-20 S7): a composed role acting as `item`, gov's
+      or the repository's, that no composed entry lists and no composed item names as its actor, the
+      items composed only where an entry does not list it
   R9  a workflow driver whose harness is not a `{prefix}/<home>/<file>.js` path, or that declares no
       `[[workflow.stages]]` row; stage rows on another driver, or a `stages` that is no array of
       tables; and per row (TOOL-dBoundRoles-22 S4), a `key` outside its pattern or repeated in its
@@ -181,10 +204,13 @@ except Exception as _e:  # the library derives its key set from role-schema.toml
     print("roles: %s" % _e)
     sys.exit(2)
 
-WORKFLOW_NAMES = ("orient", "research", "reuse", "handoff", "spec-write", "spec-review", "build",
-                  "closing-review", "gate-bar", "bookkeeping", "plan", "design")
-WORKFLOW_KEYS = ("name", "driver", "harness", "roles", "stages", "enforced-by", "trigger",
+WORKFLOW_KEYS =("name", "driver", "harness", "roles", "stages", "enforced-by", "trigger",
                  "kind", "checklist", "orientation", "merge", "twin", "of", "experiment")
+#: The entry keys read as sets in the workflow kind's row schema, `workflow-schema.toml`, every other a scalar;
+#: R6 joins that file's `[[field]]` rows to WORKFLOW_KEYS by these shapes (TOOL-dBoundRoles-20 S2).
+WORKFLOW_SET_KEYS = ("roles", "enforced-by")
+#: The keys a repository or scenario entry carries beside its own, which the composition derives (S3).
+COMPOSED_KEYS = ("origin", "tag")
 #: The entry keys R6 lets every entry omit: its stage rows, the two its kind defaults, and the two only a
 #: `twin` or an `experiment` entry carries (TOOL-dBoundRoles-16 S2).
 OPTIONAL_WORKFLOW_KEYS = ("stages", "merge", "twin", "of", "experiment")
@@ -385,8 +411,11 @@ def check_experiment_table(table, limit, root, kit_dir, notes):
     return bad
 
 
-def check_roles(root, kit_dir, write=False):
-    """`(defects, notes, summary)`; raises RolesError when the check is unarmed (R0)."""
+def check_roles(root, kit_dir, write=False, scenario=None, composed=None):
+    """`(defects, notes, summary)`; raises RolesError when the check is unarmed (R0). Every rule from R2 on
+    grades the COMPOSITION (TOOL-dBoundRoles-20 S3): `roles_lib.compose_roles` and `compose_workflows` over
+    gov's role files and table and the overlay's rows at HEAD, `scenario`, `{kind tag: [row]}`, the
+    activated rows handed after them (S11). `composed`, where given, is filled with the two compositions."""
     root, kit_dir = pathlib.Path(root), pathlib.Path(kit_dir)
     tool_root = kit_dir.parent
     charter_path = lib.resolve_charter_path(root)
@@ -412,6 +441,7 @@ def check_roles(root, kit_dir, write=False):
         notes.append("roles: note: no layer register answered, so each role's layer is not joined to a row: %s"
                      % layer_why)
     by_layer, by_acts = {}, {}
+    parsed = {}
     for p in sorted((kit_dir / "agents").glob("*.agent.md")):
         slot = p.name[:-len(".agent.md")]
         try:
@@ -420,7 +450,21 @@ def check_roles(root, kit_dir, write=False):
         except lib.RolesError as e:
             defects.append("roles: %s" % e)
             continue
-        roles[slot] = {"path": p, "keys": keys, "body": body}
+        parsed[slot] = {"path": p, "keys": keys, "body": body, "text": text}
+    # THE COMPOSITION (TOOL-dBoundRoles-20 S3): gov's parsed roles and the overlay's [[role]] rows, so a
+    # repository's role is graded by every field rule here as gov's are; a refused composition is one defect
+    # per line and gov's roles are graded alone.
+    scenario = scenario or {}
+    roles, said, refused = lib.compose_roles(root, "HEAD", kit_dir, scenario.get("kind.role"), parsed)
+    notes.extend("roles: note: %s" % n for n in said)
+    defects.extend("roles: %s: R2 — the role composition is refused: %s" % (lib.OVERLAY_FILE, ln) for ln in refused)
+    # S2, the field join (section 8 F9): the role kind's row schema names each front-matter key, and no other
+    for what in lib.check_row_schema(kit_dir, lib.ROLE_ROW_SCHEMA, {
+            r["key"]: "set" if r["shape"] in lib.SET_SHAPES else "scalar" for r in _SCHEMA}):
+        add_defect(kit_dir / lib.ROLE_ROW_SCHEMA, "R2", what)
+    for slot, r in roles.items():
+        p, keys, body, text = r["path"], r["keys"], r["body"], r.get("text", "")
+        mine = r.get("origin") == "gov"
         for k in REQUIRED_ROLE_KEYS:
             if k not in keys or (k not in EMPTY_ROLE_KEYS and not keys[k]):
                 add_defect(p, "R2", "front-matter key '%s' is missing" % k)
@@ -438,7 +482,8 @@ def check_roles(root, kit_dir, write=False):
             except lib.RolesError as e:
                 add_defect(p, "R2", "return '%s': %s" % (keys["return"], str(e).split(" — ", 1)[-1]))
         if keys.get("name") and keys["name"] != slot:
-            add_defect(p, "R2", "name '%s' is not the file stem '%s'" % (keys["name"], slot))
+            add_defect(p, "R2", ("name '%s' is not the file stem '%s'" if mine else
+                                 "name '%%s' is not the name '%%s' its tag %s holds" % r["tag"]) % (keys["name"], slot))
         if keys.get("writes") and keys["writes"] not in WRITES:
             add_defect(p, "R2", "writes '%s' is not one of %s" % (keys["writes"], " ".join(WRITES)))
         layer, acts = keys.get("layer"), keys.get("acts-as")
@@ -498,18 +543,23 @@ def check_roles(root, kit_dir, write=False):
         for what in tag_defects:
             add_defect(p, "R4", what)
         notes.extend("roles: note: %s: %s" % (resolve_display_path(root, p), n) for n in tag_notes)
-        for name in protocol_files:
+        # A repository row carries front-matter fields alone, so R5's body arms and its static block pass it over
+        # with one note (the main loop's decision of round two, its third point); its budget is still read below.
+        for name in protocol_files if mine else ():
             if name in body:
                 add_defect(p, "R5", "body spells the protocol file %s; name the protocol, never its file" % name)
-        if not body.strip():
+        if mine and not body.strip():
             add_defect(p, "R5", "body is empty")
+        if not mine:
+            notes.append("roles: note: %s#%s: a %s row carries no body, so R5's body and static-block arms pass "
+                         "it over" % (lib.OVERLAY_FILE, r["tag"], r.get("origin")))
         if any(ln.startswith(("# ", "## ")) for ln in body.split("\n")):
             add_defect(p, "R5", "body carries a '# ' or '## ' heading line")
         # THE BODY ARM (TOOL-dBoundRoles-2 S3): a limit lives in `never` with its enforcer, so a body line
         # carrying a prohibition word is one defect naming its line in the file.
         folded = text.replace("\r\n", "\n")
-        first = folded.count("\n", 0, folded.find(body, lib.FRONT_MATTER_RE.match(folded).end())) + 1
-        for i, ln in enumerate(body.split("\n")):
+        first = folded.count("\n", 0, folded.find(body, lib.FRONT_MATTER_RE.match(folded).end())) + 1 if mine else 1
+        for i, ln in enumerate(body.split("\n") if mine else ()):
             hit = lib.PROHIBITION_RE.search(ln)
             if hit:
                 add_defect(p, "R5", "body line %d carries '%s', a limit: %r; move it to `never` as "
@@ -544,12 +594,25 @@ def check_roles(root, kit_dir, write=False):
 
     table = kit_dir / "workflows.toml"
     try:
-        workflows = lib.load_workflows(kit_dir)
+        own_workflows = lib.load_workflows(kit_dir)
     except lib.RolesError as e:
         defects.append("roles: %s" % e)
-        workflows = []
-    if not workflows:
+        own_workflows = []
+    if not own_workflows:
         add_defect(table, "R1", "DEAD PROBE: no workflow entry, so this check graded nothing")
+    # The workflow registry is the composition's names (TOOL-dBoundRoles-20 S4): gov's entries and the
+    # overlay's, never a tuple typed here; a gov entry an exclusion took out is joined to no loop row below.
+    workflows, said, refused = lib.compose_workflows(root, "HEAD", kit_dir, scenario.get("kind.workflow"),
+                                                     own_workflows) if own_workflows else ([], [], [])
+    notes.extend("roles: note: %s" % n for n in said)
+    defects.extend("roles: %s: R6 — the workflow composition is refused: %s" % (lib.OVERLAY_FILE, ln)
+                   for ln in refused)
+    excluded = {w.get("name") for w in own_workflows} - {w.get("name") for w in workflows if "origin" not in w}
+    for what in lib.check_row_schema(kit_dir, lib.WORKFLOW_ROW_SCHEMA, {
+            k: "set" if k in WORKFLOW_SET_KEYS else "scalar" for k in WORKFLOW_KEYS}):
+        add_defect(kit_dir / lib.WORKFLOW_ROW_SCHEMA, "R6", what)
+    if composed is not None:
+        composed.update(roles=roles, workflows=workflows)
     kind_rows = {}
     if workflows:
         try:
@@ -626,15 +689,16 @@ def check_roles(root, kit_dir, write=False):
     for i, w in enumerate(workflows, 1):
         where = "entry %d (%s)" % (i, w.get("name", "unnamed"))
         for k in w:
-            if k not in WORKFLOW_KEYS:
+            if k not in WORKFLOW_KEYS and not ("origin" in w and k in COMPOSED_KEYS):
                 add_defect(table, "R6", "%s has an unknown key '%s'" % (where, k))
         lists_role = isinstance(w.get("roles"), list) and bool(w["roles"])
         for k in WORKFLOW_KEYS:
             if k not in OPTIONAL_WORKFLOW_KEYS and (lists_role or k not in SHAPE_KEYS) and k not in w:
                 add_defect(table, "R6", "%s is missing key '%s'" % (where, k))
         name = w.get("name")
-        if name not in WORKFLOW_NAMES:
-            add_defect(table, "R6", "%s names an unknown workflow" % where)
+        if "origin" in w and name != lib.derive_repository_slot(w.get("tag")):
+            add_defect(table, "R6", "%s, the %s entry %s, names %r, not the name its tag holds"
+                       % (where, w["origin"], w.get("tag"), name))
         elif name in by_name:
             add_defect(table, "R6", "%s repeats the name '%s'" % (where, name))
         else:
@@ -651,7 +715,7 @@ def check_roles(root, kit_dir, write=False):
             add_defect(table, "R6", "%s roles is not a list of slot keys" % where)
             listed = []
         for slot in listed:
-            if slot not in files:
+            if slot not in roles:
                 add_defect(table, "R8", "%s lists '%s', which names no role file" % (where, slot))
         if w.get("driver") in ("agent", "workflow") and not listed:
             add_defect(table, "R8", "%s is driven by '%s' and names no role" % (where, w["driver"]))
@@ -758,23 +822,23 @@ def check_roles(root, kit_dir, write=False):
     for (slot, kind), at in stage_kinds.items():
         add_defect(roles[slot]["path"], "R9", "shapes '%s' does not declare the kind '%s', which its stage(s) %s "
                    "run in" % (roles[slot]["keys"]["shapes"], kind, ", ".join(at)))
-    for name in WORKFLOW_NAMES:
-        if workflows and name not in by_name:
-            add_defect(table, "R6", "the workflow '%s' has no entry" % name)
     # THE JOIN WITH THE LOOP DEFINITION, both ways (TOOL-dDeclaredLoop-1): a workflow's order and step
-    # are written there alone, so each workflow here has one row there and each row there names one here.
+    # are written there alone, so each gov workflow here has one row there and each row there names one here.
+    # It is the one walk refusing a missing gov entry, by the loop definition's own names and never a tuple
+    # typed here (TOOL-dBoundRoles-20 S4); a repository's entry is placed by no gov loop row, and a gov entry
+    # `instructions.exclude` took out is owed by none.
     if workflows:
         try:
             placed = lib.read_workflow_order(kit_dir)
         except lib.RolesError as e:
             add_defect(table, "R6", str(e))
         else:
-            for name in by_name:
-                if name not in placed:
+            for name, w in by_name.items():
+                if name not in placed and "origin" not in w:
                     add_defect(table, "R6", "the workflow '%s' has no [[workflow]] row in the loop "
                                "definition, so no loop row places it" % name)
             for name in placed:
-                if name not in by_name:
+                if name not in by_name and name not in excluded:
                     add_defect(table, "R6", "the loop definition's [[workflow]] row '%s' names no "
                                "workflow of this table" % name)
 
@@ -799,14 +863,32 @@ def check_roles(root, kit_dir, write=False):
             add_defect(r["path"], "R13", "mandatory '%s' calls this role mandatory, and the '%s' entry's "
                        "enforced-by names no hook; name the hook script there, or say 'unenforced — <why>' "
                        "in the value" % (value, wf))
-    for slot in sorted(files - listed_anywhere):
+    unlisted = {s for s, r in roles.items() if r.get("origin") == "gov"} - listed_anywhere
+    for slot in sorted(unlisted):
         add_defect(kit_dir / "agents" / (slot + ".agent.md"), "R8", "no workflow entry lists this role")
+    # THE MATRIX ARM (TOOL-dBoundRoles-20 S7): every composed role acting as `item` acts somewhere, listed by
+    # a composed entry or named by a composed item's actor; a gov role R8 named above is not named twice. The
+    # items are composed only where a role is listed by no entry, and a composition that does not answer
+    # leaves the entries alone to grade it, one note saying so.
+    idle = lib.check_role_acts({s: r for s, r in roles.items() if s not in unlisted}, (), workflows)
+    if idle:
+        code, payload, lines = lib.read_kind_composition(root, "HEAD", "item", None, kit_dir)
+        if code == 1:
+            defects.extend("roles: %s: R8 — the item composition is refused: %s" % (lib.OVERLAY_FILE, ln)
+                           for ln in lines)
+        elif code:
+            notes.append("roles: note: the item composition is unarmed, so a role's acts are read from the "
+                         "workflow entries alone: %s" % " | ".join(lines))
+        idle = lib.check_role_acts({s: r for s, r in roles.items() if s not in unlisted},
+                                   (payload or {}).get("rows") or (), workflows)
+    for what in idle:
+        add_defect(root / lib.OVERLAY_FILE, "R8", what)
 
     overlays = {}
     for p in sorted((kit_dir / "house").glob("*.md")):
         text = lib.load_text(p)
         overlays[p.stem] = len(text.encode("utf-8"))
-        if p.stem not in files:
+        if p.stem not in roles:
             add_defect(p, "R10", "overlay names no role: there is no agents/%s.agent.md" % p.stem)
         if any(ln.startswith(("# ", "## ")) for ln in text.split("\n")):
             add_defect(p, "R10", "overlay carries a '# ' or '## ' heading line")
@@ -846,6 +928,8 @@ def check_roles(root, kit_dir, write=False):
         if budget is None:
             add_defect(p, "R5", "slot '%s' declares no budget, so its static block has no ceiling" % slot)
             continue
+        if r.get("origin") != "gov":
+            continue   # a repository row renders no static block, its note above; its budget is graded as written
         try:
             block = lib.render_static_block(kit_dir, slot, r, memory_root, charter, None, granted.get(slot, ()),
                                             (), rows, doc)
@@ -891,7 +975,7 @@ def check_roles(root, kit_dir, write=False):
     notes.extend(r16_notes)
 
     readme = kit_dir / "README.md"
-    region = render_catalogue_region(roles, workflows)
+    region = render_catalogue_region(parsed, own_workflows)   # the kit's README renders gov's own catalogue
     text = lib.load_text(readme) if readme.is_file() else ""
     i = text.find(REGION_OPEN)
     j = text.find(REGION_CLOSE, i + 1) if i >= 0 else -1
@@ -908,7 +992,8 @@ def check_roles(root, kit_dir, write=False):
                "%d writer outputs, %d never entries (%d unenforced), %d rule tags and %d protocol file "
                "names against %s, a %s charter; roles by layer %s, by acts-as %s; "
                "overlay bytes %s; %d stand-in waiver(s), %d stand-in declaration(s); %s; %d defect(s)" % (
-                   len(files), len(overlays), len(workflows),
+                   len(files) + sum(1 for r in roles.values() if r.get("origin") != "gov"), len(overlays),
+                   len(workflows),
                    ", ".join("%s=%d" % kv for kv in sorted(by_kind.items())) or "none",
                    "%d unit tag(s) resolved" % len(named_units) if unit_tags is not None else "units unarmed",
                    n_stage_rows,
@@ -1090,15 +1175,82 @@ def print_rows(mode, text):
     return 0
 
 
+def read_json_file(path):
+    """The JSON value of the file at `path`, read as UTF-8; RolesError naming the path where it does not read."""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    except (OSError, ValueError) as e:
+        raise lib.RolesError("%s does not read as JSON: %s" % (path, e))
+
+
+def check_actor_patch_file(root, kit_dir, path):
+    """`--check-actor-patch <file>` (TOOL-dBoundRoles-20 S6): `<file>` holds `{"item": <the composed item
+    row>, "original": <gov's actor, role:<slot>>}`, the one row the loop kit's item check hands; the item's
+    `actor` names the repository role, read from `roles_lib.compose_roles` at HEAD, and the original role is
+    gov's own file. One `roles: actor patch · ...` line per refusal of `roles_lib.check_actor_patch`, exit 1;
+    exit 0 admitted; 2 where the file does not read or names no role the composition holds."""
+    try:
+        data = read_json_file(path)
+        item, original = data.get("item") or {}, str(data.get("original") or "")
+        roles, _notes, refused = lib.compose_roles(root, "HEAD", kit_dir)
+        workflows, _wnotes, wrefused = lib.compose_workflows(root, "HEAD", kit_dir)
+    except (lib.RolesError, AttributeError) as e:
+        print("roles: --check-actor-patch — %s" % e, file=sys.stderr)
+        return 2
+    for line in refused + wrefused:
+        print("roles: actor patch · the composition is refused: %s" % line)
+    if refused or wrefused:
+        return 1
+    actor = str(item.get("actor") or "")
+    slot = lib.derive_repository_slot("role." + actor.partition(":")[2])
+    gov = lib.load_roles(kit_dir).get(original.partition(":")[2] or original)
+    role = roles.get(slot)
+    if role is None or gov is None or not actor.startswith("role:"):
+        print("roles: --check-actor-patch — item %s names %r and gov's row %r, and the composition holds no role "
+              "for %s" % (item.get("tag"), actor, original, actor if role is None else original), file=sys.stderr)
+        return 2
+    refusals = lib.check_actor_patch(item, role, dict(gov, tag="role." + gov["keys"].get("name", "")), workflows)
+    for line in refusals:
+        print("roles: actor patch · item %s · %s" % (item.get("tag"), line))
+    return 1 if refusals else 0
+
+
+def print_scenario_rows(root, kit_dir, path):
+    """`--scenario-rows <file>` (TOOL-dBoundRoles-20 S11): `<file>` holds the activated rows of a build's
+    placed scenarios, `{kind tag: [row]}` as the loop kit's `scenario.read_activated_rows` returns them; the
+    check runs over the composition with the `kind.role` and `kind.workflow` rows handed after the overlay's,
+    and prints its lines, then one `roles: composed <tag> · origin: <origin>` line per composed role and
+    entry. -> the check's exit."""
+    try:
+        rows = read_json_file(path)
+        if not isinstance(rows, dict) or not all(isinstance(v, list) for v in rows.values()):
+            raise lib.RolesError("%s holds no {kind tag: [row]} object" % path)
+        composed = {}
+        defects, notes, summary = check_roles(root, kit_dir, False, rows, composed)
+    except lib.RolesError as e:
+        print("roles: %s" % e)
+        return 2
+    for line in defects + notes:
+        print(line)
+    print(summary)
+    for slot, r in (composed.get("roles") or {}).items():
+        print("roles: composed %s · origin: %s" % (r.get("tag", "role." + slot), r.get("origin", "gov")))
+    for w in composed.get("workflows") or ():
+        print("roles: composed %s · origin: %s" % (w.get("tag", "workflow.%s" % w.get("name")), w.get("origin", "gov")))
+    return 1 if defects else 0
+
+
 def main(argv):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    args, root, write, legacy, out = list(argv), None, False, False, None
+    args, root, write, legacy, out, mode = list(argv), None, False, False, None, None
     if args[:1] == ["--print-tag-rows"] and args[1:] in (["role"], ["stage"]):
         return print_tag_rows(args[1], sys.stdin.buffer.read().decode("utf-8", "replace"))
     if args[:1] == ["--print-rows"] and args[1:] in (["role"], ["workflow"]):
         return print_rows(args[1], sys.stdin.buffer.read().decode("utf-8", "replace"))
     usage = ("usage: python check_roles.py [--root <dir>] [--write] | [--root <dir>] --legacy-rows --out <path> "
-             "| --print-tag-rows role|stage | --print-rows role|workflow")
+             "| --print-tag-rows role|stage | --print-rows role|workflow "
+             "| [--root <dir>] --check-actor-patch <file> | [--root <dir>] --scenario-rows <file>")
     while args:
         a = args.pop(0)
         if a == "--write":
@@ -1109,10 +1261,12 @@ def main(argv):
             root = args.pop(0)
         elif a == "--out" and args and out is None:
             out = args.pop(0)
+        elif a in ("--check-actor-patch", "--scenario-rows") and args and mode is None:
+            mode = (a, args.pop(0))
         else:
             print(usage, file=sys.stderr)
             return 2
-    if legacy != (out is not None) or (legacy and write):
+    if legacy != (out is not None) or (legacy and write) or (mode is not None and (legacy or write)):
         print(usage, file=sys.stderr)
         return 2
     if root is None:
@@ -1123,6 +1277,9 @@ def main(argv):
         root = r.stdout.strip()
     if legacy:
         return write_legacy_rows(root, KIT_DIR, out)
+    if mode is not None:
+        return (check_actor_patch_file if mode[0] == "--check-actor-patch" else print_scenario_rows)(
+            root, KIT_DIR, mode[1])
     try:
         defects, notes, summary = check_roles(root, KIT_DIR, write)
     except lib.RolesError as e:

@@ -442,8 +442,11 @@ fi
 # kit's `check_roles.py --print-tag-rows` by subprocess: two role files as `role` members beside a guide whose
 # misspelt citation alone reds; the role binding join red both ways over one manifest whose second unit
 # puts `scope` before `tag`, then green with gov-builder citing yagni alone; and the installed read-key
-# literal and workflow table as `field` members, each once, beside a misspelt citation. What this does not
-# check: whether a role's `rules` suits the units it binds, only that the two name each other.
+# literal and workflow table as `field` members, each once, beside a misspelt citation. The `workflow-rows`
+# rows (TOOL-dBoundRoles-20 AC1): the installed workflow table's entries as `workflow` members tagged from
+# their names, and the fixture overlay's `[[workflow]]` row as `workflow.adopter.triage`, beside a misspelt
+# citation; red where the extractor reads gov's table alone. What this does not check: whether a role's
+# `rules` suits the units it binds, only that the two name each other.
 _uk=; check_sibling_kit memory-tree tree_lib.py || _uk=memory-tree
 check_sibling_kit roles check_roles.py || _uk=${_uk:-roles}
 if [ -n "$_uk" ]; then echo "UNARMED — the role and field namespaces' plants: no $_uk kit in this install"; else
@@ -456,6 +459,9 @@ role-binding $_tk|1|gov-builder.agent.md:2 · role binding · role.gov-builder c
 role-binding $_tk|1|with gov-builder citing yagni alone: rc=0
 field-rows $_tk|1|\`field.task.titel\` is cited and undeclared in field|\`field.task.title\` is cited
 field-rows $_tk|1|field.task.title 1 · field.input.spec 1 · field.stage.spec-writer 1 · field.stage.skeptic 1
+workflow-rows $_tk|1|members workflow.adopter.triage workflow.bookkeeping
+workflow-rows $_tk|1|workflow.spec-review workflow.spec-write, check: rc=1
+workflow-rows $_tk|1|\`workflow.spec-wrte\` is cited and undeclared in workflow|\`workflow.spec-write\` is cited
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf role and field namespace arm(s) failed"; exit 1; fi
 echo "PASS — the role and field namespaces' plants"

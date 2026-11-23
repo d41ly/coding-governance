@@ -1031,9 +1031,11 @@ routes = { done = "item.test.exit" }
   adding widens it. An absent `seed` or `map` reads `none`, an absent `unfolds` reads empty.
 - `actor` is open to a repository role and admitted by the actor-patch check alone. The schema opens it
   on the direction `changes`, any value other than gov's reading as a widening, so the patch composes,
-  and `check` then refuses it, naming the item, your row and the value: a repository role,
-  `role:adopter.<name>`, until the roles kit's actor-patch check answers there, and any other value,
-  a gov role or a command, because an actor patch names a repository role.
+  and `check` then judges it, naming the item, your row and the value: a repository role,
+  `role:adopter.<name>`, by the roles kit's `check_roles.py --check-actor-patch`, which `check` runs and
+  which refuses a role whose `return` lacks gov's role's template, whose `writes` lacks its class or
+  whose `shapes` lacks the kind the item runs in; and any other value, a gov role or a command, is
+  refused because an actor patch names a repository role.
 - `step`, `witness` and `outcomes` are fixed by a principle, and `allowance`, `returns` and `owner` stay
   fixed because they declare no direction. Patching one is refused, naming the field and what fixes it.
 - Each step's exit item and the floor item `item.test.verdict`, whose verdict the runner writes, are
@@ -1370,8 +1372,8 @@ naming it.
   catalogue. Its gate is `roles catalogue`.
 - **A workflow:** `python tools/loop/factories.py workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step>` <!-- usage: script:tools/loop/factories.py#workflow d7b86fbb -->
   appends its row to the roles kit's `workflows.toml`, its `name`, `order` and `step` row to this
-  kit's `loop.toml`, and its name to the roles checker's `WORKFLOW_NAMES`. Its gate is `roles
-  catalogue`, then `python tools/loop/loop_lib.py --check`.
+  kit's `loop.toml`; the roles checker reads the workflow names from the composed registry, so no
+  closed set in code moves. Its gate is `roles catalogue`, then `python tools/loop/loop_lib.py --check`.
 - **A scenario:** `python tools/loop/factories.py scenario <name> --extends <tag|none> --admit <fact>=<value> --entry <step tag>` <!-- usage: script:tools/loop/factories.py#scenario 490958b5 -->
   appends a gov `[[scenario]]` row to this kit's `scenarios.toml`, with `activates` and `then` empty;
   repeat `--admit` for each value a fact admits. The name `adopter`, a tag the pack already holds and an

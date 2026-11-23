@@ -142,7 +142,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +1 for arm 42's read check (TOOL-dBoundRoles-53).
 # +3 for arm 44 (TOOL-dBoundRoles-59).
 # +2 for arm 45, the missing slot and the refused front matter (TOOL-dBoundRoles-61).
-FLOOR_ASSERTIONS=189
+# +23 for arm 46, twenty-one over the composed fixture and two over the adopter's harness list (TOOL-dBoundRoles-20).
+FLOOR_ASSERTIONS=212
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1481,8 +1482,8 @@ check_arm "arm 29 an absent house file falls to the declared effort and is no R1
 
 # ---- arm 30 (TOOL-dBoundRoles-22 AC2 AC4 AC5, and AC3's house-less half): the stage rows graded as R9,
 # ---- and a row's declared effort read after the keys and the house file. The fixture adds the workflow
-# ---- `scratch` the way the loop kit's workflow factory adds one, its name to the copied checker's
-# ---- WORKFLOW_NAMES and its row to the copied loop definition, so R6 places it; its two stage rows are
+# ---- `scratch` the way the loop kit's workflow factory adds one, its entry and its row to the copied loop
+# ---- definition, so R6 places it, the checker holding no closed set of names (TOOL-dBoundRoles-20 S4); its two stage rows are
 # ---- `scout` as gov-reuse-scout and `judge` as gov-skeptic. A plant rewrites `judge` alone. The fixture's
 # ---- loop kit holds no `upstream.py` (a01362eb0's kit answers no `kinds` verb either), so the row kinds
 # ---- fall to the seg shape; a stub `upstream.py` answering `kinds` stands for the verb §8 F5 asked of
@@ -1538,7 +1539,7 @@ if sys.argv[1:] != ["kinds"]:
 for kind in ("seam", "criterion", "interface", "fork", "finding", "repair"):
     print(kind)
 """
-table, checker = kit / "workflows.toml", kit / "check_roles.py"
+table = kit / "workflows.toml"
 held = table.read_text(encoding="utf-8")
 def plant(fan=1, cap=1, effort="medium", returns=("finding",)):
     table.write_text(held + ENTRY + ROW % ("scout", "gov-reuse-scout", "", 1, 1, "medium", "[]", json.dumps(["seam"]))
@@ -1549,13 +1550,10 @@ def commit(n):
     (fx / ".governance").mkdir(exist_ok=True)
     (fx / ".governance" / "policy.toml").write_text("runtime.agents-in-flight = %d\n" % n, encoding="utf-8")
     return git("add", "-A") == 0 and git("commit", "-q", "--allow-empty", "-m", "limit %d" % n) == 0
-text = checker.read_text(encoding="utf-8")
-added = text.replace("WORKFLOW_NAMES = (", "WORKFLOW_NAMES = (%s, " % json.dumps("scratch"), 1)
-checker.write_text(added, encoding="utf-8")
 with open(loop / "loop.toml", "a", encoding="utf-8") as fh:
     fh.write("\n[[workflow]]\nname = %s\norder = 0\nstep = %s\n" % (json.dumps("scratch"), json.dumps("none")))
 plant()
-ok = added != text and git("symbolic-ref", "HEAD", "refs/heads/main") == 0 \
+ok = git("symbolic-ref", "HEAD", "refs/heads/main") == 0 \
     and run("check_roles.py", "--root", str(fx), "--write")[0] == 0
 rc, out, r9 = check()
 args = run("handoff.py", "harness-args", "scratch")[1]
@@ -2566,6 +2564,242 @@ check_arm "arm 45 AC2 ...and over gov-orienter with its reads key indented fails
    "$([ "$_r" = 1 ] && [[ ${_o%%$'\n'*} == 'FAIL '*gov-orienter*R2* ]] && [[ $_k == 'ok '* ]] && echo 1 || echo 0)"
 [ "$_r" = 1 ] && [[ ${_o%%$'\n'*} == 'FAIL '*gov-orienter*R2* ]] && [[ $_k == 'ok '* ]] \
    || printf '    %s\n' "exit $_r" "${_o//$'\n'/$'\n'    }" "restored: ${_k//$'\n'/$'\n'    }"
+
+# ---- arm 46 (TOOL-dBoundRoles-20 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC11): a repository's roles and workflow
+# ---- entries composed beside gov's. Its fixture is a repository holding this tree's roles, loop, playbook,
+# ---- memory-tree, policy and lib kits whole, the gate manifest and each enforcer a role's `never` names,
+# ---- since the composition runs the playbook kit's `compose` verb through the loop kit's caller of it; each
+# ---- case commits its overlay or policy rows, since the composition reads HEAD, and resets after. Its lines:
+# ---- the planted role and entry graded clean and indexed `origin: repository` (ac2); no closed population
+# ---- in the checker and gov's rows composed through the verb to themselves (ac3); the out-of-shape role
+# ---- (ac4); a core role's write class patched, its return patched, the cycle row gov-prompt-writer and a
+# ---- fixture cycle row `driver` superseded (ac5); the actor patch without the template, by the verb and by
+# ---- the loop kit's item check, then with it (ac6); an excluded role an item acts as, an excluded leg a
+# ---- grant names, and a role left idle by an exclusion, then taken out with it (ac7); a scenario's rows
+# ---- composed for a build alone and its activation of both kinds admitted (ac11). Then, over the adopter's
+# ---- own fixture, which holds no review-harness kit: the scaffold leaves the unheld harness out of the
+# ---- index with its note, and an index planted naming it reds `--check` (ac8). The failing cases, owed at
+# ---- the close and not observed by the pass that wrote this, each staged by removing its check: the
+# ---- composers reading gov's rows alone (ac2, ac11), `check_core_fields` returning nothing (ac5 writes and
+# ---- cycle), `check_actor_patch` returning nothing (ac6), `check_role_acts` returning nothing (ac7 idle),
+# ---- `derive_harness_paths` listing an unheld harness again (ac8), and the `schema` keys dropped from the
+# ---- kinds register (ac11 activatable). WHAT IT DOES NOT CHECK: an overlay row the composition marks
+# ---- `stale` or `orphaned`; a repository role spawned as an agent type, which renders none; or the role
+# ---- render byte for byte at gov's own tree, which the `roles render wiring` leg reads.
+A46=$("$PY" -B - "$REPO" "$HERE" "$TMP_ROOT/fx46" "$MR" "$CH" <<'PY'
+import json, os, pathlib, shutil, subprocess, sys, tomllib
+repo, kit, fx = (pathlib.Path(a).resolve() for a in sys.argv[1:4])
+mr, ch = sys.argv[4], sys.argv[5]
+env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_") and k != "GOV_DEFAULT_BRANCH"}
+env["PYTHONIOENCODING"] = "utf-8"
+tool_rel = kit.parent.relative_to(repo)
+tool = fx / tool_rel
+OV = ".governance/instructions.toml"
+def git(*a):
+    return subprocess.run(["git", "-c", "user.name=fx", "-c", "user.email=fx@fx", "-c", "commit.gpgsign=false",
+                           "-C", str(fx), *a], env=env, capture_output=True, text=True, encoding="utf-8")
+def run(*a):
+    p = subprocess.run([sys.executable, "-B", *a], cwd=str(fx), env=env, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    return p.returncode, (p.stdout + p.stderr).replace("\r", "")
+def say(name, ok, why=""):
+    print("%s %d%s" % (name, 1 if ok else 0, "" if ok else " " + why.replace("\n", " | ")[:1500]))
+for home in ("roles", "loop", "playbook", "memory-tree", "policy", "lib"):
+    if (kit.parent / home).is_dir():
+        shutil.copytree(kit.parent / home, tool / home, ignore=shutil.ignore_patterns("__pycache__"))
+shutil.copyfile(kit.parent / "gate-legs.json", tool / "gate-legs.json")
+sys.path.insert(0, str(kit))
+import roles_lib
+for role in roles_lib.load_roles(kit).values():   # each enforcer a never entry names, as build_fixture copies it
+    for _limit, enforcer in roles_lib.parse_never_entries(role["keys"].get("never", "")):
+        first = (enforcer.split() or [""])[0]
+        path = roles_lib.resolve_enforcer_path(kit.parent, first) if roles_lib.ENFORCER_SCRIPT_RE.match(first) else None
+        dest = tool / path.relative_to(kit.parent) if path is not None else None
+        if dest is not None and not dest.exists():
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(path, dest)
+(fx / ch).parent.mkdir(parents=True, exist_ok=True)
+shutil.copyfile(repo / ch, fx / ch)
+(fx / mr / "project").mkdir(parents=True, exist_ok=True)
+(fx / ".memory-tree.conf").write_text("MEMORY_ROOT=%s\nCHARTER=%s\n" % (mr, ch), encoding="utf-8")
+git("init", "-q"); git("symbolic-ref", "HEAD", "refs/heads/main")
+git("add", "-A"); git("commit", "-q", "--no-verify", "-m", "base")
+BASE = git("rev-parse", "HEAD").stdout.strip()
+roles_py, compose_py = tool / "roles" / "check_roles.py", tool / "playbook" / "overlay_rows.py"
+RET = "outcome:done|returned, why:text?"
+def role_row(name, ret=RET, shapes="single", workflow="triage"):
+    return ('\n[[role]]\ntag = "role.adopter.%s"\nname = "%s"\ndescription = "Triages a request."\n'
+            'tools = ["Read"]\nmodel = "inherit"\nworkflow = "%s"\nlayer = "layer.roles"\nacts-as = "item"\n'
+            'shapes = ["%s"]\nreads = ["field.input.spec"]\nwrites = ["none"]\nrules = ["verify"]\n'
+            'mandatory = "no"\noutput = "a triage line in its return"\n'
+            'never = ["edits a file \\u2014 unenforced \\u2014 the role writes nothing"]\nreturn = "%s"\n'
+            'agent = "true"\neffort = "medium"\nbudget = "4000"\n' % (name, name, workflow, shapes, ret))
+def flow_row(name, roles, driver="agent", harness="none", kind="single"):
+    return ('\n[[workflow]]\ntag = "workflow.adopter.%s"\nname = "%s"\ndriver = "%s"\nharness = "%s"\n'
+            'roles = %s\nkind = "%s"\nchecklist = "none"\norientation = "none"\n'
+            'enforced-by = ["agent-cap.js spawn guard"]\ntrigger = "when a request asks for it"\n'
+            % (name, name, driver, harness, json.dumps(roles), kind))
+STAGE = ('\n[[workflow.stages]]\nkey = "triage"\nrole = "triager"\nfan = 1\ncap = 1\neffort = "medium"\n'
+         'receives = []\nreturns = []\n')
+def plant(files, msg):
+    for rel, text in files.items():
+        p = fx / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text((p.read_text(encoding="utf-8") if p.is_file() and text.startswith("+") else "")
+                     + text.lstrip("+"), encoding="utf-8", newline="\n")
+    git("add", "-A")
+    return git("commit", "-q", "--no-verify", "-m", msg).returncode == 0
+def reset():
+    git("reset", "-q", "--hard", BASE); git("clean", "-qfdx")
+def check(*more):
+    return run(str(roles_py), "--root", str(fx), *more)
+def composed(kind):
+    rc, out = run(str(compose_py), "compose", "--kind", kind)
+    return rc, (json.loads(out) if rc == 0 else out)
+# AC2: a repository role and the entry naming it, graded clean and listed in the index as the repository's
+ok = plant({OV: role_row("triager") + flow_row("triage", ["triager"])}, "ac2")
+rc, out = check()
+say("ac2-check", ok and rc == 0, out)
+rc2, out2 = run(str(tool / "roles" / "render_agents.py"), "--write")
+idx = json.loads((fx / ".claude" / "roles.json").read_text(encoding="utf-8")) if rc2 == 0 else {}
+say("ac2-index", (idx.get("roles") or {}).get("triager", {}).get("origin") == "repository", out2)
+reset()
+# AC3: no closed population in the checker, and gov's rows composed through the verb compose to themselves
+text = roles_py.read_text(encoding="utf-8")
+say("ac3-closed", "WORKFLOW_NAMES" not in text and "BODY_CEILINGS" not in text)
+empty = fx.parent / "fx46-empty.json"
+empty.write_text(json.dumps({"kind.role": [], "kind.workflow": []}), encoding="utf-8")
+rc, out = check("--scenario-rows", str(empty))
+tags = sorted(ln.split()[2] for ln in out.splitlines() if ln.startswith("roles: composed "))
+files = sorted("role." + p.name[:-len(".agent.md")] for p in (tool / "roles" / "agents").glob("*.agent.md"))
+names = sorted("workflow." + w["name"] for w in tomllib.loads((tool / "roles" / "workflows.toml").read_text(
+    encoding="utf-8"))["workflow"])
+say("ac3-self", rc == 0 and tags == sorted(files + names) and "origin: repository" not in out, out)
+# AC4: a role in `single` named by a panel entry's stage
+plant({OV: role_row("triager") + flow_row("triage", ["triager"], "workflow", "{prefix}/workflows/triage.js", "panel")
+       + STAGE}, "ac4")
+rc, out = check()
+say("ac4", rc == 1 and any("role.adopter.triager" in ln and "does not declare the kind 'panel'" in ln
+                           for ln in out.splitlines()), out)
+reset()
+# AC5: the write class of a core role, its return, and a cycle row replaced, gov's and a fixture's `driver`
+_rc, got = composed("role")
+pins = got["pins"] if isinstance(got, dict) else {}
+def whole(tag, **change):
+    row = dict(next(r for r in got["rows"] if r["tag"] == tag), **change)
+    return "".join("%s = %s\n" % (json.dumps(k), json.dumps(v)) for k, v in row.items()
+                   if k not in ("tag", "origin", "source"))
+cases = {
+    "ac5-writes": ('\n[[role]]\ntag = "role.adopter.wide"\nedges = "amends=role.gov-builder@%s"\n'
+                   'add = { writes = ["spec"] }\n' % pins.get("role.gov-builder"),
+                   "role.adopter.wide patches role.gov-builder · field writes"),
+    "ac5-return": ('\n[[role]]\ntag = "role.adopter.ret"\nedges = "amends=role.gov-builder@%s"\n'
+                   'return = "outcome:done"\n' % pins.get("role.gov-builder"),
+                   "role.adopter.ret amends role.gov-builder · field return · fixed by principle=principle.p26"),
+    "ac5-cycle": ('\n[[role]]\ntag = "role.adopter.pw"\nedges = "supersedes=role.gov-prompt-writer@%s"\n%s'
+                  % (pins.get("role.gov-prompt-writer"), whole("role.gov-prompt-writer", tools=["Read", "Grep"]))
+                  if pins else "", "supersedes role.gov-prompt-writer · acts-as cycle")}
+for name, (row, needle) in cases.items():
+    plant({OV: "+" + row}, name)
+    rc, out = check()
+    say(name, rc == 1 and needle in out, out)
+    reset()
+# the second fixture: gov's pack holds a cycle row named `driver`, and a row replaces it
+src = (tool / "roles" / "agents" / "gov-session.agent.md").read_text(encoding="utf-8")
+plant({"%s/roles/agents/driver.agent.md" % tool_rel.as_posix(): src.replace("name: gov-session", "name: driver")},
+      "a cycle row named driver")
+_rc, got = composed("role")
+pins = got["pins"] if isinstance(got, dict) else {}
+plant({OV: "+" + ('\n[[role]]\ntag = "role.adopter.drv"\nedges = "supersedes=role.driver@%s"\n%s'
+                  % (pins.get("role.driver"), whole("role.driver", tools=["Read", "Grep"])) if pins else "")},
+      "ac5-driver")
+rc, out = check()
+say("ac5-driver", rc == 1 and "supersedes role.driver · acts-as cycle" in out, out)
+reset()
+# AC6: a gov item's actor patched to the repository role, whose return lacks the template, then holds it
+_rc, items = composed("item")
+ipins = items["pins"] if isinstance(items, dict) else {}
+orienter = next(
+    ln.partition(":")[2].strip() for ln in (tool / "roles" / "agents" / "gov-orienter.agent.md").read_text(
+        encoding="utf-8").splitlines() if ln.startswith("return:"))
+patch = ('\n[[item]]\ntag = "item.entry.adopter.orient-triaged"\nedges = "amends=item.entry.orient@%s"\n'
+         'actor = "role:adopter.triager"\n' % ipins.get("item.entry.orient"))
+item_file = fx.parent / "fx46-item.json"
+item_file.write_text(json.dumps({"item": {"tag": "item.entry.orient", "actor": "role:adopter.triager"},
+                                 "original": "role:gov-orienter"}), encoding="utf-8")
+for name, ret, want in (("ac6-lacking", RET, 1), ("ac6-held", orienter, 0)):
+    plant({OV: role_row("triager", ret, workflow="triage") + flow_row("triage", ["triager"]) + patch}, name)
+    rc, out = check("--check-actor-patch", str(item_file))
+    lrc, lout = run(str(tool / "loop" / "loop_items.py"), "check")
+    lacks = "lacks item item.entry.orient's return template"
+    say(name + "-verb", rc == want and (lacks in out) == (want == 1), out)
+    say(name + "-item", (lacks in lout) == (want == 1)
+        and "loop: patch item.entry.adopter.orient-triaged on item.entry.orient · actor" in lout, lout)
+    reset()
+# AC7: an excluded role an active item names; an excluded leg a role's gates names; the matrix arm
+legs = json.loads((tool / "gate-legs.json").read_text(encoding="utf-8"))
+leg = next(r["tag"] for r in legs if r.get("name") == "lexicon naming predicates")
+for name, tag, kind, needle in (("ac7-role", "role.gov-orienter", "item", "which item.entry.orient still holds"),
+                                ("ac7-leg", leg, "role", "which role.gov-builder still holds in its grants field")):
+    plant({".governance/policy.toml": "instructions.exclude = [%s]\n" % json.dumps(tag)}, name)
+    rc, out = composed(kind)
+    say(name, rc == 1 and needle in str(out), str(out))
+    reset()
+_rc, wf = composed("workflow")
+wpins = wf["pins"] if isinstance(wf, dict) else {}
+amend = ('\n[[workflow]]\ntag = "workflow.adopter.orient-plus"\nedges = "amends=workflow.orient@%s"\n'
+         'add = { roles = ["triager"] }\n' % wpins.get("workflow.orient"))
+idle = "R8 — role triager acts as item and acts in no composed item or workflow entry"
+for name, overlay, want in (("ac7-idle", role_row("triager", workflow="orient") + amend, True),
+                            ("ac7-taken-out", "", False)):
+    plant({OV: overlay or "# no row\n", ".governance/policy.toml": 'instructions.exclude = ["workflow.orient"]\n'}, name)
+    rc, out = check()
+    say(name, (idle in out) == want and (rc == 1 if want else "triager" not in out), out)
+    reset()
+# AC11: a scenario's activated role and entry composed for the build alone, and its activation admitted
+sc = fx.parent / "fx46-scenario.json"
+row = tomllib.loads(role_row("screener", workflow="quick"))["role"][0]
+flow = tomllib.loads(flow_row("quick", ["screener"]))["workflow"][0]
+sc.write_text(json.dumps({"kind.role": [row], "kind.workflow": [flow]}), encoding="utf-8")
+rc, out = check("--scenario-rows", str(sc))
+say("ac11-composed", rc == 0 and "roles: composed role.adopter.screener · origin: scenario" in out
+    and "roles: composed workflow.adopter.quick · origin: scenario" in out, out)
+rc, out = check()
+say("ac11-alone", rc == 0 and "screener" not in out and "workflow.adopter.quick" not in out, out)
+plant({OV: '\n[[scenario]]\ntag = "scenario.adopter.triage-run"\nextends = "none"\nadmits = { entry = ["triage"] }\n'
+           'entry = "step.plan"\nactivates = { "kind.role" = [ { tag = "role.adopter.screener" } ], '
+           '"kind.workflow" = [ { tag = "workflow.adopter.quick" } ] }\nthen = []\n'}, "ac11-scenario")
+rc, out = run(str(tool / "loop" / "scenario.py"), "check")
+say("ac11-activatable", "activates kind" not in out and "unarmed" not in out and "scenario" in out, out)
+reset()
+PY
+); A46=${A46//$'\r'/}
+_l46=(); [ -z "$A46" ] || mapfile -t _l46 <<< "$A46"
+check_arm "arm 46 the composed fixture printed its twenty verdict lines" "$([ "${#_l46[@]}" = 20 ] && echo 1 || echo 0)"
+for _ln in "${_l46[@]}"; do
+  _w=${_ln#* }
+  check_arm "arm 46 ${_ln%% *} (TOOL-dBoundRoles-20)" "${_w%% *}"
+  [ "${_w%% *}" = 1 ] || printf '    %s\n' "$_ln"
+done
+build_fixture; _rc46=$?
+_t46=; [[ $FXK == */* ]] && _t46=${FXK%/*}/
+_h46="${_t46}workflows/tier2-review.js"
+out=$(run_adopter --scaffold); rc=$?
+_i46=$("$PY" -B -c 'import json, sys
+with open(sys.argv[1], encoding="utf-8") as fh:
+    print(" ".join(json.load(fh).get("harnesses") or []))' "$FX/.claude/roles.json" 2>/dev/null); _i46=${_i46//$'\r'/}
+check_arm "arm 46 ac8 the scaffold leaves the unheld harness out of roles.json and prints its note" \
+   "$([ "$_rc46" = 0 ] && [ "$rc" = 0 ] && [ ! -e "$FX/$_h46" ] && [[ " $_i46 " != *" $_h46 "* ]] \
+      && [[ $out == *"note — $_h46 is named by the workflow table and absent here"* ]] && echo 1 || echo 0)"
+"$PY" -B -c 'import json, sys
+with open(sys.argv[1], encoding="utf-8") as fh:
+    held = json.load(fh)
+held["harnesses"] = sorted(held.get("harnesses", []) + [sys.argv[2]])
+with open(sys.argv[1], "w", encoding="utf-8", newline="\n") as fh:
+    fh.write(json.dumps(held, indent=2, sort_keys=True, ensure_ascii=True) + "\n")' "$FX/.claude/roles.json" "$_h46"
+out=$(run_adopter --check); rc=$?
+check_arm "arm 46 ac8 an index naming a harness the install lacks reds --check, naming the path" \
+   "$([ "$rc" != 0 ] && [[ $out == *"$_h46"* ]] && [[ $out == *'drift .claude/roles.json'* ]] && echo 1 || echo 0)"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

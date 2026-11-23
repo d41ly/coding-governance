@@ -1,0 +1,76 @@
+# workflow-schema.toml — the row schema of the `workflow` kind (TOOL-dBoundRoles-20 S2): what a repository's
+# own `[[workflow]]` row in its overlay may hold, and which keys of gov's entries it may patch. Read by the
+# playbook kit's overlay_rows.py through the kinds register's `kind.workflow` row, in that kit's row grammar.
+# Gov's rows are the `[[workflow]]` entries of workflows.toml beside this file, each tagged
+# workflow.<name> from its `name` by check_roles.py --print-rows, never by a typed key; one `[[field]]` row
+# here names each key check_roles.py's R6 knows an entry by.
+#
+# [kind]: `name`, the kind, and `owner-seat`, the tag segment a repository row holds `adopter` at, so a
+# repository entry is tagged workflow.adopter.<name>.
+#
+# A field is open when it declares `widens`, fixed otherwise. `roles` is a set widening on `add`; every
+# other key is fixed by its undeclared class: `name`, `kind` and `driver` among them, so `driver` stays one
+# of check_roles.py's fixed DRIVERS and no row moves an entry to another driver; `stages`, the ordered
+# `[[workflow.stages]]` rows, is one scalar whose order is its meaning, each stage's cap graded by R9 at or
+# under runtime.agents-in-flight wherever the entry comes from.
+
+[kind]
+name = "workflow"
+owner-seat = 1
+
+[[field]]
+name = "name"
+shape = "scalar"
+
+[[field]]
+name = "driver"
+shape = "scalar"
+
+[[field]]
+name = "harness"
+shape = "scalar"
+
+[[field]]
+name = "roles"
+shape = "set"
+widens = "add"
+
+[[field]]
+name = "stages"
+shape = "scalar"
+
+[[field]]
+name = "enforced-by"
+shape = "set"
+
+[[field]]
+name = "trigger"
+shape = "scalar"
+
+[[field]]
+name = "kind"
+shape = "scalar"
+
+[[field]]
+name = "checklist"
+shape = "scalar"
+
+[[field]]
+name = "orientation"
+shape = "scalar"
+
+[[field]]
+name = "merge"
+shape = "scalar"
+
+[[field]]
+name = "twin"
+shape = "scalar"
+
+[[field]]
+name = "of"
+shape = "scalar"
+
+[[field]]
+name = "experiment"
+shape = "scalar"

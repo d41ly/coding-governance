@@ -64,7 +64,7 @@ extract-arms self-test	60		measured 11s on node a 2026-09-07 at inner width 4, x
 drift-audit selftest	1290		worst of 8 readings 855s, x1.5
 foreign-prefix parity (every self-test at three prefixes)	3750		one reading 2494s on node a 2026-10-01, the redesigned leg alone at 19ef4230, PASS at three prefixes with whole rows serial, x1.5; it was 60000, sized for the calibrate design
 gotchas selftest	90		worst of 10 readings 54s, x1.5
-govkit selftest	1600		worst of 7 readings 1065s, x1.5
+govkit selftest	1633		worst of 7 readings 1065s, x1.5, then PINNED proxy scaled 2026-11-23 by TOOL-dBoundRoles-20's two step-gate class rows, not a reading: their four fixture runs, the role and workflow plants with and without a witness row, 5.5s each by direct CLI over a scratch clone, 22s x1.5 = 33s added; no self-test ran under the unattended mandate. Re-price from the main loop's first reading of the leg alone.
 held-halves selftest	60		measured 1.3s on node a 2026-10-11 by direct invocation, x1.5 floored at this file 60s minimum
 hook destinations self-test	510		worst of 4 readings 335s, x1.5
 install-prefix self-test	1180		worst of 11 readings 783s, x1.5
@@ -105,7 +105,7 @@ method-carriers self-test	180		worst of 11 readings 116s, x1.5
 micro-format gate selftest	460		worst of 8 readings 303s, x1.5
 placeholder-catalogue self-test	80		worst of 8 readings 50s, x1.5
 playbook parity selftest	150		worst of 7 readings 93s, x1.5
-playbook render selftest	60		worst of 8 readings 10s, x1.5
+playbook render selftest	60		worst of 8 readings 10s, x1.5, then TOOL-dBoundRoles-20's three workflow-rows plant rows, 1.4s each by direct CLI, 4.2s x1.5 = 6.3s added, under this file's 60s floor, which stands
 policy fixtures	1820		measured 1210s on node a 2026-11-13 at 2ba17e9d6, one whole serial run of the leg's own argv alone on a clone, 1021 assertion(s) executed and 33 wrong, the 33 filed as TOOL-aNimbleMend-20, x1.5. TOOL-aNimbleMend-15
 pre-push bar self-test	60		one proxy reading 32.5s on node a 2026-09-23, a scratch fixture making the harness's 18 pushes, x1.5 floored at this file 60s minimum. TOOL-aRepatriatedFork-5
 pre-push run-log line	60		worst of 3 readings 39s on node d 2026-09-14 by direct invocation, x1.5 floored at this file 60s minimum. TOOL-dLoggedFlight-4, withheld from adopters
@@ -120,7 +120,7 @@ recall floor arms	120		worst of 11 readings 79s, x1.5
 remote literals self-test	60		measured 17s on node d 2026-10-08, one direct run, x1.5 floored at this file's 60s minimum
 review-join self-test	460		worst of 8 readings 301s, x1.5
 review-replay selftest	60		measured 0.2s on node a 2026-10-01 by direct invocation, x1.5 floored at this file 60s minimum
-roles adopter self-test	60		PINNED by declaration at this file's 60s floor, not measured; re-priced from the first measured run. TOOL-aOrientedCast-8
+roles adopter self-test	188		PINNED by declaration at this file's 60s floor, not measured; re-priced from the first measured run. TOOL-aOrientedCast-8 Then PINNED proxy scaled 2026-11-23 by TOOL-dBoundRoles-20's arm 46, not a reading: its composed fixture's program run by direct CLI over a scratch fixture in 85s, x1.5 = 128s added to the 60s; no self-test ran under the unattended mandate. Re-price from the main loop's first reading of the leg alone.
 roles render selftest	60		measured 1.3s on node a 2026-10-11, one direct run of the argv in the pass that wrote it, x1.5 floored at this file 60s minimum. TOOL-aOrientedCast-3
 routed-commits selftest	500		measured 330s on node a 2026-11-13 at 2ba17e9d6, one direct run of the leg's own argv alone on a clone, all arms held, x1.5. TOOL-aNimbleMend-15
 row-grammar selftest	60		worst of 10 readings 36s, x1.5

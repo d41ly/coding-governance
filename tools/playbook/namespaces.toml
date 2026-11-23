@@ -208,6 +208,17 @@ purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedL
 join-armed-by = "dBoundRoles"
 
 [[namespace]]
+ns = "workflow"
+owner = "dBoundRoles"
+layer = "layer.roles"
+source = "{prefix}/roles/workflows.toml"
+rows = "tag_index:read_roles_rows"
+extractor = "tag_index:extract_workflow"
+role = "describes"
+purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md"
+join-armed-by = "dBoundRoles"
+
+[[namespace]]
 ns = "field"
 owner = "dBoundRoles"
 layer = "layer.roles"

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-20 — a repository's roles and workflow entries composed beside gov's, with the role kind's fixed set, widening directions and step-gate classes
 
-**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
+**Status:** CLOSED · rev-7 · 2026-11-23 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0185@ce70dc70 whole
 **Carries:** node:tag-namespace.workflow
@@ -18,7 +18,9 @@
 | [2026-11-05-build-TOOL-dBoundRoles-20-deviation-203.md](../build/2026-11-05-build-TOOL-dBoundRoles-20-deviation-203.md) | deviation | — |
 | [2026-11-23-build-TOOL-dBoundRoles-20-1-main-loop-decision.md](../build/2026-11-23-build-TOOL-dBoundRoles-20-1-main-loop-decision.md) | journal | — |
 | [2026-11-23-build-TOOL-dBoundRoles-20-2-owner-ruling.md](../build/2026-11-23-build-TOOL-dBoundRoles-20-2-owner-ruling.md) | journal | TOOL-dBoundRoles-19 |
+| [2026-11-23-build-TOOL-dBoundRoles-20-3-acceptance-ledger.md](../build/2026-11-23-build-TOOL-dBoundRoles-20-3-acceptance-ledger.md) | journal | — |
 | [2026-11-23-build-TOOL-dBoundRoles-20-4-main-loop-decision.md](../build/2026-11-23-build-TOOL-dBoundRoles-20-4-main-loop-decision.md) | journal | — |
+| [2026-11-23-build-TOOL-dBoundRoles-20-deviation-204.md](../build/2026-11-23-build-TOOL-dBoundRoles-20-deviation-204.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |

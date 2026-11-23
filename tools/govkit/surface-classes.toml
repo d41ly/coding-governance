@@ -42,6 +42,20 @@ plant = "{prefix}/govkit/step_gate.py:write_agent_plant"
 summary = "each role agent an adopter's roles kit renders, by its stem"
 
 [[class]]
+id = "role"
+reader = "{prefix}/govkit/step_gate.py:read_role_members"
+plant = "{prefix}/govkit/step_gate.py:write_role_plant"
+summary = "each gov role row of the composition, by its tag role.<name> (TOOL-dBoundRoles-20)"
+witness = "{prefix}/playbook/pins.py:read_change_successors"
+
+[[class]]
+id = "workflow"
+reader = "{prefix}/govkit/step_gate.py:read_workflow_members"
+plant = "{prefix}/govkit/step_gate.py:write_workflow_plant"
+summary = "each gov [[workflow]] entry of the composition, by its tag workflow.<name> (TOOL-dBoundRoles-20)"
+witness = "{prefix}/playbook/pins.py:read_change_successors"
+
+[[class]]
 id = "conf"
 reader = "{prefix}/govkit/step_gate.py:read_conf_members"
 plant = "{prefix}/govkit/step_gate.py:write_conf_plant"

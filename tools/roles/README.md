@@ -614,7 +614,9 @@ a handoff carries none. A pre-tag (v3.x) charter, with
 asking for a reseed; a doc of neither shape refuses. Beside the types sits `.claude/roles.json`, the generated index the hooks read: every role
 with its `workflow`, `writes`, `agent`, `layer` and `acts-as`, `agent: false` roles included, its
 `role-sha`, and `harnesses`, the
-repo-relative scripts of every workflow whose `driver` is `workflow`. `role-sha` is
+repo-relative scripts of every workflow whose `driver` is `workflow` that this install holds, an unheld
+one printed and left out (TOOL-dBoundRoles-20 S8); a repository role of the composition carries
+`origin: repository` and an empty `role-sha`. `role-sha` is
 `roles_lib.derive_section_sha` of the `## Role` section `roles_lib.render_role_section` composes, the
 one composition `handoff.py render` writes into a handoff and hashes into its marker: the work-order
 template's role part under the kit, filled with the rendered role, its `### Drive` lines from the
@@ -691,8 +693,8 @@ Protocols section lists.
   cannot spawn a type written after it started.
 - `/build` drives the three harnesses the workflow table names, which ship in the `review-harness`
   kit, not a default. Without it the role agents, the handoffs and the gates still work, and the
-  catalogue checker, the agent render and `check-wiring.sh` each print a `note` per absent harness.
-  The agent render is the one reader that prints `misplaced`, for a harness its kit holds elsewhere
+  catalogue checker, the agent render and `check-wiring.sh` each print a `note` per absent harness,
+  which `.claude/roles.json` does not list. The agent render is the one reader that prints `misplaced`, for a harness its kit holds elsewhere
   under the tool root; `check-wiring.sh`'s note names `adopt-roles.sh --check` as the command that
   says which.
 
@@ -793,6 +795,20 @@ header, with what it does not check), then a summary of every count it graded, t
 them. Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the conf, its
 `CHARTER` or its `MEMORY_ROOT` is missing, or the doc is no charter this kit reads. `--write` re-renders the region below from the table and the front matter, and nothing
 else; the check compares the two on every run.
+
+THE COMPOSITION (TOOL-dBoundRoles-20). From R2 on the checker grades the role and workflow kinds as
+`roles_lib.compose_roles` and `compose_workflows` compose them: these files with the overlay's
+`[[role]]` and `[[workflow]]` rows, `.governance/instructions.toml` at HEAD, through the playbook kit's
+`overlay_rows.py compose`, which the loop kit's `composition.read_composition_at` runs. Each kind's row
+schema sits beside this file, `role-row-schema.toml` and `workflow-schema.toml`; R2 joins the first to
+`role-schema.toml` key for key, and R6 the second to the entry keys. No closed set of workflow names or
+role slots sits in the checker: R6 refuses a missing gov entry through the loop definition's own rows.
+A repository row is graded by every field rule, its body arms aside, and the region below renders gov's
+own table and roles alone. `render_agents.py` lists a repository role in `.claude/roles.json` with
+`origin: repository` and renders no agent type for it, and `handoff.py` reads the same composition.
+`--check-actor-patch <file>` and `--scenario-rows <file>` are the checker's two composed verbs, for the
+loop kit's item check and for a build's scenario rows; the help page on roles, its section "Adding
+your own role or workflow", is the adopter's account.
 
 ## The workflow shapes
 
