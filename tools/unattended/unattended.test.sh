@@ -18244,6 +18244,46 @@ same "KDS44 AC30 ...and is at most PROGRESS_BOUND + 5 s grace + 5 s margin slowe
   "$(( ${kd44_t1:-999} - ${kd44_t0:-0} <= PROGRESS_BOUND + 10 ))" "1"
 remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"; rm -rf "$kd44_stub"; reset_tree
 
+# ==================================================================================================
+# KICK-dKeptSession-56 AC21 — THE BOUNDED PATH NEVER WAITS ON A GRANDCHILD, AND THE UNBOUNDED ONE
+# STILL EMITS. AC30's landing fixture again, its stub's `progress` now printing one progress line and
+# exiting 0 at once: first after starting a 30 s grandchild that holds the verb's stdout, the shape
+# `sleep 30 &` takes, so `--landed tRun` exits 0 printing the line and is slower than AC30's stub
+# sleeping 0 by at most AC30's own PROGRESS_BOUND + 10 s: `run_loop_verb`'s bounded path writes to
+# `init_bounded`'s capture files and waits on its child alone, never a `$( )` the grandchild holds
+# open (S34). Then with GATE_BOUND_LIVE=0, `init_bounded`'s unbounded branch, the stub with no
+# grandchild still has its line printed. STAGED: a driver whose bounded verb captures by `$( )`;
+# RED, observed at the close. WHAT THIS BLOCK DOES NOT DRIVE: a host with no runnable `timeout`.
+# ==================================================================================================
+kd56_stub=$(mktemp -d)
+printf '%s\n' 'import subprocess, sys' 'sys.stdout.reconfigure(encoding="utf-8")' 'if sys.argv[1:2] == ["progress"]:' \
+  '    if open(sys.argv[0] + ".s", encoding="utf-8").read() == "grandchild":' \
+  '        subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"], stdout=sys.stdout, stderr=sys.stderr)' \
+  '    print("progress — tRun · landing · kd56 stub", flush=True)' > "$kd56_stub/loop_transition.py"
+run_kd56_landed() { # grandchild|plain · GATE_BOUND_LIVE -> the in-process --landed output, then `rc <n> took <s>`
+  local s=$EPOCHSECONDS out rc
+  printf '%s' "$1" > "$kd56_stub/loop_transition.py.s"
+  out=$( ( GATE_BOUND_LIVE=$2
+           resolve_position_engine() { # the stub for loop_transition.py, the real engine for every other script
+             if [ "${1:-}" = loop_transition.py ]; then PE_PY=$_rkd_py; PE_PATH=$kd56_stub/loop_transition.py; return 0; fi
+             resolve_kd44_engine "$@"; }
+           load_driver_conf && main --landed tRun ) 2>&1 ); rc=$?
+  printf '%s\nrc %s took %s\n' "$out" "$rc" "$((EPOCHSECONDS - s))"
+}
+build_claim_landing
+kd56_held=$(run_kd56_landed grandchild "$REMOTE_BOUND_LIVE")
+remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"
+build_claim_landing
+kd56_plain=$(run_kd56_landed plain 0)
+kd56_t=$(sed -n 's/^rc [0-9]* took \([0-9]*\)$/\1/p' <<<"$kd56_held")
+same "KDS56 AC21 a progress stub backgrounding a 30 s grandchild: --landed exits 0 printing its line" \
+  "$(grep -c '^rc 0 took ' <<<"$kd56_held") $(grep -c '^progress — tRun · landing · kd56 stub$' <<<"$kd56_held")" "1 1"
+same "KDS56 AC21 ...and is at most PROGRESS_BOUND + 10 s slower than AC30's stub sleeping 0, never waiting on the grandchild" \
+  "$(( ${kd56_t:-999} - ${kd44_t0:-0} <= PROGRESS_BOUND + 10 ))" "1"
+same "KDS56 AC21 with GATE_BOUND_LIVE=0 a stub exiting 0 still has its progress line printed" \
+  "$(grep -c '^rc 0 took ' <<<"$kd56_plain") $(grep -c '^progress — tRun · landing · kd56 stub$' <<<"$kd56_plain")" "1 1"
+remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"; rm -rf "$kd56_stub"; reset_tree
+
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
@@ -25180,7 +25220,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # hung-progress block's 3 region-eight `same` (AC25 3, AC27 1, AC30 3), each unconditional and outside
 # any loop, off the diff's own lines; the landed-notice fixture's region adds none. No skip branch. No
 # suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4187
+# RAISED 4187 -> 4190 by KICK-dKeptSession-56 on 2026-11-23: the grandchild-progress block's 3
+# region-eight `same` (AC21 3), each unconditional and outside any loop, off the diff's own lines; no
+# skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4190
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25479,7 +25522,8 @@ FLOOR_SHARD_7=311
 # RAISED 1390 -> 1393 by KICK-dKeptSession-11: the same 3 region-eight progress assertions, see FLOOR_ASSERTIONS.
 # RAISED 1393 -> 1397 by KICK-dKeptSession-61: the same 4 region-eight sent-read assertions, see FLOOR_ASSERTIONS.
 # RAISED 1397 -> 1404 by KICK-dKeptSession-44: the same 7 region-eight reply-verb, fetch and progress assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1404
+# RAISED 1404 -> 1407 by KICK-dKeptSession-56: the same 3 region-eight grandchild-progress assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1407
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
