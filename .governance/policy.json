@@ -1331,7 +1331,7 @@
   },
   "legacy_blobs": {
     ".agent-cap.conf": null,
-    ".governance/instructions.toml": "6b3049c9cc983619025574c23e5146d330901c22"
+    ".governance/instructions.toml": "fdaa9842408427fd8a85ac2e7dd51191973749eb"
   },
   "policy_blob": "1475a5e4ad9d506b5c6084c239bc4bfd0783d60d"
 }
