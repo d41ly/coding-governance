@@ -1,6 +1,6 @@
 # KICK-dKeptSession-53 — a consumed interface notice supersedes the parent's earlier rows by content key and by the session chain, never by arrival
 
-**Status:** DEFERRED · rev-8 · 2026-11-23 · node a · Tier-2 · base 4eb48ae6 · streams kickoff · order 26 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-9 · 2026-11-23 · node a · Tier-2 · base 4eb48ae6 · streams kickoff · order 26 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -19,6 +19,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md) | research | KICK-dKeptSession-50 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-55 KICK-dKeptSession-61 |
 | [2026-11-22-prompt-KICK-dKeptSession-53-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-53-reground-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-53-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-53-1-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-53-2-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-53-2-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-53-plant-fix-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-53-plant-fix-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 
 <!-- /gen:spec-records -->
@@ -54,8 +56,11 @@ keys write. It repairs `KICK-dKeptSession-42` and builds one step after it (orde
   `MAIL_COLUMNS` and then `MAIL_ORDER_COLUMNS`, a new tuple `("seq", "after", "content-key")`, so a
   row dict carries columns 12 to 14 where the row holds them. Its floor stays a row of at least
   eleven fields, `len(MAIL_COLUMNS)`, so a shorter row is still guarded, and `derive_mail_chain`
-  reads a column the row lacks as `-`. The comment above `MAIL_COLUMNS` and `read_mail_rows`'
-  docstring name the tuple and what reads it. Observed by AC1 and AC3.
+  reads a column the row lacks as `-`; the zip stops at the shorter, so columns 15 and 16 stay out
+  of the dict. The comment above `MAIL_COLUMNS` names all five later columns, 12 `seq`, 13 `after`,
+  14 `content-key`, 15 `deadline` and 16 `default` (`KICK-dKeptSession-24` S5), the first three as
+  the tuple `derive_mail_chain` reads and the last two as read by no row dict; `read_mail_rows`'
+  docstring names the tuple and what reads it. Observed by AC1 and AC3.
 - **S3** — id 4. What the current row supersedes. Where `check_parent_interfaces` answers `rc` 0
   with `interface — current <id> · <kind> · key <k>` (`KICK-dKeptSession-7` S3),
   `write_consumed_acks` acknowledges that row and every `open` `confirmed` or `changed` row from
@@ -85,6 +90,12 @@ keys write. It repairs `KICK-dKeptSession-42` and builds one step after it (orde
   `after=None`, each written as its key line where given, and its docstring names them.
   `derive_mail_chain` is the one function the module gains, so `memory/map/generated/symbols.json`
   moves by it alone. Observed by AC6.
+- **S7** — The plant's helper. `tools/loop/placement.py#write_fixture_gov_ref` gains `parent=None`,
+  the commit's one parent where given, and returns the commit's sha, so a plant lands a second
+  message on a ref after the first; its callers pass none and ignore the sha, and its docstring
+  says so. `acks-later-key` pushes `c` onto `s2` with `parent` the sha it returned for `b`. It adds
+  no function, so `memory/map/generated/symbols.json`, which records no signature, does not move by
+  it. Observed by AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -114,12 +125,16 @@ keys write. It repairs `KICK-dKeptSession-42` and builds one step after it (orde
 ### Evidence
 
 Read at `4eb48ae6` (2026-11-23), with the specs of units 24, 10, 25, 21, 6, 7, 35, 42, 8, 11, 43
-and 52 read as landed before this unit.
+and 52 read as landed before this unit; the helper, the columns and the comment re-read at
+`edb4a01e` for rev-9.
 
-- `tools/unattended/unattended.sh#read_mailbox` prints fourteen TAB columns: 1 `id`, 2 `kind`, 3
+- `tools/unattended/unattended.sh#read_mailbox` printed fourteen TAB columns at `4eb48ae6`: 1 `id`, 2 `kind`, 3
   `to`, 4 `state`, 5 `first-seen`, 6 `from-build`, 7 `subject`, 8 `answers`, 9 `ref`, 10 `commit`,
   11 `reply`, then 12 `seq`, 13 `after` and 14 `content-key`, each `-` where the record carries none.
-  `KICK-dKeptSession-24` S5 appends 15 `deadline` and 16 `default`, the first fourteen in place.
+  `KICK-dKeptSession-24` S5, merged at `84b64ab7e`, appended 15 `deadline` and 16 `default`, so at
+  `edb4a01e` it prints sixteen (DERIVED: eleven plus the five later keys `read_mailbox` splits), the
+  first fourteen in place, and the comment above
+  `tools/loop/loop_transition.py#MAIL_COLUMNS` still names the later columns 12 to 14 alone.
 - `tools/unattended/unattended.sh#write_mail_post` writes `seq` 1 on a session's empty ref, else its
   tip's first-parent count plus one, and on `seq` 1 writes `after`, the id of the tip of the build's
   other cached mail ref first sighted last, or `none`. It fetches only the sender build's mail refs,
@@ -138,7 +153,11 @@ and 52 read as landed before this unit.
   `content_key=None` and unit 24 optional `deadline` and `default` keys. A record with no
   `deadline` judges 2 under unit 24 S5 and stays `open`, whatever its sighting.
 - `tools/loop/placement.py#write_fixture_gov_ref` pushes one parentless commit to a ref of the
-  fixture's remote, so each planted message is its ref's one commit, and its `seq` the key it says.
+  fixture's remote and returns nothing, so each planted message is its ref's one commit, and its
+  `seq` the key it says. Git refuses a parentless commit pushed onto a ref already holding one as a
+  non-fast-forward, so at `edb4a01e` it cannot put `c` on `s2` over `b`. Its callers are the
+  fixtures of `tools/loop/placement.py`, `tools/loop/claim.py`, `tools/loop/position.py` and
+  `tools/loop/loop_transition.py`, each one message per ref.
 
 ### The take-over case
 
@@ -158,6 +177,7 @@ acks-later-key adds  ref fy/z/s2: seq 2 changed K3 (id c)  -> b precedes c, c st
 | `derive_mail_chain` | function, `tools/loop/loop_transition.py` | `py.function`, OK by `lexicon.py --suggest` |
 | `MAIL_ORDER_COLUMNS` | constant, `tools/loop/loop_transition.py` | none |
 | `seq`, `after` | keywords of `render_fixture_mail`, each one key line where given | none |
+| `parent` | keyword of `write_fixture_gov_ref`, `tools/loop/placement.py` | none |
 | `acks-takeover`, `acks-later-key` | `--plant` cases of `loop_transition.py --fixture`, `PLANTS` and `run_selftest` | none |
 
 ### The plants
@@ -170,7 +190,12 @@ session. The acks post as unit 42's plants set the fleet user and the session id
 | Plant | Stages |
 |---|---|
 | `acks-takeover` | `fy`'s spec and lease as `acks-confirmed` stages them, K2 the key over the listing at the lease's `witness`. `b` on `refs/gov/mail/fy/z/s2`, `seq: 1`, `after: a`, sighted by one `read_mail_rows(top, "tFix")`; then `a`, K1 a key no listing derives, on `refs/gov/mail/fy/z/s1`, `seq: 1`. B4 over the real chain and acks; one read after it, each state printed `loop: fixture · state <id> · <state>`; then `loop: fixture · chain · a precedes b · <yes or no> · first-seen swapped · <yes or no>` over that read's rows and over a copy with the `first-seen` of `a` and `b` swapped |
-| `acks-later-key` | `a`, `b` and `c`, `seq: 2` on `s2`, put on the remote with no read between; `check_parent_interfaces` stood in naming `b` current and `run_sourced` wrapped, each ack recorded and answered `(0, "mail — posted <id> · <ref>")`, as `acks-superseded` stands both in; B4; then `loop: fixture · acks <ids or none>` |
+| `acks-later-key` | `a`, `b` and `c`, `seq: 2` on `s2`, put on the remote with no read between, `c` pushed with `parent` the sha returned for `b` (S7); `check_parent_interfaces` stood in naming `b` current and `run_sourced` wrapped, each ack recorded and answered `(0, "mail — posted <id> · <ref>")`, as `acks-superseded` stands both in; B4; then `loop: fixture · acks <ids or none>` |
+
+S7 takes the `parent` keyword over a ref of `c`'s own, since on its own ref `c` would be placed by
+`after` alone, as `b` is in `acks-takeover`, and no plant would observe S1's same-ref `seq` branch.
+It is the keyword `KICK-dKeptSession-61` rev-9 S4 describes, in its words; unit 61 builds at order
+27 (PINNED 2026-11-23, its status header), after this unit, so it finds the keyword landed and its spec is re-grounded at its turn.
 
 ### Migration
 
@@ -180,11 +205,14 @@ None: no notice exists before `KICK-dKeptSession-7`.
 
 Found by `git grep -n -i -E "first.seen|earlier|superseded|MAIL_COLUMNS|eleven|seq|after"` over
 `tools/loop`, `help/loop.md`, `help/orientation-card.md` and `memory/guides` at `4eb48ae6`, with
-unit 42's, unit 7's and unit 24's specs for the texts they land.
+unit 42's, unit 7's and unit 24's specs for the texts they land; for rev-9, `git grep -n -i -E
+"parentless|write_fixture_gov_ref"` over `tools`, `help` and `memory/guides` at `edb4a01e`.
 
 | Text | Verdict |
 |---|---|
-| `tools/loop/loop_transition.py`, the comment above `MAIL_COLUMNS`, which says the later columns are not read | false: S2 |
+| `tools/loop/loop_transition.py`, the comment above `MAIL_COLUMNS`, which names the later columns 12 to 14 alone and says they are not read | false: S2 |
+| `tools/loop/placement.py#write_fixture_gov_ref`, its docstring "One parentless commit" | false: S7 |
+| `tools/loop/position.py`, the comment on its mail plants, each message one parentless commit on its own ref | stays: it passes no `parent` |
 | `tools/loop/loop_transition.py`, `read_mail_rows`' docstring, each row a dict of `MAIL_COLUMNS` | false by omission: S2 |
 | `tools/loop/loop_transition.py`, `write_consumed_acks`' docstring (unit 42) | false: S3 |
 | `help/loop.md`, unit 42's table "Who acknowledges what", its earlier and not-current rows | false: S4 |
@@ -256,6 +284,7 @@ raise, and never edits `tools/gate-legs.json`.
 - `tools/loop/loop_transition.py`: S1's `derive_mail_chain`, S2's `MAIL_ORDER_COLUMNS` and zip,
   S3 in `write_consumed_acks`, `render_fixture_mail`'s two keywords, the two plants and their
   `run_selftest` cases, and the comment and docstrings of §4 "The shipped texts"
+- `tools/loop/placement.py`: S7, `write_fixture_gov_ref`'s `parent`, its return and its docstring
 - `tools/loop/README.md`: S4, the fixture sentence and the guard paragraph where it states the rule
 - `help/loop.md`: S4, the table's two rows and the fixture-cases sentence
 - `memory/map/generated/symbols.json`: `derive_mail_chain` added, by `python
@@ -312,9 +341,10 @@ which `a` is `s1`'s `confirmed` K1, `b` the take-over `s2`'s `changed` K2 naming
   `first-seen` prints `no` on one side.
 - **AC3** — When `--plant acks-later-key` runs, B4 prints `loop: fixture · record · exit 1` and a
   `refused — tFix · mail open` line naming `c`'s id, `KICK-dKeptSession-5` S9's `MailHeld`, and the
-  `loop: fixture · acks` line does not name `c`.
+  `loop: fixture · acks` line does not name `c`, which the plant pushed onto `s2` over `b` (S7).
   Red when: a row the chain places after the current one is acked unconsumed, as a scratch copy
-  acking every row the chain relates to the current one shows.
+  acking every row the chain relates to the current one shows; or the plant stops at `c`'s push,
+  refused as a non-fast-forward, as a scratch copy of `write_fixture_gov_ref` with no `parent` does.
 - **AC4** — When `grep -n "content key or by the session chain" help/loop.md` runs, it prints the
   guard table's row for a superseded `confirmed` or `changed`; and `grep -c "acks-takeover"
   help/loop.md tools/loop/README.md tools/loop/loop_transition.py` prints a count of at least `1`
@@ -338,12 +368,18 @@ which `a` is `s1`'s `confirmed` K1, `b` the take-over `s2`'s `changed` K2 naming
 
 ## 7. Gates
 
-`loop transition record` · `every held leg is budgeted, every budget row resolves` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop transition record` · `loop placement fixtures` · `loop claim fixtures` · `loop position fixtures` · `every held leg is budgeted, every budget row resolves` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 · the `acks-takeover` plant, unit 27's take-over with the `changed` sighted first, and `acks-later-key`, a later key on the take-over's ref, staged red by scratch copies of `write_consumed_acks` selecting by `first-seen`, of `derive_mail_chain` ordering by `first-seen`, and of one acking every row the chain relates · the `loop transition record` row's `plants=<n>` token rises by two
 
+By `python tools/check-spec-tokens.py --legs-for tools/loop/placement.py` at `edb4a01e`, S7's
+file trips only the broad `tools/` guard, as `tools/loop/loop_transition.py` does; `loop placement
+fixtures`, `loop claim fixtures` and `loop position fixtures` run the helper's callers passing no
+`parent`, so they join the line.
+
 The arm does not check a predecessor addressed to another dependent, unit 61's; two concurrent
-sessions with no take-over; or a row of fewer than fourteen fields, which no landed writer prints.
+sessions with no take-over; a row of fewer than fourteen fields, which no landed writer prints; or
+a `parent` naming a commit other than the ref's tip.
 
 ## 8. Open questions
 
@@ -397,6 +433,13 @@ sessions with no take-over; or a row of fewer than fourteen fields, which no lan
   plants, the `changed` sighted by a read rather than a planted feed line, and `acks-later-key` over
   unit 42's stand-ins; AC3 holds whether unit 55 lands first; the token re-priced from 32 to 34
   and the leg's added seconds stated, §4's estimates; the refusal ceiling stated untouched.
+- rev-9 · 2026-11-23 · S2 · S7 · §4 · AC3 · §7 · under
+  `2026-11-23-prompt-KICK-dKeptSession-53-plant-fix-brief`, handed off by
+  `2026-11-23-prompt-KICK-dKeptSession-53-2-spec-writer`: S7 is new, `write_fixture_gov_ref` gaining
+  `parent=None` and its sha, since a parentless push of `c` onto `s2` is refused, so this unit makes
+  its own plant buildable ahead of `KICK-dKeptSession-61`; `tools/loop/placement.py` joins Files
+  touched, its docstring the texts made false, and three fixture legs the leg line; S2's comment
+  names all five later columns, unit 24 having landed `deadline` and `default` as 15 and 16.
 
 ## 10. Reuse audit
 
