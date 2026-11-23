@@ -326,3 +326,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T04:12:30Z brief · item TOOL-dBoundRoles-11 · reason 64782219c8cd memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-11-build-brief.md
 
 2026-11-23T04:30:48Z brief · item TOOL-dBoundRoles-11 · reason 548d6021cff4 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-11-build-brief.md
+
+2026-11-23T05:25:29Z dispatch · item 1d6abb15 TOOL-dBoundRoles-47 · reason tools/roles/adopt-roles.test.sh memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-47-deviation-472.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-47-1-acceptance-ledger.md memory/map/generated/symbols.json
+
+2026-11-23T05:25:30Z brief · item TOOL-dBoundRoles-47 · reason bd7e823ec7fa memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-47-build-brief.md
