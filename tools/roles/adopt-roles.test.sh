@@ -2625,7 +2625,8 @@ shutil.copyfile(repo / ch, fx / ch)
 git("init", "-q"); git("symbolic-ref", "HEAD", "refs/heads/main")
 git("add", "-A"); git("commit", "-q", "--no-verify", "-m", "base")
 BASE = git("rev-parse", "HEAD").stdout.strip()
-roles_py, compose_py = tool / "roles" / "check_roles.py", tool / "playbook" / "overlay_rows.py"
+RK, LK, PK = (tool / home for home in ("roles", "loop", "playbook"))
+roles_py, compose_py = RK / "check_roles.py", PK / "overlay_rows.py"
 RET = "outcome:done|returned, why:text?"
 def role_row(name, ret=RET, shapes="single", workflow="triage"):
     return ('\n[[role]]\ntag = "role.adopter.%s"\nname = "%s"\ndescription = "Triages a request."\n'
@@ -2660,7 +2661,7 @@ def composed(kind):
 ok = plant({OV: role_row("triager") + flow_row("triage", ["triager"])}, "ac2")
 rc, out = check()
 say("ac2-check", ok and rc == 0, out)
-rc2, out2 = run(str(tool / "roles" / "render_agents.py"), "--write")
+rc2, out2 = run(str(RK / "render_agents.py"), "--write")
 idx = json.loads((fx / ".claude" / "roles.json").read_text(encoding="utf-8")) if rc2 == 0 else {}
 say("ac2-index", (idx.get("roles") or {}).get("triager", {}).get("origin") == "repository", out2)
 reset()
@@ -2671,8 +2672,8 @@ empty = fx.parent / "fx46-empty.json"
 empty.write_text(json.dumps({"kind.role": [], "kind.workflow": []}), encoding="utf-8")
 rc, out = check("--scenario-rows", str(empty))
 tags = sorted(ln.split()[2] for ln in out.splitlines() if ln.startswith("roles: composed "))
-files = sorted("role." + p.name[:-len(".agent.md")] for p in (tool / "roles" / "agents").glob("*.agent.md"))
-names = sorted("workflow." + w["name"] for w in tomllib.loads((tool / "roles" / "workflows.toml").read_text(
+files = sorted("role." + p.name[:-len(".agent.md")] for p in (RK / "agents").glob("*.agent.md"))
+names = sorted("workflow." + w["name"] for w in tomllib.loads((RK / "workflows.toml").read_text(
     encoding="utf-8"))["workflow"])
 say("ac3-self", rc == 0 and tags == sorted(files + names) and "origin: repository" not in out, out)
 # AC4: a role in `single` named by a panel entry's stage
@@ -2705,7 +2706,7 @@ for name, (row, needle) in cases.items():
     say(name, rc == 1 and needle in out, out)
     reset()
 # the second fixture: gov's pack holds a cycle row named `driver`, and a row replaces it
-src = (tool / "roles" / "agents" / "gov-session.agent.md").read_text(encoding="utf-8")
+src = (RK / "agents" / "gov-session.agent.md").read_text(encoding="utf-8")
 plant({"%s/roles/agents/driver.agent.md" % tool_rel.as_posix(): src.replace("name: gov-session", "name: driver")},
       "a cycle row named driver")
 _rc, got = composed("role")
@@ -2720,7 +2721,7 @@ reset()
 _rc, items = composed("item")
 ipins = items["pins"] if isinstance(items, dict) else {}
 orienter = next(
-    ln.partition(":")[2].strip() for ln in (tool / "roles" / "agents" / "gov-orienter.agent.md").read_text(
+    ln.partition(":")[2].strip() for ln in (RK / "agents" / "gov-orienter.agent.md").read_text(
         encoding="utf-8").splitlines() if ln.startswith("return:"))
 patch = ('\n[[item]]\ntag = "item.entry.adopter.orient-triaged"\nedges = "amends=item.entry.orient@%s"\n'
          'actor = "role:adopter.triager"\n' % ipins.get("item.entry.orient"))
@@ -2730,7 +2731,7 @@ item_file.write_text(json.dumps({"item": {"tag": "item.entry.orient", "actor": "
 for name, ret, want in (("ac6-lacking", RET, 1), ("ac6-held", orienter, 0)):
     plant({OV: role_row("triager", ret, workflow="triage") + flow_row("triage", ["triager"]) + patch}, name)
     rc, out = check("--check-actor-patch", str(item_file))
-    lrc, lout = run(str(tool / "loop" / "loop_items.py"), "check")
+    lrc, lout = run(str(LK / "loop_items.py"), "check")
     lacks = "lacks item item.entry.orient's return template"
     say(name + "-verb", rc == want and (lacks in out) == (want == 1), out)
     say(name + "-item", (lacks in lout) == (want == 1)
@@ -2769,7 +2770,7 @@ say("ac11-alone", rc == 0 and "screener" not in out and "workflow.adopter.quick"
 plant({OV: '\n[[scenario]]\ntag = "scenario.adopter.triage-run"\nextends = "none"\nadmits = { entry = ["triage"] }\n'
            'entry = "step.plan"\nactivates = { "kind.role" = [ { tag = "role.adopter.screener" } ], '
            '"kind.workflow" = [ { tag = "workflow.adopter.quick" } ] }\nthen = []\n'}, "ac11-scenario")
-rc, out = run(str(tool / "loop" / "scenario.py"), "check")
+rc, out = run(str(LK / "scenario.py"), "check")
 say("ac11-activatable", "activates kind" not in out and "unarmed" not in out and "scenario" in out, out)
 reset()
 PY
@@ -2783,7 +2784,11 @@ for _ln in "${_l46[@]}"; do
 done
 build_fixture; _rc46=$?
 _t46=; [[ $FXK == */* ]] && _t46=${FXK%/*}/
-_h46="${_t46}workflows/tier2-review.js"
+_h46=$("$PY" -B -c 'import sys, tomllib
+with open(sys.argv[1], "rb") as fh:
+    rows = tomllib.load(fh).get("workflow") or []
+print(next(w["harness"] for w in rows if w.get("name") == "closing-review").split("}/", 1)[-1])' "$FX/$FXK/workflows.toml")
+_h46="${_t46}${_h46//$''/}"
 out=$(run_adopter --scaffold); rc=$?
 _i46=$("$PY" -B -c 'import json, sys
 with open(sys.argv[1], encoding="utf-8") as fh:
