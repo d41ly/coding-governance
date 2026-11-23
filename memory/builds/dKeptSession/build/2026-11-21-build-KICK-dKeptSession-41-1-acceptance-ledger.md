@@ -10,9 +10,9 @@ the mirror at that commit and it landed in the second, as S5 states. The referen
 `help/reference/drive.md`, `help/reference/kinds.md` and `help/reference/units.md` with LF endings over
 a CRLF checkout and no content change, so `git diff` read nothing in them and they were restored.
 
-Owed to the close: every leg the spec's section 7 names, among them `policy check`, `help reference
-pages`, `docs`, `recall floor`, `recall floor arms` and `memory hygiene`. The spec declares no `New
-arm:` line, so no RED-first observation is owed.
+Owed to the close: every leg the spec's section 7 names, among them `policy check`,
+`help reference pages`, `docs`, `recall floor`, `recall floor arms` and `memory hygiene`. The spec
+declares no `New arm:` line, so no RED-first observation is owed.
 
 **Evidences:** KICK-dKeptSession-41
 - AC1 — the spec's `tomllib` probe, run in the policy kit over `catalogue.toml`, printed
@@ -22,8 +22,8 @@ arm:` line, so no RED-first observation is owed.
 - AC2 — `policy.py lists --write` printed `drained 3: actions.free, attendance, notify.owner` for
   `unsummarised-keys.txt` (DERIVED, that run), and the spec's `grep -cx` over the list then printed `0`
   (DERIVED, that probe).
-- AC3 — `policy.py mirror --write`, run once the catalogue edit was committed, printed `mirror written
-  · 260 keys` with catalogue blob `d754425f` (DERIVED, that run); `mirror --check` at the pass's last
+- AC3 — `policy.py mirror --write`, run once the catalogue edit was committed, printed
+  `mirror written · 260 keys` with catalogue blob `d754425f` (DERIVED, that run); `mirror --check` at the pass's last
   commit printed `policy: mirror fresh` (DERIVED, that probe).
 - AC4 — over the rendered page and the edited list, the spec's four greps printed `1`, `2`, `0` and
   `0` (DERIVED, that probe), against `0`, `0`, `3` and `3` at `edb4a01e` (PINNED 2026-11-23, the
@@ -42,8 +42,8 @@ answered here (spec §8 F2).
 
 - KICK-dKeptSession-8 AC8 — its S1: "This unit writes none of the three: the row's `summary` and
   `usage` are KICK-dKeptSession-41's." The `tomllib` probe printed `dKeptSession read-only-probes`;
-  `node tools/policy/policy-mirror.js get actions.free` printed `read-only-probes`; `docs_leg.py
-  --fingerprints` printed `policy:actions.free` with `c5786fdc` and `help/orientation-card.md`, the
+  `node tools/policy/policy-mirror.js get actions.free` printed `read-only-probes`;
+  `docs_leg.py --fingerprints` printed `policy:actions.free` with `c5786fdc` and `help/orientation-card.md`, the
   fingerprint that page's anchor carries; and `grep -c 'policy:actions.free'` over
   `memory/project/docs-undocumented.txt` printed `0` (DERIVED, that probe).
 - KICK-dKeptSession-11 AC6 — its S1: "This unit writes neither file: the row's `summary` and `usage`
