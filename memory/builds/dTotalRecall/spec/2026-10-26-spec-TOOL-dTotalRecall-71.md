@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-71 — unit 57's edge to unit 56 is certified at step 21 by a probe proven live on a copy without it, and unit 67's false reading is recorded
 
-**Status:** DEFERRED · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-11-22-build-TOOL-dTotalRecall-71-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-71-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-71-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-71-1-spec-writer.md) | journal | TOOL-dTotalRecall-1 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-71-round6-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-71-round6-fix-brief.md) | research | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-71-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-71-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-71-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-71-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-71-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-71-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-75 TOOL-dTotalRecall-74 TOOL-dTotalRecall-76 |
