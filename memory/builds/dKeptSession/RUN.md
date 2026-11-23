@@ -337,3 +337,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T10:05:09Z brief · item KICK-dKeptSession-17 · reason f2b112f593c1 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-17-build-brief.md
 
 2026-11-23T10:08:17Z dispatch · item 476a9dd9 KICK-dKeptSession-17 · reason tools/loop/loop.toml tools/loop/loop_lib.py memory/map/generated/symbols.json tools/loop/breakpoints.py tools/loop/kit.toml tools/loop/README.md tools/run-gates/selftest-budgets.txt help/loop.md memory/project/docs-undocumented.txt tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-17-1-acceptance-ledger.md
+
+2026-11-23T10:36:41Z brief · item KICK-dKeptSession-61 · reason ff61539ec7dd memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-61-build-brief.md
+
+2026-11-23T10:40:19Z dispatch · item 16e8868c KICK-dKeptSession-61 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/loop/loop_transition.py tools/loop/README.md tools/run-gates/selftest-budgets.txt tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-61-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
