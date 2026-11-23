@@ -440,6 +440,13 @@ verb = "check"
 flags = ["--build=", "--root=", "--selftest"]
 
 [[usage]]
+id = "script:{prefix}/loop/loop_transition.py#dependents"
+shape = "verb"
+entry = "{prefix}/loop/loop_transition.py"
+verb = "dependents"
+flags = ["--build=", "--root="]
+
+[[usage]]
 id = "script:{prefix}/loop/policy_edit.py#set"
 shape = "verb"
 entry = "{prefix}/loop/policy_edit.py"

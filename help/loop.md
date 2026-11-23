@@ -1100,7 +1100,7 @@ The notices are mail, posted through the mailbox's own writer:
 - **`confirmed`** — when a parent moves from designing to building, it posts `interfaces <parent>`
   to each build naming it in `parents:`, keyed over the bytes of `git ls-tree -r` of its `spec/`
   folder at the transition commit. A later exit from Design posts `changed` with the new key.
-  `python tools/loop/loop_transition.py dependents --build <slug>` lists who those builds are.
+  `python tools/loop/loop_transition.py dependents --build <slug>` lists who those builds are. <!-- usage: script:tools/loop/loop_transition.py#dependents b7ddefe3 -->
 - **`landed`** — `--landed <parent>` posts `landing <parent>` with the landed sha to each of them,
   and a post that fails prints its line without failing the landing.
 
