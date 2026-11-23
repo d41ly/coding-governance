@@ -122,6 +122,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   build already holds this unit's deviation records 441 and 442, so check the number is unused first. The widen
   door names its own records: the last in this build is widen record 12, so yours start at 13; name every stem it
   mints in your return.
+- This is round two. Round one (`wf_74c1c83a-fbf`) wrote nothing and handed back the kickoff manifest's re-stamp,
+  AC7's grep and S2's spec-audit arm; the main loop decided each in
+  `build/2026-11-23-build-TOOL-dBoundRoles-44-1-main-loop-decision.md`, which binds over the spec as the owner's
+  ruling does: read it whole before you write. `memory/guides/SESSION-KICKOFF.md` joins the write set for the
+  re-stamp; AC7 greps `handoff.py facts` and the pass leaves the unattended Skill's template as it stands; the
+  spec-audit arm over FULL sets `diffFinder` to a distinct role. Every finding round one recorded at this base
+  still holds, the S1 and S3 populations among them; do not re-derive them. This unit's decision record holds
+  sequence number one, so your acceptance ledger is `build/2026-11-22-build-TOOL-dBoundRoles-44-2-acceptance-ledger.md`.
 - A new `[[upgrade]]` step id enters `memory/project/landed-steps.txt` in the pass commit if the ratchet asks for it,
   and a plant you add to a kit's self-test moves its row in `tools/run-gates/selftest-budgets.txt`: re-price that
   row's `plants=` token and scale its ceiling by the plant count, as the rows re-priced in this run did.
@@ -135,7 +143,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   paths only, never `git add -A`.
 - The spec's status is already `INPROGRESS`; move it to `CLOSED` only in the pass commit, after every edit has landed.
   Run `python tools/memory-tree/gen_build_index.py --write` after staging and commit every file it rewrites.
-- Write the acceptance ledger `memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-44-1-acceptance-ledger.md` in the
+- Write the acceptance ledger `memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-44-2-acceptance-ledger.md` in the
   pass commit: one line per section 6 criterion, each leading with a backticked token that criterion itself spells.
 - In every record you write, cite code as `path#symbol` or a blob-pinned `path@<blob8>:<line>`, never a bare
   `path:line`, and put a pin (a sha, a `path:line` or `DERIVED`) on any line quoting a count of lines, files or units.
