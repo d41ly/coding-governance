@@ -18346,6 +18346,13 @@ rr_out=$( (
   echo "ac10.add=$(( $(grep -c . "$F") - n10 )) $(grep -c '^feed: NOTE -' "$rr_d/ac10.err")"
   o=$(check_feed refs/gov/remote/); echo "ac10.check=$? $(grep -c '^unread refs/heads/main MEMORY_ROOT \.\./x$' <<<"$o")"
   run_rr_git checkout -q -- .memory-tree.conf
+  # ---- S3's refusals: a walk git refuses, from a newest record commit this clone does not hold, and a
+  # ---- tip that names no commit; each prints one NOTE and appends nothing.
+  cp "$F" "$rr_d/s3.log"; printf '%s\trefs/heads/main\trecord\t-\t%s\t2026-11-23T00:00:00Z\n' 902 1111111111111111111111111111111111111111 >> "$F"
+  n3=$(grep -c . "$F"); add_record_events refs/heads/main HEAD 2>"$rr_d/s3.err"
+  echo "s3.walk=$(( $(grep -c . "$F") - n3 )) $(grep -c '^feed: NOTE - git could not walk the records of refs/heads/main to ' "$rr_d/s3.err")"
+  cp "$rr_d/s3.log" "$F"; n3=$(grep -c . "$F"); add_record_events refs/heads/main no-such-tip 2>"$rr_d/s3.err"
+  echo "s3.tip=$(( $(grep -c . "$F") - n3 )) $(grep -c '^feed: NOTE - no-such-tip names no commit this clone holds' "$rr_d/s3.err")"
   # ---- AC9: a node with no feed rebuilds it from its tracking ref, then one whose tracking ref is gone.
   run_rr_git clone -q "$rr_d/o.git" "$rr_d/c" && cd "$rr_d/c" || exit 9
   bash "$SCRIPT" --feed rebuild >/dev/null 2>&1; echo "ac9.rebuild=$?"
@@ -18386,6 +18393,8 @@ same "AC8 ...and the check names no duplicate" "$(read_rr_field ac8.check)" "0 0
 same "AC8 RED: a walk keeping one event per file prints four (staged)" "$(read_rr_field ac8.perfile)" "4"
 same "AC10 a root of ../x appends nothing and prints one NOTE" "$(read_rr_field ac10.add)" "0 1"
 same "AC10 ...and the check names it unread" "$(read_rr_field ac10.check)" "1 1"
+same "S3 a walk git refuses appends nothing and prints one NOTE" "$(read_rr_field s3.walk)" "0 1"
+same "S3 a tip naming no commit appends nothing and prints one NOTE" "$(read_rr_field s3.tip)" "0 1"
 same "AC9 --feed rebuild on a node with no feed" "$(read_rr_field ac9.rebuild)" "0"
 same "AC9 ...writes the tracking ref's record events" "$(read_rr_field ac9.events)" "ok"
 same "AC9 ...and --feed check then exits 0" "$(read_rr_field ac9.check)" "0"
