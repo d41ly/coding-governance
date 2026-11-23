@@ -43,7 +43,8 @@ texts. Every other code claim held at the builder's base `6a7a6a052`. Revise the
    Make S31 an observation only, and drop `mail-notice.js` from Files touched unless another clause still edits it.
 4. F-figures: the §7 `New arm:` line's floors read `FLOOR_ASSERTIONS` 4180 and `FLOOR_SHARD_8` 1397 at this base.
    Pin each with DERIVED and its derivation, so the builder raises from the figure it reads.
-5. F-bound: AC30's 12 s bound on the whole `--landed` run leaves 2 s past `PROGRESS_BOUND=10` and `timeout -k 5s`,
+5. F-bound: AC30's 12 s bound on the whole `--landed` run leaves 2 s past `PROGRESS_BOUND=10` and `timeout -k 5s`
+   (PINNED 2026-11-23, the rev-6 AC30),
    which covers the rest of `verb_landed`, including `observe_anchor`, and nothing has measured it. Derive the bound
    from `PROGRESS_BOUND`, the kill grace and a stated margin, rather than a typed 12.
 6. F-decisions: S23 writes `memory/DECISIONS.md` only when the driver's census passes its `REFUSAL_CEILINGS` row.
