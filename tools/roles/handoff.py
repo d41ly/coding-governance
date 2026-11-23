@@ -956,7 +956,9 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     the frame, `lib.derive_frame` over every block's slot (TOOL-dBoundRoles-23 S1): an item's return states its
     list bounds, a population adds `### row contract`, and `item` with `framed_by` refuses a framing with no
     `population` (S2). Every anchor of the composed `## Task` section, `lib.check_anchors`', resolves to the key of
-    a fact this work order hands, or the render refuses naming each one (TOOL-dBoundRoles-24 S3)."""
+    a fact this work order hands, or the render refuses naming each one (TOOL-dBoundRoles-24 S3). The check reads
+    the graded text, that section composed from the same parts with the content of every handed block left out and
+    its heading and fact line kept, so only the text the order authors is graded (TOOL-dBoundRoles-41 S1 S3)."""
     if item is not None and not lib.ITEM_VALUE_RE.match(item):
         raise lib.RolesError("--item '%s' is not an item tag item.<step>.<name>, each segment lowercase "
                              "letters, digits and '-'" % item)
@@ -1157,10 +1159,13 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             if typed:
                 refusals += lib.check_authored_lines(v, key)
             fence = None if typed else lib.render_handed_fence(v)
-            # TOOL-dBoundRoles-23 S1: each block carries its frame slot and its handed fences
-            blocks.append((FRAME_BLOCK_SLOTS.get("### " + key, "material"),
-                           "### %s\n\n%s\n\n%s" % (key, lib.render_fact_line(fact, root), v if typed else fence),
-                           None if typed else [(0, fence)]))
+            line = lib.render_fact_line(fact, root)
+            part = "### %s\n\n%s\n\n%s" % (key, line, v if typed else fence)
+            # TOOL-dBoundRoles-23 S1: each block carries its frame slot and its handed fences; TOOL-dBoundRoles-41
+            # S1 S2: and its graded text, the block itself where it is authored, a typed value or the upstream
+            # rows, else its heading and fact line, the content cut from a file or a record left out
+            blocks.append((FRAME_BLOCK_SLOTS.get("### " + key, "material"), part, None if typed else [(0, fence)],
+                           part if typed or key == UPSTREAM_KEY else "### %s\n\n%s" % (key, line)))
             continue
         src, path = sources[key.split(":")[0]]
         what = ("no %s: %s" % (src, why[src])) if why.get(src) else (
@@ -1176,7 +1181,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     if declaration is not None:
         # TOOL-dBoundRoles-3 S2: each input of the item handed as content under its own level-3 heading, a `reads`
         # key spelled as its `field.` tag, its fact line two below; one it cannot resolve refuses or is not supplied
-        subs, fences = [], []
+        subs, fences, kept = [], [], []
         for k in item_keys:
             key = k.rstrip("?")
             head = lib.derive_field_tag(key) if key in lib.READ_KEYS else key
@@ -1185,7 +1190,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             if fact and not check_placeholder(v):
                 handed_keys.add(fact)
                 fences.append(lib.render_handed_fence(v))
-                subs.append("### %s\n\n%s\n\n%s" % (head, lib.render_fact_line(fact, root), fences[-1]))
+                kept.append("### %s\n\n%s" % (head, lib.render_fact_line(fact, root)))
+                subs.append("%s\n\n%s" % (kept[-1], fences[-1]))
             elif not k.endswith("?"):
                 if not any(r.startswith(key + " — ") for r in refusals):
                     refusals.append("%s — the item %s's input carries no value this render resolves" % (head, item))
@@ -1199,13 +1205,18 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         # TOOL-dBoundRoles-23 S3 S4: the return states each list field's bound, and restates the upstream rule
         # where the rows are handed
         contract = render_return_contract(template, bound, any(b[0] == "upstream" for b in blocks))
-        blocks += [(FRAME_BLOCK_SLOTS.get(head), text, offsets if head == "### inputs" else None) for head, text in
-                   zip(lib.WORK_ORDER_BLOCKS, render_work_order_blocks(item, declaration, prefixes, subs, contract))]
+        # TOOL-dBoundRoles-41 S1 S2: the five blocks once more over the kept sub-blocks, every excerpt's content
+        # left out, as the graded text of each
+        blocks += [(FRAME_BLOCK_SLOTS.get(head), text, offsets if head == "### inputs" else None, graded)
+                   for head, text, graded in zip(lib.WORK_ORDER_BLOCKS,
+                                                 render_work_order_blocks(item, declaration, prefixes, subs, contract),
+                                                 render_work_order_blocks(item, declaration, prefixes, kept, contract))]
     # TOOL-dBoundRoles-4 S3 F5: the prompt writer's framing, authored text inside the bytes the task-sha covers,
     # checked by the fence walk below as every authored block is; with a population, the row contract
-    blocks += [(FRAME_BLOCK_SLOTS.get(text.split("\n", 1)[0]), text, None) for text in framing]
+    blocks += [(FRAME_BLOCK_SLOTS.get(text.split("\n", 1)[0]), text, None, text) for text in framing]
     if any(b[0] == "population" for b in blocks):
-        blocks.append((FRAME_BLOCK_SLOTS[ROW_CONTRACT_HEAD], render_row_contract(template), None))
+        rows_contract = render_row_contract(template)
+        blocks.append((FRAME_BLOCK_SLOTS[ROW_CONTRACT_HEAD], rows_contract, None, rows_contract))
     if charter_error is not None:
         raise charter_error
     refusals += tag_refusals
@@ -1213,7 +1224,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         raise lib.RolesError("\n".join(refusals))
     # TOOL-dBoundRoles-23 S1: the frame, one stable sort by slot, and each handed block's fences at its new index
     frame = lib.derive_frame(blocks)
-    blocks = [b[1] for b in frame]
+    blocks, graded = [b[1] for b in frame], [b[3] for b in frame]
     handed = {i: b[2] for i, b in enumerate(frame) if b[2] is not None}
     opening = ("This handoff is for build `%s`, unit `%s`." % (slug, unit_id) if unit
                else "This handoff is for build `%s`, and names no single unit." % slug)
@@ -1223,7 +1234,9 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         opening += "\nNot supplied, optional: %s%s." % (
             ", ".join("`%s`" % k for k in absent), " — " + "; ".join(reasons) if reasons else "")
     step = reach[0][1].rsplit(".", 1)[1] if reach else None
-    practices = ("### Practices at %s\n\n" % step + "\n".join(
+    # TOOL-dBoundRoles-41 S2: the practices are cut from the charter, so their graded text is the heading alone
+    lead_kept = "### Practices at %s" % step if reach else ""
+    practices = (lead_kept + "\n\n" + "\n".join(
         "- [%s] %s" % (tag.split(".")[1], text) for _reader, tag, text in reach)) if reach else ""
     path = out_path or build_dir / "prompts" / derive_prompt_name(
         build_dir / "prompts", datetime.date.today().isoformat(), unit_id, role, tail)
@@ -1234,16 +1247,24 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         row = lib.read_envelope_row(shown_rows, doc, memory_root)
         if practices and row is not None:
             practices = lib.render_envelope(PRACTICES_DOC % (doc, step), row[0], row[1], practices)
+            lead_kept = lib.render_envelope(PRACTICES_DOC % (doc, step), row[0], row[1], lead_kept)
     # PLAY-dOrderedCharter-8 S7: the card's level-1 block leads the task part after the level-0 practices
     card_block = render_card_block(root)
     lead = [practices, card_block]
     if card_block:
         practices = practices.rstrip("\n") + "\n\n" + card_block if practices else card_block
+    # TOOL-dBoundRoles-41 S1 S2: the card block is cut from the card, so its graded text is its heading alone
+    lead_kept = "\n\n".join(p.rstrip("\n") for p in (lead_kept, card_block.split("\n", 1)[0]) if p)
     # TOOL-dBoundRoles-6 S4: the role section is the library's one composition, the one the role index's
     # `role-sha` hashes, with its drive lines and its agent file's envelope; the task part is the template's
     role_sec = lib.render_role_section(KIT_DIR, role, memory_root, charter_text, granted.get(role, ()), shown_rows)
-    task_sec = lib.render_work_order_section(WORK_ORDER, lib.extract_work_order_parts(WORK_ORDER)[1], {
+    task_part = lib.extract_work_order_parts(WORK_ORDER)[1]
+    task_sec = lib.render_work_order_section(WORK_ORDER, task_part, {
         "opening": opening, "reads": "\n\n".join(blocks), "practices": practices}, wraps) + "\n"
+    # TOOL-dBoundRoles-41 S1: the graded text, the same section composed from the same parts, every handed block's
+    # content left out and its heading and fact line kept, so the anchor check grades only what the order authors
+    graded_sec = lib.render_work_order_section(WORK_ORDER, task_part, {
+        "opening": opening, "reads": "\n\n".join(graded), "practices": lead_kept}, wraps) + "\n"
     # TOOL-dBoundRoles-48 S2: the fence state checked at every block's extents, the render's own, once the section
     # is composed and before the marker hashes it, so a block that opens inside a fence, a handed block's content
     # read outside its own and a walk ending inside one (TOOL-dBoundRoles-38 S5) refuse, and nothing is written
@@ -1251,8 +1272,9 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     if fenced:
         raise lib.RolesError("\n".join(fenced))
     # TOOL-dBoundRoles-24 S3: every anchor the composed section points at resolves to a fact this work order hands,
-    # raised as a list of its own, since the refusals above are raised before the section is assembled (§8 F4)
-    unresolved = lib.check_anchors(task_sec, handed_keys)
+    # raised as a list of its own, since the refusals above are raised before the section is assembled (§8 F4);
+    # TOOL-dBoundRoles-41 S3: read over the graded text, while the marker still hashes the whole section
+    unresolved = lib.check_anchors(graded_sec, handed_keys)
     if unresolved:
         raise lib.RolesError("\n".join(unresolved))
     marker ="<!-- gov:handoff role=%s build=%s unit=%s item=%s path=%s role-sha=%s task-sha=%s -->" % (

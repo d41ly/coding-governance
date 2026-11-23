@@ -135,7 +135,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +8 for arm 37 (TOOL-dBoundRoles-45).
 # +4 for arm 38 (TOOL-dBoundRoles-48).
 # +5 for arm 39 (TOOL-dBoundRoles-24).
-FLOOR_ASSERTIONS=163
+# +3 for arm 40 (TOOL-dBoundRoles-41).
+FLOOR_ASSERTIONS=166
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -2196,7 +2197,7 @@ check_arm "arm 38 AC2 the skeptic's render handing a scratch spec exits 0" "$([ 
 kit = pathlib.Path(sys.argv[1]); src = (kit / "handoff.py").read_text(encoding="utf-8")
 anchor = "    if declaration is not None:\n        # TOOL-dBoundRoles-3 S2"
 (kit / "handoff_a38.py").write_text(src.replace(anchor, sys.argv[2] + "\n" + anchor, 1), encoding="utf-8", newline="\n")' \
-  "$FX/$FXK" $'    blocks.append(("added", "### framing:added\\n\\n```", None))'
+  "$FX/$FXK" $'    blocks.append(("added", "### framing:added\\n\\n```", None, "### framing:added\\n\\n```"))'
 _ls=$(ls -A "$A38P")
 (cd "$FX" && "$PY" -B "$FXK/handoff_a38.py" render --role gov-skeptic --build tFix --unit TOOL-tFix-1 --input "spec=$A38S" \
    --input "diff=one diff line" >/dev/null 2>"$A38E"); _rc=$?
@@ -2251,6 +2252,44 @@ _key=$(printf '%s\n' "$A39" | sed -n 's/^key //p')
 check_arm "arm 39 AC2 ...and a typed diff anchoring the key of the spec the order hands renders" \
    "$([ "$_rc" = 0 ] && [[ $_key == record:* ]] && echo 1 || echo 0)"
 [ "$_rc" = 0 ] || { printf '    key %s\n' "$_key"; sed 's/^/    /' "$A39E"; }
+
+# ---- arm 40 (TOOL-dBoundRoles-41 AC1 AC2): the anchor check grades the text a work order authors, never the content
+# ---- it hands. A scratch spec whose prose, outside any fence, quotes the backticked spans `cmd:<command>` and a
+# ---- well-formed example key: the builder's render handing it as `input:spec` exits 0 and writes its prompt file;
+# ---- the same render under a card whose route quotes the same two spans, its card block handed unfenced at the
+# ---- head of the task, exits 0; the orienter's render handing the spec as `input:prompt` beside a typed question
+# ---- holding a backticked `record:` anchor the order does not hand exits non-zero naming it and writes no file. The
+# ---- failing cases, owed at the close and not observed by the pass that wrote this: `render_handoff` passing the
+# ---- whole section to `check_anchors`, under which the card render exits 1 naming both spans, and a graded text
+# ---- dropping the typed value, under which the orienter's render exits 0. The spec's own spans sit inside its
+# ---- handed fence (TOOL-dBoundRoles-38), which the check's fence walk skips with or without the graded text. WHAT
+# ---- IT DOES NOT CHECK: a practices block, which a fixture with no playbook kit never renders, an item's excerpts,
+# ---- and the marker's task-sha, which the pass compared against a render before the change.
+build_fixture; _rc40=$?
+A40P="$FX/$MR/builds/tFix/prompts"; A40S="$MR/builds/tFix/spec/2026-11-23-spec-TOOL-tFix-1.md"; A40E="$TMP_ROOT/a40.err"
+mkdir -p "$A40P" "$FX/$MR/builds/tFix/spec" \
+  && printf '# TOOL-tFix-1\n\nThe spec quotes `cmd:<command>` and `blob:roles_lib.py@%s:1-4` in its prose.\n' 0123456789ab > "$FX/$A40S"
+_ls=$(ls -A "$A40P")
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-builder --build tFix --unit TOOL-tFix-1 --input "spec=$A40S" \
+   >/dev/null 2>"$A40E"); _rc=$?
+check_arm "arm 40 AC1 the builder's render handing a spec quoting the key grammar in its prose exits 0, writing its file" \
+   "$([ "$_rc40" = 0 ] && [ "$_rc" = 0 ] && [ -z "$_ls" ] && [ -n "$(ls -A "$A40P")" ] && echo 1 || echo 0)"
+[ "$_rc" = 0 ] || sed 's/^/    /' "$A40E"
+mkdir -p "$FX/.claude" && printf '[.claude/orientation-card.md · Level 1 · the card]\n## route\n- build: tFix\n- quotes `cmd:<command>` and `blob:roles_lib.py@%s:1-4`\n[/.claude/orientation-card.md]\n' \
+  0123456789ab > "$FX/.claude/orientation-card.md"
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-builder --build tFix --unit TOOL-tFix-1 --input "spec=$A40S" \
+   --stdout >/dev/null 2>"$A40E"); _rc=$?
+check_arm "arm 40 AC1 ...and under a card whose route quotes both spans, its block handed at the task's head, exits 0" \
+   "$([ "$_rc" = 0 ] && echo 1 || echo 0)"
+[ "$_rc" = 0 ] || sed 's/^/    /' "$A40E"
+rm -f "$FX/.claude/orientation-card.md"
+_ls=$(ls -A "$A40P")
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-orienter --build tFix --unit TOOL-tFix-1 --input "prompt=$A40S" \
+   --input 'question=which seam fits; see `record:memory/nowhere.md@0123456789ab`' >/dev/null 2>"$A40E"); _rc=$?
+check_arm "arm 40 AC2 the orienter's typed question planting an anchor the order does not hand exits non-zero naming it" \
+   "$([ "$_rc" != 0 ] && grep -qF -- 'anchor `record:memory/nowhere.md@0123456789ab` — resolves to no fact' "$A40E" \
+      && [ "$(ls -A "$A40P")" = "$_ls" ] && echo 1 || echo 0)"
+[ "$_rc" != 0 ] || { printf '    exit %s, want non-zero\n' "$_rc"; sed 's/^/    /' "$A40E"; }
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
