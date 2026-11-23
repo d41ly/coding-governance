@@ -404,7 +404,11 @@ writer runs the unattended kit's `--mail read <slug>` once, `read_mail_rows`, un
 notice it has consumed, `write_consumed_acks` (KICK-dKeptSession-42): every open `landed`, `superseded`
 or `withdrawn`, and per parent holding an open `confirmed` or `changed` of subject `interfaces
 <parent>`, one `check_parent_interfaces` call, whose `interface — current <id>` line consumes that row
-and every such row of the parent sighted strictly earlier; each consumed id is posted once as the
+and every such row of the parent it supersedes, one whose `content-key` equals the current row's or
+which `derive_mail_chain` places before it (KICK-dKeptSession-53): the chain is read off the parent's
+rows of the one read, a row preceding a later `seq` on its ref and, through the `after` of the ref's
+`seq` 1 row, every row of the session it took over, transitively, never by `first-seen` or arrival, and
+a row the chain places after the current one or cannot place stays open; each consumed id is posted once as the
 unattended kit's `--mail ack <slug> <id>` through `breakpoints.py`'s `run_sourced`, a failed ack
 printing `mail — ack not posted <id> · rc <n|->` on stderr and a check that does not read `mail —
 interfaces <parent> unread · <why>`. A `question`, `intake` or `overlap` is never acknowledged, nor a
@@ -483,13 +487,18 @@ two dependents and three exits from Design, back through B21 between them, each 
 to the first dependent rebound to exit 1, the move still recording and printing its `notice — not
 posted` line; `notices-repeat-key`, one dependent and three exits from Design, the spec edited after
 the first exit alone, so the third repeats the second's listing, kind and key, its pass `3` alone
-telling it apart, and every notice still posted; and the four over `write_consumed_acks`, each rebinding the launcher to record every ack
+telling it apart, and every notice still posted; and the six over `write_consumed_acks`, each rebinding the launcher to record every ack
 and restoring it: `acks-landed`, a parent's `landed` acknowledged by the move that records past it;
 `acks-confirmed`, a `confirmed` keyed over the parent's listing at its lease's witness, acknowledged
 over the real chain; `acks-superseded`, `check_parent_interfaces` stood in, a `confirmed` and the later
 `changed` it names current both acknowledged, then another parent's pair under an unconfirmed check
-refusing B5; and `acks-failed`, one ack across B4 and B5, then an ack exiting 1 and one raising
-`LookupError`, each on stderr, refusing B7; and the five over `notify.owner`: `notify-micro`,
+refusing B5; `acks-failed`, one ack across B4 and B5, then an ack exiting 1 and one raising
+`LookupError`, each on stderr, refusing B7; `acks-takeover`, a take-over's `changed` naming its
+predecessor in `after`, keyed over the parent's listing and sighted before that predecessor's
+`confirmed`, both acknowledged over the real chain and the chain read the same with their `first-seen`
+swapped; and `acks-later-key`, the check stood in naming the take-over's `changed` current and a later
+`changed` pushed onto its ref as `seq` 2, through `placement.py`'s `write_fixture_gov_ref` and its
+`parent`, left open and refusing B4; and the five over `notify.owner`: `notify-micro`,
 `notify-park-landing`, `notify-every` and `notify-park-only`, B4 under that value, `NOTIFY_SETS`
 committing it and `notify-micro` none, then a park and a landing run through `progress`, each printing
 `loop: fixture · progress <n>`, the progress lines the three printed, and `notify-shape`, an `AGENTS.md`
