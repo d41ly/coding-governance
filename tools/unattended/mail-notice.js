@@ -9,6 +9,19 @@
  * Contract: the spec for KICK-dKeptSession-21 under the dKeptSession build folder, S5 and S6. First
  * written by the hook kind's factory; this body is its author's.
  *
+ * WHY POSTTOOLUSE. A `PreToolUse` hook carries `additionalContext` too, and the hooks kit's
+ * scratch-guard already uses that channel on the Bash, PowerShell and write tools its matcher routes
+ * (KICK-dKeptSession-13 S7 owns it). This `PostToolUse` registration exists only to cover the tools
+ * that matcher does not route, the non-Bash tools such as Read, Grep, Glob and Agent, so a session
+ * that only reads still hears its mail (KICK-dKeptSession-44 S6).
+ *
+ * THE BINDING (KICK-dKeptSession-44 S9). The session's build is the route's `- build:` of the tree's
+ * card file at CARD_FILE_REL whose `card-owner —` line names the session, read as the hooks kit's
+ * `checkItemBoundary` reads it, with one file read and no spawn; else the run lease's slug
+ * `resolveLease` finds. CARD_FILE_REL and `extractRouteUnits` are carried inline from that kit's
+ * scratch-guard, never required, since a kit imports no sibling kit (TOOL-dGroundRules-1 §4); its
+ * `readCard` is not carried, since it spawns a bash to find the card engine.
+ *
  * THE STAMP. The driver's `--mail notice <slug>` is the one reader of `mailbox.notice` and
  * `mailbox.fetch-seconds`, and the one writer of `<git-dir>/unattended/mail-notice.<slug>.log`, the
  * path `deriveSidecarPath` derives: its first line `{"notice": …, "fetch-seconds": …, "bash": …}`,
@@ -17,7 +30,7 @@
  * one read, and reads no policy: the JavaScript policy reader spawns git on every call.
  *
  * PER CALL, in order: the payload; a subagent's call (`agent_id` set), no `session_id`, no repository
- * or no lease binding the session leaves. The stamp absent, or its first line not `every-tool-call`,
+ * or neither a card nor a lease binding the session leaves. The stamp absent, or its first line not `every-tool-call`,
  * leaves. A stamp older than its own `fetch-seconds` starts THE DETACHED FETCH: `<stamp>.fetching`
  * created with the exclusive flag, and only by the call that created it, the stamp's `bash` running
  * the driver beside this file as `--mail notice <slug>`, detached, its streams ignored, so the call
@@ -40,6 +53,45 @@ const SIDECAR_KIND = 'mail-notice'
 const NOTICE_EVERY_CALL = 'every-tool-call'
 const SLUG_RE = /^[A-Za-z][A-Za-z0-9-]*$/
 const ID_RE = /^[0-9a-f]{12}$/
+/** The tree's card file, the hooks kit scratch-guard's CARD_FILE_REL, carried inline (S9). */
+const CARD_FILE_REL = '.claude/orientation-card.md'
+
+/**
+ * The card's `## route` section: `{ seen, build, units, lines }`, carried inline byte for byte from the
+ * hooks kit scratch-guard's `extractRouteUnits` (S9), of which this hook reads `build` alone.
+ */
+function extractRouteUnits(text) {
+  let inRoute = false
+  let build = ''
+  let seen = false
+  const units = []
+  const lines = []
+  for (const raw of String(text || '').split(/\r?\n/)) {
+    const line = raw.replace(/`/g, '').trim()
+    if (line === '## route') { inRoute = true; seen = true; lines.push({ text: raw, unit: null }); continue }
+    if (line.startsWith('## ') || line.replace(/^- /, '').startsWith('READY — ')) { inRoute = false; continue }
+    if (!inRoute || line === '') continue
+    let unit = null
+    const b = /^- build:\s*(\S+)\s*$/.exec(line)
+    const u = /^- unit:\s*(\S+)(?:\s*·\s*spec\s+(\S+))?\s*$/.exec(line)
+    if (b) build = b[1]
+    else if (u) units.push(unit = { unit: u[1], spec: u[2] || '' })
+    lines.push({ text: raw, unit })
+  }
+  return { seen, build, units, lines }
+}
+
+/**
+ * S9: the build the tree's card file at `<root>/` CARD_FILE_REL binds `sid` to — its route's build where
+ * its first `card-owner —` line names `sid`, else ''. One file read, no spawn.
+ */
+function readCardBuild(root, sid) {
+  let text
+  try { text = fs.readFileSync(path.join(root, CARD_FILE_REL), 'utf8') } catch { return '' }
+  const owner = text.split(/\r?\n/).map((l) => /^card-owner — ([A-Za-z0-9][A-Za-z0-9._-]*)(?: · .*)?$/.exec(l)).find(Boolean)
+  if (!owner || owner[1] !== sid) return ''
+  return extractRouteUnits(text).build
+}
 
 /**
  * The stamp at `file` -> `{head, rows, ageS}` when its first line reads `every-tool-call`, else null:
@@ -101,16 +153,20 @@ function main() {
   if (!sid) return
   const repo = lease.resolveRepo(typeof data.cwd === 'string' && data.cwd ? data.cwd : process.cwd())
   if (!repo) return
-  const memoryRoot = lease.readMemoryRoot(repo.root)
-  if (!memoryRoot) return
-  const bound = lease.resolveLease(repo.root, memoryRoot, sid)[0]
-  if (!bound || !SLUG_RE.test(bound.slug)) return
-  const file = lease.deriveSidecarPath(repo.gitDir, SIDECAR_KIND, bound.slug)
+  let slug = readCardBuild(repo.root, sid)
+  if (!slug) {
+    const memoryRoot = lease.readMemoryRoot(repo.root)
+    if (!memoryRoot) return
+    const bound = lease.resolveLease(repo.root, memoryRoot, sid)[0]
+    slug = bound ? bound.slug : ''
+  }
+  if (!SLUG_RE.test(slug)) return
+  const file = lease.deriveSidecarPath(repo.gitDir, SIDECAR_KIND, slug)
   const stamp = readMailNotice(file)
   if (!stamp) return
   const seconds = checkFetchDue(stamp.head, stamp.ageS)
-  if (seconds !== null) runDetachedFetch(file, stamp.head, bound.slug, repo.root, seconds)
-  const line = renderMailNotice(bound.slug, stamp.rows, stamp.ageS)
+  if (seconds !== null) runDetachedFetch(file, stamp.head, slug, repo.root, seconds)
+  const line = renderMailNotice(slug, stamp.rows, stamp.ageS)
   if (!line) return
   process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: line } }) + '\n')
 }

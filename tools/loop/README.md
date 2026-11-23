@@ -474,8 +474,10 @@ and its body in one `~~~~` block, after the move's own record and in its commit.
 
 **The notices** (KICK-dKeptSession-7 S4, S9). On a move from designing to building, after the card
 follow, `write_dependency_notices` posts the build's frozen interfaces to each build
-`loop_transition.py dependents --build <slug>` lists, every one whose README's `parents:` names it, read
-by the memory-tree kit's `parse_front_matter`: the unattended kit's `--mail post` of kind `confirmed`,
+`loop_transition.py dependents --build <slug>` lists, every one the "Child builds" line of the build's
+own README's rendered `<!-- gen:build-edges -->` region names, the memory-tree kit's inversion of
+`parents:` read by its `GEN_REGIONS` markers (KICK-dKeptSession-44 S20), so a dependent opened after
+that README's last `gen_build_index.py --write` is not notified until the next render: the unattended kit's `--mail post` of kind `confirmed`,
 subject `interfaces <slug>`, its interface `derive_interface_listing`'s bytes of `git ls-tree -r` over
 the build's `spec/` folder at the transition commit (HEAD where the set makes none), its body that
 commit's sha and `--pass <n>`, `<n>` the Design-exit ordinal, one plus the moves from designing to
@@ -527,8 +529,10 @@ question carrying `deadline: 30`, first sighted 31 hours ago (PINNED) and never 
 guard's launch, each rebinding the name the guard imports inside its function and restoring it:
 `mail-argv`, the mailbox read's argv recorded and held to the located driver and `resolve_bash`'s
 bash, `mail-no-driver`, the driver's locator over an empty directory, the move recorded unarmed, and
-`mail-no-bash`, `resolve_bash` answering `None`, the move refused as `mail unknown`; and `deps-notices`,
-a dependent naming the build in `parents:`, the move out of Design posting it one `confirmed` keyed
+`mail-no-bash`, `resolve_bash` answering `None`, the move refused as `mail unknown`; `mail-read-crash`,
+the read exiting 3 with no output, the move refused as `mail unknown` naming that exit, no commit
+(KICK-dKeptSession-44 S29); and `deps-notices`, a dependent naming the build in `parents:` and the
+build's README holding the region `render_edges` renders over it, the move out of Design posting it one `confirmed` keyed
 over the listing at the move's commit and a second exit posting `changed`; `notices-two-dependents`,
 two dependents and three exits from Design, back through B21 between them, each dependent reading one
 `confirmed` and two `changed` whose commits carry `pass:` 1, 2 and 3; and `notices-refused`, the post

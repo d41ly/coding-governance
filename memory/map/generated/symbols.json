@@ -15578,6 +15578,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "extractRouteUnits",
+      "kind": "function",
+      "file": "tools/unattended/mail-notice.js"
+    },
+    {
       "id": "extractTaskSection",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -21021,6 +21026,11 @@
       "id": "readCard",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readCardBuild",
+      "kind": "function",
+      "file": "tools/unattended/mail-notice.js"
     },
     {
       "id": "readCardEnvelope",
@@ -32078,6 +32088,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "resolve_position_engine",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "resolve_posix_shell",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -35166,6 +35181,11 @@
       "id": "run_judge",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "run_kd44_landed",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_keep",
