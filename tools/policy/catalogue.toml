@@ -192,6 +192,8 @@ owner = "dKeptSession"
 name = "deps.messaging"
 allowed = { type = "enum", of = ["live-and-mailbox", "live-only", "mailbox-only"], registry = "a registered doorbell" }
 default = "live-and-mailbox"
+summary = "Which live channels a mail post rings once its message is written to the mailbox, read by the unattended driver's post, ack and answer: under live-and-mailbox and live-only each live channel the harness offers, none in this one until dWellOiledMachine's doorbell point, carrying only the message's mail ref and id; under mailbox-only none. The mailbox is written first under every value, live-only included."
+usage = 'deps.messaging = "mailbox-only"'
 owner = "dKeptSession"
 
 [[key]]

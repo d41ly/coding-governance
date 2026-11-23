@@ -3804,8 +3804,10 @@ write_mail_ref() { # ref · tip read or empty · message -> 0 written, 1 lost, 2
 # on any other; `check_mail_duplicate`; the tip read from this session's cache ref; its order (S1,
 # S2): `seq` 1 where that tip is empty, else the tip's first-parent count plus one, and on `seq` 1
 # `after` the id of the tip of the build's other cached ref first sighted last, an unsighted tip
-# newest, ties to the lesser ref, or `none`; `write_mail_ref`.
-# ONE LINE PER OUTCOME: `mail — posted <id> · <ref>` exit 0; `mail — duplicate <id> · <ref>` or `mail —
+# newest, ties to the lesser ref, or `none`; `write_mail_ref`; on a written message alone, the ring
+# point `run_mail_ring <ref> <id>` (KICK-dKeptSession-6 S1), after the posted line.
+# ONE LINE PER OUTCOME: `mail — posted <id> · <ref>` exit 0, followed by the ring point's one `ring —`
+# line; `mail — duplicate <id> · <ref>` or `mail —
 # lost <id> · <ref> · <why>` exit 1; `mail — not written · <why>`, `mail — not written: <why>` for no
 # session or no fleet row, or `mail — not written <id> · <ref> · <why>` exit 2. The record is
 # `gov-mail <slug>/<id>`, a blank line, the keys `id`, `build`, `from-tag`, `from-session`, `to`,
@@ -3896,10 +3898,32 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
     deadline "$dl" default "$df" || { echo "mail — not written · $GOVMSG_WHY"; return 2; }
   write_mail_ref "$ref" "$tip" "$GOVMSG"; rc=$?
   case "$rc" in
-    0) echo "mail — posted $id · $ref"; return 0 ;;
+    0) echo "mail — posted $id · $ref"; run_mail_ring "$ref" "$id"; return 0 ;;
     1) echo "mail — lost $id · $ref · $GOVREF_WHY"; return 1 ;;
     *) echo "mail — not written $id · $ref · $GOVREF_WHY"; return 2 ;;
   esac
+}
+
+# THE RING POINT (KICK-dKeptSession-6 S1 to S4, coordination item 7): live delivery after the mailbox.
+# `write_mail_post` calls it once `write_mail_ref` has written the message, and only then, with the mail
+# ref and the message's id and nothing else, the payload `--mail notice --ring` takes, so a lost ring
+# costs latency alone. `deps.messaging`, read through `read_lease_policy`, picks the channels: under
+# `mailbox-only` it rings nothing and prints `ring — off (deps.messaging: mailbox-only)`; under
+# `live-and-mailbox` and `live-only` it rings each live channel the harness offers, none in this
+# harness, and prints `ring — none · no live channel in this harness (stand-in dWellOiledMachine)`,
+# the doorbell point dWellOiledMachine's Runtime declares in its `[extend]` joining here. The mailbox
+# is written first under every value. A refused read takes `live-and-mailbox` under one `unattended:
+# NOTE -` line on stderr naming the refusal. A ring never fails a post: 0 on every path.
+run_mail_ring() { # mail ref · message id -> 0, its one `ring —` line on stdout
+  local v=live-and-mailbox
+  if read_lease_policy deps.messaging >/dev/null; then v=$LP_VALUE
+  else echo "unattended: NOTE - deps.messaging did not read, so the ring takes live-and-mailbox: $LP_VALUE" >&2
+  fi
+  case "$v" in
+    mailbox-only) echo "ring — off (deps.messaging: mailbox-only)" ;;
+    *) echo "ring — none · no live channel in this harness (stand-in dWellOiledMachine)" ;;
+  esac
+  return 0
 }
 
 # A MAIL DEADLINE (KICK-dKeptSession-24 S3, I23): whether this node first saw <commit> at <ref> more than
@@ -4061,7 +4085,7 @@ write_mail_ack() { # slug · id -> the post's exits
 # `question` is the question, and one reading `answered`, `acked` or `expired` prints `answer — <id> ·
 # <state>`, exit 1; each cite held by `git cat-file -e <sha>:<path>`; a scratch body, the body file and
 # one `cites <path>@<sha>` line per cite in flag order; then the post `write_mail_ack` makes, of kind
-# `answer`, so its line and exits are the answer's. Every other refusal is one `mail — not written ·
+# `answer`, so its lines and exits are the answer's. Every other refusal is one `mail — not written ·
 # <why>` line, exit 2, writing nothing. WHAT THIS DOES NOT CHECK: that the answering session owns the
 # asked interface or item, `next`'s once dWellOiledMachine lands it; what a cited file says.
 write_mail_answer() { # slug · id · body file · [cite]... -> 0 posted, 1 no longer open, duplicate or lost, 2 not written
@@ -4336,7 +4360,9 @@ derive_lease_ref() { # build <slug> | unit <slug> <id> | run <cadence> <period> 
 # KICK-dKeptSession-21 S8 adds the two keys `--mail notice` reads, its one reader: `mailbox.notice`
 # (`every-item`), the closed set `every-tool-call`, `every-item` and `off`, and `mailbox.fetch-seconds`
 # (60), the seconds the tool-call hook lets its local copy age, a number under the bounds' rule.
-read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|leases.offline|leases.expiry-hours|leases.queued-claim-days|leases.offer-seconds|flow.wait-ceiling|mailbox.notice|mailbox.fetch-seconds -> LP_VALUE on stdout; 1 with the refusal in LP_VALUE
+# KICK-dKeptSession-6 S2 adds `deps.messaging` (`live-and-mailbox`), the closed set `live-and-mailbox`,
+# `live-only` and `mailbox-only`, read by `run_mail_ring`, which takes `live-and-mailbox` on a refusal.
+read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|leases.offline|leases.expiry-hours|leases.queued-claim-days|leases.offer-seconds|flow.wait-ceiling|mailbox.notice|mailbox.fetch-seconds|deps.messaging -> LP_VALUE on stdout; 1 with the refusal in LP_VALUE
   local key="${1:-}" def py d out v
   case "$key" in
     leases) def=warn ;;
@@ -4350,7 +4376,8 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
     flow.wait-ceiling) def=72 ;;
     mailbox.notice) def=every-item ;;
     mailbox.fetch-seconds) def=60 ;;
-    *) LP_VALUE="read_lease_policy reads leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days, leases.offer-seconds, flow.wait-ceiling, mailbox.notice or mailbox.fetch-seconds, and was asked for '$key'"
+    deps.messaging) def=live-and-mailbox ;;
+    *) LP_VALUE="read_lease_policy reads leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days, leases.offer-seconds, flow.wait-ceiling, mailbox.notice, mailbox.fetch-seconds or deps.messaging, and was asked for '$key'"
        printf '%s\n' "$LP_VALUE"; return 1 ;;
   esac
   case $'\n'"$LP_SEEN" in
@@ -4358,7 +4385,7 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
   esac
   if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
      || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
-    [ -n "$LP_NOTED" ] || echo "unattended: NOTE - no policy kit resolves beside this kit, so leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days, leases.offer-seconds, flow.wait-ceiling, mailbox.notice and mailbox.fetch-seconds take their catalogue defaults; $key reads '$def'." >&2
+    [ -n "$LP_NOTED" ] || echo "unattended: NOTE - no policy kit resolves beside this kit, so leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days, leases.offer-seconds, flow.wait-ceiling, mailbox.notice, mailbox.fetch-seconds and deps.messaging take their catalogue defaults; $key reads '$def'." >&2
     LP_NOTED=1; out=$def
   else
     # THE KIT'S PATH IS REPO-RELATIVE TO ITS OWN CHECKOUT: a driver run over another tree, a fixture's,
@@ -4376,6 +4403,7 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
       flow.wait-ceiling) out=$("$py" "$d/policy.py" get flow.wait-ceiling 2>&1) ;;
       mailbox.notice) out=$("$py" "$d/policy.py" get mailbox.notice 2>&1) ;;
       mailbox.fetch-seconds) out=$("$py" "$d/policy.py" get mailbox.fetch-seconds 2>&1) ;;
+      deps.messaging) out=$("$py" "$d/policy.py" get deps.messaging 2>&1) ;;
     esac || { LP_VALUE=${out//$'\r'/}; LP_VALUE=${LP_VALUE//$'\n'/ }; printf '%s\n' "$LP_VALUE"; return 1; }
     out=${out%$'\r'}
   fi
@@ -4385,6 +4413,7 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
     leases.overlap:kit-dirs|leases.overlap:files|leases.overlap:builds) ;;
     leases.offline:warn|leases.offline:refuse|leases.offline:follow-leases) ;;
     mailbox.notice:every-tool-call|mailbox.notice:every-item|mailbox.notice:off) ;;
+    deps.messaging:live-and-mailbox|deps.messaging:live-only|deps.messaging:mailbox-only) ;;
     leases.expiry-hours:*|leases.queued-claim-days:*|leases.offer-seconds:*|flow.wait-ceiling:*|mailbox.fetch-seconds:*)
       [[ $out =~ ^[0-9]+(\.[0-9]+)?$ ]] || { LP_VALUE="$key answered '$out', which is not the non-negative number this driver ages a lease or a message by"
         printf '%s\n' "$LP_VALUE"; return 1; } ;;
