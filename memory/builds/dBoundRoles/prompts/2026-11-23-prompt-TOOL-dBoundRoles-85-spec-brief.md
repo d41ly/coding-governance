@@ -62,3 +62,14 @@ The write grant is `memory/builds/dBoundRoles/spec/2026-11-23-spec-TOOL-dBoundRo
 ### Reuse
 
 `tools/playbook/instruction_units.py#check_unit_row`, `#check_statement`, `STATEMENT_TYPES` and `BUDGET_BYTES`.
+
+### Revision 1
+
+A first writer (run `wf_fd4c768b-7f1`) authored `memory/builds/dBoundRoles/spec/2026-11-23-spec-TOOL-dBoundRoles-85.md`, and its
+commit was refused by hygiene check 12: the spec's §3 **hands-off** bullet to `TOOL-dBoundRoles-19` has no matching
+**consumes-from** bullet in `TOOL-dBoundRoles-19`'s spec, which this run does not revise, because the owner's ruling record binds
+the relation over that spec. The draft is on disk, uncommitted, and is NOT conforming until that one bullet is
+gone. Revise it in place: remove the **hands-off** bullet naming `TOOL-dBoundRoles-19`, keep every other line as written,
+**hands-off** bullets naming `external` included, and say in one prose sentence under §3, outside the Edges list,
+that `TOOL-dBoundRoles-19` consumes this unit through `build/2026-11-23-build-TOOL-dBoundRoles-20-2-owner-ruling.md`. Then run
+item 8's two checks again.
