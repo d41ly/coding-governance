@@ -112,7 +112,7 @@ ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 
 | [TOOL-dQuietDisk-37 — the closing review's MEDIUM and LOW findings: the missing arms, the template key's builder arguments, the CR guard on batch names, and the serial runner's owned temp root](spec/2026-11-22-spec-TOOL-dQuietDisk-37.md) | 9 | 2 | CLOSED | rev-1 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 152 bound to this build, across 4 record folder(s).
+Records: 153 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
