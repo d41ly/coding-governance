@@ -87,8 +87,6 @@ lexicon.drift
 lexicon.forced
 lexicon.packs
 lexicon.pin
-mailbox.fetch-seconds
-mailbox.notice
 maintain.cadence
 maintain.dead-after
 maintain.events

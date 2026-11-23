@@ -49,9 +49,10 @@
 #   unattended.sh --register decision <build> <item> <fork> <file> # one create-only decision on the remote, keyed by item and fork; 0 written, 1 exists, 2 not written
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
 #   unattended.sh --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] [--default <text>] <body file>   # one message on this session's own mail ref; 0 posted, 1 duplicate or lost, 2 not written; `mail — off` exit 2 while RUN_CLAIMS is not on
-#   unattended.sh --mail read <who> [--open] [--ids]               # the mailbox of a build or a recipient, one TAB row per message; --open the open rows, --ids their ids on one line or none
+#   unattended.sh --mail read <who> [--open] [--ids] [--local]     # the mailbox of a build or a recipient, one TAB row per message; --open the open rows, --ids their ids on one line or none, --local the node's cache with no fetch
 #   unattended.sh --mail ack <slug> <id>                           # an ack of a message addressed to <slug>, posted to its sender's build; the post's exits
 #   unattended.sh --mail answer <slug> <question id> <body file> [--cite <path>@<sha>]...   # an answer to a question addressed to <slug>, posted to its asker's build; 1 the question no longer open, else the post's exits
+#   unattended.sh --mail notice <slug> [--item <instance key>] [--local] [--ring <ref> <id>]   # the build's unread mail as mailbox.notice says, one line, its stamp rewritten after a fetch; 0 shown, off or the local copy, 2 not read
 #   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
 #   unattended.sh --card-ref lookup <slug>                         # that ref read into this node's cache, read-only: its commit and message, `card-ref — none` or `— off`; 0 read, 2 not read
 #   unattended.sh --request <file>                                 # an owner's request: its words kept on this node, refs/gov/requests/<content key> created on the remote
@@ -3934,11 +3935,12 @@ check_mail_deadline() { # ref · commit · hours -> rc 0 passed, 1 not yet, 2 no
 # `check_lease_witness` reads 2, 4 and 10 by position, and KICK-dKeptSession-25's three readers,
 # `write_mail_answer`, `derive_mail_answer_outcome` and `read_lease_renewal`'s question step, read 1,
 # 2, 4, 6, 7 and 10. Under `soft` a failed fetch prints `mail — local
-# copy: <why>` on stderr and reads the cache; `strict` prints `mail — not read · <why>` and returns 2.
+# copy: <why>` on stderr and reads the cache; `strict` prints `mail — not read · <why>` and returns 2;
+# `local` (KICK-dKeptSession-21 S2) attempts no fetch, prints no cause and reads the cache.
 # While RUN_CLAIMS is not `on` it reads nothing and prints no row. WHAT THIS DOES NOT CHECK: a
 # message's id against its fields; a clock offset between nodes, since each node judges a deadline by
 # its own first sighting and its own clock.
-read_mailbox() { # who · soft|strict -> 0 with one TAB row per message addressed to <who>; 2 not read
+read_mailbox() { # who · soft|strict|local -> 0 with one TAB row per message addressed to <who>; 2 not read
   local who="${1:-}" pol="${2:-soft}" d rc why="" line t _st=$status _nc=${#RUNLOG_CHECKS[@]}
   local -a refs=() f=()
   [ "$RUN_CLAIMS" = on ] || return 0
@@ -3948,7 +3950,8 @@ read_mailbox() { # who · soft|strict -> 0 with one TAB row per message addresse
   resolve_claim_remote >/dev/null; rc=$?
   status=$_st; RUNLOG_CHECKS=("${RUNLOG_CHECKS[@]:0:$_nc}")
   d=$(mktemp -d) || { echo "mail — not read · no scratch directory to bound the read in"; return 2; }
-  if [ "$rc" != 0 ]; then
+  if [ "$pol" = local ]; then :
+  elif [ "$rc" != 0 ]; then
     why="the clone does not declare exactly one remote, check 24"
   else
     observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+refs/gov/mail/*:refs/gov/remote/mail/*" && rc=0 || rc=$?
@@ -4121,13 +4124,14 @@ derive_mail_answer_outcome() { # slug · id -> answered|defaulted|awaiting on st
 }
 
 # --mail read, THE MAILBOX AS A VERB (KICK-dKeptSession-5 S8): `read_mailbox <who> soft`, its rows as
-# it prints them; `--open` only the `open` rows; `--ids` the selected rows' ids on one line, or `none`.
+# it prints them; `--open` only the `open` rows; `--ids` the selected rows' ids on one line, or `none`;
+# `--local` the mode `local`, the node's cache read with no fetch (KICK-dKeptSession-21 S2).
 # While RUN_CLAIMS is not `on` it prints `mail — off`, exit 0 and no row; a refused read exits 2.
-print_mailbox() { # who · open 0|1 · ids 0|1 -> 0 read or off, 2 not read
+print_mailbox() { # who · open 0|1 · ids 0|1 · [soft|local] -> 0 read or off, 2 not read
   local rows line st ids=""
   local -a lines=()
   [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 0; }
-  rows=$(read_mailbox "${1:-}" soft) || { printf '%s\n' "$rows"; return 2; }
+  rows=$(read_mailbox "${1:-}" "${4:-soft}") || { printf '%s\n' "$rows"; return 2; }
   mapfile -t lines <<<"$rows"
   for line in "${lines[@]}"; do
     st=${line#*$'\t'}; st=${st#*$'\t'}; st=${st#*$'\t'}; st=${st%%$'\t'*}
@@ -4138,6 +4142,110 @@ print_mailbox() { # who · open 0|1 · ids 0|1 -> 0 read or off, 2 not read
   done
   [ "${3:-0}" = 0 ] || printf '%s\n' "${ids:-none}"
   return 0
+}
+
+# THE NOTICE STAMP (KICK-dKeptSession-21 S3, I24 as its section 8 F2 refines it): <file>, the sidecar
+# `mail-notice.<slug>.log` under `resolve_sidecar_dir`, rewritten whole through a unique temp file
+# beside it renamed into place. Its first line `{"notice": <value>, "fetch-seconds": <n>, "bash":
+# <path>}`, the bash that ran this driver as a native path, `cygpath -m` where cygpath resolves (F6),
+# then one line `{"id": …, "kind": …, "to": …}` per row given as three words. Its mtime is the age of
+# the local copy; `mail-notice.js` reads it at every tool call. -> 0 written, 1 not, the stamp as it was.
+write_mail_notice() { # file · notice · fetch-seconds · [id kind to]... -> 0 written, 1 not
+  local f="${1:-}" nv="${2:-}" fs="${3:-}" b=$BASH t v
+  shift 3 2>/dev/null || return 1
+  if command -v cygpath >/dev/null 2>&1; then b=$(cygpath -m "$BASH" 2>/dev/null) || b=$BASH; fi
+  b=${b//\\/\\\\}; b=${b//\"/\\\"}
+  mkdir -p "${f%/*}" 2>/dev/null && t=$(mktemp "$f.XXXXXX" 2>/dev/null) || return 1
+  {
+    printf '{"notice": "%s", "fetch-seconds": %s, "bash": "%s"}\n' "$nv" "$fs" "$b"
+    while [ $# -ge 3 ]; do
+      v=${3//\\/\\\\}; v=${v//\"/\\\"}
+      printf '{"id": "%s", "kind": "%s", "to": "%s"}\n' "$1" "$2" "$v"
+      shift 3
+    done
+  } > "$t" 2>/dev/null && mv -f "$t" "$f" 2>/dev/null && return 0
+  rm -f "$t"
+  return 1
+}
+
+# --mail notice, THE BUILD'S UNREAD MAIL AS `mailbox.notice` SAYS (KICK-dKeptSession-21 S1 to S3, S7, S8).
+# In order: a `--ring <ref> <id>`, I25's payload, held before any read to a ref `derive_mail_ref` writes,
+# `refs/gov/mail/<build>/<tag>/<segment>` with a segment of `[A-Za-z0-9_-]` bytes and `%HH`, and an id
+# of twelve lower-case hex digits, else `mail — not read · --ring takes a mail ref and a twelve-hex-digit
+# id`, exit 2; the ring is then dropped, since the receiver's one act is this fetch. The slug; dark while
+# RUN_CLAIMS is not `on`, `mail — off`, exit 0; the stamp under `resolve_sidecar_dir`; `mailbox.notice`
+# and `mailbox.fetch-seconds` through `read_lease_policy`, a refused read taking the catalogue default,
+# `every-item` and 60, under one `unattended: NOTE -` line on stderr naming the key. Under `off` nothing
+# is fetched, the stamp keeps its first line alone, and it prints `mail — notice off for <slug>
+# (mailbox.notice: off)`. Otherwise `read_mailbox <slug> soft`, its one bounded fetch, or `local` under
+# `--local`; its `open` rows, the ones `check_mail_addressed` admits for `build:<slug>`, print as ONE
+# line, `mail — <n> unread for <slug> · <id> <id> …` or `mail — none for <slug>`, then ` · fetched`, the
+# stamp rewritten from those rows, or, where the fetch failed and the reader printed `mail — local copy:
+# <why>`, which passes through on stderr, or under `--local`, ` · local copy <age>s old (<why>)`, the
+# age the stamp's by `stat`, ` · local copy age unknown (<why>)` with no stamp, the stamp untouched; then
+# ` · item <key>` with `--item`. Every path past the slug removes `<stamp>.fetching`, the hook's marker.
+# A refused read prints its line, exit 2. WHAT THIS DOES NOT CHECK: a message posted after the fetch;
+# that a ring's message exists, since the mailbox is read and the ring never.
+print_mail_notice() { # slug · item or empty · local 0|1 · ring ref or empty · ring id or empty -> 0 shown, off or the local copy; 2 not read
+  local slug="${1:-}" it="${2:-}" loc="${3:-0}" rr="${4:-}" ri="${5:-}" nv fs sd st d rows why="" line m n=0 ids="" rc=0
+  local -a parts=() lines=() row=() keep=()
+  if [ -n "$rr$ri" ]; then
+    IFS=/ read -r -a parts <<<"$rr"
+    if [ "${#parts[@]}" != 6 ] || ! [[ $ri =~ ^[0-9a-f]{12}$ ]] || ! [[ ${parts[5]} =~ ^([A-Za-z0-9_-]|%[0-9A-F]{2})+$ ]] \
+        || ! derive_mail_ref "${parts[3]}" "${parts[4]}" x >/dev/null || [ "$rr" != "${MAIL_REF%/*}/${parts[5]}" ]; then
+      echo "mail — not read · --ring takes a mail ref and a twelve-hex-digit id"; return 2
+    fi
+  fi
+  check_slug_shape "$slug" || { echo "mail — not read · '$slug' is no build's slug"; return 2; }
+  [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 0; }
+  sd=$(resolve_sidecar_dir) || sd=""
+  [ -n "$sd" ] || { echo "mail — not read · the sidecar root cannot be derived in this clone"; return 2; }
+  st="$sd/mail-notice.$slug.log"
+  if read_lease_policy mailbox.notice >/dev/null; then nv=$LP_VALUE
+  else nv=every-item; echo "unattended: NOTE - mailbox.notice was not read, so it reads its catalogue default '$nv': $LP_VALUE" >&2; fi
+  if read_lease_policy mailbox.fetch-seconds >/dev/null; then fs=$LP_VALUE
+  else fs=60; echo "unattended: NOTE - mailbox.fetch-seconds was not read, so it reads its catalogue default '$fs': $LP_VALUE" >&2; fi
+  if [ "$nv" = off ]; then
+    write_mail_notice "$st" "$nv" "$fs" || :
+    echo "mail — notice off for $slug (mailbox.notice: off)"
+  elif ! d=$(mktemp -d); then
+    echo "mail — not read · no scratch directory to hold the read's cause"; rc=2
+  else
+    if [ "$loc" = 1 ]; then
+      rows=$(read_mailbox "$slug" local) || rc=2; why=--local
+    else
+      rows=$(read_mailbox "$slug" soft 2>"$d/err") || rc=2
+      mapfile -t lines <"$d/err"
+      for line in ${lines[@]+"${lines[@]}"}; do
+        printf '%s\n' "$line" >&2
+        case "$line" in "mail — local copy: "*) [ -n "$why" ] || why=${line#mail — local copy: } ;; esac
+      done
+    fi
+    rm -rf "$d"
+    if [ "$rc" != 0 ]; then
+      printf '%s\n' "$rows"
+    else
+      lines=()
+      [ -z "$rows" ] || mapfile -t lines <<<"$rows"
+      for line in ${lines[@]+"${lines[@]}"}; do
+        IFS=$'\t' read -r -a row <<<"$line"
+        [ "${row[3]:-}" = open ] || continue
+        n=$((n + 1)); ids="${ids:+$ids }${row[0]}"; keep+=("${row[0]}" "${row[1]:-}" "${row[2]:-}")
+      done
+      if [ -n "$why" ]; then
+        if m=$(stat -c %Y -- "$st" 2>/dev/null) && [[ $m =~ ^[0-9]+$ ]]; then
+          m=$((EPOCHSECONDS - m)); [ "$m" -ge 0 ] || m=0; why=" · local copy ${m}s old ($why)"
+        else why=" · local copy age unknown ($why)"; fi
+      else
+        write_mail_notice "$st" "$nv" "$fs" ${keep[@]+"${keep[@]}"} || :
+        why=" · fetched"
+      fi
+      if [ "$n" -gt 0 ]; then line="mail — $n unread for $slug · $ids$why"; else line="mail — none for $slug$why"; fi
+      printf '%s%s\n' "$line" "${it:+ · item $it}"
+    fi
+  fi
+  rm -f "$st.fetching"
+  return "$rc"
 }
 
 # THE DEPENDENT'S CHECK (KICK-dKeptSession-27 S5), a function no verb prints: the key `derive_gov_id
@@ -4225,7 +4333,10 @@ derive_lease_ref() { # build <slug> | unit <slug> <id> | run <cadence> <period> 
 # `leases.queued-claim-days` and `leases.offer-seconds`, each a non-negative number and read through
 # `read_lease_bound` in seconds. KICK-dKeptSession-24 S1 adds `flow.wait-ceiling` (72), the hours a mail
 # post declares as its message's `deadline`, a non-negative number under the same rule.
-read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|leases.offline|leases.expiry-hours|leases.queued-claim-days|leases.offer-seconds|flow.wait-ceiling -> LP_VALUE on stdout; 1 with the refusal in LP_VALUE
+# KICK-dKeptSession-21 S8 adds the two keys `--mail notice` reads, its one reader: `mailbox.notice`
+# (`every-item`), the closed set `every-tool-call`, `every-item` and `off`, and `mailbox.fetch-seconds`
+# (60), the seconds the tool-call hook lets its local copy age, a number under the bounds' rule.
+read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|leases.offline|leases.expiry-hours|leases.queued-claim-days|leases.offer-seconds|flow.wait-ceiling|mailbox.notice|mailbox.fetch-seconds -> LP_VALUE on stdout; 1 with the refusal in LP_VALUE
   local key="${1:-}" def py d out v
   case "$key" in
     leases) def=warn ;;
@@ -4237,7 +4348,9 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
     leases.queued-claim-days) def=7 ;;
     leases.offer-seconds) def=300 ;;
     flow.wait-ceiling) def=72 ;;
-    *) LP_VALUE="read_lease_policy reads leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days, leases.offer-seconds or flow.wait-ceiling, and was asked for '$key'"
+    mailbox.notice) def=every-item ;;
+    mailbox.fetch-seconds) def=60 ;;
+    *) LP_VALUE="read_lease_policy reads leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days, leases.offer-seconds, flow.wait-ceiling, mailbox.notice or mailbox.fetch-seconds, and was asked for '$key'"
        printf '%s\n' "$LP_VALUE"; return 1 ;;
   esac
   case $'\n'"$LP_SEEN" in
@@ -4245,7 +4358,7 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
   esac
   if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
      || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
-    [ -n "$LP_NOTED" ] || echo "unattended: NOTE - no policy kit resolves beside this kit, so leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days, leases.offer-seconds and flow.wait-ceiling take their catalogue defaults; $key reads '$def'." >&2
+    [ -n "$LP_NOTED" ] || echo "unattended: NOTE - no policy kit resolves beside this kit, so leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days, leases.offer-seconds, flow.wait-ceiling, mailbox.notice and mailbox.fetch-seconds take their catalogue defaults; $key reads '$def'." >&2
     LP_NOTED=1; out=$def
   else
     # THE KIT'S PATH IS REPO-RELATIVE TO ITS OWN CHECKOUT: a driver run over another tree, a fixture's,
@@ -4261,6 +4374,8 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
       leases.queued-claim-days) out=$("$py" "$d/policy.py" get leases.queued-claim-days 2>&1) ;;
       leases.offer-seconds) out=$("$py" "$d/policy.py" get leases.offer-seconds 2>&1) ;;
       flow.wait-ceiling) out=$("$py" "$d/policy.py" get flow.wait-ceiling 2>&1) ;;
+      mailbox.notice) out=$("$py" "$d/policy.py" get mailbox.notice 2>&1) ;;
+      mailbox.fetch-seconds) out=$("$py" "$d/policy.py" get mailbox.fetch-seconds 2>&1) ;;
     esac || { LP_VALUE=${out//$'\r'/}; LP_VALUE=${LP_VALUE//$'\n'/ }; printf '%s\n' "$LP_VALUE"; return 1; }
     out=${out%$'\r'}
   fi
@@ -4269,7 +4384,8 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
     leases.renewal:progress|leases.renewal:activity|leases.renewal:fixed|leases.renewal:none) ;;
     leases.overlap:kit-dirs|leases.overlap:files|leases.overlap:builds) ;;
     leases.offline:warn|leases.offline:refuse|leases.offline:follow-leases) ;;
-    leases.expiry-hours:*|leases.queued-claim-days:*|leases.offer-seconds:*|flow.wait-ceiling:*)
+    mailbox.notice:every-tool-call|mailbox.notice:every-item|mailbox.notice:off) ;;
+    leases.expiry-hours:*|leases.queued-claim-days:*|leases.offer-seconds:*|flow.wait-ceiling:*|mailbox.fetch-seconds:*)
       [[ $out =~ ^[0-9]+(\.[0-9]+)?$ ]] || { LP_VALUE="$key answered '$out', which is not the non-negative number this driver ages a lease or a message by"
         printf '%s\n' "$LP_VALUE"; return 1; } ;;
     *) LP_VALUE="$key answered '$out', which is outside the closed set this driver branches on"
@@ -20021,11 +20137,12 @@ while [ $# -gt 0 ]; do
     --register)     refuse_waive_unless_preflight --register
                     shift; write_register "$@"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # KICK-dKeptSession-5 - the mailbox: a post on this session's own mail ref, a read of a build's or a
-    # recipient's messages, an ack, an answer to a question (KICK-dKeptSession-25); no slug verb, because
-    # `post`, `read`, `ack` or `answer` comes first.
+    # recipient's messages, an ack, an answer to a question (KICK-dKeptSession-25), the notice of a
+    # build's unread mail (KICK-dKeptSession-21); no slug verb, because `post`, `read`, `ack`, `answer`
+    # or `notice` comes first.
     --mail)         refuse_waive_unless_preflight --mail
                     shift; MV_ACT=${1:-}; [ $# -eq 0 ] || shift
-                    MV_POS=(); MV_TO=""; MV_KIND=""; MV_SUB=""; MV_ITEM=""; MV_PASS=""; MV_ANS=""; MV_IFC=""; MV_DEF=(); MV_CITE=(); MV_OPEN=0; MV_IDS=0; MV_FLAGS=""; _rl_rc=""
+                    MV_POS=(); MV_TO=""; MV_KIND=""; MV_SUB=""; MV_ITEM=""; MV_PASS=""; MV_ANS=""; MV_IFC=""; MV_DEF=(); MV_CITE=(); MV_RING=(); MV_OPEN=0; MV_IDS=0; MV_LOCAL=0; MV_FLAGS=""; _rl_rc=""
                     while [ $# -gt 0 ]; do
                       case "$1" in
                         --to|--kind|--subject|--item|--pass|--answers|--interface|--default|--cite)
@@ -20034,19 +20151,24 @@ while [ $# -gt 0 ]; do
                           MV_FLAGS="$MV_FLAGS $1"; shift 2 ;;
                         --open) MV_OPEN=1; MV_FLAGS="$MV_FLAGS $1"; shift ;;
                         --ids)  MV_IDS=1; MV_FLAGS="$MV_FLAGS $1"; shift ;;
-                        --*) echo "mail — not written · --mail takes --to, --kind, --subject, --item, --pass, --answers, --interface, --default, --cite, --open or --ids, not $1"; _rl_rc=2; break ;;
+                        --local) MV_LOCAL=1; MV_FLAGS="$MV_FLAGS $1"; shift ;;
+                        --ring)
+                          if [ $# -lt 3 ]; then echo "mail — not read · --ring takes a ref and an id"; _rl_rc=2; break; fi
+                          MV_RING=("$2" "$3"); MV_FLAGS="$MV_FLAGS $1"; shift 3 ;;
+                        --*) echo "mail — not written · --mail takes --to, --kind, --subject, --item, --pass, --answers, --interface, --default, --cite, --open, --ids, --local or --ring, not $1"; _rl_rc=2; break ;;
                         *) MV_POS+=("$1"); shift ;;
                       esac
                     done
                     if [ -n "$_rl_rc" ]; then :
                     elif [ "$MV_ACT" = post ]; then
-                      if [ "${#MV_POS[@]}" != 2 ] || [ "$MV_OPEN$MV_IDS" != 00 ] || [ "${#MV_CITE[@]}" != 0 ] || [[ " $MV_FLAGS " != *" --to "* ]] \
+                      if [ "${#MV_POS[@]}" != 2 ] || [ "$MV_OPEN$MV_IDS$MV_LOCAL" != 000 ] || [ "${#MV_CITE[@]}" != 0 ] || [ "${#MV_RING[@]}" != 0 ] || [[ " $MV_FLAGS " != *" --to "* ]] \
                           || [[ " $MV_FLAGS " != *" --kind "* ]] || [[ " $MV_FLAGS " != *" --subject "* ]]; then
                         echo "mail — not written · the form is --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] [--default <text>] <body file>"; _rl_rc=2
                       else write_mail_post "${MV_POS[0]}" "$MV_TO" "$MV_KIND" "$MV_SUB" "${MV_ITEM:-none}" "${MV_PASS:-none}" "${MV_ANS:-none}" "${MV_POS[1]}" "${MV_IFC:-none}" ${MV_DEF[@]+"${MV_DEF[@]}"}; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = read ]; then
-                      if [ "${#MV_POS[@]}" != 1 ] || [ -n "$MV_TO$MV_KIND$MV_SUB$MV_ITEM$MV_PASS$MV_ANS$MV_IFC" ] || [ "${#MV_DEF[@]}" != 0 ] || [ "${#MV_CITE[@]}" != 0 ]; then
-                        echo "mail — not read · the form is --mail read <who> [--open] [--ids]"; _rl_rc=2
+                      if [ "${#MV_POS[@]}" != 1 ] || [ -n "$MV_TO$MV_KIND$MV_SUB$MV_ITEM$MV_PASS$MV_ANS$MV_IFC" ] || [ "${#MV_DEF[@]}" != 0 ] || [ "${#MV_CITE[@]}" != 0 ] || [ "${#MV_RING[@]}" != 0 ]; then
+                        echo "mail — not read · the form is --mail read <who> [--open] [--ids] [--local]"; _rl_rc=2
+                      elif [ "$MV_LOCAL" = 1 ]; then print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS" local; _rl_rc=$?
                       else print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS"; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = ack ]; then
                       if [ "${#MV_POS[@]}" != 2 ] || [ -n "${MV_FLAGS// /}" ]; then
@@ -20056,8 +20178,12 @@ while [ $# -gt 0 ]; do
                       if [ "${#MV_POS[@]}" != 3 ] || [ -n "${MV_FLAGS// --cite/}" ]; then
                         echo "mail — not written · the form is --mail answer <slug> <question id> <body file> [--cite <path>@<sha>]..."; _rl_rc=2
                       else write_mail_answer "${MV_POS[0]}" "${MV_POS[1]}" "${MV_POS[2]}" ${MV_CITE[@]+"${MV_CITE[@]}"}; _rl_rc=$?; fi
+                    elif [ "$MV_ACT" = notice ]; then
+                      if [ "${#MV_POS[@]}" != 1 ] || [ -n "$MV_TO$MV_KIND$MV_SUB$MV_PASS$MV_ANS$MV_IFC" ] || [ "${#MV_DEF[@]}" != 0 ] || [ "${#MV_CITE[@]}" != 0 ] || [ "$MV_OPEN$MV_IDS" != 00 ]; then
+                        echo "mail — not read · the form is --mail notice <slug> [--item <instance key>] [--local] [--ring <ref> <id>]"; _rl_rc=2
+                      else print_mail_notice "${MV_POS[0]}" "$MV_ITEM" "$MV_LOCAL" "${MV_RING[0]:-}" "${MV_RING[1]:-}"; _rl_rc=$?; fi
                     else
-                      echo "mail — not written · --mail takes post, read, ack or answer, not ${MV_ACT:-nothing}"; _rl_rc=2
+                      echo "mail — not written · --mail takes post, read, ack, answer or notice, not ${MV_ACT:-nothing}"; _rl_rc=2
                     fi
                     RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-dPlacedRequest-33 - the build card's remote ref, written for the kickoff engine; no slug

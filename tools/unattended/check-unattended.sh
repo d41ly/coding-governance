@@ -6264,8 +6264,8 @@ if check_selected 32; then
 # What this check does NOT check, because a structural check reads as a semantic one to everybody
 # who did not write it: a second derivation spelled WITHOUT the literal — `rev-parse --git-common-dir`,
 # a `$GIT_DIR` read, a path composed from `.git` by hand — is invisible here; the check binds the one
-# literal this build's specs spelled. The two hooks, `stop-guard.js` and `stall-recorder.js`, are
-# outside the population by design: they derive the git dir in JavaScript through `deriveSidecarPath`,
+# literal this build's specs spelled. The three hooks, `stop-guard.js`, `stall-recorder.js` and
+# `mail-notice.js`, are outside the population by design: they derive the git dir in JavaScript through `deriveSidecarPath`,
 # and a shell function cannot be their spelling. A spelling on a COMMENT line is not counted, so a
 # commented-out second derivation passes until the edit that uncomments it, which is the edit this
 # check reds. And whether the one derivation is CORRECT — the worktree's git dir, never the common

@@ -21087,7 +21087,7 @@ same "KDS25 AC2 a cite whose sha does not hold its path, and one whose sha is -x
 ma_out=$(run_deadline_arm c1 a4 answer tFix 000000000000 "$LF/body.txt"); ma_rc=$?
 same "KDS25 AC2 an id naming no question exits 2 saying so" "$ma_rc $(grep -c 'is no question addressed to tFix$' <<<"$ma_out")" "2 1"
 ma_out=$(run_deadline_arm c1 r1 read tFix --cite a@b); ma_rc=$?
-same "KDS25 AC2 --mail read with --cite exits 2 printing the read's form" "$ma_rc [$ma_out]" "2 [mail — not read · the form is --mail read <who> [--open] [--ids]]"
+same "KDS25 AC2 --mail read with --cite exits 2 printing the read's form" "$ma_rc [$ma_out]" "2 [mail — not read · the form is --mail read <who> [--open] [--ids] [--local]]"
 # ---- AC3
 write_lease_policy '[flow]
 wait-ceiling = 30'
@@ -21201,6 +21201,140 @@ same "KDS25 AC5 a transition differing from the witness beside an open question 
 rm -rf "$kw_d"
 git for-each-ref --format='delete %(refname)' refs/gov/remote/mail | git update-ref --stdin
 remove_claim_refs; reset_tree
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
+# KICK-dKeptSession-21 — NEWS SHOWN AS `mailbox.notice` SAYS. The lease fixture's clone c1 is B, the
+# reader, RUN_CLAIMS on, its policy landed by `write_lease_policy`; c2, a second clone of the origin
+# under GOV_NODE=b, is A, posting from fy to build:tFix with `--default no`. B's stamp is
+# `mail-notice.tFix.log` under c1's sidecar root, and B's session k21 is bound to tFix by a `session:`
+# fact in c1's `memory/builds/tFix/RUN.md`, which the hook's lease scan reads. AC1: B's notice at an
+# item boundary names A's message, ` · fetched · item <key>`; a scratch copy whose notice reads the
+# cache only prints `mail — none`, the RED a boundary that never fetches is. AC2: c1's origin pointed
+# at a missing path, the notice prints the id with ` · local copy <n>s old (` and the fetch's cause,
+# `<n>` within two seconds of the stamp's age by `stat`, the stamp unmoved; `--local` names
+# `(--local)` and prints no cause. AC7: a ring of eleven hex digits, or a ref outside the mail grammar,
+# exits 2 with the origin away and prints no cause, so nothing was read; a valid pair prints S1's line;
+# under `deps.messaging = "live-and-mailbox"` with no ring a new message is still shown. AC5 and AC4,
+# under `notice = "every-tool-call"` and `fetch-seconds = 10` (PINNED, the planted interval): with the
+# origin away and the stamp fresh the hook prints the ids within 500 ms (PINNED), and prints nothing
+# for a subagent's call or an unbound session; fed a payload every two seconds (PINNED) for 22
+# seconds, it names a message posted after the stamp within 20 seconds (PINNED, twice the interval),
+# its marker created one to three times (PINNED, the window over the interval, plus one); a copy whose
+# S6 spawns nothing never names the next one, the RED a hook that never fetches is. AC6: a fresh
+# fixture whose first policy revision does not parse prints one NOTE per key, reads `every-item` and
+# writes it into the stamp, so the hook prints nothing. RED, observed at the close, is the base
+# driver, which has no `--mail notice`. WHAT THIS BLOCK DOES NOT DRIVE: the boundary verb's step, the
+# kickoff engine's `mail-notice-boundary` plant's (AC3); the texts (AC8 to AC10), probed in the unit's
+# acceptance ledger.
+# ==================================================================================================
+LF=$(mktemp -d); write_lease_fixture
+git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null && git -C "$LF/c2" config user.email t@t.test \
+  && git -C "$LF/c2" config user.name t && git -C "$LF/c2" config core.autocrlf false
+printf 'a message body\n' > "$LF/body.txt"
+printf '# run\n\n## Run facts\nsession: k21\nphase: BUILDING\n' > "$LF/c1/memory/builds/tFix/RUN.md"
+nt_st="$LF/c1/.git/unattended/mail-notice.tFix.log"; nt_k='item.build.base@KICK-tFix-1#aaaa0001'
+nt_pid='s/^mail — posted \([0-9a-f]*\) · .*/\1/p'
+nt_c1=$(cygpath -m "$LF/c1" 2>/dev/null || printf '%s' "$LF/c1")
+run_notice_arm() { # clone · GOV_NODE · --mail args -> the driver's stdout and exit, its stderr in $LF/err; NT_SCRIPT names a scratch driver
+  local c=$1 g=$2; shift 2
+  ( cd "$LF/$c" && GOV_NODE=$g CLAUDE_CODE_SESSION_ID=p1 GOV_RUNLOG=0 bash "${NT_SCRIPT:-$SCRIPT}" --mail "$@" 2>"$LF/err" )
+}
+run_notice_hook() { # hook file · session · [agent id] -> the hook's stdout over one PostToolUse payload with c1 as its cwd
+  local p
+  printf -v p '{"session_id":"%s","cwd":"%s","hook_event_name":"PostToolUse","tool_name":"Bash"%s}' "$2" "$nt_c1" "${3:+,\"agent_id\":\"$3\"}"
+  printf '%s' "$p" | node "$1" 2>/dev/null
+}
+# ---- AC1
+nt_out=$(run_notice_arm c1 a notice tFix)
+same "KDS21 AC1 B's first notice prints none, fetched, and writes the stamp" "[$nt_out] $([ -f "$nt_st" ] && echo written)" \
+  "[mail — none for tFix · fetched] written"
+nt_q1=$(run_notice_arm c2 b post fy --to build:tFix --kind question --subject 'q one' --default no "$LF/body.txt" | sed -n "$nt_pid")
+mkdir -p "$LF/sc"; cp "$HERE/lib-unattended.sh" "$LF/sc/"
+sed 's/rows=$(read_mailbox "$slug" soft 2>"$d\/err")/rows=$(read_mailbox "$slug" local 2>"$d\/err")/' "$SCRIPT" > "$LF/sc/unattended.sh"
+same "KDS21 AC1 the scratch copy differs from the driver by its notice's one read line" "$(diff "$SCRIPT" "$LF/sc/unattended.sh" | grep -c '^>')" "1"
+nt_out=$(NT_SCRIPT="$LF/sc/unattended.sh" run_notice_arm c1 a notice tFix --item "$nt_k")
+same "KDS21 AC1 a notice that skips its fetch prints mail — none" "${nt_out%% for *}" "mail — none"
+nt_out=$(run_notice_arm c1 a notice tFix --item "$nt_k")
+same "KDS21 AC1 B's notice at the boundary names A's message, fetched, and the item" "$nt_out" \
+  "mail — 1 unread for tFix · ${nt_q1:-unposted} · fetched · item $nt_k"
+# ---- AC2
+git -C "$LF/c1" remote set-url origin "$LF/missing.git"
+sleep 3
+nt_m=$(stat -c %Y "$nt_st")
+nt_out=$(run_notice_arm c1 a notice tFix); nt_rc=$?; nt_now=$EPOCHSECONDS
+nt_n=$(sed -n 's/.* · local copy \([0-9]*\)s old (the remote did not answer, git fetch exited [0-9]*: .*)$/\1/p' <<<"$nt_out")
+same "KDS21 AC2 a failed fetch exits 0 naming the id, the cause and the stamp's age within 2s, the stamp unmoved, one cause line on stderr" \
+  "$nt_rc $(grep -c "^mail — 1 unread for tFix · ${nt_q1:-unposted} · local copy " <<<"$nt_out") $([ -n "$nt_n" ] && [ $((nt_n - nt_now + nt_m)) -ge -2 ] && [ $((nt_n - nt_now + nt_m)) -le 2 ] && echo aged) $([ "$(stat -c %Y "$nt_st")" = "$nt_m" ] && echo unmoved) $(grep -c '^mail — local copy: the remote did not answer' "$LF/err")" \
+  "0 1 aged unmoved 1"
+nt_out=$(run_notice_arm c1 a notice tFix --local)
+same "KDS21 AC2 --local names (--local) and prints no cause" \
+  "$(sed -n 's/^mail — 1 unread for tFix · [0-9a-f]* · local copy [0-9]*s old \((--local)\)$/\1/p' <<<"$nt_out") $(grep -c 'mail — local copy:' "$LF/err")" "(--local) 0"
+# ---- AC7
+nt_out=$(run_notice_arm c1 a notice tFix --ring refs/gov/mail/fy/b/p1 0123456789a); nt_rc=$?
+same "KDS21 AC7 a ring of eleven hex digits exits 2 before any read, the origin away printing no cause" "$nt_rc [$nt_out] [$(<"$LF/err")]" \
+  "2 [mail — not read · --ring takes a mail ref and a twelve-hex-digit id] []"
+nt_out=$(run_notice_arm c1 a notice tFix --ring refs/heads/main 0123456789ab); nt_rc=$?
+same "KDS21 AC7 a ref outside the mail grammar exits 2 before any read" "$nt_rc [$nt_out] [$(<"$LF/err")]" \
+  "2 [mail — not read · --ring takes a mail ref and a twelve-hex-digit id] []"
+git -C "$LF/c1" remote set-url origin "$LF/origin.git"
+nt_out=$(run_notice_arm c1 a notice tFix --ring refs/gov/mail/fy/b/p1 "${nt_q1:-unposted}")
+same "KDS21 AC7 a valid ring runs the notice, whose line is S1's" "$nt_out" "mail — 1 unread for tFix · ${nt_q1:-unposted} · fetched"
+write_lease_policy '[deps]
+messaging = "live-and-mailbox"'
+nt_q2=$(run_notice_arm c2 b post fy --to build:tFix --kind question --subject 'q two' --default no "$LF/body.txt" | sed -n "$nt_pid")
+nt_out=$(run_notice_arm c1 a notice tFix --item "$nt_k")
+same "KDS21 AC7 under live-and-mailbox with no ring delivered the boundary still shows the message" "$(grep -c " ${nt_q2:-unposted} · fetched · item " <<<"$nt_out")" "1"
+# ---- AC5
+write_lease_policy '[mailbox]
+notice = "every-tool-call"
+fetch-seconds = 10'
+run_notice_arm c1 a notice tFix >/dev/null
+same "KDS21 AC4 the notice writes every-tool-call and its interval into the stamp's first line" "$(head -n 1 "$nt_st" | grep -c '^{"notice": "every-tool-call", "fetch-seconds": 10, "bash": "')" "1"
+git -C "$LF/c1" remote set-url origin "$LF/missing.git"
+nt_t0=${EPOCHREALTIME/[.,]/}; nt_out=$(run_notice_hook "$HERE/mail-notice.js" k21); nt_t1=${EPOCHREALTIME/[.,]/}
+same "KDS21 AC5 the origin away and the stamp fresh, the hook names the stamp's ids in under 500 ms" \
+  "$(grep -c "\"additionalContext\":\"mail — 2 unread for tFix · ${nt_q1:-unposted} ${nt_q2:-unposted} · local copy [0-9]*s old\"" <<<"$nt_out") $([ $(( (nt_t1 - nt_t0) / 1000 )) -lt 500 ] && echo fast)" "1 fast"
+same "KDS21 AC5 a subagent's call and an unbound session print nothing" "[$(run_notice_hook "$HERE/mail-notice.js" k21 agent-1)] [$(run_notice_hook "$HERE/mail-notice.js" k99)]" "[] []"
+same "KDS21 AC5 the hook spells no synchronous spawn and no policy read" "$(grep -c 'execFileSync\|spawnSync\|readPolicy' "$HERE/mail-notice.js")" "0"
+git -C "$LF/c1" remote set-url origin "$LF/origin.git"
+# ---- AC4
+nt_q3=$(run_notice_arm c2 b post fy --to build:tFix --kind question --subject 'q three' --default no "$LF/body.txt" | sed -n "$nt_pid")
+nt_t0=$EPOCHSECONDS; nt_got=""; nt_made=0
+for nt_i in 1 2 3 4 5 6 7 8 9 10 11; do
+  nt_pre=0; [ ! -e "$nt_st.fetching" ] || nt_pre=1
+  nt_out=$(run_notice_hook "$HERE/mail-notice.js" k21)
+  [ "$nt_pre" = 1 ] || [ ! -e "$nt_st.fetching" ] || nt_made=$((nt_made + 1))
+  case "$nt_out" in *"${nt_q3:-unposted}"*) [ -n "$nt_got" ] || nt_got=$((EPOCHSECONDS - nt_t0)) ;; esac
+  sleep 2
+done
+same "KDS21 AC4 a payload within 20s of the post names it, the marker created one to three times" \
+  "$([ -n "$nt_got" ] && [ "$nt_got" -le 20 ] && echo named) $([ "$nt_made" -ge 1 ] && [ "$nt_made" -le 3 ] && echo throttled)" "named throttled"
+mkdir -p "$LF/hk"; cp "$HERE/run-lease.js" "$LF/hk/"
+sed 's/= spawn(bash, /= ((...a) => ({ on() {}, unref() {} }))(bash, /' "$HERE/mail-notice.js" > "$LF/hk/mail-notice.js"
+same "KDS21 AC4 the stubbed hook differs from the hook by its one spawn line" "$(diff "$HERE/mail-notice.js" "$LF/hk/mail-notice.js" | grep -c '^>')" "1"
+for nt_i in $(seq 1 30); do [ -e "$nt_st.fetching" ] || break; sleep 1; done
+nt_q4=$(run_notice_arm c2 b post fy --to build:tFix --kind question --subject 'q four' --default no "$LF/body.txt" | sed -n "$nt_pid")
+nt_got=0
+for nt_i in 1 2 3 4 5 6 7 8 9 10 11; do
+  nt_out=$(run_notice_hook "$LF/hk/mail-notice.js" k21)
+  case "$nt_out" in *"${nt_q4:-unposted}"*) nt_got=$((nt_got + 1)) ;; esac
+  sleep 2
+done
+same "KDS21 AC4 a hook whose fetch spawns nothing never names the next message" "${nt_q4:+posted} $nt_got" "posted 0"
+# ---- AC6
+write_lease_fixture
+printf '# run\n\n## Run facts\nsession: k21\nphase: BUILDING\n' > "$LF/c1/memory/builds/tFix/RUN.md"
+write_lease_policy 'mailbox = 1
+this line does not parse'
+nt_out=$(run_notice_arm c1 a notice tFix); nt_rc=$?
+same "KDS21 AC6 refused reads print one NOTE per key and the notice as every-item" \
+  "$nt_rc [$nt_out] $(grep -c '^unattended: NOTE - mailbox.notice was not read' "$LF/err") $(grep -c '^unattended: NOTE - mailbox.fetch-seconds was not read' "$LF/err")" \
+  "0 [mail — none for tFix · fetched] 1 1"
+same "KDS21 AC6 the stamp's first line reads every-item, so the hook prints nothing" \
+  "$(head -n 1 "$nt_st" | grep -c '^{"notice": "every-item", "fetch-seconds": 60, ') [$(run_notice_hook "$HERE/mail-notice.js" k21)]" "1 []"
+rm -rf "$LF"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
@@ -24697,7 +24831,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4120 -> 4137 by KICK-dKeptSession-25 on 2026-11-23: the answer and wait blocks' 17 region-eight
 # `same` (AC2 6, AC3 3, AC4 4, AC5 4), each unconditional and outside any loop, off the diff's own lines;
 # no skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4137
+# RAISED 4137 -> 4156 by KICK-dKeptSession-21 on 2026-11-23: the notice block's 19 region-eight `same`
+# (AC1 4, AC2 2, AC4 4, AC5 3, AC6 2, AC7 4), each unconditional and outside any loop, off the diff's
+# own lines; the KDS25 read-form arm re-armed for `[--local]` adds none. No skip branch. No suite ran,
+# and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4156
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24989,7 +25127,8 @@ FLOOR_SHARD_7=311
 # RAISED 1317 -> 1325 by KICK-dKeptSession-27: the same 8 region-eight session-order assertions, see FLOOR_ASSERTIONS.
 # RAISED 1325 -> 1337 by KICK-dKeptSession-24: the same 13 region-eight deadline assertions less 1 retired, see FLOOR_ASSERTIONS.
 # RAISED 1337 -> 1354 by KICK-dKeptSession-25: the same 17 region-eight answer and wait assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1354
+# RAISED 1354 -> 1373 by KICK-dKeptSession-21: the same 19 region-eight notice assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1373
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

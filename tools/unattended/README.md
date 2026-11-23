@@ -299,7 +299,7 @@ header of the `health_log_sh` block in `lib-unattended.sh`.
 ## The sidecar
 
 `<git-dir>/unattended/` is where the keepalive actors write, and it is the WORKTREE's git dir,
-never the common dir, because a run lives in one worktree. Four kinds, one file per run each:
+never the common dir, because a run lives in one worktree. Five kinds, one file per run each:
 `stop.<slug>.log`, one JSON line per stop the stop-guard decided (unit 3); `stall.<slug>.log`, one
 line per API-error end the stall-recorder saw (unit 4); `resume.<slug>.log`, one attempt line per
 tick, with the launcher `resume.<slug>.<utc>.sh` and its `.out` beside it (unit 5). The first three
@@ -308,6 +308,11 @@ The fourth, `liveness.<slug>.json`, is the stop-guard's cache of the driver's `-
 (`TOOL-aLightenedLoop-5`): one entry, rewritten whole, keyed on a hash of every input that verdict
 reads, a LIVE entry expiring before a fresh read could say STALE. Only the stop-guard reads it, and
 `STOP_GUARD_LIVENESS_CACHE=off` in the hook's environment stops it being read or written.
+The fifth, `mail-notice.<slug>.log`, is the notice stamp (`KICK-dKeptSession-21`): rewritten whole by
+`--mail notice` after every notice that fetched, its first line the `mailbox.notice` and
+`mailbox.fetch-seconds` values that notice read and the bash that ran it, then one line per unread
+message; its mtime is the age of the build's local mail copy. Only the `mail-notice.js` hook reads it,
+at every tool call, and its `<stamp>.fetching` marker beside it lasts for one detached fetch.
 
 ## The bar `--close` runs
 

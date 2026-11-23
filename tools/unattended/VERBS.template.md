@@ -590,7 +590,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `register — not written · <why>`, `register — refused <subject|decision key> over <n> bytes
   encoded` or `register — off` (exit 2). Dark behind `RUN_CLAIMS` like every claim; no entry is
   ever deleted or rewritten. It takes no slug.
-- `--mail` — the mailbox per build, four verbs. `--mail post <slug> --to <recipient> --kind <kind>
+- `--mail` — the mailbox per build, five verbs. `--mail post <slug> --to <recipient> --kind <kind>
   --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>]
   [--default <text>] <body file>` appends ONE message to this session's own ref,
   `refs/gov/mail/<slug>/<fleet tag>/<session>`, the slug the sender's build, so writers never
@@ -637,7 +637,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `default` the answer, a message this node has not sighted never expiring; `open` otherwise;
   `reply` names the message that decided the state. `--open` prints only the open rows and `--ids`
   their ids on one line, or `none`. A failed fetch prints `mail — local copy: <why>` and reads the
-  cache (exit 0); a refused read exits 2. `--mail ack <slug> <id>` posts an `ack` from `<slug>`
+  cache (exit 0); `--local` reads the cache with no fetch and prints no cause; a refused read exits
+  2. `--mail ack <slug> <id>` posts an `ack` from `<slug>`
   answering `<id>` to its sender's build, with its subject and an empty body, exit 2 where `<id>` is
   no row addressed to `<slug>`, else the post's exits. `--mail answer <slug> <question id> <body file>
   [--cite <path>@<sha>]...` answers a `question` addressed to `<slug>`, the answering build, the loop
@@ -653,10 +654,35 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   line per cite in flag order, so the post's line and exits are the answer's. Each refusal exits 2
   writing nothing. `--cite` with no value prints `mail — not written · --cite takes a value`, the
   `post`, `read` and `ack` forms refuse it, and an `answer` with any other flag, or other than three
-  words, prints its form. A build's transition is refused while a
+  words, prints its form. `--mail notice <slug> [--item <instance key>] [--local] [--ring <ref>
+  <id>]` shows the build's unread mail as the `mailbox.notice` policy key says, the one reader of
+  that key and of `mailbox.fetch-seconds`, each read through the driver's policy reader, a refused
+  read taking its catalogue default, `every-item` and 60, under one `unattended: NOTE -` line naming
+  the key. Under `off` it fetches nothing, rewrites its stamp's first line alone and prints `mail —
+  notice off for <slug> (mailbox.notice: off)`. Otherwise it is one mailbox read, its one bounded
+  fetch, and ONE line over the `open` rows: `mail — <n> unread for <slug> · <id> <id> …` or `mail —
+  none for <slug>`, then ` · fetched`; or, where the fetch failed, its `mail — local copy: <why>`
+  passed through on stderr, ` · local copy <age>s old (<why>)`, the age its stamp's, ` · local copy
+  age unknown (<why>)` with no stamp; `--local` reads the cache with no fetch and ends ` · local copy
+  <age>s old (--local)`; `--item` appends ` · item <instance key>`. THE STAMP is
+  `<git-dir>/unattended/mail-notice.<slug>.log`, rewritten whole through a temp file renamed into place
+  after every notice that fetched, and after an `off` one: its first line `{"notice": <value>,
+  "fetch-seconds": <n>, "bash": <path>}`, the bash that ran the driver, then one `{"id": …, "kind": …,
+  "to": …}` line per unread row; its mtime is the local copy's age, and a failed or `--local` notice
+  leaves it untouched. The kit's `PostToolUse` hook `mail-notice.js` reads it at every tool call under
+  `every-tool-call` and adds `mail — <n> unread for <slug> · <ids> · local copy <age>s old` to the
+  session's context, with no git, policy or network call; past `fetch-seconds` it creates
+  `<stamp>.fetching` exclusively and, only then, starts this verb detached with the stamp's bash, which
+  removes the marker when it ends, a marker older than twice the interval replaced. `--ring <ref>
+  <id>`, the live channel's receiver, is held before any read to a ref of
+  `refs/gov/mail/<build>/<tag>/<segment>` as the post writes it and an id of twelve lower-case hex
+  digits, else `mail — not read · --ring takes a mail ref and a twelve-hex-digit id` (exit 2); then
+  the notice runs and reads the mailbox, never the ring. A refused read exits 2. Only `read` and
+  `notice` take `--local`, only `notice` takes `--ring`, and a notice with any other flag, or other
+  than one word, prints its form. A build's transition is refused while a
   message addressed to it reads `open`, and the move disposes each answered, acknowledged or expired
   message once (the loop kit's `loop_transition.py`). Dark behind `RUN_CLAIMS`: a post, an ack or an
-  answer prints `mail — off` and exits 2, a read prints it and exits 0.
+  answer prints `mail — off` and exits 2, a read or a notice prints it and exits 0.
 - `--card-ref` — `--card-ref write <slug> --message <file>`, the build card's ref on the remote,
   written for the kickoff engine's `remote-ref` card store, which calls it bounded with the commit
   message it rendered in the file (TOOL-dPlacedRequest-33). Dark behind `RUN_CLAIMS`: while the

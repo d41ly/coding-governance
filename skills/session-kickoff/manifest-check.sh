@@ -36,6 +36,7 @@
 #   manifest-check.sh --card --boundary --build <slug> --session <sid> [--transcript <path>] [--out <file>]
 #                                         # the item boundary, I12: the card's `item —` line moved to
 #                                         # HEAD, and a crossing written and published as card.pointers says,
+#                                         # the notice as a `notice —` line, as mailbox.notice says,
 #                                         # and the build's open mail as `interrupt — mailbox` lines, as mailbox.reads says
 #   manifest-check.sh --card --fixture-run <scratch-dir>   # run card-compaction.fixture.sh there and
 #                                         # record its verdict in <git-common-dir>/orientation/card-fixture.verdict
@@ -2594,7 +2595,8 @@ run_card_boundary() { # slug -> the verb's lines on stdout; 0, or 2 with no sess
         printf 'card — skipped: card.pointers refused: %s\n' "${mode%%$'\n'*}"
       fi
       run_context_boundary
-      run_mail_interrupts "$slug" ;;
+      if run_mail_notice "$slug" "${b##* → }"; then run_mail_interrupts "$slug" --local
+      else run_mail_interrupts "$slug"; fi ;;
     *)
       printf 'boundary — skipped: %s\n' "$b"
       write_card_pointers "$slug" ;;
@@ -2857,6 +2859,30 @@ render_context_line() { # [boundary] -> one context — line on stdout at a repl
 # lines to its `--out` file, which the hook hands the session at its next shell call.
 run_context_boundary() { # -> the fresh-now line or nothing on stdout; 0 always
   render_context_line boundary
+}
+
+# The boundary verb's notice step after a crossing (KICK-dKeptSession-21 S4): the unattended driver's
+# `--mail notice <slug> --item <key>`, the key the crossing's target, run through `run_driver_bounded` under
+# CARD_CLAIMS_BOUND as `render_mail_line` runs its read. Its first line prints as `notice — <line>`, CRs
+# stripped and cut to 160 bytes as `run_item_boundary` cuts; nothing for `mail — off` or an `off` notice;
+# `notice — skipped: <why>` for a driver that does not resolve, the bound passed or a non-zero exit. It
+# returns 0 only when the line says ` · fetched`, so the step after it reads the cache with `--local` and
+# the boundary makes one fetch (its section 8 F4); after an `off` line or a skip that step fetches itself.
+run_mail_notice() { # slug · key -> the notice — line or nothing on stdout; 0 fetched, 1 not
+  local o="$CARD_TMP/mail.notice" rc a
+  run_driver_bounded "$CARD_CLAIMS_BOUND" "$o" /dev/null --mail notice "$1" --item "$2"; rc=$?
+  if [ "$rc" = 125 ] && [ -n "$CARD_REF_WHY" ]; then printf 'notice — skipped: %s\n' "$CARD_REF_WHY"; return 1; fi
+  a=$(tr -d '\r' < "$o" 2>/dev/null | LC_ALL=C awk 'NF { f = $0; d = (f ~ / · fetched$/ || f ~ / · fetched · item /) ? 1 : 0
+      if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+      print d f; exit }')
+  rm -f "$o" 2>/dev/null
+  case "$rc:${a:1}" in
+    124:*|137:*) printf 'notice — skipped: --mail notice did not answer within %ss\n' "$CARD_CLAIMS_BOUND" ;;
+    "0:mail — off"|"0:mail — notice off "*) ;;
+    0:mail\ —\ *) printf 'notice — %s\n' "${a:1}"; [ "${a:0:1}" = 1 ] && return 0 ;;
+    *) printf 'notice — skipped: --mail notice exited %s: %s\n' "$rc" "${a:1}" ;;
+  esac
+  return 1
 }
 
 # The boundary verb's step after a crossing (KICK-dKeptSession-10 S1): the loop kit's `position.py <slug>

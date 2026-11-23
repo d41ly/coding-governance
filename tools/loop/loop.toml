@@ -1213,6 +1213,10 @@ key = "PostToolUse {prefix}/process-monitor/procmon-hook.js"
 stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
 
 [[hook]]
+key = "PostToolUse {prefix}/unattended/mail-notice.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
 key = "PreToolUse {prefix}/hooks/agent-cap.js"
 stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
 

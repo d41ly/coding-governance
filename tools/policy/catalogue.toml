@@ -612,12 +612,16 @@ owner = "dKeptSession"
 name = "mailbox.notice"
 allowed = ["every-tool-call", "every-item", "off"]
 default = "every-item"
+summary = "When a session is shown the unread mail addressed to its build, read by the unattended driver's `--mail notice`: under every-item at each item boundary, after one bounded fetch of the mail refs, as a `notice —` line; under every-tool-call also at each tool call, listed by the unattended kit's hook from the node's local copy with no network call, a detached fetch started once the copy is older than mailbox.fetch-seconds; under off never. The item boundary's mailbox read, mailbox.reads, runs under each."
+usage = 'mailbox.notice = "every-tool-call"'
 owner = "dKeptSession"
 
 [[key]]
 name = "mailbox.fetch-seconds"
 allowed = { type = "seconds", min = 10 }
 default = 60
+summary = "Under mailbox.notice every-tool-call, the seconds the node's local copy of the mail refs may age before a tool call starts one detached fetch, read by the unattended driver's `--mail notice` and written into its stamp for the hook, so a message reaches the session within twice this."
+usage = 'mailbox.fetch-seconds = 30'
 owner = "dKeptSession"
 direction = "raise-loosens"
 
