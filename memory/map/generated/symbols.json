@@ -5003,6 +5003,11 @@
       "file": "tools/workflows/spec-audit-optin.js"
     },
     {
+      "id": "checkFraming",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkGateLeg",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -5096,6 +5101,11 @@
       "id": "checkPosixRootLitter",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkPromptPath",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "checkRedLane",
@@ -6726,6 +6736,11 @@
       "id": "check_fragments",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_framing_arm",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "check_frozen",
@@ -23043,6 +23058,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "read_framing",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "read_front_matter",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -29236,6 +29256,16 @@
       "id": "render_fixture_row",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "render_for_work_order",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "render_framing_blocks",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "render_front_matter",

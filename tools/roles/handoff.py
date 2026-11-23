@@ -4,6 +4,7 @@
     python handoff.py render --role <name> --build <slug> [--unit <id>] [--item <tag> [--allowance <path>]...]
                              [--card <path>]
                              [--input <key>=<value>]... [--upstream <rows file>]
+                             [--for <role> | --framed-by <agent id>]
                              [--out <path> | --stdout | --stand-in]
                              [--part full|task]
     python handoff.py facts --build <slug> [--unit <id>] --input <key>=<value>...
@@ -77,6 +78,24 @@ class and `by`. All five sit inside `## Task`, so `task-sha` covers them. `--all
 refuses. The hooks kit's spawn guard admits such a work order only in a session whose card routes its unit.
 A research return names the work order it answers on a `**Answers:** <path> task-sha=<12hex>` line,
 `roles_lib.derive_answers_value`'s value, which the catalogue checker's R16 grades.
+THE PROMPT WRITER'S CYCLE (TOOL-dBoundRoles-4): render `gov-prompt-writer` with `--for <role>`, spawn it, then
+render the role with `--framed-by <its agent id>`. `--for` fills `input:work-order`, the one `reads` key no
+`--input` supplies (`INPUT_NAMES` leaves it out), with `render_for_work_order`'s content: the role's `## Role`
+and `## Task` sections as this render composes them for it, unranked, from the same build, unit, card, the
+inputs that role reads, rows file, item and allowance, and with no `--item` its `### allowance` and its
+`### return` template after them; the inputs and the rows file the role reads are admitted beside the prompt
+writer's own, `--allowance` too, and the prompt writer's marker carries `item=-`. A role reading
+`input:work-order` rendered with no `--for` refuses naming it; `--for` on a role not reading it is a usage
+error. `--framed-by` reads the prompt writer's return off its own transcript, `read_framing`, and refuses with
+exit 1, writing nothing, naming each failed condition: an id off `PATH_ID_RE`, no session, no
+`agent-<id>.jsonl` in its `subagents` folder, a `.meta.json` type other than `gov-prompt-writer`, a first record
+opening with no marker of a `gov-prompt-writer` work order of this build, no return text, a return
+`roles_lib.check_return` refuses, an outcome other than `framed`, and a return lacking `job` or `nostop`. The
+task's `reads` fill then closes with `render_framing_blocks`: `### framing:job`, `### framing:population`,
+`### framing:added` and `### framing:no-stop`, one per field the return carries, each verbatim, the first
+closing with `Framed by: <the prompt writer's prompt path> task-sha=<12hex>`, inside the bytes `task-sha`
+covers. The prompt writer's own task is framed by no prompt writer: `--framed-by` on it and `--for` naming it
+refuse.
 The marker carries two hashes, each the first 12 hex digits of the SHA-256 of one section's bytes
 with CRLF folded to LF: `## Role` up to the byte before the `## Task` line, and `## Task` to the end
 of the file. `check` re-derives both and compares the marker's `path` with the file's own, and for a
@@ -193,7 +212,9 @@ transcript rewritten so its consumed bytes keep their sha256 resumes from the st
 For `--model`: the id is not checked to be the model the session or the spawned agent runs, since
 the caller types it, and an id no profile matches answers the default levels with no note. For
 `--allowance`: that a granted path exists or is the unit's dispatched write set, since the caller passes it,
-so a caller granting a whole `ROUTED_PATHS` entry is admitted.
+so a caller granting a whole `ROUTED_PATHS` entry is admitted. For `--framed-by`: whether the framing says
+anything the work order supports, a heading, fact or marker line inside a framing field, which only the fence
+walk reads, and whether the session read is the one that spawned the prompt writer.
 """
 import argparse
 import datetime
@@ -230,6 +251,15 @@ UPSTREAM_CONTRACT = ("Answer every row id above exactly once, in a `## Upstream`
                      "per row: `- <row id> · used|bypassed|not-applicable · <reason>`, a reason on every line, "
                      "and no row id this block does not list. `used` means your work honours the row, "
                      "`bypassed` that it departs from it, and `not-applicable` that the row does not bear on it.")
+#: The prompt writer's cycle (TOOL-dBoundRoles-4): its slot; the `reads` key only `--for <role>` fills, the
+#: destination's resolved work order, which `INPUT_NAMES` leaves out so no `--input` supplies it; the four
+#: blocks `--framed-by` appends to the destination's task, each `(return field, block key)` in this order; and
+#: the line `### framing:job` closes with, naming the prompt writer's work order.
+PROMPT_WRITER = "gov-prompt-writer"
+WORK_ORDER_KEY = "input:work-order"
+FRAMING_FIELDS = (("job", "framing:job"), ("population", "framing:population"), ("added", "framing:added"),
+                  ("nostop", "framing:no-stop"))
+FRAMED_BY_LEAD = "Framed by:"
 PLACEHOLDERS =("…", "...", "tbd", "todo", "n/a", "none", "-", "?")
 KICKOFF_HOME, KICKOFF_CHECKER = "session-kickoff", "manifest-check.sh"
 CHECKER_BOUND_S = 30
@@ -735,29 +765,147 @@ def derive_block_extents(section, lead, opening, blocks, handed):
     return out
 
 
+def render_for_work_order(root, memory_root, charter_path, dest, slug, unit, card_arg, inputs, upstream, item,
+                          allowance):
+    """The destination's resolved work order, the content `--for <dest>` hands the prompt writer under
+    `input:work-order` (TOOL-dBoundRoles-4 S1): `render_handoff`'s `## Role` and `## Task` sections for `dest`,
+    cut from the same build, unit, card, `--input` values the role reads, rows file, item and allowance,
+    rendered unranked, so no envelope line of the destination's reaches the prompt writer's own levels. A
+    work order cut for no item then closes with `### allowance`, `lib.derive_allowance`'s prefixes over the
+    role's write class and the paths `--allowance` grants, one `- <path>` line each, `none` for a role writing
+    nothing, and a `product` role granted no path one line saying so; and `### return`, the role's `return`
+    template verbatim (TOOL-dBoundRoles-2). An item's work order carries its own five blocks. RolesError
+    naming the slot for a role outside the catalogue or the prompt writer itself, and any refusal the
+    destination's own render makes."""
+    roles = lib.load_roles(KIT_DIR)
+    if dest not in roles:
+        raise lib.RolesError("--for %s: no role '%s' in the catalogue; its slots are %s"
+                             % (dest, dest, ", ".join(roles)))
+    if dest == PROMPT_WRITER:
+        raise lib.RolesError("--for %s: the prompt writer's own task is its driver's details rendered as they "
+                             "are, and is framed by no prompt writer (TOOL-dBoundRoles-4 F3)" % dest)
+    keys = roles[dest]["keys"]
+    read = {lib.parse_read_key(x)[0] for x in keys.get("reads", "").split(",") if x.strip()}
+    handed = {n: v for n, v in inputs.items() if n in ("prompt", CODE_INPUT) or "input:" + n in read}
+    _path, text, _task = render_handoff(root, memory_root, charter_path, dest, keys, slug, unit, card_arg, handed,
+                                        None, None, "", upstream if UPSTREAM_KEY in read else None, item=item,
+                                        allowance=allowance if item is not None else (), ranked=False)
+    body = text[ROLE_HEAD_RE.search(text).start():].rstrip("\n")
+    if item is not None:
+        return body + "\n"
+    writes = keys.get("writes") or "none"
+    if writes == "product" and not allowance:
+        lines = ("product — no path granted to this render: the role writes only the paths of the unit's "
+                 "--dispatch --writes set, which --allowance grants")
+    else:
+        conf = root / ".memory-tree.conf"
+        lines = "\n".join("- " + p for p in lib.derive_allowance(
+            {"tag": "role:" + dest, "allowance": writes}, slug, allowance, memory_root,
+            lib.read_conf_key(conf, "ROUTED_PATHS") if conf.is_file() else None)) or "none"
+    return "%s\n\n### allowance\n\n%s\n\n### return\n\n%s\n" % (body, lines, keys.get("return") or "none")
+
+
+def read_framing(root, slug, agent_id):
+    """`(fields, framed_by)` of the prompt writer whose agent id `--framed-by` names (TOOL-dBoundRoles-4 S3):
+    its transcript `agent-<id>.jsonl` under the `subagents` folder of the session `resolve_session_file` finds
+    with no `--session` (§8 F6), the id admitted only in `PATH_ID_RE`'s shape, as `print_agent_lines` finds one;
+    its type, the `.meta.json` `agentType` `load_agent_transcript` reads, `gov-prompt-writer`; its first `user`
+    record opening with the marker of a `gov-prompt-writer` work order of build `slug`, read by
+    `lib.extract_prompt_marker`; and its last assistant text, `read_agent_turns`', passing `lib.check_return`
+    against that work order with `outcome` `framed` and both `job` and `nostop`. `fields` is the return object,
+    `framed_by` the `<prompt path> task-sha=<12hex>` of that marker. RolesError naming each failed condition."""
+    if not PATH_ID_RE.match(agent_id):
+        raise lib.RolesError("--framed-by '%s' is not an agent id of letters, digits, '_' and '-'" % agent_id[:80])
+    session, why = resolve_session_file(root, None)
+    if session is None:
+        raise lib.RolesError("--framed-by %s: no session transcript to find the prompt writer in — %s"
+                             % (agent_id, why))
+    sdir = session.with_name(session.name[:-len(".jsonl")] if session.name.endswith(".jsonl") else session.stem)
+    path = sdir / "subagents" / ("agent-%s.jsonl" % agent_id)
+    if not path.is_file():
+        raise lib.RolesError("--framed-by %s: no agent transcript %s; spawn the prompt writer in this session "
+                             "first and pass the agent id its call returned" % (agent_id, path.as_posix()))
+    kind = load_agent_transcript(path)["type"]
+    if kind != PROMPT_WRITER:
+        raise lib.RolesError("--framed-by %s: the agent's type is %s, not %s; only the prompt writer's return "
+                             "frames a task" % (agent_id, kind or "unknown, its .meta.json naming none", PROMPT_WRITER))
+    first, last = read_agent_turns(path)
+    marker = lib.extract_prompt_marker(first) if first else None
+    if marker is None or marker.group("role") != PROMPT_WRITER:
+        raise lib.RolesError("--framed-by %s: the transcript's first record opens with no gov:handoff marker of a "
+                             "%s work order, so its return answers no rendered task" % (agent_id, PROMPT_WRITER))
+    if marker.group("build") != slug:
+        raise lib.RolesError("--framed-by %s: the prompt writer's work order %s is build %s's, not %s's"
+                             % (agent_id, marker.group("path"), marker.group("build"), slug))
+    if last is None:
+        raise lib.RolesError("--framed-by %s: the prompt writer left no return text" % agent_id)
+    work_order = (marker.group("path"), marker.group("task_sha"))
+    defects = lib.check_return(PROMPT_WRITER, last, root, work_order)
+    if defects:
+        raise lib.RolesError("--framed-by %s: the prompt writer's return fails its template: %s"
+                             % (agent_id, "; ".join(defects)))
+    template = lib.parse_return_template(lib.load_roles(KIT_DIR)[PROMPT_WRITER]["keys"].get("return"))
+    fields, _why = lib.extract_return_object(last, template)
+    if fields.get("outcome") != "framed":
+        raise lib.RolesError("--framed-by %s: the prompt writer returned outcome %s, not framed: %s"
+                             % (agent_id, fields.get("outcome"), fields.get("why") or "it gave no why"))
+    lacking = [f for f in ("job", "nostop") if f not in fields]
+    if lacking:
+        raise lib.RolesError("--framed-by %s: the prompt writer's framed return lacks %s, which every framing "
+                             "carries" % (agent_id, " and ".join(lacking)))
+    return fields, lib.derive_answers_value(*work_order)
+
+
+def render_framing_blocks(fields, framed_by):
+    """One `### <block key>` block per `FRAMING_FIELDS` field `fields` carries, in that order, each holding the
+    field's text verbatim, its trailing newlines dropped, and `### framing:job` closing with the line
+    `Framed by: <framed_by>` (TOOL-dBoundRoles-4 S3). The blocks are authored text, unfenced."""
+    out = []
+    for field, head in FRAMING_FIELDS:
+        if field in fields:
+            text = str(fields[field]).replace("\r\n", "\n").rstrip("\n")
+            if field == "job":
+                text += "\n\n%s %s" % (FRAMED_BY_LEAD, framed_by)
+            out.append("### %s\n\n%s" % (head, text))
+    return out
+
+
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
-                   notes=None, tail="", upstream=None, item=None, allowance=()):
+                   notes=None, tail="", upstream=None, item=None, allowance=(), for_role=None, framed_by=None,
+                   ranked=True):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
     The charter library's notes are appended to `notes` when a list is given; `tail` goes before
     the derived name's `.md`; `upstream` is the rows file `--upstream` names, the `upstream:rows` source;
     `item` the item tag the marker's `item=` carries, `-` when None (TOOL-dBoundRoles-17 S3), a tag
     outside `ITEM_VALUE_RE` refused before anything is read. With `item`, its declaration is read from the loop
     kit and the task closes with `lib.WORK_ORDER_BLOCKS` (TOOL-dBoundRoles-3 S2), its allowance
-    `lib.derive_allowance`'s over `allowance`, the paths `--allowance` grants."""
+    `lib.derive_allowance`'s over `allowance`, the paths `--allowance` grants. With `for_role`, `--for`'s
+    destination (TOOL-dBoundRoles-4 S1), `input:work-order` is `render_for_work_order`'s, the item and the
+    allowance are the destination's, and this marker carries `item=-`. With `framed_by`, `--framed-by`'s agent
+    id (S3), the task's `reads` fill closes with `render_framing_blocks` over `read_framing`'s return. `ranked`
+    False renders every block unranked, as with no playbook kit, and prints no note of it."""
     if item is not None and not lib.ITEM_VALUE_RE.match(item):
         raise lib.RolesError("--item '%s' is not an item tag item.<step>.<name>, each segment lowercase "
                              "letters, digits and '-'" % item)
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
-    # TOOL-dBoundRoles-3 S1 S3: the item's declaration and its allowance, refused before any value is read
+    # TOOL-dBoundRoles-4 S3 F3: the prompt writer's own task is the driver's details, rendered unframed
+    framing = []
+    if framed_by is not None:
+        if role == PROMPT_WRITER:
+            raise lib.RolesError("--framed-by %s: %s's own task is its driver's details rendered as they are, "
+                                 "and is framed by no prompt writer (TOOL-dBoundRoles-4 F3)" % (framed_by, role))
+        framing = render_framing_blocks(*read_framing(root, slug, framed_by))
+    # TOOL-dBoundRoles-3 S1 S3: the item's declaration and its allowance, refused before any value is read;
+    # under `--for` both are the destination's, read by its own render
     declaration = prefixes = None
-    if item is not None:
+    if item is not None and for_role is None:
         declaration = read_item_declaration(item, role)
         conf = root / ".memory-tree.conf"
         prefixes = lib.derive_allowance(declaration, slug, allowance, memory_root,
                                         lib.read_conf_key(conf, "ROUTED_PATHS") if conf.is_file() else None)
-    elif allowance:
+    elif allowance and for_role is None:
         raise lib.RolesError("--allowance %s: only an item's work order takes an allowance; pass --item <tag>"
                              % allowance[0])
     # TOOL-dBoundRoles-13 S3: every `reads` value is handed as content under the key it was cut by, the
@@ -771,6 +919,12 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             fact_keys[UPSTREAM_KEY] = lib.derive_fact_key("record", rel, raw)
     for name, (key, text) in derive_input_facts(root, inputs).items():
         values[name], fact_keys[name] = text, key
+    # TOOL-dBoundRoles-4 S1: the destination's resolved work order, handed as content keyed by the fixed argv
+    # `--for`, NUL, `<role>` over the text, which the renderer composed and no agent typed
+    if for_role is not None:
+        values[WORK_ORDER_KEY] = render_for_work_order(root, memory_root, charter_path, for_role, slug, unit,
+                                                       card_arg, inputs, upstream, item, allowance)
+        fact_keys[WORK_ORDER_KEY] = lib.derive_fact_key("cmd", ["--for", for_role], values[WORK_ORDER_KEY])
     # PLAY-dOrderedCharter-11 S4: the role's load set and its block's budget, before any card or brief is read;
     # a supplied code block is measured beside it, CR stripped (PLAY-dOrderedCharter-27 S4)
     # TOOL-dBoundRoles-2 S6: the role closes with its never list, its ceiling and its return, the ceiling's
@@ -801,6 +955,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         rows = None
         if notes is not None:
             notes.append(lib.UNRANKED_NOTE % exc)
+    # TOOL-dBoundRoles-4 S1: a work order handed as content is composed unranked, its load set measured as ranked
+    shown_rows = rows if ranked else None
     # PLAY-dOrderedCharter-5 S3: the charter rides once, in the agent file; the render still grades the tags,
     # here, where the load-set check measures the whole static block (TOOL-dBoundRoles-15 §8 F7)
     block, tag_refusals = role_text, []
@@ -922,7 +1078,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         what = ("no %s: %s" % (src, why[src])) if why.get(src) else (
             "the %s %s carries no single filled value for it: absent, repeated, empty or a placeholder"
             % (src, path.as_posix()) if path else "not supplied; pass --upstream <rows file>" if key == UPSTREAM_KEY
-            else "not supplied; pass --input %s=<value>" % key[6:])
+            else "not supplied; pass --for <role>, the role whose work order this task frames"
+            if key == WORK_ORDER_KEY else "not supplied; pass --input %s=<value>" % key[6:])
         if not k.endswith("?"):
             refusals.append("%s — %s" % (key, what))
         else:
@@ -952,6 +1109,9 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             at += sub.count("\n") + 2
         handed[len(blocks) + lib.WORK_ORDER_BLOCKS.index("### inputs")] = offsets
         blocks += render_work_order_blocks(item, declaration, prefixes, subs)
+    # TOOL-dBoundRoles-4 S3 F5: the prompt writer's framing closes the `reads` fill, authored text inside the bytes
+    # the task-sha covers, checked by the fence walk below as every authored block is
+    blocks += framing
     if charter_error is not None:
         raise charter_error
     refusals += tag_refusals
@@ -971,9 +1131,9 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         build_dir / "prompts", datetime.date.today().isoformat(), unit_id, role, tail)
     rel = path.relative_to(root).as_posix()
     wraps = None
-    if rows is not None:   # PLAY-dOrderedCharter-5 S2: each block in the envelope of its level
+    if shown_rows is not None:   # PLAY-dOrderedCharter-5 S2: each block in the envelope of its level
         wraps = {"## Task": (rel, TASK_LEVEL, TASK_DIRECTION)}
-        row = lib.read_envelope_row(rows, doc, memory_root)
+        row = lib.read_envelope_row(shown_rows, doc, memory_root)
         if practices and row is not None:
             practices = lib.render_envelope(PRACTICES_DOC % (doc, step), row[0], row[1], practices)
     # PLAY-dOrderedCharter-8 S7: the card's level-1 block leads the task part after the level-0 practices
@@ -983,7 +1143,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         practices = practices.rstrip("\n") + "\n\n" + card_block if practices else card_block
     # TOOL-dBoundRoles-6 S4: the role section is the library's one composition, the one the role index's
     # `role-sha` hashes, with its drive lines and its agent file's envelope; the task part is the template's
-    role_sec = lib.render_role_section(KIT_DIR, role, memory_root, charter_text, granted.get(role, ()), rows)
+    role_sec = lib.render_role_section(KIT_DIR, role, memory_root, charter_text, granted.get(role, ()), shown_rows)
     task_sec = lib.render_work_order_section(WORK_ORDER, lib.extract_work_order_parts(WORK_ORDER)[1], {
         "opening": opening, "reads": "\n\n".join(blocks), "practices": practices}, wraps) + "\n"
     # TOOL-dBoundRoles-48 S2: the fence state checked at every block's extents, the render's own, once the section
@@ -993,7 +1153,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     if fenced:
         raise lib.RolesError("\n".join(fenced))
     marker ="<!-- gov:handoff role=%s build=%s unit=%s item=%s path=%s role-sha=%s task-sha=%s -->" % (
-        role, slug, unit or "-", item or "-", rel, lib.derive_section_sha(role_sec), lib.derive_section_sha(task_sec))
+        role, slug, unit or "-", item if item is not None and for_role is None else "-", rel,
+        lib.derive_section_sha(role_sec), lib.derive_section_sha(task_sec))
     head = "**Serves:** journal %s\n%s\n# %s handoff — %s\n\n%s\n\n" % (
         unit_id, "".join(g + "\n" for g in gaps), role, unit_id, marker)
     return path, head + role_sec + task_sec, marker + "\n\n" + task_sec
@@ -1821,6 +1982,8 @@ def main(argv):
     r.add_argument("--card")
     r.add_argument("--input", action="append", default=[])
     r.add_argument("--upstream")
+    r.add_argument("--for", dest="for_role")
+    r.add_argument("--framed-by")
     dest = r.add_mutually_exclusive_group()
     dest.add_argument("--out")
     dest.add_argument("--stdout", action="store_true")
@@ -1939,6 +2102,16 @@ def main(argv):
             raise lib.RolesError("no role '%s' in the catalogue; its slots are %s" % (a.role, ", ".join(roles)))
         keys = roles[a.role]["keys"]
         read = {lib.parse_read_key(x)[0] for x in keys.get("reads", "").split(",") if x.strip()}
+        # TOOL-dBoundRoles-4 S1: `--for` names the role whose work order fills `input:work-order`, so the inputs
+        # and the rows file that role reads are admitted beside this role's own
+        if a.for_role is not None:
+            if WORK_ORDER_KEY not in read:
+                ap.error("--for: %s is a key %s does not read" % (WORK_ORDER_KEY, a.role))
+            if a.for_role not in roles:
+                raise lib.RolesError("--for %s: no role '%s' in the catalogue; its slots are %s"
+                                     % (a.for_role, a.for_role, ", ".join(roles)))
+            read |= {lib.parse_read_key(x)[0] for x in roles[a.for_role]["keys"].get("reads", "").split(",")
+                     if x.strip()}
         for name in inputs:
             if name not in ("prompt", CODE_INPUT) and "input:" + name not in read:
                 ap.error("input:%s is a key %s does not read" % (name, a.role))
@@ -1965,7 +2138,7 @@ def main(argv):
         path, text, task_part = render_handoff(root, memory_root, charter_path, a.role, keys, a.build,
                                                a.unit, a.card, inputs, out, notes,
                                                lib.STAND_IN_TAIL if a.stand_in else "", a.upstream, item=a.item,
-                                               allowance=a.allowance)
+                                               allowance=a.allowance, for_role=a.for_role, framed_by=a.framed_by)
         for line in notes:
             print("handoff: note — %s" % line, file=sys.stderr)
         if not a.stand_in:

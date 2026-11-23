@@ -189,7 +189,7 @@
 - `gov-synthesizer`: Merges verified findings into one report. Mandatory for every review's report. Output: a report in `memory/builds/<slug>/reviews/`.
 - `gov-tester`: Judges a red the bar attributed to this build, and answers the Test step's question. Optional, when Test hands it an OWN or blocking MIXED red, a fix pass asks whether the spec is wrong, or the reason stage asks its question. Output: judgments, to its harness.
 - `gov-researcher`: Finds candidates and the test each could lose. Optional, when no seam decides a design. Output: candidates, to its caller.
-- `gov-prompt-writer`: Composes the task a role agent is handed. Optional, when the driver hands a role its task. Output: a task, to the driver.
+- `gov-prompt-writer`: Frames the task a role agent is handed. Optional, before every direct spawn of another role while prompts.author is prompt-writer. Output: a framing, to the driver, which the renderer reads into the destination's task.
 - `gov-session`: Opens a handoff to another session. Optional, when work leaves this session. Output: a prompt file in the build's `prompts/`.
 - `gov-planner`: Drafts and judges a build's plan. Optional, when a build's plan is drafted or judged. Output: a plan record under `memory/`.
 - `gov-architect`: Inventories a build's scope and decomposes it into units. Optional, when a build's scope is inventoried or decomposed. Output: an inventory or a roster under `memory/`.

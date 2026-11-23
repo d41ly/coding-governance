@@ -213,6 +213,29 @@ in a session whose orientation card routes the marker's `unit=`, the stand-in bi
 dWellOiledMachine's. `python handoff.py check <file>` refuses a work order with `item=` set that lacks
 any of the five blocks, naming it. The record kind is `roles_lib.WORK_ORDER_KIND`: its folder, its name
 grammar, its door, its parts and its readers, `check_handoff`, rule 6 and R16.
+THE PROMPT WRITER'S CYCLE (TOOL-dBoundRoles-4): three calls, render the prompt writer with `--for`, spawn it,
+render the destination with `--framed-by`. `render --role gov-prompt-writer --for <role>` fills the `reads` key
+`input:work-order`, which `READ_FAMILIES` lists and `INPUT_NAMES` leaves out, so `--input work-order=` is
+refused and the key unsupplied names `--for`: its content, `handoff.render_for_work_order`'s, is the
+destination's own `## Role` and `## Task` sections as `render_handoff` renders them, unranked, from the same
+build, unit, card, inputs, rows file, item and allowance, the inputs the destination reads admitted beside the
+prompt writer's own; with no `--item`, `### allowance` (`roles_lib.derive_allowance` over the role's write
+class and the `--allowance` paths, which `--for` admits, a `product` role granted none named so) and
+`### return`, its template, close it. It is keyed `cmd:` over the argv `--for`, NUL, `<role>`, and the
+prompt writer's own marker carries `item=-`. `render --role <dest> --framed-by <agent id>` reads the prompt
+writer's return mechanically, `handoff.read_framing`: `agent-<id>.jsonl` under the `subagents` folder of the
+session `resolve_session_file` finds with no `--session`, the id in `PATH_ID_RE`'s shape, its `.meta.json`
+`agentType` `gov-prompt-writer`, its first record's marker a `gov-prompt-writer` work order of the same build,
+and its last assistant text passing `roles_lib.check_return` against that work order with `outcome` `framed`,
+`job` and `nostop`; each failed condition refuses with exit 1, writing nothing. The destination's `reads`
+fill then closes with `handoff.render_framing_blocks`: `### framing:job`, `### framing:population`,
+`### framing:added` and `### framing:no-stop`, one per field the return carries, `job`, `population`, `added`
+and `nostop`, each verbatim, authored text checked by the fence walk, and `### framing:job` closing with
+`Framed by: <prompt path> task-sha=<12hex>`, all inside the bytes the task-sha covers. `--framed-by` on the
+prompt writer, and `--for` naming it, refuse: its own task is the driver's details, unframed. While the policy
+key `prompts.author` is `prompt-writer`, the hooks kit's spawn guard admits a spawn of any other role only
+with that framing (its `checkFraming`). WHAT THIS DOES NOT CHECK: that the framing says anything the work
+order supports, which TOOL-dBoundRoles-24's anchor check grades, nor a forged line inside a framing field.
 `python handoff.py check <file>` re-derives both hashes and the marker's path, then
 grades the envelopes: every one opened closes, and their levels never decrease down the `## Role` part
 or the `## Task` part, each failure naming the envelope; it prints each part's levels in order, and a
@@ -755,7 +778,7 @@ key holds.
 | `gov-builder` | build | product | field.input.spec, field.card.route?, field.brief.non-goals? | yagni, reuse, core, derive, verify, gate, docs, security, portable, tools | true | outcome:committed\|returned, commit:sha?, why:text?, checks:list |
 | `gov-orienter` | orient | none | field.input.question, field.input.prompt? | small, ids, memory, tokens, tools | true | outcome:oriented\|placed, card:text?, disposition:text?, reason:text?, evidence:text?, observations:text?, scenarios:text?, facts:text? |
 | `gov-planner` | plan | records | field.input.question, field.brief.goal?, field.brief.non-goals?, field.card.route? | yagni, reuse, derive, verify, memory | true | outcome:select\|defer\|retire\|refuse\|drafted\|research\|owner-question\|review\|no-review\|grouped\|probe, record:path?, reason:text |
-| `gov-prompt-writer` | handoff | none | field.input.question, field.brief.goal?, field.card.route? | small, ids, tokens | true | outcome:composed\|refused, task:text?, reason:text? |
+| `gov-prompt-writer` | handoff | none | field.input.question, field.input.work-order | small, ids, tokens | true | outcome:framed\|refused, job:text?, population:text?, added:text?, nostop:text?, why:text? |
 | `gov-researcher` | research | none | field.input.question, field.brief.goal?, field.brief.non-goals? | reuse, verify, class, memory | true | outcome:picked\|none, candidates:list, pick:text?, reason:text |
 | `gov-reuse-scout` | reuse | none | field.input.question, field.task.in?, field.card.reuse? | reuse | true | outcome:seam\|none-fits, seam:path?, evidence:text |
 | `gov-reviewer` | closing-review | none | field.input.spec?, field.input.diff?, field.brief.goal?, field.brief.non-goals? | spec?, verify, gate, class, docs, left-shift, security, risk, portable | true | outcome:findings\|clean, findings:list |

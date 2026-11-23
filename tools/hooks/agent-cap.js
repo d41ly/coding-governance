@@ -54,8 +54,13 @@
  * whose every value is an `agent`-true role. A throw inside it refuses. An `Agent` call reads the policy
  * key `prompts.author` once (TOOL-dBoundRoles-10 S3, `resolvePromptsAuthor`), and every rule-6 refusal of
  * one ends with a line naming the key, the value in force and the remedy; no policy kit beside this hook
- * reads it as unarmed, and the check is the rendered-handoff check under both values until
- * TOOL-dBoundRoles-4 adds the prompt writer's framing under `prompt-writer`.
+ * reads it as unarmed, and the check is the rendered-handoff check alone then and under
+ * `requesting-worker-rendered`. Under `prompt-writer` a spawn of any role but `gov-prompt-writer`, once every
+ * step above admits it, is admitted only when its task carries exactly one `### framing:job` block and exactly
+ * one `Framed by: <path> task-sha=<12hex>` line inside it, outside every fence, the path a file under
+ * `builds/<build>/prompts/` holding exactly one marker, of role `gov-prompt-writer` and that task-sha
+ * (TOOL-dBoundRoles-4 S4, `checkFraming`); the refusal names the three-call route: render the prompt writer with
+ * `--for`, spawn it, render the destination with `--framed-by`.
  * CEILING, said rather than implied: it stops forgetting, not evasion. A hook-less or `--bare` run,
  * the agents a running harness spawns through its own `agent()`, a session-to-session message, a
  * self-consistent hand-written prompt file whose marker copies the index's `role-sha`, and an index
@@ -883,7 +888,8 @@ function renderHandoffDeny(tool, why, index) {
 // through `resolvePolicyHelper`, the way rule 7 reads its key; null where no policy kit resolves beside this
 // hook, so rule 6 runs as before the key; a refused read throws the reader's PolicyRefusal. Under
 // `requesting-worker-rendered` rule 6 is the rendered-handoff check below; under `prompt-writer` it is that
-// check too, and the framing requirement the value adds is TOOL-dBoundRoles-4's, which reads this function.
+// check and then the prompt writer's framing, `checkFraming` (TOOL-dBoundRoles-4 S4), which reads the value
+// `renderAuthorNote` kept.
 const PROMPTS_AUTHOR_KEY = 'prompts.author'
 function resolvePromptsAuthor(root) {
   const helper = resolvePolicyHelper()
@@ -892,24 +898,26 @@ function resolvePromptsAuthor(root) {
 }
 
 // The line every rule-6 refusal of an `Agent` call ends with (S6): the key, the value in force, and the remedy
-// with its actor. The key is read once per call and root, kept in `renderAuthorNote.at`, and the line never
-// throws: a refused read is named, and rule 6 judges the call as the rendered-handoff check alone, since no
-// value of the key changes that check until TOOL-dBoundRoles-4 lands; rule 7 refuses a refused policy read.
+// with its actor. The key is read once per call and root, kept with its value in `renderAuthorNote.at`, which
+// `checkFraming` reads, and the line never throws: a refused read is named, its value kept as undefined, and
+// rule 6 judges the call as the rendered-handoff check alone; rule 7 refuses a refused policy read.
 function renderAuthorNote(root) {
   if (renderAuthorNote.at && renderAuthorNote.at.root === root) return renderAuthorNote.at.line
   const remedy = 'The driver renders the handoff the value requires; the owner may set another value of prompts.author through the policy file\'s one door, the loop kit\'s policy_edit.py.'
   let line
+  let value
   try {
     const v = resolvePromptsAuthor(root)
+    value = v
     line = v === null
       ? `${PROMPTS_AUTHOR_KEY} unarmed — no policy kit resolves beside this hook, so rule 6 is the rendered-handoff check alone (TOOL-dBoundRoles-10).`
       : v === 'requesting-worker-rendered'
         ? `${PROMPTS_AUTHOR_KEY} is requesting-worker-rendered (TOOL-dBoundRoles-10): every task is a handoff the requesting session rendered with handoff.py render, which rule 6 checks. ${remedy}`
-        : `${PROMPTS_AUTHOR_KEY} is ${v} (TOOL-dBoundRoles-10): every worker's task is the prompt writer's, rendered as a handoff with handoff.py render, which rule 6 checks; the framing the value adds is TOOL-dBoundRoles-4's. ${remedy}`
+        : `${PROMPTS_AUTHOR_KEY} is ${v} (TOOL-dBoundRoles-10): every worker's task is framed by the prompt writer, a handoff rendered with handoff.py render --framed-by, whose framing rule 6 checks on every spawn but the prompt writer's own (TOOL-dBoundRoles-4). ${remedy}`
   } catch (e) {
     line = `${PROMPTS_AUTHOR_KEY} could not be read (${String((e && e.message) || e).split(/\r?\n/)[0]}), so rule 6 judged this call as the rendered-handoff check alone (TOOL-dBoundRoles-10).`
   }
-  renderAuthorNote.at = { root, line }
+  renderAuthorNote.at = { root, line, value }
   return line
 }
 
@@ -934,9 +942,8 @@ function checkHandoffSpawn(data, index, root) {
   if (marks.length !== 1) return renderHandoffDeny('Agent', `the prompt carries ${marks.length} ${HANDOFF_MARK} marker lines; exactly one is required.`, index)
   const m = marks[0]
   if (m.role !== type) return renderHandoffDeny('Agent', `the marker's role ${m.role} is not the subagent_type ${type}.`, index)
-  const parts = m.path.replace(/\\/g, '/').split('/')
-  const at = parts.indexOf('builds')
-  if (extractBuildSlug(m.path) !== m.build || parts[at + 2] !== 'prompts' || parts.length < at + 4 || parts.slice(at + 3).some((s) => s === '' || s === '.')) {
+  const parts = checkPromptPath(m.path, m.build)
+  if (!parts) {
     return renderHandoffDeny('Agent', `the marker's path ${m.path} is not a repo-relative file under builds/${m.build}/prompts/ with no \`..\` segment.`, index)
   }
   const file = path.join(root, ...parts)
@@ -1010,6 +1017,60 @@ function checkHandoffSpawn(data, index, root) {
     return renderHandoffDeny('Agent', `the call's description ${JSON.stringify(ti.description === undefined ? null : ti.description)} is not this handoff's name ` +
       `${JSON.stringify(spawnName)}: the marker's build and unit and the ${type} role's workflow. Pass description exactly as handoff.py render prints it.`, index)
   }
+  // TOOL-dBoundRoles-4 S4 - the prompt writer's framing, last, once every check above admits the handoff.
+  const unframed = checkFraming(type, m, section, root)
+  if (unframed) return renderHandoffDeny('Agent', unframed, index)
+  return null
+}
+
+// The repo-relative path `p` split at its separators when it names a file under `builds/<build>/prompts/` with
+// no `..`, empty or `.` segment below that folder, else null: the one test of a marker's path and of the file a
+// `Framed by:` line names (TOOL-dBoundRoles-4 S4).
+function checkPromptPath(p, build) {
+  const parts = String(p).replace(/\\/g, '/').split('/')
+  const at = parts.indexOf('builds')
+  if (extractBuildSlug(p) !== build || parts[at + 2] !== 'prompts' || parts.length < at + 4 || parts.slice(at + 3).some((s) => s === '' || s === '.')) return null
+  return parts
+}
+
+// TOOL-dBoundRoles-4 S4 - THE FRAMING UNDER `prompts.author = prompt-writer`. The value is the one rule 6 read at
+// its start, `renderAuthorNote.at.value`; any other value, no policy kit beside this hook, or a read that refused
+// applies nothing, and neither does a spawn of the prompt writer itself, whose task is its driver's details
+// rendered unframed. Otherwise the section, walked by the sibling's `readUnfencedLines`, holds exactly one
+// `### framing:job` heading and exactly one `Framed by:` line, that line inside the block the heading opens (up to
+// the next `### ` or `## ` heading), spelled `Framed by: <path> task-sha=<12hex>`, its path a file under
+// `builds/<the marker's build>/prompts/` (`checkPromptPath`) holding exactly one marker, read by
+// `extractHandoffMarker`, whose role is the prompt writer and whose task-sha is the line's. null to admit, else
+// the refusal naming the key, its value and the three-call route. The task-sha binds the framing's bytes to the
+// prompt writer's work order; WHAT IT DOES NOT CHECK: that the framing is that agent's return, which the
+// renderer read, nor that the named work order was spawned at all.
+const PROMPT_WRITER = 'gov-prompt-writer'
+const FRAMED_BY_RE = /^Framed by: (?<path>\S+) task-sha=(?<taskSha>[0-9a-f]{12})$/
+function checkFraming(type, m, section, root) {
+  const fs = require('fs')
+  const path = require('path')
+  const author = renderAuthorNote.at && renderAuthorNote.at.root === root ? renderAuthorNote.at.value : undefined
+  if (author !== 'prompt-writer' || type === PROMPT_WRITER) return null
+  const route = `${PROMPTS_AUTHOR_KEY} is prompt-writer, so a ${type} task carries the prompt writer's framing: render the prompt writer with \`handoff.py render --role ${PROMPT_WRITER} --for ${type} --build ${m.build}${m.unit === '-' ? '' : ` --unit ${m.unit}`} --input question=<your details> ...\`, spawn it, then render this task with \`handoff.py render --role ${type} ... --framed-by <the prompt writer's agent id>\` and spawn that.`
+  const lines = []
+  for (const [n, raw] of require(path.join(__dirname, 'scratch-guard.js')).readUnfencedLines(section)) if (raw !== null) lines.push([n, raw.replace(/\r/g, '')])
+  const heads = lines.filter(([, l]) => /^### framing:job[ \t]*$/.test(l))
+  if (heads.length !== 1) return `the task carries ${heads.length} \`### framing:job\` blocks; exactly one is required. ${route}`
+  const framed = lines.filter(([, l]) => l.startsWith('Framed by:'))
+  if (framed.length !== 1) return `the task carries ${framed.length} \`Framed by:\` lines; exactly one is required, inside its \`### framing:job\` block. ${route}`
+  const next = lines.find(([n, l]) => n > heads[0][0] && /^#{2,3} /.test(l))
+  if (framed[0][0] < heads[0][0] || (next && framed[0][0] > next[0])) return `the task's \`Framed by:\` line sits outside its \`### framing:job\` block. ${route}`
+  const f = FRAMED_BY_RE.exec(framed[0][1].trimEnd())
+  if (!f) return `the task's line ${JSON.stringify(framed[0][1].slice(0, 120))} is not \`Framed by: <path> task-sha=<12 hex>\`. ${route}`
+  const parts = checkPromptPath(f.groups.path, m.build)
+  if (!parts) return `the \`Framed by:\` path ${f.groups.path} is not a repo-relative file under builds/${m.build}/prompts/ with no \`..\` segment. ${route}`
+  let text = null
+  try { text = fs.readFileSync(path.join(root, ...parts), 'utf8') } catch { text = null }
+  if (text === null) return `the \`Framed by:\` path ${f.groups.path} names no file under ${root.split(path.sep).join('/')}. ${route}`
+  const marks = extractHandoffMarker(text)
+  if (marks.length !== 1) return `${f.groups.path} holds ${marks.length} ${HANDOFF_MARK} marker lines; the prompt writer's work order holds exactly one. ${route}`
+  if (marks[0].role !== PROMPT_WRITER) return `${f.groups.path}'s marker names role=${marks[0].role}, not ${PROMPT_WRITER}: only the prompt writer's work order frames a task. ${route}`
+  if (marks[0].taskSha !== f.groups.taskSha) return `${f.groups.path}'s marker says task-sha=${marks[0].taskSha}, and the \`Framed by:\` line names ${f.groups.taskSha}: the framing was cut from another render of it. ${route}`
   return null
 }
 
