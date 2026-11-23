@@ -71,7 +71,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   drains from `memory/project/docs-undocumented.txt` leaves that list in the same commit. The self-test arm of
   section 7 goes in `tools/govkit/selftest.py`; run it only as the probe of your own cases, never the suite.
 - In every record, name a bare line citation in words, never as `path:line`, and never put a number before a
-  counted noun (write "the deviation record of this unit", not "deviation 183 records"): the positional and
+  counted noun (write "the deviation record of this unit", not the record's number before a counted noun): the positional and
   pinned-facts checks read both as findings, as they did on units 59 and 61. Spell every fixture key from parts.
   Every scratch target and staged break runs under `%TEMP%`, never in the tree.
 - Record every change the spec does not state in ONE deviation record,
