@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-11-23, the newest record date in this tree (dDeclaredLoop).
+Dormant: no record dated within 21 days of 2026-11-24, the newest record date in this tree (dKeptSession).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -22,12 +22,11 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 120 | 2026-11-23 | active | 0 |
 | [dFurnishedOrders](builds/dFurnishedOrders/README.md) | DEFERRED | d | 2026-10-21 | tooling | 61 | 2026-11-05 | active | 0 |
 | [dIndexedDesign](builds/dIndexedDesign/README.md) | DEFERRED | d | 2026-10-21 | tooling | 53 | 2026-11-05 | active | 0 |
-| [dKeptSession](builds/dKeptSession/README.md) | INPROGRESS | d | 2026-10-21 | kickoff | 81 | 2026-11-23 | active | 0 |
+| [dKeptSession](builds/dKeptSession/README.md) | INPROGRESS | d | 2026-10-21 | kickoff | 81 | 2026-11-24 | active | 0 |
 | [dLandedVerdict](builds/dLandedVerdict/README.md) | DEFERRED | d | 2026-08-19 | tooling | 2 | 2026-11-13 | active | 0 |
 | [dLinkedLibrary](builds/dLinkedLibrary/README.md) | DEFERRED | d | 2026-10-21 | tooling | 102 | 2026-11-05 | active | 0 |
 | [dMindYourWords](builds/dMindYourWords/README.md) | DEFERRED | d | 2026-10-21 | tooling | 52 | 2026-11-03 | active | 0 |
 | [dRankedPlan](builds/dRankedPlan/README.md) | DEFERRED | d | 2026-10-21 | tooling | 83 | 2026-11-05 | active | 0 |
-| [dSafePassage](builds/dSafePassage/README.md) | DEFERRED | d | 2026-10-21 | tooling | 104 | 2026-11-02 | active | 0 |
 | [dScopedBuild](builds/dScopedBuild/README.md) | DEFERRED | d | 2026-10-21 | tooling | 43 | 2026-11-03 | active | 0 |
 | [dShippedRelease](builds/dShippedRelease/README.md) | DEFERRED | d | 2026-10-21 | deployer | 145 | 2026-11-12 | active | 0 |
 | [dTendedCadence](builds/dTendedCadence/README.md) | DEFERRED | d | 2026-10-21 | tooling | 74 | 2026-11-03 | active | 0 |
@@ -52,6 +51,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dPinnedHandoff](builds/dPinnedHandoff/README.md) | SPECCED | d | 2026-09-22 | tooling | 3 | 2026-09-28 | dormant | 0 |
 | [dPromptedSeam](builds/dPromptedSeam/README.md) | DEFERRED | d | 2026-08-25 | tooling | 4 | 2026-08-25 | dormant | 0 |
 | [dRetiredFork](builds/dRetiredFork/README.md) | DEFERRED | d | 2026-09-02 | tooling+deployer | 56 | 2026-09-03 | dormant | 0 |
+| [dSafePassage](builds/dSafePassage/README.md) | DEFERRED | d | 2026-10-21 | tooling | 104 | 2026-11-02 | dormant | 0 |
 | [dScaffoldedMirror](builds/dScaffoldedMirror/README.md) | DEFERRED | d | 2026-08-24 | tooling | 22 | 2026-08-25 | dormant | 0 |
 
 ## Open BLOCKER asks
