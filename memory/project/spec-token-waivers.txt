@@ -24,12 +24,12 @@ review-join ban	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 build-index selftest <- tools/check-spec-tokens.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 memory-hygiene self-test <- tools/check-spec-tokens.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 routed-commits selftest <- tools/unattended/	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-tools/hooks/agent-cap.js:2092	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy fixtures <- tools/workflows/unattended-build.template.js	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy fixtures <- skills/session-kickoff/manifest-check.sh	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy fixtures <- tools/codebase-map/map_lib.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy fixtures <- tools/memory-tree/check-memory-hygiene.sh	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy fixtures <- tools/check-spec-tokens.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy fixtures <- tools/workflows/kit.toml	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-tools/hooks/agent-cap.js:1972	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 hook destinations self-test <- tools/workflows/kit.toml	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/hooks/agent-cap.js	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+tools/hooks/agent-cap.test.sh	2	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25

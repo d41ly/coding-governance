@@ -12346,6 +12346,8 @@ memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	
 memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2278	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
 memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2282	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
 memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/playbook/instructions.toml:5	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-widen-6.md	BUILD-METHOD M4	1	611257969e81bd87945994a10b64a667391cb8a3	widened:2026-11-22-build-TOOL-dBoundRoles-54-widen-7
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-widen-7.md	BUILD-METHOD M4	1	611257969e81bd87945994a10b64a667391cb8a3	widened:2026-11-22-build-TOOL-dBoundRoles-54-widen-7
 memory/builds/dBoundRoles/prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md	BUILD-METHOD M2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-11-spec-writer.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-owner-review-stop.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -37296,8 +37298,6 @@ memory/map/features/build-method.md	tools/memory-tree/adopt-memory-tree.sh:59	1	
 memory/map/features/build-method.md	tools/memory-tree/kit-dogfood-parity.test.sh:53	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/features/review-harnesses.md	drift-audit-code.js:48	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/features/review-harnesses.md	drift-audit-state.js:47	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/project/spec-token-waivers.txt	tools/hooks/agent-cap.js:1972	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/project/spec-token-waivers.txt	tools/hooks/agent-cap.js:2092	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 skills/session-kickoff/manifest-check.sh	run-gates.sh:407	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 skills/session-kickoff/manifest-check.test.sh	manifest-check.sh:60	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/check-install-prefix.test.sh	qdemo/colon.sh:1	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -37468,5 +37468,3 @@ tools/workflows/tier2-review.test.sh	p.js:9	1	9e21ac760dc0a43d6ed007396922722cce
 tools/workflows/tier2-review.test.sh	security.js:1	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh32-pathless.js:3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh36-mid.js:2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-widen-6.md	BUILD-METHOD M4	1	611257969e81bd87945994a10b64a667391cb8a3	widened:2026-11-22-build-TOOL-dBoundRoles-54-widen-7
-memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-widen-7.md	BUILD-METHOD M4	1	611257969e81bd87945994a10b64a667391cb8a3	widened:2026-11-22-build-TOOL-dBoundRoles-54-widen-7
