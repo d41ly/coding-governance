@@ -50,7 +50,7 @@
 #   unattended.sh --register decision <build> <item> <fork> <file> # one create-only decision on the remote, keyed by item and fork; 0 written, 1 exists, 2 not written
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
 #   unattended.sh --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] [--default <text>] <body file>   # one message on this session's own mail ref; 0 posted, 1 duplicate or lost, 2 not written; `mail — off` exit 2 while RUN_CLAIMS is not on
-#   unattended.sh --mail read <who> [--open] [--ids] [--local]     # the mailbox of a build or a recipient, one TAB row per message; --open the open rows, --ids their ids on one line or none, --local the node's cache with no fetch
+#   unattended.sh --mail read <who> [--open] [--ids] [--local] [--sent]   # the mailbox of a build or a recipient, one TAB row per message; --open the open rows, --ids their ids on one line or none, --local the node's cache with no fetch, --sent a build's own sent messages, whoever they were addressed to
 #   unattended.sh --mail ack <slug> <id>                           # an ack of a message addressed to <slug>, posted to its sender's build; the post's exits
 #   unattended.sh --mail answer <slug> <question id> <body file> [--cite <path>@<sha>]...   # an answer to a question addressed to <slug>, posted to its asker's build; 1 the question no longer open, else the post's exits
 #   unattended.sh --mail notice <slug> [--item <instance key>] [--local] [--ring <ref> <id>]   # the build's unread mail as mailbox.notice says, one line, its stamp rewritten after a fetch; 0 shown, off or the local copy, 2 not read
@@ -3945,7 +3945,12 @@ check_mail_deadline() { # ref · commit · hours -> rc 0 passed, 1 not yet, 2 no
 # mail refs into this node's cache, sighted into the feed; ONE `git log --first-parent --source` over
 # the cached mail refs, none run where none is cached, split by `CLAIM_KV_AWK`'s strict `read_kv` in one
 # `awk`; `read_first_seen` over each message's ref and commit; one `awk` deciding each state. It prints
-# one TAB row per message whose `to` passes `check_mail_addressed <to> <who>`, oldest sighting first:
+# one TAB row per message whose `to` passes `check_mail_addressed <to> <who>`, or under the selection
+# `sent` (KICK-dKeptSession-61 S1) one per message whose `ref`, column 9, lies under
+# `refs/gov/mail/<who>/`, so every message the build <who> wrote, whoever it was addressed to, each
+# state still decided over every cached row; `sent` takes a slug alone, and any other <who> prints
+# `mail — not read · --sent reads one build's own mail refs, and '<who>' is no build's slug` and
+# returns 2 before the remote is read. Either way oldest sighting first:
 # id, kind, to, state, first-seen, from-build, subject, answers, ref (the remote's name), commit, reply,
 # then seq, after and content-key (KICK-dKeptSession-27 S4), then deadline and default
 # (KICK-dKeptSession-24 S5), read from the record beside the six keys it requires and never required,
@@ -3965,11 +3970,13 @@ check_mail_deadline() { # ref · commit · hours -> rc 0 passed, 1 not yet, 2 no
 # While RUN_CLAIMS is not `on` it reads nothing and prints no row. WHAT THIS DOES NOT CHECK: a
 # message's id against its fields; a clock offset between nodes, since each node judges a deadline by
 # its own first sighting and its own clock.
-read_mailbox() { # who · soft|strict|local -> 0 with one TAB row per message addressed to <who>; 2 not read
-  local who="${1:-}" pol="${2:-soft}" d rc why="" line t _st=$status _nc=${#RUNLOG_CHECKS[@]}
+read_mailbox() { # who · soft|strict|local · [sent] -> 0 with one TAB row per message addressed to <who>, or sent by it; 2 not read
+  local who="${1:-}" pol="${2:-soft}" sel="${3:-}" d rc why="" line t _st=$status _nc=${#RUNLOG_CHECKS[@]}
   local -a refs=() f=()
   [ "$RUN_CLAIMS" = on ] || return 0
-  if check_slug_shape "$who"; then who="build:$who"
+  if [ "$sel" = sent ]; then
+    check_slug_shape "$who" || { echo "mail — not read · --sent reads one build's own mail refs, and '$who' is no build's slug"; return 2; }
+  elif check_slug_shape "$who"; then who="build:$who"
   elif ! check_mail_recipient "$who" 2>/dev/null; then echo "mail — not read · '$who' is neither a build's slug nor a recipient"; return 2
   fi
   resolve_claim_remote >/dev/null; rc=$?
@@ -4021,9 +4028,14 @@ read_mailbox() { # who · soft|strict|local -> 0 with one TAB row per message ad
   if [ ! -s "$d/rows" ]; then rm -rf "$d"; return 0; fi
   read_first_seen <"$d/pairs" >"$d/seen"
   while IFS= read -r line; do
-    t=${line#*$'\t'}; t=${t#*$'\t'}; t=${t%%$'\t'*}
-    check_mail_addressed "$t" "$who" || continue
-    IFS=$'\t' read -r -a f <<<"$line"
+    if [ "$sel" = sent ]; then
+      IFS=$'\t' read -r -a f <<<"$line"
+      [[ ${f[8]:-} == "refs/gov/mail/$who/"* ]] || continue
+    else
+      t=${line#*$'\t'}; t=${t#*$'\t'}; t=${t%%$'\t'*}
+      check_mail_addressed "$t" "$who" || continue
+      IFS=$'\t' read -r -a f <<<"$line"
+    fi
     if [ "${f[3]:-}" = open ] && check_mail_deadline "${f[8]:-}" "${f[9]:-}" "${f[14]:-}"; then
       f[3]=expired; printf -v line '%s\t' "${f[@]}"; line=${line%$'\t'}
     fi
@@ -4150,13 +4162,15 @@ derive_mail_answer_outcome() { # slug · id -> answered|defaulted|awaiting on st
 
 # --mail read, THE MAILBOX AS A VERB (KICK-dKeptSession-5 S8): `read_mailbox <who> soft`, its rows as
 # it prints them; `--open` only the `open` rows; `--ids` the selected rows' ids on one line, or `none`;
-# `--local` the mode `local`, the node's cache read with no fetch (KICK-dKeptSession-21 S2).
+# `--local` the mode `local`, the node's cache read with no fetch (KICK-dKeptSession-21 S2); `--sent`
+# the selection `sent`, the messages the build <who> wrote, whoever they were addressed to
+# (KICK-dKeptSession-61 S1), passed on to `read_mailbox` beside the mode, `soft` where `--local` is absent.
 # While RUN_CLAIMS is not `on` it prints `mail — off`, exit 0 and no row; a refused read exits 2.
-print_mailbox() { # who · open 0|1 · ids 0|1 · [soft|local] -> 0 read or off, 2 not read
+print_mailbox() { # who · open 0|1 · ids 0|1 · [soft|local] · [sent] -> 0 read or off, 2 not read
   local rows line st ids=""
   local -a lines=()
   [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 0; }
-  rows=$(read_mailbox "${1:-}" "${4:-soft}") || { printf '%s\n' "$rows"; return 2; }
+  rows=$(read_mailbox "${1:-}" "${4:-soft}" "${5:-}") || { printf '%s\n' "$rows"; return 2; }
   mapfile -t lines <<<"$rows"
   for line in "${lines[@]}"; do
     st=${line#*$'\t'}; st=${st#*$'\t'}; st=${st#*$'\t'}; st=${st%%$'\t'*}
@@ -20244,12 +20258,12 @@ while [ $# -gt 0 ]; do
     --register)     refuse_waive_unless_preflight --register
                     shift; write_register "$@"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # KICK-dKeptSession-5 - the mailbox: a post on this session's own mail ref, a read of a build's or a
-    # recipient's messages, an ack, an answer to a question (KICK-dKeptSession-25), the notice of a
-    # build's unread mail (KICK-dKeptSession-21); no slug verb, because `post`, `read`, `ack`, `answer`
-    # or `notice` comes first.
+    # recipient's messages, or with `--sent` of the messages one build wrote (KICK-dKeptSession-61), an
+    # ack, an answer to a question (KICK-dKeptSession-25), the notice of a build's unread mail
+    # (KICK-dKeptSession-21); no slug verb, because `post`, `read`, `ack`, `answer` or `notice` comes first.
     --mail)         refuse_waive_unless_preflight --mail
                     shift; MV_ACT=${1:-}; [ $# -eq 0 ] || shift
-                    MV_POS=(); MV_TO=""; MV_KIND=""; MV_SUB=""; MV_ITEM=""; MV_PASS=""; MV_ANS=""; MV_IFC=""; MV_DEF=(); MV_CITE=(); MV_RING=(); MV_OPEN=0; MV_IDS=0; MV_LOCAL=0; MV_FLAGS=""; _rl_rc=""
+                    MV_POS=(); MV_TO=""; MV_KIND=""; MV_SUB=""; MV_ITEM=""; MV_PASS=""; MV_ANS=""; MV_IFC=""; MV_DEF=(); MV_CITE=(); MV_RING=(); MV_OPEN=0; MV_IDS=0; MV_LOCAL=0; MV_SENT=""; MV_FLAGS=""; _rl_rc=""
                     while [ $# -gt 0 ]; do
                       case "$1" in
                         --to|--kind|--subject|--item|--pass|--answers|--interface|--default|--cite)
@@ -20259,24 +20273,25 @@ while [ $# -gt 0 ]; do
                         --open) MV_OPEN=1; MV_FLAGS="$MV_FLAGS $1"; shift ;;
                         --ids)  MV_IDS=1; MV_FLAGS="$MV_FLAGS $1"; shift ;;
                         --local) MV_LOCAL=1; MV_FLAGS="$MV_FLAGS $1"; shift ;;
+                        --sent) MV_SENT=sent; MV_FLAGS="$MV_FLAGS $1"; shift ;;
                         --ring)
                           if [ $# -lt 3 ]; then echo "mail — not read · --ring takes a ref and an id"; _rl_rc=2; break; fi
                           MV_RING=("$2" "$3"); MV_FLAGS="$MV_FLAGS $1"; shift 3 ;;
-                        --*) echo "mail — not written · --mail takes --to, --kind, --subject, --item, --pass, --answers, --interface, --default, --cite, --open, --ids, --local or --ring, not $1"; _rl_rc=2; break ;;
+                        --*) echo "mail — not written · --mail takes --to, --kind, --subject, --item, --pass, --answers, --interface, --default, --cite, --open, --ids, --local, --sent or --ring, not $1"; _rl_rc=2; break ;;
                         *) MV_POS+=("$1"); shift ;;
                       esac
                     done
                     if [ -n "$_rl_rc" ]; then :
                     elif [ "$MV_ACT" = post ]; then
-                      if [ "${#MV_POS[@]}" != 2 ] || [ "$MV_OPEN$MV_IDS$MV_LOCAL" != 000 ] || [ "${#MV_CITE[@]}" != 0 ] || [ "${#MV_RING[@]}" != 0 ] || [[ " $MV_FLAGS " != *" --to "* ]] \
+                      if [ "${#MV_POS[@]}" != 2 ] || [ "$MV_OPEN$MV_IDS$MV_LOCAL$MV_SENT" != 000 ] || [ "${#MV_CITE[@]}" != 0 ] || [ "${#MV_RING[@]}" != 0 ] || [[ " $MV_FLAGS " != *" --to "* ]] \
                           || [[ " $MV_FLAGS " != *" --kind "* ]] || [[ " $MV_FLAGS " != *" --subject "* ]]; then
                         echo "mail — not written · the form is --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] [--default <text>] <body file>"; _rl_rc=2
                       else write_mail_post "${MV_POS[0]}" "$MV_TO" "$MV_KIND" "$MV_SUB" "${MV_ITEM:-none}" "${MV_PASS:-none}" "${MV_ANS:-none}" "${MV_POS[1]}" "${MV_IFC:-none}" ${MV_DEF[@]+"${MV_DEF[@]}"}; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = read ]; then
                       if [ "${#MV_POS[@]}" != 1 ] || [ -n "$MV_TO$MV_KIND$MV_SUB$MV_ITEM$MV_PASS$MV_ANS$MV_IFC" ] || [ "${#MV_DEF[@]}" != 0 ] || [ "${#MV_CITE[@]}" != 0 ] || [ "${#MV_RING[@]}" != 0 ]; then
-                        echo "mail — not read · the form is --mail read <who> [--open] [--ids] [--local]"; _rl_rc=2
-                      elif [ "$MV_LOCAL" = 1 ]; then print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS" local; _rl_rc=$?
-                      else print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS"; _rl_rc=$?; fi
+                        echo "mail — not read · the form is --mail read <who> [--open] [--ids] [--local] [--sent]"; _rl_rc=2
+                      elif [ "$MV_LOCAL" = 1 ]; then print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS" local "$MV_SENT"; _rl_rc=$?
+                      else print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS" soft "$MV_SENT"; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = ack ]; then
                       if [ "${#MV_POS[@]}" != 2 ] || [ -n "${MV_FLAGS// /}" ]; then
                         echo "mail — not written · the form is --mail ack <slug> <id>"; _rl_rc=2
@@ -20286,7 +20301,7 @@ while [ $# -gt 0 ]; do
                         echo "mail — not written · the form is --mail answer <slug> <question id> <body file> [--cite <path>@<sha>]..."; _rl_rc=2
                       else write_mail_answer "${MV_POS[0]}" "${MV_POS[1]}" "${MV_POS[2]}" ${MV_CITE[@]+"${MV_CITE[@]}"}; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = notice ]; then
-                      if [ "${#MV_POS[@]}" != 1 ] || [ -n "$MV_TO$MV_KIND$MV_SUB$MV_PASS$MV_ANS$MV_IFC" ] || [ "${#MV_DEF[@]}" != 0 ] || [ "${#MV_CITE[@]}" != 0 ] || [ "$MV_OPEN$MV_IDS" != 00 ]; then
+                      if [ "${#MV_POS[@]}" != 1 ] || [ -n "$MV_TO$MV_KIND$MV_SUB$MV_PASS$MV_ANS$MV_IFC" ] || [ "${#MV_DEF[@]}" != 0 ] || [ "${#MV_CITE[@]}" != 0 ] || [ "$MV_OPEN$MV_IDS$MV_SENT" != 00 ]; then
                         echo "mail — not read · the form is --mail notice <slug> [--item <instance key>] [--local] [--ring <ref> <id>]"; _rl_rc=2
                       else print_mail_notice "${MV_POS[0]}" "$MV_ITEM" "$MV_LOCAL" "${MV_RING[0]:-}" "${MV_RING[1]:-}"; _rl_rc=$?; fi
                     else

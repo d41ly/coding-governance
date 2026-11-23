@@ -21039,6 +21039,51 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# KICK-dKeptSession-61 — A BUILD'S SENT MAIL, READ BY THE ONE READER'S `sent` SELECTION. A fresh bare
+# origin and one clone A, RUN_CLAIMS on, KICK-dKeptSession-5's `run_mail_arm` reused. AC7: build fx's
+# session s1 posts a question to build:fy, then one to build:fz, and s2 does the same, so s2's first
+# post's `after` names s1's post to build:fz; `--mail read fy` prints the two rows addressed to fy, and
+# `--mail read fx --local --sent` then prints the four posts' ids from the cache that read fetched,
+# column 13 of s2's first naming s1's post to build:fz, a row `--mail read fy` does not print. AC8:
+# `--mail read build:fx --sent` exits 2 with S1's refusal, and `--mail ack fx <id> --sent` exits 2 with
+# the ack's form. RED, observed at the close: a scratch `unattended.sh` whose `read_mailbox` keeps the
+# address filter under `sent`, which prints no row, no post being addressed to build:fx (AC7). WHAT
+# THIS BLOCK DOES NOT DRIVE: the loop kit's chain over the sent read, its `chain-two-dependents`
+# plant's (AC1 to AC3); a `--sent` read of a build with no mail ref; the guide, help and docstring
+# texts (AC6), probed in the unit's acceptance ledger.
+# ==================================================================================================
+mb_d=$(mktemp -d)
+git init -q --bare -b main "$mb_d/o.git"
+git init -q -b main "$mb_d/A" && git -C "$mb_d/A" config user.email t@t.test && git -C "$mb_d/A" config user.name t \
+  && git -C "$mb_d/A" config core.autocrlf false
+( cd "$mb_d/A" && mkconf && sed -i 's/^RUN_CLAIMS="off"$/RUN_CLAIMS="on"/' .unattended.conf && git add -A \
+  && git commit -q -m base --no-verify && git remote add origin "$mb_d/o.git" && git push -q origin main 2>/dev/null )
+printf 'a message body\n' > "$mb_d/body.txt"
+ms_pid='s/^mail — posted \([0-9a-f]*\) · .*/\1/p'
+ms_1=$(run_mail_arm A s1 post fx --to build:fy --kind question --subject one --default no "$mb_d/body.txt" | sed -n "$ms_pid")
+ms_2=$(run_mail_arm A s1 post fx --to build:fz --kind question --subject two --default no "$mb_d/body.txt" | sed -n "$ms_pid")
+ms_3=$(run_mail_arm A s2 post fx --to build:fy --kind question --subject three --default no "$mb_d/body.txt" | sed -n "$ms_pid")
+ms_4=$(run_mail_arm A s2 post fx --to build:fz --kind question --subject four --default no "$mb_d/body.txt" | sed -n "$ms_pid")
+# ---- AC7
+ms_fy=$(run_mail_arm A s1 read fy)
+same "KDS61 AC7 --mail read fy prints the two rows addressed to fy" \
+  "$(cut -f1 <<<"$ms_fy" | sort | tr '\n' ' ')" "$(printf '%s\n' "${ms_1:-unposted1}" "${ms_3:-unposted3}" | sort | tr '\n' ' ')"
+ms_out=$(run_mail_arm A s1 read fx --local --sent)
+same "KDS61 AC7 --mail read fx --local --sent prints the four posts' ids, s2's first after s1's post to build:fz, a row --mail read fy does not print" \
+  "$(cut -f1 <<<"$ms_out" | sort | tr '\n' ' ')$(awk -F'\t' -v a="${ms_3:-none}" '$1 == a { print $13 }' <<<"$ms_out") $(grep -c "^${ms_2:-unposted2}" <<<"$ms_fy")" \
+  "$(printf '%s\n' "${ms_1:-unposted1}" "${ms_2:-unposted2}" "${ms_3:-unposted3}" "${ms_4:-unposted4}" | sort | tr '\n' ' ')${ms_2:-unposted2} 0"
+# ---- AC8
+ms_out=$(run_mail_arm A s1 read build:fx --sent); ms_rc=$?
+same "KDS61 AC8 --mail read build:fx --sent exits 2 with S1's refusal" "$ms_rc [$ms_out]" \
+  "2 [mail — not read · --sent reads one build's own mail refs, and 'build:fx' is no build's slug]"
+ms_out=$(run_mail_arm A s1 ack fx "${ms_1:-unposted1}" --sent); ms_rc=$?
+same "KDS61 AC8 --mail ack with --sent exits 2 printing the ack's form" "$ms_rc [$ms_out]" \
+  "2 [mail — not written · the form is --mail ack <slug> <id>]"
+rm -rf "$mb_d"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # KICK-dKeptSession-24 — A MAIL DEADLINE JUDGED BY THE OBSERVER CLOCK. The lease fixture's clone c1,
 # RUN_CLAIMS on and USERNAME daily-agent, so its fleet tag is `a`, and c2, a second clone of the same
 # origin whose posts c1 has not sighted until a line is planted in c1's feed by `add_claim_sighting`;
@@ -21214,7 +21259,7 @@ same "KDS25 AC2 a cite whose sha does not hold its path, and one whose sha is -x
 ma_out=$(run_deadline_arm c1 a4 answer tFix 000000000000 "$LF/body.txt"); ma_rc=$?
 same "KDS25 AC2 an id naming no question exits 2 saying so" "$ma_rc $(grep -c 'is no question addressed to tFix$' <<<"$ma_out")" "2 1"
 ma_out=$(run_deadline_arm c1 r1 read tFix --cite a@b); ma_rc=$?
-same "KDS25 AC2 --mail read with --cite exits 2 printing the read's form" "$ma_rc [$ma_out]" "2 [mail — not read · the form is --mail read <who> [--open] [--ids] [--local]]"
+same "KDS25 AC2 --mail read with --cite exits 2 printing the read's form" "$ma_rc [$ma_out]" "2 [mail — not read · the form is --mail read <who> [--open] [--ids] [--local] [--sent]]"
 # ---- AC3
 write_lease_policy '[flow]
 wait-ceiling = 30'
@@ -25044,7 +25089,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4173 -> 4176 by KICK-dKeptSession-11 on 2026-11-23: the progress block's 3 region-eight `same`
 # (AC3 3), each unconditional and outside any loop, off the diff's own lines; no skip branch. No suite
 # ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4176
+# RAISED 4176 -> 4180 by KICK-dKeptSession-61 on 2026-11-23: the sent-read block's 4 region-eight `same`
+# (AC7 2, AC8 2), each unconditional and outside any loop, off the diff's own lines; the KDS25 read-form
+# arm re-armed for `[--sent]` adds none. No skip branch. No suite ran, and its RED-first observation is
+# the close's.
+FLOOR_ASSERTIONS=4180
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25341,7 +25390,8 @@ FLOOR_SHARD_7=311
 # RAISED 1379 -> 1387 by KICK-dKeptSession-7: the same 8 region-eight landed-notice and witness-read assertions, see FLOOR_ASSERTIONS.
 # RAISED 1387 -> 1390 by KICK-dKeptSession-35: the same 3 region-eight re-landing assertions, see FLOOR_ASSERTIONS.
 # RAISED 1390 -> 1393 by KICK-dKeptSession-11: the same 3 region-eight progress assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1393
+# RAISED 1393 -> 1397 by KICK-dKeptSession-61: the same 4 region-eight sent-read assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1397
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
