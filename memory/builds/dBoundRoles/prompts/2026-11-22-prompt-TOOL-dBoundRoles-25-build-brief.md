@@ -87,6 +87,12 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every new Python text read or write, subprocess call included, names `encoding="utf-8"`. No shipped file spells a
   kit path literally: build a path from a variable or from the file's own location. Every code citation in a record
   names its full path. The pass legs red on each of these.
+- This is round two. Round one (`wf_b09ae497-e39`) wrote nothing and handed back paths beyond the declared set and
+  exports the inventory missed; the main loop decided each in
+  `build/2026-11-23-build-TOOL-dBoundRoles-25-2-main-loop-decision.md`, which binds over the spec as the owner's
+  ruling does: read it whole before you write. It adds `tools/roles/roles_lib.py`, `tools/govkit/refusal_join.py`,
+  `memory/project/shell-role.txt` and `memory/project/quoting-sites.txt` to the write set, and places `TYPED_INPUTS`
+  and `resolvePromptsAuthor` with rule 6 in the pack. Every claim round one confirmed at this base still holds.
 - Record every change the spec does not state in ONE deviation record,
   `build/2026-11-23-build-TOOL-dBoundRoles-25-deviation-255.md` (values `report` and `author-recorded`); check that
   its number is unused in the build first.
