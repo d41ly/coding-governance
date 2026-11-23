@@ -246,7 +246,8 @@ not graded` until TOOL-dDeclaredLoop-101's judgement refuses it, and a loop kit 
 announces both halves. Its cases are outcome cases: `presets-complete` plants a cut key, a refused value,
 the default preset off a default and a fifth table on a copy of the store; `presets-derived`
 (KICK-dKeptSession-33) a key on a derived row the store leaves unassigned, a derived default's text as a
-value, a stage key one preset lacks and a literal-default row in the `literal` list; `presets-pairs` a broken pair in
+value, a stage key one preset lacks, a literal-default row in the `literal` list and the default preset's
+`review.build` off the member its row's text names for that stage (KICK-dKeptSession-56); `presets-pairs` a broken pair in
 a preset, which the arm and `presets.py check` both red, then `policy.py check` admitting a file whose one
 revision sets a round count past its preset's ceiling, since the pair rules judge the store alone (§8
 F10); `presets-repo` a repository preset admitted and refused; and `presets-core-only` copies this kit,
@@ -6394,12 +6395,13 @@ def run_presets_complete(name):
 
 
 def run_presets_derived(name):
-    """`presets-derived` (KICK-dKeptSession-33 AC2): four plants on a copy of the shipped store, each
+    """`presets-derived` (KICK-dKeptSession-33 AC2): five plants on a copy of the shipped store, each
     red in `arm_presets` naming its place, the copy put back green: `5` on the census's first cap in
     `strict`, a row the store leaves unassigned; `velocity`'s `maintain.fixes` set to the one member
     equal to its row's derived text; `review.test` cut from `guarded`, a stage key the other presets
-    assign; and `hooks.bypass`, a row whose default is literal, added to `literal`. The repository
-    holds no loop kit, so the load halves announce."""
+    assign; `hooks.bypass`, a row whose default is literal, added to `literal`; and `standard`'s
+    `review.build` set to `off`, the default preset off the member its row's text names for that stage
+    (KICK-dKeptSession-56 AC6). The repository holds no loop kit, so the load halves announce."""
     rows = policy.load_catalogue(KIT)
     cap = next(iter(budgets.read_cap_census(KIT)))
     text = policy.read_catalogue_row(("maintain", "fixes"), rows)["default"]["derived"]
@@ -6414,6 +6416,11 @@ def run_presets_derived(name):
                       "guarded", "review.test", "lacks this key"),
         "literal-widened": (lambda t: re.sub(r'(?m)^literal = \[', 'literal = ["hooks.bypass", ', t),
                             None, "literal · hooks.bypass", "names no catalogue row"),
+        # KICK-dKeptSession-56 AC6: the default preset's stage key off the member its row's text names for
+        # that stage, `owed` for build, which `check_value` alone admits
+        "stage-default": (lambda t: set_preset_block(t, "standard", lambda b: re.sub(
+            r'(?m)^"review\.build" = .*$', '"review.build" = "off"', b)), "standard", "review.build",
+            "is not the row's default"),
     }
     repo, kit = build_presets_repo(rows)
     try:
@@ -6887,7 +6894,7 @@ CASES = [
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
     *((c, None, run_pass_lane_case) for c in PASS_LANE_CASES),  # a pass-leg run and an inline red fix, end to end
     ("presets-complete", None, run_presets_complete),  # the named presets (KICK-dKeptSession-1): the store's plants
-    ("presets-derived", None, run_presets_derived),  # the derived-default rows (KICK-dKeptSession-33): four store plants
+    ("presets-derived", None, run_presets_derived),  # the derived-default rows (KICK-dKeptSession-33): five store plants
     ("presets-pairs", None, run_presets_pairs),  # a pair broken in a preset and over a repository's override
     ("presets-repo", None, run_presets_repo),  # a repository preset admitted and refused
     ("presets-core-only", None, run_presets_core_only),  # the load over a core-only register, and its two planted loaders

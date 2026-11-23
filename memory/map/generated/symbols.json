@@ -14673,6 +14673,11 @@
       "file": "tools/loop/splice.py"
     },
     {
+      "id": "derive_stage_default",
+      "kind": "function",
+      "file": "tools/policy/presets.py"
+    },
+    {
       "id": "derive_stage_rows",
       "kind": "function",
       "file": "tools/loop/termination.py"
