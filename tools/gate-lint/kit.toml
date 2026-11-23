@@ -233,9 +233,10 @@ ceiling = 300
 # THE PORTABILITY PACK (TOOL-dWitnessedBar-24): one leg per rule of the portable practice, each row
 # `pack = "portability"` and `enforces` naming its rule, beside the four shell-hygiene rows above that
 # joined it. Every scan row is `subject = "repo"` with no guard, for the loop scan's reason, and its
-# adopter argv passes no registry, so an adopter's first run grades against an empty declaration and
-# lists every site it carries — the posture the shell-hygiene rows set. Gov's argv passes its ledger
-# home under `[gate_leg.gov]`, over the population the home's seed measures.
+# adopter argv passes an empty registry, which reads the population's home, then the seed's population,
+# `. :!memory`: frozen records are no ratchet's population — the posture the shell-hygiene rows set
+# (TOOL-aFlattenedSeed-3, -4). Gov's argv passes its ledger home under `[gate_leg.gov]`, over the
+# population the home's seed measures.
 #
 # The encoding leg MOVED IN from the deployer registry's `[[exempt_leg]]` table: it ships now, the
 # owner ruling that kept it gov-only (TOOL-aRepatriatedFork-3 §8 F2) answered by `test.seed`, which
@@ -248,12 +249,12 @@ enforces = ["practice.portable.encoding"]
 name = "encoding posture (text IO names its encoding)"
 subject = "repo"
 purpose = "catches Python text IO that does not name its encoding"
-argv = ["python3", "{kit}/encoding_posture.py"]
+argv = ["python3", "{kit}/encoding_posture.py", "", ".", ":!memory"]
 guard = []
 stage = ["step.test"]
 
 [gate_leg.gov]
-argv = ["python3", "{prefix}/gate-lint/encoding_posture.py", "memory/project/encoding-posture-sites.txt", ".", "{prefix}", "skills"]
+argv = ["python3", "{prefix}/gate-lint/encoding_posture.py", "memory/project/encoding-posture-sites.txt", ".", "{prefix}", "skills", ":!memory"]
 guard = []
 chunk = "product"
 ceiling = 300
@@ -266,12 +267,12 @@ enforces = ["practice.portable.encoding"]
 name = "encoding posture (an entry point writes stdout as UTF-8)"
 subject = "repo"
 purpose = "catches an entry point printing to a non-UTF-8 stdout"
-argv = ["python3", "{kit}/encoding_posture.py", "--stdout"]
+argv = ["python3", "{kit}/encoding_posture.py", "--stdout", "", ".", ":!memory"]
 guard = []
 stage = ["step.test"]
 
 [gate_leg.gov]
-argv = ["python3", "{prefix}/gate-lint/encoding_posture.py", "--stdout", "memory/project/encoding-stdout-sites.txt", ".", "{prefix}", "skills"]
+argv = ["python3", "{prefix}/gate-lint/encoding_posture.py", "--stdout", "memory/project/encoding-stdout-sites.txt", ".", "{prefix}", "skills", ":!memory"]
 guard = []
 chunk = "product"
 ceiling = 300
@@ -284,12 +285,12 @@ enforces = ["practice.portable.encoding"]
 name = "encoding posture (JavaScript text IO names its encoding)"
 subject = "repo"
 purpose = "catches JavaScript text IO that does not name its encoding"
-argv = ["python3", "{kit}/encoding_posture.py", "--js"]
+argv = ["python3", "{kit}/encoding_posture.py", "--js", "", ".", ":!memory"]
 guard = []
 stage = ["step.test"]
 
 [gate_leg.gov]
-argv = ["python3", "{prefix}/gate-lint/encoding_posture.py", "--js", "memory/project/encoding-js-sites.txt", ".", "{prefix}", "skills"]
+argv = ["python3", "{prefix}/gate-lint/encoding_posture.py", "--js", "memory/project/encoding-js-sites.txt", ".", "{prefix}", "skills", ":!memory"]
 guard = []
 chunk = "product"
 ceiling = 300
@@ -395,7 +396,7 @@ ceiling = 300
 [[ledger]]
 population = "encoding-posture-sites"
 leg = "encoding posture (text IO names its encoding)"
-seed = ["python", "{prefix}/gate-lint/encoding_posture.py", "--measure", ".", "{prefix}", "skills"]
+seed = ["python", "{prefix}/gate-lint/encoding_posture.py", "--measure", ".", "{prefix}", "skills", ":!memory"]
 key = "site"
 fields = ["path", "arm"]
 drain = "hunk"
@@ -471,7 +472,7 @@ home = "memory/project/stage-commit-sites.txt"
 [[ledger]]
 population = "encoding-stdout-sites"
 leg = "encoding posture (an entry point writes stdout as UTF-8)"
-seed = ["python", "{prefix}/gate-lint/encoding_posture.py", "--stdout", "--measure", ".", "{prefix}", "skills"]
+seed = ["python", "{prefix}/gate-lint/encoding_posture.py", "--stdout", "--measure", ".", "{prefix}", "skills", ":!memory"]
 key = "site"
 fields = ["path", "class"]
 drain = "hunk"
@@ -481,7 +482,7 @@ home = "memory/project/encoding-stdout-sites.txt"
 [[ledger]]
 population = "encoding-js-sites"
 leg = "encoding posture (JavaScript text IO names its encoding)"
-seed = ["python", "{prefix}/gate-lint/encoding_posture.py", "--js", "--measure", ".", "{prefix}", "skills"]
+seed = ["python", "{prefix}/gate-lint/encoding_posture.py", "--js", "--measure", ".", "{prefix}", "skills", ":!memory"]
 key = "site"
 fields = ["path", "class"]
 drain = "hunk"

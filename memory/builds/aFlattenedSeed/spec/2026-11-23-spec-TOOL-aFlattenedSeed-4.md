@@ -1,6 +1,6 @@
 # TOOL-aFlattenedSeed-4 — the positional and encoding ledgers leave frozen records alone
 
-**Status:** INPROGRESS · rev-1 · 2026-11-23 · node a · Tier-1 · base 4b5054df · streams tooling
+**Status:** CLOSED · rev-1 · 2026-11-23 · node a · Tier-1 · base 4b5054df · streams tooling
 
 <!-- gen:spec-records -->
 
