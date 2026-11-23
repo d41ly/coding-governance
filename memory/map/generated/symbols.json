@@ -1013,6 +1013,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "add_leg_counts",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "add_local_scope",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -3278,6 +3283,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "build_fixture_index",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "build_fixture_r3",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -3631,6 +3641,11 @@
       "id": "build_ledger_plane",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "build_leg_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "build_leg_yield",
@@ -7461,6 +7476,11 @@
       "id": "check_leg_claimable",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "check_leg_harvest",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
     },
     {
       "id": "check_legacy",
@@ -12863,6 +12883,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_id_params",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
       "id": "derive_idle_gaps",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -13251,6 +13276,11 @@
       "id": "derive_leg_unarmed",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "derive_leg_version",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "derive_legacy_home",
@@ -15948,6 +15978,11 @@
       "file": "tools/run-gates/adopt-run-gates.sh"
     },
     {
+      "id": "extract_head_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "extract_heredoc_body",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -15956,6 +15991,11 @@
       "id": "extract_hs_lines",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "extract_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
     },
     {
       "id": "extract_item",
@@ -16166,6 +16206,11 @@
       "id": "extract_session",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "extract_spec_head",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
     },
     {
       "id": "extract_stated_count",
@@ -17378,9 +17423,19 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "load_leg_module",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "load_leg_names",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "load_leg_reader",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "load_loop",
@@ -17676,6 +17731,11 @@
       "id": "load_tag_index",
       "kind": "function",
       "file": "tools/memory-tree/record_find.py"
+    },
+    {
+      "id": "load_tag_index",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "load_text",
@@ -20358,6 +20418,11 @@
       "file": "tools/memory-tree/tree_lib.py"
     },
     {
+      "id": "parse_spec_head",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "parse_spec_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -20821,6 +20886,11 @@
       "id": "print_lease_status",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "print_leg_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "print_leg_window",
@@ -24603,6 +24673,11 @@
       "file": "tools/memory-tree/record_kinds.py"
     },
     {
+      "id": "read_leg_payloads",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "read_leg_tests",
       "kind": "function",
       "file": "tools/unattended/fix_keeps.py"
@@ -26473,6 +26548,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "read_rows_at",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "read_rp_line",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -27036,6 +27116,11 @@
       "id": "read_spec_uids",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_spec_unit",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "read_spec_words",
@@ -30341,6 +30426,11 @@
       "id": "render_ledger_row",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "render_leg_line",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "render_leg_row",
@@ -41053,6 +41143,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_leg_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "test_legacy_language_name_refuses_and_names_the_extension",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -44081,6 +44176,11 @@
       "id": "write_leg_capture",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "write_leg_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "write_leg_record",

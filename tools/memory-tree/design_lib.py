@@ -110,7 +110,8 @@ KIT =os.path.dirname(os.path.abspath(__file__))
 if KIT not in sys.path:
     sys.path.insert(0, KIT)
 from tree_lib import (  # noqa: E402
-    GIT_ENV_LEAKS, build_git_env, build_spec_path_re, parse_conf, read_blobs_at, read_git_output, unfenced_lines)
+    GIT_ENV_LEAKS, build_git_env, build_spec_path_re, parse_conf, read_blobs_at, read_git_output, unfenced,
+    unfenced_lines)
 
 _CL = r"cl-d[A-Z]\w+-\d{4}"
 _DECISION = r"[A-Z]+-d[A-Z]\w+-\d+"
@@ -605,6 +606,22 @@ def read_spec_edges(text, verb):
             cur = [t[1] if t[1] is not None else t[2], line]
             out.append(cur)
     return [tuple(x) for x in out]
+
+
+def extract_spec_head(text, arg=None):
+    """The `spec-head` leg reader (TOOL-dTotalRecall-23 S2), beside the two readers it calls: a spec's first
+    five unfenced lines, its `read_spec_writes` words and its `read_spec_edges` consumes targets, the
+    path-independent half of the index generator's `parse_spec_text`; `{"undecodable": true}` for a blob
+    that is not UTF-8."""
+    if text is None:
+        return {"undecodable": True}
+    head = []
+    for line in unfenced(text):
+        if len(head) == 5:
+            break
+        head.append(line)
+    return {"head": head, "writes": read_spec_writes(text),
+            "consumes": [t for t, _b in read_spec_edges(text, "consumes-from")]}
 
 
 def read_rev_log(text):

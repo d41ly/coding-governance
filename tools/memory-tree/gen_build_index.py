@@ -202,7 +202,13 @@ from tree_lib import (  # noqa: E402  the kit's shared helpers
     _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, derive_constant_charges, kit_rel,
     parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at, read_id_pins, read_policy_value,
     read_text, record_paths, scan_missing_citations, unfenced, unfenced_lines,
+    add_leg_counts, read_rows_at, render_leg_line,
 )
+
+#: TOOL-dTotalRecall-23 S6: `{reader: counts}` summed over every leg read of this run, `read_bindings`' and
+#: `collect`'s spec heads, printed one line per reader on stderr by `print_leg_lines` at a `--check` or a
+#: `--print-bindings` exit.
+LEG_COUNTS: dict = {}
 
 
 GEN_HEADER = (
@@ -626,9 +632,25 @@ def parse_spec_text(text: str, path: str, alt: str = "(?!)") -> dict | None:
     has no id grammar to offer, and admitting every token would be a grammar bound to the wrong tree
     — the shape whose empty classification reads exactly like a clean corpus.
     """
-    body = list(unfenced(text))
+    unit = parse_spec_head(list(unfenced(text))[:5], path, alt)
+    if unit is None:
+        return None
+    # The build-order render's two inputs (TOOL-dGroundRules-25 S37, S38): the Files touched
+    # words, None where the sub-head is absent, an unknown write set (TOOL-dGroundRules-32 S13), and
+    # the `consumes-from` targets, read through the one edge read (S17).
+    unit["writes"] = design_lib.read_spec_writes(text)
+    unit["consumes"] = [t for t, _b in design_lib.read_spec_edges(text, "consumes-from")]
+    return unit
+
+
+def parse_spec_head(lines: list, path: str, alt: str = "(?!)") -> dict | None:
+    """The unit record of `parse_spec_text` but its `writes` and `consumes`, from a spec's first five
+    unfenced `lines` alone (TOOL-dTotalRecall-23 S4), or None when they carry no parseable status header.
+    `collect` reads it over the `spec-head` leg row, `parse_spec_text` over its own text, so a row and a
+    text cannot parse a header two ways."""
+    body = lines[:5]
     hdr = None
-    for line in body[:5]:
+    for line in body:
         m = HDR_RE.match(line)
         if m:
             hdr = m
@@ -636,7 +658,7 @@ def parse_spec_text(text: str, path: str, alt: str = "(?!)") -> dict | None:
     if hdr is None:
         return None
     unit_id, title = os.path.basename(path)[:-3], ""
-    for line in body[:5]:
+    for line in body:
         m = H1_RE.match(line)
         if m:
             unit_id, title = m.group("id"), m.group("title")
@@ -662,12 +684,18 @@ def parse_spec_text(text: str, path: str, alt: str = "(?!)") -> dict | None:
         # renders it, which costs this key and one cell. It is MANDATORY in the header regex, so a
         # unit row always has a value and only the ORDER cell can be empty.
         "tier": hdr.group("tier"),
-        # The build-order render's two inputs (TOOL-dGroundRules-25 S37, S38): the Files touched
-        # words, None where the sub-head is absent, an unknown write set (TOOL-dGroundRules-32 S13), and
-        # the `consumes-from` targets, read through the one edge read (S17).
-        "writes": design_lib.read_spec_writes(text),
-        "consumes": [t for t, _b in design_lib.read_spec_edges(text, "consumes-from")],
     }
+
+
+def read_spec_unit(path: str, alt: str, head: dict) -> dict | None:
+    """`parse_spec`'s unit record of the spec at `path` from its `spec-head` leg product `head`
+    (TOOL-dTotalRecall-23 S4); an undecodable or unreadable spec is read by `parse_spec` as before."""
+    if "head" not in head:
+        return parse_spec(path, alt)
+    unit = parse_spec_head(head["head"], path, alt)
+    if unit is not None:
+        unit["writes"], unit["consumes"] = head["writes"], head["consumes"]
+    return unit
 
 
 # ------------------------------------------------------------------------------ record -> spec bindings
@@ -836,7 +864,7 @@ def cmd_print_bindings(root: str, conf: dict, resolve=None) -> int:
     tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
     # TOOL-dTotalRecall-4 S7 — a design-only build's README `ids:` defines its units beside the spec H1s.
     defined = derive_defined_ids(root, tracked, conf)
-    binds = read_bindings(root, tracked, conf)
+    binds = read_bindings(root, tracked, conf, counts=LEG_COUNTS.setdefault("unfenced-head", {}))
     revs = read_spec_revs(root, tracked, conf) if cutoff else {}
     # TOOL-dTrueNorth-13 S4 — WHICH ids of a graded record owe a pin. A graded record is a spec-audit
     # record dated on or after the cutoff, or undated, because unparseable is not old (the rule check
@@ -1469,6 +1497,11 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
             head, sep, _ = p[len(in_builds):].partition("/")
             if sep:
                 by_slug.setdefault(head, []).append(p)
+    # TOOL-dTotalRecall-23 S4: every spec's head in ONE leg read, its `spec-head` row where the index holds
+    # its unchanged blob; the per-build loop below parses each in its own order, refusals included.
+    spec_heads, got = read_rows_at(root, [p for ps in by_slug.values() for p in ps if p.endswith(".md")
+                                          and p[len(in_builds):].split("/")[1:2] == ["spec"]], "spec-head")
+    add_leg_counts(LEG_COUNTS.setdefault("spec-head", {}), got)
     for slug in slugs:
         readme = f"{m}/builds/{slug}/README.md"
         if readme not in tracked:
@@ -1516,7 +1549,7 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
                           f"`--print-front-matter {slug}`, and this README is outside the legacy population "
                           f"that may type it; delete the {', '.join(typed)} line(s)")
         specs = sorted(p for p in by_slug.get(slug, []) if p.startswith(f"{m}/builds/{slug}/spec/") and p.endswith(".md"))
-        units = [parse_spec(os.path.join(root, p), _id_alternation(conf)) for p in specs]
+        units = [read_spec_unit(os.path.join(root, p), _id_alternation(conf), spec_heads[p]) for p in specs]
         # THE SPEC INDEX THE FOLD READS, built from the parse this loop already performs and keyed
         # by the spec's H1 id. The path stored is the REPO-RELATIVE one, not `parse_spec`'s
         # absolute argument: every verdict message names it, and an absolute Windows path in a
@@ -3525,7 +3558,7 @@ def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> t
     # cross-build record renders where a reader will look for it.
     try:
         tracked_all = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
-        binds_all = read_bindings(root, tracked_all, conf)
+        binds_all = read_bindings(root, tracked_all, conf, counts=LEG_COUNTS.setdefault("unfenced-head", {}))
     except Problem as exc:
         # NARROWED from `except Exception` (TOOL-dScrubbedConduit-1 S1). The render must not depend on
         # the parse succeeding, but swallowing EVERY exception meant read_bindings could die of a
@@ -5593,6 +5626,121 @@ def _fixture(tmp: str, *, marker=True, readme=True, status_key=None, spec_status
     run("git", "add", "-A", cwd=tmp)
     run("git", "commit", "-q", "-m", "f", "--no-verify", cwd=tmp)
     return load_conf(tmp)
+
+
+def test_leg_rows(arm) -> None:
+    """TOOL-dTotalRecall-23's arm (section 7, AC1 to AC6) over `tree_lib.write_leg_fixture`, its index built
+    by the playbook kit's `load_view`: the bindings and `--check` read alike from rows and from text, a
+    changed path is parsed and an unchanged one served, a row of another reader version is never served, a
+    failing reader fails no tag build, rows leave with their blobs, and an absent index is announced.
+    Staged red by `read_rows_at` serving a dirty path from its HEAD row, which AC2 and AC3 see."""
+    import shutil
+    import sqlite3
+    import tree_lib as tl
+
+    seen: dict = {}
+    gbi = os.path.abspath(__file__)
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+
+    def run_leg_child(t, *argv):
+        p = subprocess.run([sys.executable, gbi, *argv], cwd=t, env=env, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+        legs = [ln for ln in p.stderr.splitlines() if ln.startswith("leg rows:")]
+        return p.returncode, p.stdout, [ln for ln in p.stderr.splitlines() if not ln.startswith("leg rows:")], legs
+
+    def read_tracked(t):
+        return [p for p in run("git", "ls-files", cwd=t).split("\n") if p]
+
+    def write_leg_commit(t, rel, body):
+        with open(os.path.join(t, rel), "wb") as fh:
+            fh.write(body)
+        run("git", "add", "--", rel, cwd=t)
+        run("git", "-c", "user.name=t", "-c", "user.email=t@t.test", "commit", "-q", "--no-verify", "-m", rel, cwd=t)
+
+    with tempfile.TemporaryDirectory() as base:
+        t = os.path.join(base, "legs")
+        try:
+            tl.write_leg_fixture(t)
+            fx, conf = tl.LEG_FIXTURE, load_conf(t)
+            db = tl.build_fixture_index(t)
+            aside = str(db) + ".aside"
+            with_ix = run_leg_child(t, "--check")
+            os.replace(db, aside)
+            without = run_leg_child(t, "--check")
+            os.replace(aside, db)
+            seen["ac6"] = (f"rc={with_ix[0]} same={with_ix[:3] == without[:3]} with={with_ix[3]} "
+                           f"without={without[3]}")
+            c1, c2 = {}, {}
+            b1 = read_bindings(t, read_tracked(t), conf, counts=c1)
+            os.replace(db, aside)
+            b2 = read_bindings(t, read_tracked(t), conf, counts=c2)
+            os.replace(aside, db)
+            seen["ac1"] = (f"equal={b1 == b2} index={c1['index']} parsed={c1['parsed']} "
+                           f"fenced={b1[fx['fenced']]['ids']} crlf={b1[fx['crlf']]['state']}")
+            late = "memory/builds/tOne/build/2026-08-03-build-ARCH-tOne-1-late.md"
+            write_leg_commit(t, late, b"# late\n\n**Serves:** research ARCH-tOne-1\n")
+            _rows, got = tl.read_rows_at(t, list(fx.values()) + [late], "unfenced-head")
+            seen["ac2"] = f"index={got['index']} parsed={got['parsed']} absent={got['absent']}"
+            with open(os.path.join(t, fx["edited"]), "rb") as fh:
+                edited = fh.read()
+            with open(os.path.join(t, fx["edited"]), "wb") as fh:
+                fh.write(b"# edited\n\n**Serves:** research ARCH-tOne-1\n" + edited.split(b"\n", 2)[2])
+            b3 = read_bindings(t, read_tracked(t), conf)[fx["edited"]]
+            seen["ac3"] = f"{b3['state']} {b3['ids']}"
+            blob = run("git", "rev-parse", "HEAD:" + fx["fenced"], cwd=t).strip()
+            con = sqlite3.connect(str(db))
+            with con:
+                con.execute("DELETE FROM leg_row WHERE blob = ? AND reader = 'unfenced-head'", (blob,))
+                con.execute("INSERT INTO leg_row VALUES (?,?,?,?)",
+                            (blob, "unfenced-head", "0" * 12, '{"head": ["**Serves:** research ARCH-tOne-7"]}'))
+            con.close()
+            rows, got = tl.read_rows_at(t, [fx["fenced"]], "unfenced-head")
+            old = run("git", "rev-parse", "HEAD:" + fx["crlf"], cwd=t).strip()
+            write_leg_commit(t, fx["crlf"], b"# crlf\r\n\r\n**Serves:** research ARCH-tOne-1\r\n\r\nbody two\r\n")
+            new = run("git", "rev-parse", "HEAD:" + fx["crlf"], cwd=t).strip()
+            held = dict(tl.LEG_READERS)
+            tl.LEG_READERS["spec-head"] = ("no_such_leg_module:nothing", None)
+            try:
+                tl.build_fixture_index(t)
+            finally:
+                tl.LEG_READERS.clear()
+                tl.LEG_READERS.update(held)
+            con = sqlite3.connect(str(db))
+            by = dict(con.execute("SELECT reader, count(*) FROM leg_row WHERE blob = ? GROUP BY reader", (new,)))
+            gone = con.execute("SELECT count(*) FROM leg_row WHERE blob = ?", (old,)).fetchone()[0]
+            vers = {v for (v,) in con.execute("SELECT DISTINCT version FROM leg_row WHERE reader = 'unfenced-head' "
+                                              "AND blob = ?", (new,))}
+            con.close()
+            seen["ac4"] = (f"other version parsed={got['parsed']} served={'ARCH-tOne-7' in str(rows)} "
+                           f"new blob readers={sorted(by)} versions={vers == {tl.derive_leg_version('unfenced-head', t)}} "
+                           f"old blob rows={gone}")
+            os.replace(db, aside)
+            _rows, got = tl.read_rows_at(t, list(fx.values()), "unfenced-head")
+            printed = run_leg_child(t, "--print-bindings")
+            os.replace(aside, db)
+            seen["ac5"] = f"index={got['index']} parsed={got['parsed']} absent={got['absent']} {printed[3]}"
+        except Exception as exc:  # noqa: BLE001 — every arm below names it
+            seen["error"] = f"UNEXPECTED {type(exc).__name__}: {exc}"
+        finally:
+            shutil.rmtree(t, ignore_errors=True)
+    say = seen.get("error", "")
+    arm("TOOL-dTotalRecall-23 AC6 — --check over the leg fixture reads alike with and without the index",
+        "rc=0 same=True with=['leg rows: spec-head 1 from the index, 0 parsed', 'leg rows: unfenced-head 3 from "
+        "the index, 1 parsed'] without=['leg rows: spec-head index absent, 1 parsed', 'leg rows: unfenced-head "
+        "index absent, 4 parsed']", lambda: seen.get("ac6", say))
+    arm("TOOL-dTotalRecall-23 AC1 — read_bindings from rows equals it from text, every committed unchanged "
+        "record from the index", "equal=True index=3 parsed=1 fenced=['ARCH-tOne-1'] crlf=bound",
+        lambda: seen.get("ac1", say))
+    arm("TOOL-dTotalRecall-23 AC2 — a later commit's blob, the edited and the untracked file are parsed, "
+        "every other path served", "index=5 parsed=3 absent=False", lambda: seen.get("ac2", say))
+    arm("TOOL-dTotalRecall-23 AC3 — an uncommitted edit adding a Serves line is read from the edit",
+        "bound ['ARCH-tOne-1']", lambda: seen.get("ac3", say))
+    arm("TOOL-dTotalRecall-23 AC4 — another version's row is parsed, a failing reader fails no build, rows "
+        "leave with their blob", "other version parsed=1 served=False new blob readers=['id-harvest', "
+        "'unfenced-head'] versions=True old blob rows=0", lambda: seen.get("ac4", say))
+    arm("TOOL-dTotalRecall-23 AC5 — an absent index parses every path and --print-bindings says so",
+        "index=0 parsed=7 absent=True ['leg rows: unfenced-head index absent, 5 parsed']",
+        lambda: seen.get("ac5", say))
 
 
 def test_relations(arm) -> None:
@@ -7802,6 +7950,7 @@ def cmd_selftest() -> int:
         arm("an edge to a build found nowhere prints pending, found nowhere", "tOne\tafter\ttGhost\tpending\tfound nowhere",
             lambda: _read_mode(cmd_print_relations, t15, conf15)[1])
         test_relations(arm)
+        test_leg_rows(arm)
         # ---- the record->spec binding parser.
         # Every arm is a POSITIVE assertion on a classification, because the failure mode of a
         # head-scan is silence: a boundary set one line short reports "absent" for a conformant
@@ -10875,6 +11024,8 @@ def main(argv: list) -> int:
         except Problem as exc:
             print(f"build-index: {exc}")
             return 2
+        finally:
+            print_leg_lines()
     # TOOL-dTotalRecall-4 S3, S4 — two read-only printers whose stdout is a value a program parses, so
     # a refusal goes to stderr and exits 2.
     # TOOL-dTotalRecall-6 S8 — `--print-relations` is a third, the edge list TOOL-dTotalRecall-22 reads.
@@ -10978,6 +11129,17 @@ def main(argv: list) -> int:
     except Problem as exc:
         print(f"build-index: {exc}")
         return 1
+    finally:
+        if mode == "--check":
+            print_leg_lines()
+
+
+def print_leg_lines() -> None:
+    """TOOL-dTotalRecall-23 S6: one `leg rows:` line per reader this run read, summed over its calls, on
+    stderr, stdout flushed first so a capture merging the two keeps them after every verdict line."""
+    sys.stdout.flush()
+    for reader, counts in LEG_COUNTS.items():
+        print(render_leg_line(reader, counts), file=sys.stderr)
 
 
 if __name__ == "__main__":

@@ -336,3 +336,10 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T07:03:28Z draw · re-dispatch · TOOL-dTotalRecall-9 · 45/186 · 20261123T070328Z-252972
 
 2026-11-23T07:03:28Z dispatch · item e1321ce7 TOOL-dTotalRecall-9 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dTotalRecall/README.md
+
+2026-11-23T07:25:24Z brief · item TOOL-dTotalRecall-23 · reason 6d0bc8a84fb2 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-23-build-brief.md
+
+2026-11-23T07:28:37Z dispatch · item 7fa604e1 TOOL-dTotalRecall-23 · reason tools/memory-tree/tree_lib.py tools/memory-tree/corpus_ids.py tools/memory-tree/design_lib.py tools/memory-tree/gen_build_index.py tools/playbook/tag_index.py help/tags.md memory/map/generated/symbols.json tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-23.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-23-1-acceptance-ledger.md
+2026-11-23T07:51:23Z draw · re-dispatch · TOOL-dTotalRecall-23 · 46/186 · 20261123T075123Z-e5f829
+
+2026-11-23T07:51:23Z dispatch · item 7fa604e1 TOOL-dTotalRecall-23 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-23-deviation-1007.md memory/builds/dTotalRecall/README.md

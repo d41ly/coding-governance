@@ -18,10 +18,15 @@ The module name follows the codebase-map kit's `map_lib.py` and the runlog kit's
 """
 from __future__ import annotations
 
+import hashlib
+import itertools
+import json
 import os
 import pathlib
 import re
+import sqlite3
 import subprocess
+import sys
 
 # The lifecycle vocabulary, one declaration for the index generator's front-matter check, check 24's
 # rotation grading and the backlog-row census.
@@ -777,8 +782,12 @@ def read_id_pins(rest: str, alt: str, root=None) -> dict:
     return pins
 
 
-def read_bindings(root: str, tracked: list, conf: dict) -> dict:
+def read_bindings(root: str, tracked: list, conf: dict, *, counts=None) -> dict:
     """path -> {state, kind, ids, pins, commissions, reason, bad}.
+
+    Each record's head is its `unfenced-head` leg row where the index holds its unchanged blob, else
+    its text parsed (TOOL-dTotalRecall-23 S4); `counts`, when passed, gains the call's `read_rows_at`
+    counts.
 
     `ids` is the kind line's ids once each, in first-seen order (TOOL-dTrueNorth-20 S9). `pins` is the
     kind line's `{id: N}`, the highest `@rev-N` each id carries there, empty when none
@@ -803,12 +812,15 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                             + r")-(?:" + read_slug_class(root) + r")-\d+-(?P<kind>" + "|".join(map(re.escape, TYPED_RECORD_KINDS))
                             + r")-\d+\.md$")
     out = {}
-    for rel in record_paths(tracked, m):
+    rels = record_paths(tracked, m)
+    heads, got = read_rows_at(root, rels, "unfenced-head")
+    if counts is not None:
+        add_leg_counts(counts, got)
+    for rel in rels:
         rec = {"state": "absent", "kind": None, "ids": [], "pins": {}, "commissions": [], "reason": None,
                "bad": [], "why": "no Serves line in the first %d unfenced lines" % BIND_HEAD_LINES}
-        try:
-            text = read_text(os.path.join(root, rel))
-        except UnicodeDecodeError:
+        head = heads[rel]
+        if head.get("undecodable"):
             # NOT TEXT, so NOT A RECORD (TOOL-dScrubbedConduit-1 S1). A record is prose that carries a
             # `**Serves:**` line binding it to a spec; a file that does not decode cannot carry one,
             # and emitting it as an `A` row only moves the failure to hygiene check 21, which would
@@ -818,12 +830,12 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
             #
             # An adopter carrying a UI review screenshot under `reviews/` is the case this serves.
             continue
-        except OSError as exc:
+        if "unreadable" in head:
             # Present in the index and unreadable from disk is a REAL anomaly and stays a row.
-            rec["why"] = f"unreadable: {exc}"
+            rec["why"] = f"unreadable: {head['unreadable']}"
             out[rel] = rec
             continue
-        for line in list(unfenced(text))[:BIND_HEAD_LINES]:
+        for line in head["head"]:
             mo = BIND_RE.match(line)
             if not mo:
                 continue
@@ -891,3 +903,306 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                           f"<date>-build-<unit id>-{rec['kind']}-<n>.md in a build's build/ folder")
         out[rel] = rec
     return out
+
+
+# ------------------------------------------------------------------------------ the memory legs' rows
+# TOOL-dTotalRecall-23 — a memory leg's per-record parse is a pure READER of a blob's text and its
+# params, and its product is stored as a row in the tag index, keyed by blob, so a leg reads rows for
+# every unchanged blob the index holds and parses only the blobs that changed. The index's one writer,
+# the playbook kit's `tag_index.build_index`, calls `build_leg_rows` in its transaction when a tree is
+# first built (S1); a leg only reads, through `read_rows_at` (S3), so a cold or absent index costs the
+# full parse it cost before, announced by `render_leg_line` (S6).
+#
+#: reader name -> (`<module>:<function>` reader, `<module>:<function>` params, None for an empty key),
+#: the tag index's extractor spelling (S2). Each module is loaded from this kit's directory by a
+#: COMPUTED path in `load_leg_module`, never imported here, so the tag index's closure, which takes this
+#: file in, does not take the readers' modules in with it.
+LEG_READERS = {
+    "unfenced-head": ("tree_lib:extract_head_lines", None),
+    "id-harvest": ("corpus_ids:extract_ids", "corpus_ids:derive_id_params"),
+    "spec-head": ("design_lib:extract_spec_head", None),
+}
+LEG_TABLE = ("CREATE TABLE IF NOT EXISTS leg_row(blob TEXT, reader TEXT, version TEXT, payload TEXT, "
+             "PRIMARY KEY (blob, reader, version))")
+#: blobs per `SELECT ... IN (...)` in `read_leg_payloads` (S3)
+LEG_QUERY_CHUNK = 999
+#: blobs per `read_blobs_at` batch in `build_leg_rows`, so a cold build never holds every memory blob at once
+LEG_READ_CHUNK = 500
+_LEG_MODULES: dict = {}
+_LEG_CLOSURES: dict = {}
+
+
+def load_leg_module(mod_name):
+    """The module `<mod_name>.py` of this kit's own directory: this one, one already loaded from that
+    file under its own name or as `__main__`, else that file loaded by its computed path, once."""
+    src = os.path.normcase(os.path.join(os.path.dirname(os.path.abspath(__file__)), mod_name + ".py"))
+    for mod in (sys.modules.get(__name__), sys.modules.get(mod_name), sys.modules.get("__main__")):
+        at = getattr(mod, "__file__", None)
+        if at and os.path.normcase(os.path.abspath(at)) == src:
+            return mod
+    if src not in _LEG_MODULES:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("leg_reader_" + mod_name, src)
+        if spec is None or not os.path.isfile(src):
+            raise ImportError(f"leg reader module {mod_name}: no file {src}")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _LEG_MODULES[src] = mod
+    return _LEG_MODULES[src]
+
+
+def load_leg_reader(name, root) -> tuple:
+    """`(reader, arg, version)` for the `LEG_READERS` row `name` at `root`: the version is
+    `derive_leg_version`'s, the closure's bytes hashed once per process and the params' key after them."""
+    spelled, params = LEG_READERS[name]
+    mod_name, _, fn_name = spelled.partition(":")
+    fn = getattr(load_leg_module(mod_name), fn_name)
+    key, arg = "", None
+    if params:
+        p_mod, _, p_fn = params.partition(":")
+        key, arg = getattr(load_leg_module(p_mod), p_fn)(root)
+    src = os.path.join(os.path.dirname(os.path.abspath(__file__)), mod_name + ".py")
+    if src not in _LEG_CLOSURES:
+        import import_walk  # noqa: E402  this kit's closure rule, the tag index's version rule
+        digest = hashlib.sha256()
+        for path in import_walk.derive_module_closure(src, [os.path.dirname(src)]):
+            digest.update(pathlib.Path(path).read_bytes())
+        _LEG_CLOSURES[src] = digest
+    digest = _LEG_CLOSURES[src].copy()
+    digest.update(key.encode("utf-8"))
+    return fn, arg, digest.hexdigest()[:12]
+
+
+def derive_leg_version(name, root) -> str:
+    """The reader's version, DERIVED (S2): the first 12 hex of the SHA-256 over the bytes of every module
+    of its module's closure under `import_walk.derive_module_closure`, in path order, then its params' key."""
+    return load_leg_reader(name, root)[2]
+
+
+def extract_head_lines(text, arg=None) -> dict:
+    """The `unfenced-head` reader: the first `BIND_HEAD_LINES` lines `unfenced` yields, which
+    `read_bindings` classifies, or `{"undecodable": true}` for a blob that is not UTF-8."""
+    if text is None:
+        return {"undecodable": True}
+    return {"head": list(itertools.islice(unfenced(text), BIND_HEAD_LINES))}
+
+
+def load_tag_index():
+    """The playbook kit's `tag_index`, reached at call time through this kit's inline `resolve_kit_dir`;
+    LookupError where that kit does not resolve."""
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    kit = resolve_kit_dir("playbook", "tag_index.py", pathlib.Path(__file__).resolve().parent)
+    if str(kit) not in sys.path:
+        sys.path.append(str(kit))
+    import tag_index  # noqa: E402
+    return tag_index
+
+
+def read_leg_payloads(root, reader, version, blobs):
+    """`{blob: payload}` for each of `blobs` `leg_row` holds under `reader` at `version`, the index
+    opened read-only, one `SELECT` per `LEG_QUERY_CHUNK` blobs; None for the index-absent case: an absent
+    playbook kit, an absent file, a file without `leg_row`, or any `sqlite3.Error` (S3)."""
+    try:
+        db = load_tag_index().derive_index_path(root)
+        if not db.is_file():
+            return None
+        con = sqlite3.connect(db.as_uri() + "?mode=ro", uri=True)
+    except (LookupError, ImportError, OSError, ValueError, subprocess.CalledProcessError, sqlite3.Error):
+        return None
+    try:
+        con.execute("SELECT 1 FROM leg_row LIMIT 0")
+        out = {}
+        for at in range(0, len(blobs), LEG_QUERY_CHUNK):
+            part = blobs[at:at + LEG_QUERY_CHUNK]
+            out.update(con.execute("SELECT blob, payload FROM leg_row WHERE reader = ? AND version = ? AND blob IN ("
+                                   + ",".join("?" * len(part)) + ")", (reader, version, *part)).fetchall())
+        return out
+    except sqlite3.Error:
+        return None
+    finally:
+        con.close()
+
+
+def read_rows_at(root, paths, reader) -> tuple:
+    """`({path: product}, {"index": n, "parsed": m, "absent": bool})` over working-tree `paths` (S3).
+
+    One `git ls-files -s -z` names each path's blob and one `git diff --name-only --no-renames -z HEAD`
+    the paths that differ from HEAD. A path absent from that diff whose blob `leg_row` holds at the
+    reader's current version is answered from the row; every other path, edited, staged, untracked or
+    absent from git's index, is read through `read_text` and parsed, a `UnicodeDecodeError` handing the
+    reader None and an `OSError` standing as `{"unreadable": "<message>"}`. A git read that fails, an
+    unborn HEAD say, parses every path."""
+    fn, arg, version = load_leg_reader(reader, root)
+    paths = list(dict.fromkeys(paths))
+    blob_of: dict = {}
+    try:
+        for rec in read_git_output(root, ("ls-files", "-s", "-z")).decode("utf-8", "replace").split("\0"):
+            meta, _, path = rec.partition("\t")
+            fields = meta.split()
+            if path and len(fields) == 3:
+                blob_of[path] = fields[1]
+        changed = {p for p in read_git_output(root, ("diff", "--name-only", "--no-renames", "-z", "HEAD"))
+                   .decode("utf-8", "replace").split("\0") if p}
+    except OSError:
+        blob_of, changed = {}, set()
+    held = {p: blob_of[p] for p in paths if p in blob_of and p not in changed}
+    rows = read_leg_payloads(root, reader, version, sorted(set(held.values())))
+    counts = {"index": 0, "parsed": 0, "absent": rows is None}
+    rows = rows or {}
+    out = {}
+    for p in paths:
+        payload = rows.get(held.get(p))
+        if payload is not None:
+            out[p] = json.loads(payload)
+            counts["index"] += 1
+            continue
+        counts["parsed"] += 1
+        try:
+            text = read_text(os.path.join(root, p))
+        except UnicodeDecodeError:
+            text = None
+        except OSError as exc:
+            out[p] = {"unreadable": str(exc)}
+            continue
+        out[p] = fn(text, arg)
+    return out, counts
+
+
+def add_leg_counts(total: dict, got: dict) -> dict:
+    """`total` gaining one `read_rows_at` call's counts: the two numbers summed, `absent` if any call's was."""
+    total["index"] = total.get("index", 0) + got["index"]
+    total["parsed"] = total.get("parsed", 0) + got["parsed"]
+    total["absent"] = total.get("absent", False) or got["absent"]
+    return total
+
+
+def render_leg_line(reader, counts) -> str:
+    """The announce line (S6): `leg rows: <reader> <n> from the index, <m> parsed`, or
+    `leg rows: <reader> index absent, <m> parsed`."""
+    if counts.get("absent"):
+        return f"leg rows: {reader} index absent, {counts.get('parsed', 0)} parsed"
+    return f"leg rows: {reader} {counts.get('index', 0)} from the index, {counts.get('parsed', 0)} parsed"
+
+
+def build_leg_rows(con, root, tree, entries) -> None:
+    """The one writer of `leg_row` (S1), inside `tag_index.build_index`'s `BEGIN IMMEDIATE` block after its
+    sweep, over the tree's `(path, blob)` entries. For each blob under the conf's `MEMORY_ROOT` that
+    `leg_row` lacks at a reader's current version, it reads the blob through `read_blobs_at` at `tree` and
+    writes the reader's row; then it clears every row whose blob no `tree_path` or `dirty_path` row holds.
+    A reader whose module, params or call raises writes no row for it and never fails the build."""
+    con.execute(LEG_TABLE)
+    try:
+        conf = parse_conf(read_text(os.path.join(root, ".memory-tree.conf")), {})
+    except (OSError, UnicodeDecodeError):
+        conf = {}
+    m = (conf.get("MEMORY_ROOT") or "memory").strip("/") + "/"
+    blobs: dict = {}
+    for path, blob in entries:
+        if path.startswith(m):
+            blobs.setdefault(blob, path)
+    readers = []
+    for name in LEG_READERS:
+        try:
+            fn, arg, version = load_leg_reader(name, root)
+        except Exception:  # noqa: BLE001  a reader that does not load costs parses, never the tag build (S1)
+            continue
+        held = {b for (b,) in con.execute("SELECT blob FROM leg_row WHERE reader = ? AND version = ?",
+                                          (name, version))}
+        readers.append((name, fn, arg, version, held))
+    todo = [(b, p) for b, p in blobs.items() if any(b not in r[4] for r in readers)]
+    for at in range(0, len(todo), LEG_READ_CHUNK):
+        part = todo[at:at + LEG_READ_CHUNK]
+        try:
+            texts = read_blobs_at(root, [(tree, p) for _b, p in part])
+        except OSError:
+            break
+        rows = []
+        for blob, path in part:
+            for name, fn, arg, version, held in readers:
+                if blob in held:
+                    continue
+                try:
+                    product = fn(texts.get((str(tree), path)), arg)
+                except Exception:  # noqa: BLE001  a reader's raise writes no row for it (S1)
+                    continue
+                rows.append((blob, name, version,
+                             json.dumps(product, sort_keys=True, separators=(",", ":"), ensure_ascii=False)))
+        con.executemany("INSERT OR REPLACE INTO leg_row VALUES (?,?,?,?)", rows)
+    con.execute("DELETE FROM leg_row WHERE NOT EXISTS (SELECT 1 FROM tree_path t WHERE t.blob = leg_row.blob) "
+                "AND NOT EXISTS (SELECT 1 FROM dirty_path d WHERE d.blob = leg_row.blob)")
+
+
+#: the leg fixture's namespace registry, empty, and its planted records by role (S7)
+LEG_FIXTURE_REGISTRY = "namespaces.toml"
+LEG_FIXTURE = {
+    "fenced": "memory/builds/tOne/build/2026-08-02-build-ARCH-tOne-1-fenced.md",
+    "undecodable": "memory/builds/tOne/reviews/2026-08-02-review-shot.png",
+    "crlf": "memory/builds/tOne/build/2026-08-02-build-ARCH-tOne-1-crlf.md",
+    "spec": "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md",
+    "cites": "memory/DECISIONS.md",
+    "edited": "memory/builds/tOne/build/2026-08-02-build-ARCH-tOne-1-edited.md",
+    "untracked": "memory/builds/tOne/build/2026-08-02-build-ARCH-tOne-1-untracked.md",
+}
+
+
+def write_leg_fixture(root) -> None:
+    """A scratch git repository at `root` (S7): a conf, an empty namespace registry and a planted memory
+    tree that `gen_build_index.py --check` accepts, rendered by this kit's own `--write` and committed.
+    `LEG_FIXTURE` names its records: one carries its Serves line inside a fence, one is undecodable, one
+    is CRLF, one is a spec, one cites an id and a dead path, one is edited and uncommitted, and one is
+    untracked. A step that fails raises OSError naming it."""
+    root = pathlib.Path(root)
+    root.mkdir(parents=True, exist_ok=True)
+    plant = {
+        ".memory-tree.conf": 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n',
+        "AGENTS.md": "# charter\n\nRead `memory/README.md` first.\n",
+        LEG_FIXTURE_REGISTRY: "# an empty namespace registry: the tag index runs extract_citations alone\n",
+        "memory/README.md": "# memory\n",
+        "memory/project/stale-header-waiver.txt": "# empty: the mechanism is inert until a header corrupts\n",
+        "memory/builds/tOne/README.md": "---\nslug: tOne\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\n"
+                                        "ids: ARCH-tOne-1\n---\n\n# tOne\n\n<!-- gen:build-index -->\n"
+                                        "<!-- /gen:build-index -->\n",
+        LEG_FIXTURE["spec"]: "# ARCH-tOne-1 — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-08-01 · node a · "
+                             "Tier-2 · base 0123abcd · order 1\n\n## 4. Design\n\n### Files touched (estimate)\n\n"
+                             "- `src/leg.py`\n",
+        LEG_FIXTURE["fenced"]: "# fenced\n\n```\n**Serves:** research ARCH-tOne-9\n```\n\n"
+                               "**Serves:** research ARCH-tOne-1\n",
+        LEG_FIXTURE["crlf"]: "# crlf\r\n\r\n**Serves:** research ARCH-tOne-1\r\n\r\nbody\r\n",
+        LEG_FIXTURE["cites"]: "# d\n\n- ARCH-tOne-1 · a decision, its notes at `memory/nowhere/gone.md`\n",
+        LEG_FIXTURE["edited"]: "# edited\n\n**Serves:** none — a scratch note\n\nfirst\n",
+    }
+    for rel, text in plant.items():
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).write_bytes(text.encode("utf-8"))
+    (root / LEG_FIXTURE["undecodable"]).parent.mkdir(parents=True, exist_ok=True)
+    (root / LEG_FIXTURE["undecodable"]).write_bytes(b"\x89PNG\r\n\x1a\n\xff\xfe\x00 not text")
+    who = ("-c", "user.name=t", "-c", "user.email=t@t.test", "-c", "core.autocrlf=false")
+    read_git_output(str(root), ("init", "-q", "--template="))
+    read_git_output(str(root), ("config", "core.autocrlf", "false"))
+    read_git_output(str(root), ("add", "-A"))
+    read_git_output(str(root), (*who, "commit", "-q", "--no-verify", "-m", "leg fixture"))
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    gbi = os.path.join(os.path.dirname(os.path.abspath(__file__)), "gen_build_index.py")
+    done = subprocess.run([sys.executable, gbi, "--write"], cwd=str(root), env=env, capture_output=True,
+                          text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+    if done.returncode:
+        raise OSError(f"the leg fixture's `gen_build_index.py --write` exited {done.returncode}: "
+                      + (done.stdout + done.stderr).strip()[-400:])
+    read_git_output(str(root), ("add", "-A"))
+    read_git_output(str(root), (*who, "commit", "-q", "--no-verify", "-m", "leg fixture rendered"))
+    with open(root / LEG_FIXTURE["edited"], "ab") as fh:
+        fh.write(b"second\n")
+    (root / LEG_FIXTURE["untracked"]).write_bytes(b"# untracked\n\n**Serves:** research ARCH-tOne-1\n")
+
+
+def build_fixture_index(root) -> pathlib.Path:
+    """Build the node index of a `write_leg_fixture` repository through the playbook kit's `load_view` over
+    `derive_context(root, <its registry>)`, and return the index file's path."""
+    ti = load_tag_index()
+    ctx = ti.derive_context(root, pathlib.Path(root) / LEG_FIXTURE_REGISTRY)
+    con = ti.load_index(root)
+    try:
+        ti.load_view(con, root, ctx)
+    finally:
+        con.close()
+    return ti.derive_index_path(root)

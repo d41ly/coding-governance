@@ -52,7 +52,7 @@ module was edited. A new format reads a file of its own name; a file stamped wit
 rebuilt in place, never deleted, so a session reading it keeps it, printing
 `tag-index — rebuilt: schema <old> to <new>`. An older format's file is left behind, unread, until you
 delete it. Deleting the file costs one rebuild. The same file holds memory-recall's full-text rows
-beside the tags, so a rebuild drops them too and the next recall query extracts them again. Two worktrees whose
+beside the tags, so a rebuild drops them too and the next recall query extracts them again. It holds the memory legs' rows too: the build index and the id walk the memory-hygiene check runs read each unchanged memory file's parse from it instead of parsing the file again, and each prints a `leg rows:` line naming how many files it read from the index and how many it parsed. Two worktrees whose
 extractor code differs keep their rows side by side in the one file, and each is served only the rows
 its own extractor code wrote, so switching between them re-parses nothing.
 When two commands write the index at once, the second queues behind the first for up to 600 seconds,

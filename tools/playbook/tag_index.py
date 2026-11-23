@@ -17,6 +17,8 @@ created at recall's next open after a reset. Its tables, keyed by blob or by pat
   dirty_path(worktree, path, blob)                           a worktree's uncommitted edits to tracked files
   tree_built(tree, versions, built_at)                       the freshness key of a tree
   blob_parsed(blob, extractor, version)                      the freshness key of a blob (PLAY-dOrderedCharter-44)
+  leg_row(blob, reader, version, payload)                    a memory leg reader's product, memory-tree's
+                                                             `build_leg_rows` writing it here (TOOL-dTotalRecall-23)
 
 A blob row's tag `""` or `#<seg>` is relative to the name its path gives it (a document's `doc.<name>`),
 so one blob at two paths is parsed once and named twice; every other tag is whole. A `blob_parsed` row
@@ -828,6 +830,8 @@ def build_index(root, tree, ctx, con, stats) -> None:
             _write_path_rows(con, pairs, ctx["versions"], ctx["conf"])
             con.execute("INSERT OR REPLACE INTO tree_built VALUES (?,?,?)", (tree, ctx["digest"], time.time()))
             remove_unheld_rows(con, root, keep={tree})
+            # memory-tree's leg rows, written when a tree is first built (TOOL-dTotalRecall-23 S1, F5)
+            tree_lib.build_leg_rows(con, root, tree, entries)
     except sqlite3.OperationalError as exc:
         raise TagError(f"the tag index is locked or unwritable: {exc}") from None
 
