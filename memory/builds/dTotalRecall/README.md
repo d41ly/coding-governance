@@ -151,7 +151,7 @@ ids TOOL-dTotalRecall-112
 | [TOOL-dTotalRecall-26 — the atlas under `help/atlas/`: generated Markdown and Mermaid pages from the one index's node table, refused when stale](spec/2026-10-26-spec-TOOL-dTotalRecall-26.md) | 25 | 2 | DEFERRED | rev-5 | 2026-11-23 |
 | [TOOL-dTotalRecall-12 — the acceptance re-measure: memory bytes per memory-reading agent over every read channel, passing only below 33 KB thirty days after landing](spec/2026-10-26-spec-TOOL-dTotalRecall-12.md) | 26 | 2 | CLOSED | rev-3 | 2026-11-23 |
 | [TOOL-dTotalRecall-43 — the round-1 spec audit's 59 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-43.md) | 27 | 2 | CLOSED | rev-8 | 2026-11-23 |
-| [TOOL-dTotalRecall-52 — the one legacy registration is keyed by path, section and check, judged at the run's real base, and leaves no carrier of the old name](spec/2026-10-26-spec-TOOL-dTotalRecall-52.md) | 28 | 2 | INPROGRESS | rev-6 | 2026-11-23 |
+| [TOOL-dTotalRecall-52 — the one legacy registration is keyed by path, section and check, judged at the run's real base, and leaves no carrier of the old name](spec/2026-10-26-spec-TOOL-dTotalRecall-52.md) | 28 | 2 | INPROGRESS | rev-7 | 2026-11-23 |
 | [TOOL-dTotalRecall-62 — unit 52 judges the merged legacy home at the run's real base and builds no `absorbs` read, so its own pass is green](spec/2026-10-26-spec-TOOL-dTotalRecall-62.md) | 28 | 2 | CLOSED | rev-3 | 2026-11-23 |
 | [TOOL-dTotalRecall-53 — the round-1 spec audit of units 36 to 43: its 41 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-53.md) | 29 | 2 | DEFERRED | rev-4 | 2026-11-23 |
 | [TOOL-dTotalRecall-59 — the merged legacy registration is judged at the run's real compare base, where it is new, and its `shrink-only` is proved on a fixture base that holds it](spec/2026-10-26-spec-TOOL-dTotalRecall-59.md) | 29 | 2 | DEFERRED | rev-3 | 2026-11-23 |
@@ -193,7 +193,7 @@ ids TOOL-dTotalRecall-112
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 687 bound to this build, across 4 record folder(s).
+Records: 691 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -299,13 +299,13 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-spec-writer.md`, `2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-brief.md` and 284 more under prompts/ |
+| briefs | `2026-11-23-prompt-TOOL-dTotalRecall-52-divergence-fold-spec-writer.md`, `2026-11-23-prompt-TOOL-dTotalRecall-52-divergence-fold-brief.md` and 286 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-23-build-TOOL-dTotalRecall-9-deviation-1006.md`, `2026-11-23-build-TOOL-dTotalRecall-48-deviation-1005.md` and 146 more under build/ |
 | red-fix | `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-19.md` and 21 more under build/ |
 | widen | `2026-11-23-build-TOOL-dTotalRecall-9-widen-10.md`, `2026-11-23-build-TOOL-dTotalRecall-51-widen-7.md` and 13 more under build/ |
-| research | `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md`, `2026-11-23-build-TOOL-dTotalRecall-43-map-lost-fold-return.md` and 110 more under build/ |
-| logs | `2026-11-23-build-TOOL-dTotalRecall-43-2-acceptance-ledger.md`, `2026-11-23-build-TOOL-dTotalRecall-21-divergence-return.md` and 92 more under build/ |
+| research | `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md`, `2026-11-23-build-TOOL-dTotalRecall-52-divergence-fold-return.md` and 111 more under build/ |
+| logs | `2026-11-23-build-TOOL-dTotalRecall-43-2-acceptance-ledger.md`, `2026-11-23-build-TOOL-dTotalRecall-21-divergence-return.md` and 93 more under build/ |
 | open asks | `BACKLOG.md`, 15 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->
