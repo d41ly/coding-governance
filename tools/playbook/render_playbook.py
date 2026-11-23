@@ -3166,7 +3166,16 @@ def run_selftest() -> int:
             (['no-direction'], 1, ['field ceiling · widens [] declares no direction']),
             (['widenings'], 0, ['widening fixture.adopter.alpha-tuned -> fixture.alpha · field grants · add ["write"] · '
                                 'gov ["read"]', 'field ceiling · set "high" · gov "low by default"']),
-            (['clean'], 0, ['needs add narrows'])]:
+            (['clean'], 0, ['needs add narrows']),
+            # TOOL-dBoundRoles-82 — a `rises-only` scalar: a raise widens, a lowering, a word and an unknown
+            # direction each refuse naming the field.
+            (['rises-raise'], 0, ['row fixture.beta · {', '"reach": 8, "tag": "fixture.beta"', 'reach 4->8 widens']),
+            (['rises-text'], 0, ['row fixture.beta · {', '"reach": 8, "tag": "fixture.beta"', 'reach 4->8 widens']),
+            (['rises-lower'], 1, ['row-checks: red · widens · fixture.adopter.beta-tuned amends fixture.beta · field '
+                                  'reach', 'row-checks: red · widens · fixture.adopter.gamma-own supersedes '
+                                  'fixture.gamma · field reach', 'never lowered']),
+            (['rises-word'], 1, ['field reach', 'is no number']),
+            (['rises-unknown'], 1, ['field reach', 'declares no direction', 'rises-only'])]:
         done = subprocess.run([sys.executable, str(row_kind), '--plant', *argv], capture_output=True, text=True,
                               encoding='utf-8', errors='replace', stdin=subprocess.DEVNULL, timeout=600)
         said = done.stdout + done.stderr
@@ -3186,6 +3195,8 @@ def run_selftest() -> int:
             ok = ok and len(re.findall(r'^row-kind: patch ', done.stdout, re.M)) == 5
         if argv == ['widenings']:
             ok = ok and len(re.findall(r'^row-kind: widening ', done.stdout, re.M)) == 2
+        if argv == ['rises-lower']:
+            ok = ok and len(re.findall(r'· field reach · .*never lowered$', said, re.M)) == 2
         if argv == ['clean']:
             counts = re.findall(r'^row-kind: check (\w+) · read (\d+)$', done.stdout, re.M)
             ok = ok and len(counts) == 4 and all(int(n) > 0 for _, n in counts)

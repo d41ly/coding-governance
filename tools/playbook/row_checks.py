@@ -19,7 +19,11 @@ refuses, naming the key. `instructions.exclude` is never its own requirer.
 THE CLASSIFIER. `derive_patch_class` reads one operation against gov's value from the field's declared
 direction alone: `add` or `remove` on a set (the one equal to `widens` widens), a new value on a scalar
 whose `widens` is an order, a later value widening. A value outside the order refuses; gov's own value
-outside it ranks below every listed one. `derive_widenings` lists the operations that widen.
+outside it ranks below every listed one. A scalar whose `widens` is a word of `SCALAR_DIRECTIONS` reads
+by that word instead (TOOL-dBoundRoles-82): `rises-only` reads both values through `derive_number`, a
+greater number widening and a lesser one or a value that is no number refusing, so the field may rise and
+never fall; gov's own value that is no number ranks below every number. `derive_widenings` lists the
+operations that widen.
 """
 from __future__ import annotations
 
@@ -36,6 +40,7 @@ import overlay as ov  # noqa: E402
 
 SAY = "row-checks"
 REF_ROLES = ("needs", "actor", "grants")
+SCALAR_DIRECTIONS = ("rises-only",)
 POLICY_SELF = "instructions.exclude"
 
 
@@ -71,10 +76,25 @@ def derive_entry_ops(schema, row, etype, gov_row) -> tuple:
     return named, ops
 
 
+def derive_number(value):
+    """TOOL-dBoundRoles-82: `value` as an integer where it is one that is no boolean, or a string of ASCII
+    decimal digits; None for any other value, which is no number."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and value.isascii() and value.isdecimal():
+        return int(value)
+    return None
+
+
 def derive_patch_class(decl, op, gov_value, value):
     """S5: `widens`, `narrows`, or None where the operation changes nothing: a set `op` moving no member
     gov's value lacks (`add`) or holds (`remove`), a scalar equal to gov's. ValueError for a scalar value
-    outside the field's order; gov's value outside it ranks below every listed value (section 8 F8)."""
+    outside the field's order; gov's value outside it ranks below every listed value (section 8 F8). A
+    `rises-only` scalar (TOOL-dBoundRoles-82) compares `derive_number`'s reads: greater widens, equal is no
+    operation, and a lesser value or one that is no number raises ValueError; gov's value that is no number
+    ranks below every number."""
     order = decl["widens"]
     if op in ("add", "remove"):
         held = derive_set_value(gov_value)
@@ -83,6 +103,15 @@ def derive_patch_class(decl, op, gov_value, value):
         return "widens" if op == order else "narrows"
     if value == gov_value:
         return None
+    if order == "rises-only":
+        new, old = derive_number(value), derive_number(gov_value)
+        if new is None:
+            raise ValueError(f"value {value!r} is no number, which a rises-only field holds")
+        if old is not None and new == old:
+            return None
+        if old is not None and new < old:
+            raise ValueError(f"value {value!r} is below gov's {gov_value!r}: a rises-only field is never lowered")
+        return "widens"
     if value not in order:
         raise ValueError(f"value {value!r} is outside its order {', '.join(map(str, order))}")
     if gov_value not in order:

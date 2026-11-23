@@ -5,7 +5,7 @@
 
 Each plant builds a throwaway repository holding a namespace registry row for `fixture`, a kinds register
 row naming the kind's schema, the schema (FIELDS below: open set fields `grants` and `needs`, open scalars
-`actor` and `ceiling`, the parser-fixed `witness`, the undeclared `note`, the fixed row `fixture.epsilon`,
+`actor` and `ceiling`, the `rises-only` scalar `reach` (TOOL-dBoundRoles-82), the parser-fixed `witness`, the undeclared `note`, the fixed row `fixture.epsilon`,
 owner seat 1), gov's principle registry and this file, which the schema's `fixed-by` sources resolve
 against, gov's pack and the overlay, commits it, and where the case needs one commits gov's next revision
 under a change record. It then composes the kind at HEAD through `overlay_rows` and prints what it expects,
@@ -46,6 +46,7 @@ FIELDS = ({"name": "grants", "shape": "set", "ref": "grants", "widens": "add"},
           {"name": "needs", "shape": "set", "ref": "needs", "widens": "remove"},
           {"name": "actor", "shape": "scalar", "ref": "actor", "widens": ["fixture.beta", "fixture.gamma"]},
           {"name": "ceiling", "shape": "scalar", "widens": ["low", "mid", "high"]},
+          {"name": "reach", "shape": "scalar", "widens": "rises-only"},
           {"name": "witness", "shape": "scalar", "fixed-by": [f"parser={SOURCE}#render_rows"]},
           {"name": "note", "shape": "scalar"})
 FIXED_ROW = {"tag": "fixture.epsilon", "fixed-by": ["principle=principle.p16"]}
@@ -203,6 +204,18 @@ def build_renamed_plant(top, _args=None):
     build_next(top, [moved, *GOV[1:]], [("fixture.alpha", "rename", GOV[0], [moved], "fixture.alpha2", "editorial")])
 
 
+def build_rise_plant(top, reach, gov_reach=4, replace=False, schema=None):
+    """TOOL-dBoundRoles-82: gov's `fixture.beta` and `fixture.gamma` carrying `reach`, beta's `gov_reach`
+    and gamma's 4, and an overlay amending beta's `reach` to `reach`; with `replace`, a `supersedes` of
+    gamma beside it, every field gov's but `reach`, written `reach`."""
+    beta, gamma = {**GOV[1], "reach": gov_reach}, {**GOV[2], "reach": 4}
+    over = [render_patch("fixture.adopter.beta-tuned", beta, reach=reach)]
+    if replace:
+        own = {k: v for k, v in gamma.items() if k != "tag"}
+        over.append(render_patch("fixture.adopter.gamma-own", gamma, "supersedes", **{**own, "reach": reach}))
+    build_tree(top, gov=[GOV[0], beta, gamma], overlay="\n".join(over), schema=schema)
+
+
 def build_states_plant(top):
     delta, zeta = STATE_GOV[3], STATE_GOV[5]
     over = "\n".join([render_amend(), render_replace(),
@@ -288,6 +301,16 @@ PLANTS = {
               lambda top, a: build_tree(top, overlay=render_patch("fixture.adopter.beta-tuned", GOV[1],
                                                                   add='{ needs = ["fixture.gamma"] }'),
                                         exclude="fixture.alpha")),
+    "rises-raise": (0, "fixture.beta's reach rises from 4 to 8, a widening",
+                    lambda top, a: build_rise_plant(top, 8)),
+    "rises-text": (0, "fixture.beta's reach rises from the decimal string \"4\" to 8, a widening",
+                   lambda top, a: build_rise_plant(top, 8, gov_reach="4")),
+    "rises-lower": (1, "refused: an amends and a supersedes each lower reach from 4 to 2, which is never lowered",
+                    lambda top, a: build_rise_plant(top, 2, replace=True)),
+    "rises-word": (1, "refused: reach's value wide is no number",
+                   lambda top, a: build_rise_plant(top, "wide")),
+    "rises-unknown": (1, "refused: the schema's reach declares widens = \"falls\", no direction",
+                      lambda top, a: build_rise_plant(top, 8, schema=render_schema(reach={"widens": "falls"}))),
     "pin-reordered": (0, "no edge stale: gov's row reordered and re-wrapped keeps its pin", build_reordered_plant),
     "pin-no-at": (1, "refused, naming the edge with no pin",
                   lambda top, a: build_tree(top, overlay=render_amend().replace(f"@{derive_pin(GOV[0])}", ""))),
