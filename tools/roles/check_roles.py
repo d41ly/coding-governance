@@ -4,14 +4,16 @@
     python check_roles.py [--root <dir>] [--write]
     python check_roles.py [--root <dir>] --legacy-rows --out <path>
     python check_roles.py --print-tag-rows role|stage < <a role file or workflows.toml>
+    python check_roles.py --print-rows role|workflow < <a role file or workflows.toml>
 
 The kit directory is this script's own directory and the tool root its parent; `--root` defaults to
 the git toplevel of the working directory. One line per defect, `roles: <path>: <rule> — <what>`,
 then one summary line naming every count it graded and each overlay's bytes. Exit 0 clean, 1 on any
 defect, 2 when the check is unarmed. `--write` renders the README's catalogue region and writes it,
 touching nothing else, then grades as usual. `--print-tag-rows` prints the tag index's rows of the
-text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says. `--legacy-rows --out
-<path>` writes every path R16 would refuse, one per line under a `#` header naming HEAD's commit, and
+text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says; `--print-rows`
+prints the same text's rows for the playbook kit's overlay composition and grades nothing, as
+`print_rows` says (TOOL-dBoundRoles-81). `--legacy-rows --out <path>` writes every path R16 would refuse, one per line under a `#` header naming HEAD's commit, and
 grades nothing: the seed the memory-tree kit's `legacy_ledger.py seed --home` runs, once, as
 `write_legacy_rows` says (TOOL-dBoundRoles-17 S6).
 
@@ -1035,13 +1037,68 @@ def print_tag_rows(mode, text):
     return 0
 
 
+def print_rows(mode, text):
+    """`--print-rows role|workflow` (TOOL-dBoundRoles-81 S1): the rows of the text handed on stdin, as the
+    playbook kit's overlay composition reads gov's rows of the kind, one JSON object per row, graded
+    nothing. `role`: the text is one role file, through `parse_front_matter`; one object, `tag`
+    `role.<name>` and every front-matter key, each value folded by its `role-schema.toml` shape: a
+    `list` its comma-separated entries, an `entries` its `;`-separated ones, each stripped and the empty
+    ones dropped, a `class` a list of its one class, any other shape the raw string. `workflow`: the text
+    is a `workflows.toml`; one object per `[[workflow]]` entry, `tag` `workflow.<name>` and every key of
+    the entry as TOML reads it. A text that does not parse, a role naming no `name`, and an entry typing
+    `tag` or naming no `name` print the defect on stderr, exit 2."""
+    text = text.replace("\r\n", "\n")
+    rows = []
+    if mode == "role":
+        try:
+            keys, _body = lib.parse_front_matter("<stdin>", text)
+        except lib.RolesError as e:
+            print("roles: %s" % e, file=sys.stderr)
+            return 2
+        if not keys.get("name"):
+            print("roles: <stdin>: R2 — the front matter names no `name`, so the row has no tag", file=sys.stderr)
+            return 2
+        shapes = {r["key"]: r["shape"] for r in lib.load_role_schema()}
+        row = {"tag": "role." + keys["name"]}
+        for key, value in keys.items():
+            shape = shapes.get(key)
+            if shape in ("list", "entries"):
+                value = [v.strip() for v in value.split("," if shape == "list" else ";") if v.strip()]
+            elif shape == "class":
+                value = [value] if value else []
+            row[key] = value
+        rows.append(row)
+    else:
+        try:
+            entries = tomllib.loads(text).get("workflow") or []
+        except tomllib.TOMLDecodeError as e:
+            print("roles: <stdin>: R6 — not valid TOML — %s" % e, file=sys.stderr)
+            return 2
+        for i, entry in enumerate(entries if isinstance(entries, list) else [entries], 1):
+            name = entry.get("name") if isinstance(entry, dict) else None
+            if not isinstance(name, str) or not name:
+                print("roles: <stdin>: R6 — [[workflow]] entry %d names no `name`, so the row has no tag" % i,
+                      file=sys.stderr)
+                return 2
+            if "tag" in entry:
+                print("roles: <stdin>: R6 — [[workflow]] entry %s types `tag`, which --print-rows derives from "
+                      "its name" % name, file=sys.stderr)
+                return 2
+            rows.append({"tag": "workflow." + name, **entry})
+    for row in rows:
+        print(json.dumps(row, ensure_ascii=False, default=str))
+    return 0
+
+
 def main(argv):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     args, root, write, legacy, out = list(argv), None, False, False, None
     if args[:1] == ["--print-tag-rows"] and args[1:] in (["role"], ["stage"]):
         return print_tag_rows(args[1], sys.stdin.buffer.read().decode("utf-8", "replace"))
+    if args[:1] == ["--print-rows"] and args[1:] in (["role"], ["workflow"]):
+        return print_rows(args[1], sys.stdin.buffer.read().decode("utf-8", "replace"))
     usage = ("usage: python check_roles.py [--root <dir>] [--write] | [--root <dir>] --legacy-rows --out <path> "
-             "| --print-tag-rows role|stage")
+             "| --print-tag-rows role|stage | --print-rows role|workflow")
     while args:
         a = args.pop(0)
         if a == "--write":

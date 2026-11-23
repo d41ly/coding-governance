@@ -3278,6 +3278,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_front_matter_plant",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "build_front_variant",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -20783,6 +20788,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "print_rows",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
+    },
+    {
       "id": "print_scaffold_recipe",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -25913,6 +25923,11 @@
       "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
+      "id": "read_roles_rows",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "read_roles_tag_rows",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -26441,6 +26456,11 @@
       "id": "read_source_number",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "read_source_paths",
+      "kind": "function",
+      "file": "tools/playbook/overlay_rows.py"
     },
     {
       "id": "read_sp_key",
@@ -30186,6 +30206,11 @@
       "id": "render_role_fields",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "render_role_file",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
       "id": "render_role_section",
@@ -34756,6 +34781,11 @@
       "id": "run_fresh_target",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_front_matter_plant",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
       "id": "run_fts",

@@ -308,6 +308,18 @@ stage key of its `workflows.toml`, folded by the same verb's `stage` mode. `chec
 join, each unit's `role.` scope against each role's `rules` both ways, `unarmed` while no unit names a
 `role.` selector.
 
+A namespace row may also name `rows`, a `<module>:<function>` resolved as its `extractor` is, and
+`overlay_rows.py compose` then reads that kind's gov rows through it, once per blob, a `source` holding
+`*` or `?` naming every blob HEAD holds one segment under its directory that it matches
+(TOOL-dBoundRoles-81). The `role` row names `tag_index:read_roles_rows`, which runs the roles kit's
+`check_roles.py --print-rows role` by subprocess, as the tag index runs `--print-tag-rows`: one row per
+role file, tagged `role.<name>`, each front-matter value folded by its `role-schema.toml` shape, a
+`list` or `entries` value to a list and a `class` value to a list of its one class. Its `workflow` mode
+prints one row per `[[workflow]]` entry, tagged `workflow.<name>`. A file the grammar refuses refuses the
+composition, exit 1, naming the file and the verb's line; a glob matching nothing, or a roles kit that
+does not resolve, leaves the kind `unarmed`, exit 2. The reader reads and grades nothing: the roles
+kit's `check_roles.py` grades a role file and an entry.
+
 The later namespaces are not registered, so their tags red until the build that arms each adds its row:
 
 | Namespace | Armed by |
