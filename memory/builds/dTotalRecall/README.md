@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27 TOOL-dTotalRecall-28 TOOL-dTotalRecall-29 TOOL-dTotalRecall-30 TOOL-dTotalRecall-31 TOOL-dTotalRecall-32 TOOL-dTotalRecall-33 TOOL-dTotalRecall-34 TOOL-dTotalRecall-35 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 TOOL-dTotalRecall-104 TOOL-dTotalRecall-105 TOOL-dTotalRecall-106 TOOL-dTotalRecall-107 TOOL-dTotalRecall-108 TOOL-dTotalRecall-109 TOOL-dTotalRecall-110 TOOL-dTotalRecall-111 TOOL-dTotalRecall-112
+ids: TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27 TOOL-dTotalRecall-28 TOOL-dTotalRecall-29 TOOL-dTotalRecall-30 TOOL-dTotalRecall-31 TOOL-dTotalRecall-32 TOOL-dTotalRecall-33 TOOL-dTotalRecall-34 TOOL-dTotalRecall-35 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 TOOL-dTotalRecall-104 TOOL-dTotalRecall-105 TOOL-dTotalRecall-106 TOOL-dTotalRecall-107 TOOL-dTotalRecall-108 TOOL-dTotalRecall-109 TOOL-dTotalRecall-110 TOOL-dTotalRecall-111 TOOL-dTotalRecall-112 TOOL-dTotalRecall-113
 parents: dDeclaredLoop dWitnessedBar dPlacedRequest
 may: PLAY-dClosedLoop-3
 ---
@@ -95,7 +95,7 @@ ids TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRe
 ids TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84
 ids TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98
 ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 TOOL-dTotalRecall-104 TOOL-dTotalRecall-105 TOOL-dTotalRecall-106 TOOL-dTotalRecall-107 TOOL-dTotalRecall-108 TOOL-dTotalRecall-109 TOOL-dTotalRecall-110 TOOL-dTotalRecall-111
-ids TOOL-dTotalRecall-112
+ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -153,7 +153,7 @@ ids TOOL-dTotalRecall-112
 | [TOOL-dTotalRecall-43 — the round-1 spec audit's 59 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-43.md) | 27 | 2 | CLOSED | rev-8 | 2026-11-23 |
 | [TOOL-dTotalRecall-52 — the one legacy registration is keyed by path, section and check, judged at the run's real base, and leaves no carrier of the old name](spec/2026-10-26-spec-TOOL-dTotalRecall-52.md) | 28 | 2 | CLOSED | rev-7 | 2026-11-23 |
 | [TOOL-dTotalRecall-62 — unit 52 judges the merged legacy home at the run's real base and builds no `absorbs` read, so its own pass is green](spec/2026-10-26-spec-TOOL-dTotalRecall-62.md) | 28 | 2 | CLOSED | rev-3 | 2026-11-23 |
-| [TOOL-dTotalRecall-53 — the round-1 spec audit of units 36 to 43: its 41 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-53.md) | 29 | 2 | INPROGRESS | rev-5 | 2026-11-23 |
+| [TOOL-dTotalRecall-53 — the round-1 spec audit of units 36 to 43: its 41 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-53.md) | 29 | 2 | INPROGRESS | rev-6 | 2026-11-23 |
 | [TOOL-dTotalRecall-59 — the merged legacy registration is judged at the run's real compare base, where it is new, and its `shrink-only` is proved on a fixture base that holds it](spec/2026-10-26-spec-TOOL-dTotalRecall-59.md) | 29 | 2 | DEFERRED | rev-4 | 2026-11-23 |
 | [TOOL-dTotalRecall-55 — the cause census keeps the build folders' scripts by a path-keyed row held outside their bytes](spec/2026-10-26-spec-TOOL-dTotalRecall-55.md) | 30 | 2 | DEFERRED | rev-4 | 2026-11-23 |
 | [TOOL-dTotalRecall-56 — the alias census keeps the pinned departures instrument's `journal` compare by its path-keyed row, never by a marker in its bytes](spec/2026-10-26-spec-TOOL-dTotalRecall-56.md) | 30 | 2 | DEFERRED | rev-5 | 2026-11-23 |
@@ -193,7 +193,7 @@ ids TOOL-dTotalRecall-112
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 699 bound to this build, across 4 record folder(s).
+Records: 703 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -299,13 +299,13 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-23-prompt-TOOL-dTotalRecall-59-reground-spec-writer.md`, `2026-11-23-prompt-TOOL-dTotalRecall-59-reground-brief.md` and 292 more under prompts/ |
+| briefs | `2026-11-23-prompt-TOOL-dTotalRecall-59-reground-spec-writer.md`, `2026-11-23-prompt-TOOL-dTotalRecall-59-reground-brief.md` and 295 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-23-build-TOOL-dTotalRecall-9-deviation-1006.md`, `2026-11-23-build-TOOL-dTotalRecall-48-deviation-1005.md` and 146 more under build/ |
 | red-fix | `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-19.md` and 21 more under build/ |
 | widen | `2026-11-23-build-TOOL-dTotalRecall-9-widen-10.md`, `2026-11-23-build-TOOL-dTotalRecall-51-widen-7.md` and 13 more under build/ |
 | research | `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md`, `2026-11-23-build-TOOL-dTotalRecall-52-divergence-fold-return.md` and 111 more under build/ |
-| logs | `2026-11-23-build-TOOL-dTotalRecall-52-2-acceptance-ledger.md`, `2026-11-23-build-TOOL-dTotalRecall-43-2-acceptance-ledger.md` and 95 more under build/ |
-| open asks | `BACKLOG.md`, 15 open |
+| logs | `2026-11-23-build-TOOL-dTotalRecall-53-1-builder-return.md`, `2026-11-23-build-TOOL-dTotalRecall-52-2-acceptance-ledger.md` and 96 more under build/ |
+| open asks | `BACKLOG.md`, 16 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->

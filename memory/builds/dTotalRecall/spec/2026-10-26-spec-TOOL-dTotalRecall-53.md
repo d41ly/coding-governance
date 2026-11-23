@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-53 — the round-1 spec audit of units 36 to 43: its 41 minors, batched
 
-**Status:** INPROGRESS · rev-5 · 2026-11-23 · node d · Tier-2 · base 7b27f765 · streams tooling · order 29 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-6 · 2026-11-23 · node d · Tier-2 · base 7b27f765 · streams tooling · order 29 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,8 +11,12 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-53-deviation-531.md](../build/2026-10-26-build-TOOL-dTotalRecall-53-deviation-531.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-53-deviation-532.md](../build/2026-10-26-build-TOOL-dTotalRecall-53-deviation-532.md) | deviation | — |
+| [2026-11-23-build-TOOL-dTotalRecall-53-1-builder-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-53-1-builder-return.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-11-23-prompt-TOOL-dTotalRecall-53-build-2-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-53-build-2-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-53-build-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-53-build-brief.md) | journal | — |
+| [2026-11-23-prompt-TOOL-dTotalRecall-53-divergence-fold-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-53-divergence-fold-brief.md) | journal | — |
+| [2026-11-23-prompt-TOOL-dTotalRecall-53-divergence-fold-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-53-divergence-fold-spec-writer.md) | log | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-53-reground-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-53-reground-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-53-reground-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-53-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 |
@@ -23,23 +27,22 @@
 
 The round-1 spec audit of units 36 to 43
 (`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md`)
-exited CONVERGED with 50 confirmed findings. Its nine highs, ids 1, 3, 22, 30, 31, 32, 35, 37 and 40,
+exited CONVERGED with 50 confirmed findings; its nine highs, ids 1, 3, 22, 30, 31, 32, 35, 37 and 40,
 are units 44 to 52. This unit is the batch BUILD-METHOD M4 makes of the rest: the 24 MEDIUM findings,
 ids 2, 5, 6, 7, 8, 9, 13, 14, 15, 17, 18, 19, 23, 25, 27, 28, 36, 38, 41, 42, 45, 49, 50 and 51 (items M1
 to M17), and the 17 LOW findings, ids 4, 10, 11, 12, 16, 20, 21, 24, 26, 29, 33, 34, 39, 43, 46, 47 and
-52 (items L1 to L16). Each keeps its report id and its own scope item. The minors land on eight units,
-so this unit repairs none in particular and builds after every unit (order 29, above the 28 that
-`TOOL-dTotalRecall-52` holds). The review record holds each item's text.
+52 (items L1 to L16), each keeping its report id and scope item. They land on eight units, so this unit
+builds after every unit (order 29, above unit 52's 28). The review record holds each item's text.
 
-Five minors report at a lower grade a defect a high unit closes: ids 13 and 23 (unit 44 and 45's), id 2
-(unit 46's), id 42 (unit 47's), ids 15, 4 and 43 (unit 49's) and ids 51 and 12 (unit 52's). Each item
-for them adds what the finding asks beyond that unit's mechanism, or re-observes that unit's fix at
-this tip where the finding asks nothing more. The report's refuted ids 44 and 48 are not in the
-disposal population.
+Five minors report at a lower grade a defect a high unit closes: ids 13 and 23 (units 44 and 45), id 2
+(unit 46), id 42 (unit 47), ids 15, 4 and 43 (unit 49) and ids 51 and 12 (unit 52). Each such item adds
+what its finding asks beyond that unit's mechanism, or re-observes that fix at this tip. The report's
+refuted ids 44 and 48 are outside the disposal population.
 
 Re-grounded at `7b27f765`. An item HEAD already satisfies keeps its criterion as a check and builds
 nothing: S2, S6, S7, S8, S11, S13, S15, S17, S25, S26, S29 and S38, and the built halves of S12, S14,
-S16 and S39. S18 does not apply. S20 and S32 ride with `TOOL-dTotalRecall-37` (§8 F3).
+S16 and S39. S18 does not apply. S20 and S32 ride with `TOOL-dTotalRecall-37` (§8 F3), and S36 with
+owner ask TOOL-dTotalRecall-113 (§8 F2).
 
 ## 2. Scope (IN)
 
@@ -54,8 +57,7 @@ and is not edited.
 - **S2** — id 23 (M1). Holds at HEAD. The two family reads at index 0, now
   `tools/memory-tree/gen_build_index.py#cmd_asks` and `tools/memory-tree/backlog.py#render_family_view`,
   are outside the census by its shape (`(?!\[0\])`), and unit 45's trailer at `c6fcf603b` keeps them as
-  the family at index 0, so census and record agree with no marker. `row_grammar.py#scan_records` is
-  unit 45's re-point. Observed by AC2.
+  the family at index 0, so census and record agree with no marker. Observed by AC2.
 - **S3** — id 2 (M2). Era parity: each reader unit 38 re-pointed (its build commit `2f59e5acb`) and the
   three unit 45 re-pointed, `branch_reconcile.py#derive_names`, `row_grammar.py#scan_records` and
   `check_policy.py#derive_run_kind` (DERIVED 2026-11-23, `git show -s --format=%B c6fcf603b | grep -c
@@ -72,20 +74,21 @@ and is not edited.
 - **S6** — id 51 (M5). Holds at HEAD by unit 52's key. `record-kinds-legacy` is keyed (`path`,
   `section`, `check`) with `drain = "key"` in `tools/govkit/registry.toml`, so a record legacy for both
   checks drains its `causes` row alone and keeps its `kind-schema` row, another key, and
-  `tools/lib/legacy_ledger.py#compare_to_base` reads a shrink as no finding. This unit writes no byte of
-  `legacy_ledger.py`. Observed by AC6.
+  `tools/lib/legacy_ledger.py#compare_to_base` reads a shrink as no finding. Observed by AC6.
 - **S7** — id 5 (M6). Holds at HEAD: `tools/memory-tree/migrate_backlog.py#render_census` writes
   `**Caused-by:** <unit_id>` as line 2, after its Serves line. Observed by AC7.
-- **S8** — id 14 (M6). Holds at HEAD: `tools/workflows/review_replay.py` is off the cause census as
-  kept, its reason opening `reader-prefix:` (`record_causes.py#CAUSE_WRITER_KEPT`). S34 moves that
-  reason onto the file's kept lines. Observed by AC8.
+- **S8** — id 14 (M6). Holds at HEAD: `tools/workflows/review_replay.py` is kept off the cause census,
+  its reason opening `reader-prefix:` (`record_causes.py#CAUSE_WRITER_KEPT`). S34 moves that reason onto
+  `ROUND1_BINDING`'s line and `LEGACY`'s lifted binding line; its docstring literal is reworded (§8 F5).
+  Observed by AC8.
 - **S9** — id 28 (M6). `record_causes.py#check_cause_writers` grades each Serves literal, not each file:
-  a literal is answered by a `Caused-by` within the three lines below it, else by S34's marker on its
-  line, so `gen_build_index.py`'s fixture bullets no longer clear its other literals.
+  a literal is answered by a `Caused-by` on its own line or the three below it, else by S34's marker on
+  its line, so `gen_build_index.py`'s fixture bullets no longer clear its other literals.
   At HEAD 116 lines stand unanswered (DERIVED 2026-11-23, every `**Serves:** ` line of
-  `record_kinds.read_code_paths`' population, test-named files excepted, its window probed), in the
-  24 census files §4 lists (DERIVED 2026-11-23, the same probe). Each takes
-  its cause where the file writes that record, else the marker with its reason. Observed by AC9.
+  `record_kinds.read_code_paths`' population, test-named files excepted, that window probed) in the
+  24 census files §4 lists (DERIVED 2026-11-23, the same probe). The five in a string body take §8 F5's
+  answer; each other takes its cause where the file writes that record, else the marker with its reason.
+  Observed by AC9.
 - **S10** — id 41 (M6). `migrate_backlog.py#render_worksheet` writes `# **Caused-by:** <unit_id>` as
   line 2, after its `# **Serves:** log <unit_id>`, the comment form unit 51 reads. Observed by AC10.
 - **S11** — id 6 (M7). Holds at HEAD: `record_causes.py#derive_record_cause` turns a
@@ -93,8 +96,8 @@ and is not edited.
   and `check_causes` walks on. Observed by AC11.
 - **S12** — id 45 (M7). `tools/playbook/edge_grammar.py#check_edge_cardinality` already counts no edge
   for a line `read_tree_edges` refuses and finishes, printing only how many it refused. It now prints
-  each refused line, naming its record, so a typed record carrying two bulleted `- **Caused-by:**`
-  fields is reported against its source. Observed by AC12.
+  each refused line with its record, so a typed record with two bulleted `- **Caused-by:**` fields is
+  reported against its source. Observed by AC12.
 - **S13** — id 7 (M8). Holds at HEAD, built by unit 42 (its §3): `unarmed` is legal on a `fields` or a
   `fence` row (`record_kinds.py#NEW_FORMS`), and the `stream-plan` row carries it. Observed by AC13.
 - **S14** — id 17 (M8). Unit 42 built the rule, `unarmed` on any other form red naming the row
@@ -104,12 +107,11 @@ and is not edited.
 - **S15** — id 8 (M9). Holds at HEAD: `TOOL-dTotalRecall-11` AC7 is re-observed at the tip, the
   `shape-run` row, marked unarmed by unit 42, passing `check_record_kinds`. Observed by AC15.
 - **S16** — id 9 (M10). `id_grammar.py#scan_readers` already skips a marked line of any shape, and
-  `run_flip_probe` reads the census through it (`TOOL-dTotalRecall-43` S14). What stays is the marking:
+  `run_flip_probe` reads the census through it (`TOOL-dTotalRecall-43` S14); what stays is the marking.
   HEAD's 34 split hits carry none (DERIVED 2026-11-23, the `--readers` lines `_READER_SPLIT_SHAPE`
-  matches). Each split a `Decided:` trailer of units 38, 44 or 45 keeps carries S34's marker with the
-  trailer's reason. A split no trailer keeps, such as `record_causes.py#derive_reached`'s, is
-  re-pointed onto `parse_id_parts` where it reads a unit id's slug, else marked with its reason. The flip
-  probe's census check then skips each marked line and fails on an unmarked plant. Observed by AC16.
+  matches). A split a `Decided:` trailer of units 38, 44 or 45 keeps carries S34's marker with that
+  reason; any other, such as `record_causes.py#derive_reached`'s, is re-pointed onto `parse_id_parts`
+  where it reads a unit id's slug, else marked with its reason. Observed by AC16.
 - **S17** — id 18 (M11). Holds at HEAD: `tools/playbook/edge_grammar.py` is tracked, and its `--check`
   walk reaches `tree_lib.read_header_edges` through `edge_grammar.py#check_header_edges` (unit 39 S1).
   Observed by AC17.
@@ -122,9 +124,9 @@ and is not edited.
 - **S21** — id 27 (M14). Unit 42 built `record_kinds.py#derive_record_kind(path, text, rows)`, which
   parses the Serves line itself, and left this item here (its §3). It becomes
   `derive_record_kind(path, written_kind, rows)`: each caller passes the kind
-  `tools/memory-tree/tree_lib.py#read_bindings` classified, read once, and `None` for a record whose
-  binding state is not `bound`; no Serves line is parsed inside the function. Its three call sites move
-  with it, `record_kinds.py#scan_legacy_records`, `tools/playbook/record_extract.py#derive_kind_row` and
+  `tools/memory-tree/tree_lib.py#read_bindings` classified, read once, or `None` for a record not
+  `bound`, and the function parses no Serves line. Its three call sites move with it,
+  `record_kinds.py#scan_legacy_records`, `tools/playbook/record_extract.py#derive_kind_row` and
   `record_extract.py#extract_record` (DERIVED 2026-11-23, `git grep -n "derive_record_kind("`).
   Observed by AC21.
 - **S22** — id 36 (M15). The alias census reads `memory/builds/*/build/*.py` below each file's binding
@@ -174,35 +176,28 @@ and is not edited.
   `memory_measure.py#derive_folded_path`, whose one caller is `check_memory_word`, goes with it.
   Observed by AC33.
 - **S34** — id 29 (L9). One keep marker for the three code censuses, `<lead> census: kept <census>
-  <reason>` on the kept line. The lead is `#` or `//`, as `id_grammar.py#READER_KEPT` admits today, so a
-  JavaScript line carries it as a `//` comment. `<census>` is `slug-grammar`, `alias-compare` or
-  `cause-writer`, the heads the censuses print. `id_grammar.py` holds its one reader,
-  `read_kept_reason(line, census)`, which `scan_readers`, `check_alias_compares` and `check_cause_writers`
-  call. The file-keyed constants `ALIAS_COMPARE_KEPT` and `CAUSE_WRITER_KEPT` give way to it for every
-  file under the tool root, each such kept line marked with the reason the constant held, and a line
-  kept for `KEPT_INSTRUMENT` keeps unit 49 S3's liveness check. A row naming a file under
-  `memory/builds/*/build/` stays in its constant at this pass, because no pass may write that file's
-  bytes: unit 50 §4's eight cause rows and S22's alias row. `TOOL-dTotalRecall-55` and
+  <reason>` on the kept line. The lead is `#` or `//` (a JavaScript comment), as
+  `id_grammar.py#READER_KEPT` admits today; `<census>` is `slug-grammar`, `alias-compare` or
+  `cause-writer`, the heads the censuses print. Its one reader, `id_grammar.py`'s
+  `read_kept_reason(line, census)`, is called by `scan_readers`, `check_alias_compares` and
+  `check_cause_writers`. The file-keyed constants `ALIAS_COMPARE_KEPT` and `CAUSE_WRITER_KEPT` give way
+  to it for every file under the tool root, each kept line marked with the reason the constant held (a
+  string-body literal per §8 F5); a line kept for `KEPT_INSTRUMENT` keeps unit 49 S3's liveness check. A
+  row naming a file under `memory/builds/*/build/` stays in its constant at this pass, since no pass may
+  write that file's bytes: unit 50 §4's eight cause rows and S22's alias row. `TOOL-dTotalRecall-55` and
   `TOOL-dTotalRecall-56` move them to the path-keyed table, and each constant ends there. Observed by AC34.
-  **Readers:** by name: READER NOT IN TREE — both constants are minted by `TOOL-dTotalRecall-40` and
-  `TOOL-dTotalRecall-36` in this build and are absent at base · by value: `check_alias_compares` and
+  **Readers:** by name: READER NOT IN TREE — units 40 and 36 mint both constants in this build, absent at
+  base · by value: `check_alias_compares` and
   `check_cause_writers` read the markers, and unit 49's legacy test reads the reason, after this item.
   **The alias hits at HEAD** (DERIVED 2026-11-23, a `python -c` call of `check_alias_compares`):
-  - seven kept, of which two sit in `tools/govkit/shims.py`'s `JS_TEMPLATE`
-    (`tools/govkit/shims.py@4aae24de2:164` and `:168`): a `#` there renders into JavaScript, so those
-    two carry the `//` lead, a JavaScript comment in every forwarder the template renders;
+  - seven kept, two in `tools/govkit/shims.py`'s `JS_TEMPLATE` (`tools/govkit/shims.py@4aae24de2:164`
+    and `:168`), which renders JavaScript, so those two carry the `//` lead;
   - five red: four lines of the `verb` blocks `shims.py --write` renders into `gen_build_index.py` from
-    `PY_PRELUDE_BODY` (`shims.py@4aae24de2:212` and `:216`), marked in that template and re-rendered,
-    never by hand; and `tools/govkit/steps/memory_journal_alias.py@2b4f436ae:64`, which counts the
-    records still spelling the alias and is marked with that reason.
+    `PY_PRELUDE_BODY` (`shims.py@4aae24de2:212` and `:216`), marked in that template and re-rendered;
+    and `tools/govkit/steps/memory_journal_alias.py@2b4f436ae:64`, counting the alias's records, so marked.
 - **S35** — id 34 (L10). `python record_causes.py --cause-writers` prints `check_cause_writers`' lines
   alone, each census file and marked line with its disposition, so the table a spec quotes is derived.
   Observed by AC35.
-- **S36** — id 33 (L11). The two record-head examples of `tools/memory-tree/BUILD-METHOD.template.md`
-  (`tools/memory-tree/BUILD-METHOD.template.md@e11b530ac:140` and `:276`) name
-  `**Caused-by:** <the first id, bare>` as the next line; the render reaches
-  `memory/guides/BUILD-METHOD.md`, and `memory/guides/SESSION-KICKOFF.md`'s `last-audit` is re-stamped,
-  its `watch:` naming that render and the other watched paths this pass edits. Observed by AC36.
 - **S37** — id 39 (L12). `tools/memory-tree/shape_run.py#check_shape_runs` prints its unarmed line from
   the `shape-run` row's `unarmed` key, read through `record_kinds.read_record_kinds`. Today
   `shape_run.py#UNARMED` spells its own reason, `no writer calls the verb yet`, beside the row's, so the
@@ -228,15 +223,16 @@ and is not edited.
 ## 3. Non-goals (OUT)
 
 - The nine highs: units 44 to 52.
-- Editing any landed spec's text, frozen at CLOSED, as §2's opening states.
-- The spec lints the report suggests as gates over the set; this unit records the one class that
-  cannot be gated in code (S31) and leaves the rest to the close's left-shift step (BUILD-METHOD M8).
-- S20 and S32 with AC20 and AC32: govkit's `linguist-generated` line for each `rendered` code row of
-  a kit it installs, and the `[[lf_pin]]` row of `check_generated_attributes`. Both extend
-  `TOOL-dTotalRecall-37`'s S1 and S2, unbuilt, so they ride with that unit under owner ask
-  TOOL-dTotalRecall-109 (§8 F3), and so does closing TOOL-dScaffoldedMirror-20, whose acceptance names
-  S32's arm.
+- The spec lints the report suggests as gates: this unit records the one class code cannot gate (S31)
+  and leaves the rest to the close's left-shift step (BUILD-METHOD M8).
+- S20 and S32 with AC20 and AC32: govkit's `linguist-generated` line per `rendered` code row of a kit it
+  installs, and the `[[lf_pin]]` row of `check_generated_attributes`. Both extend unbuilt
+  `TOOL-dTotalRecall-37`'s S1 and S2, so they ride with it under owner ask TOOL-dTotalRecall-109 (§8 F3),
+  as does closing TOOL-dScaffoldedMirror-20, whose acceptance names S32's arm.
 - `tools/lib/legacy_ledger.py` and its inline copies: S6 holds by unit 52's key.
+- S36 and AC36 (id 33, L11), the cause line in `BUILD-METHOD.template.md`'s two record-head examples:
+  its render `memory/guides/BUILD-METHOD.md` is 30717 of its owner-set 30720 bytes (DERIVED 2026-11-23,
+  LF bytes; its M1 Budget line), so they ride owner ask TOOL-dTotalRecall-113 (§8 F2).
 
 ### Edges
 
@@ -276,27 +272,26 @@ and is not edited.
 One pass, after every unit is terminal. The items share `record_causes.py`, `record_kinds.py` and
 `id_grammar.py`, so their write sets intersect and BUILD-METHOD M6 keeps them one unit. Within the
 pass the order is: the census marker and its reader (S34) first, since S9, S16, S19, S22 and S39 write
-or read it; then the code items in unit order; then the prose items S30, S31 and S36. A marker sits
-only where its lead opens a comment in that line's language; a Serves literal inside text a writer
-renders into a record takes its cause line instead.
+or read it; then the code items in unit order, then S30 and S31. A marker sits only
+where its lead opens a comment in that line's language; a literal in text a writer renders into a
+record takes its cause line, and one in another string body is answered per §8 F5. `read_kept_reason`
+reads line text, so no census checks that the lead opens a comment.
 
 ### The legacy ledger, and unit 59
 
-This unit writes no byte of `tools/lib/legacy_ledger.py` or of its inline copies under
-`tools/memory-tree/` and `tools/gate-lint/`: S6 observes unit 52's key, and S40 calls memory-tree's
-copy of `_write_atomic` unchanged. `TOOL-dTotalRecall-59` builds over HEAD's file. The two units still
-share `memory/map/generated/`, so M6 sequences them at order 29, this unit first.
+S40 calls memory-tree's `_write_atomic` as is (§3). `TOOL-dTotalRecall-59` builds over HEAD's
+`legacy_ledger.py`; the two share `memory/map/generated/`, so M6 sequences them at order 29, this unit
+first.
 
 ### Inventory
 
 Minted: the flip case `i-named-reader`; the marker `<lead> census: kept <census> <reason>` and its
-reader `read_kept_reason` in `id_grammar.py`; `--cause-writers` in `record_causes.py`; the registry list
-`not-records` and its reader `read_not_record_globs` in `record_kinds.py`; the plants
-`literal-without-cause`, `duplicate-cause` and `unmarked-writer` (causes), `unarmed-on-disallowed-form`,
-`awk-regex-alias`, `alias-constant` and `homeless-empty` (record kinds), `cardinality-refused` (edges),
-and `msys-d-drive`, `dot-relative` and `parent-relative` (runlog); one gotcha class; one ask row.
-Naming cells: `read_kept_reason` and `read_not_record_globs` each open on the VERBS table's `read`; a
-flag or plant name has no lexicon cell.
+reader `read_kept_reason` (`id_grammar.py`); `--cause-writers` (`record_causes.py`); the registry list
+`not-records` and its reader `read_not_record_globs` (`record_kinds.py`); the plants
+`literal-without-cause`, `duplicate-cause`, `unmarked-writer`, `unarmed-on-disallowed-form`,
+`awk-regex-alias`, `alias-constant`, `homeless-empty`, `cardinality-refused`, `msys-d-drive`,
+`dot-relative` and `parent-relative`; one gotcha class; one ask row. Naming cells: both readers open on
+the VERBS table's `read`; a flag or plant name has none.
 
 ### Files touched (estimate)
 
@@ -306,7 +301,7 @@ flag or plant name has no lexicon cell.
 - `tools/memory-tree/check-memory-hygiene.sh`, `tools/memory-tree/row_grammar.py`, `tools/memory-tree/gov-claim.sh`
 - `tools/memory-tree/build_records.py`, `tools/memory-tree/deviation_join.py`, `tools/memory-tree/asbuilt_view.py`
 - `tools/memory-tree/record_find.py`, `tools/memory-tree/ratchet.py`, `tools/memory-tree/seen_red.py`
-- `tools/memory-tree/adopt-memory-tree.sh`, `tools/memory-tree/BUILD-METHOD.template.md`
+- `tools/memory-tree/adopt-memory-tree.sh`
 - `tools/playbook/edge_grammar.py`, `tools/playbook/record_extract.py`, `tools/playbook/gov_tag.py`
 - `tools/playbook/instruction_units.py`, `tools/policy/check_policy.py`, `tools/loop/placement.py`, `tools/loop/upstream.py`
 - `tools/govkit/shims.py`, `tools/govkit/selftest.py`, `tools/govkit/steps/memory_journal_alias.py`
@@ -319,34 +314,33 @@ flag or plant name has no lexicon cell.
 - `tools/run-gates/run-gates.evidence.test.sh`, `tools/run-gates/run-gates.runlog.test.sh`
 - `tools/unattended/unattended.sh`, `tools/unattended/unattended.test.sh`, `tools/unattended/lib-unattended.sh`
 - `tools/unattended/pass-tree.sh`
-- `memory/guides/BUILD-METHOD.md`, `memory/guides/SESSION-KICKOFF.md` (its `last-audit` re-stamped, S36)
+- `memory/guides/SESSION-KICKOFF.md` (`last-audit` re-stamped for the watched paths edited)
 - `memory/builds/dClosedLoop/BACKLOG.md` (S22's ask), `memory/gotchas/` (S31's class)
 - `memory/builds/dTotalRecall/README.md` and each build README `gen_build_index.py --write` renders (S27)
 - `memory/map/generated/` (regenerated by `python tools/codebase-map/gen_map.py --write`)
 
-The marker sites are HEAD's (S9, S16, S34), each list re-derived at the pass base by the census that
-reads it.
+Each census re-derives its marker sites (S9, S16, S34) at the pass base.
 
 ### Alternatives rejected
 
 - **Fold each minor into its unit's spec.** M4 refuses folding at the exit.
-- **Split into two batches.** S34's marker is read by the slug, alias and cause censuses, which sit in
-  three of the item groups, so no two halves have disjoint write sets.
-- **Keep the two `JS_TEMPLATE` lines in `ALIAS_COMPARE_KEPT`.** The constant would then hold a
-  tool-root row S34 exists to end; the `//` lead `READER_KEPT` already reads keeps them in-line.
+- **Split into two batches.** The slug, alias and cause censuses all read S34's marker and sit in
+  three item groups, so no two halves have disjoint write sets.
+- **Keep the two `JS_TEMPLATE` lines in `ALIAS_COMPARE_KEPT`.** That keeps a tool-root row S34 exists
+  to end; the `//` lead `READER_KEPT` already reads keeps them in-line.
 
 ## 5. Production-readiness checklist
 
 - security — S40 narrows the ask door's write to a compare-and-swap; no other surface.
-- perf / scale — each census reads one more glob (S22) or a three-line window (S9); no new walk.
-- error / empty / loading states — S23 reds an empty population; S12 prints each refusal it already
-  collects; S40 names its two failure states.
+- perf / scale — each census reads one more glob (S22) or a four-line window (S9); no new walk.
+- error / empty / loading states — S23 reds an empty population; S12 prints each refusal; S40 names its
+  two failure states.
 - observability — S35 prints the census table; S4 names the remedy.
-- risks — S9, S16 and S34 mark lines across the files §4 lists; a marker in `PY_PRELUDE_BODY`
-  re-renders every forwarder `shims.py` writes.
-- testing — AC1 to AC41 by the pass, AC20 and AC32 excepted (§3); the arms of §7 at the close.
+- risks — S9, S16 and S34 mark lines across §4's files; a `PY_PRELUDE_BODY` marker re-renders every
+  forwarder `shims.py` writes.
+- testing — AC1 to AC41 by the pass, AC20, AC32 and AC36 excepted (§3); the arms of §7 at the close.
 - migration — S34's markers take the constants' tool-root rows one for one.
-- user docs — none under `help/`: S36's guide is a governance carrier, not a help page.
+- user docs — none under `help/`: no item changes a user-facing surface.
 
 ## 6. Acceptance criteria
 
@@ -370,10 +364,14 @@ reads it.
   Red when: the drain takes both slices.
 - **AC7** — When `render_census` from `migrate_backlog.py` renders a fixture, line 2 is
   `**Caused-by:** <unit_id>`. It holds at HEAD. Red when: the census record is written causeless.
-- **AC8** — When `python record_causes.py --check` runs at the tip, it lists `review_replay.py` as kept
-  with a reason opening `reader-prefix`. Red when: the file is red or unlisted.
+- **AC8** — When `python record_causes.py --check` runs at the tip, it lists each Serves literal of
+  `review_replay.py` kept, its reason opening `reader-prefix`, and a `python -c` probe finds `LEGACY`
+  equal to base `7b27f765`'s. Red when: a literal is red or unlisted, or the fixture moved.
 - **AC9** — When `python record_causes.py --check` runs over the plant `literal-without-cause`, a file
-  holding one Serves literal with a cause below it and one without, it lists the second literal's line. Red when: one cause spelling clears the file.
+  holding three Serves literals, `Caused-by` on the first's line, three lines below the second and four
+  below the third, none other in reach, it lists the third's line alone; at the tip an
+  `ast.get_docstring` probe finds no `**Serves:** ` in the four docstrings §8 F5 rewords. Red when: one
+  cause clears the file, the window is off by one, or a reworded docstring spells the literal.
 - **AC10** — When `render_worksheet` renders a fixture, line 2 is `# **Caused-by:** <unit_id>`, and
   `read_header_edges` reads it. Red when: the worksheet is written causeless or bare.
 - **AC11** — When `python record_causes.py --check` walks a fixture with one record holding two bare
@@ -437,8 +435,6 @@ reads it.
   build-folder file carries the marker.
 - **AC35** — When `python record_causes.py --cause-writers` runs at the tip, every census file prints
   with a disposition. Red when: a file prints with none.
-- **AC36** — When `grep -c "Caused-by" memory/guides/BUILD-METHOD.md` runs at the tip, it prints at least
-  2, and `bash manifest-check.sh` exits 0. Red when: a head example lacks the line or the stamp is stale.
 - **AC37** — When a probe calls `check_shape_runs` over a fixture with no shape-run record, its unarmed
   line ends with the `shape-run` row's `unarmed` value, and `git grep -c "no writer calls the verb yet"
   -- tools` prints nothing. Red when: the reason is spelled in two homes.
@@ -455,7 +451,7 @@ reads it.
 
 ## 7. Gates
 
-`memory hygiene` · `build-index selftest` · `backlog migration selftest` · `row-grammar selftest` · `tier2-review self-test` · `review-replay selftest` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `kit/dogfood doc parity` · `build-method size` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `gotchas selftest` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `drift-audit selftest` · `memory-recall kit selftest` · `policy fixtures` · `routed-commits selftest` · `scratch-guard self-test` · `branch-guard self-test` · `manifest-check self-test`
+`memory hygiene` · `build-index selftest` · `backlog migration selftest` · `row-grammar selftest` · `tier2-review self-test` · `review-replay selftest` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `kit/dogfood doc parity` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `gotchas selftest` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `drift-audit selftest` · `memory-recall kit selftest` · `policy fixtures` · `routed-commits selftest` · `scratch-guard self-test` · `branch-guard self-test` · `manifest-check self-test`
 
 New arm: tools/memory-tree/record_causes.py · covers AC4 AC9 AC11 AC34 · the plants `literal-without-cause`, `duplicate-cause` and `unmarked-writer`, staged by restoring the file-keyed rule · none
 New arm: tools/memory-tree/record_kinds.py · covers AC14 AC19 AC23 AC39 · the plants `unarmed-on-disallowed-form`, `awk-regex-alias`, `alias-constant` and `homeless-empty`, staged by the line-level quoted predicate and the bound-only population · none
@@ -473,26 +469,34 @@ New arm: tools/runlog/selftest.py · covers AC24 · the three path plants, stage
   `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
 - **F2 — May S36 change `BUILD-METHOD.template.md`, a governance carrier?** Options: (a) yes, under the
   grant `TOOL-dTotalRecall-36` §8 F2 used for the Record bindings section, the cause line being
-  cl-dClosedLoop-0230's "each record's header (Serves, Made-by, Caused-by)", within `build-method size`'s
-  ceiling; (b) no, leaving a hand-written review record copied from the guide causeless. (b) leaves the
-  guide's own example red under the causes leg. RESOLVED (agent, 2026-10-26, delegated): (a), rung 5,
-  the grant the README's `may:` line names. grants: PLAY-dClosedLoop-3 BUILD-METHOD.template.md's two
-  record-head examples carry the cause line · widens: none · relaxes: none
+  cl-dClosedLoop-0230's "each record's header (Serves, Made-by, Caused-by)", within the guide's size
+  ceiling; (b) no, leaving a record copied from the guide causeless and the guide's own example red
+  under the causes leg. RESOLVED (agent, 2026-10-26, delegated): (a), rung 5, the grant the README's
+  `may:` line names. grants: PLAY-dClosedLoop-3 BUILD-METHOD.template.md's two record-head examples
+  carry the cause line · widens: none · relaxes: none
+  2026-11-23: that ceiling is the owner's (§3), so S36 and AC36 ride owner ask TOOL-dTotalRecall-113, per
+  `2026-11-23-prompt-TOOL-dTotalRecall-53-divergence-fold-brief` item 3.
 - **F3 — Do S20 and S32 stay in scope while TOOL-dTotalRecall-37 is held unbuilt?** Unit 37 is DEFERRED
-  to owner ask TOOL-dTotalRecall-109, so neither its `check_generated_attributes` arm nor the four
-  renders' `linguist-generated` lines exist for S20 and S32 to extend. Options: (a) S20, S32, AC20 and
-  AC32 ride with unit 37 under that ask, and this unit consumes nothing from it; (b) hold all of this
-  unit, and every unit that consumes from it, until unit 37 builds. (b) parks the other items for two
-  that extend an unbuilt arm. RESOLVED (agent, 2026-11-23, delegated): (a), M3, per
+  to owner ask TOOL-dTotalRecall-109, so the `check_generated_attributes` arm and `linguist-generated`
+  lines S20 and S32 extend do not exist. Options: (a) S20, S32, AC20 and AC32 ride with unit 37 under
+  that ask; (b) hold this unit and its consumers until unit 37 builds, parking every other item for
+  two. RESOLVED (agent, 2026-11-23, delegated): (a), M3, per
   `2026-11-23-prompt-TOOL-dTotalRecall-53-reground-brief` item 7. widens: none · relaxes: none
 - **F4 — Where are S23's non-record globs declared?** HEAD declares none, so the widened arm would red
   every unhomed file. Options: (a) a top-level `not-records` list in
-  `tools/memory-tree/record-kinds.toml`, each entry `{ glob, why }`, read beside the rows' homes;
-  (b) a constant in `record_kinds.py`; (c) a `.memory-tree.conf` key. (b) declares half a partition in
-  code and half in the registry (`[one-fact]`); (c) puts the kit's own partition among the adopter's
-  values. RESOLVED (agent, 2026-11-23, delegated): (a), M3, the one option keeping a path's home and
-  its non-home in one declared file; `2026-11-23-prompt-TOOL-dTotalRecall-53-reground-brief` item 4.
-  widens: none · relaxes: none
+  `tools/memory-tree/record-kinds.toml`, each entry `{ glob, why }`; (b) a constant in
+  `record_kinds.py`; (c) a `.memory-tree.conf` key. (b) splits one partition between code and registry
+  (`[one-fact]`); (c) puts the kit's partition among the adopter's values. RESOLVED (agent, 2026-11-23,
+  delegated): (a), M3, a path's home and non-home in one declared file, per
+  `2026-11-23-prompt-TOOL-dTotalRecall-53-reground-brief` item 4. widens: none · relaxes: none
+- **F5 — How is S9's Serves literal inside a string body answered?** Five of HEAD's 116 do (DERIVED
+  2026-11-23, a `tokenize` pass over S9's lines): `review_replay.py`'s module docstring and `LEGACY`
+  fixture, `build_records.py`'s module and `write_record` docstrings, and `record.py#check_serves_line`'s.
+  Options: (a) each docstring spells `Serves: <rest>`, unbolded, and `LEGACY`'s binding line moves to a
+  one-line string on a code line, S34's marker its trailing comment, the value byte-identical; (b) the census skips string bodies;
+  (c) a marker in string text counts. (b) blinds the census to a fixture whose string body renders a
+  record; (c) writes the marker into that record. RESOLVED (agent, 2026-11-23, delegated): (a), M3, per
+  `2026-11-23-prompt-TOOL-dTotalRecall-53-divergence-fold-brief` item 2. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -516,6 +520,9 @@ New arm: tools/runlog/selftest.py · covers AC24 · the three path plants, stage
   disposes HEAD's five red alias hits; S23 declares its non-records (F4); this unit writes no
   `legacy_ledger.py` (§4); §7's leg line gains the four legs the guard join names for §4's new paths;
   citations by symbol or blob.
+- rev-6 · 2026-11-23 · §1 S2 S6 S8 S9 S12 S16 S21 S34 S36 §3 §4 §5 AC8 AC9 AC36 §7 §8 F2-F5 §10 · per
+  `2026-11-23-prompt-TOOL-dTotalRecall-53-divergence-fold-brief`: S9's window holds the literal's own
+  line; string-body literals per F5; S36 and AC36 ride TOOL-dTotalRecall-113, with their paths and leg.
 
 ## 10. Reuse audit
 
@@ -524,9 +531,9 @@ Each item extends the seam its finding names, cited in the item: unit 38's `--re
 `tools/memory-tree/id_grammar.py#READER_KEPT`, arm and path match,
 `tools/memory-tree/tree_lib.py#read_bindings`, `tools/runlog/model.py#derive_path_key`,
 `tools/memory-tree/gen_build_index.py#render_order`, `tools/memory-tree/record_kinds.py#check_homeless_records`
-and, for S40, the ledger factory's atomic write `tools/memory-tree/legacy_ledger.py#_write_atomic`. S34
-is the one new mechanism, and it widens the marker unit 43 minted to the two file-keyed constants, so
-the three censuses read one keep grammar. `python tools/codebase-map/reuse_lookup.py "insert a cause line into a
-record head after its binding line"` ranked name-stem neighbours and no seam these items bypass.
+and S40's `tools/memory-tree/legacy_ledger.py#_write_atomic`. S34, the one new mechanism, widens unit
+43's marker over the two file-keyed constants, so the three censuses read one keep grammar.
+`python tools/codebase-map/reuse_lookup.py "insert a cause line into a record head after its binding
+line"` ranked name-stem neighbours and no seam these items bypass.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a record written by a pinned instrument given its cause and kept green by the causes check" --terms "Caused-by causes legacy-records backfill instrument pinned repin departures record_causes census kept"`
