@@ -598,10 +598,12 @@ def check_return_arm(state):
     orientation twin of `key: value` lines; `return-no-object`, `return-unknown-field` and a closed-set
     value outside its set each name their field; `return-bad-sha` names `commit`; `return-answers-mismatch`
     names `answers`, called directly and read off a transcript's first `user` marker by the verb;
-    `stop-retry` blocks three stops under the catalogue default of `roles.retries`, the record counting
-    them; `stop-exhausted` then passes with a stderr witness. The verb runs as a subprocess, so its policy
-    reader is the real one. WHAT IT DOES NOT CHECK: a policy file's value (the adopter's git fixtures read
-    one), nor that the platform continues a blocked subagent."""
+    `harness-typed-stop` and `unmarked-stop` (TOOL-dBoundRoles-39 AC1, AC2) pass the route test's two
+    misses silent with no record; `stop-retry`, a marked direct spawn, blocks three stops under the
+    catalogue default of `roles.retries`, the record counting them; `stop-exhausted` then passes with a
+    stderr witness. The verb runs as a subprocess, so its policy reader is the real one. WHAT IT DOES NOT
+    CHECK: a policy file's value (the adopter's git fixtures read one), that the platform continues a
+    blocked subagent, nor where a live runtime writes a harness stage's transcript."""
     env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
     env["GOV_DEFAULT_BRANCH"] = "main"
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
@@ -644,8 +646,35 @@ def check_return_arm(state):
                                env=env)
             return p.returncode, p.stdout.strip(), p.stderr.strip()
 
-        record = root / ".git" / read_return_dir() / "a1.json"
-        stop = {"agent_type": "gov-builder", "agent_id": "a1", "last_assistant_message": fence % '{"checks": []}'}
+        marker = ("<!-- gov:handoff role=gov-builder build=x unit=U-1 item=- path=%s role-sha=%s task-sha=%s -->"
+                  % (order[0], "c" * 12, order[1]))
+        subagents = root / "session" / "subagents"
+
+        def write_transcript(path, prompt):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps({"type": "user", "message": {"role": "user", "content": prompt}}) + "\n",
+                            encoding="utf-8")
+            return str(path)
+
+        # The route test (TOOL-dBoundRoles-39 AC1, AC2): `harness-typed-stop`, a typed harness stage under the
+        # workflow layout whose computed task opens with a marker line, so the path test alone stops it; and
+        # `unmarked-stop`, under the direct layout with no marker, so the marker test alone stops it. Each,
+        # its return plain text, would block if graded; each must pass silent and leave no record.
+        record_dir = root / ".git" / read_return_dir()
+        for plant, aid, transcript in (
+                ("harness-typed-stop", "h1", write_transcript(subagents / "workflows" / "wf_fx-1" / "agent-h1.jsonl",
+                                                              marker + "\n\n[Workflow harness — computed task] Build "
+                                                              "ONE unit.")),
+                ("unmarked-stop", "u1", write_transcript(subagents / "agent-u1.jsonl", "Build it."))):
+            rc, out, err = run_verb({"agent_type": "gov-builder", "agent_id": aid, "agent_transcript_path": transcript,
+                                     "last_assistant_message": "Committed it; the checks ran."})
+            left = sorted(p.name for p in record_dir.iterdir()) if record_dir.is_dir() else []
+            check_arm(state, 22, rc == 0 and out == "" and err == "" and left == [],
+                      "%s exited %d printing %r and %r with %r under %s, not 0, nothing and no record"
+                      % (plant, rc, out, err, left, read_return_dir()))
+        record = record_dir / "a1.json"
+        stop = {"agent_type": "gov-builder", "agent_id": "a1", "last_assistant_message": fence % '{"checks": []}',
+                "agent_transcript_path": write_transcript(subagents / "agent-a1.jsonl", marker + "\n\nBuild it.")}
         for n in (1, 2, 3):  # stop-retry: blocked while the attempts are fewer than the default of 3
             rc, out, _err = run_verb(stop)
             try:
@@ -666,8 +695,6 @@ def check_return_arm(state):
             rc, out, _err = run_verb(payload)
             check_arm(state, 22, rc == 0 and out == "", "%s exited %d printing %r, not 0 and nothing" % (what, rc, out))
         transcript = root / "agent.jsonl"
-        marker = ("<!-- gov:handoff role=gov-builder build=x unit=U-1 item=- path=%s role-sha=%s task-sha=%s -->"
-                  % (order[0], "c" * 12, order[1]))
         transcript.write_text("\n".join(json.dumps(r) for r in (
             {"type": "user", "message": {"role": "user", "content": marker + "\n\nBuild it."}},
             {"type": "assistant", "message": {"content": [{"type": "text", "text":

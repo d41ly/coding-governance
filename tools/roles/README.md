@@ -336,9 +336,15 @@ excepted where a work order is given; an `answers` value must read `<work order 
 
 The hook is `return-check.sh`, wired by `return-check.fragment.json` (event `SubagentStop`, matcher
 `*`, interpreter `bash`). It resolves a python with the inline resolver and runs `handoff.py
-check-return` with the payload on stdin: the role from `agent_type`, an `agent`-true slot; the return
-from `last_assistant_message`, else the agent transcript's last assistant text; the work order from the
-marker of that transcript's first `user` record. On defects, while the attempts recorded for the agent
+check-return` with the payload on stdin. `check-return` grades a direct spawn's return only
+(TOOL-dBoundRoles-39), by two tests run first, before the role is loaded or any record is read:
+a direct spawn's `agent_transcript_path`, separators folded to `/`, holds no `/subagents/workflows/` pair,
+and a direct spawn's first `user` record opens with a marker line `roles_lib.extract_prompt_marker` parses.
+A harness stage's return is graded by its stage schema instead: its stop, and any stop failing either test,
+one with no transcript path or an unreadable first record included, exits 0 printing nothing, writes no
+record and holds no attempt. Then the role from `agent_type`, an `agent`-true slot; the return from
+`last_assistant_message`, else the agent transcript's last assistant text; the work order from the
+marker the route test read. On defects, while the attempts recorded for the agent
 are fewer than the policy key `roles.retries` (default 3, read through `read_policy_setting`), it prints
 a `block` decision whose reason names every defect and the template and asks for one corrected `json`
 block; once they reach it, the stop goes ahead with one stderr line. Each checked stop rewrites
@@ -348,8 +354,8 @@ of the hook or the verb exits 0, so a broken check never blocks a stop.
 
 WHAT IT DOES NOT CHECK: what a `text` value says or which commit a `sha` names; that an `answers` is
 present, which the catalogue checker's R16 grades for a record return; and that the platform continues
-a subagent whose stop was blocked, for which the record still reads one attempt and invalid. A harness
-stage's stop is not yet told apart from a direct spawn's, so a typed harness stage reaches the check too.
+a subagent whose stop was blocked, for which the record still reads one attempt and invalid; and a spawn whose
+prompt was written by hand with no marker, which goes ungraded, though the spawn guard's rule 6 refuses it.
 
 ## Standing in for a role
 
