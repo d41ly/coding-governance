@@ -29,6 +29,9 @@ Which exception records excuse a core red: any well-formed record a session wrot
 core.exceptions = "owner-only-expiring"
 ```
 
+## `attendance`
+Documented on [help/loop.md](../loop.md).
+
 ## `policy-file.on-invalid`
 Documented on [help/policy.md](../policy.md).
 
@@ -43,8 +46,19 @@ hooks.bypass = "refused"
 ## `deps.messaging`
 Documented on [help/loop.md](../loop.md).
 
+## `actions.free`
+Documented on [help/orientation-card.md](../orientation-card.md).
+
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
+
+## `notify.owner`
+<!-- usage: policy:notify.owner 42cdf26c -->
+Which events report the build's progress to the owner as one progress line.
+
+```text
+notify.owner = "park-and-landing"
+```
 
 ## `mailbox.reads`
 Documented on [help/loop.md](../loop.md).
@@ -312,12 +326,11 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (219)
+## Not yet summarised (216)
 - `preset`
 - `design.forks`
 - `design.reentry`
 - `autonomy`
-- `attendance`
 - `attendance.scope`
 - `policy-file.guard`
 - `policy-file.proof`
@@ -340,7 +353,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `kickoff.runs`
 - `card.store`
 - `card.snapshot`
-- `actions.free`
 - `resume.partial`
 - `resume.context`
 - `orient.budget`
@@ -390,7 +402,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `runtime.secret-scan`
 - `plan.ratification`
 - `run.host`
-- `notify.owner`
 - `notify.channel`
 - `notify.owner-items`
 - `run.owner-deadline`

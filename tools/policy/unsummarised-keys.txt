@@ -2,13 +2,11 @@
 # The catalogue rows with no `summary` or no `usage`, sorted. SHRINK-ONLY: `lists --check` reds a
 # row the catalogue no longer owes, a row the catalogue owes and this list lacks, and a row the
 # list at the compare base did not carry. Give a row both fields, then `lists --write`.
-actions.free
 annotations.delivery
 annotations.grammar
 annotations.lookup
 annotations.resolve-scope
 asks.acceptance
-attendance
 attendance.scope
 autonomy
 budgets.*
@@ -117,7 +115,6 @@ memory.project-map
 memory.superseded-slices
 notices.record
 notify.channel
-notify.owner
 notify.owner-items
 observability.run-record
 orient.budget
