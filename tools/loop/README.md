@@ -617,12 +617,18 @@ next item the first of that step whose witness does not hold and whose needs are
 precedence, `render_next_line` maps it onto `--plan`'s five shapes in `NEXT_SHAPES`, and every claim
 prints with its key and verdict through `claims.py`. The driver's `--plan` prints that line as `next:`
 and `--status` prints the engine's lines after its own; both find the module by `resolve_kit_dir`.
-`--fixture --plant <case>` runs one of `PLANTS` over a scratch repository and bare remote, the last two
-over the unattended driver, and `--selftest` runs every case through `run_selftest_cases`; it is gov's
+`<slug> --mail-interrupts [--local]` (KICK-dKeptSession-10) prints the build's open mail as `interrupt —
+mailbox` lines, `read_mail_interrupts` reading `mailbox.reads` through the policy kit's `resolve` and the
+mailbox through the transition guard's one launch, `read_mail_rows`, with `--local` appended under
+`local`; the kickoff engine's boundary verb runs it after a crossing, and every other call keeps the
+`unarmed` mailbox line.
+`--fixture --plant <case>` runs one of `PLANTS` over a scratch repository and bare remote, the `FX_DRIVER`
+plants over the unattended driver, and `--selftest` runs every case through `run_selftest_cases`; it is gov's
 `loop position fixtures` leg.
 
 ```bash
 python <prefix>/loop/position.py <slug> [--json | --next-line]
+python <prefix>/loop/position.py <slug> --mail-interrupts [--local]
 python <prefix>/loop/position.py --fixture --plant steps
 python <prefix>/loop/position.py --selftest
 ```

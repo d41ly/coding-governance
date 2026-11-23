@@ -371,7 +371,7 @@ flags = []
 id = "script:{prefix}/loop/position.py"
 shape = "verb"
 entry = "{prefix}/loop/position.py"
-flags = ["--json", "--next-line", "--frontier", "--check-refusal=", "--fixture", "--plant=", "--selftest"]
+flags = ["--json", "--next-line", "--frontier", "--check-refusal=", "--mail-interrupts", "--local", "--fixture", "--plant=", "--selftest"]
 
 [[usage]]
 id = "script:{prefix}/loop/stage_coverage.py"

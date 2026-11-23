@@ -3,6 +3,7 @@
 
     python position.py <slug> [--json | --next-line [--frontier]]   # the position of <slug> in this working directory
     python position.py <slug> --boundary <key|none>     # the item boundary, I12, against a held pointer
+    python position.py <slug> --mail-interrupts [--local]   # the build's open mail, as mailbox.reads says
     python position.py --check-refusal <tag> <key>      # may the driver record this refusal row
     python position.py --fixture --plant <case>         # one fixture case
     python position.py --selftest                       # every case
@@ -92,6 +93,25 @@ which say nothing about the item and keep `pointer`. `--boundary <key|none>` der
 ending ` · <answer>` for a kept pointer, then `forked — <unit id> · …` or `forked — none`, the units the
 same derivation's hand-over grades `FORKED`; it exits 0, and 2 on `invalid-input` after both lines.
 
+THE MAILBOX INTERRUPT (KICK-dKeptSession-10). `--mail-interrupts` reads the positional slug, `--local`
+only beside it, and `read_mail_interrupts(repo, slug, local=False)` answers over `git rev-parse
+--show-toplevel`'s answer, each line printed, exit 0; the kickoff engine's boundary verb runs it after a
+crossing. `mailbox.reads` is read through the policy kit's `resolve`: `transitions-only` runs no read and
+prints `interrupt — mailbox · read at transitions (mailbox.reads: transitions-only)`; `every-item` lists
+every kind; `every-item-amendments-at-transitions` lists every kind but `intake` and prints `interrupt —
+mailbox · <n> intake held to the next transition (mailbox.reads: every-item-amendments-at-transitions)`
+where it held any. A refused key reads the catalogue's default, printing `interrupt — mailbox ·
+mailbox.reads refused, read as <default>: <why>`; no policy kit lists every kind, printing `interrupt —
+mailbox · mailbox.reads unread, every kind listed: <why>`. The one read is the transition guard's,
+`loop_transition.read_mail_rows`, the unattended driver's `--mail read <slug>`, with `--local` appended
+under `local`, a read of the node's cache with no fetch. Its `open` rows are kept, as `--open` keeps them,
+ordered by `first-seen` then id, a `-` sighting last, each printed `interrupt — mailbox · <id> <kind> from
+<from-build>`, an `intake` ending ` · amendment`, the request to amend the lease holder disposes through
+the mailbox's verbs. An unarmed read, a driver that does not resolve, a repository with no
+`.unattended.conf` or `mail — off`, and an unknown one, `mail unknown: …`, print `interrupt — mailbox ·
+unarmed · <why>`. No other call reads the mailbox: `derive_interrupts` keeps its `unarmed` line, and a
+mailbox line changes no answer.
+
 THE ABSENT REMOTE (TOOL-dDeclaredLoop-56 S36). Where the ladder names no remote and refuses nothing, or
 the tracking ref of its default branch does not resolve, the remote reads absent: the answer is taken on
 local witnesses, so no unit reads `deployed`, the interrupt `remote · none` prints, and no remote-tip
@@ -103,12 +123,14 @@ prints the engine's lines and one `position: fixture · <case> · held` or `· M
 removes the scratch; it exits as the engine did where the case held, 1 where it missed, 2 where a kit it
 needs does not resolve. Every case runs with `GIT_CONFIG_GLOBAL` and `GIT_CONFIG_SYSTEM` naming one empty
 file under its scratch top, so no setting of the machine's reaches it (TOOL-dDeclaredLoop-75 S34). `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `built-unarmed`,
-`plan-line` and `status-line` run the unattended driver found by `resolve_kit_dir`. `--selftest` runs every case
+`plan-line`, `status-line`, `mail-open`, `mail-transitions-only`, `mail-amendments`, `mail-unarmed` and
+`mail-refused` run the unattended driver found by `resolve_kit_dir`. `--selftest` runs every case
 through `loop_lib.run_selftest_cases`.
 
 WHAT THIS DOES NOT CHECK: a witness reader for any item outside the three kinds above, which lands with
 the build that arms the item; a settling row for a parked entry, which the driver's grammar does not
-have yet, so every owed entry stands; the mailbox, printed `unarmed`; that a `gates-run` fact names a
+have yet, so every owed entry stands; the mailbox on every call but `--mail-interrupts`, printed
+`unarmed`; a list read from the cache after a failed fetch, listed unmarked; that a `gates-run` fact names a
 green bar rather than the last bar run; a fetch run with `--no-write-fetch-head`, which leaves no
 `FETCH_HEAD` and so reads by the reflog where the ref moved, and as stale where it did not; a
 `FETCH_HEAD` whose URL git spelled otherwise than `derive_fetch_url` spells the configured URL, its
@@ -140,7 +162,7 @@ from loop_lib import (NO_STEP, ROUTE_STAND_IN, LoopError, check_computed_witness
                       read_item_rows, read_memory_tree, resolve_kit_dir, resolve_memory_root, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_table import check_recorded_move, derive_from_states, read_transition_rows  # noqa: E402
-from loop_transition import read_transitions  # noqa: E402
+from loop_transition import read_mail_rows, read_transitions, render_fixture_mail  # noqa: E402
 from scenario import read_activated_rows  # noqa: E402
 from loop_witness import read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
 
@@ -205,7 +227,18 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
           "plan-line": "the driver's next: line equals render_next_line's, in three states",
           "status-line": "the driver's --status prints the engine's position line",
           "boundary": "over planted engine answers: the key held is no crossing, another key crosses, awaiting "
-                      "crosses to none, stale-remote keeps the pointer, and forked names the FORKED unit"}
+                      "crosses to none, stale-remote keeps the pointer, and forked names the FORKED unit",
+          "mail-open": "fy's open question, open intake and a question tPos's answer names, to build:tPos: "
+                       "--mail-interrupts lists the two open ones in id order, the intake an amendment; the plain "
+                       "call's mailbox interrupt stays unarmed",
+          "mail-transitions-only": "mail-open's messages under mailbox.reads transitions-only: the one read at "
+                                   "transitions line, no read",
+          "mail-amendments": "an open changed and an open intake under every-item-amendments-at-transitions: the "
+                             "changed listed and 1 intake held",
+          "mail-unarmed": "mail-open's repository, the driver's locator run over an empty scratch directory: one "
+                          "unarmed line naming the unattended kit",
+          "mail-refused": "mail-open's messages, mailbox.reads sometimes in the policy file's only revision: the "
+                          "refused line read as every-item, then mail-open's two lines"}
 FX_SLUG = "tPos"
 FX_IDS = ["TOOL-tPos-1", "TOOL-tPos-2", "TOOL-tPos-3"]
 FX_ASK = "TOOL-tAsk-1"
@@ -217,7 +250,24 @@ FX_A, FX_B, FX_C, FX_D = "item.build.base", "item.build.unit-lease", "item.build
 #: The build step's unit-forward item, the one the least-advanced designed unit has not passed.
 FX_UNIT = "item.build.acceptance"
 #: The plants that run the unattended driver, and so copy its conf into the scratch repository.
-FX_DRIVER = ("frontier-refused", "frontier-bad-key", "plan-frontier", "built-unarmed", "plan-line", "status-line")
+FX_DRIVER = ("frontier-refused", "frontier-bad-key", "plan-frontier", "built-unarmed", "plan-line", "status-line",
+             "mail-open", "mail-transitions-only", "mail-amendments", "mail-unarmed", "mail-refused")
+#: The mail plants' messages (KICK-dKeptSession-10), each `(ref, build, id, to, kind, subject, answers)`, the
+#: arguments of `render_fixture_mail` after the ref: fy's open question and intake, and a question tPos answers.
+FX_OPEN_MAIL = (("refs/gov/mail/fy/z/s-1", "fy", "a1b2c3d4e5f6", "build:tPos", "question", "the fixture's question", "none"),
+                ("refs/gov/mail/fy/z/s-2", "fy", "b2c3d4e5f6a1", "build:tPos", "intake", "the fixture's amendment", "none"),
+                ("refs/gov/mail/fy/z/s-3", "fy", "c3d4e5f6a1b2", "build:tPos", "question", "the answered question", "none"),
+                ("refs/gov/mail/tPos/z/s-1", "tPos", "d4e5f6a1b2c3", "build:fy", "answer", "the answered question",
+                 "c3d4e5f6a1b2"))
+FX_MAIL = {"mail-amendments": (
+    ("refs/gov/mail/fy/z/s-1", "fy", "e5f6a1b2c3d4", "build:tPos", "changed", "the fixture's interface", "none"),
+    ("refs/gov/mail/fy/z/s-2", "fy", "f6a1b2c3d4e5", "build:tPos", "intake", "the fixture's amendment", "none"))}
+#: The `mailbox.reads` value each mail plant's policy file sets, in its only revision.
+FX_MAIL_READS = {"mail-transitions-only": "transitions-only", "mail-amendments": "every-item-amendments-at-transitions",
+                 "mail-refused": "sometimes"}
+#: `mail-open`'s two owed lines, which `mail-refused` owes after its refused line.
+FX_OPEN_LINES = ["interrupt — mailbox · a1b2c3d4e5f6 question from fy",
+                 "interrupt — mailbox · b2c3d4e5f6a1 intake from fy · amendment"]
 #: The `url-forms` plant's pairs (TOOL-dDeclaredLoop-77 S3): a configured URL, a URL as git wrote it into
 #: `FETCH_HEAD`, and whether `derive_fetch_url` owes them equal.
 FX_URL_FORMS = (("git@example.com:up.git", "example.com:up", "equal"),
@@ -580,6 +630,41 @@ def render_boundary_lines(pos, pointer):
     return lines + ["forked — %s" % (" · ".join(forked) or "none")]
 
 
+def read_mail_interrupts(repo, slug, local=False):
+    """`--mail-interrupts`' lines (KICK-dKeptSession-10): `mailbox.reads` through the policy kit's `resolve`,
+    then, unless it reads `transitions-only`, the build's open messages through `read_mail_rows`, `local`
+    reading the node's cache with no fetch, each an `interrupt — mailbox` line. A refused key reads the
+    catalogue's default; no policy kit lists every kind; an unarmed or unknown read is one `unarmed` line."""
+    say = "interrupt — mailbox · %s"
+    out = []
+    try:
+        policy, _guard = read_policy_kit()
+    except LookupError as e:
+        reads, out = "every-item", [say % ("mailbox.reads unread, every kind listed: %s" % e)]
+    else:
+        try:
+            reads = policy.resolve("mailbox.reads", str(repo)).value
+        except policy.Refusal as e:
+            reads = policy.read_catalogue_row(policy.parse_key("mailbox.reads"), policy.load_catalogue(policy.KIT))["default"]
+            out = [say % ("mailbox.reads refused, read as %s: %s" % (reads, e))]
+    if reads == "transitions-only":
+        return out + [say % "read at transitions (mailbox.reads: transitions-only)"]
+    try:
+        rows, unarmed = read_mail_rows(repo, slug, local=local)
+    except ValueError as e:
+        return out + [say % ("unarmed · %s" % e)]
+    if unarmed:
+        return out + [say % ("unarmed · %s" % unarmed)]
+    kept = sorted((r for r in rows if r["state"] == "open"),
+                  key=lambda r: (r["first-seen"] in ("", "-"), r["first-seen"], r["id"]))
+    held = [r for r in kept if r["kind"] == "intake"] if reads == "every-item-amendments-at-transitions" else []
+    out += [say % ("%s %s from %s%s" % (r["id"], r["kind"], r["from-build"], " · amendment" if r["kind"] == "intake" else ""))
+            for r in kept if r not in held]
+    if held:
+        out.append(say % ("%d intake held to the next transition (mailbox.reads: %s)" % (len(held), reads)))
+    return out
+
+
 def read_build_items(repo, slug, moves, pin, read=None):
     """The composed item rows build `slug` reads at the pin `pin`, `moves` its moves newest first: the
     composition there joined with the item rows the newest move's scenarios activate at the same pin
@@ -823,6 +908,11 @@ def write_position_plant(top, case, root):
                 raise LookupError("the driver plant copies %s from %s, which holds none" % (name, root.as_posix()))
             shutil.copyfile(root / name, repo / name)
         files.pop(".memory-tree.conf")
+    if case.startswith("mail-"):   # KICK-dKeptSession-10: the two lines the transition plants append, RUN_CLAIMS on
+        with open(repo / ".unattended.conf", "a", encoding="utf-8", newline="\n") as fh:
+            fh.write('\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="on"\n')
+    if case in FX_MAIL_READS:   # in the fixture commit, pushed as main, since `resolve` reads the landed revision
+        files[".governance/policy.toml"] = '[mailbox]\nreads = "%s"\n' % FX_MAIL_READS[case]
     run_fixture_git(repo, "init", "-q", "--template=", "-b", "main")
     write_fixture_files(repo, files)
     run_fixture_git(repo, "add", "-A")
@@ -893,6 +983,10 @@ def write_position_plant(top, case, root):
         run_fixture_git(repo, "push", "-q", fx, "main")
     if remote:
         run_fixture_git(repo, "remote", "set-head", fx, "main")
+    if case.startswith("mail-"):   # each message one parentless commit on its own ref of the remote
+        from placement import write_fixture_gov_ref   # the plants alone write a ref, so no engine call loads it
+        for ref, *mail in FX_MAIL.get(case, FX_OPEN_MAIL):
+            write_fixture_gov_ref(repo, ref, render_fixture_mail(*mail), remote=fx)
     if case in ("stale-remote", "quiet-remote", "failed-fetch", "fetch-other-branch", "scp-remote", "ssh-userinfo-remote",
                 "url-forms"):  # the tracking tip kept, its one reflog entry dated 2000-01-01, past any bound
         tip = run_fixture_git(repo, "rev-parse", "refs/remotes/%s/main" % fx)
@@ -1198,6 +1292,49 @@ def check_url_forms_rows(top, repo, definition, handover):
     return misses
 
 
+def check_mail_plant(case, repo, definition, handover):
+    """The misses of a mail plant (KICK-dKeptSession-10): `read_mail_interrupts` over its repository, its
+    lines printed, against what `case` owes; for `mail-unarmed` with `loop_lib.resolve_kit_dir` rebound for
+    the call to the real locator over an empty scratch directory, the name `read_mail_rows` imports inside
+    its function, then restored; for `mail-open` the plain engine call too, owed its one unarmed line."""
+    import loop_lib
+    real = loop_lib.resolve_kit_dir
+    empty = repo / ".git" / "fx-empty"   # inside the git dir, so the scratch's removal takes it too
+
+    def resolve_empty_kit(home, anchor, here):   # the driver's locator over an empty scratch directory
+        return real(home, anchor, empty if (home, anchor) == ("unattended", "unattended.sh") else here)
+    if case == "mail-unarmed":
+        empty.mkdir()
+        loop_lib.resolve_kit_dir = resolve_empty_kit
+    try:
+        lines = read_mail_interrupts(repo, FX_SLUG)
+    finally:
+        loop_lib.resolve_kit_dir = real
+    for line in lines:
+        print(line)
+    refused = "interrupt — mailbox · mailbox.reads refused, read as every-item: "
+    held = {"mail-open": lambda: lines == FX_OPEN_LINES,
+            "mail-transitions-only": lambda: lines == ["interrupt — mailbox · read at transitions (mailbox.reads: "
+                                                       "transitions-only)"],
+            "mail-amendments": lambda: lines == ["interrupt — mailbox · e5f6a1b2c3d4 changed from fy",
+                                                 "interrupt — mailbox · 1 intake held to the next transition "
+                                                 "(mailbox.reads: every-item-amendments-at-transitions)"],
+            "mail-unarmed": lambda: len(lines) == 1 and lines[0].startswith("interrupt — mailbox · unarmed · ")
+            and "no unattended kit" in lines[0],
+            "mail-refused": lambda: len(lines) == 3 and lines[0].startswith(refused) and "mailbox.reads" in lines[0][
+                len(refused):] and lines[1:] == FX_OPEN_LINES}[case]()
+    misses = [] if held else ["--mail-interrupts printed %r" % lines]
+    if case == "mail-open":
+        every = render_position_lines(derive_plant_position(repo, definition, handover))
+        plain = [ln for ln in every if ln.startswith("interrupt — mailbox")]
+        ids = [m[2] for m in FX_OPEN_MAIL if any(m[2] in ln for ln in every)]
+        print("%s: fixture · %s · plain call %s · ids %s" % (SAY, case, " / ".join(plain) or "no mailbox line",
+                                                             " ".join(ids) or "none"))
+        if plain != ["interrupt — mailbox · unarmed"] or ids:
+            misses.append("the plain call printed %r and the ids %r, owed its one unarmed line and none" % (plain, ids))
+    return misses
+
+
 def run_boundary_plant():
     """The `boundary` case's misses (KICK-dKeptSession-13 AC4), over planted engine answers rather
     than a scratch repository: AC4 grades `derive_item_boundary`'s comparison, not the derivation."""
@@ -1243,6 +1380,8 @@ def run_plant(case):
                 "--status printed no position line"]
         elif case in ("frontier-bad-key", "plan-frontier"):
             misses, rc = run_refusal_plant(case, repo, definition, handover), 0
+        elif case.startswith("mail-"):
+            misses, rc = check_mail_plant(case, repo, definition, handover), 0
         else:
             misses = run_refusal_plant(case, repo, definition, handover) if case == "frontier-refused" else []
             readings = [definition]
@@ -1304,10 +1443,23 @@ def main(argv):
     ap.add_argument("--frontier", action="store_true", help="with --next-line, the frontier's tags on a second line")
     ap.add_argument("--boundary", metavar="KEY", help="the item boundary against the held pointer <key|none>")
     ap.add_argument("--check-refusal", nargs=2, metavar=("TAG", "KEY"), help="may a refusal row name TAG at KEY")
+    ap.add_argument("--mail-interrupts", action="store_true",
+                    help="the build's open mail as interrupt — mailbox lines, as mailbox.reads says")
+    ap.add_argument("--local", action="store_true", help="with --mail-interrupts, the node's cached mailbox, no fetch")
     ap.add_argument("--fixture", action="store_true", help="run one fixture case")
     ap.add_argument("--plant", choices=list(PLANTS))
     ap.add_argument("--selftest", action="store_true", help="run every fixture case")
     args = ap.parse_args(argv)
+    if args.local and not args.mail_interrupts:
+        ap.error("--local is a flag of --mail-interrupts")
+    if args.mail_interrupts:
+        if (not args.slug or args.json or args.next_line or args.frontier or args.boundary is not None
+                or args.check_refusal or args.fixture or args.plant or args.selftest):
+            ap.error("--mail-interrupts takes a slug and --local, and nothing else")
+        rc, top = read_git(".", "rev-parse", "--show-toplevel")
+        for line in read_mail_interrupts(top if rc == 0 and top else ".", args.slug, local=args.local):
+            print(line)
+        return 0
     if args.selftest:
         if args.fixture or args.slug:
             ap.error("--selftest takes no slug and no --fixture")

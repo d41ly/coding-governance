@@ -89,7 +89,6 @@ lexicon.packs
 lexicon.pin
 mailbox.fetch-seconds
 mailbox.notice
-mailbox.reads
 maintain.cadence
 maintain.dead-after
 maintain.events

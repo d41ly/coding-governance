@@ -158,7 +158,9 @@ build's card. Between those, the item boundary does: after a commit, the session
 notices that HEAD has moved past the `at` of its card's `item —` line and starts `manifest-check.sh
 --card --boundary --build <slug> --session <sid>` in the background, so the call is not held up. The
 verb moves `at` to HEAD and reads the build's current item. When the item has changed it prints
-`boundary — <old> → <new>` and rewrites your session card's section. The `card.pointers` policy key
+`boundary — <old> → <new>` and rewrites your session card's section. The verb then lists each open
+message addressed to the build as an `interrupt — mailbox` line, as `mailbox.reads` says; see "Where a
+build is, and what runs next" in [the loop page](loop.md). The `card.pointers` policy key
 decides whether the build's card is published too: <!-- usage: policy:card.pointers 6940ded3 -->
 
 - `every-item` (the default): the build's card is published at every item boundary.

@@ -983,7 +983,7 @@ The unattended driver's `--plan` prints the engine's answer as its `next:` line,
 shapes it always printed, and beneath it a `frontier:` line naming the frontier's tags, or
 `frontier: none`. `--status` prints the engine's lines after its status line.
 
-- **Read a build's position:** `python tools/loop/position.py <slug>` prints a `position —` line with <!-- usage: script:tools/loop/position.py 8d078234 -->
+- **Read a build's position:** `python tools/loop/position.py <slug>` prints a `position —` line with <!-- usage: script:tools/loop/position.py c1931acf -->
   the state, the step, the answer and its reason, one `unit —` line per unit, the `next —` item with
   its actor and its instance key, a `frontier —` line, one `refusal —` line per refusal the run
   recorded with its item, key and reason, each `interrupt —`, then every file and ref it read as
@@ -998,6 +998,21 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   held`, exit 0, `loop: refused` with the reason, exit 1, or `loop: unarmed`, exit 2, where your
   composition does not read. With no composition it checks against gov's own items. The driver's
   `--refused` runs it and records nothing unless it exits 0.
+- **Read the build's mail at an item boundary:** `<slug> --mail-interrupts` lists each open message
+  addressed to the build as `interrupt — mailbox · <id> <kind> from <build>`, oldest sighting first,
+  and exits 0; `--local` reads your node's cached copy with no fetch. The kickoff engine's
+  `--card --boundary` verb runs it after every crossing, so a message waits one item, not one step;
+  the lines appear at your next shell call after the verb finishes. An `intake`, an amendment from a
+  session that does not hold the build's lease, ends ` · amendment`: as the lease holder, dispose it
+  with the driver's mail verbs. The `mailbox.reads` policy key says when the list is read: <!-- usage: policy:mailbox.reads 6509cdac -->
+  `every-item` (the default) lists every kind; `transitions-only` reads no mail at the boundary and
+  prints `interrupt — mailbox · read at transitions (mailbox.reads: transitions-only)`; and
+  `every-item-amendments-at-transitions` lists every kind but `intake`, counting the held ones as
+  `interrupt — mailbox · <n> intake held to the next transition`. Under every value the transition
+  guard still reads the mailbox at each move. A driver that is not installed, a repository with no
+  `.unattended.conf`, `RUN_CLAIMS` off or a failed read prints `interrupt — mailbox · unarmed ·
+  <why>`, and a refused `mailbox.reads` reads as its default, saying so on an `interrupt — mailbox`
+  line. Every other engine call keeps its `interrupt — mailbox · unarmed` line and reads no mail.
 - **See it on a fixture:** `--fixture --plant <case>` builds a scratch repository with a bare remote,
   but none for `no-remote`, plants one case, prints the engine's lines and one line ending `held` or
   `MISSED`, and removes it: `steps`, `typed-status`, `idempotent`, `owner-decision`, `parent-unlanded`,
@@ -1014,8 +1029,13 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   `ssh-userinfo-remote` (the aged reflog, then a fetch over an ssh shim from a URL with a user part,
   read from `FETCH_HEAD`), `url-forms` (a fetch failing at connect from a URL carrying a password,
   which no line prints, then one row per configured and written URL pair, `equal` or `unequal`),
-  `plan-line` and `status-line`; `frontier-refused`,
-  `frontier-bad-key`, `plan-frontier`, `built-unarmed` and the last two run the unattended driver. Every
+  `plan-line`, `status-line`, `boundary` (the item boundary over planted engine answers),
+  `mail-open` (an open question, an open intake and an answered question listed as the two open
+  ones), `mail-transitions-only`, `mail-amendments` (a `changed` listed and the `intake` held),
+  `mail-unarmed` (no unattended kit found) and `mail-refused` (an invalid `mailbox.reads` read as its
+  default); `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `built-unarmed`, `plan-line`,
+  `status-line`, `mail-open`, `mail-transitions-only`, `mail-amendments`, `mail-unarmed` and
+  `mail-refused` run the unattended driver. Every
   case runs with an empty global and system git config, so no setting of your machine's reaches it. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->

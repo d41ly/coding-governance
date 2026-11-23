@@ -604,6 +604,8 @@ owner = "dShippedRelease"
 name = "mailbox.reads"
 allowed = ["every-item", "transitions-only", "every-item-amendments-at-transitions"]
 default = "every-item"
+summary = "When a build's open mail is listed to the session: at every item boundary, only at transitions, or at every item boundary with an intake amendment held to the next transition; the transition guard reads the mailbox under each."
+usage = 'mailbox.reads = "transitions-only"'
 owner = "dKeptSession"
 
 [[key]]
