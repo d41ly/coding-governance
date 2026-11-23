@@ -18103,10 +18103,14 @@ if in_shard 8; then
 # notice. WHAT THIS BLOCK DOES NOT DRIVE: the in-place exit, whose call is the same function.
 # ==================================================================================================
 kd7_bin=$(mktemp -d); kd7_git=$(command -v git)
+# KICK-dKeptSession-44 S20: the dependents verb reads tRun's own README's rendered `gen:build-edges`
+# region, so tRun's README gains the region the memory-tree kit's `render_edges` itself returns for tDep.
 write_landed_dependent() { # -> tRun's LANDING record beside tDep, whose README names tRun in parents:, pushed
   build_claim_landing
   mkdir -p memory/builds/tDep
   printf -- '---\nslug: tDep\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids:\nparents: tRun\n---\n\n# tDep\n' > memory/builds/tDep/README.md
+  "$_rkd_py" -c 'import sys; sys.path.insert(0, sys.argv[1]); from gen_build_index import render_edges
+print("\n" + render_edges({"parents": [], "children": ["tDep"]}))' "$HERE/../$MT_KIT" >> memory/builds/tRun/README.md
   fixture; git push -q -f origin HEAD:main
 }
 write_landed_dependent
@@ -18198,6 +18202,47 @@ same "KDS11 AC3 a --landed under park-and-landing prints its landing progress li
   "$kd11_rc|$(grep -E '^(unattended: phase LANDED · witness |progress — )' <<<"$kd11_out" | sed 's/ · anchor .*//' | tr '\n' '|')" \
   "0|unattended: phase LANDED · witness $kd11_head|progress — tRun · landing · ${kd11_head:0:8}|"
 remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"; reset_tree
+
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
+# KICK-dKeptSession-44 AC30 — A PROGRESS VERB THAT HANGS NEVER HOLDS A LANDING. The claim block's
+# LANDING fixture lands twice in process, the loop kit's `loop_transition.py` stood in by a scratch
+# stub that sleeps on `progress` and prints nothing for any other verb, so `dependents` lists none:
+# first sleeping 0, then 3 x PROGRESS_BOUND. Each `--landed tRun` exits 0; the second alone prints
+# `progress not emitted`, and is slower than the first by at most PROGRESS_BOUND, `init_bounded`'s
+# 5 s kill grace and a 5 s margin (PINNED 2026-11-23). STAGED: the base driver, whose unbounded verb
+# sleeps the whole 3 x PROGRESS_BOUND; RED, observed at the close. WHAT THIS BLOCK DOES NOT DRIVE:
+# the park's call, which is the same function, and a host with no runnable `timeout`.
+# ==================================================================================================
+kd44_stub=$(mktemp -d)
+printf '%s\n' 'import sys, time' 'if sys.argv[1:2] == ["progress"]:' \
+  '    time.sleep(float(open(sys.argv[0] + ".s", encoding="utf-8").read()))' > "$kd44_stub/loop_transition.py"
+eval "$(declare -f resolve_position_engine | sed '1s/^resolve_position_engine/resolve_kd44_engine/')"
+run_kd44_landed() { # seconds the stub sleeps -> the in-process --landed output, then `rc <n> took <s>`
+  local s=$EPOCHSECONDS out rc
+  printf '%s' "$1" > "$kd44_stub/loop_transition.py.s"
+  out=$( ( GATE_BOUND_LIVE=$REMOTE_BOUND_LIVE
+           resolve_position_engine() { # the stub for loop_transition.py, the real engine for every other script
+             if [ "${1:-}" = loop_transition.py ]; then PE_PY=$_rkd_py; PE_PATH=$kd44_stub/loop_transition.py; return 0; fi
+             resolve_kd44_engine "$@"; }
+           load_driver_conf && main --landed tRun ) 2>&1 ); rc=$?
+  printf '%s\nrc %s took %s\n' "$out" "$rc" "$((EPOCHSECONDS - s))"
+}
+build_claim_landing
+kd44_zero=$(run_kd44_landed 0)
+remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"
+build_claim_landing
+kd44_hang=$(run_kd44_landed "$((3 * PROGRESS_BOUND))")
+kd44_t0=$(sed -n 's/^rc [0-9]* took \([0-9]*\)$/\1/p' <<<"$kd44_zero"); kd44_t1=$(sed -n 's/^rc [0-9]* took \([0-9]*\)$/\1/p' <<<"$kd44_hang")
+same "KDS44 AC30 under a stub sleeping 0, --landed exits 0 and prints no progress note" \
+  "$(grep -c '^rc 0 took ' <<<"$kd44_zero") $(grep -c 'progress not emitted' <<<"$kd44_zero")" "1 0"
+same "KDS44 AC30 under a stub sleeping 3 x PROGRESS_BOUND, --landed exits 0 printing progress not emitted" \
+  "$(grep -c '^rc 0 took ' <<<"$kd44_hang") $(grep -c '^unattended: NOTE — progress not emitted: ' <<<"$kd44_hang")" "1 1"
+same "KDS44 AC30 ...and is at most PROGRESS_BOUND + 5 s grace + 5 s margin slower than the stub sleeping 0" \
+  "$(( ${kd44_t1:-999} - ${kd44_t0:-0} <= PROGRESS_BOUND + 10 ))" "1"
+remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"; rm -rf "$kd44_stub"; reset_tree
 
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -21280,6 +21325,44 @@ same "KDS25 AC3 its line planted 31 hours ago it reads defaulted, and --open --i
   "$ma_got $(run_deadline_arm c1 r1 read tFix --open --ids)" "defaulted none"
 same "KDS25 AC3 ...and --mail read shows it expired, deadline 30, default no" \
   "$(run_deadline_arm c1 r1 read tFix | awk -F'\t' -v q="${ma_q3:-unposted}" '$1 == q { print $4, $15, $16 }')" "expired 30 no"
+rm -rf "$LF"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
+# KICK-dKeptSession-44 AC25, AC27 — A REPLY POSTS THROUGH ITS OWN VERB, AND NO POST WRITES PAST A FAILED
+# FETCH. Unit 24's lease fixture again, c2 a second clone asking as fy. AC25: c2's question to
+# build:tFix; c1, posting as a third build dB, `--mail post dB --to build:fy --kind ack --answers <id>
+# <body>`, the form S28 names, exits 2 naming `--mail ack`, and `--kind answer` names `--mail answer`;
+# `--mail read tFix --open --ids` still prints the id; `--mail ack tFix <id>` then posts, and the id is
+# open no more. AC27: the origin moved away, `--mail post tFix --to build:fy --kind landed` exits 2
+# naming the failed `git fetch`, and with the origin moved back neither it nor c1 holds the session's
+# mail ref. STAGED: the base driver, which posts the third build's ack and releases the question, and
+# a scratch copy of the driver reading a failed fetch as 0; RED, observed at the close. WHAT THIS BLOCK
+# DOES NOT DRIVE: a fetch killed by the driver's own bound, whose refusal is the same branch's.
+# ==================================================================================================
+LF=$(mktemp -d); write_lease_fixture
+git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null && git -C "$LF/c2" config user.email t@t.test \
+  && git -C "$LF/c2" config user.name t && git -C "$LF/c2" config core.autocrlf false
+printf 'a reply body\n' > "$LF/body.txt"
+kd44_q=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q held' --default no "$LF/body.txt" \
+  | sed -n 's/^mail — posted \([0-9a-f]*\) · .*/\1/p')
+kd44_got=""
+for kd44_k in ack answer; do
+  kd44_out=$(run_deadline_arm c1 x1 post dB --to build:fy --kind "$kd44_k" --answers "${kd44_q:-unposted}" "$LF/body.txt")
+  kd44_got="$kd44_got$? $(grep -c -- "post it with --mail $kd44_k," <<<"$kd44_out");"
+done
+same "KDS44 AC25 a third build's --mail post of kind ack, then answer, exits 2 naming that reply's own verb" "$kd44_got" "2 1;2 1;"
+same "KDS44 AC25 ...and the question is still the one open id" "$(run_deadline_arm c1 r1 read tFix --open --ids)" "${kd44_q:-unposted}"
+kd44_out=$(run_deadline_arm c1 x2 ack tFix "${kd44_q:-unposted}"); kd44_rc=$?
+same "KDS44 AC25 --mail ack tFix <id> posts, and no id is open after it" \
+  "$kd44_rc $(grep -c '^mail — posted ' <<<"$kd44_out") $(run_deadline_arm c1 r1 read tFix --open --ids)" "0 1 none"
+mv "$LF/origin.git" "$LF/origin.gone"
+kd44_out=$(run_deadline_arm c1 x3 post tFix --to build:fy --kind landed --subject gone "$LF/body.txt"); kd44_rc=$?
+mv "$LF/origin.gone" "$LF/origin.git"
+same "KDS44 AC27 an unreachable origin refuses the post, exit 2 naming the fetch, and no mail ref of the session stands" \
+  "$kd44_rc $(grep -c '^mail — not written · the remote did not answer, git fetch exited ' <<<"$kd44_out") $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/mail/tFix/a/x3 | grep -c .) $(git -C "$LF/c1" for-each-ref refs/gov | grep -c '/x3$')" \
+  "2 1 0 0"
 rm -rf "$LF"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -25093,7 +25176,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # (AC7 2, AC8 2), each unconditional and outside any loop, off the diff's own lines; the KDS25 read-form
 # arm re-armed for `[--sent]` adds none. No skip branch. No suite ran, and its RED-first observation is
 # the close's.
-FLOOR_ASSERTIONS=4180
+# RAISED 4180 -> 4187 by KICK-dKeptSession-44 on 2026-11-23: the reply-verb and fetch block's 4 and the
+# hung-progress block's 3 region-eight `same` (AC25 3, AC27 1, AC30 3), each unconditional and outside
+# any loop, off the diff's own lines; the landed-notice fixture's region adds none. No skip branch. No
+# suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4187
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25391,7 +25478,8 @@ FLOOR_SHARD_7=311
 # RAISED 1387 -> 1390 by KICK-dKeptSession-35: the same 3 region-eight re-landing assertions, see FLOOR_ASSERTIONS.
 # RAISED 1390 -> 1393 by KICK-dKeptSession-11: the same 3 region-eight progress assertions, see FLOOR_ASSERTIONS.
 # RAISED 1393 -> 1397 by KICK-dKeptSession-61: the same 4 region-eight sent-read assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1397
+# RAISED 1397 -> 1404 by KICK-dKeptSession-44: the same 7 region-eight reply-verb, fetch and progress assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1404
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

@@ -374,7 +374,11 @@ from collections import Counter  # noqa: E402
 # check moves, and one check lands in `test_extract_context_window` — the 150000-token turn beside its
 # 900000-token sibling read under CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000 at 75% with source env (AC1).
 # 1 + 0 = 1
-ASSERTION_FLOOR = 1630
+# RAISED 1630 -> 1632 by KICK-dKeptSession-44, the refused orient row: NO new arm, so no decoy check
+# moves, and two checks land in `test_extract_orient` — the owner-ceiling case under
+# `budgets.enforce = "refuse"` and with the cap in `budgets.pinned`, each refusing the 40-call row (AC9).
+# 2 + 0 = 2
+ASSERTION_FLOOR = 1632
 
 PASS = []
 FAIL = []
@@ -2327,6 +2331,13 @@ def test_extract_orient():
           (r.returncode, [ln.split("sid=")[1] for ln in lines if ln.startswith("runlog: orient WARN")],
            sum(ln.startswith("BUDGET WARN — orient-calls") for ln in lines)),
           (0, [f"{heavy} source=main stage=step.design calls 40 past the owner ceiling 30"], 1))
+    # KICK-dKeptSession-44 S11: the same case under `budgets.enforce = "refuse"`, then with the cap in
+    # `budgets.pinned`, each refusing the 40-call row alone and exiting 1.
+    for label, budgets in (("orient-refuse", 'enforce = "refuse"\n'), ("orient-pinned", 'pinned = ["orient-calls"]\n')):
+        r, lines, rows = run_orient('[orient]\nbudget = "owner-ceiling"\n\n[budgets]\n' + budgets + '"orient-calls" = 30\n')
+        check(f"orient AC5 {label}: owner-ceiling at 30 refuses the 40-call row alone, exit 1",
+              (r.returncode, [ln.split("sid=")[1] for ln in lines if ln.startswith("runlog: orient REFUSED")]),
+              (1, [f"{heavy} source=main stage=step.design calls 40 past the owner ceiling 30"]))
     r, lines, rows = run_orient('[orient]\nbudget = "owner-ceiling"\n')
     check("orient AC5: owner-ceiling with no budgets.orient-calls prints one NOTE naming it and no WARN",
           (r.returncode, sum(ln.startswith("runlog: orient NOTE budgets.orient-calls") for ln in lines),

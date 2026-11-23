@@ -113,7 +113,9 @@ then that sent read's four rows read `acked` and `build:fy`'s sent read refused.
 
 THE NOTICES (KICK-dKeptSession-7 S4, S9). On a move from designing to building, after the card follow,
 `write_dependency_notices` posts the build's frozen interfaces to each dependent `dependents --build <slug>`
-lists, every build whose README's `parents:` names it: the driver's `--mail post <slug> --to
+lists, every build the "Child builds" line of its own README's rendered `<!-- gen:build-edges -->` region
+names, the memory-tree kit's inversion of `parents:` (KICK-dKeptSession-44 S20), so a dependent opened
+after that README's last render is not notified until the next: the driver's `--mail post <slug> --to
 build:<dependent> --kind confirmed --subject "interfaces <slug>" --interface <listing> --pass <n>`, the
 listing the bytes of `git ls-tree -r` over the build's `spec/` folder at the transition commit (at HEAD
 where the set makes none), the body that commit's sha, and `<n>` the Design-exit ordinal, one plus the
@@ -268,6 +270,8 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
           "mail-no-driver": "the driver's conf, the driver's locator run over an empty scratch directory: B4 "
                             "records with the mailbox unarmed",
           "mail-no-bash": "the driver's conf and resolve_bash answering None: B4 refused as mail unknown, no commit",
+          "mail-read-crash": "the driver's conf and the guard's --mail read answering exit 3 with no output: B4 "
+                             "refused as mail unknown naming the read's exit, no commit",
           "deps-notices": "the driver's conf with RUN_CLAIMS on, a bare remote and tDep naming tFix in parents: B5 at "
                           "an older --witness posts one confirmed to build:tDep keyed over tFix's spec listing at the "
                           "transition commit; B8 back and B5 again post changed with another key, no second confirmed",
@@ -332,7 +336,8 @@ FX_BUILD = "tFix"
 FX_UNIT = "TOOL-tFix-1"
 FX_SPEC = "memory/builds/tFix/spec/2026-01-01-spec-%s.md" % FX_UNIT
 #: The `deps-notices` plant's dependent, whose README names `FX_BUILD` in `parents:` (KICK-dKeptSession-7 AC7),
-#: and the session its posts run as.
+#: and the session its posts run as. `FX_BUILD`'s README then holds the region `render_edges` renders over
+#: its dependents (KICK-dKeptSession-44 S20).
 FX_DEPENDENT = "tDep"
 FX_SESSION = "s-notice"
 #: The two dependents of the `notices-` plants (KICK-dKeptSession-35 AC1, AC3), each README naming `FX_BUILD`.
@@ -712,25 +717,30 @@ def derive_interface_listing(root, build, commit):
 
 
 def read_dependents(root, build):
-    """Every build whose README front matter's `parents:` names `build` (KICK-dKeptSession-7 S9), read by the
-    memory-tree kit's `parse_front_matter` as `loop_parents.read_withdrawn_parents` reads it, sorted. A README
-    whose bytes hold no `parents:` names no parent and is not parsed. ValueError on a README that does not
-    read; LookupError where the memory-tree kit does not resolve."""
+    """Every build `build`'s own README names in its rendered `<!-- gen:build-edges -->` region
+    (KICK-dKeptSession-44 S20): the link texts of the "Child builds" line the memory-tree kit's `render_edges`
+    writes, the inversion of every README's `parents:` its `plan` derives, found by `GEN_REGIONS`' markers
+    and that line's lead `render_edges` itself prints, sorted. No README's `parents:` is read here, so a
+    dependent opened after the parent's last `gen_build_index.py --write` is listed from the next render on.
+    An absent README, region or line lists none. ValueError on a README that does not read; LookupError
+    where the memory-tree kit does not resolve."""
     read_memory_tree("gen_build_index.py")
-    from gen_build_index import Problem, parse_front_matter
-    builds = pathlib.Path(root) / resolve_memory_root(root) / "builds"
-    out = []
-    for readme in sorted(builds.glob("*/README.md")) if builds.is_dir() else []:
-        slug = readme.parent.name
-        try:
-            if slug == build or b"parents:" not in readme.read_bytes():
-                continue
-            fm = parse_front_matter(str(readme), slug)
-        except (Problem, OSError) as e:
-            raise ValueError("the build %s's README does not read: %s" % (slug, e)) from None
-        if build in (fm.get("parents") or "").split():
-            out.append(slug)
-    return out
+    from gen_build_index import GEN_REGIONS, render_edges
+    mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-edges")
+    lead = next(ln for ln in render_edges({"parents": [], "children": ["x"]}).split("\n") if "[x]" in ln)
+    lead = lead[:lead.index("[x]")]
+    readme = pathlib.Path(root) / resolve_memory_root(root) / "builds" / build / "README.md"
+    try:
+        text = readme.read_bytes().decode("utf-8")
+    except FileNotFoundError:
+        return []
+    except (OSError, UnicodeDecodeError) as e:
+        raise ValueError("the build %s's README does not read: %s" % (build, e)) from None
+    start = text.find(mo)
+    end = text.find(mc, start) if start >= 0 else -1
+    lines = text[start + len(mo):end].splitlines() if end >= 0 else []
+    line = next((ln.rstrip("\r") for ln in lines if ln.startswith(lead)), "")
+    return sorted(re.findall(r"\[([^\]]+)\]\(", line[len(lead):]))
 
 
 def check_parent_interfaces(root, slug, parent):
@@ -1328,11 +1338,17 @@ def write_transition_plant(top, case):
             '\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="on"\n'
     # KICK-dKeptSession-7 AC7: the second build, its README naming tFix a parent; KICK-dKeptSession-35 AC1, AC3: two;
     # KICK-dKeptSession-52 S1: dA alone, since the id carries the recipient and a second one decides nothing
-    for dependent in ((FX_DEPENDENT,) if case == "deps-notices" else FX_DEPENDENTS[:1] if case == "notices-repeat-key"
-                      else FX_DEPENDENTS if notices else ()):
+    dependents = ((FX_DEPENDENT,) if case == "deps-notices" else FX_DEPENDENTS[:1] if case == "notices-repeat-key"
+                  else FX_DEPENDENTS if notices else ())
+    for dependent in dependents:
         files["memory/builds/%s/README.md" % dependent] = (
             "---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: TOOL\nids: TOOL-%s-1\nparents: %s\n"
             "---\n# %s\n" % (dependent, dependent, FX_BUILD, dependent))
+    if dependents:   # KICK-dKeptSession-44 S20: the parent's README holds the region the index renders, by its renderer
+        read_memory_tree("gen_build_index.py")
+        from gen_build_index import render_edges
+        files["memory/builds/%s/README.md" % FX_BUILD] = "# %s\n\n%s\n" % (
+            FX_BUILD, render_edges({"parents": [], "children": sorted(dependents)}))
     write_fixture_files(top, files)
     run_fixture_git(top, "add", "-A")
     run_fixture_git(top, "commit", "-q", "-m", "fixture")
@@ -1869,7 +1885,7 @@ def run_transition_fixture(case):
             value = run_fixture_git(top, "log", "-1", "--format=%%(trailers:key=%s,valueonly)" % TRAILER_KEY)
             print("%s: fixture · next move · %s" % (SAY, "disposes again: " + value if "disposed=" in value else "disposes nothing"))
             return run_verb(["check", *at])
-        if case in ("mail-argv", "mail-no-driver", "mail-no-bash"):   # KICK-dKeptSession-36 S4: the guard's launch
+        if case in ("mail-argv", "mail-no-driver", "mail-no-bash", "mail-read-crash"):   # KICK-dKeptSession-36 S4: the guard's launch
             import subprocess   # each plant rebinds the name the guard imports inside its function, then restores it
             import loop_lib
             import loop_witness
@@ -1883,6 +1899,11 @@ def run_transition_fixture(case):
                     return subprocess.CompletedProcess(argv, 0, "", "")
                 return real_run(argv, *rest, **kw)
 
+            def run_mail_crash(argv, *rest, **kw):   # KICK-dKeptSession-44 S29: the --mail read exits 3, printing nothing
+                if "--mail" in [str(a) for a in argv]:
+                    return subprocess.CompletedProcess(argv, 3, "", "")
+                return real_run(argv, *rest, **kw)
+
             def resolve_empty_kit(home, anchor, here):   # the driver's locator over an empty scratch directory
                 return real_locate(home, anchor, empty if (home, anchor) == ("unattended", "unattended.sh") else here)
 
@@ -1890,14 +1911,15 @@ def run_transition_fixture(case):
                 return None
             owner, name, stand_in = {"mail-argv": (subprocess, "run", run_mail_spawn),
                                      "mail-no-driver": (loop_lib, "resolve_kit_dir", resolve_empty_kit),
-                                     "mail-no-bash": (loop_witness, "resolve_bash", resolve_no_bash)}[case]
+                                     "mail-no-bash": (loop_witness, "resolve_bash", resolve_no_bash),
+                                     "mail-read-crash": (subprocess, "run", run_mail_crash)}[case]
             real, before = getattr(owner, name), read_count()
             setattr(owner, name, stand_in)
             try:
                 rc = run_verb(b4)
             finally:
                 setattr(owner, name, real)
-            if case == "mail-no-bash":
+            if case in ("mail-no-bash", "mail-read-crash"):
                 print("%s: fixture · commits %s" % (SAY, "unchanged" if read_count() == before else "changed"))
             if case != "mail-argv":
                 return rc
@@ -2070,6 +2092,9 @@ def run_selftest():
              ("mail-no-bash", fx("mail-no-bash"), 2, "%s: unanswered · mail unknown: no bash that can see " % SAY,
               "unattended.sh"),
              ("mail-no-bash commits", fx("mail-no-bash"), 2, "%s: fixture · commits unchanged" % SAY, ""),
+             ("mail-read-crash", fx("mail-read-crash"), 2, "%s: unanswered · mail unknown: --mail read %s exited 3: "
+              "no output" % (SAY, FX_BUILD), ""),
+             ("mail-read-crash commits", fx("mail-read-crash"), 2, "%s: fixture · commits unchanged" % SAY, ""),
              ("deps-notices", fx("deps-notices"), 0, "%s: fixture · deps-notices · held" % SAY, ""),
              ("notices-two-dependents", fx("notices-two-dependents"), 0,
               "%s: fixture · notices-two-dependents · held" % SAY, ""),
@@ -2153,7 +2178,8 @@ def main(argv):
     chk.add_argument("--build")
     chk.add_argument("--root", default=".")
     chk.add_argument("--selftest", action="store_true", help="the tree's definition, then every plant")
-    dep = sub.add_parser("dependents", help="the builds whose README's parents: names --build, one per line")
+    dep = sub.add_parser("dependents", help="the builds --build's README's rendered build-edges region names "
+                                            "as its child builds, one per line")
     dep.add_argument("--build", required=True)
     dep.add_argument("--root", default=".")
     pro = sub.add_parser("progress", help="print the owner's progress line where notify.owner selects the event")

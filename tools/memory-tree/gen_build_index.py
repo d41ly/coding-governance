@@ -9,7 +9,7 @@
     python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
     python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
     python <prefix>/memory-tree/gen_build_index.py --doctor <slug> # every failing rule for one build folder
-    python <prefix>/memory-tree/gen_build_index.py --latest-records <slug>  # the newest bound record per kind
+    python <prefix>/memory-tree/gen_build_index.py --latest-records <slug>  # the newest bound record of each base kind
     python <prefix>/memory-tree/gen_build_index.py --new-spec <ID> --tier <1|2>  # a spec skeleton
     python <prefix>/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
 
@@ -193,6 +193,7 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
     BIND_HEAD_LINES, BIND_RE, GIT_ENV_LEAKS, HDR_RE, RECORD_KIND_TOKENS, RECORD_KINDS, STATUS_TOKENS, TERMINAL,
+    TYPED_RECORD_KINDS,
     UNBOUND_RE, _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, derive_constant_charges, kit_rel,
     parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at, read_id_pins, read_policy_value,
     read_text, record_paths, scan_missing_citations, unfenced, unfenced_lines,
@@ -705,11 +706,13 @@ def derive_audit_writers(root: str, memory_root: str, rels, resolve=None) -> set
 
 
 def cmd_latest_records(root: str, conf: dict, slug: str) -> int:
-    """READ-ONLY (KICK-dKeptSession-13 S3): one `<kind> <path>` line per `RECORD_KIND_TOKENS` kind the
-    build's bound records carry, the newest of that kind by filename, sorted by kind. `read_bindings`
-    runs over the build folder's tracked paths alone, so a kind `TYPED_RECORD_KINDS` gains is read with
-    no change here. Exit 0, a build with no bound record printing nothing; 2 on a slug that is not one.
-    WHAT THIS DOES NOT CHECK: that a record's content is current; the newest name is the newest date."""
+    """READ-ONLY (KICK-dKeptSession-13 S3): one `<kind> <path>` line for each base kind the build's bound
+    records carry, `RECORD_KIND_TOKENS` less `TYPED_RECORD_KINDS`, the newest of that kind by filename,
+    sorted by kind. `read_bindings` runs over the build folder's tracked paths alone, and a typed kind is
+    never printed, so a kind `TYPED_RECORD_KINDS` gains never lengthens the card's `records —` line
+    (KICK-dKeptSession-44 S22). Exit 0, a build with no bound record printing nothing; 2 on a slug that
+    is not one. WHAT THIS DOES NOT CHECK: that a record's content is current; the newest name is the
+    newest date."""
     if not re.fullmatch(r"[A-Za-z0-9]+", slug or ""):
         print(f"build-index: --latest-records takes a build slug, [A-Za-z0-9]+, and was given {slug!r}",
               file=sys.stderr)
@@ -717,8 +720,9 @@ def cmd_latest_records(root: str, conf: dict, slug: str) -> int:
     folder = f"{conf['MEMORY_ROOT']}/builds/{slug}/"
     tracked = [p for p in run("git", "ls-files", "--", folder, cwd=root).split("\n") if p]
     newest: dict = {}
+    base = set(RECORD_KIND_TOKENS) - set(TYPED_RECORD_KINDS)
     for rel, rec in read_bindings(root, tracked, conf).items():
-        kind = rec["kind"] if rec["state"] == "bound" else None
+        kind = rec["kind"] if rec["state"] == "bound" and rec["kind"] in base else None
         if kind and (kind not in newest or os.path.basename(rel) > os.path.basename(newest[kind])):
             newest[kind] = rel
     for kind in sorted(newest):

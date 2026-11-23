@@ -1291,9 +1291,16 @@ CONTEXT_WINDOW_SCAN = 20
 
 def derive_context_tokens(ev) -> int:
     """The context one `usage` event read: its `in`, `cache_read` and `cache_write` summed, the one
-    such sum in the kit, which `measure_ready_tree`, `derive_context_fill` and `derive_context_window`
-    call."""
+    such sum in the kit, which `measure_ready_tree`, `derive_context_fill`, `derive_context_window` and
+    `derive_spent_tokens` call."""
     return ev["in"] + ev["cache_read"] + ev["cache_write"]
+
+
+def derive_spent_tokens(ev) -> int:
+    """The tokens one `usage` event or ready row spent: `derive_context_tokens` and its `out`, the one
+    four-field sum in the kit (KICK-dKeptSession-44 S40), which `runlog.print_ready` and
+    `measure_orient_tree` call."""
+    return derive_context_tokens(ev) + ev["out"]
 
 
 def derive_context_window(model, root=None, held=None) -> tuple:
@@ -1568,7 +1575,7 @@ def measure_orient_tree(root, repo, slug) -> dict:
                 if ev["kind"] == "tool":
                     row["calls"] += 1
                 elif ev["kind"] == "usage":
-                    row["tokens"] += ev["in"] + ev["out"] + ev["cache_read"] + ev["cache_write"]
+                    row["tokens"] += derive_spent_tokens(ev)
             last = None
             for ev in mains:
                 if t_action is not None and ev["t"] >= t_action:

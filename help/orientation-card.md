@@ -131,8 +131,10 @@ budget — open 3/10
 mail — 6299617af701
 ```
 
-- `records —` names the build's newest record of each kind, one per kind, read by the memory-tree
-  kit's `gen_build_index.py --latest-records <slug>`.
+- `records —` names the build's newest record of each base kind, one per kind, read by the memory-tree
+  kit's `gen_build_index.py --latest-records <slug>`: a spec audit, a diff review, a journal and a
+  research record. A typed record, such as a deviation, a red-fix or a transition, is never named,
+  so however many your build keeps, the line stays short.
 - `forks —` names the spec of each unit whose open questions are still unresolved, with its `§8`, or
   `none`.
 - `item —` names the item in flight, the loop kit's instance key, or `none` while the build waits on

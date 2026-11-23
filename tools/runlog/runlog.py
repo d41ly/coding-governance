@@ -236,7 +236,7 @@ def print_ready(root) -> int:
         f"{k}={report[k]}" for k in ("sessions", "ready", "card", "text")))
     rows = report["rows"]
     for label, values in (
-            ("spent_tokens", [r["in"] + r["out"] + r["cache_read"] + r["cache_write"] for r in rows]),
+            ("spent_tokens", [ex.derive_spent_tokens(r) for r in rows]),
             ("context_growth", [r["context_ready"] - r["context_first"] for r in rows
                                 if r["context_first"] is not None]),
             ("minutes", [r["minutes"] for r in rows])):

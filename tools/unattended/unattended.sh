@@ -9347,12 +9347,19 @@ resolve_position_engine() { # [script] -> sets PE_PY and PE_PATH; 1 where python
 # kit script, keeping its whole output in `_bd_out` and printing nothing, and answers 1 where the script
 # does not resolve, so a caller that reads nothing then can tell that apart from a refusal. `run_budget_verb`
 # is it over `budget.py`, its output printed, its texts and globals byte for byte what they were.
+# Where the caller sets RB_BOUND for the call, the verb runs through `run_bounded` under that bound, its
+# stdout then its stderr in `_bd_out` and a fired bound `timeout`'s exit in `_bd_rc`; with RB_BOUND
+# empty it runs as it always ran (KICK-dKeptSession-44 S33). `print_progress` is the one bounded caller.
 run_loop_verb() { # script · verb · flag=value... -> sets _bd_out, _bd_why to its first line and _bd_rc to its exit; 1 where it does not resolve
   _bd_out=""
   _bd_why="the loop kit's $1 or python does not resolve beside this kit, so the $2 cannot be made"
   _bd_rc=2
   resolve_position_engine "$1" || return 1
-  _bd_out=$("$PE_PY" "$PE_PATH" "${@:2}" 2>&1); _bd_rc=$?
+  if [ -n "$RB_BOUND" ]; then
+    run_bounded "$PE_PY" "$PE_PATH" "${@:2}"; _bd_rc=$?; _bd_out=$RB_OUT
+  else
+    _bd_out=$("$PE_PY" "$PE_PATH" "${@:2}" 2>&1); _bd_rc=$?
+  fi
   _bd_why=${_bd_out%%$'\n'*}; _bd_why=${_bd_why%$'\r'}
   [ -n "$_bd_why" ] || _bd_why="$1 $2 printed nothing and exited $_bd_rc"
   return 0
@@ -9924,15 +9931,28 @@ check_keepalive_reaped() { # slug · run-state file -> 0 read back or announced 
 # a key that does not read is said and never read as the default, each carriage return a Windows python
 # writes dropped. `verb_park` calls it after a park that wrote, and `verb_landed` at each success exit,
 # ahead of the landed notices. Returns 0 on every path.
-print_progress() { # slug · event · detail -> 0, the verb's line, its refusal or nothing
-  run_loop_verb loop_transition.py progress "--build=$1" "--event=$2" "--detail=$3" || return 0
+# BOUNDED (KICK-dKeptSession-44 S33): the verb runs under PROGRESS_BOUND seconds through `run_loop_verb`,
+# since a landing must never wait on a progress line; a fired bound, `timeout`'s 124 or its kill's 137,
+# prints `unattended: NOTE — progress not emitted: <why>` in place of the verb's lines, and the caller's
+# exit and lines are unmoved. `run_bounded print_progress` could not do this: `init_bounded` runs its
+# argv in a child bash, where no driver function exists. A literal, as REMOTE_BOUND's 60 is too long
+# for a lander's note.
+PROGRESS_BOUND=10
+print_progress() { # slug · event · detail -> 0, the verb's line, its refusal, a NOTE or nothing
+  RB_BOUND=$PROGRESS_BOUND run_loop_verb loop_transition.py progress "--build=$1" "--event=$2" "--detail=$3" || return 0
+  case "$_bd_rc" in
+    124|137) echo "unattended: NOTE — progress not emitted: the loop kit's progress verb ran past its ${PROGRESS_BOUND}s bound"
+             return 0 ;;
+  esac
   [ -z "$_bd_out" ] || printf '%s\n' "${_bd_out//$'\r'/}"
   return 0
 }
 
 # THE LANDED NOTICE (KICK-dKeptSession-7 S5): at both of `verb_landed`'s success exits, one `landed`
-# message to each build whose README's `parents:` names <slug>, as the loop kit's
-# `loop_transition.py dependents` lists them, kind `landed`, subject `landing <slug>`, its body the
+# message to each build the "Child builds" line of <slug>'s own README's rendered `gen:build-edges`
+# region names, the memory-tree kit's inversion of `parents:`, as the loop kit's
+# `loop_transition.py dependents` lists them (KICK-dKeptSession-44 S20), so a dependent opened after
+# that README's last render hears nothing until the next; kind `landed`, subject `landing <slug>`, its body the
 # landed <sha>, posted through `( main --mail post … --pass <sha8> )`, the sha's first eight hex, so a
 # re-landing after a revert is a new message and never a duplicate (KICK-dKeptSession-35 S2), with the
 # post's lines printed, and where the post exits non-zero one more, `notice — not posted landed to
@@ -20283,7 +20303,12 @@ while [ $# -gt 0 ]; do
                     done
                     if [ -n "$_rl_rc" ]; then :
                     elif [ "$MV_ACT" = post ]; then
-                      if [ "${#MV_POS[@]}" != 2 ] || [ "$MV_OPEN$MV_IDS$MV_LOCAL$MV_SENT" != 000 ] || [ "${#MV_CITE[@]}" != 0 ] || [ "${#MV_RING[@]}" != 0 ] || [[ " $MV_FLAGS " != *" --to "* ]] \
+                      # KICK-dKeptSession-44 S28: a reply is posted by its own verb, which reads the row it
+                      # answers, so no third build's post can release another build's question; judged
+                      # first, so the refusal names that verb whatever else the post's form lacks
+                      if [ "$MV_KIND" = ack ] || [ "$MV_KIND" = answer ]; then
+                        echo "mail — not written · --mail post takes no --kind $MV_KIND: post it with --mail $MV_KIND, which reads the row it replies to"; _rl_rc=2
+                      elif [ "${#MV_POS[@]}" != 2 ] || [ "$MV_OPEN$MV_IDS$MV_LOCAL$MV_SENT" != 000 ] || [ "${#MV_CITE[@]}" != 0 ] || [ "${#MV_RING[@]}" != 0 ] || [[ " $MV_FLAGS " != *" --to "* ]] \
                           || [[ " $MV_FLAGS " != *" --kind "* ]] || [[ " $MV_FLAGS " != *" --subject "* ]]; then
                         echo "mail — not written · the form is --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] [--default <text>] <body file>"; _rl_rc=2
                       else write_mail_post "${MV_POS[0]}" "$MV_TO" "$MV_KIND" "$MV_SUB" "${MV_ITEM:-none}" "${MV_PASS:-none}" "${MV_ANS:-none}" "${MV_POS[1]}" "${MV_IFC:-none}" ${MV_DEF[@]+"${MV_DEF[@]}"}; _rl_rc=$?; fi

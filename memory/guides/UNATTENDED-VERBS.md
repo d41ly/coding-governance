@@ -612,6 +612,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `confirmed`, `changed`, `overlap`, `takeover`, `landed`, `question`, `answer`, `ack`, `intake`,
   `withdrawn` and `superseded`, as its `loop_lib.py --mail-kinds` prints them; the recipient is one
   of four forms, `build:<slug>`, `unit:<id>`, `node:<fleet tag>` or the bare word `project`. A
+  post of kind `ack` or `answer` is refused, `mail — not written · --mail post takes no --kind <kind>:
+  post it with --mail <kind>, which reads the row it replies to` (exit 2), since `--mail ack` and
+  `--mail answer` post those kinds after reading the row they reply to (KICK-dKeptSession-44 S28). A
   `confirmed` or `changed` post names the file of the interface it announces with `--interface`,
   and no other kind names one. A `question` or a `confirm-request` declares the answer it takes if
   nobody answers in time with `--default`; any other kind may, and records `ack` where it does not.
@@ -694,7 +697,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   "fetch-seconds": <n>, "bash": <path>}`, the bash that ran the driver, then one `{"id": …, "kind": …,
   "to": …}` line per unread row; its mtime is the local copy's age, and a failed or `--local` notice
   leaves it untouched. The kit's `PostToolUse` hook `mail-notice.js` reads it at every tool call under
-  `every-tool-call` and adds `mail — <n> unread for <slug> · <ids> · local copy <age>s old` to the
+  `every-tool-call`, the session's build the route's `- build:` of the tree's card file
+  `.claude/orientation-card.md` whose `card-owner —` line names the session, else its run lease's, and adds `mail — <n> unread for <slug> · <ids> · local copy <age>s old` to the
   session's context, with no git, policy or network call; past `fetch-seconds` it creates
   `<stamp>.fetching` exclusively and, only then, starts this verb detached with the stamp's bash, which
   removes the marker when it ends, a marker older than twice the interval replaced. `--ring <ref>

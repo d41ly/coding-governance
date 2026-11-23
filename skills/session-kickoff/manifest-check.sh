@@ -2375,8 +2375,9 @@ write_card_follow() { # slug · state · terminal 0|1 -> its card — lines; 0 a
 # ---- the card's pointers (KICK-dKeptSession-13) ---------------------------------------------------
 # THE SECTION, I11: `## pointers` and its lines, in each tail `write_build_card` builds and in a session's
 # card, directly above the READY line, which stays last:
-#   records — <kind> <path> · …      the build's newest bound record of each kind, `gen_build_index.py
-#                                     --latest-records`, under CARD_RECORDS_BOUND
+#   records — <kind> <path> · …      the build's newest bound record of each base kind, `gen_build_index.py
+#                                     --latest-records`, under CARD_RECORDS_BOUND; a typed kind is never
+#                                     named, so the line cannot grow with them (KICK-dKeptSession-44 S22)
 #   forks — <spec path> §8 · …       each unit the item boundary's derivation grades FORKED, by its tracked
 #                                     spec under the build's `spec/`; the `§8` a word apart, so the path is
 #                                     one token `extract_card_tokens` finds tracked

@@ -75,10 +75,11 @@ mkrepo empty
 want "--scaffold with no commit names the re-run" 0 're-run --scaffold after the first commit' --scaffold --preset standard --target "$R"
 
 # 4b — the preset (KICK-dKeptSession-4 S2): with no policy file, a --scaffold naming no preset refuses
-# before any write, and one naming a preset the catalogue does not hold writes nothing.
+# before any write, and one naming a preset the catalogue does not hold writes nothing, the scaffold's
+# exit 2 and its refusal passed through (KICK-dKeptSession-44 S13).
 mkrepo no-preset commit
 want "--scaffold with no file and no --preset refuses" 2 'pass --preset <name>' --scaffold --target "$R"
-want "--scaffold --preset lax writes nothing" 1 'policy: the scaffold could not be written to ' --scaffold --preset lax --target "$R"
+want "--scaffold --preset lax refuses with the scaffold's own line" 2 'policy: scaffold refused · preset · "lax" is not one of ["velocity", "standard", "strict", "guarded"]' --scaffold --preset lax --target "$R"
 if [ -e "$R/.governance/policy.toml" ]; then bad "no policy file after a refused scaffold" "$R/.governance/policy.toml exists"
 else ok "no policy file after a refused scaffold"; fi
 
