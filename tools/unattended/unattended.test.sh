@@ -9115,25 +9115,25 @@ printf 'MEMORY_ROOT=memory\nFORK_ITEM_CUTOFF="2026-07-01"\nFORK_RECORD_CUTOFF="2
 git add "$FK_SPEC" .memory-tree.conf >/dev/null 2>&1
 FK_HOLD="--dispatch declares a build pass for a unit whose spec grades FORKED, a section 8 fork that no conforming mark or fork record closes, and run.on-owner-question holds it before any code is written: "
 FK_BOUNDS='\n[review]\nmax-rounds = 7\n\n[review.design]\nrounds = "fixed-count"\nround-count = 7\n'
-fk_rows() { grep -c ' decision · ' memory/builds/tRun/RUN.md; }
-_fk0=$(fk_rows)
+measure_decision_rows() { grep -c ' decision · ' memory/builds/tRun/RUN.md; }
+_fk0=$(measure_decision_rows)
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
 hit "$o" "run.on-owner-question answers resolve: resolve each open F-item by principle.p18"
 hit "$o" "then dispatch again; ARCH-tRun-1 ($FK_SPEC) holds F1"
 miss "$o" "dispatch declared"
-same "fork hold: the default answer parks nothing" "$(fk_rows)" "$_fk0"
+same "fork hold: the default answer parks nothing" "$(measure_decision_rows)" "$_fk0"
 write_tracking_policy "run.on-owner-question = \"park-item\"\n$FK_BOUNDS"
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
 hit "$o" "run.on-owner-question answers park-item, so ARCH-tRun-1 is parked as a decision row naming F1, for the owner at the close"
-same "fork hold: park-item parks one decision row" "$(fk_rows)" "$((_fk0 + 1))"
+same "fork hold: park-item parks one decision row" "$(measure_decision_rows)" "$((_fk0 + 1))"
 hit "$(tail -n 1 memory/builds/tRun/RUN.md)" " decision · item ARCH-tRun-1 · reason open fork F1 held by run.on-owner-question"
 write_tracking_policy "run.on-owner-question = \"stop-run\"\n$FK_BOUNDS"
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
 hit "$o" "run.on-owner-question answers stop-run, so the run stops here: the next verb is --abort tRun"
-same "fork hold: stop-run parks nothing" "$(fk_rows)" "$((_fk0 + 1))"
+same "fork hold: stop-run parks nothing" "$(measure_decision_rows)" "$((_fk0 + 1))"
 write_tracking_policy "run.on-owner-question = \"park-build\"\n$FK_BOUNDS"
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 hit "$o" "run.on-owner-question answers park-build, so build tRun is parked as one decision row naming every FORKED unit: ARCH-tRun-1 (F1)"

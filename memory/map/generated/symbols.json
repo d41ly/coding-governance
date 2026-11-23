@@ -16078,11 +16078,6 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
-      "id": "fk_rows",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
       "id": "fkspec",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -18471,6 +18466,11 @@
       "id": "measure_cutoffs",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "measure_decision_rows",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "measure_design_recall",

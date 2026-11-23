@@ -265,7 +265,6 @@ policy:roles.shape-enforce	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:roles.trust	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:roles.verifier-context	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:run.host	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:run.on-owner-question	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:run.on-owner-silence	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:run.owner-deadline	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:runtime.act-auth	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
