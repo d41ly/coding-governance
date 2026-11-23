@@ -86,7 +86,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
@@ -125,7 +125,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-40 — a recorded harness-stage stop replayed against every `SubagentStop` hook a default install registers, red on any output, any block or any record](spec/2026-10-26-spec-TOOL-dBoundRoles-40.md) | 16 | 2 | CLOSED | rev-4 | 2026-11-23 |
 | [TOOL-dBoundRoles-4 — the prompt writer composing every role's task from the driver's details](spec/2026-10-25-spec-TOOL-dBoundRoles-4.md) | 17 | 2 | CLOSED | rev-6 | 2026-11-23 |
 | [TOOL-dBoundRoles-23 — the prompt writer's default frame, bounded lists, upstream rows, and the medium effort floor](spec/2026-10-25-spec-TOOL-dBoundRoles-23.md) | 18 | 2 | CLOSED | rev-7 | 2026-11-23 |
-| [TOOL-dBoundRoles-24 — the framing checked at render: every anchor a work order points at resolves to a fact it hands](spec/2026-10-25-spec-TOOL-dBoundRoles-24.md) | 19 | 2 | INPROGRESS | rev-6 | 2026-11-22 |
+| [TOOL-dBoundRoles-24 — the framing checked at render: every anchor a work order points at resolves to a fact it hands](spec/2026-10-25-spec-TOOL-dBoundRoles-24.md) | 19 | 2 | CLOSED | rev-6 | 2026-11-23 |
 | [TOOL-dBoundRoles-12 — the orientation scout's placement return through the typed channel, recorded and checked by the driver](spec/2026-10-25-spec-TOOL-dBoundRoles-12.md) | 20 | 2 | DEFERRED | rev-7 | 2026-11-22 |
 | [TOOL-dBoundRoles-41 — the anchor check grades the text a work order authors, never the content it hands, by the block extents the render assembled](spec/2026-10-26-spec-TOOL-dBoundRoles-41.md) | 20 | 2 | DEFERRED | rev-6 | 2026-11-22 |
 | [TOOL-dBoundRoles-11 — every fork resolved by the role that meets it with its full record, or held as `run.on-owner-question` says](spec/2026-10-25-spec-TOOL-dBoundRoles-11.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-22 |
@@ -158,7 +158,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 373 bound to this build, across 4 record folder(s).
+Records: 375 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

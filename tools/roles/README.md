@@ -183,6 +183,22 @@ render is refused naming `input:<name>` and the line when a line of the value wo
 marker line or a `Framed by:` line, or when a fence it opens never closes (`roles_lib.check_authored_lines`), and
 the anchor check grades the value whole.
 
+**Anchors resolve to handed facts** (TOOL-dBoundRoles-24). A task points at a handed fact by its key, in
+backticks, never by retyping it: that span is an anchor. `roles_lib.ANCHOR_RE` reads a backticked span whose text
+opens with `blob:`, `record:` or `cmd:`, and a well-formed anchor is the whole key of its form, the forms
+`derive_fact_key` writes: `blob:<path>@<12 hex>:<lo>-<hi>` with `lo <= hi`, both positive, `record:<id>@<12 hex>` or
+`cmd:<12 hex>:<12 hex>`; a span the prefix opens with any other shape is malformed, never skipped.
+`roles_lib.check_anchors(text, handed)` returns one line per anchor span that is malformed,
+``anchor `<span>` — malformed: <form expected>``, or names no key in `handed`, ``anchor `<span>` — resolves to no
+fact this work order hands``, each span once in first-seen order, and writes nothing. `render_handoff` calls it over
+the whole composed `## Task` section, after the fence check and before the marker is hashed, `handed` the keys of
+the facts that work order hands, so a planted anchor to nothing refuses the render with exit 1, naming every such
+anchor, and no file is written; the key refusals raise first, before the section is assembled. A handed block's own
+fact line is no backticked span, so a correct order refuses nothing. WHAT THIS DOES NOT SEE: a reference without the
+key shape, such as "see the spec's §4", which is prose; whether the fact behind a resolving anchor says what the task
+claims of it; the `## Role` section, the role's static text; a span inside a fenced block, read by
+`read_unfenced_lines`, so an example key belongs in a fence; and a span whose closing backtick is not on its line.
+
 The file is written under the build's `prompts/` folder as
 `<date>-prompt-<id>-<n>-<role without gov->.md`, and its `gov:handoff` marker line carries a hash of
 each section: `<!-- gov:handoff role=<slot> build=<slug> unit=<id|-> item=<item.step.name|-> path=<rel>
@@ -236,7 +252,8 @@ and `nostop`, each verbatim, authored text checked by the fence walk, and `### f
 prompt writer, and `--for` naming it, refuse: its own task is the driver's details, unframed. While the policy
 key `prompts.author` is `prompt-writer`, the hooks kit's spawn guard admits a spawn of any other role only
 with that framing (its `checkFraming`). WHAT THIS DOES NOT CHECK: that the framing says anything the work
-order supports, which TOOL-dBoundRoles-24's anchor check grades, nor a forged line inside a framing field.
+order supports, of which TOOL-dBoundRoles-24's anchor check grades only that each anchor resolves to a handed fact,
+nor a forged line inside a framing field.
 THE FRAME (TOOL-dBoundRoles-23): the work-order template's `reads` fill is one frame, aScoutedSeam's prompt
 skeleton. `roles_lib.FRAME_SLOTS` names its nine slots in order, `role`, `material`, `boundaries`,
 `population`, `upstream`, `contract`, `added`, `no-stop` and `return`; every block the render adds carries

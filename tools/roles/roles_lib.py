@@ -117,6 +117,12 @@ MARKER_RE = re.compile(r"^<!-- gov:handoff role=(?P<role>\S+) build=(?P<build>\S
 #: spells it again, as a kit imports no sibling kit. A text's fact lines are read only on the lines
 #: `read_unfenced_lines` yields, so a fact line quoted inside handed content is content (TOOL-dBoundRoles-38 S4).
 FACT_RE = re.compile(r"^<!-- gov:fact key=(?P<key>\S+) class=(?P<class>witnessed|decided|claimed) -->$", re.M)
+#: An anchor (TOOL-dBoundRoles-24 S1): a backticked span whose text opens with a fact-key prefix `derive_fact_key`
+#: writes, `blob:`, `record:` or `cmd:`, its text the group `span`. The group `key` is set only where the span is a
+#: whole key of its form, `blob:<path>@<12 hex>:<lo>-<hi>`, `record:<id>@<12 hex>` or `cmd:<12 hex>:<12 hex>`; a
+#: span the prefix opens with any other shape is a malformed anchor. A blob's `lo <= hi` is `check_anchors`'.
+ANCHOR_RE = re.compile(r"`(?P<span>(?P<key>blob:[^`\s]+@[0-9a-f]{12}:[1-9][0-9]*-[1-9][0-9]*"
+                       r"|record:[^`\s]+@[0-9a-f]{12}|cmd:[0-9a-f]{12}:[0-9a-f]{12})|(?:blob|record|cmd):[^`]*)`")
 #: The `--input` names whose value is typed on the command line rather than read from a file: each is keyed
 #: `cmd:` over the fixed argv `--input`, NUL, `<name>`, which is how `derive_fact_class` tells it `claimed`.
 ARGUMENT_INPUTS = ("diff", "question")
@@ -1961,6 +1967,32 @@ def render_fact_line(key, root):
         raise RolesError("the fact key %r does not read back through FACT_RE: a path holding whitespace "
                          "cannot be handed as a keyed fact" % key)
     return line
+
+
+def check_anchors(text, handed):
+    """One line per anchor span in text that is malformed or names no key in handed:
+    'anchor `<span>` — malformed: <form expected>' or
+    'anchor `<span>` — resolves to no fact this work order hands'. [] when every anchor resolves.
+    An anchor is an `ANCHOR_RE` span on a line `read_unfenced_lines` yields, so a span inside a fenced block is
+    never graded; `handed` is the set of keys the work order hands. Each span is named once, in first-seen order,
+    and nothing is written (TOOL-dBoundRoles-24 S2)."""
+    forms = {"blob": "blob:<path>@<12 hex>:<lo>-<hi>, lo <= hi, both positive integers",
+             "record": "record:<id>@<12 hex>", "cmd": "cmd:<12 hex>:<12 hex>"}
+    out, seen = [], set()
+    for _n, line in read_unfenced_lines(text):
+        for m in ANCHOR_RE.finditer(line or ""):
+            span, key = m.group("span"), m.group("key")
+            if span in seen:
+                continue
+            seen.add(span)
+            if key and key.startswith("blob:"):
+                lo, hi = key.rsplit(":", 1)[1].split("-")
+                key = key if int(lo) <= int(hi) else None
+            if key is None:
+                out.append("anchor `%s` — malformed: %s" % (span, forms[span.split(":", 1)[0]]))
+            elif key not in handed:
+                out.append("anchor `%s` — resolves to no fact this work order hands" % span)
+    return out
 
 
 def extract_drive_lines(text, role):

@@ -134,7 +134,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +6 for arm 36 (TOOL-dBoundRoles-38).
 # +8 for arm 37 (TOOL-dBoundRoles-45).
 # +4 for arm 38 (TOOL-dBoundRoles-48).
-FLOOR_ASSERTIONS=158
+# +5 for arm 39 (TOOL-dBoundRoles-24).
+FLOOR_ASSERTIONS=163
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1087,7 +1088,7 @@ for prompt in (lines, ""):
     try:
         task = handoff.render_handoff(fx, sys.argv[3], lib.resolve_charter_path(fx),
                                       "gov-spec-writer", keys, "bx", "TOOL-bx-1", None, {}, None)[2]
-        # the block's fact line (TOOL-dBoundRoles-13) and the fence its content sits in (TOOL-dBoundRoles-38)
+        # the fact line of the block (TOOL-dBoundRoles-13) and the fence its content sits in (TOOL-dBoundRoles-38)
         print("rendered %d" % bool(re.search(r"### brief:prompt\n\n<!-- gov:fact key=record:\S+ class=\w+ -->\n\n```\n"
                                              + re.escape(lines) + r"```\n\n### brief:goal\n", task)))
     except lib.RolesError as e:
@@ -1130,7 +1131,7 @@ for up in ("rows.txt", None):
     task = handoff.render_handoff(fx, mr, lib.resolve_charter_path(fx), "gov-builder", keys, "bx", "TOOL-bx-1",
                                   None, {}, None, upstream=up)[2]
     block = task.split("### upstream:rows\n\n", 1)[1] if "### upstream:rows\n\n" in task else ""
-    # past the block's fact line (TOOL-dBoundRoles-13) and its fence's opening line (TOOL-dBoundRoles-38)
+    # past the fact line of the block (TOOL-dBoundRoles-13) and the opening line of its fence (TOOL-dBoundRoles-38)
     block = re.sub(r"\A<!-- gov:fact key=record:\S+ class=\w+ -->\n\n```\n", "", block)
     if up:
         print("rendered %d" % (block.startswith(rows) and all(w in block for w in ("## Upstream", "used", "bypassed", "not-applicable"))))
@@ -2203,6 +2204,53 @@ check_arm "arm 38 AC2 a handoff.py appending an unfenced block holding a lone fe
    "$([ "$_rc" = 1 ] && grep -qF -- '### framing:added — a fence opened at line' "$A38E" && [ "$(ls -A "$A38P")" = "$_ls" ] && echo 1 || echo 0)"
 [ "$_rc" = 1 ] || { printf '    exit %s, want 1\n' "$_rc"; sed 's/^/    /' "$A38E"; }
 rm -f "$FX/$FXK/handoff_a38.py"
+
+# ---- arm 39 (TOOL-dBoundRoles-24 AC1 AC2 AC4): every anchor the rendered task points at resolves to a fact the work
+# ---- order hands. `check_anchors` over a scratch file holding one backticked `blob:` key names it as resolving to no
+# ---- fact this work order hands, and returns [] with that key in the set; over a text holding the span `blob:nothing`
+# ---- and, inside a fenced block, a `cmd:` example, it returns one line, marked malformed. The researcher's render of a
+# ---- question carrying a backticked `record:` key the order does not hand exits 1 naming the anchor and writes no file,
+# ---- and exits 0 with the anchor removed; the skeptic's render whose typed diff anchors the key of the spec it is
+# ---- handed exits 0. The failing case, owed at the close and not observed by the pass that wrote this: the
+# ---- `check_anchors` call removed from `render_handoff`, under which the planted render exits 0 and writes its file.
+# ---- WHAT IT DOES NOT CHECK: that the fact behind a resolving anchor says what the task claims of it, or a reference
+# ---- without the key shape, which is prose.
+build_fixture; _rc39=$?
+A39P="$FX/$MR/builds/tFix/prompts"; A39S="$MR/builds/tFix/spec/2026-11-23-spec-TOOL-tFix-1.md"; A39E="$TMP_ROOT/a39.err"
+mkdir -p "$A39P" "$FX/$MR/builds/tFix/spec" && printf '# TOOL-tFix-1\n\nThe spec line one.\n' > "$FX/$A39S"
+printf 'See `blob:roles_lib.py@0123456789ab:1-4` for it.\n' > "$TMP_ROOT/anchor-nothing.md"
+A39=$("$PY" -B -c 'import pathlib, sys; sys.path.insert(0, sys.argv[1]); import roles_lib as lib
+text = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8")
+span = "blob:roles_lib.py@0123456789ab:1-4"
+got = lib.check_anchors(text, set())
+print("nothing %d" % (len(got) == 1 and span in got[0] and got[0].endswith("resolves to no fact this work order hands")
+                      and lib.check_anchors(text, {span}) == []))
+got = lib.check_anchors("one `blob:nothing` here\n```\nthe `cmd:000000000000:000000000000` example\n```\n", set())
+print("malformed %d" % (len(got) == 1 and "`blob:nothing`" in got[0] and "malformed" in got[0]))
+print("key %s" % lib.derive_fact_key("record", sys.argv[4], (pathlib.Path(sys.argv[3]) / sys.argv[4]).read_bytes()))' \
+  "$HERE" "$TMP_ROOT/anchor-nothing.md" "$FX" "$A39S" 2>&1); A39=${A39//$'\r'/}
+check_arm "arm 39 AC1 an anchor to nothing is named as resolving to no handed fact, and [] once its key is handed" \
+   "$([ "$_rc39" = 0 ] && [[ $A39 == *"nothing 1"* ]] && echo 1 || echo 0)"
+check_arm "arm 39 AC4 a prefix-shaped span failing its form is one malformed line, and a fenced example is not graded" \
+   "$([[ $A39 == *"malformed 1"* ]] && echo 1 || echo 0)"
+[[ $A39 == *"nothing 1"*"malformed 1"* ]] || printf '    %s\n' "${A39//$'\n'/$'\n'    }"
+_ls=$(ls -A "$A39P")
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-researcher --build tFix --unit TOOL-tFix-1 \
+   --input 'question=which mechanism fits; see `record:memory/nowhere.md@0123456789ab`' >/dev/null 2>"$A39E"); _rc=$?
+check_arm "arm 39 AC2 a question planting an anchor the order does not hand exits 1 naming it, writing nothing" \
+   "$([ "$_rc" = 1 ] && grep -qF -- 'anchor `record:memory/nowhere.md@0123456789ab` — resolves to no fact' "$A39E" \
+      && [ "$(ls -A "$A39P")" = "$_ls" ] && echo 1 || echo 0)"
+[ "$_rc" = 1 ] || { printf '    exit %s, want 1\n' "$_rc"; sed 's/^/    /' "$A39E"; }
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-researcher --build tFix --unit TOOL-tFix-1 \
+   --input 'question=which mechanism fits' --stdout >/dev/null 2>"$A39E"); _rc=$?
+check_arm "arm 39 AC2 ...and the same render with the anchor removed exits 0" "$([ "$_rc" = 0 ] && echo 1 || echo 0)"
+[ "$_rc" = 0 ] || sed 's/^/    /' "$A39E"
+_key=$(printf '%s\n' "$A39" | sed -n 's/^key //p')
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-skeptic --build tFix --unit TOOL-tFix-1 --input "spec=$A39S" \
+   --input "diff=the diff answers \`$_key\`" --stdout >/dev/null 2>"$A39E"); _rc=$?
+check_arm "arm 39 AC2 ...and a typed diff anchoring the key of the spec the order hands renders" \
+   "$([ "$_rc" = 0 ] && [[ $_key == record:* ]] && echo 1 || echo 0)"
+[ "$_rc" = 0 ] || { printf '    key %s\n' "$_key"; sed 's/^/    /' "$A39E"; }
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
