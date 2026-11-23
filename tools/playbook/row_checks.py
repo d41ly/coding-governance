@@ -22,8 +22,10 @@ whose `widens` is an order, a later value widening. A value outside the order re
 outside it ranks below every listed one. A scalar whose `widens` is a word of `SCALAR_DIRECTIONS` reads
 by that word instead (TOOL-dBoundRoles-82): `rises-only` reads both values through `derive_number`, a
 greater number widening and a lesser one or a value that is no number refusing, so the field may rise and
-never fall; gov's own value that is no number ranks below every number. `derive_widenings` lists the
-operations that widen.
+never fall; gov's own value that is no number ranks below every number. `changes` (TOOL-dBoundRoles-84,
+the word TOOL-dWitnessedBar-28 S4 specs) reads every value other than gov's as widening, so the row checks
+admit the patch and leave its judgement to the kind's own check. `derive_widenings` lists the operations
+that widen.
 """
 from __future__ import annotations
 
@@ -40,7 +42,7 @@ import overlay as ov  # noqa: E402
 
 SAY = "row-checks"
 REF_ROLES = ("needs", "actor", "grants")
-SCALAR_DIRECTIONS = ("rises-only",)
+SCALAR_DIRECTIONS = ("rises-only", "changes")
 POLICY_SELF = "instructions.exclude"
 
 
@@ -94,7 +96,8 @@ def derive_patch_class(decl, op, gov_value, value):
     outside the field's order; gov's value outside it ranks below every listed value (section 8 F8). A
     `rises-only` scalar (TOOL-dBoundRoles-82) compares `derive_number`'s reads: greater widens, equal is no
     operation, and a lesser value or one that is no number raises ValueError; gov's value that is no number
-    ranks below every number."""
+    ranks below every number. A `changes` scalar (TOOL-dBoundRoles-84) reads every value other than gov's
+    as widening."""
     order = decl["widens"]
     if op in ("add", "remove"):
         held = derive_set_value(gov_value)
@@ -103,6 +106,8 @@ def derive_patch_class(decl, op, gov_value, value):
         return "widens" if op == order else "narrows"
     if value == gov_value:
         return None
+    if order == "changes":
+        return "widens"
     if order == "rises-only":
         new, old = derive_number(value), derive_number(gov_value)
         if new is None:

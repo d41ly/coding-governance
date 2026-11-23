@@ -5483,6 +5483,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "check_actor_patches",
+      "kind": "function",
+      "file": "tools/loop/loop_items.py"
+    },
+    {
       "id": "check_admit",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"

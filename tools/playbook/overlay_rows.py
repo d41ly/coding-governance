@@ -13,7 +13,8 @@ THE SCHEMA. `read_kind_schema` finds a kind's schema through `pins.read_row_kind
 `widens` and the `[[fixed-row]]` table, refusing an unknown key, a typed `class`, both class keys on one
 field, a field whose `widens` declares no direction and every `fixed-by` source `check_fixed_sources` reds.
 A scalar's `widens` is an order of values or a word of `row_checks.SCALAR_DIRECTIONS`: `rises-only`
-(TOOL-dBoundRoles-82) lets a patch raise the field's number and never lower it.
+(TOOL-dBoundRoles-82) lets a patch raise the field's number and never lower it, and `changes`
+(TOOL-dBoundRoles-84) reads every value other than gov's as widening.
 
 THE COMPOSITION. `derive_row_composition` runs `check_row_owners` (a tag holding `adopter` at the kind's
 owner seat is the repository's: legal only on an overlay row, and an overlay row needs it), then:
@@ -109,7 +110,8 @@ def read_field_decl(where, shape, field, root) -> tuple:
     """PLAY-dOrderedCharter-36 S1, S2, S5: `(decl, reds)`, the field's `ref`, `fixed-by` and `widens`. A
     `ref` outside the three roles, both class keys, a set's `widens` not `add` or `remove`, a scalar's
     neither an order of two or more distinct values nor a word of `row_checks.SCALAR_DIRECTIONS`
-    (`rises-only`, TOOL-dBoundRoles-82), and every `fixed-by` red refuse, naming `where`."""
+    (`rises-only`, TOOL-dBoundRoles-82; `changes`, TOOL-dBoundRoles-84), and every `fixed-by` red refuse,
+    naming `where`."""
     ref, by, widens = field.get("ref"), field.get("fixed-by"), field.get("widens")
     reds = check_schema_keys(where, field, FIELD_KEYS)
     if ref is not None and ref not in rc.REF_ROLES:
