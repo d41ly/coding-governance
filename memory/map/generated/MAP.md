@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 224 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 177 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 224 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 179 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -383,6 +383,7 @@ Inventories: gate-legs: 224 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · 
 | `degradation-known-but-unreported.md` | review-harnesses |
 | `destructive-step-before-its-precondition.md` | unattended |
 | `doc-names-an-argument-the-code-never-reads.md` | memory-tree-hygiene |
+| `docstring-misnames-a-returned-value.md` | runlog |
 | `empty-field-collapses-unless-it-is-last.md` | run-gates |
 | `fail-count-reads-a-pattern-the-row-never-prints.md` | run-gates |
 | `failed-stage-reads-as-nothing-staged.md` | push-main |
@@ -407,6 +408,7 @@ Inventories: gate-legs: 224 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · 
 | `guard-fed-the-value-it-supersedes.md` | unattended |
 | `hand-named-gate-list-green-while-the-bar-reds.md` | build-method |
 | `hand-typed-count-of-an-enumerated-population.md` | run-gates |
+| `header-rationale-contradicts-the-registration.md` | unattended |
 | `held-suite-guard-misses-a-sibling-kit.md` | agent-cap |
 | `helper-whose-only-caller-is-its-selftest.md` | memory-tree-hygiene |
 | `heredoc-escape-reaches-the-regex.md` | baseline |

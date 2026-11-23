@@ -21776,7 +21776,7 @@ run_notice_arm() { # clone · GOV_NODE · --mail args -> the driver's stdout and
 run_notice_hook() { # hook file · session · [agent id] -> the hook's stdout over one PostToolUse payload with c1 as its cwd
   local p
   printf -v p '{"session_id":"%s","cwd":"%s","hook_event_name":"PostToolUse","tool_name":"Bash"%s}' "$2" "$nt_c1" "${3:+,\"agent_id\":\"$3\"}"
-  printf '%s' "$p" | node "$1" 2>/dev/null
+  printf '%s' "$p" | node ${NT_PRELOAD:+-r "$NT_PRELOAD"} "$1" 2>/dev/null
 }
 # ---- AC1
 nt_out=$(run_notice_arm c1 a notice tFix)
@@ -21830,7 +21830,46 @@ same "KDS21 AC5 the origin away and the stamp fresh, the hook names the stamp's 
   "$(grep -c "\"additionalContext\":\"mail — 2 unread for tFix · ${nt_q1:-unposted} ${nt_q2:-unposted} · local copy [0-9]*s old\"" <<<"$nt_out") $([ $(( (nt_t1 - nt_t0) / 1000 )) -lt 500 ] && echo fast)" "1 fast"
 same "KDS21 AC5 a subagent's call and an unbound session print nothing" "[$(run_notice_hook "$HERE/mail-notice.js" k21 agent-1)] [$(run_notice_hook "$HERE/mail-notice.js" k99)]" "[] []"
 same "KDS21 AC5 the hook spells no synchronous spawn and no policy read" "$(grep -c 'execFileSync\|spawnSync\|readPolicy' "$HERE/mail-notice.js")" "0"
+# ---- KICK-dKeptSession-79 S5, S6 and S3, the origin still away. A recorder preloaded into the hook stands
+# in for every child_process launcher and logs one TAB line per call to $LF/spawn.log, launching nothing,
+# so a launch is seen on any platform. S5: a card naming k79, which no `session:` fact binds, gives the
+# hook its build; S6: past fetch-seconds the hook's one spawn is the driver beside it, detached and
+# hidden; S3: a failed fetch keeps the marker, touched, so two calls inside fetch-seconds launch nothing,
+# and a fetched notice removes it. The card goes after S6, so the AC4 loop below binds k21 by its lease.
+cat > "$LF/rec.js" <<'JS'
+const cp = require('child_process'), fs = require('fs'), path = require('path')
+for (const k of ['spawn', 'spawnSync', 'exec', 'execSync', 'execFile', 'execFileSync', 'fork']) cp[k] = (f, a, o) => {
+  o = o && typeof o === 'object' && !Array.isArray(o) ? o : {}
+  fs.appendFileSync(path.join(__dirname, 'spawn.log'), [k, f, (Array.isArray(a) ? a : []).join(' '),
+    'windowsHide=' + o.windowsHide, 'detached=' + o.detached].join('\t') + '\n')
+  return { on() { return this }, unref() {}, status: 0, stdout: '', stderr: '' }
+}
+JS
+nt_card="$LF/c1/.claude/orientation-card.md"
+mkdir -p "$LF/c1/.claude" && printf 'card-owner — k79\n\n## route\n- build: tFix\n' > "$nt_card"
+touch "$nt_st"
+same "KDS79 S5 a card naming the session binds the hook" \
+  "$(grep -c "\"additionalContext\":\"mail — 2 unread for tFix · ${nt_q1:-unposted} ${nt_q2:-unposted} · local copy " <<<"$(run_notice_hook "$HERE/mail-notice.js" k79)") [$(run_notice_hook "$HERE/mail-notice.js" k98)]" "1 []"
+: > "$LF/spawn.log"; NT_PRELOAD="$LF/rec.js" run_notice_hook "$HERE/mail-notice.js" k79 >/dev/null
+same "KDS79 S5 the card path launches nothing" "[$(<"$LF/spawn.log")]" "[]"
+touch -d '2 hours ago' "$nt_st"; rm -f "$nt_st.fetching"; : > "$LF/spawn.log"
+NT_PRELOAD="$LF/rec.js" run_notice_hook "$HERE/mail-notice.js" k79 >/dev/null
+IFS=$'\t' read -r -a nt_sp <"$LF/spawn.log"
+nt_sd=${nt_sp[2]:-}; nt_sd=${nt_sd%%/unattended.sh *}
+same "KDS79 S6 one detached spawn of the driver, hidden" \
+  "$(grep -c '' "$LF/spawn.log") ${nt_sp[0]:-none} ${nt_sd##*/}/${nt_sp[2]##*/} ${nt_sp[3]:-} ${nt_sp[4]:-}" \
+  "1 spawn unattended/unattended.sh --mail notice tFix windowsHide=true detached=true"
+rm -f "$nt_card" "$nt_st.fetching"
+run_notice_arm c1 a notice tFix >/dev/null; nt_now=$EPOCHSECONDS
+same "KDS79 S3 a failed fetch keeps the marker, touched" \
+  "$([ -e "$nt_st.fetching" ] && nt_m=$(stat -c %Y "$nt_st.fetching") && [ $((nt_now - nt_m)) -ge -2 ] && [ $((nt_now - nt_m)) -le 2 ] && echo kept)" "kept"
+: > "$LF/spawn.log"
+NT_PRELOAD="$LF/rec.js" run_notice_hook "$HERE/mail-notice.js" k21 >/dev/null
+NT_PRELOAD="$LF/rec.js" run_notice_hook "$HERE/mail-notice.js" k21 >/dev/null
+same "KDS79 S3 two hook calls inside fetch-seconds launch nothing" "[$(<"$LF/spawn.log")]" "[]"
 git -C "$LF/c1" remote set-url origin "$LF/origin.git"
+run_notice_arm c1 a notice tFix >/dev/null
+same "KDS79 S3 a fetched notice removes the marker" "$([ -e "$nt_st.fetching" ] && echo kept || echo removed)" "removed"
 # ---- AC4
 nt_q3=$(run_notice_arm c2 b post fy --to build:tFix --kind question --subject 'q three' --default no "$LF/body.txt" | sed -n "$nt_pid")
 nt_t0=$EPOCHSECONDS; nt_got=""; nt_made=0
@@ -25475,7 +25514,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # region-eight `same` (AC1 3, AC2 2), each unconditional and outside any loop, off the diff's own lines,
 # in the mailbox block; it takes none out. No skip branch. No suite ran, and its RED-first observation
 # is the close's.
-FLOOR_ASSERTIONS=4217
+# RAISED 4217 -> 4223 by KICK-dKeptSession-79 on 2026-11-23: the notice block's hook-and-marker rows, 6
+# region-eight `same` (S5 2, S6 1, S3 3), each unconditional and outside any loop, off the diff's own
+# lines, the floors read at the build base c3ba5199. No skip branch. No suite ran, and its RED-first
+# observation is the close's.
+FLOOR_ASSERTIONS=4223
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25779,7 +25822,8 @@ FLOOR_SHARD_7=311
 # RAISED 1416 -> 1423 by KICK-dKeptSession-63: the same 7 region-eight chained-ack list assertions, see FLOOR_ASSERTIONS.
 # RAISED 1423 -> 1429 by KICK-dKeptSession-64: the same 6 region-eight ack-batch order-and-exits assertions, see FLOOR_ASSERTIONS.
 # RAISED 1429 -> 1434 by KICK-dKeptSession-65: the same 5 region-eight sent-ack skip and strict-fetch assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1434
+# RAISED 1434 -> 1440 by KICK-dKeptSession-79: the same 6 region-eight hook-and-marker assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1440
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

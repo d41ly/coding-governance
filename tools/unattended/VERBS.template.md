@@ -651,7 +651,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   its units' messages too: `id`, `kind`, `to`, `state`, `first-seen`, `from-build`, `subject`,
   `answers`, `ref`, `commit`, `reply`, `seq`, `after`, `content-key`, `deadline` and `default`, the
   last five `-` on a record that carries none, one id held on two refs shown once at its earliest
-  sighting. A
+  sighting. A record whose `id` is not twelve lower-case hex digits, whose `kind` is none of the loop
+  kit's `[mail]` set or whose `build` is not the slug its ref names, and every record on a ref whose
+  build segment is no build's slug, is not read, so no reader of the rows sees it; a kind set that
+  does not read prints `mail — not read · <why>` (exit 2) before any fetch. A
   dependent acts on the `confirmed` or `changed` row whose `content-key` equals the key it
   recomputes from the interface's text, the lesser id where two do, never on arrival order, so a
   lost or reordered relay costs latency and never correctness. The five states: `reply` for an `answer` or an `ack`, which never waits; `answered`
@@ -714,8 +717,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `every-tool-call`, the session's build the route's `- build:` of the tree's card file
   `.claude/orientation-card.md` whose `card-owner —` line names the session, else its run lease's, and adds `mail — <n> unread for <slug> · <ids> · local copy <age>s old` to the
   session's context, with no git, policy or network call; past `fetch-seconds` it creates
-  `<stamp>.fetching` exclusively and, only then, starts this verb detached with the stamp's bash, which
-  removes the marker when it ends, a marker older than twice the interval replaced. `--ring <ref>
+  `<stamp>.fetching` exclusively and, only then, starts this verb detached with the stamp's bash. A
+  notice that fetched, an `off` notice and a `--local` notice remove the marker; a notice whose fetch
+  failed, the local copy or a refused read, keeps it, touched at its end, so the hook starts no fetch
+  until it is older than twice the interval, when it is replaced. `--ring <ref>
   <id>`, the live channel's receiver, is held before any read to a ref of
   `refs/gov/mail/<build>/<tag>/<segment>` as the post writes it and an id of twelve lower-case hex
   digits, else `mail — not read · --ring takes a mail ref and a twelve-hex-digit id` (exit 2); then

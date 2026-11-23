@@ -1397,7 +1397,7 @@ def derive_context_fill(ev, *, window=None, root=None) -> float:
 
 
 def measure_context_fill(transcript, until=None) -> tuple:
-    """`(share, tokens, source)`: the share of its model's window the transcript's last `usage` event
+    """`(share, window, source)`: the share of its model's window the transcript's last `usage` event
     with `src` `main` used, at or before `until` (an epoch second; the end when None), and that window
     as `derive_context_window` derives it under the transcript's own projects root, its parent's
     parent; `(None, None, None)` with no such event (KICK-dKeptSession-14 S1, KICK-dKeptSession-30 S2).

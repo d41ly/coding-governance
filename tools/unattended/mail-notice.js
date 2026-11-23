@@ -9,11 +9,12 @@
  * Contract: the spec for KICK-dKeptSession-21 under the dKeptSession build folder, S5 and S6. First
  * written by the hook kind's factory; this body is its author's.
  *
- * WHY POSTTOOLUSE. A `PreToolUse` hook carries `additionalContext` too, and the hooks kit's
- * scratch-guard already uses that channel on the Bash, PowerShell and write tools its matcher routes
- * (KICK-dKeptSession-13 S7 owns it). This `PostToolUse` registration exists only to cover the tools
- * that matcher does not route, the non-Bash tools such as Read, Grep, Glob and Agent, so a session
- * that only reads still hears its mail (KICK-dKeptSession-44 S6).
+ * WHY POSTTOOLUSE. This hook is registered on every tool, matcher `*` in its fragment and in
+ * `.claude/settings.json`, and it is the only carrier of the unread-mail line: the Bash tool and the
+ * write tools as much as Read, Grep, Glob and Agent. The hooks kit's scratch-guard carries
+ * `additionalContext` on its own `PreToolUse` matcher, and what it carries there is the card pointers
+ * (KICK-dKeptSession-13 S7), never mail. This statement is KICK-dKeptSession-79 S8's, and it replaces
+ * KICK-dKeptSession-44 S6's wording, which gave the non-Bash tools as the registration's reason.
  *
  * THE BINDING (KICK-dKeptSession-44 S9). The session's build is the route's `- build:` of the tree's
  * card file at CARD_FILE_REL whose `card-owner —` line names the session, read as the hooks kit's
@@ -34,8 +35,9 @@
  * leaves. A stamp older than its own `fetch-seconds` starts THE DETACHED FETCH: `<stamp>.fetching`
  * created with the exclusive flag, and only by the call that created it, the stamp's `bash` running
  * the driver beside this file as `--mail notice <slug>`, detached, its streams ignored, so the call
- * never waits; the verb clears the marker when it ends, and a marker older than twice
- * `fetch-seconds` is replaced. Then, where the stamp holds a row, ONE `additionalContext` line:
+ * never waits; the verb clears the marker when its fetch rewrote the stamp, and a failed fetch keeps
+ * the marker, touched at its end, so no call spawns again until it is older than twice `fetch-seconds`,
+ * when it is replaced (KICK-dKeptSession-79 S3). Then, where the stamp holds a row, ONE `additionalContext` line:
  * `mail — <n> unread for <slug> · <ids> · local copy <age>s old`.
  *
  * WHAT THIS DOES NOT CHECK: that the local copy is current, only its age; the message bodies, never
