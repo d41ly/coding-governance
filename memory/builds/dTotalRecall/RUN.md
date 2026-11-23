@@ -406,3 +406,9 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T13:42:58Z draw · fix-pass · TOOL-dTotalRecall-17 · 55/186 · 20261123T134258Z-b04e93
 
 2026-11-23T13:42:59Z dispatch · item 9ed9d9e5 TOOL-dTotalRecall-17 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict.md memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-17-map-replay-manifest.json memory/builds/dBoundRoles/BACKLOG.md memory/builds/dWellOiledMachine/BACKLOG.md memory/builds/dCalibratedLens/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-17.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-17-1-acceptance-ledger.md memory/builds/dTotalRecall/README.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dBoundRoles/README.md memory/builds/dWellOiledMachine/README.md memory/builds/dCalibratedLens/README.md
+
+2026-11-23T13:47:45Z rescope · item defer TOOL-dTotalRecall-14 · reason held under spec 17 section 8 F5: the map lost its replay on recall (verdict record 2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict); owner ask TOOL-dTotalRecall-111 decides retire or re-run
+
+2026-11-23T13:47:47Z rescope · item defer TOOL-dTotalRecall-15 · reason held under spec 17 section 8 F5: the map lost its replay on recall (verdict record 2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict); owner ask TOOL-dTotalRecall-111 decides retire or re-run
+
+2026-11-23T13:47:49Z rescope · item defer TOOL-dTotalRecall-26 · reason held under spec 17 section 8 F5: the map lost its replay on recall (verdict record 2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict); owner ask TOOL-dTotalRecall-111 decides retire or re-run

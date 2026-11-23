@@ -690,6 +690,7 @@ Cite ids, never line numbers.
 | [TOOL-dTotalRecall-108](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE RECORD-KIND CHECK READS NO SERVES LINE OUTSIDE THE BUILD FOLDERS.… |
 | [TOOL-dTotalRecall-109](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | HIGH | TOOL-dTotalRecall-37 | 2026-11-22 | THE CODE RECORD LOST ITS OWN RE-TIMING. TOOL-dTotalRecall-8's cold… |
 | [TOOL-dTotalRecall-110](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE RECORD KINDS WITH NO PURPOSE. TOOL-dTotalRecall-16's… |
+| [TOOL-dTotalRecall-111](../builds/dTotalRecall/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | THE MAP LOST ITS REPLAY. TOOL-dTotalRecall-17's map-replay verdict is… |
 | [TOOL-dTracedLedger-2](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aSparedSpawn's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTracedLedger-3](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aOrientedCast's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTrackedAtlas-13](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite pre-push run-log line red at 9e21ac76 on the daily held… |
