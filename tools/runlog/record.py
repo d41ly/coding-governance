@@ -151,6 +151,9 @@ RECORD_NAME_RE = rl.derive_slug_pattern(lambda c: r"[0-9]{4}-[0-9]{2}-[0-9]{2}-b
                                         + RECORD_TAG + r"-([0-9a-f]{8})\.md")
 UNIT_ID_RE = rl.derive_slug_pattern(lambda c: r"([A-Z]+)-((?:" + c + r"))-([0-9]+)")
 UNIT_RANGE_RE = rl.derive_slug_pattern(lambda c: r"([A-Z]+)-((?:" + c + r"))-([0-9]+)(?:\.\.([0-9]+))?")
+# The run record's cause line (TOOL-dTotalRecall-36 S4), one shape for the head that admits it and the
+# check that grades its target (TOOL-dTotalRecall-48 S1, S2).
+CAUSE_LINE_RE = re.compile(r"\*\*Caused-by:\*\* (\S+)")
 PLACEHOLDER_RE = re.compile(r"\{([a-z-]+)\}")
 COMMITMENT_RE = re.compile(r"sha256 ([0-9a-f]{64}) · lines ([0-9]+)")
 # EVERY SUMMARY FACT WHOSE RENDERED VALUE A PARSER IN THIS KIT READS BACK, mapped to that parser
@@ -763,8 +766,8 @@ def render_serves(ids) -> str:
 def render_cause_line(serves) -> str:
     """The run record's cause line (TOOL-dTotalRecall-36 S4): `**Caused-by:** <the first served id>`, the
     first of `serves` in `derive_unit_key` order, as `render_serves` sorts them, and bare, never an `N..M`
-    run, since a cause resolves as a family id or a record key and a run is neither. Wired into no
-    writer here: `TOOL-dTotalRecall-48` writes it from the render."""
+    run, since a cause resolves as a family id or a record key and a run is neither. `render_markdown`
+    writes it at line 4, under the Serves line (TOOL-dTotalRecall-48 S3)."""
     return f"**Caused-by:** {sorted(serves, key=derive_unit_key)[0]}"
 
 
@@ -1160,7 +1163,8 @@ def render_twin(doc) -> str:
 
 
 def render_markdown(doc, serves) -> str:
-    out = [TITLE, "", f"**Serves:** {SERVES_KIND} {render_serves(serves)}", "", INTRO, ""]
+    out = [TITLE, "", f"**Serves:** {SERVES_KIND} {render_serves(serves)}", render_cause_line(serves), "",
+           INTRO, ""]
     for name in RECORD_SCHEMA["headings"]:
         out += [f"## {name}", ""]
         if name == "Data":
@@ -1486,14 +1490,23 @@ def scan_forbidden(lines) -> list:
 
 def check_cause_line(ln, line, served) -> list:
     """The head's cause line (TOOL-dTotalRecall-36 S4), `check_serves_line`'s sibling and finding shape:
-    `**Caused-by:** <target>`, the target one of `served`, the served ids, bare. Wired into no reader
-    here: `TOOL-dTotalRecall-48` calls it from `check_record_lines` over a head that admits the line."""
-    m = re.fullmatch(r"\*\*Caused-by:\*\* (\S+)", line or "")
+    `**Caused-by:** <target>`, the target a bare id inside `served`, the Serves tokens, each `N..M` run
+    read through `UNIT_RANGE_RE` as `check_serves_line` reads it. SHAPE, NEVER ABSENCE
+    (TOOL-dTotalRecall-48 S2): an empty or missing line is a head without a cause and passes here,
+    since whether a record needs one is the causes check's question, which reads the legacy population
+    this kit cannot. `check_record_lines` calls it over the line 4 its head admits."""
+    if not line:
+        return []
+    m = CAUSE_LINE_RE.fullmatch(line)
     if m is None:
         return [(ln, "cause", "the line is not `**Caused-by:** <target>`")]
-    if m.group(1) not in set(served):
-        return [(ln, "cause", f"the cause `{m.group(1)}` is no unit the record serves")]
-    return []
+    t = UNIT_RANGE_RE.fullmatch(m.group(1))
+    for tok in served:
+        r = UNIT_RANGE_RE.fullmatch(tok)
+        if t and r and not t.group(4) and t.group(1, 2) == r.group(1, 2) \
+                and int(r.group(3)) <= int(t.group(3)) <= int(r.group(4) or r.group(3)):
+            return []
+    return [(ln, "cause", f"the cause `{m.group(1)}` is no unit the record serves")]
 
 
 def check_serves_line(ln, line, slug, own_ids) -> list:
@@ -1606,16 +1619,23 @@ def check_record_lines(lines, checks, slug, own_ids) -> list:
     out = [(ln, "line", "a CR byte; the renderer writes LF only") for ln, line in enumerate(lines, 1)
            if "\r" in line]
     lines = [line.replace("\r", "") for line in lines]
-    for i, want in enumerate((TITLE, "", None, "", INTRO, "")):
+    # Line 4 is the cause line where it matches `**Caused-by:** <target>`, the fixed tail one line
+    # lower; else the head is the six lines every record before TOOL-dTotalRecall-48 carries. Its
+    # ABSENCE is never graded here (S2).
+    cause = len(lines) > 3 and CAUSE_LINE_RE.fullmatch(lines[3]) is not None
+    head = (TITLE, "", None, None, "", INTRO, "") if cause else (TITLE, "", None, "", INTRO, "")
+    for i, want in enumerate(head):
         got = lines[i] if i < len(lines) else None
-        if want is None:
+        if want is None and i == 2:
             out += check_serves_line(i + 1, got, slug, own_ids)
+        elif want is None:
+            out += check_cause_line(i + 1, got, lines[2].split(" ")[2:])
         elif got != want:
             out.append((i + 1, "line", "the record's head is fixed text, and this line departs from it"))
     headings, sec, spec, labels, table, started = [], None, None, [], None, False
     data_state, fence_ln, json_lines = None, 0, []
     last = len(lines) - 1 if lines and lines[-1] == "" else len(lines)
-    for idx in range(min(6, len(lines)), last):
+    for idx in range(min(len(head), len(lines)), last):
         ln, line = idx + 1, lines[idx]
         if data_state == "open":
             if line == DATA_CLOSE:

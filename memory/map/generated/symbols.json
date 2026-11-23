@@ -41383,6 +41383,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_record_cause_head",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_record_cause_line",
       "kind": "function",
       "file": "tools/runlog/selftest.py"

@@ -7086,19 +7086,44 @@ def test_record_duration_derived_mark():
 
 
 def test_record_cause_line():
-    """TOOL-dTotalRecall-36 AC4: the run record's cause is the first served id, bare and never a run, and
-    its check reds a cut cause line and an unserved cause."""
+    """TOOL-dTotalRecall-36 AC4: the run record's cause is the first served id, bare and never a run.
+    TOOL-dTotalRecall-48 AC3: its check grades SHAPE, never absence: an unserved cause reds, a cut cause
+    line and a cause opening a served `N..M` run do not."""
     ids = [f"X-{FX_SLUG}-2", f"X-{FX_SLUG}-1"]
     check("cause AC4: render_cause_line names the first served id, bare",
           rl_record.render_cause_line(ids), f"**Caused-by:** X-{FX_SLUG}-1")
     check("cause AC4 liveness: render_serves writes the same ids as a run",
           rl_record.render_serves(ids), f"X-{FX_SLUG}-1..2")
-    served = sorted(ids)
-    check("cause AC4: check_cause_line passes a served cause",
-          rl_record.check_cause_line(4, f"**Caused-by:** X-{FX_SLUG}-1", served), [])
-    check("cause AC4: check_cause_line reds a cut cause line and an unserved cause, one finding each",
-          [[f[:2] for f in rl_record.check_cause_line(4, line, served)]
-           for line in ("", f"**Caused-by:** X-{FX_SLUG}-9")], [[(4, "cause")], [(4, "cause")]])
+    served = [f"X-{FX_SLUG}-1"]
+    unserved = rl_record.check_cause_line(4, f"**Caused-by:** X-{FX_SLUG}-9", served)
+    check("cause AC3: an unserved cause is one finding naming it",
+          ([f[:2] for f in unserved], all(f"X-{FX_SLUG}-9" in f[2] for f in unserved)), ([(4, "cause")], True))
+    check("cause AC3: a cut cause line and a cause opening a served run pass, absence is not shape",
+          (rl_record.check_cause_line(4, "", served), rl_record.check_cause_line(4, None, served),
+           rl_record.check_cause_line(4, f"**Caused-by:** X-{FX_SLUG}-1", [f"X-{FX_SLUG}-1..2"])),
+          ([], [], []))
+
+
+def test_record_cause_head():
+    """TOOL-dTotalRecall-48 AC1 and AC3: the landed fixture's render carries its cause at line 4 under a
+    head that admits it and grades clean; the same render with the cause cut, the head every tracked
+    record carries, grades clean too; and a doubled cause line is the fixed-text finding at line 5."""
+    fx = build_landed_fixture()
+    j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    model = build_model(fx["repo"], journals=j)
+    lines = rl_record.render_record(model, "memory", rl_record.measure_commitment(model, j)).split("\n")
+    own = [u["id"] for u in dataclasses.asdict(model)["units"] if u.get("id")]
+    checks = rl_record.build_record_checks(FX_SLUG, "memory", own)
+    check("cause AC1: the render's line 4 is its cause, and the record's check grades it clean",
+          (lines[3], rl_record.check_record_lines(lines, checks, FX_SLUG, own)),
+          (f"**Caused-by:** X-{FX_SLUG}-1", []))
+    cut = lines[:3] + lines[4:]
+    check("cause AC3: the render with its cause line cut grades clean",
+          rl_record.check_record_lines(cut, checks, FX_SLUG, own), [])
+    doubled = lines[:4] + lines[3:]
+    check_true("cause AC3: a doubled cause line is the fixed-text finding at line 5",
+               (5, "line") in [f[:2] for f in rl_record.check_record_lines(doubled, checks, FX_SLUG, own)],
+               str(rl_record.check_record_lines(doubled, checks, FX_SLUG, own)[:3]))
 
 
 
