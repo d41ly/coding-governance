@@ -379,6 +379,9 @@ WRITE_TOOLS = ("Write", "Edit", "MultiEdit", "NotebookEdit")
 SESSION_ID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 #: A run id or an agent id reaches a path only in this shape.
 PATH_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+# The session folder a harness run's agents sit under, `subagents/<this>/<run_id>/`: the same name scratch-guard.js
+# exports as WORKFLOW_RUNS_DIR, kept as one constant so no path below spells it.
+WORKFLOW_RUNS_DIR = "workflows"
 LABEL_UNIT_RE = re.compile(r"[A-Z]+-[A-Za-z]+-[0-9]+")
 SHAPE_FIELD_RE = re.compile(r"<([^<>]+)>")
 NOTIFICATION_RE = re.compile(r"<task-notification>(.*?)</task-notification>", re.S)
@@ -1730,7 +1733,7 @@ def resolve_agent_transcript(session_dir, agent_id, run_id=None):
     if run_id is not None:
         if not isinstance(run_id, str) or not PATH_ID_RE.match(run_id):
             return None
-        folder = folder / "workflows" / run_id
+        folder = folder / WORKFLOW_RUNS_DIR / run_id
     return folder / ("agent-%s.jsonl" % agent_id)
 
 
