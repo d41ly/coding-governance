@@ -33,8 +33,8 @@ memory/gotchas/inline-marker-breaks-a-line-continuation.md	1 failed`. The third 
 {prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"source": "{prefix}/hooks/agent-cap.js"	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
 {prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"path": ".claude/hooks/agent-cap.test.sh",	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
 {prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"source": "{prefix}/hooks/agent-cap.test.sh"	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
-{prefix}/govkit/steps/spawn_guard_pack.py	THE UP. No command in the target's `.claude/settings.json` naming `agent-cap.js`: exit 0, nothing written.	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
-{prefix}/govkit/steps/spawn_guard_pack.py	written under `tempfile.mkdtemp`: the marker `agent-cap.js`, the group's event and matcher, and the hook	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
-{prefix}/govkit/steps/spawn_guard_pack.py	THE WITNESS exits 0 when no command naming `agent-cap.js` is wired and, where the roles kit is installed,	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
-{prefix}/govkit/steps/spawn_guard_pack.py	OLD_MARKER = "agent-cap.js"	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
-{prefix}/hooks/kit.toml	surfaces = ["installable:{prefix}/hooks/agent-cap.js", "file:{prefix}/hooks/agent-cap.js"]	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/hooks/kit.toml	surfaces = ["installable:{prefix}/hooks/agent-cap.js", "file:{prefix}/hooks/agent-cap.js"]	1	8f8abe4d0e788ded680281df62af0882f03f5453	widened:2026-11-23-build-TOOL-dBoundRoles-42-widen-8
+{prefix}/govkit/steps/spawn_guard_pack.py	OLD_MARKER = "agent-cap.js"	1	8f8abe4d0e788ded680281df62af0882f03f5453	widened:2026-11-23-build-TOOL-dBoundRoles-42-widen-8
+{prefix}/govkit/steps/spawn_guard_pack.py	THE UP. No command in the target's `.claude/settings.json` naming `agent-cap.js`: exit 0, nothing written.	1	8f8abe4d0e788ded680281df62af0882f03f5453	widened:2026-11-23-build-TOOL-dBoundRoles-42-widen-8
+{prefix}/govkit/steps/spawn_guard_pack.py	written under `tempfile.mkdtemp`: the marker `agent-cap.js`, the group's event and matcher, and the hook	1	8f8abe4d0e788ded680281df62af0882f03f5453	widened:2026-11-23-build-TOOL-dBoundRoles-42-widen-8
+{prefix}/govkit/steps/spawn_guard_pack.py	THE WITNESS exits 0 when no command naming `agent-cap.js` is wired and, where the roles kit is installed,	1	8f8abe4d0e788ded680281df62af0882f03f5453	widened:2026-11-23-build-TOOL-dBoundRoles-42-widen-8
