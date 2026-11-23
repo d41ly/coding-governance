@@ -158,14 +158,14 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-41 — the three catalogue rows that already stand given their summary and usage, one row per name, never a second minted beside them](spec/2026-10-26-spec-KICK-dKeptSession-41.md) | 29 | 2 | CLOSED | rev-5 | 2026-11-23 |
 | [KICK-dKeptSession-44 — the round-1 spec audit's 42 minor findings, closed after every unit they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-44.md) | 30 | 2 | CLOSED | rev-8 | 2026-11-23 |
 | [KICK-dKeptSession-56 — the round-1 promotions' audit's 45 minor findings, closed after every unit they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-56.md) | 31 | 2 | CLOSED | rev-6 | 2026-11-23 |
-| [KICK-dKeptSession-57 — the batch's pass-bound items observed at a pass that runs after them, never at an earlier unit's commit](spec/2026-10-26-spec-KICK-dKeptSession-57.md) | 32 | 2 | INPROGRESS | rev-4 | 2026-11-23 |
+| [KICK-dKeptSession-57 — the batch's pass-bound items observed at a pass that runs after them, never at an earlier unit's commit](spec/2026-10-26-spec-KICK-dKeptSession-57.md) | 32 | 2 | CLOSED | rev-4 | 2026-11-23 |
 | [KICK-dKeptSession-62 — the round-2 promotions' audit's 32 minor findings, closed after every unit they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-62.md) | 33 | 2 | DEFERRED | rev-5 | 2026-11-23 |
 | [KICK-dKeptSession-63 — the round-3 promotions' audit's 26 minor findings, closed after every unit they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-63.md) | 34 | 2 | DEFERRED | rev-5 | 2026-11-23 |
 | [KICK-dKeptSession-64 — the round-4 minors batch's audit's 20 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-64.md) | 35 | 2 | DEFERRED | rev-5 | 2026-11-23 |
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-4 | 2026-11-23 |
 <!-- /gen:build-units -->
 
-Records: 481 bound to this build, across 4 record folder(s).
+Records: 482 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
