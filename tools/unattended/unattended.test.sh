@@ -20827,6 +20827,97 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# KICK-dKeptSession-27 — EACH MESSAGE CARRIES ITS SESSION'S SEQUENCE NUMBER, A TAKE-OVER ITS
+# PREDECESSOR, AND AN INTERFACE NOTICE ITS CONTENT KEY. KICK-dKeptSession-5's two-clone fixture, built
+# again over a fresh bare remote, its `run_mail_arm` and `read_mail_refs` reused; B reads nothing
+# before AC4. A's session s0 posts first, the build's very first message. AC1: A's s1 posts two
+# questions to build:fy and `--mail read fy` on A prints them with `seq` 1 and 2 in column 12. AC2:
+# s0's sighting in A's feed rewritten to 2026-01-01T00:00:00Z so the order holds without a sleep, s2
+# posts twice: column 13 reads s1's second id on s2's first message, `none` on s2's second and on
+# s0's. AC3: a `confirmed` naming `--interface` records the key `derive_gov_id --file` derives over
+# that file, under the id `derive_message_id` derives with that key eighth; a `changed` naming none,
+# a `question` naming one and a `confirmed` naming an absent file each exit 2 with S3's line, the
+# remote unmoved. AC4: s1's `confirmed` over i1.txt and s2's `changed` over i2.txt, both to build:fy
+# under the subject I16, planted in B's feed the `changed` first at 2026-01-01T00:00:00Z and the
+# `confirmed` at 2026-01-01T00:01:00Z, and `check_interface_notice fy I16 i2.txt` on B names the
+# `changed`, exit 0. AC5: an interface matching neither key reads `unconfirmed`, exit 1; an absent
+# file `not read`, exit 2 with no `unconfirmed` line; RUN_CLAIMS off `interface — off`, exit 2. Each
+# check runs in a subshell that sources the driver and runs `load_driver_conf`. RED, observed at the
+# close: a planted writer counting from zero, whose second post reads `seq` 1 (AC1); a planted pair
+# spelled with the cache prefix, every tip then `-` and the tie to s0's lesser ref (AC2); and a
+# planted check choosing the newest `first-seen`, which names the `confirmed` (AC4). WHAT THIS BLOCK
+# DOES NOT DRIVE: the loop kit's guard over the fourteen-column row, its `mail-open` plant's (AC7);
+# the guide, help and usage texts (AC6), probed in the unit's acceptance ledger.
+# ==================================================================================================
+mb_d=$(mktemp -d)
+git init -q --bare -b main "$mb_d/o.git"
+for mb_c in A B; do
+  git init -q -b main "$mb_d/$mb_c" && git -C "$mb_d/$mb_c" config user.email t@t.test && git -C "$mb_d/$mb_c" config user.name t \
+    && git -C "$mb_d/$mb_c" config core.autocrlf false
+  ( cd "$mb_d/$mb_c" && mkconf && sed -i 's/^RUN_CLAIMS="off"$/RUN_CLAIMS="on"/' .unattended.conf )
+done
+( cd "$mb_d/A" && git add -A && git commit -q -m base --no-verify && git remote add origin "$mb_d/o.git" && git push -q origin main 2>/dev/null )
+( cd "$mb_d/B" && git remote add origin "$mb_d/o.git" && git fetch -q origin && git reset -q --hard origin/main )
+printf 'a message body\n' > "$mb_d/body.txt"
+printf 'interface one\n' > "$mb_d/i1.txt"; printf 'interface two\n' > "$mb_d/i2.txt"; printf 'interface three\n' > "$mb_d/i3.txt"
+mq_log="$mb_d/A/.git/gov-feed.log"
+mq_pid='s/^mail — posted \([0-9a-f]*\) · .*/\1/p'
+# ---- AC1, after AC2's first post
+mq_0=$(run_mail_arm A s0 post fx --to build:fy --kind question --subject zero "$mb_d/body.txt" | sed -n "$mq_pid")
+mq_1=$(run_mail_arm A s1 post fx --to build:fy --kind question --subject one "$mb_d/body.txt" | sed -n "$mq_pid")
+mq_2=$(run_mail_arm A s1 post fx --to build:fy --kind question --subject two "$mb_d/body.txt" | sed -n "$mq_pid")
+same "KDS27 AC1 s1's two posts read seq 1 and 2 in column 12" \
+  "$(run_mail_arm A s1 read fy | awk -F'\t' -v a="${mq_1:-none}" -v b="${mq_2:-none}" '$1 == a { x = $12 } $1 == b { y = $12 } END { print x, y }')" "1 2"
+# ---- AC2
+mq_c=$(git --git-dir="$mb_d/o.git" rev-parse --verify -q refs/gov/mail/fx/a/s0)
+awk -F'\t' -v OFS='\t' -v c="$mq_c" '$2 == "refs/gov/mail/fx/a/s0" && $5 == c { $6 = "2026-01-01T00:00:00Z" } 1' "$mq_log" > "$mq_log.new" \
+  && mv "$mq_log.new" "$mq_log"
+mq_3=$(run_mail_arm A s2 post fx --to build:fy --kind question --subject three "$mb_d/body.txt" | sed -n "$mq_pid")
+mq_4=$(run_mail_arm A s2 post fx --to build:fy --kind question --subject four "$mb_d/body.txt" | sed -n "$mq_pid")
+same "KDS27 AC2 column 13 reads s1's second id on s2's first message, none on s2's second and on s0's, the build's first" \
+  "$(run_mail_arm A s1 read fy | awk -F'\t' -v a="${mq_3:-none}" -v b="${mq_4:-none}" -v z="${mq_0:-none}" '$1 == a { x = $13 } $1 == b { y = $13 } $1 == z { w = $13 } END { print x, y, w }')" \
+  "${mq_2:-unposted} none none"
+# ---- AC3
+mq_k=$( set +u; . "$SCRIPT" >/dev/null 2>&1; derive_gov_id --file "$mb_d/i1.txt" )
+mq_w=$( set +u; . "$SCRIPT" >/dev/null 2>&1; derive_message_id fx none none confirmed iface none build:fy "$mq_k" )
+mq_i=$(run_mail_arm A s3 post fx --to build:fy --kind confirmed --subject iface --interface "$mb_d/i1.txt" "$mb_d/body.txt" | sed -n "$mq_pid")
+same "KDS27 AC3 the confirmed post's record carries derive_gov_id's key over the interface file, its id derived with that key eighth" \
+  "$(git --git-dir="$mb_d/o.git" log -1 --format=%B refs/gov/mail/fx/a/s3 2>/dev/null | sed -n 's/^content-key: //p') $mq_i" "$mq_k $mq_w"
+mq_n=$(read_mail_refs)
+mq_out=$(run_mail_arm A s4 post fx --to build:fy --kind changed --subject x "$mb_d/body.txt"); mq_got="$? [$mq_out];"
+mq_out=$(run_mail_arm A s4 post fx --to build:fy --kind question --subject x --interface "$mb_d/i1.txt" "$mb_d/body.txt"); mq_got="$mq_got$? [$mq_out];"
+mq_out=$(run_mail_arm A s4 post fx --to build:fy --kind confirmed --subject x --interface "$mb_d/absent.txt" "$mb_d/body.txt"); mq_got="$mq_got$? [$mq_out];"
+same "KDS27 AC3 a changed with no --interface, a question naming one and a confirmed naming an absent file each exit 2 with S3's line, the remote unmoved" \
+  "$mq_got $(read_mail_refs)" \
+  "2 [mail — not written · a changed post names the interface it announces: --interface <file>];2 [mail — not written · --interface names the interface of a confirmed or changed post, not a question];2 [mail — not written · the interface file cannot be read: $mb_d/absent.txt]; $mq_n"
+# ---- AC4 and AC5
+mq_f=$(run_mail_arm A s1 post fx --to build:fy --kind confirmed --subject I16 --interface "$mb_d/i1.txt" "$mb_d/body.txt" | sed -n "$mq_pid")
+mq_g=$(run_mail_arm A s2 post fx --to build:fy --kind changed --subject I16 --interface "$mb_d/i2.txt" "$mb_d/body.txt" | sed -n "$mq_pid")
+mq_t=$(git --git-dir="$mb_d/o.git" mktree </dev/null)
+add_claim_sighting "$mb_d/B" refs/gov/mail/fx/a/s2 "$mq_t" "$(git --git-dir="$mb_d/o.git" rev-parse --verify -q refs/gov/mail/fx/a/s2)" 2026-01-01T00:00:00Z
+add_claim_sighting "$mb_d/B" refs/gov/mail/fx/a/s1 "$mq_t" "$(git --git-dir="$mb_d/o.git" rev-parse --verify -q refs/gov/mail/fx/a/s1)" 2026-01-01T00:01:00Z
+mq_k=$( set +u; . "$SCRIPT" >/dev/null 2>&1; derive_gov_id --file "$mb_d/i2.txt" )
+mq_out=$( cd "$mb_d/B" || exit 1; set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  GOV_RUNLOG=0 check_interface_notice fy I16 "$mb_d/i2.txt" 2>/dev/null; echo "rc $?" )
+same "KDS27 AC4 the changed sighted before the confirmed it supersedes is the one named current, by its key" \
+  "$(tr '\n' ' ' <<<"$mq_out")" "interface — current ${mq_g:-unposted} · changed · key $mq_k rc 0 "
+mq_out=$( cd "$mb_d/B" || exit 1; set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  GOV_RUNLOG=0 check_interface_notice fy I16 "$mb_d/i3.txt" 2>/dev/null; echo "rc $?" )
+same "KDS27 AC5 an interface matching neither key reads unconfirmed with its key, exit 1" \
+  "$(tr '\n' ' ' <<<"$mq_out")" "interface — unconfirmed · key $( set +u; . "$SCRIPT" >/dev/null 2>&1; derive_gov_id --file "$mb_d/i3.txt" ) rc 1 "
+mq_out=$( cd "$mb_d/B" || exit 1; set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  GOV_RUNLOG=0 check_interface_notice fy I16 "$mb_d/absent.txt" 2>/dev/null; echo "rc $?" )
+same "KDS27 AC5 an absent interface file reads not read, exit 2, and no unconfirmed line" \
+  "$(tr '\n' ' ' <<<"$mq_out") $(grep -c unconfirmed <<<"$mq_out")" "interface — not read · the interface file cannot be read: $mb_d/absent.txt rc 2  0"
+sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$mb_d/B/.unattended.conf"
+mq_out=$( cd "$mb_d/B" || exit 1; set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  GOV_RUNLOG=0 check_interface_notice fy I16 "$mb_d/i2.txt" 2>/dev/null; echo "rc $?" )
+same "KDS27 AC5 RUN_CLAIMS off prints interface — off, exit 2" "$(tr '\n' ' ' <<<"$mq_out")" "interface — off rc 2 "
+rm -rf "$mb_d"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-18 — THE CADENCE SEGMENT IS THE TAG GRAMMAR'S. The sourced driver's
 # `check_cadence_segment` over the spec's probe set, each refusal naming its rule (AC1); the playbook
 # kit's `parse_tag` over each `unit.<name>`, a name admitted there when the tag reads as namespace
@@ -24309,7 +24400,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4095 -> 4100 by KICK-dKeptSession-23 on 2026-11-23: the mail-feed block's 5 region-eight
 # `same` (AC1 1, AC2 3, AC5 1), each unconditional and outside any loop, off the diff's own lines; no
 # skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4100
+# RAISED 4100 -> 4108 by KICK-dKeptSession-27 on 2026-11-23: the session-order block's 8 region-eight
+# `same` (AC1 1, AC2 1, AC3 2, AC4 1, AC5 3), each unconditional and outside any loop, off the diff's
+# own lines; no skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4108
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24598,7 +24692,8 @@ FLOOR_SHARD_7=311
 # RAISED 1294 -> 1308 by KICK-dKeptSession-5: the same 14 region-eight mailbox assertions, see FLOOR_ASSERTIONS.
 # RAISED 1308 -> 1312 by KICK-dKeptSession-31: the same 4 region-eight eight-field id assertions, see FLOOR_ASSERTIONS.
 # RAISED 1312 -> 1317 by KICK-dKeptSession-23: the same 5 region-eight mail-feed assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1317
+# RAISED 1317 -> 1325 by KICK-dKeptSession-27: the same 8 region-eight session-order assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1325
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
