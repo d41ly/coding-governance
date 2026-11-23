@@ -164,7 +164,7 @@ ids KICK-dKeptSession-71 KICK-dKeptSession-72 KICK-dKeptSession-73 KICK-dKeptSes
 | [KICK-dKeptSession-63 — the round-3 promotions' audit's 26 minor findings, closed after every unit they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-63.md) | 34 | 2 | CLOSED | rev-5 | 2026-11-23 |
 | [KICK-dKeptSession-64 — the round-4 minors batch's audit's 20 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-64.md) | 35 | 2 | CLOSED | rev-5 | 2026-11-23 |
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | CLOSED | rev-4 | 2026-11-23 |
-| [KICK-dKeptSession-79 — the closing diff review's eight minors: a fetched mail record validated once, a refused move posting no ack, a failed fetch spacing the next, and the gaps the review found](spec/2026-11-23-spec-KICK-dKeptSession-79.md) | 37 | 2 | SPECCED | rev-1 | 2026-11-23 |
+| [KICK-dKeptSession-79 — the closing diff review's eight minors: a fetched mail record validated once, a refused move posting no ack, a failed fetch spacing the next, and the gaps the review found](spec/2026-11-23-spec-KICK-dKeptSession-79.md) | 37 | 2 | SPECCED | rev-2 | 2026-11-23 |
 <!-- /gen:build-units -->
 
 Records: 494 bound to this build, across 4 record folder(s).
@@ -201,7 +201,7 @@ Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 67 spec(s) at
   `spec/2026-10-26-spec-KICK-dKeptSession-53.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-56.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-26-spec-KICK-dKeptSession-57.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-58.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-59.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-60.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-26-spec-KICK-dKeptSession-61.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-62.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-64.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-KICK-dKeptSession-65.md` (PLAY-dClosedLoop-2), `spec/2026-11-22-spec-KICK-dKeptSession-67.md` (PLAY-dClosedLoop-2), `spec/2026-11-22-spec-KICK-dKeptSession-69.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-26-spec-KICK-dKeptSession-65.md` (PLAY-dClosedLoop-2), `spec/2026-11-22-spec-KICK-dKeptSession-67.md` (PLAY-dClosedLoop-2), `spec/2026-11-22-spec-KICK-dKeptSession-69.md` (PLAY-dClosedLoop-2), `spec/2026-11-23-spec-KICK-dKeptSession-79.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0141, cl-dClosedLoop-0142, cl-dClosedLoop-0144, cl-dClosedLoop-0153, cl-dClosedLoop-0157, cl-dClosedLoop-0158, cl-dClosedLoop-0160, cl-dClosedLoop-0161, cl-dClosedLoop-0163, cl-dClosedLoop-0165
 <!-- /gen:build-coverage -->
 

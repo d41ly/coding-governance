@@ -1,6 +1,8 @@
 # KICK-dKeptSession-79 — the closing diff review's eight minors: a fetched mail record validated once, a refused move posting no ack, a failed fetch spacing the next, and the gaps the review found
 
-**Status:** SPECCED · rev-1 · 2026-11-23 · node d · Tier-2 · base c3ba5199 · streams kickoff · order 37 · advances KICK-dKeptSession-29
+**Status:** SPECCED · rev-2 · 2026-11-23 · node d · Tier-2 · base c3ba5199 · streams kickoff · order 37 · advances KICK-dKeptSession-29
+
+**Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
@@ -544,6 +546,9 @@ none
 - rev-1 · 2026-11-23 · initial draft from the promotion brief
   `2026-11-23-prompt-KICK-dKeptSession-79-spec-brief`, taking M1 to M5 and L1 to L3 of
   `2026-11-23-review-KICK-dKeptSession-69-closing-diff-review-round1`, grounded at `c3ba5199`.
+- rev-2 · 2026-11-23 · §1 · the Derived binding line naming PLAY-dClosedLoop-2 added below the
+  status header, above §1, as units 44, 56, 65 and 69 carry it, so the carries join reads this chain
+  spec as derived from the packet's decision and not unbound. No scope, design or criterion moved.
 
 ## 10. Reuse audit
 
