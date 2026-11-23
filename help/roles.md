@@ -523,6 +523,12 @@ commit the row before you check it: `check_roles.py`, `render_agents.py` (the ag
 `overlay_rows.py compose --kind role` and `--kind workflow`, run by the loop kit's `composition.py`.
 See [overlay rows](overlay-rows.md) for the edge grammar, pins and exclusions every kind shares.
 
+Gov's own rows are the ones your rows compose beside: each role is `role.<name>` and each workflow
+entry `workflow.<name>`, the tags an `amends`, a `supersedes` or an `instructions.exclude` names.
+Run `python tools/roles/check_roles.py` to grade the composition. <!-- usage: script:tools/roles/check_roles.py 59023e37 -->
+<!-- usage: role:role.gov-architect --> <!-- usage: role:role.gov-builder --> <!-- usage: role:role.gov-orienter --> <!-- usage: role:role.gov-planner --> <!-- usage: role:role.gov-prompt-writer --> <!-- usage: role:role.gov-researcher --> <!-- usage: role:role.gov-reuse-scout --> <!-- usage: role:role.gov-reviewer --> <!-- usage: role:role.gov-session --> <!-- usage: role:role.gov-skeptic --> <!-- usage: role:role.gov-spec-writer --> <!-- usage: role:role.gov-synthesizer --> <!-- usage: role:role.gov-tester -->
+<!-- usage: workflow:workflow.orient --> <!-- usage: workflow:workflow.reuse --> <!-- usage: workflow:workflow.spec-write --> <!-- usage: workflow:workflow.spec-review --> <!-- usage: workflow:workflow.build --> <!-- usage: workflow:workflow.closing-review --> <!-- usage: workflow:workflow.gate-bar --> <!-- usage: workflow:workflow.research --> <!-- usage: workflow:workflow.handoff --> <!-- usage: workflow:workflow.bookkeeping --> <!-- usage: workflow:workflow.plan --> <!-- usage: workflow:workflow.design -->
+
 - **Your own role** is a `[[role]]` row tagged `role.adopter.<name>`, its `name` that `<name>`. It
   carries every key a role file's front matter carries, each a TOML value: `tools`, `shapes`, `reads`,
   `rules`, `writes` and `never` as lists, the rest as strings, `budget` among them. The catalogue

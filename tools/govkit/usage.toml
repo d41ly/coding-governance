@@ -43,6 +43,16 @@ usage = "page"
 why = "a role agent is graded for presence on a page"
 
 [[class]]
+class = "role"
+usage = "page"
+why = "a composed role tag is graded for presence on a page, as its agent is"
+
+[[class]]
+class = "workflow"
+usage = "page"
+why = "a composed workflow tag is graded for presence on a page"
+
+[[class]]
 class = "conf"
 usage = "key"
 rows = "usage.toml"
@@ -122,6 +132,12 @@ shape = "verb"
 entry = "{prefix}/roles/handoff.py"
 verb = "roster"
 flags = []
+
+[[usage]]
+id = "script:{prefix}/roles/check_roles.py"
+shape = "verb"
+entry = "{prefix}/roles/check_roles.py"
+flags = ["--root=", "--write", "--legacy-rows", "--out=", "--print-tag-rows=", "--print-rows=", "--check-actor-patch=", "--scenario-rows="]
 
 [[usage]]
 id = "script:{prefix}/roles/render_agents.py"
