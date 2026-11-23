@@ -384,7 +384,13 @@ from collections import Counter  # noqa: E402
 # dropped and a planted read named (AC24) — and one check in `test_extract_context_window_compact`'s
 # loop, the main-file sidechain compaction left at 75% (AC10). Their decoy checks move it by 6.
 # 1 + 2 + 2 + 6 = 11
-ASSERTION_FLOOR = 1643
+# RAISED 1643 -> 1646 by KICK-dKeptSession-63, the minors batch: NO new arm, so no decoy check moves,
+# and three checks land in two arms — `test_extract_env_reads`' population from the import graph holding
+# extract and model, and its planted read in a copy of model.py named (AC14), its two checks before
+# graded over that population; and `test_extract_main_transcripts_inside`'s two measures counting the
+# linked session out (AC23), behind the arm's own link-or-skip branch as its AC17 checks are.
+# 2 + 1 + 0 = 3
+ASSERTION_FLOOR = 1646
 
 PASS = []
 FAIL = []
@@ -2224,7 +2230,8 @@ def test_extract_main_transcripts_inside():
     """KICK-dKeptSession-62 AC17: `derive_main_transcripts`, the one population the window scan and
     `scan_preflights` read, omits a transcript under a project directory linked from outside the root,
     so the window reads the root's own 150000-token turn and never the linked 900000. The raw glob
-    listing the linked transcript is the liveness that the link was made and is walked."""
+    listing the linked transcript is the liveness that the link was made and is walked. Both measures
+    read the same population, so each counts the linked session out too (KICK-dKeptSession-63 AC23)."""
     base, projects = build_projects("runlog-inside-")
     sid = build_scenario(projects, "context-window")
     outside = base / "outside"
@@ -2241,6 +2248,9 @@ def test_extract_main_transcripts_inside():
           ([p.name[:-len(".jsonl")] for p in rx.derive_main_transcripts(projects)],
            rx.derive_context_window("fixture-model", root=projects)),
           ([sid], (200000, "observed 150000 on fixture-model")))
+    check(f"extract KICK-dKeptSession-63 AC23: measure_tree and measure_ready_tree each count the {made_link}ed "
+          "session out, scanning the root's own session alone",
+          (rx.measure_tree(projects)["sessions"], rx.measure_ready_tree(projects)["sessions"]), (1, 1))
 
 
 # A variable read by name: `env.get("X")`, `env["X"]`, `os.environ.get("X")`, `os.environ["X"]` or
@@ -2275,20 +2285,46 @@ def read_arm_guarded():
     return names
 
 
+def derive_kit_imports():
+    """The kit's own modules the CLI or this suite imports, by name, sorted (KICK-dKeptSession-63 S14):
+    every `import x` or `from x import ...`, at any depth of `runlog.py` or `selftest.py` read by `ast`,
+    whose `x.py` sits in this kit's directory, the two roots themselves left out. The population
+    `test_extract_env_reads` reads, so a module a case reaches is graded without being listed."""
+    roots = ("runlog", "selftest")
+    names = set()
+    for root in roots:
+        for node in ast.walk(ast.parse(HERE.joinpath(root + ".py").read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Import):
+                names.update(a.name.split(".")[0] for a in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
+                names.add(node.module.split(".")[0])
+    return sorted(n for n in names if n not in roots and HERE.joinpath(n + ".py").is_file())
+
+
 def test_extract_env_reads():
-    """KICK-dKeptSession-62 AC24, the class of KICK-dKeptSession-30's popped window variable: every
-    variable `extract.py` reads by name is a DECOY_VARS root, set by `build_arm_env` or popped by `main`
-    before any arm runs, so no case reads it from the machine. The same reader over a copy of the source
-    adding `env.get("RUNLOG_PLANTED")` names that variable, the arm's own liveness."""
-    text = (HERE / "extract.py").read_text(encoding="utf-8")
+    """KICK-dKeptSession-62 AC24, the class of KICK-dKeptSession-30's popped window variable, over the
+    population `derive_kit_imports` derives from the import graph (KICK-dKeptSession-63 S14): every
+    variable each of those modules reads by name is a DECOY_VARS root, set by `build_arm_env` or popped
+    by `main` before any arm runs, so no case reads it from the machine. The population holds
+    `extract` and `model` at the least, its liveness; the same reader over a copy of `extract.py`
+    adding `env.get("RUNLOG_PLANTED")`, and of `model.py` adding `os.environ.get("RUNLOG_PLANTED")`,
+    names that variable."""
     guarded = read_arm_guarded()
-    reads = read_env_reads(text)
-    check("extract KICK-dKeptSession-62 AC24: every variable extract.py reads by name is aimed or dropped "
-          "before any arm runs, over a population of at least the decoy roots",
-          (len(reads) >= len(DECOY_VARS), [v for v in reads if v not in guarded]), (True, []))
-    planted = text + '\n_PLANTED = env.get("RUNLOG_PLANTED")\n'
-    check("extract KICK-dKeptSession-62 AC24: a copy adding env.get(\"RUNLOG_PLANTED\") reds naming that "
-          "variable", [v for v in read_env_reads(planted) if v not in guarded], ["RUNLOG_PLANTED"])
+    population = derive_kit_imports()
+    check("extract KICK-dKeptSession-63 AC14: the import graph's population holds extract and model",
+          {"extract", "model"} <= set(population), True)
+    loose = {m: [v for v in read_env_reads((HERE / f"{m}.py").read_text(encoding="utf-8")) if v not in guarded]
+             for m in population}
+    check("extract KICK-dKeptSession-62 AC24 KICK-dKeptSession-63 S14: every variable each imported kit module "
+          "reads by name is aimed or dropped before any arm runs, extract.py over at least the decoy roots",
+          (len(read_env_reads((HERE / "extract.py").read_text(encoding="utf-8"))) >= len(DECOY_VARS),
+           {m: v for m, v in loose.items() if v}), (True, {}))
+    for mod, line in (("extract", '\n_PLANTED = env.get("RUNLOG_PLANTED")\n'),
+                      ("model", '\n_PLANTED = os.environ.get("RUNLOG_PLANTED")\n')):
+        planted = (HERE / f"{mod}.py").read_text(encoding="utf-8") + line
+        check(f"extract KICK-dKeptSession-62 AC24 KICK-dKeptSession-63 AC14: a copy of {mod}.py adding a read of "
+              "RUNLOG_PLANTED reds naming that variable",
+              [v for v in read_env_reads(planted) if v not in guarded], ["RUNLOG_PLANTED"])
 
 
 # KICK-dKeptSession-9: the orientation report's fixture. Each design session starts between the two
@@ -9349,6 +9385,11 @@ def main():
     # The harness's window variable (KICK-dKeptSession-30 S4) goes too, so no node's setting moves a
     # context arm; the one arm that reads it sets it in its own child's environment.
     os.environ.pop("CLAUDE_CODE_MAX_CONTEXT_TOKENS", None)
+    # The remote and branch `model.resolve_remote` reads (KICK-dKeptSession-63 S14) go too: the lander's
+    # post-merge hook exports GOV_REMOTE, and the in-process `rl_model` calls and every `build_arm_env`
+    # copy would otherwise read the machine's choice instead of the fixture's own remotes.
+    os.environ.pop("GOV_REMOTE", None)
+    os.environ.pop("GOV_DEFAULT_BRANCH", None)
     try:
         for name, fn in sorted(globals().items()):
             if name.startswith("test_") and callable(fn):

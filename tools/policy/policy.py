@@ -1017,7 +1017,8 @@ MIRROR_REL = ".governance/policy.json"
 # records its blob id under `legacy_blobs`, and the helper reads a mirror whose ids differ at L as
 # STALE (TOOL-dGroundRules-21 S17). The instruction overlay is one: its `[[policy]]` rows are the
 # `adopter.` keys' rows (PLAY-dOrderedCharter-32 S7).
-# The rule for adding one is THE RULE in this kit's `README.md`, "The mirror" (KICK-dKeptSession-60).
+# The rule for adding one is THE RULE in this kit's `README.md`, "The mirror" (KICK-dKeptSession-60),
+# and the tuple's JS copy is `MIRROR_LEGACY_INPUTS` in policy-mirror.js (KICK-dKeptSession-63 S5).
 LEGACY_INPUTS = (LEGACY_FANOUT, OVERLAY_REL)
 
 

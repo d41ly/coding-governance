@@ -110,9 +110,11 @@ and `mirror-absent-refuse` are outcome cases (TOOL-dGroundRules-5): each copies 
 policy-mirror.js and policy-shim.sh into the kit copy, pushes a landed revision L to a bare remote,
 and asserts what the helper, the hooks kit's agent-cap.js and `arm_mirror_landed` answer there.
 `mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in six ladder states.
-`mirror-input-parity` (KICK-dKeptSession-59) holds policy-mirror.js's `MIRROR_KIT_INPUTS` literal,
-each name spelled by `derive_kit_rel`, to `derive_mirror_inputs` less `LEGACY_INPUTS`, and its
-`MIRROR_LEGACY_INPUTS` literal to `LEGACY_INPUTS` (KICK-dKeptSession-62).
+`mirror-input-parity` (KICK-dKeptSession-59, KICK-dKeptSession-62) holds policy-mirror.js's `MIRROR_KIT_INPUTS`, each
+name spelled by `derive_kit_rel`, joined with its `MIRROR_LEGACY_INPUTS`, to `derive_mirror_inputs`
+in one join, each list read by its one `const`, `let` or `var` declaration, and stages three plants
+of its own: a header comment spelling a list, a doubled declaration and an absent one
+(KICK-dKeptSession-63).
 `mirror-commit-rewrite` (TOOL-dGroundRules-65) commits the mirror rendered at its parent, rewrites
 that commit with `git commit-tree` as the lander does, and reds a `mirror --check` that is not fresh
 at either commit, or a helper reading the rewrite that leaves the render's `{rev}` unfilled.
@@ -3230,16 +3232,21 @@ def run_mirror_upgrade(name):
     return print_checks(name, checks)
 
 
-MIRROR_KIT_INPUTS_RX = re.compile(r"MIRROR_KIT_INPUTS\s*=\s*(\[[^\]]*\])")  # spans newlines inside the brackets
-MIRROR_LEGACY_INPUTS_RX = re.compile(r"MIRROR_LEGACY_INPUTS\s*=\s*(\[[^\]]*\])")
+# Each JS list is found by its DECLARATION, a line opening `const`, `let` or `var` (KICK-dKeptSession-63
+# S8), so a header comment spelling a list is neither counted nor graded; the brackets span newlines.
+MIRROR_KIT_INPUTS_RX = re.compile(r"^(?:const|let|var)\s+MIRROR_KIT_INPUTS\s*=\s*(\[[^\]]*\])", re.M)
+MIRROR_LEGACY_INPUTS_RX = re.compile(r"^(?:const|let|var)\s+MIRROR_LEGACY_INPUTS\s*=\s*(\[[^\]]*\])", re.M)
+# A name no input of the kit carries, which the comment plant's declaration adds.
+MIRROR_PLANTED_NAME = "planted-input.toml"
 
 
 def read_mirror_literal(text, const, rx):
-    """`(names, seen)`: the one `<const> = [...]` literal `rx` takes from policy-mirror.js's `text`,
-    parsed as JSON, or `(None, <why>)` where it is absent, doubled, unparseable or no list of names."""
+    """`(names, seen)`: the one `<const> = [...]` declaration `rx` takes from policy-mirror.js's
+    `text`, parsed as JSON, or `(None, <why>)` where it is absent, doubled, unparseable or no list of
+    names (KICK-dKeptSession-63 S26: each list must have exactly one declaration)."""
     found = rx.findall(text)
     if len(found) != 1:
-        return None, f"policy-mirror.js holds {len(found)} {const} = [...] literal(s), not one"
+        return None, f"policy-mirror.js holds {len(found)} {const} declaration(s), not one"
     try:
         names = json.loads(found[0])
     except ValueError as exc:  # a JSONDecodeError is a ValueError
@@ -3249,40 +3256,76 @@ def read_mirror_literal(text, const, rx):
     return names, ""
 
 
+def check_mirror_inputs(text):
+    """`(ok, seen)` for policy-mirror.js's `text` (KICK-dKeptSession-63 S21): its two lists, each read
+    by its one declaration, held to `policy.derive_mirror_inputs()` in ONE join,
+    `{derive_kit_rel(n) for n in MIRROR_KIT_INPUTS} | set(MIRROR_LEGACY_INPUTS)`, so a legacy name is
+    never spelled by the kit's prefix. A declaration absent, doubled, unparseable or no list of names,
+    or a name `derive_kit_rel` refuses, is not ok; unequal sets name each input on one side only."""
+    kit, why_kit = read_mirror_literal(text, "MIRROR_KIT_INPUTS", MIRROR_KIT_INPUTS_RX)
+    legacy, why_legacy = read_mirror_literal(text, "MIRROR_LEGACY_INPUTS", MIRROR_LEGACY_INPUTS_RX)
+    if kit is None or legacy is None:
+        return False, "; ".join(w for w in (why_kit, why_legacy) if w)
+    try:
+        js = {policy.derive_kit_rel(n) for n in kit} | set(legacy)
+        want = set(policy.derive_mirror_inputs())
+    except policy.Refusal as exc:
+        return False, f"derive_kit_rel refused: {exc}"
+    only = [f"{r} in derive_mirror_inputs alone" for r in sorted(want - js)]
+    only += [f"{r} in the JS lists alone" for r in sorted(js - want)]
+    return not only, "; ".join(only) or f"{len(js)} input(s) on each side: {', '.join(sorted(js)) or '(none)'}"
+
+
+def derive_mirror_plants(text):
+    """`(label, planted text, what its seen must name)` per plant of `mirror-input-parity`'s own arm
+    (KICK-dKeptSession-63 AC8, AC21, AC26), each staged on `text`: a header comment spelling
+    `MIRROR_KIT_INPUTS` as the list stood while the declaration gains MIRROR_PLANTED_NAME, a second
+    `MIRROR_KIT_INPUTS` declaration, and `MIRROR_LEGACY_INPUTS` declared nowhere. A plant whose
+    declaration is absent from `text` stages nothing and is returned as `text` itself."""
+    kit = MIRROR_KIT_INPUTS_RX.search(text)
+    legacy = MIRROR_LEGACY_INPUTS_RX.search(text)
+    plants = []
+    try:
+        names = json.loads(kit[1]) if kit else None
+    except ValueError:
+        names = None
+    if isinstance(names, list):
+        grown = json.dumps([*names, MIRROR_PLANTED_NAME])
+        commented = (f"// MIRROR_KIT_INPUTS = {json.dumps(names)};\n" + text[:kit.start(1)] + grown + text[kit.end(1):])
+        plants.append(("a header comment spelling the list while the declaration holds a second name",
+                       commented, MIRROR_PLANTED_NAME))
+    else:
+        plants.append(("a header comment spelling the list while the declaration holds a second name", text,
+                       MIRROR_PLANTED_NAME))
+    plants.append(("MIRROR_KIT_INPUTS declared twice",
+                   text + (f"\n{kit[0]};\n" if kit else ""), "2 MIRROR_KIT_INPUTS declaration(s)"))
+    plants.append(("MIRROR_LEGACY_INPUTS declared nowhere",
+                   (text[:legacy.start()] + text[legacy.end():]) if legacy else text,
+                   "0 MIRROR_LEGACY_INPUTS declaration(s)"))
+    return plants
+
+
 def run_mirror_input_parity(name):
-    """`mirror-input-parity` (KICK-dKeptSession-59 S1): the one `MIRROR_KIT_INPUTS = [...]` literal of
-    this kit's policy-mirror.js, taken by regex and parsed as JSON, each name spelled by
-    `policy.derive_kit_rel`, against `policy.derive_mirror_inputs()` less `policy.LEGACY_INPUTS`; and
-    beside it the one `MIRROR_LEGACY_INPUTS = [...]` literal, the repository-relative inputs, against
-    `policy.LEGACY_INPUTS` (KICK-dKeptSession-62 S24), every list read live from the kit's own
-    policy.py. A literal absent, unparseable or no list of names, or a name `derive_kit_rel` refuses,
-    is a WRONG and never a pass; unequal sets are a WRONG naming each input on one side only."""
+    """`mirror-input-parity` (KICK-dKeptSession-59 S1, KICK-dKeptSession-62 S24): this kit's
+    policy-mirror.js, its `MIRROR_KIT_INPUTS` and `MIRROR_LEGACY_INPUTS` each read by its one
+    declaration (KICK-dKeptSession-63 S8, S26) and held together to `policy.derive_mirror_inputs()`
+    read live from the kit's own policy.py, by `check_mirror_inputs`' one join (S21). Beside it the
+    case's own arm: each of `derive_mirror_plants`' texts, staged on the file as read, reds naming
+    what it planted, so a reader grading a comment's literal, a second declaration or an absent one
+    is a WRONG here and never a pass."""
     try:
         text = (KIT / "policy-mirror.js").read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
         return print_checks(name, [("the JS literals", "policy-mirror.js read", False,
                                     f"policy-mirror.js did not read: {type(exc).__name__}: {exc}")])
-    checks = []
-    for const, rx, base in (("MIRROR_KIT_INPUTS", MIRROR_KIT_INPUTS_RX, "derive_mirror_inputs less LEGACY_INPUTS"),
-                            ("MIRROR_LEGACY_INPUTS", MIRROR_LEGACY_INPUTS_RX, "LEGACY_INPUTS")):
-        what = f"{const} against {base}"
-        names, seen = read_mirror_literal(text, const, rx)
-        if names is None:
-            checks.append(("the JS literal", what, False, seen))
-            continue
-        try:
-            if const == "MIRROR_KIT_INPUTS":
-                js = {policy.derive_kit_rel(n) for n in names}
-                want = set(policy.derive_mirror_inputs()) - set(policy.LEGACY_INPUTS)
-            else:
-                js, want = set(names), set(policy.LEGACY_INPUTS)
-        except policy.Refusal as exc:
-            checks.append(("the JS literal", what, False, f"derive_kit_rel refused: {exc}"))
-            continue
-        only = [f"{r} in {base.split()[0]} alone" for r in sorted(want - js)]
-        only += [f"{r} in {const} alone" for r in sorted(js - want)]
-        seen = "; ".join(only) or f"{len(js)} input(s) on each side: {', '.join(sorted(js)) or '(none)'}"
-        checks.append(("the kit's two lists", what, not only, seen))
+    ok, seen = check_mirror_inputs(text)
+    checks = [("the kit's two lists", "MIRROR_KIT_INPUTS by derive_kit_rel and MIRROR_LEGACY_INPUTS against "
+               "derive_mirror_inputs", ok, seen)]
+    for label, planted, needle in derive_mirror_plants(text):
+        pok, pseen = check_mirror_inputs(planted)
+        staged = planted != text
+        checks.append(("a planted policy-mirror.js", label, staged and not pok and needle in pseen,
+                       pseen if staged else "the plant did not stage: its declaration is absent"))
     return print_checks(name, checks)
 
 

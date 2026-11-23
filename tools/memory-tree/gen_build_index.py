@@ -209,8 +209,9 @@ PRECEDENCE = ("INPROGRESS", "BLOCKED", "OPEN", "SPECCED", "DEFERRED")
 
 H1_RE = re.compile(r"^#\s+(?P<id>[A-Za-z0-9][A-Za-z0-9-]*)\s+—\s+(?P<title>.+?)\s*$")
 # The build-order verb, appended after `base` in a spec's status header. Units sharing a value are
-# the parallel group; the owner resolved against a second `group` verb, which would have needed its
-# own contradiction refusals to render an identical region.
+# one step, whose Parallel cell `derive_parallel_step` derives, as `render_order` reads
+# (KICK-dKeptSession-63 S24); the owner resolved against a second `group` verb, which would have
+# needed its own contradiction refusals to render an identical region.
 # TOOL-dFramedEntrypoint-4 S2 — ANCHORED on both sides. The shipped form ended `(?![0-9])`, which
 # rejects a longer number and nothing else: `order 0x2` matched `0` and rendered as step 0, and
 # `order 2x` matched `2` and rendered as step 2 — both probed on the shipped regex before this change.

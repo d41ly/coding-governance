@@ -1176,7 +1176,8 @@ def derive_main_transcripts(root) -> list:
     whose stem `SID_RE` fullmatches, so an agent file or a stray name is never one (KICK-dKeptSession-56
     S21), and which `_check_inside` places under the resolved root, so a transcript linked from outside
     it is omitted (KICK-dKeptSession-62 S19). The one population `measure_tree`, `measure_ready_tree`,
-    `derive_context_window` and `scan_preflights` read (S18). Reads no file."""
+    `derive_context_window` and `scan_preflights` read (S18), so each of the four, both measures
+    included, counts a linked transcript out (KICK-dKeptSession-63 S23). Reads no file."""
     root = pathlib.Path(root)
     inside = root.resolve()
     return sorted(p for p in root.glob("*/*.jsonl")
