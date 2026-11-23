@@ -271,3 +271,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T00:30:27Z brief · item KICK-dKeptSession-27 · reason cd23931c3543 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-27-build-brief.md
 
 2026-11-23T00:33:05Z dispatch · item dba19c7a KICK-dKeptSession-27 · reason tools/unattended/unattended.sh memory/map/generated/symbols.json tools/unattended/unattended.test.sh tools/run-gates/selftest-budgets.txt tools/loop/loop_transition.py tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-27-1-acceptance-ledger.md
+
+2026-11-23T00:58:59Z brief · item KICK-dKeptSession-24 · reason 8ee3fec1498a memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-24-build-brief.md
+
+2026-11-23T01:01:43Z dispatch · item 8d3d4a0e KICK-dKeptSession-24 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/loop/loop_transition.py tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json help/loop.md tools/loop/README.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md skills/session-kickoff/card-store.fixture.sh memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-24-1-acceptance-ledger.md
