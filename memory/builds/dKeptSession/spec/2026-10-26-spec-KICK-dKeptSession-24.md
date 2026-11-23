@@ -1,6 +1,6 @@
 # KICK-dKeptSession-24 — a mail deadline judged by the observer clock: `flow.wait-ceiling` declared on each message, the asker's default past it
 
-**Status:** INPROGRESS · rev-5 · 2026-11-23 · node a · Tier-2 · base 8b8b1374 · streams kickoff · order 19 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-6 · 2026-11-23 · node a · Tier-2 · base 8b8b1374 · streams kickoff · order 19 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0162@6ce67958 whole
 
@@ -21,6 +21,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md) | research | KICK-dKeptSession-36 KICK-dKeptSession-27 |
 | [2026-11-22-prompt-KICK-dKeptSession-24-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-24-reground-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-24-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-24-1-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-24-2-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-24-2-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-24-divergence-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-24-divergence-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -105,8 +107,7 @@ names a deadline as what it does not check (`tools/unattended/unattended.sh#read
   `tools/unattended/unattended.sh#write_mail_ref` builds every message by `build_gov_commit` under
   the fixed `gov-claim` identity the walk requires. This unit adds no call and changes none. NOT
   OBSERVED here: it is landed code this unit relies on, which `KICK-dKeptSession-23`'s AC5, landing
-  at order 17, observes as a fetched message sighted; rev-4's AC6 restated that criterion, which
-  this spec now leaves to unit 23.
+  at order 17, observes as a fetched message sighted.
 - **S5** — The `expired` state. `read_mailbox`'s parse reads `deadline` and `default` through
   `read_kv` under a second key set beside the required one, so a record without them keeps its row
   and reads `-` in each. The row appends the two columns after the three `KICK-dKeptSession-27` S4
@@ -120,8 +121,12 @@ names a deadline as what it does not check (`tools/unattended/unattended.sh#read
   expired row leaves `--open --ids`. The guard of `KICK-dKeptSession-5` holds on `open` rows only, so
   an expired message lets the recipient's transitions go on; `MAIL_DISPOSED_STATES` already holds
   `expired` (`tools/loop/loop_transition.py@2f3a26de0fd2:137`), so the disposal takes the row and
-  its record's `State` reads `expired`, no edit there. `MailHeld`'s message, "holds its moves until it
-  is answered or acknowledged", gains "or past its deadline". An expired question reads
+  its record's `State` reads `expired`, no edit there. The texts saying what holds a move read the
+  expiry: "neither answered nor acknowledged" in `tools/loop/loop_transition.py#MailHeld`'s docstring
+  and the module docstring's guard paragraph reads "neither answered, acknowledged nor past its
+  deadline", and "answered or acknowledged" reads "answered, acknowledged or past its deadline" in
+  `MailHeld`'s message, the `mail —` bullet (`help/orientation-card.md@09510792d640:148`) and the
+  guard paragraph of `tools/loop/claim.py@724ab226e58e:46`'s docstring. An expired question reads
   `question-closed` to `check_lease_witness`, which renews nothing on it. A record with no
   `deadline`, as `seed_mail_at` and `tools/loop/loop_transition.py#render_fixture_mail` plant one,
   judges 2 and stays `open`: the DPR1 lease arms' question still renews and `mail-open` still
@@ -138,22 +143,24 @@ names a deadline as what it does not check (`tools/unattended/unattended.sh#read
   `stale-holder` plant writes. Its branch of `tools/loop/loop_transition.py#run_transition_fixture`
   runs B4 and prints the commit count, the trailer and each mail record's `State`, as `mail-disposed`
   does; `PLANTS` gains the key and `tools/loop/loop_transition.py#run_selftest`'s case table one row
-  per line AC2 reads. Observed by AC2, AC3 and AC4.
+  per line AC2 reads. Observed by AC2, AC3, AC4 and AC8.
 - **S6** — The user texts. The `--mail` entry of `tools/unattended/VERBS.template.md`, and its
   byte-equal installed copy `memory/guides/UNATTENDED-VERBS.md` under the unattended kit gate's
   check 10: the usage gains `[--default <text>]`; the record's key list gains `deadline` and
   `default`; the row's column list gains them; "The four states" becomes five, `expired` stated as
   an `open` message this node first saw more than its `deadline` hours ago, by its own clock, its
   `default` the answer; and the transition sentence disposes "each answered, acknowledged or expired
-  message". `help/loop.md`: the `--mail` paragraph names `--default`, the two columns and `expired`,
-  its `verb:unattended.sh:--mail` anchor re-stamped with the fingerprint
+  message". `help/loop.md`: the `--mail` paragraph names `--default` and the two columns, its "A
+  message is `open` until …" sentence gaining `expired` as the verbs guide states it, its
+  `verb:unattended.sh:--mail` anchor re-stamped with the fingerprint
   `python tools/govkit/docs_leg.py --fingerprints` prints at build time, since `--default` joins the
   flags it hashes (`tools/govkit/docs_leg.py#read_verb_usage`); the guard paragraph under "Recording
-  a build's move" says a message past its deadline holds no move and is disposed with the answered
-  and acknowledged ones; and the fixture-cases sentence names `mail-expired`. `tools/loop/README.md`:
-  the mail guard paragraph's `open` row reads "neither answered, acknowledged nor past its deadline",
-  and its plant list names `mail-expired`. The module docstring of `tools/loop/loop_transition.py`
-  and its comment above `TRANSITION_FIELDS` name the plant and the expiry. Observed by AC6.
+  a build's move" reads "neither answered, acknowledged nor past its deadline holds the move" and
+  "each answered, acknowledged or expired message"; and the fixture-cases sentence names
+  `mail-expired`. `tools/loop/README.md`: the mail guard paragraph's
+  `open` row reads "neither answered, acknowledged nor past its deadline", and its plant list names
+  `mail-expired`. The module docstring of `tools/loop/loop_transition.py` and its comment above
+  `TRANSITION_FIELDS` name the plant and the expiry. Observed by AC6 and AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -204,12 +211,11 @@ Read on the run tree at `9900b200`, 2026-11-23, with units 23, 36, 39, 51 and 27
   last valid first-parent revision and refuses only where none precedes it
   (`tools/policy/policy.py#read_last_valid_value`), which DPR1 AC17 stages with an unparsable first
   revision after a fresh `write_lease_fixture`.
-- `build_gov_message` refuses an empty value and any value matching `[[:cntrl:]]`, tab included,
-  and holds no value to a length.
-- The transition guard's row split takes any row of eleven or more fields, and its disposal set is
-  `answered`, `acked` and `expired` (`tools/loop/loop_transition.py#read_mail_rows`,
-  `tools/loop/loop_transition.py@2f3a26de0fd2:137`).
 - The lander mints kit versions, so a branch owes no bump (`tools/push-main.sh@78f40c3c2475:27`).
+- A whitespace-folded search for "answered or acknowledged", "answered nor acknowledged" and "is
+  `open` until" outside `memory/builds/` at `0e5b281a` found nine statements beside the verbs guide's
+  (PINNED, 2026-11-23): one each in `help/orientation-card.md`, `tools/loop/claim.py` and
+  `tools/loop/README.md`, three each in `help/loop.md` and `tools/loop/loop_transition.py`.
 
 ### The rule
 
@@ -241,8 +247,7 @@ kind that only needs acknowledging (`changed`, `landed`, `overlap`, `takeover`, 
 1. `read_mailbox`'s bounded fetch, then `add_feed_sightings refs/gov/remote/`, both landed.
 2. Its parse yields each message's `ref`, `commit`, `state`, `deadline` and `default`.
 3. For each `open` row, `check_mail_deadline <ref> <commit> <deadline>`; rc 0 sets `expired`.
-   Each call is one `read_first_seen` pass over the feed and one `date`, so the cost is linear in
-   open messages, which the guard keeps few.
+   The cost is linear in open messages (§5), which the guard keeps few.
 
 ### Shipped texts
 
@@ -250,8 +255,11 @@ kind that only needs acknowledging (`changed`, `landed`, `overlap`, `takeover`, 
 |---|---|
 | `tools/unattended/unattended.sh`: the usage line, the `--mail` refusals, and the comments of `write_mail_post`, `read_mailbox`, `read_lease_policy`, `read_lease_bound`, `check_deadline_passed` and `check_lease_witness` | S1, S2, S3, S5 |
 | `tools/unattended/unattended.test.sh`: the DPR1 AC11 block comment naming the stub | S3 |
-| `tools/unattended/VERBS.template.md`, `memory/guides/UNATTENDED-VERBS.md`, `help/loop.md`, `tools/loop/README.md` | S6 |
-| `tools/loop/loop_transition.py`: its docstring, its plant comment and `MailHeld`'s message | S5, S6 |
+| `tools/unattended/VERBS.template.md`, `memory/guides/UNATTENDED-VERBS.md`, `tools/loop/README.md` | S6 |
+| `help/loop.md`: the `--mail` paragraph's open-until sentence, the guard paragraph's holds-the-move and disposal sentences, the fixture-cases sentence | S6 |
+| `tools/loop/loop_transition.py`: its docstring, its plant comment, `MailHeld`'s docstring and message | S5, S6 |
+| `help/orientation-card.md`: the `mail —` bullet's holds-the-moves sentence | S5 |
+| `tools/loop/claim.py`: the module docstring's KICK-dKeptSession-5 guard paragraph | S5 |
 | the comments of `seed_mail_at`, `render_fixture_mail` and `write_card_mail` | S5 |
 
 These stay true and are left as they are. `tools/unattended/STOPS.template.md`'s lease-key table
@@ -262,7 +270,9 @@ open. `help/reference/policy.md` and the catalogue row are unchanged, and the ro
 so `.governance/policy.json` does not move. `help/loop.md`'s loop-wait `deadline =
 "policy.flow.wait-ceiling"` and the `--entry-claim` ceiling text govern a wait and a claim, never a
 message. The key already has readers in `tools/loop/claim.py` and `tools/loop/termination.py`, so
-the policy kit's reader coverage moves by nothing a gate reads.
+the policy kit's reader coverage moves by nothing a gate reads. `help/loop.md`'s "so answer or acknowledge
+each" and "While a message addressed to a build is open, that build's moves are refused" stay true,
+as does the card bullet's "names each open message": an expired message is not open.
 
 ### The refusal ceiling
 
@@ -285,8 +295,7 @@ arm, and the probe it deletes is no site. The ceiling is met unraised.
 
 ### Migration
 
-None. A message posted before this unit carries no `deadline`, reads `-` in both columns, judges 2
-and stays `open` until an answer or an ack disposes it, as unit 5 lands it.
+None: a message posted before this unit carries no `deadline` and stays `open`, as S5 reads it.
 
 ### Rollout
 
@@ -306,7 +315,10 @@ change.
   (`tools/unattended/unattended.test.sh@92da5fb2d5cc:24236` and `:24524`, DERIVED, the last
   assignment of each), and units 23 and 27 raise both first
 - `tools/loop/loop_transition.py`: the `mail-expired` plant and its cases, `render_fixture_mail`'s
-  two keys, `MailHeld`'s message, the docstring and the plant comment
+  two keys, `MailHeld`'s docstring and message and the docstring's guard paragraph (S5), the
+  docstring's plant list and the plant comment (S6)
+- `tools/loop/claim.py`: the docstring's guard clause (S5)
+- `help/orientation-card.md`: the `mail —` bullet (S5)
 - `tools/run-gates/selftest-budgets.txt`: the `loop transition record` row's `plants=<n>` token, 15
   at `9900b200` (`tools/run-gates/selftest-budgets.txt@9709091da4b8:82`) and 18 once
   `KICK-dKeptSession-36` lands its three, set to 19 (DERIVED: `len(PLANTS)`), its reading re-priced
@@ -324,17 +336,13 @@ change.
 - **The sender's commit time as the clock.** It is the holder's stamp, the clause's red case.
 - **An `answer` message posted at expiry.** A second record of what the deadline already derives,
   written once per reading node (§8 F5).
-- **A second hours-to-seconds conversion inside `check_mail_deadline`.** `read_lease_bound` already
-  spells it, so this second instance extracts it.
-- **A length limit on `--default`.** No other record value carries one, and `build_gov_message` is
-  the one value check.
 
 ## 5. Production-readiness checklist
 
 - security — `--default` passes `build_gov_message`'s value checks before any commit; a refused
   policy read writes nothing; no new outbound call.
-- perf / scale — one feed pass and one `date` per open message per read; every witness check now
-  makes the one bounded mail fetch its design names.
+- perf / scale — one feed pass and one `date` per open message per read; each witness check one
+  bounded mail fetch (S3).
 - error / empty / loading states — an unsighted message reads `open`, never `expired`; an unresolved
   policy kit writes the default with a NOTE; a malformed `deadline` judges rc 2 and stays `open`.
 - observability — `--mail read` prints each expired row's state and its `default` column.
@@ -342,7 +350,8 @@ change.
   deadline and never advances it.
 - testing — the probes of §6 and the arms of §7.
 - migration — none.
-- user docs — the verbs guide, `help/loop.md` and `tools/loop/README.md` (S6).
+- user docs — the verbs guide, `help/loop.md` and `tools/loop/README.md` (S6);
+  `help/orientation-card.md` (S5).
 
 ## 6. Acceptance criteria
 
@@ -405,10 +414,24 @@ The fixture is `KICK-dKeptSession-5`'s two-clone mailbox, or the lease fixture's
   prints 0, and `grep -c "functions absent" tools/unattended/unattended.test.sh` prints 0.
   Red when: a probe that can no longer fail stays in the driver, or the suite still asserts its
   absent case.
+- **AC8** — When `python tools/loop/loop_transition.py --fixture --plant mail-open` runs, its
+  `refused —` line ends "until it is answered, acknowledged or past its deadline"; with text folded
+  to one line by `tr -s ' \n' '  '`, `grep -c 'answered, acknowledged or past its deadline'` prints 1
+  over each of `help/orientation-card.md` and `tools/loop/claim.py`, and
+  `grep -c -E 'answered (or|nor) acknowledged'` prints 0 over those two, `help/loop.md`, `tools/loop/loop_transition.py`,
+  `tools/loop/README.md` and `tools/unattended/VERBS.template.md` folded together.
+  Red when: a shipped text says an answer or an ack alone releases a move.
+  figure: 1 and 0 are PINNED, the folded counts once every rewrite lands.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `scratch-guard self-test` · `tier2-review self-test` · `policy check` · `policy fixtures` · `loop transition record` · `docs` · `manifest-check self-test`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `scratch-guard self-test` · `tier2-review self-test` · `policy check` · `policy fixtures` · `loop transition record` · `loop claim fixtures` · `docs` · `manifest-check self-test`
+
+By `python tools/check-spec-tokens.py --legs-for tools/loop/claim.py help/orientation-card.md`,
+2026-11-23: `tools/loop/claim.py` trips only the broad `tools/` guard, as
+`tools/loop/loop_transition.py` does; `kit epoch` reads it as loop-kit bytes and `loop claim
+fixtures` runs it, so joins the line. The card page trips no guarded leg; `docs` reads its
+anchors, commands and links, never prose, and the edit keeps its link and moves no anchor's shape.
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · the deadline arms over planted feed lines and mail commits, staged by a scratch copy whose judgment reads the commit's own date · the effective `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8` move by the arms' counted assertions less DPR1 AC11's retired one, counted off the diff
 New arm: tools/loop/loop_transition.py · covers AC2 · the `mail-expired` plant, staged by a guard reading `expired` as `open` · the `loop transition record` row's `plants=<n>` token rises by one, to 19 over unit 36's 18
@@ -484,7 +507,6 @@ New arm: tools/loop/loop_transition.py · covers AC2 · the `mail-expired` plant
   no-deadline records `open`; S6 and AC7 re-stamp `help/loop.md`'s `--mail` anchor; the version move
   left Files touched, which gained `symbols.json`, the plant and its budget row; `policy fixtures`,
   `loop transition record` and `docs` joined §7.
-
 - rev-5 · 2026-11-23 · §1 · S1 · S2 · S3 · S4 · S5 · S6 · §3 · §4 · §5 · AC1 · AC2 · AC5 · AC6 · AC7 ·
   §7 · §10 · re-grounded on the run tree at `9900b200` under
   `2026-11-22-prompt-KICK-dKeptSession-24-reground-brief`: unit 5 landed the post, the reader's
@@ -498,6 +520,10 @@ New arm: tools/loop/loop_transition.py · covers AC2 · the `mail-expired` plant
   `manifest-check self-test` leg the card-store fixture's comment trips; the floors, the plant
   count and the strict preset are pinned; base moved to `8b8b1374`, the default-branch sha the run
   branch reconciled.
+- rev-6 · 2026-11-23 · S5 · S6 · §4 · §5 · AC8 · §7 · under
+  `2026-11-23-prompt-KICK-dKeptSession-24-divergence-brief`: S5 rewrites the card's `mail —` bullet
+  and `tools/loop/claim.py`'s guard clause, both in Files touched; S6 names the `help/loop.md`
+  sentences, §4 those that stay true; AC8 observes them; §7 adds `loop claim fixtures`.
 
 ## 10. Reuse audit
 
@@ -514,7 +540,6 @@ only, and `python tools/codebase-map/reuse_lookup.py "convert a policy duration 
 seconds"` ranked `read_policy_value`, `read_policy_kit`, `PolicyRefused` and `load_policy`, Python
 readers that do not convert; neither probe names a shell judgment or conversion, so no seam fits
 beyond the driver's own. `python tools/memory-recall/query.py "how does a mailbox message expire by
-the observer clock"` returned scout B's row 7 and this spec; scout B's row agrees with source on
-`check_deadline_passed`'s arguments and predates the landed feed's ref spelling.
+the observer clock"` returned scout B's row 7 and this spec.
 
 Recall terms used: mailbox deadline flow.wait-ceiling observer clock first sighting check_deadline_passed expired default read_first_seen add_feed_sightings
