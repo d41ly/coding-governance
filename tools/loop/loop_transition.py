@@ -5,6 +5,7 @@
                                      [--fact k=v]... [--field k=v]... [--root <path>]
     python loop_transition.py check --build <slug> [--root <path>]
     python loop_transition.py check --selftest
+    python loop_transition.py dependents --build <slug> [--root <path>]
     python loop_transition.py --fixture --plant <case>
 
 THE CHANNELS. The policy key `transitions.record`, read through the policy kit's `resolve` at one
@@ -80,11 +81,21 @@ a bare remote, `mail-disposed` the disposal after its `ack` and a second move th
 `mail-expired` the disposal of a question carrying `deadline: 30`, first sighted 31 hours ago and never
 answered, its record's `State` reading `expired`.
 
+THE NOTICES (KICK-dKeptSession-7 S4, S9). On a move from designing to building, after the card follow,
+`write_dependency_notices` posts the build's frozen interfaces to each dependent `dependents --build <slug>`
+lists, every build whose README's `parents:` names it: the driver's `--mail post <slug> --to
+build:<dependent> --kind confirmed --subject "interfaces <slug>" --interface <listing>`, the listing the
+bytes of `git ls-tree -r` over the build's `spec/` folder at the transition commit (at HEAD where the set
+makes none) and the body that commit's sha, `changed` where the dependent's mailbox already holds a
+`confirmed` of that subject from the build. A dependent whose mailbox does not read gets nothing and one
+`loop: notice · unread · <dependent> · <why>` line; a failed post prints its line; neither fails the move.
+`--fixture --plant deps-notices` holds both notices' keys over a two-build scratch.
+
 Exit: `record` 0 recorded, 1 refused by the table or held by open mail; `check` 0 clean, 1 on a finding, `pending` or
-`unstored`. Both exit 2 printing `loop: unanswered · <why>` on a value outside its grammar, a witness
+`unstored`; `dependents` 0 with one slug per line. Both exit 2 printing `loop: unanswered · <why>` on a value outside its grammar, a witness
 that is not HEAD or its ancestor, a staged index, or a policy refusal naming `transitions.record`, an
-empty set with no valid revision before it among them; and 2 printing `loop: unarmed · <why>` where the
-policy or memory-tree kit does not resolve, never a default. The loop kit takes no edge to the policy
+empty set with no valid revision before it among them, or, for `dependents`, a README that does not read;
+and 2 printing `loop: unarmed · <why>` where the policy or memory-tree kit does not resolve, never a default. The loop kit takes no edge to the policy
 kit, which is why.
 
 `--fixture --plant <case>` builds a scratch repository under the host temp directory holding the build
@@ -192,7 +203,10 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
                        "recorded, answered zero rows, and held to the located driver and the bash that sees it",
           "mail-no-driver": "the driver's conf, the driver's locator run over an empty scratch directory: B4 "
                             "records with the mailbox unarmed",
-          "mail-no-bash": "the driver's conf and resolve_bash answering None: B4 refused as mail unknown, no commit"}
+          "mail-no-bash": "the driver's conf and resolve_bash answering None: B4 refused as mail unknown, no commit",
+          "deps-notices": "the driver's conf with RUN_CLAIMS on, a bare remote and tDep naming tFix in parents: B5 at "
+                          "an older --witness posts one confirmed to build:tDep keyed over tFix's spec listing at the "
+                          "transition commit; B8 back and B5 again post changed with another key, no second confirmed"}
 #: The mail plants' messages, each `(ref, build, id, to, kind, subject, answers)`, put straight on the fixture's
 #: remote; `mail-disposed` adds the ack. `mail-expired` writes the question with `FX_DEADLINE`'s two keys and
 #: its first sighting `FX_SIGHTED_HOURS` back in the fixture's feed, past the 30-hour deadline.
@@ -212,6 +226,10 @@ PLANT_SETS = {"subset-trailer-line": '["trailer", "micro-format"]', "subset-log"
 FX_BUILD = "tFix"
 FX_UNIT = "TOOL-tFix-1"
 FX_SPEC = "memory/builds/tFix/spec/2026-01-01-spec-%s.md" % FX_UNIT
+#: The `deps-notices` plant's dependent, whose README names `FX_BUILD` in `parents:` (KICK-dKeptSession-7 AC7),
+#: and the session its posts run as.
+FX_DEPENDENT = "tDep"
+FX_SESSION = "s-notice"
 
 
 # ------------------------------------------------------------------------------------------ the grammar
@@ -524,14 +542,160 @@ def write_mail_records(root, build, anchor, rows):
     return out
 
 
-def render_fixture_mail(build, mid, to, kind, subject, answers="none", deadline=None, default=None):
+def render_fixture_mail(build, mid, to, kind, subject, answers="none", deadline=None, default=None, content_key=None):
     """A mail commit's message as `KICK-dKeptSession-5`'s post recorded it, with no deadline, for a plant that puts
     one straight on its remote: the header, the ten keys, `from-tag` `z` and `from-session` `s-other`, and a
-    one-line body; `deadline` and `default`, where given, append the two keys KICK-dKeptSession-24's post writes."""
+    one-line body; `deadline` and `default`, where given, append the two keys KICK-dKeptSession-24's post writes,
+    and `content_key` a `content-key: <k>` line, the key a `confirmed` or `changed` post carries
+    (KICK-dKeptSession-27 S3), which the dependency plants set (KICK-dKeptSession-7)."""
     keys = (("id", mid), ("build", build), ("from-tag", "z"), ("from-session", "s-other"), ("to", to), ("kind", kind),
             ("item", "none"), ("pass", "none"), ("subject", subject), ("answers", answers))
-    keys += tuple((k, v) for k, v in (("deadline", deadline), ("default", default)) if v is not None)
+    keys += tuple((k, v) for k, v in (("content-key", content_key), ("deadline", deadline), ("default", default))
+                  if v is not None)
     return "gov-mail %s/%s\n\n%s\nthe fixture's message\n" % (build, mid, "".join("%s: %s\n" % kv for kv in keys))
+
+
+# ------------------------------------------------------------------------------------------ the dependents
+def derive_interface_listing(root, build, commit):
+    """The interfaces a `confirmed` notice carries the key of (KICK-dKeptSession-7 S4, §8 F3): the bytes
+    `git ls-tree -r <commit> -- <memory root>/builds/<build>/spec/` prints, run under `read_clean_env()` and
+    never through `read_git`, which decodes and strips, so a key posted on one node recomputes on another.
+    ValueError on a non-zero exit or a run past `MAIL_GUARD_SECONDS`."""
+    import subprocess
+    from loop_witness import read_clean_env
+    path = "%s/builds/%s/spec/" % (resolve_memory_root(root), build)
+    try:
+        p = subprocess.run(["git", "ls-tree", "-r", commit, "--", path], cwd=str(root), capture_output=True,
+                           stdin=subprocess.DEVNULL, env=read_clean_env(), timeout=MAIL_GUARD_SECONDS)
+    except (OSError, subprocess.TimeoutExpired) as e:
+        raise ValueError("the spec listing of %s at %s did not answer: %s" % (build, commit, e)) from None
+    if p.returncode != 0:
+        raise ValueError("the spec listing of %s at %s exited %d: %s" % (
+            build, commit, p.returncode, p.stderr.decode("utf-8", "replace").strip().split("\n")[0] or "no output"))
+    return p.stdout
+
+
+def read_dependents(root, build):
+    """Every build whose README front matter's `parents:` names `build` (KICK-dKeptSession-7 S9), read by the
+    memory-tree kit's `parse_front_matter` as `loop_parents.read_withdrawn_parents` reads it, sorted. A README
+    whose bytes hold no `parents:` names no parent and is not parsed. ValueError on a README that does not
+    read; LookupError where the memory-tree kit does not resolve."""
+    read_memory_tree("gen_build_index.py")
+    from gen_build_index import Problem, parse_front_matter
+    builds = pathlib.Path(root) / resolve_memory_root(root) / "builds"
+    out = []
+    for readme in sorted(builds.glob("*/README.md")) if builds.is_dir() else []:
+        slug = readme.parent.name
+        try:
+            if slug == build or b"parents:" not in readme.read_bytes():
+                continue
+            fm = parse_front_matter(str(readme), slug)
+        except (Problem, OSError) as e:
+            raise ValueError("the build %s's README does not read: %s" % (slug, e)) from None
+        if build in (fm.get("parents") or "").split():
+            out.append(slug)
+    return out
+
+
+def check_parent_interfaces(root, slug, parent):
+    """`(rc, line)` of the dependent `slug`'s confirmation of `parent`'s interfaces (KICK-dKeptSession-7 S3):
+    the parent lease's `witness` by the driver's `--lease show build <parent>`; where that commit is absent
+    here, one bounded `git fetch` of the claims remote; `derive_interface_listing` at it in a scratch file;
+    then the driver's `check_interface_notice <slug> "interfaces <parent>" <file>`. 0 confirmed, its line;
+    1 awaiting, the check's exit 1 or a witness of `-`; 2 unread, the check's exit 2, a read past
+    `MAIL_GUARD_SECONDS`, a commit still absent or a listing that does not derive, naming why."""
+    import os
+    import subprocess
+    from breakpoints import run_sourced   # it imports this module at its top, so here
+    from claims import resolve_remote
+
+    def read_driver(script, *args):
+        """`(exit, its last non-empty line)` of one sourced driver call, `(2, why)` where it does not answer."""
+        try:
+            rc, out = run_sourced(root, script, args=args, timeout=MAIL_GUARD_SECONDS)
+        except (LookupError, OSError, subprocess.TimeoutExpired) as e:
+            return 2, "the driver did not answer within %ds: %s" % (MAIL_GUARD_SECONDS, str(e) or type(e).__name__)
+        lines = [ln.rstrip("\r") for ln in out.splitlines() if ln.strip()]
+        return rc, lines[-1] if lines else "exit %d with no output" % rc
+    rc, wit = read_driver('( load_driver_conf && main --lease show build "$2" )', parent)
+    if rc != 0:
+        return 2, "--lease show build %s: %s" % (parent, wit)
+    if wit == "-":
+        return 1, "the lease of %s holds no witness" % parent
+    if not SHA.fullmatch(wit):
+        return 2, "--lease show build %s printed %s" % (parent, wit)
+    if read_git(root, "cat-file", "-e", "%s^{commit}" % wit)[0] != 0:
+        remote = resolve_remote(root)[0]
+        try:
+            subprocess.run(["git", "fetch", "-q", remote or "origin"], cwd=str(root), capture_output=True,
+                           stdin=subprocess.DEVNULL, timeout=MAIL_GUARD_SECONDS)
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+        if read_git(root, "cat-file", "-e", "%s^{commit}" % wit)[0] != 0:
+            return 2, "the witness %s of %s is not a commit here, fetched or not" % (wit[:12], parent)
+    fd, name = tempfile.mkstemp(prefix="loop-interfaces-")
+    os.close(fd)
+    try:
+        try:
+            pathlib.Path(name).write_bytes(derive_interface_listing(root, parent, wit))
+        except ValueError as e:
+            return 2, str(e)
+        rc, line = read_driver('load_driver_conf && check_interface_notice "$2" "$3" "$4"', slug,
+                               "interfaces %s" % parent, pathlib.Path(name).as_posix())
+    finally:
+        pathlib.Path(name).unlink(missing_ok=True)
+    return (rc, line) if rc in (0, 1) else (2, line)
+
+
+def write_dependency_notices(root, build, commit):
+    """The notices of `build`'s frozen interfaces (KICK-dKeptSession-7 S4): per dependent of `read_dependents`,
+    one post of `derive_interface_listing` at `commit` as its interface and `commit`'s full sha as its body,
+    `--mail post <build> --to build:<dependent> --kind <kind> --subject "interfaces <build>"`, `<kind>` `changed`
+    where `read_mail_rows` over the dependent holds a `confirmed` row from `build` with that subject, else
+    `confirmed`. -> the posts' lines; a read answering unarmed or raising, or a raising `read_dependents`,
+    posts nothing to whom it covers and adds one `loop: notice · unread · <whom> · <why>`. Never raises."""
+    import subprocess
+    from breakpoints import run_sourced   # it imports this module at its top, so here
+    subject = "interfaces %s" % build
+    try:
+        dependents = read_dependents(root, build)
+    except (ValueError, LookupError, OSError) as e:
+        return ["%s: notice · unread · the dependents of %s · %s" % (SAY, build, e)]
+    if not dependents:
+        return []
+    top = pathlib.Path(tempfile.mkdtemp(prefix="loop-notice-"))
+    said = []
+    try:
+        listing, body = top / "interfaces", top / "body"
+        try:
+            listing.write_bytes(derive_interface_listing(root, build, commit))
+            sha = resolve_commit(root, commit)
+            if sha is None:
+                raise ValueError("%s names no commit" % commit)
+            body.write_bytes(("%s\n" % sha).encode("utf-8"))
+        except (ValueError, OSError) as e:
+            return ["%s: notice · unread · %s · %s" % (SAY, " ".join(dependents), e)]
+        for dependent in dependents:
+            try:
+                rows, unarmed = read_mail_rows(root, dependent)
+            except ValueError as e:
+                rows, unarmed = [], str(e)
+            if unarmed:
+                said.append("%s: notice · unread · %s · %s" % (SAY, dependent, unarmed))
+                continue
+            kind = "changed" if any(r.get("kind") == "confirmed" and r.get("from-build") == build
+                                    and r.get("subject") == subject for r in rows) else "confirmed"
+            try:
+                _rc, out = run_sourced(root, '( load_driver_conf && main --mail post "$2" --to "$3" --kind "$4" '
+                                             '--subject "$5" --interface "$6" "$7" )',
+                                       args=(build, "build:%s" % dependent, kind, subject, listing.as_posix(),
+                                             body.as_posix()), timeout=MAIL_GUARD_SECONDS)
+            except (LookupError, OSError, subprocess.TimeoutExpired) as e:
+                out = "%s: notice · %s · the post did not answer: %s" % (SAY, dependent, str(e) or type(e).__name__)
+            said += [ln.rstrip("\r") for ln in out.splitlines() if ln.strip()]
+    finally:
+        remove_tree(top)
+    return said
 
 
 def write_transition_record(root, anchor, move, lines=()):
@@ -550,7 +714,8 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     per `item-ended` order or one `loop: composition · unread · <why>`, after a `loop: scenario · unread`
     line where the scenario composition is unarmed, then the build card follow's `card —` lines
     (`write_card_follow`, TOOL-dPlacedRequest-2 S4), a `loop: mail · unarmed` line first where the mailbox
-    was not read. TransitionRefused where no row holds the move, `MailHeld` where a message addressed to the
+    was not read, and on a move from designing to building the notices' lines last, each dependent's post or
+    its `loop: notice · unread` line (`write_dependency_notices`, KICK-dKeptSession-7 S4). TransitionRefused where no row holds the move, `MailHeld` where a message addressed to the
     build is open; ValueError on a value, witness, index, policy read, tag resolver, scenario conflict or
     unknown mailbox refused, writing no record; LookupError where a kit it reads does not resolve."""
     from composition import PINNED, derive_composition_revision, read_step_composition, write_ended_orders
@@ -739,6 +904,10 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         raise
     # the build's card follows the move, its last step (TOOL-dPlacedRequest-2 S4); the move stands whatever it prints
     said += write_card_follow(root, build, to, to in read_transition_rows(data, where)["terminal"])
+    # Design's exit posts the frozen interfaces to each dependent (KICK-dKeptSession-7 S4), the listing at the
+    # transition commit, at HEAD where the set makes none; the move stands whatever a notice prints
+    if (state, to) == ("designing", "building"):
+        said += write_dependency_notices(root, build, commit or "HEAD")
     return move, commit, wrote, render_transition_line(move) if "micro-format" in chosen else None, said
 
 
@@ -856,22 +1025,26 @@ def write_transition_plant(top, case):
         files[".governance/policy.toml"] = "[transitions]\nrecord = %s\n" % PLANT_SETS[case]
     if case == "descope-spent":
         files[".governance/policy.toml"] = "[flow]\nrework-budget = 0\n"
-    if case.startswith("mail-"):   # the driver's conf, RUN_CLAIMS on, as the placement plants copy it
+    if case.startswith("mail-") or case == "deps-notices":   # the driver's conf, RUN_CLAIMS on, as the placement plants copy it
         src = next((d for d in (KIT, *KIT.parents) if (d / ".unattended.conf").is_file()), None)
         if src is None:
             raise LookupError("the mail plants copy .unattended.conf from this tree, which holds none")
         files[".unattended.conf"] = (src / ".unattended.conf").read_text(encoding="utf-8") + \
             '\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="on"\n'
+    if case == "deps-notices":   # KICK-dKeptSession-7 AC7: the second build, its README naming tFix a parent
+        files["memory/builds/%s/README.md" % FX_DEPENDENT] = (
+            "---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: TOOL\nids: TOOL-%s-1\nparents: %s\n"
+            "---\n# %s\n" % (FX_DEPENDENT, FX_DEPENDENT, FX_BUILD, FX_DEPENDENT))
     write_fixture_files(top, files)
     run_fixture_git(top, "add", "-A")
     run_fixture_git(top, "commit", "-q", "-m", "fixture")
-    if case in ("mail-open", "mail-disposed", "mail-expired"):   # a bare remote inside the git dir, so the scratch's removal takes it too
+    if case in ("mail-open", "mail-disposed", "mail-expired", "deps-notices"):   # a bare remote inside the git dir, so the scratch's removal takes it too
         from placement import write_fixture_gov_ref
         origin = top / ".git" / "fx-origin.git"
         run_fixture_git(top, "init", "-q", "--bare", "--template=", str(origin))
         run_fixture_git(top, "remote", "add", FIXTURE_REMOTE, str(origin))
         run_fixture_git(top, "push", "-q", FIXTURE_REMOTE, "main")
-        for ref, *mail in (FX_QUESTION, FX_ACK) if case == "mail-disposed" else (FX_QUESTION,):
+        for ref, *mail in () if case == "deps-notices" else (FX_QUESTION, FX_ACK) if case == "mail-disposed" else (FX_QUESTION,):
             write_fixture_gov_ref(top, ref, render_fixture_mail(*mail, **(FX_DEADLINE if case == "mail-expired" else {})))
         if case == "mail-expired":
             # its first sighting, the six-field line `claim.py`'s stale-holder plant writes for a lease: the commit
@@ -888,6 +1061,63 @@ def write_transition_plant(top, case):
             with feed.open("a", encoding="utf-8", newline="\n") as fh:
                 fh.write("%d\t%s\tmail\t%s\t%s\t%s\n" % (seq, ref, run_fixture_git(top, "rev-parse", sha + "^{tree}"), sha, ago))
     return run_fixture_git(top, "rev-parse", "HEAD")
+
+
+def run_notice_plant(top, witness):
+    """The `deps-notices` plant's misses (KICK-dKeptSession-7 AC7) over the scratch at `top`, `witness` its
+    fixture commit, run as the fleet registry's first user and `FX_SESSION`: a spec added, then B5 at that
+    older `witness`, B8 back, a spec added and B5 again; then the driver's `--mail read` of the dependent,
+    owed one `confirmed` keyed over the spec listing at the first move's commit, never at `witness`, and one
+    `changed` keyed over the second's, each key the driver's `derive_gov_id --file` over that listing."""
+    import os
+    from breakpoints import run_sourced   # it imports this module at its top, so here
+    from placement import read_fleet_user
+    at = ["--build", FX_BUILD, "--root", str(top)]
+    kept = {k: os.environ.get(k) for k in ("USERNAME", "CLAUDE_CODE_SESSION_ID")}
+    os.environ.update(USERNAME=read_fleet_user(), CLAUDE_CODE_SESSION_ID=FX_SESSION)
+    exits, commits = [], []
+    try:
+        for n in (2, 3):   # each Design exit after a spec is added, so its listing differs from the one before
+            uid = "TOOL-%s-%d" % (FX_BUILD, n)
+            write_fixture_files(top, {"memory/builds/%s/spec/2026-01-0%d-spec-%s.md" % (FX_BUILD, n, uid):
+                                      "# %s — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n" % uid})
+            run_fixture_git(top, "add", "-A")
+            run_fixture_git(top, "commit", "-q", "-m", "a spec of %s" % uid)
+            exits.append(main(["record", *at, "--from", "designing", "--item", "item.design.exit", "--outcome",
+                               "recorded", "--witness", witness if n == 2 else "HEAD"]))
+            commits.append(run_fixture_git(top, "rev-parse", "HEAD"))
+            if n == 2:   # B8, back into designing
+                exits.append(main(["record", *at, *BACKWARD_MOVES[4], "--witness", "HEAD"]))
+        files = []
+        for n, sha in enumerate([witness] + commits):
+            path = top / ".git" / ("fx-listing-%d" % n)
+            path.write_bytes(derive_interface_listing(top, FX_BUILD, sha))
+            files.append(path.as_posix())
+        _rc, out = run_sourced(top, 'load_driver_conf && for f in "$2" "$3" "$4"; do derive_gov_id --file "$f"; done',
+                               args=files, timeout=MAIL_GUARD_SECONDS)
+        keys = [ln.strip() for ln in out.splitlines() if re.fullmatch(r"[0-9a-f]{12}", ln.strip())]
+        _rc, out = run_sourced(top, '( load_driver_conf && main --mail read "$2" )', args=(FX_DEPENDENT,),
+                               timeout=MAIL_GUARD_SECONDS)
+    finally:
+        for k, v in kept.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+    rows =[ln.rstrip("\r").split("\t") for ln in out.splitlines() if ln.count("\t") >= 13]
+    for r in rows:
+        print("%s: fixture · deps-notices · row %s · %s · %s · %s · content-key %s" % (SAY, r[0], r[1], r[2], r[6], r[13]))
+    print("%s: fixture · deps-notices · keys %s" % (SAY, " ".join(keys) or "none"))
+    subject = "interfaces %s" % FX_BUILD
+    held = {kind: [r[13] for r in rows if r[1] == kind and r[2] == "build:%s" % FX_DEPENDENT and r[6] == subject]
+            for kind in ("confirmed", "changed")}
+    return [why for ok, why in (
+        (exits == [0, 0, 0], "the three moves exited %s" % exits),
+        (len(keys) == 3 and len(set(keys)) == 3, "the three listings keyed %s, owed three distinct keys" % keys),
+        (len(keys) == 3 and held["confirmed"] == [keys[1]], "the confirmed rows carry %s, owed the one key %s of the "
+         "first move's commit and never %s of --witness" % (held["confirmed"], keys[1:2], keys[:1])),
+        (len(keys) == 3 and held["changed"] == [keys[2]], "the changed rows carry %s, owed the one key %s of the "
+         "second move's commit" % (held["changed"], keys[2:3]))) if not ok]
 
 
 def run_transition_fixture(case):
@@ -934,6 +1164,10 @@ def run_transition_fixture(case):
                     "testing", "building", "@any"), "the descope did not record testing -> building on @any"),
                 (not held["draws"], "the descope drew a row")) if not ok]
             print("%s: fixture · descope-spent · %s" % (SAY, "held" if not misses else "MISSED " + "; ".join(misses)))
+            return 0 if not misses else 1
+        if case == "deps-notices":   # KICK-dKeptSession-7 AC7: Design's exits notify the dependent
+            misses = run_notice_plant(top, witness)
+            print("%s: fixture · deps-notices · %s" % (SAY, "held" if not misses else "MISSED " + "; ".join(misses)))
             return 0 if not misses else 1
         if case == "mail-open":   # KICK-dKeptSession-5 AC6: the open question refuses B4, writing nothing
             before = read_count()
@@ -1168,7 +1402,8 @@ def run_selftest():
              ("mail-no-driver recorded", fx("mail-no-driver"), 0, "%s: recorded · planning -> designing" % SAY, ""),
              ("mail-no-bash", fx("mail-no-bash"), 2, "%s: unanswered · mail unknown: no bash that can see " % SAY,
               "unattended.sh"),
-             ("mail-no-bash commits", fx("mail-no-bash"), 2, "%s: fixture · commits unchanged" % SAY, "")]
+             ("mail-no-bash commits", fx("mail-no-bash"), 2, "%s: fixture · commits unchanged" % SAY, ""),
+             ("deps-notices", fx("deps-notices"), 0, "%s: fixture · deps-notices · held" % SAY, "")]
     return run_selftest_cases(run_cached_case, cases, "%s: transition selftest" % SAY)
 
 
@@ -1189,13 +1424,16 @@ def main(argv):
     chk.add_argument("--build")
     chk.add_argument("--root", default=".")
     chk.add_argument("--selftest", action="store_true", help="the tree's definition, then every plant")
+    dep = sub.add_parser("dependents", help="the builds whose README's parents: names --build, one per line")
+    dep.add_argument("--build", required=True)
+    dep.add_argument("--root", default=".")
     args = ap.parse_args(argv)
     if args.fixture != bool(args.plant) or (args.fixture and args.verb):
         ap.error("--fixture takes --plant <case> and no verb")
     if args.fixture:
         return run_transition_fixture(args.plant)
     if args.verb is None:
-        ap.error("a verb, record or check, or --fixture --plant <case>")
+        ap.error("a verb, record, check or dependents, or --fixture --plant <case>")
     if args.verb == "check" and args.selftest != (args.build is None):
         ap.error("check takes --build <slug>, or --selftest alone")
     if args.verb == "check" and args.selftest:
@@ -1210,6 +1448,10 @@ def main(argv):
             pairs[flag][k] = v
     root = pathlib.Path(args.root).absolute()
     try:
+        if args.verb == "dependents":   # KICK-dKeptSession-7 S9: the builds a landing or Design's exit notifies
+            for slug in read_dependents(root, args.build):
+                print(slug)
+            return 0
         if args.verb == "record":
             move, commit, wrote, line, said = write_transition(root, args.build, getattr(args, "from"), args.item,
                                                                args.outcome, args.witness, pairs["fact"], pairs["field"])

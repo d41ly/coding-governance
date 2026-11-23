@@ -78,7 +78,7 @@ ref's `read —` line ends `fetched <n>s ago · from FETCH_HEAD|reflog|clone`, o
 skipped `FETCH_HEAD` follows it as `read — <name> · skipped — empty`, `no line for <branch> of <remote>`
 or `unreadable`), `terminal` (the state is a `[states]` terminal, or every unit is deployed
 and no ask stands), `awaiting` on an owed parked entry or an unpassed hold, `blocked` on a `parents:`
-build neither recorded nor derived `LANDED`, `act` with a next item, `awaiting` on an undecided ask, and
+build neither recorded nor derived `LANDED` whose cause holds the build's step, `act` with a next item, `awaiting` on an undecided ask, and
 `stuck` naming the step's unwitnessed exit. Line output is §4's six line kinds; `--json` the same fields
 as one object, each unit carrying `acceptance_armed`, false exactly where its line ends `· acceptance
 unarmed` (TOOL-dDeclaredLoop-67 S50); `--next-line` the `next:` shape `render_next_line` picks from `NEXT_SHAPES`. Exit 0 for
@@ -112,6 +112,22 @@ the mailbox's verbs. An unarmed read, a driver that does not resolve, a reposito
 unarmed · <why>`. No other call reads the mailbox: `derive_interrupts` keeps its `unarmed` line, and a
 mailbox line changes no answer.
 
+THE DEPENDENCY GATE (KICK-dKeptSession-7). Each `parents:` build not landed is read for its reach by
+`derive_parent_reach`: `reachable` while the unattended driver's `--lease status build <parent>` reads its
+lease `live` or `held`, else `unreachable`. `deps.coordination` and `deps.early-build`, read through the
+policy kit's `resolve` at the landed revision in the build's own slot, give its cause by
+`derive_dependency_hold`: `wait-for-landing` holds Build as `not landed`; `order-only` runs it as `order
+only`; `message-then-progress` holds an unreachable parent's dependent as `unreachable` and, for a reachable
+one, reads `deps.early-build`: `design-only` holds as `not landed`, `anything-coordinated` runs as
+`coordinated`, and `confirmed-interfaces` runs only where `loop_transition.check_parent_interfaces` finds a
+`confirmed` or `changed` message whose `content-key` recomputes over the parent's `spec/` listing at its
+lease's `witness`, `awaiting confirmed` or `confirmation unread` otherwise. A key that does not read holds as
+`policy unread`. Each parent is one `interrupt — dependency · <parent> · <reach> · <cause>
+(deps.coordination: <value>)` line, and a row holds only where its cause holds Build and the build's step is
+Build or later, so a Design item runs under every value. A refused key or confirmation check adds one
+`position: NOTE · <key> unread: <why>` or `position: NOTE · interfaces <parent> unread: <line>` to the
+position's `notes`, printed after the `interrupt —` lines and carried by `--json`.
+
 THE ABSENT REMOTE (TOOL-dDeclaredLoop-56 S36). Where the ladder names no remote and refuses nothing, or
 the tracking ref of its default branch does not resolve, the remote reads absent: the answer is taken on
 local witnesses, so no unit reads `deployed`, the interrupt `remote · none` prints, and no remote-tip
@@ -123,8 +139,9 @@ prints the engine's lines and one `position: fixture · <case> · held` or `· M
 removes the scratch; it exits as the engine did where the case held, 1 where it missed, 2 where a kit it
 needs does not resolve. Every case runs with `GIT_CONFIG_GLOBAL` and `GIT_CONFIG_SYSTEM` naming one empty
 file under its scratch top, so no setting of the machine's reaches it (TOOL-dDeclaredLoop-75 S34). `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `built-unarmed`,
-`plan-line`, `status-line`, `mail-open`, `mail-transitions-only`, `mail-amendments`, `mail-unarmed` and
-`mail-refused` run the unattended driver found by `resolve_kit_dir`. `--selftest` runs every case
+`plan-line`, `status-line`, `mail-open`, `mail-transitions-only`, `mail-amendments`, `mail-unarmed`,
+`mail-refused`, `deps-wait`, `deps-unreachable`, `deps-order`, `deps-confirmed`, `deps-design-only`,
+`deps-anything` and `deps-strict` run the unattended driver found by `resolve_kit_dir`. `--selftest` runs every case
 through `loop_lib.run_selftest_cases`.
 
 WHAT THIS DOES NOT CHECK: a witness reader for any item outside the three kinds above, which lands with
@@ -135,7 +152,8 @@ green bar rather than the last bar run; a fetch run with `--no-write-fetch-head`
 `FETCH_HEAD` and so reads by the reflog where the ref moved, and as stale where it did not; a
 `FETCH_HEAD` whose URL git spelled otherwise than `derive_fetch_url` spells the configured URL, its
 user part cut by git's rule, then every trailing `/` and one `.git`, such as one git rewrote through a
-`url.<base>.insteadOf`, which reads skipped.
+`url.<base>.insteadOf`, which reads skipped; a parent's interfaces beyond its `spec/` listing, which is
+all a `confirmed` key is taken over.
 """
 import argparse
 import copy
@@ -162,7 +180,8 @@ from loop_lib import (NO_STEP, ROUTE_STAND_IN, LoopError, check_computed_witness
                       read_item_rows, read_memory_tree, resolve_kit_dir, resolve_memory_root, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_table import check_recorded_move, derive_from_states, read_transition_rows  # noqa: E402
-from loop_transition import read_mail_rows, read_transitions, render_fixture_mail  # noqa: E402
+from loop_transition import (MAIL_GUARD_SECONDS, check_parent_interfaces, derive_interface_listing,  # noqa: E402
+                             read_mail_rows, read_transitions, render_fixture_mail)
 from scenario import read_activated_rows  # noqa: E402
 from loop_witness import read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
 
@@ -238,7 +257,23 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
           "mail-unarmed": "mail-open's repository, the driver's locator run over an empty scratch directory: one "
                           "unarmed line naming the unattended kit",
           "mail-refused": "mail-open's messages, mailbox.reads sometimes in the policy file's only revision: the "
-                          "refused line read as every-item, then mail-open's two lines"}
+                          "refused line read as every-item, then mail-open's two lines",
+          "deps-wait": "parents: tPar unlanded, its lease live, deps.coordination wait-for-landing: the Design item "
+                       "acts beside the not landed interrupt, the Build item is blocked naming tPar, not landed and "
+                       "the value",
+          "deps-unreachable": "the defaults and no tPar lease: Build blocked unreachable; then the lease live, its "
+                              "witness a commit holding tPar's spec, and a confirmed whose key recomputes: Build acts",
+          "deps-order": "deps.coordination order-only, tPar unlanded and unreachable: Build acts beside the order only "
+                        "interrupt",
+          "deps-confirmed": "the defaults, tPar reachable: Build blocked awaiting confirmed, acts on a confirmed whose "
+                            "key recomputes, still acts beside a newer changed whose key does not, blocked again once "
+                            "the witness moves, and blocked confirmation unread with one NOTE where the check is refused",
+          "deps-design-only": "deps.early-build design-only, tPar reachable: Design acts, Build blocked not landed",
+          "deps-anything": "deps.early-build anything-coordinated, tPar reachable and unconfirmed: Build acts; with no "
+                           "lease Build blocked unreachable",
+          "deps-strict": "preset = \"strict\": the keys read wait-for-landing and design-only from the preset, Design "
+                         "acts and Build is blocked not landed; a second scratch whose only revision holds "
+                         "deps.coordination = \"bogus\": Design acts, Build blocked policy unread, one NOTE"}
 FX_SLUG = "tPos"
 FX_IDS = ["TOOL-tPos-1", "TOOL-tPos-2", "TOOL-tPos-3"]
 FX_ASK = "TOOL-tAsk-1"
@@ -251,7 +286,18 @@ FX_A, FX_B, FX_C, FX_D = "item.build.base", "item.build.unit-lease", "item.build
 FX_UNIT = "item.build.acceptance"
 #: The plants that run the unattended driver, and so copy its conf into the scratch repository.
 FX_DRIVER = ("frontier-refused", "frontier-bad-key", "plan-frontier", "built-unarmed", "plan-line", "status-line",
-             "mail-open", "mail-transitions-only", "mail-amendments", "mail-unarmed", "mail-refused")
+             "mail-open", "mail-transitions-only", "mail-amendments", "mail-unarmed", "mail-refused", "deps-wait",
+             "deps-unreachable", "deps-order", "deps-confirmed", "deps-design-only", "deps-anything", "deps-strict")
+#: The dependency plants' policy files (KICK-dKeptSession-7), each the only revision, committed in the fixture
+#: commit and pushed as main; an empty text commits none, so the catalogue's defaults read.
+FX_DEPS_POLICY = {"deps-wait": '[deps]\ncoordination = "wait-for-landing"\n', "deps-unreachable": "",
+                  "deps-order": '[deps]\ncoordination = "order-only"\n', "deps-confirmed": "",
+                  "deps-design-only": '[deps]\nearly-build = "design-only"\n',
+                  "deps-anything": '[deps]\nearly-build = "anything-coordinated"\n', "deps-strict": 'preset = "strict"\n'}
+#: The dependency plants' parent, its one spec, and the subject its confirmations carry.
+FX_PARENT = "tPar"
+FX_PARENT_SPEC = "memory/builds/%s/spec/2026-01-01-spec-TOOL-%s-1.md" % (FX_PARENT, FX_PARENT)
+FX_INTERFACES = "interfaces %s" % FX_PARENT
 #: The mail plants' messages (KICK-dKeptSession-10), each `(ref, build, id, to, kind, subject, answers)`, the
 #: arguments of `render_fixture_mail` after the ref: fy's open question and intake, and a question tPos answers.
 FX_OPEN_MAIL = (("refs/gov/mail/fy/z/s-1", "fy", "a1b2c3d4e5f6", "build:tPos", "question", "the fixture's question", "none"),
@@ -541,10 +587,56 @@ def read_refusals(text):
             for r in record["rows"] if r["kind"] == "refusal"]
 
 
+def derive_parent_reach(root, parent):
+    """`landed`, `reachable` or `unreachable` of one `parents:` build (KICK-dKeptSession-7 S1): `landed` where
+    its newest recorded move enters `landed`; else `reachable` where the unattended driver's `--lease status
+    build <parent>`, sourced in a subshell under `MAIL_GUARD_SECONDS`, prints the `<parent>/build` row of six
+    TAB fields whose fifth, the verdict, is `live` or `held`; else `unreachable`, any other verdict, `lease —
+    none`, `lease — off`, a non-zero exit, an unresolved driver and a read past the bound alike. No lease ref
+    is parsed here: the lease is the reach test, and no other timeout applies."""
+    from breakpoints import run_sourced   # it imports this module at its top, so here
+    root = pathlib.Path(root)
+    if (root / resolve_memory_root(root) / "builds" / parent).is_dir() and (
+            read_transitions(parent, root) or [{}])[0].get("to") == "landed":
+        return "landed"
+    try:
+        rc, out = run_sourced(root, '( load_driver_conf && main --lease status build "$2" )', args=(parent,),
+                              timeout=MAIL_GUARD_SECONDS)
+    except (LookupError, OSError, subprocess.TimeoutExpired):
+        return "unreachable"
+    row = next((ln.rstrip("\r").split("\t") for ln in out.splitlines()
+                if ln.startswith("%s/build\t" % parent) and ln.rstrip("\r").count("\t") == 5), None)
+    return "reachable" if rc == 0 and row and row[4] in ("live", "held") else "unreachable"
+
+
+def derive_dependency_hold(coordination, early_build, reach, confirmed):
+    """`(cause, holds)` of one parent not landed by §4's table (KICK-dKeptSession-7 S2): `coordination` and
+    `early_build` the two keys' values, None where unread; `reach` `derive_parent_reach`'s word; `confirmed`
+    a callable answering `confirmed`, `awaiting confirmed` or `confirmation unread`, called only where
+    `confirmed-interfaces` is read for a reachable parent. `holds` is whether the table holds Build items;
+    Design items run in every row."""
+    if coordination is None or early_build is None:
+        return "policy unread", True
+    if coordination == "wait-for-landing":
+        return "not landed", True
+    if coordination == "order-only":
+        return "order only", False
+    if reach != "reachable":
+        return "unreachable", True
+    if early_build == "anything-coordinated":
+        return "coordinated", False
+    if early_build == "design-only":
+        return "not landed", True
+    cause = confirmed()
+    return cause, cause != "confirmed"
+
+
 def derive_interrupts(text, handover, owed, parents_open, claims, now, remote_absent=False):
     """The interrupts in `[position]`'s order: owner decisions, the mailbox, invalidated witnesses, an
     absent remote, dependency gates, the undecided ask. `text` is the run-state file's text, `owed` the
-    policy kit's `read_run_fact` where that file exists, `parents_open` the parents not landed,
+    policy kit's `read_run_fact` where that file exists, `parents_open` one row per parent not landed,
+    its `parent`, `reach`, `cause`, `value` and `holds` (KICK-dKeptSession-7 S2), each a `dependency`
+    interrupt carrying them and the subject `<parent> · <reach> · <cause> (deps.coordination: <value>)`,
     `remote_absent` the remote reading absent, `remote · none` (TOOL-dDeclaredLoop-56 S36)."""
     out = []
     kinds, acts = handover["owed"]
@@ -563,16 +655,20 @@ def derive_interrupts(text, handover, owed, parents_open, claims, now, remote_ab
     out.append({"kind": "mailbox", "subject": "unarmed"})
     out += [{"kind": "invalidated", "subject": c["name"]} for c in claims if c["verdict"] == "re-derived"]
     out += [{"kind": "remote", "subject": "none"}] if remote_absent else []
-    out += [{"kind": "dependency", "subject": p} for p in parents_open]
+    out += [dict(r, kind="dependency", subject="%s · %s · %s (deps.coordination: %s)" % (
+        r["parent"], r["reach"], r["cause"], r["value"])) for r in parents_open]
     if handover["ask"]:
         out.append({"kind": "ask", "subject": handover["ask"]})
     return out
 
 
 def derive_answer(pos, terminal, remote_fresh, every_deployed, nxt, exit_item):
-    """`(answer, reason)` by §4's precedence, invalid-input already decided by the caller."""
+    """`(answer, reason)` by §4's precedence, invalid-input already decided by the caller: `blocked`, at the
+    landed gate's rung, on a dependency interrupt whose `holds` is true, the reason its subjects joined by
+    `; ` (KICK-dKeptSession-7 S2); a dependency interrupt that does not hold changes no answer."""
     kinds = [i["kind"] for i in pos["interrupts"]]
     ask = next((i["subject"] for i in pos["interrupts"] if i["kind"] == "ask"), None)
+    held = [i["subject"] for i in pos["interrupts"] if i["kind"] == "dependency" and i["holds"]]
     if not remote_fresh:
         return "stale-remote", "the default branch's remote-tracking tip is unread or older than its bound"
     if pos["state"] in terminal:
@@ -582,9 +678,8 @@ def derive_answer(pos, terminal, remote_fresh, every_deployed, nxt, exit_item):
     if "owner-decision" in kinds:
         return "awaiting", "an owner decision: %s" % next(i["subject"] for i in pos["interrupts"]
                                                           if i["kind"] == "owner-decision")
-    if "dependency" in kinds:
-        return "blocked", "the parent %s has not landed" % " ".join(
-            i["subject"] for i in pos["interrupts"] if i["kind"] == "dependency")
+    if held:
+        return "blocked", "; ".join(held)
     if nxt:
         return "act", "%s for %s" % (nxt["item"], nxt["unit"])
     if ask:
@@ -598,7 +693,7 @@ def derive_position(repo, slug, definition=None):
     repo = pathlib.Path(repo).absolute()
     pos = {"slug": slug, "state": "none", "build_step": NO_STEP, "units": [], "next": None, "frontier": [],
            "refusals": [], "interrupts": [], "answer": "invalid-input", "reason": "", "read": [], "claims": [],
-           "witnesses": {}, "undeclared": {}}
+           "witnesses": {}, "undeclared": {}, "notes": []}
     try:
         derive_position_into(pos, repo, slug, definition)
     except (LoopError, ValueError, OSError, LookupError, KeyError, subprocess.SubprocessError) as e:
@@ -808,13 +903,39 @@ def derive_position_into(pos, repo, slug, definition):
             pos["undeclared"].setdefault(m["item"], [])
             if m.get("from") and m["from"] not in pos["undeclared"][m["item"]]:
                 pos["undeclared"][m["item"]].append(m["from"])
+    # the dependency gate (KICK-dKeptSession-7 S2, S6): each parent not landed read for its reach, then the
+    # two keys at the landed revision in the build's slot, a refused read holding Build as `policy unread`
+    # with one NOTE per key; a row holds where the table holds Build and the build's step is Build or later
+    reaches = [(p, "landed" if handover["parents"].get(p) == "LANDED" else derive_parent_reach(repo, p))
+               for p in (fm.get("parents") or "").split()]
+    reaches = [(p, r) for p, r in reaches if r != "landed"]
+    keys = dict.fromkeys(("deps.coordination", "deps.early-build"))
+    if reaches:
+        try:
+            policy = read_policy_kit()[0]
+        except LookupError as e:
+            pos["notes"] += ["%s: NOTE · %s unread: %s" % (SAY, k, e) for k in keys]
+        else:
+            for k in keys:
+                try:
+                    keys[k] = policy.resolve(k, str(repo), build=slug).value
+                except policy.Refusal as e:
+                    pos["notes"].append("%s: NOTE · %s unread: %s" % (SAY, k, e))
+    at = steps.get(pos["build_step"], {}).get("order")
+    gate = steps.get("step.build", {}).get("order")
+    at_build = at is None or gate is None or at >= gate
     parents_open = []
-    for p in (fm.get("parents") or "").split():
-        landed = handover["parents"].get(p) == "LANDED"
-        if not landed and (builds / p).is_dir():
-            landed = bool((read_transitions(p, repo) or [{}])[0].get("to") == "landed")
-        if not landed:
-            parents_open.append(p)
+    for p, reach in reaches:
+        def read_confirmation(parent=p):
+            """The cause `check_parent_interfaces` gives `parent`, a refused check adding its NOTE."""
+            rc, line = check_parent_interfaces(repo, slug, parent)
+            if rc == 2:
+                pos["notes"].append("%s: NOTE · interfaces %s unread: %s" % (SAY, parent, line))
+            return ("confirmed", "awaiting confirmed", "confirmation unread")[rc]
+        cause, held = derive_dependency_hold(keys["deps.coordination"], keys["deps.early-build"], reach,
+                                             read_confirmation)
+        parents_open.append({"parent": p, "reach": reach, "cause": cause, "value": keys["deps.coordination"] or "unread",
+                             "holds": held and at_build})
     pos["interrupts"] = derive_interrupts(text, handover, owed, parents_open, pos["claims"], now, remote_claim is None)
     pos["answer"], pos["reason"] = derive_answer(pos, tables["terminal"],
                                                  remote_claim is None or remote_claim["verdict"] == "fresh",
@@ -859,6 +980,7 @@ def render_position_lines(pos):
     lines += ["refusal — unarmed · %s" % r["unarmed"] if "unarmed" in r else
               "refusal — %s · %s · %s" % (r["item"], r["key"], r["reason"]) for r in pos["refusals"]]
     lines += ["interrupt — %s · %s" % (i["kind"], i["subject"]) for i in pos["interrupts"]]
+    lines += pos.get("notes", [])   # KICK-dKeptSession-7 S6: a refused key or confirmation check
     lines += ["read — %s" % r for r in pos["read"]]
     lines += ["claim — %s · key %s · %s" % (c["name"], c["key"], c["verdict"]) for c in pos["claims"]]
     return lines
@@ -881,15 +1003,17 @@ def render_handover(units, ask=None, parents=None):
     return "\n".join(lines) + "\n"
 
 
-def write_position_plant(top, case, root):
+def write_position_plant(top, case, root, policy=None):
     """The scratch repository `top/r` for `case`, with its bare remote `top/o.git` where it has one,
     and the clone `top/c` of that remote as the repository for `fresh-clone`, `offline-stale` and
-    `clone-without-reflog`;
+    `clone-without-reflog`; `policy`, where given, the policy file a dependency plant commits in place of
+    its `FX_DEPS_POLICY` text;
     `(repo, definition, handover)`."""
     repo = top / "r"
     repo.mkdir()
     ids = FX_IDS[:2] if case in ("typed-status", "bar-wait") or case.startswith("built-") else FX_IDS
-    extra = "parents: tPar\n" if case == "parent-unlanded" else ""
+    parented = case == "parent-unlanded" or case.startswith("deps-")
+    extra = "parents: %s\n" % FX_PARENT if parented else ""
     rows = "".join("| [%s — u](spec/2026-01-01-spec-%s.md) | INPROGRESS | rev-1 | 2026-01-01 |\n" % (u, u) for u in ids)
     files = {".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tool:TOOL"\n',
              "memory/builds/%s/README.md" % FX_SLUG:
@@ -900,15 +1024,20 @@ def write_position_plant(top, case, root):
     for n, uid in enumerate(ids):
         status = "CLOSED" if case == "typed-status" and n == 1 else "INPROGRESS"
         files["memory/builds/%s/spec/2026-01-01-spec-%s.md" % (FX_SLUG, uid)] = render_spec(uid, status)
-    if case == "parent-unlanded":
+    if parented:
         files["memory/builds/tPar/README.md"] = "---\nslug: tPar\nnode: a\nopened: 2026-01-01\nstreams: tooling\n---\n# tPar\n"
+    if case.startswith("deps-"):   # KICK-dKeptSession-7: the parent's one spec, its interfaces' listing
+        files[FX_PARENT_SPEC] = render_spec("TOOL-%s-1" % FX_PARENT, "INPROGRESS")
+        text = FX_DEPS_POLICY[case] if policy is None else policy
+        if text:
+            files[".governance/policy.toml"] = text
     if case in FX_DRIVER:
         for name in (".unattended.conf", ".memory-tree.conf"):
             if not (root / name).is_file():
                 raise LookupError("the driver plant copies %s from %s, which holds none" % (name, root.as_posix()))
             shutil.copyfile(root / name, repo / name)
         files.pop(".memory-tree.conf")
-    if case.startswith("mail-"):   # KICK-dKeptSession-10: the two lines the transition plants append, RUN_CLAIMS on
+    if case.startswith(("mail-", "deps-")):   # KICK-dKeptSession-10: the two lines the transition plants append, RUN_CLAIMS on
         with open(repo / ".unattended.conf", "a", encoding="utf-8", newline="\n") as fh:
             fh.write('\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="on"\n')
     if case in FX_MAIL_READS:   # in the fixture commit, pushed as main, since `resolve` reads the landed revision
@@ -1050,7 +1179,7 @@ def write_position_plant(top, case, root):
     if case not in ("plan-line", "status-line"):
         definition = data
     words = {"typed-status": ["READY", "DONE"]}.get(case, ["READY"] * len(ids))
-    handover = render_handover(list(zip(ids, words)), parents={"tPar": "RUNNING"} if case == "parent-unlanded" else None)
+    handover = render_handover(list(zip(ids, words)), parents={FX_PARENT: "RUNNING"} if parented else None)
     return repo, definition, handover
 
 
@@ -1335,6 +1464,118 @@ def check_mail_plant(case, repo, definition, handover):
     return misses
 
 
+def run_dependency_plant(case, top, repo, definition, handover, root):
+    """The misses of a dependency plant (KICK-dKeptSession-7 AC1 to AC6, AC9): positions derived over `repo`
+    under the hand-over `handover` for a Build item, and with every unit `THIN` for a Design item, each
+    printed and held to the answer and the cause it owes; `tPar`'s lease written by `write_foreign_lease` on
+    the fixture's remote, each confirmation by `render_fixture_mail` with the driver's `derive_gov_id --file`
+    over `tPar`'s spec listing as its key. `deps-strict` builds a second scratch under `top/b`."""
+    import breakpoints
+    from placement import write_fixture_gov_ref, write_foreign_lease
+    fx = run_fixture_git(repo, "remote")
+    design = render_handover([(u, "THIN") for u in FX_IDS], parents={FX_PARENT: "RUNNING"})
+    misses = []
+
+    def check_reading(label, pos_repo, step, answer, cause):
+        """One position derived at `step`, printed, and held to `answer` and a dependency interrupt naming
+        `cause`; the position."""
+        pos = derive_plant_position(pos_repo, definition, design if step == "design" else handover)
+        lines = render_position_lines(pos)
+        for line in lines:
+            print(line)
+        dep = [i for i in pos["interrupts"] if i["kind"] == "dependency"]
+        named = len(dep) == 1 and dep[0]["subject"].startswith("%s · " % FX_PARENT) and dep[0]["cause"] == cause
+        print("%s: fixture · %s · %s · %s item · answer %s · cause %s" % (
+            SAY, case, label, step, pos["answer"], dep[0]["cause"] if dep else "none"))
+        if pos["answer"] != answer or not named or (answer == "blocked" and dep[0]["subject"] not in pos["reason"]):
+            misses.append("%s: the %s item answered %s naming %s, owed %s naming %s" % (
+                label, step, pos["answer"], [i["subject"] for i in dep], answer, cause))
+        return pos
+
+    def write_parent_lease(witness=None):
+        """`tPar`'s lease live on the remote, its `witness` where given, any earlier one deleted first."""
+        read_git(repo, "push", "-q", fx, ":refs/gov/leases/%s/build" % FX_PARENT)
+        write_foreign_lease(repo, FX_PARENT, fields=(("witness", witness),) if witness else (), remote=fx)
+
+    def derive_listing_key(commit):
+        """The driver's `derive_gov_id --file` over `tPar`'s spec listing at `commit`."""
+        path = top / ("listing-%s" % commit[:12])
+        path.write_bytes(derive_interface_listing(repo, FX_PARENT, commit))
+        rc, out = breakpoints.run_sourced(repo, 'load_driver_conf && derive_gov_id --file "$2"', args=(path.as_posix(),),
+                                          timeout=MAIL_GUARD_SECONDS)
+        return out.strip().splitlines()[-1] if rc == 0 and out.strip() else "unkeyed"
+
+    def write_confirmation(n, mid, kind, key):
+        """One `kind` message from `tPar` to `build:tPos`, subject `interfaces tPar`, keyed `key`, on its own ref."""
+        write_fixture_gov_ref(repo, "refs/gov/mail/%s/z/s-%d" % (FX_PARENT, n), render_fixture_mail(
+            FX_PARENT, mid, "build:%s" % FX_SLUG, kind, FX_INTERFACES, content_key=key), remote=fx)
+
+    w1 = run_fixture_git(repo, "rev-parse", "HEAD")
+    if case == "deps-wait":   # AC1
+        write_parent_lease()
+        check_reading("lease live", repo, "design", "act", "not landed")
+        check_reading("lease live", repo, "build", "blocked", "not landed")
+    elif case == "deps-unreachable":   # AC2
+        check_reading("no lease", repo, "build", "blocked", "unreachable")
+        write_parent_lease(w1)
+        write_confirmation(1, "c1c2c3c4c5c6", "confirmed", derive_listing_key(w1))
+        check_reading("lease live and confirmed", repo, "build", "act", "confirmed")
+    elif case == "deps-order":   # AC3
+        check_reading("no lease", repo, "build", "act", "order only")
+    elif case == "deps-confirmed":   # AC4
+        write_parent_lease(w1)
+        check_reading("no confirmation", repo, "build", "blocked", "awaiting confirmed")
+        write_confirmation(1, "c1c2c3c4c5c6", "confirmed", derive_listing_key(w1))
+        check_reading("a confirmed that recomputes", repo, "build", "act", "confirmed")
+        write_confirmation(2, "d1d2d3d4d5d6", "changed", "0123456789ab")
+        check_reading("a newer changed that does not", repo, "build", "act", "confirmed")
+        write_fixture_files(repo, {FX_PARENT_SPEC.replace("-1.md", "-2.md"): render_spec("TOOL-%s-2" % FX_PARENT, "INPROGRESS")})
+        run_fixture_git(repo, "add", "-A")
+        run_fixture_git(repo, "commit", "-q", "-m", "a second spec of %s" % FX_PARENT)
+        write_parent_lease(run_fixture_git(repo, "rev-parse", "HEAD"))
+        check_reading("the witness moved", repo, "build", "blocked", "awaiting confirmed")
+        real = breakpoints.run_sourced
+
+        def run_refused_check(where, script, driver=None, **kw):
+            """The real sourced call, but the confirmation check, which answers exit 2."""
+            if "check_interface_notice" in script:
+                return 2, "interface — not read · the fixture's refused check"
+            return real(where, script, driver, **kw)
+        breakpoints.run_sourced = run_refused_check
+        try:
+            pos = check_reading("the check refused", repo, "build", "blocked", "confirmation unread")
+        finally:
+            breakpoints.run_sourced = real
+        notes = [n for n in pos["notes"] if n.startswith("%s: NOTE · %s unread: " % (SAY, FX_INTERFACES))]
+        if len(notes) != 1 or len(pos["notes"]) != 1:
+            misses.append("the refused check printed the notes %r, owed one interfaces NOTE" % pos["notes"])
+    elif case == "deps-design-only":   # AC5
+        write_parent_lease(w1)
+        check_reading("lease live", repo, "design", "act", "not landed")
+        check_reading("lease live", repo, "build", "blocked", "not landed")
+    elif case == "deps-anything":   # AC6
+        write_parent_lease(w1)
+        check_reading("lease live, unconfirmed", repo, "build", "act", "coordinated")
+        read_git(repo, "push", "-q", fx, ":refs/gov/leases/%s/build" % FX_PARENT)
+        check_reading("no lease", repo, "build", "blocked", "unreachable")
+    elif case == "deps-strict":   # AC9
+        policy = read_policy_kit()[0]
+        got = [(k, policy.resolve(k, str(repo), build=FX_SLUG)) for k in ("deps.coordination", "deps.early-build")]
+        print("%s: fixture · %s · %s" % (SAY, case, " · ".join("%s %s from %s" % (k, r.value, r.source) for k, r in got)))
+        if [(r.value, r.source) for _k, r in got] != [("wait-for-landing", "preset"), ("design-only", "preset")]:
+            misses.append("the strict keys read %r" % [(r.value, r.source) for _k, r in got])
+        write_parent_lease(w1)
+        check_reading("strict", repo, "design", "act", "not landed")
+        check_reading("strict", repo, "build", "blocked", "not landed")
+        (top / "b").mkdir()
+        bogus = write_position_plant(top / "b", case, root, policy='[deps]\ncoordination = "bogus"\n')[0]
+        check_reading("bogus", bogus, "design", "act", "policy unread")
+        pos = check_reading("bogus", bogus, "build", "blocked", "policy unread")
+        if not any(n.startswith("%s: NOTE · deps.coordination unread: " % SAY) for n in pos["notes"]):
+            misses.append("the bogus value printed the notes %r, owed a deps.coordination NOTE" % pos["notes"])
+    return misses
+
+
 def run_boundary_plant():
     """The `boundary` case's misses (KICK-dKeptSession-13 AC4), over planted engine answers rather
     than a scratch repository: AC4 grades `derive_item_boundary`'s comparison, not the derivation."""
@@ -1382,6 +1623,8 @@ def run_plant(case):
             misses, rc = run_refusal_plant(case, repo, definition, handover), 0
         elif case.startswith("mail-"):
             misses, rc = check_mail_plant(case, repo, definition, handover), 0
+        elif case.startswith("deps-"):
+            misses, rc = run_dependency_plant(case, top, repo, definition, handover, root), 0
         else:
             misses = run_refusal_plant(case, repo, definition, handover) if case == "frontier-refused" else []
             readings = [definition]

@@ -410,6 +410,19 @@ silent within the bound, or a non-zero read with no row is `mail unknown`, exit 
 where the set holds `log`, `write_mail_records` writes one `mailbox-message` record per id, its fields
 and its body in one `~~~~` block, after the move's own record and in its commit.
 
+**The notices** (KICK-dKeptSession-7 S4, S9). On a move from designing to building, after the card
+follow, `write_dependency_notices` posts the build's frozen interfaces to each build
+`loop_transition.py dependents --build <slug>` lists, every one whose README's `parents:` names it, read
+by the memory-tree kit's `parse_front_matter`: the unattended kit's `--mail post` of kind `confirmed`,
+subject `interfaces <slug>`, its interface `derive_interface_listing`'s bytes of `git ls-tree -r` over
+the build's `spec/` folder at the transition commit (HEAD where the set makes none) and its body that
+commit's sha; `changed` where `read_mail_rows` over the dependent already holds a `confirmed` of that
+subject from the build. A dependent whose mailbox does not read gets nothing and one `loop: notice ·
+unread · <dependent> · <why>` line; a failed post prints its line; neither fails the move. The
+unattended kit's `--landed` posts `landed` to the same list. The position engine's dependency gate
+reads the notices back through `check_parent_interfaces`, the confirmation that lets a dependent's Build
+run under `deps.early-build`'s default.
+
 `record` (`write_transition`) answers the move by `derive_move` first, so a move no row holds prints
 `refused` and writes nothing; it resolves the witness to HEAD or its ancestor, refuses a staged index,
 and commits the records, or an empty commit, as `loop transition(<slug>): <from> -> <to>` with the
@@ -433,7 +446,9 @@ question carrying `deadline: 30`, first sighted 31 hours ago (PINNED) and never 
 guard's launch, each rebinding the name the guard imports inside its function and restoring it:
 `mail-argv`, the mailbox read's argv recorded and held to the located driver and `resolve_bash`'s
 bash, `mail-no-driver`, the driver's locator over an empty directory, the move recorded unarmed, and
-`mail-no-bash`, `resolve_bash` answering `None`, the move refused as `mail unknown`. `check --selftest` holds the tree's own definition, then runs every plant, and
+`mail-no-bash`, `resolve_bash` answering `None`, the move refused as `mail unknown`; and `deps-notices`,
+a dependent naming the build in `parents:`, the move out of Design posting it one `confirmed` keyed
+over the listing at the move's commit and a second exit posting `changed`. `check --selftest` holds the tree's own definition, then runs every plant, and
 is gov's `loop transition record` leg.
 
 ```bash

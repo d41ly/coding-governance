@@ -18093,6 +18093,48 @@ fi   # ---- region 8 continues below: one compound block past about 3000 command
 if in_shard 8; then
 
 # ==================================================================================================
+# KICK-dKeptSession-7 AC8 — A LANDING POSTS `landed` TO EACH DEPENDENT. The claim block's LANDING
+# fixture of tRun, RUN_CLAIMS on, beside a second build tDep whose README names tRun in `parents:`,
+# committed and pushed; `--landed tRun` runs as USERNAME daily-agent, fleet tag `a`, so the notice is
+# on `refs/gov/mail/tRun/a/fixture-session`. It exits 0 and prints the posted line, and the origin's
+# message is kind `landed` to build:tDep, subject `landing tRun`, its body the landed sha. STAGED: a
+# git shim on PATH failing every call naming `refs/gov/mail`, so the post fails; the verb still exits
+# 0 and prints the post's one line. RED, observed at the close, is the base driver, which posts no
+# notice. WHAT THIS BLOCK DOES NOT DRIVE: the in-place exit, whose call is the same function.
+# ==================================================================================================
+kd7_bin=$(mktemp -d); kd7_git=$(command -v git)
+write_landed_dependent() { # -> tRun's LANDING record beside tDep, whose README names tRun in parents:, pushed
+  build_claim_landing
+  mkdir -p memory/builds/tDep
+  printf -- '---\nslug: tDep\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids:\nparents: tRun\n---\n\n# tDep\n' > memory/builds/tDep/README.md
+  fixture; git push -q -f origin HEAD:main
+}
+write_landed_dependent
+kd7_head=$(git rev-parse HEAD)
+kd7_out=$(USERNAME=daily-agent bash "$SCRIPT" --landed tRun 2>&1); kd7_rc=$?
+same "KDS7 AC8 --landed exits 0 and prints the landed notice's posted line" \
+  "$kd7_rc $(grep -c '^mail — posted [0-9a-f]* · refs/gov/mail/tRun/a/fixture-session$' <<<"$kd7_out")" "0 1"
+kd7_msg=$(git --git-dir="$ORIGIN" log -1 --format=%B refs/gov/mail/tRun/a/fixture-session -- 2>/dev/null)
+same "KDS7 AC8 the origin holds a landed message to build:tDep, its body the landed sha" \
+  "$(sed -n 's/^to: //p; s/^kind: //p; s/^subject: //p' <<<"$kd7_msg" | tr '\n' '|')$(grep -cx "$kd7_head" <<<"$kd7_msg")" \
+  "build:tDep|landed|landing tRun|1"
+remove_claim_landing
+write_landed_dependent
+cat > "$kd7_bin/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *"refs/gov/mail"*) exit 1 ;; esac
+exec "$kd7_git" "\$@"
+EOF
+chmod +x "$kd7_bin/git"
+kd7_out=$(PATH="$kd7_bin:$PATH" USERNAME=daily-agent bash "$SCRIPT" --landed tRun 2>&1); kd7_rc=$?
+same "KDS7 AC8 a notice whose post fails leaves --landed exit 0, printing the post's one line" \
+  "$kd7_rc $(grep -c '^mail — ' <<<"$kd7_out") $(grep -c '^mail — posted ' <<<"$kd7_out")" "0 1 0"
+remove_claim_landing; remove_claim_refs; rm -rf "$kd7_bin"; git remote set-url origin "$ORIGIN"; reset_tree
+
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-13 — THE CHANGE FEED. One subshell drives the `gov_feed_sh` block the driver
 # carries, sourced above with it, over the suite's bare origin and a second clone of it: GOVFEED_DIR
 # names a fresh scratch dir, so no earlier arm's claim write is in the feed, and the cache namespace is
@@ -19184,6 +19226,23 @@ run_lease_arm renew build tFix --witness "$la_w" >/dev/null
 same "DPR1 AC4 the same witness again renews nothing" "$(read_lease_field tFix/build renews)" "no"
 run_lease_arm renew build tFix --witness "${la_w:0:7}" >/dev/null
 same "DPR1 AC4 a short sha is stored and compared as the full one" "$(read_lease_field tFix/build renews) $(read_lease_field tFix/build witness)" "no $la_w"
+# ---- KICK-dKeptSession-7 AC11: `--lease show build <slug>` prints the renewed lease's witness ALONE,
+# ---- exit 0, and moves no ref; `-` for a build with no lease; `lease — off · <slug>/build` with
+# ---- RUN_CLAIMS off, exit 0; any other shape exits 2. The fixture is this lease fixture, not AC8's:
+# ---- the renew with a transition witness is this arm's own. RED, observed at the close, is the base
+# ---- driver, which refuses `show` as an unknown act.
+kd7_refs=$(git --git-dir="$LF/origin.git" for-each-ref --format='%(refname) %(objectname)' refs/gov)
+la_out=$(run_lease_arm show build tFix); la_rc=$?
+same "KDS7 AC11 --lease show prints the renewed lease's witness alone, exit 0" "$la_rc [$la_out]" "0 [$la_w]"
+same "KDS7 AC11 ...and moves no ref on the origin" "$(git --git-dir="$LF/origin.git" for-each-ref --format='%(refname) %(objectname)' refs/gov)" "$kd7_refs"
+la_out=$(run_lease_arm show build tNone); la_rc=$?
+same "KDS7 AC11 a build with no lease prints -, exit 0" "$la_rc [$la_out]" "0 [-]"
+la_out=$(run_lease_arm show unit tFix u1); la_rc=$?
+same "KDS7 AC11 a unit shape exits 2 naming the one shape" "$la_rc [$la_out]" "2 [lease not written — --lease show takes build <slug> and nothing else]"
+sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$LF/c1/.unattended.conf"
+la_out=$(run_lease_arm show build tFix); la_rc=$?
+sed -i 's/^RUN_CLAIMS="off"$/RUN_CLAIMS="on"/' "$LF/c1/.unattended.conf"
+same "KDS7 AC11 RUN_CLAIMS off prints the off line, exit 0" "$la_rc [$la_out]" "0 [lease — off · tFix/build]"
 ( cd "$LF/c1" && git commit -q --allow-empty -m quiet --no-verify )
 la_out=$(run_lease_arm renew build tFix --witness "$(git -C "$LF/c1" rev-parse HEAD)"); la_rc=$?
 same "DPR1 AC4 a witness recording no transition exits 2" "$la_rc" "2"
@@ -24908,7 +24967,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4156 -> 4162 by KICK-dKeptSession-6 on 2026-11-23: the ring block's 6 region-eight `same`
 # (AC1 2, AC2 2, AC3 1, AC4 1), each unconditional and outside any loop, off the diff's own lines; no
 # skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4162
+# RAISED 4162 -> 4170 by KICK-dKeptSession-7 on 2026-11-23: the landed-notice and witness-read blocks' 8
+# region-eight `same` (AC8 3, AC11 5), each unconditional and outside any loop, off the diff's own lines;
+# no skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4170
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25202,7 +25264,8 @@ FLOOR_SHARD_7=311
 # RAISED 1337 -> 1354 by KICK-dKeptSession-25: the same 17 region-eight answer and wait assertions, see FLOOR_ASSERTIONS.
 # RAISED 1354 -> 1373 by KICK-dKeptSession-21: the same 19 region-eight notice assertions, see FLOOR_ASSERTIONS.
 # RAISED 1373 -> 1379 by KICK-dKeptSession-6: the same 6 region-eight ring assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1379
+# RAISED 1379 -> 1387 by KICK-dKeptSession-7: the same 8 region-eight landed-notice and witness-read assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1387
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

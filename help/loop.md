@@ -638,8 +638,11 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   question with a 30-hour deadline, first seen 31 hours ago (PINNED) and never answered, disposed as
   expired), `mail-argv` (the
   mailbox read's command line recorded and held to the located driver and the bash that sees it),
-  `mail-no-driver` (no driver found, the move recorded with the mailbox unarmed) and `mail-no-bash`
-  (no bash that sees the driver, the move refused as `mail unknown`). `check --selftest` runs every case, and gov's own
+  `mail-no-driver` (no driver found, the move recorded with the mailbox unarmed), `mail-no-bash`
+  (no bash that sees the driver, the move refused as `mail unknown`) and `deps-notices` (a second
+  build naming `tFix` in `parents:`: the move out of Design posts it one `confirmed` keyed over the
+  spec listing at the move's commit, and a second exit from Design posts `changed`, never a second
+  `confirmed`). `check --selftest` runs every case, and gov's own
   `loop transition record` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
@@ -905,7 +908,7 @@ A message for another build, or for the session working on it, is posted with `b
 
 Once a post, an ack or an answer has written its message, it rings the other sessions live, and its posted line is followed by one `ring —` line. The mailbox is always written first, and the ring carries only the message's mail ref and id, which `--mail notice --ring` takes, so a ring that never arrives costs only the time until the next mailbox read. Your landed `deps.messaging` policy key picks the channels: under `live-and-mailbox`, the default, and `live-only` the post rings each live channel the harness offers, and since this harness offers none between sessions it prints `ring — none · no live channel in this harness (stand-in dWellOiledMachine)` until dWellOiledMachine adds a doorbell; `live-only` still writes the mailbox. Under `mailbox-only` it rings nothing and prints `ring — off (deps.messaging: mailbox-only)`. A `deps.messaging` that cannot be read rings as `live-and-mailbox` and says why in one `unattended: NOTE -` line on stderr, and the ring never changes the post's exit. <!-- usage: policy:deps.messaging 21013b0f -->
 
-A build, a unit of a build, a cadence run or a recorded request is leased on the remote with `bash tools/unattended/unattended.sh --lease acquire build <slug>` (or `unit <slug> <id>`, `run <cadence> <period>`, `request <content key>`, the last refused `no-record` where the remote holds no `refs/gov/requests/<content key>`, and the slug `request` reserved for it as `run` is); `renew` takes `--witness <sha>`, `release` with no `--as` hands the lease over as `released`, which anyone takes at the next epoch, while `--as landed|withdrawn` leaves a build or unit lease a tombstone (a cadence run lease takes `--as landed|aborted`), `take-over` takes a stale foreign lease and raises its epoch, `offer <kind> <name> [<sub>] --to <tag>` (or `--to <tag>/<session>`) offers an absent or released lease to one node, or one session of it, without assigning it, every other caller refused `offered` until `leases.offer-seconds` after its first sighting of the offer, `acquire build <slug> --for draw` holds a closed build's tombstone for a patch build's draw, `--lease flush` pushes the writes this node queued while the remote did not answer, refusing one whose last fetch is older than `leases.queued-claim-days`, and `--lease prune` deletes the run leases and legacy run claims terminal that long, never a build's; `fence build <slug> [--after <tip>]` prints the fence the lander's push carries and writes nothing, `--after` re-fencing a move of the lease by its own holder at the same epoch. Each prints one line, `lease — <tail> · <act> · epoch <n>`, or names the refusal: `live-holder`, `tombstone`, `epoch-fence`, `overlap`, `offline`, `offered`, `terminal` or `no-record`. With no session id from the harness (`CLAUDE_CODE_SESSION_ID` unset, empty or `absent`) the acts that write a holder, `acquire`, `take-over`, `renew`, `release` and `offer`, print `lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder` and exit 2 before reading anything, because an absent session would name every id-less session on your node; `flush`, `prune` and `fence` name no holder and run as they do with a session, so a headless supervisor still prunes and a fence from a terminal or CI still answers. A run's own claim, identified by its keepalive, is unaffected. `--lease status <kind> <name> [<sub>]` reads one lease and writes nothing: one TAB-separated line, its tail, fleet tag, session, status, verdict and epoch, or `lease — none · <tail>`; it is how a reader tells two sessions of one node apart, which `--claims` cannot. With `RUN_CLAIMS` off every act but `fence` prints `lease — off · <tail>` and exits 0 having written nothing, and `fence` prints `fence — none · leases are off`. An offer is refused `offered` over an offer still open, whoever it names, and when `--to` names your own tag or your own session on it; another session on your tag is a hand-over and lands. An offer over a build or unit tombstone is refused `tombstone`, and `terminal` stays a cadence or legacy claim's. A create whose last commit this node's feed holds but git can no longer read, after a `git prune` say, is refused `epoch-fence` for a build or unit lease, whose epoch it cannot continue, and is a plain create at epoch 1 for a cadence run. An offline write whose ref's newest queued line is not a readable queued commit, a commit this clone does not hold or a line of another shape, prints `lease not written — <tail> · queued commit unreadable; nothing queued` and exits 2, queueing nothing, rather than building on that line, an older one or the cached tip. The `leases.*` policy keys shape it: `memory/guides/UNATTENDED-STOPS.md` section 7. <!-- usage: verb:unattended.sh:--lease f067f09f -->
+A build, a unit of a build, a cadence run or a recorded request is leased on the remote with `bash tools/unattended/unattended.sh --lease acquire build <slug>` (or `unit <slug> <id>`, `run <cadence> <period>`, `request <content key>`, the last refused `no-record` where the remote holds no `refs/gov/requests/<content key>`, and the slug `request` reserved for it as `run` is); `renew` takes `--witness <sha>`, `release` with no `--as` hands the lease over as `released`, which anyone takes at the next epoch, while `--as landed|withdrawn` leaves a build or unit lease a tombstone (a cadence run lease takes `--as landed|aborted`), `take-over` takes a stale foreign lease and raises its epoch, `offer <kind> <name> [<sub>] --to <tag>` (or `--to <tag>/<session>`) offers an absent or released lease to one node, or one session of it, without assigning it, every other caller refused `offered` until `leases.offer-seconds` after its first sighting of the offer, `acquire build <slug> --for draw` holds a closed build's tombstone for a patch build's draw, `--lease flush` pushes the writes this node queued while the remote did not answer, refusing one whose last fetch is older than `leases.queued-claim-days`, and `--lease prune` deletes the run leases and legacy run claims terminal that long, never a build's; `fence build <slug> [--after <tip>]` prints the fence the lander's push carries and writes nothing, `--after` re-fencing a move of the lease by its own holder at the same epoch. Each prints one line, `lease — <tail> · <act> · epoch <n>`, or names the refusal: `live-holder`, `tombstone`, `epoch-fence`, `overlap`, `offline`, `offered`, `terminal` or `no-record`. With no session id from the harness (`CLAUDE_CODE_SESSION_ID` unset, empty or `absent`) the acts that write a holder, `acquire`, `take-over`, `renew`, `release` and `offer`, print `lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder` and exit 2 before reading anything, because an absent session would name every id-less session on your node; `flush`, `prune` and `fence` name no holder and run as they do with a session, so a headless supervisor still prunes and a fence from a terminal or CI still answers. A run's own claim, identified by its keepalive, is unaffected. `--lease status <kind> <name> [<sub>]` reads one lease and writes nothing: one TAB-separated line, its tail, fleet tag, session, status, verdict and epoch, or `lease — none · <tail>`; it is how a reader tells two sessions of one node apart, which `--claims` cannot. `--lease show build <slug>` reads one build lease's witness and writes nothing: the commit alone, or `-` where the lease holds none or no lease exists; a dependent build reads its parent's witness with it, and any other shape exits 2. With `RUN_CLAIMS` off every act but `fence` prints `lease — off · <tail>` and exits 0 having written nothing, and `fence` prints `fence — none · leases are off`. An offer is refused `offered` over an offer still open, whoever it names, and when `--to` names your own tag or your own session on it; another session on your tag is a hand-over and lands. An offer over a build or unit tombstone is refused `tombstone`, and `terminal` stays a cadence or legacy claim's. A create whose last commit this node's feed holds but git can no longer read, after a `git prune` say, is refused `epoch-fence` for a build or unit lease, whose epoch it cannot continue, and is a plain create at epoch 1 for a cadence run. An offline write whose ref's newest queued line is not a readable queued commit, a commit this clone does not hold or a line of another shape, prints `lease not written — <tail> · queued commit unreadable; nothing queued` and exits 2, queueing nothing, rather than building on that line, an older one or the cached tip. The `leases.*` policy keys shape it: `memory/guides/UNATTENDED-STOPS.md` section 7. <!-- usage: verb:unattended.sh:--lease f067f09f -->
 
 Each node also keeps a change feed of every governance ref write it made or saw, in `gov-feed.log` under its git common dir. `bash tools/unattended/unattended.sh --feed check` holds that feed to the governance refs the clone holds and names each `missing`, `duplicate`, `extra`, `order` or `torn` line with exit 1; `--feed rebuild` writes the feed from those refs on a node that has none, and `--feed print --from <seq>` replays it from a sequence number. <!-- usage: verb:unattended.sh:--feed 4f313579 -->
 
@@ -971,8 +974,9 @@ and a token, compares without it on both sides; a URL git rewrote through `url.<
 still reads skipped. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
 engine answers on your local witnesses, so no unit reads `deployed`, and prints
 `interrupt — remote · none` with no remote-tip claim. A tracking ref you deleted reads the same. An owed parked decision or an unpassed hold answers
-`awaiting`; a `parents:` build that has not landed answers `blocked`; an undecided ask answers
-`awaiting` only when no item can run.
+`awaiting`; a `parents:` build that has not landed answers `blocked` where its cause holds the
+build's step, as [Coordinating with a parent build](#coordinating-with-a-parent-build) describes; an
+undecided ask answers `awaiting` only when no item can run.
 
 The frontier is every item of the build's step whose witness does not hold and whose needs are
 witnessed, in the order the composition lists them; the next item is its first entry. A refused item
@@ -1049,10 +1053,16 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   `plan-line`, `status-line`, `boundary` (the item boundary over planted engine answers),
   `mail-open` (an open question, an open intake and an answered question listed as the two open
   ones), `mail-transitions-only`, `mail-amendments` (a `changed` listed and the `intake` held),
-  `mail-unarmed` (no unattended kit found) and `mail-refused` (an invalid `mailbox.reads` read as its
-  default); `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `built-unarmed`, `plan-line`,
-  `status-line`, `mail-open`, `mail-transitions-only`, `mail-amendments`, `mail-unarmed` and
-  `mail-refused` run the unattended driver. Every
+  `mail-unarmed` (no unattended kit found), `mail-refused` (an invalid `mailbox.reads` read as its
+  default), and the seven dependency cases: `deps-wait` (`wait-for-landing`: Design runs, Build
+  blocked `not landed`), `deps-unreachable` (no parent lease blocks Build, a live one confirmed lets
+  it run), `deps-order` (`order-only` runs Build), `deps-confirmed` (Build waits on a confirmation
+  whose key recomputes, ignores a newer one that does not, waits again when the witness moves, and
+  reads a refused check as `confirmation unread`), `deps-design-only`, `deps-anything` and
+  `deps-strict` (the `strict` preset's two values, then an invalid `deps.coordination` held as
+  `policy unread`); `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `built-unarmed`,
+  `plan-line`, `status-line`, the five `mail-` cases and the seven `deps-` cases run the unattended
+  driver. Every
   case runs with an empty global and system git config, so no setting of your machine's reaches it. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->
@@ -1061,6 +1071,49 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   python tools/loop/position.py --fixture --plant steps
   python tools/loop/position.py --selftest
   ```
+
+## Coordinating with a parent build
+
+A build whose README names other builds in `parents:` coordinates with each of them before it waits
+for their landing. The engine reads every parent that has not landed for its reach: `reachable`
+while the parent's build lease reads `live` or `held` to the unattended driver's `--lease status
+build <parent>`, else `unreachable`. A parent whose newest recorded move enters `landed` is done and
+holds nothing. Two policy keys, read at the landed revision in your build's own scenario slot, decide
+what an unlanded parent holds:
+
+- **`deps.coordination`** — `message-then-progress` (the default) holds your Build items on an
+  `unreachable` parent and reads `deps.early-build` for a `reachable` one; `wait-for-landing` holds
+  Build as `not landed` until the parent lands; `order-only` holds nothing, the cause `order only`.
+- **`deps.early-build`** — `confirmed-interfaces` (the default) runs Build once the parent has
+  confirmed its interfaces to you, `awaiting confirmed` until then; `design-only` holds Build as
+  `not landed`; `anything-coordinated` runs it as `coordinated`.
+
+The `strict` preset sets `wait-for-landing` and `design-only`. Design items run under every value: the
+gate holds a build's Build step and every step after it, never its Design. A key that does not read,
+an invalid value with no valid revision before it say, reads no default: the parent's cause is
+`policy unread`, holding Build, and one `position: NOTE · <key> unread: <why>` line prints. Each
+unlanded parent prints one line, `interrupt — dependency · <parent> · <reach> · <cause>
+(deps.coordination: <value>)`, and where it holds, the answer is `blocked` naming it.
+
+The notices are mail, posted through the mailbox's own writer:
+
+- **`confirmed`** — when a parent moves from designing to building, it posts `interfaces <parent>`
+  to each build naming it in `parents:`, keyed over the bytes of `git ls-tree -r` of its `spec/`
+  folder at the transition commit. A later exit from Design posts `changed` with the new key.
+  `python tools/loop/loop_transition.py dependents --build <slug>` lists who those builds are.
+- **`landed`** — `--landed <parent>` posts `landing <parent>` with the landed sha to each of them,
+  and a post that fails prints its line without failing the landing.
+
+Under `confirmed-interfaces` the dependent reads the parent's lease witness with the driver's
+`--lease show build <parent>`, recomputes the key over the parent's `spec/` listing at that commit,
+fetching it once where it is missing, and runs Build only where a `confirmed` or `changed` message
+from the parent carries that key: the key decides, never the order the messages arrived in. A moved witness that no message's key
+matches reads `awaiting confirmed` again; a check that cannot be read reads `confirmation unread`
+with one `position: NOTE · interfaces <parent> unread: <line>`, never as unconfirmed. Until a
+dependent acknowledges a notice with `--mail ack`, it is open mail addressed to it, and the mailbox's
+guard holds the dependent's own moves on it. Nothing here re-enters a dependent's units on a
+`changed`, and no request for confirmation is answered for you: the parent's session answers one by
+hand with `--mail post --kind confirmed --answers <id> --interface <file>`.
 
 ## The item kind, `kind.item`
 

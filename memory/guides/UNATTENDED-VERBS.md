@@ -262,6 +262,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   reason and lands. It parses nothing beyond a substring test for the id, and it does not check that
   the id was ever this run's job. Where `RUN_CLAIMS` is `on` it writes `landed` into the run's claim
   once the record is staged; a claim it may not write is announced on one line and never fails it.
+  On both success exits, with `RUN_CLAIMS` `on`, it posts one `landed` message, subject `landing
+  <slug>` and the landed sha as its body, to each build the loop kit's `loop_transition.py dependents`
+  lists as naming the slug in `parents:`, printing each post's line; a failed post, or a dependents
+  read that does not answer (one `NOTE — no landed notice` line), never moves its exit
+  (KICK-dKeptSession-7).
 - `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add|defer`, the
   unit as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the
   first three acts; this verb is the record. `defer` sets a roster unit aside against an open ask so
@@ -563,7 +568,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `--lease status <kind> <name> [<sub>]` reads one lease and writes nothing: one TAB-separated line,
   `<tail> <fleet tag> <session> <status> <verdict> <epoch>`, or `lease — none · <tail>` (exit 0); a
   read that does not answer is `lease not written` (exit 2). `placement.py check` reads it, never
-  `--claims`, which names no session. An offer is refused `offered` over an offer still open, whoever
+  `--claims`, which names no session. `--lease show build <slug>` reads one build lease and writes
+  nothing: its `witness` alone, or `-` where it holds none or no lease exists (exit 0), `lease — off ·
+  <slug>/build` with `RUN_CLAIMS` off, `lease not written` for a read that does not answer or any
+  other shape (exit 2); a dependent build's engine reads its parent's witness with it
+  (KICK-dKeptSession-7). An offer is refused `offered` over an offer still open, whoever
   it names, and when `--to` names the caller's own tag or its own session on it, and `tombstone` over
   a build or unit tombstone, `terminal` kept for a cadence or legacy claim. A create whose feed commit
   git cannot read is refused `epoch-fence` for a build or unit lease and is a plain create at epoch 1

@@ -974,14 +974,16 @@ def write_placement_fixture(top, policy="", driver=False, remote=False, scenario
     return root
 
 
-def write_foreign_lease(root, build):
-    """A build lease of `build` held live by another node's fleet tag, pushed to the fixture's remote."""
+def write_foreign_lease(root, build, fields=(), remote=FIXTURE_REMOTE):
+    """A build lease of `build` held live by another node's fleet tag, pushed to the fixture's remote, `remote`
+    naming it; `fields` are extra `(key, value)` pairs after the twelve, such as `witness`, which the position
+    engine's dependency plants pass with their own remote (KICK-dKeptSession-7)."""
     now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     msg = "gov-claim %s/build\n\n" % build + "".join("%s: %s\n" % kv for kv in (
         ("slug", build), ("node", "z"), ("host", "elsewhere"), ("session", "s-other"), ("keepalive", "k-other"),
         ("status", "live"), ("lease-utc", now), ("beat-utc", now), ("epoch", "1"), ("kind", "build"),
-        ("fleet-tag", "z"), ("renews", "yes")))
-    write_fixture_gov_ref(root, "refs/gov/leases/%s/build" % build, msg)
+        ("fleet-tag", "z"), ("renews", "yes")) + tuple(fields))
+    write_fixture_gov_ref(root, "refs/gov/leases/%s/build" % build, msg, remote=remote)
 
 
 def write_fixture_gov_ref(root, ref, msg, remote=FIXTURE_REMOTE):

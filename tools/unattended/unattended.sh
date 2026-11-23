@@ -44,6 +44,7 @@
 #   unattended.sh --lease acquire|renew|release|take-over|offer <kind> <name> [<sub>] [--witness <sha>] [--as <status>] [--for draw] [--to <fleet tag>[/<session>]]   # one lease of a build, unit, cadence run or request, by compare-and-swap; one line
 #   unattended.sh --lease flush                                    # push this node's queued offline lease writes, oldest first
 #   unattended.sh --lease status <kind> <name> [<sub>]             # one lease read, read-only: tail, fleet tag, session, status, verdict, epoch, TAB-separated; or `lease — none · <tail>`
+#   unattended.sh --lease show build <slug>                        # one build lease's witness alone, read-only, or `-` where it holds none or no lease exists
 #   unattended.sh --lease prune [<kind> <name> [<sub>]]            # delete each run lease and legacy run claim terminal past leases.queued-claim-days; never a build or unit lease
 #   unattended.sh --lease fence build <slug> [--after <tip>]       # the fence an effect push carries: this session's lease, its tip and a beat on it; one line, pushes nothing; --after re-fences a same-holder, same-epoch move from <tip>
 #   unattended.sh --register decision <build> <item> <fork> <file> # one create-only decision on the remote, keyed by item and fork; 0 written, 1 exists, 2 not written
@@ -5004,6 +5005,28 @@ print_lease_status() { # kind · name · [sub] -> 0 one line, 2 not read
   return 0
 }
 
+# --lease show, ONE BUILD LEASE'S WITNESS (KICK-dKeptSession-7 S7, the owner's verb of its §8 F5):
+# read-only, beside `--lease status`, so a dependent build reads the commit its parent last recorded
+# a transition at without parsing `--claims`. One `read_claims quiet`, then the build row's `witness`,
+# field 15 of CLAIM_ROWS, ALONE on one line, or `-` where the lease holds none or no lease exists,
+# exit 0; `lease — off · <slug>/build` with RUN_CLAIMS off, exit 0; `lease not written — <why>`, exit
+# 2, for a read that does not answer. It writes nothing. The dispatch refuses any shape but `build
+# <slug>`, exit 2.
+print_lease_witness() { # slug -> 0 the witness or `-` on one line, 2 not read
+  local row c1 c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12 c13 c14 c_wit c_rest
+  derive_lease_ref build "${1:-}" >/dev/null || { echo "lease not written — $LEASE_WHY"; return 2; }
+  [ "$RUN_CLAIMS" = on ] || { echo "lease — off · $1/build"; return 0; }
+  read_claims quiet || { echo "lease not written — $CL_WHY"; return 2; }
+  row=""
+  case $'\n'"$CLAIM_ROWS" in
+    *$'\n'"$1"$'\t'*) row=$'\n'"$CLAIM_ROWS"; row=${row#*$'\n'"$1"$'\t'}; row="$1"$'\t'"${row%%$'\n'*}" ;;
+  esac
+  [ -n "$row" ] || { echo "-"; return 0; }
+  IFS=$'\t' read -r c1 c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12 c13 c14 c_wit c_rest <<<"$row"
+  printf '%s\n' "${c_wit:--}"
+  return 0
+}
+
 # THE OFFER WRITE (TOOL-dPlacedRequest-20 S1): the record `released`, `offer` the target and
 # `offer-deadline` the window `read_lease_bound offer` read at this write, a window in seconds and
 # never a timestamp, by `write_claim` through the one compare-and-swap writer on the tip
@@ -9880,6 +9903,31 @@ check_keepalive_reaped() { # slug · run-state file -> 0 read back or announced 
   return 0
 }
 
+# THE LANDED NOTICE (KICK-dKeptSession-7 S5): at both of `verb_landed`'s success exits, one `landed`
+# message to each build whose README's `parents:` names <slug>, as the loop kit's
+# `loop_transition.py dependents` lists them, kind `landed`, subject `landing <slug>`, its body the
+# landed <sha>, posted through `( main --mail post … )` with the post's line printed. With RUN_CLAIMS
+# off it posts nothing; a dependents verb that does not answer prints `unattended: NOTE — no landed
+# notice: <why>`. It returns 0 whatever a post prints, so the landing's exit never moves.
+# WHAT THIS DOES NOT CHECK: that a dependent reads the notice; that is unit 5's mailbox.
+write_landed_notices() { # slug · landed sha -> 0, one post's lines per dependent or one NOTE
+  local slug="${1:-}" sha="${2:-}" dep f
+  local -a deps=()
+  [ "$RUN_CLAIMS" = on ] || return 0
+  if ! run_loop_verb loop_transition.py dependents "--build=$slug" || [ "$_bd_rc" != 0 ]; then
+    echo "unattended: NOTE — no landed notice: $_bd_why"; return 0
+  fi
+  [ -n "$_bd_out" ] && mapfile -t deps <<<"$_bd_out"
+  for dep in ${deps[@]+"${deps[@]}"}; do
+    dep=${dep%$'\r'}; [ -n "$dep" ] || continue
+    f=$(mktemp) || { echo "unattended: NOTE — no landed notice to $dep: no scratch file for its body"; continue; }
+    printf '%s\n' "$sha" > "$f"
+    ( main --mail post "$slug" --to "build:$dep" --kind landed --subject "landing $slug" "$f" ) 2>&1
+    rm -f "$f"
+  done
+  return 0
+}
+
 # S1 - THE SOLE PRODUCER OF `LANDED`, and it is an OBSERVATION rather than a claim.
 #
 # Two preconditions, and both are load-bearing:
@@ -9974,6 +10022,7 @@ WTS
         fact "$rel" keepalive >/dev/null; _sk=$_fact
         fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" released "$_sk" soft "$rel"
       fi
+      write_landed_notices "$slug" "$DP_LANDING"
       return 0
     fi
     if [ -z "$DP_LANDING" ]; then
@@ -10230,6 +10279,7 @@ WTS
   else
     fact "$rel" branch-ref >/dev/null; echo "unattended: phase LANDED · witness $head · anchor LOCAL · $_fact is merged into refs/heads/$lbranch, which the remote has not seen · unpushed on local $lbranch: $unp"
   fi
+  write_landed_notices "$slug" "$head"
   return 0
 }
 
@@ -20149,6 +20199,12 @@ while [ $# -gt 0 ]; do
                       if [ -n "$LV_WIT$LV_AS$LV_FOR$LV_TO" ] || [ "${#LV_POS[@]}" -lt 2 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
                         echo "lease not written — --lease status takes <kind> <name> [<sub>] and nothing else"; _rl_rc=2
                       else print_lease_status "${LV_POS[@]}"; _rl_rc=$?; fi
+                    elif [ "$LV_ACT" = show ]; then
+                      # KICK-dKeptSession-7 S7 - one build lease's witness, read-only, dispatched before
+                      # run_lease_verb, which refuses an act it does not write.
+                      if [ -n "$LV_WIT$LV_AS$LV_FOR$LV_TO" ] || [ "${#LV_POS[@]}" != 2 ] || [ "${LV_POS[0]}" != build ]; then
+                        echo "lease not written — --lease show takes build <slug> and nothing else"; _rl_rc=2
+                      else print_lease_witness "${LV_POS[1]}"; _rl_rc=$?; fi
                     elif [ "$LV_ACT" = fence ]; then
                       # TOOL-dPlacedRequest-15 S2 - the fence read of a build lease, one line; TOOL-dPlacedRequest-29
                       # S1 - `--after <tip>`, the re-fence after a fenced push failed on a moved tip.

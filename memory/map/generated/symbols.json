@@ -7928,6 +7928,11 @@
       "file": "tools/unattended/runlog-writer.test.sh"
     },
     {
+      "id": "check_parent_interfaces",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "check_parent_sides",
       "kind": "function",
       "file": "tools/policy/guard.py"
@@ -11978,6 +11983,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_dependency_hold",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "derive_derived_rows",
       "kind": "function",
       "file": "tools/policy/presets.py"
@@ -12788,6 +12798,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_interface_listing",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "derive_interrupts",
       "kind": "function",
       "file": "tools/loop/position.py"
@@ -13446,6 +13461,11 @@
       "id": "derive_parallel_step",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "derive_parent_reach",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "derive_parent_route",
@@ -20403,6 +20423,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_lease_witness",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_leg_window",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
@@ -22461,6 +22486,11 @@
       "id": "read_defs_at_sha",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_dependents",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "read_deploy",
@@ -33998,6 +34028,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "run_dependency_plant",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "run_derive",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
@@ -35501,6 +35536,11 @@
       "id": "run_notice_hook",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_notice_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "run_observation_probes",
@@ -42423,6 +42463,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "write_dependency_notices",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "write_design_fixture",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
@@ -43176,6 +43221,16 @@
       "id": "write_kits",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "write_landed_dependent",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_landed_notices",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_landed_observation",
