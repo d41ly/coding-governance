@@ -114,4 +114,6 @@ write and return.
 ## Return
 
 Return one object holding these fields, in this order: outcome (one of committed, returned); commit (a sha, optional); why (text, optional); checks (a list).
+
+Or refuse, returning outcome: refused; rule (text); remedy (text); actor (one of self, producer, driver, owner, build:<slug>).
 [/.claude/agents/gov-builder.md]

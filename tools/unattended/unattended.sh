@@ -17,7 +17,7 @@
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
-#   unattended.sh --refused <slug> --item <tag> --key <key> --reason <text>  # record a refused item; --plan prints the frontier
+#   unattended.sh --refused <slug> --item <tag> --key <key> --reason <text> [--rule <r> --remedy <m> --actor <a>]  # record a refused item; --plan prints the frontier
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --rescope <slug> --flow <tag> --act <add|amend|exclude|supersede> --item <id> [--row <path>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...] [--fix-of <red>]
@@ -915,7 +915,7 @@ read_bound_key RESUME_STALE_BOUND "$RESUME_STALE_BOUND_DEFAULT" seconds "a run r
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
 # a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
 # supplying the item nobody typed.
-PK_ITEM=""; PK_STEP=""; RF_KEY=""
+PK_ITEM=""; PK_STEP=""; RF_KEY=""; RF_RULE=""; RF_REMEDY=""; RF_ACTOR=""
 # Internal state for trusted_base, initialised here for PK_ITEM's reason (TOOL-aHomedAnchor-6 S8).
 TB_IGNORE_RECORD=0
 HALT_CODE=""
@@ -16869,14 +16869,33 @@ PROPOSED
 # THE ENGINE DECIDES WHAT MAY BE RECORDED: `position.py --check-refusal` holds a tag the composition
 # declares at a key of `derive_instance_key`'s shape, and every other answer, the engine unresolved
 # included, is the ONE refusal below, so an unarmed check records nothing.
-write_refusal() { # slug · item tag · instance key · reason
-  local slug="$1" item="$2" key="$3" reason="$4" rel want pl _out _rc _why
+# TOOL-dBoundRoles-26 S4 - THE TYPED REFUSAL. `--rule`, `--remedy` and `--actor`, given together, ride INSIDE
+# the line-final reason as ` · rule <r> · remedy <m> · actor <a>`, so no reader of the row's earlier fields
+# moves and the loop kit's `read_refusals` splits the tail off. Every check the three carry is the ONE
+# refusal below: a partial set, a rule or remedy spelling the separator that split reads at, and an actor
+# outside the five forms the roles kit's refusal arm declares in its role-schema.toml (spelled here again,
+# since a kit imports no sibling kit). The newline and bypass guards then read the composed reason.
+write_refusal() { # slug · item tag · instance key · reason · rule · remedy · actor
+  local slug="$1" item="$2" key="$3" reason="$4" rule="${5:-}" remedy="${6:-}" actor="${7:-}" rel want pl _out _rc _why _tw=""
   check_slug "$slug" || return 1
   runmd_of "$slug" >/dev/null; rel=$_runmd
   check_run_state "$rel" "run to record a refusal against" || return 1
   check_verb_flag --refused --item "$item" || return 1
   check_verb_flag --refused --key "$key" || return 1
   check_verb_flag --refused --reason "$reason" || return 1
+  if [ -n "$rule$remedy$actor" ]; then
+    case "$actor" in
+      self|producer|driver|owner) ;;
+      build:*) [[ ${actor#build:} =~ ^[A-Za-z]+$ ]] || _tw="the actor $actor is none of self, producer, driver, owner, build:<slug>" ;;
+      *) _tw="the actor ${actor:-(none)} is none of self, producer, driver, owner, build:<slug>" ;;
+    esac
+    [ -n "$rule" ] && [ -n "$remedy" ] || _tw="--rule, --remedy and --actor go together, each non-empty${_tw:+; $_tw}"
+    case "$rule|$remedy" in *" · "*) _tw="a rule or remedy spells the record's own field separator ' · '${_tw:+; $_tw}" ;; esac
+    if [ -n "$_tw" ]; then
+      fail 48 "the typed refusal is malformed, so nothing is recorded and the run-state file is unchanged: $_tw"; return 1
+    fi
+    reason="$reason · rule $rule · remedy $remedy · actor $actor"
+  fi
   check_step_fields "$item" "$key" "$reason" || return 1
   refuse_if_terminal "$rel" --refused || return 1
   # EXACT LINE COMPARE, verb_propose's, read in this shell: the timestamp is the first token.
@@ -19434,6 +19453,9 @@ while [ $# -gt 0 ]; do
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --step)         PK_STEP="${2:-}"; shift 2 || shift ;;
     --key)          RF_KEY="${2:-}"; shift 2 || shift ;;
+    --rule)         RF_RULE="${2:-}"; shift 2 || shift ;;
+    --remedy)       RF_REMEDY="${2:-}"; shift 2 || shift ;;
+    --actor)        RF_ACTOR="${2:-}"; shift 2 || shift ;;
     --unit)         BR_UNIT="${2:-}"; shift 2 || shift ;;
     --path)         RP_PATH="${2:-}"; shift 2 || shift ;;
     --leg)          RP_LEG="${2:-}"; shift 2 || shift ;;
@@ -19693,7 +19715,7 @@ case "$VERB" in
   --settle)    run_settle "$SLUG" ;;
   --park)    verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
-  --refused)   write_refusal "$SLUG" "$PK_ITEM" "$RF_KEY" "$REASON" ;;
+  --refused)   write_refusal "$SLUG" "$PK_ITEM" "$RF_KEY" "$REASON" "$RF_RULE" "$RF_REMEDY" "$RF_ACTOR" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
   --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" "$RV_FOLDED" "$RV_PROMOTED" "$RV_RHIGHS" "$RV_RMINORS" ;;
   --trigger)   run_trigger "$SLUG" "$RV_SUBJECT" "$TR_CAUSE" ${TR_PINS[@]+"${TR_PINS[@]}"} ;;

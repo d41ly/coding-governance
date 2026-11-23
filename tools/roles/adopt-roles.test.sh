@@ -138,7 +138,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +3 for arm 40 (TOOL-dBoundRoles-41).
 # +4 for arm 41 (TOOL-dBoundRoles-11).
 # +2 for arm 42 (TOOL-dBoundRoles-47).
-FLOOR_ASSERTIONS=172
+# +11 for arm 43 (TOOL-dBoundRoles-26).
+FLOOR_ASSERTIONS=183
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -2372,6 +2373,98 @@ check_arm "arm 42 AC1 the orienter's span planted in its typed question and its 
 check_arm "arm 42 AC1 ...and with the question in plain words it exits 0 and writes its prompt file" \
    "$([ "$_rc" = 0 ] && [ -z "$_ls" ] && [ -n "$(ls -A "$A42P")" ] && echo 1 || echo 0)"
 [ "$_rc" = 0 ] || sed 's/^/    /' "$A42E"
+
+# ---- arm 43 (TOOL-dBoundRoles-26 AC1 AC2 AC3 AC5): the typed refusal. The fixture gains the policy kit, as arm
+# ---- 41's does, with no run.on-owner-question set on `main`. AC3: every scaffolded agent file counts one
+# ---- `outcome: refused`, the arm rendered under its `## Return`, and gov-builder's `return` planted with `refused`
+# ---- in its outcome set makes check_roles.py exit 1 with an R2 line naming it. AC2: `check_return` refuses a
+# ---- refusal whose actor is `nobody` naming `actor`, and one with an empty remedy naming `remedy`, and passes
+# ---- `build:dPlanted`. AC1: `handoff.py route-refusal` over one plant per actor kind, the producer's answering a
+# ---- work order whose upstream rows name its item. AC5: the owner plant answers `resolve`, and `choose-ending`
+# ---- naming the three endings under `--budget-spent`. The failing case, owed at the close and not observed by the
+# ---- pass that wrote this: `resolve_refusal_route` answering `bounded` for every actor, under which every route
+# ---- but `self` reds. WHAT IT DOES NOT CHECK: the driver's `--refused` record, which the unattended suite holds, or
+# ---- an attended owner.
+build_fixture; _rc43=$?
+_pk=policy; [[ $FXK == */* ]] && _pk=${FXK%/*}/policy
+mkdir -p "$FX/$_pk" && cp -R "$HERE/../policy"/. "$FX/$_pk"/ || _rc43=2
+A43=$("$PY" -B -c 'import json, os, pathlib, re, subprocess, sys
+fx, kit = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve()
+sys.path.insert(0, str(kit))
+import roles_lib as lib
+env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_") and k != "GOV_DEFAULT_BRANCH"}
+def git(*a):
+    return subprocess.run(["git", "-c", "user.name=fx", "-c", "user.email=fx@fx", "-C", str(fx), *a], env=env,
+                          capture_output=True, text=True, encoding="utf-8", errors="replace").returncode
+(fx / ".governance").mkdir(exist_ok=True)
+(fx / ".governance" / "policy.toml").write_text("# no key\n", encoding="utf-8")
+ok = git("symbolic-ref", "HEAD", "refs/heads/main") == 0 and git("add", "-A") == 0 \
+    and git("commit", "-q", "--allow-empty", "-m", "plant") == 0
+agents = sorted((fx / ".claude" / "agents").glob("*.md"))
+print("rendered %d" % int(ok and bool(agents) and all(a.read_text(encoding="utf-8").count("outcome: refused") == 1
+                                                         for a in agents)))
+role = kit / "agents" / "gov-builder.agent.md"
+before = role.read_bytes()
+role.write_bytes(re.sub(rb"(?m)^(return: outcome:[^,\r\n]*)", rb"\1|refused", before, count=1))
+p = subprocess.run([sys.executable, "-B", str(kit / "check_roles.py"), "--root", str(fx)], cwd=str(fx), env=env,
+                   capture_output=True, text=True, encoding="utf-8", errors="replace")
+role.write_bytes(before)
+print("redeclared %d" % int(p.returncode == 1 and any("gov-builder.agent.md: R2 — " in ln and "outcome set holds refused" in ln
+                                                       for ln in p.stdout.splitlines())))
+def ret(**f):
+    return "```json\n%s\n```\n" % json.dumps({**dict(outcome="refused", rule="r1", remedy="render the handoff"), **f})
+said = lambda **f: lib.check_return("gov-builder", ret(**f), fx)
+print("nobody %d" % int([d.split(" — ")[0] for d in said(actor="nobody")] == ["actor"]))
+print("empty %d" % int([d.split(" — ")[0] for d in said(actor="driver", remedy="")] == ["remedy"]))
+print("planted %d" % int(said(actor="build:dPlanted") == []))
+rel = "mem/builds/tFix/prompts/2026-11-23-prompt-TOOL-tFix-1-1-builder.md"
+sha = "1" * 12
+rows = "- item.design.unit-spec#r1 · fact · the spec holds\n"
+(fx / rel).parent.mkdir(parents=True, exist_ok=True)
+(fx / rel).write_text("<!-- gov:handoff role=gov-builder build=tFix unit=TOOL-tFix-1 item=item.build.unit-pass path=%s "
+                      "role-sha=%s task-sha=%s -->\n\n## Role\n\nr\n\n## Task\n\n### upstream:rows\n\n%s\n\n### return\n\nr\n"
+                      % (rel, "0" * 12, sha, lib.render_handed_fence(rows)), encoding="utf-8")
+def route(actor, *flags, **f):
+    plant = fx / ("plant-%s.json" % actor.replace(":", "-"))
+    plant.write_text(ret(actor=actor, **f), encoding="utf-8")
+    p = subprocess.run([sys.executable, "-B", str(kit / "handoff.py"), "route-refusal", "--return", plant.name, *flags],
+                       cwd=str(fx), env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return p.stdout.strip() if p.returncode == 0 else "exit %d %s" % (p.returncode, p.stderr.strip())
+print("self %d" % int("refusal — self · route retry · re-offer bounded" in route("self")))
+got = route("producer", answers="%s task-sha=%s" % (rel, sha))
+print("producer %d" % int("refusal — producer · route route-back · re-offer never · item item.design.unit-spec" in got))
+print("driver %d" % int("refusal — driver · route driver · re-offer never" in route("driver")))
+got = route("owner")
+print("owner %d" % int("refusal — owner · route owner · re-offer never · answer resolve" in got))
+print("build %d" % int("refusal — build:dPlanted · route ask build:dPlanted · re-offer never" in route("build:dPlanted")))
+got = route("owner", "--budget-spent")
+print("spent %d" % int("answer choose-ending · endings park-item > park-build > stop-run" in got and "resolve" not in got))
+' "$FX" "$FX/$KREL" 2>&1)
+A43=${A43//$'\r'/}
+check_arm "arm 43 AC3 every scaffolded agent file counts one outcome: refused" \
+   "$([ "$_rc43" = 0 ] && [[ $A43 == *'rendered 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 43 AC3 a role whose return redeclares the arm exits 1 with an R2 line naming it" \
+   "$([[ $A43 == *'redeclared 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 43 AC2 a refusal whose actor is nobody is refused naming actor" \
+   "$([[ $A43 == *'nobody 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 43 AC2 a refusal with an empty remedy is refused naming remedy" \
+   "$([[ $A43 == *'empty 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 43 AC2 a refusal to build:dPlanted with both fields set returns no line" \
+   "$([[ $A43 == *'planted 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 43 AC1 a self refusal routes retry, re-offered bounded" \
+   "$([[ $A43 == *'self 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 43 AC1 a producer refusal routes back to its first upstream row's item, never re-offered" \
+   "$([[ $A43 == *'producer 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 43 AC1 a driver refusal routes to the driver, never re-offered" \
+   "$([[ $A43 == *'driver 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 43 AC1 an owner refusal routes to the owner with the reader's answer, never re-offered" \
+   "$([[ $A43 == *'owner 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 43 AC1 a build:dPlanted refusal routes to an ask for that build, never re-offered" \
+   "$([[ $A43 == *'build 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 43 AC5 under --budget-spent the owner refusal answers choose-ending among the three endings" \
+   "$([[ $A43 == *'spent 1'* ]] && echo 1 || echo 0)"
+[ "$A43" = $'rendered 1\nredeclared 1\nnobody 1\nempty 1\nplanted 1\nself 1\nproducer 1\ndriver 1\nowner 1\nbuild 1\nspent 1' ] \
+   || printf '    %s\n' "${A43//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

@@ -458,9 +458,19 @@ def check_refusal(tag, key, tags):
     return True, ""
 
 
+#: A typed refusal's tail inside a `refusal` row's line-final reason (TOOL-dBoundRoles-26 S4): the driver's
+#: `--refused --rule --remedy --actor` appends ` · rule <r> · remedy <m> · actor <a>`, neither the rule nor the
+#: remedy spelling the separator, so the reason is the text before it.
+REFUSAL_TAIL_RE = re.compile(r"(?P<reason>.*) · rule (?P<rule>(?:(?! · ).)+) · remedy (?P<remedy>(?:(?! · ).)+)"
+                             r" · actor (?P<actor>\S+)", re.S)
+
+
 def read_refusals(text):
     """The `refusal` rows of the run-state `text`, through runlog's `read_run_state`, found by
-    `resolve_kit_dir`; one `{"unarmed": why}` entry where that kit does not resolve."""
+    `resolve_kit_dir`; one `{"unarmed": why}` entry where that kit does not resolve. Each row carries
+    `rule`, `remedy` and `actor`, split off its reason's `REFUSAL_TAIL_RE` tail, its `reason` the text
+    before them; a row written with no tail carries the three empty and its whole reason
+    (TOOL-dBoundRoles-26 S4)."""
     try:
         path = resolve_kit_dir("runlog", "model.py", KIT) / "model.py"
         spec = importlib.util.spec_from_file_location("runlog_model", str(path))
@@ -471,10 +481,16 @@ def read_refusals(text):
         sys.modules.pop("runlog_model", None)
         return [{"unarmed": "runlog's model does not load beside this kit: %s" % (str(e) or type(e).__name__)}]
     record, _state = model.read_run_state(text)
-    return [{"item": r["item"], "key": r["step"] or "", "reason": r["reason"],
-             "at": datetime.datetime.fromtimestamp(r["t"], datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-             if r["t"] is not None else ""}
-            for r in record["rows"] if r["kind"] == "refusal"]
+    out = []
+    for r in record["rows"]:
+        if r["kind"] != "refusal":
+            continue
+        m = REFUSAL_TAIL_RE.fullmatch(r["reason"] or "")
+        typed = m.groupdict() if m else {"reason": r["reason"], "rule": "", "remedy": "", "actor": ""}
+        out.append({"item": r["item"], "key": r["step"] or "", **typed,
+                    "at": datetime.datetime.fromtimestamp(r["t"], datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+                    if r["t"] is not None else ""})
+    return out
 
 
 def derive_interrupts(text, handover, owed, parents_open, claims, now, remote_absent=False):

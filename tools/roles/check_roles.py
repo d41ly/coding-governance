@@ -31,7 +31,8 @@ grades nothing: the seed the memory-tree kit's `legacy_ledger.py seed --home` ru
       `roles.effort.default` (TOOL-dBoundRoles-21 S3, S4); a `gates` field on an `agent: false`
       role or naming a leg as R12 grades a `[gates]` row; a `return` template
       `parse_return_template` refuses, a required `outcome` of a closed set among what it owes
-      (TOOL-dBoundRoles-2); a `layer` that is no `layer.<seg>` tag or names no `[[layer]]` row of the
+      (TOOL-dBoundRoles-2), or whose `outcome` set holds the refusal arm's value, `refused`, which
+      `role-schema.toml`'s `[return.refusal]` declares once for every role (TOOL-dBoundRoles-26 S1); a `layer` that is no `layer.<seg>` tag or names no `[[layer]]` row of the
       playbook kit's `layers.toml`, joined only where that register resolves and a `roles: note:`
       otherwise; an `acts-as` other than `item` or `cycle`. The summary counts the roles per layer
       and per `acts-as` value (TOOL-dBoundRoles-1). A `shapes` value that is no list of distinct
@@ -423,7 +424,15 @@ def check_roles(root, kit_dir, write=False):
                 add_defect(p, "R2", "front-matter key '%s' is missing" % k)
         if keys.get("return"):
             try:
-                lib.parse_return_template(keys["return"])
+                template = lib.parse_return_template(keys["return"])
+                # TOOL-dBoundRoles-26 S1: the refusal arm is declared once in role-schema.toml and rendered under
+                # every template, so a role's own `outcome` set holding its value is a second copy of it
+                arm = lib.load_refusal_arm()
+                if any(n == "outcome" and isinstance(t, tuple) and arm["outcome"] in t for n, t, _o in template):
+                    add_defect(p, "R2", "return '%s': role %s's outcome set holds %s, which the refusal arm "
+                               "[return.refusal] of %s declares once for every role; drop it and refuse through "
+                               "the arm's %s" % (keys["return"], slot, arm["outcome"], lib.ROLE_SCHEMA,
+                                                 ", ".join(arm["fields"])))
             except lib.RolesError as e:
                 add_defect(p, "R2", "return '%s': %s" % (keys["return"], str(e).split(" — ", 1)[-1]))
         if keys.get("name") and keys["name"] != slot:

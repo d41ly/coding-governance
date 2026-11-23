@@ -139,7 +139,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
-      "role-sha": "f712bc3d11ad",
+      "role-sha": "4e54591cb591",
       "shapes": [
         "single"
       ],
@@ -153,7 +153,7 @@
         "lexicon naming predicates"
       ],
       "layer": "layer.roles",
-      "role-sha": "71fd4d699559",
+      "role-sha": "07eb89e2d354",
       "shapes": [
         "per-unit"
       ],
@@ -165,7 +165,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
-      "role-sha": "7e1bafa3b5c2",
+      "role-sha": "893403b9bbc7",
       "shapes": [
         "single"
       ],
@@ -177,7 +177,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
-      "role-sha": "785729cbae0a",
+      "role-sha": "0020106d4370",
       "shapes": [
         "single"
       ],
@@ -189,7 +189,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
-      "role-sha": "faa09ed5b94c",
+      "role-sha": "05124eca6a8e",
       "shapes": [
         "single"
       ],
@@ -201,7 +201,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
-      "role-sha": "e8788e02c318",
+      "role-sha": "5866fb163998",
       "shapes": [
         "single",
         "twin"
@@ -214,7 +214,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
-      "role-sha": "054e380a188e",
+      "role-sha": "e833f6bdea3d",
       "shapes": [
         "single",
         "experiment"
@@ -227,7 +227,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
-      "role-sha": "e6a1258582fc",
+      "role-sha": "1b05784bdb5b",
       "shapes": [
         "panel",
         "twin"
@@ -240,7 +240,7 @@
       "agent": false,
       "gates": [],
       "layer": "layer.runtime",
-      "role-sha": "b463c4537a21",
+      "role-sha": "bcbcced4fcc3",
       "shapes": [],
       "workflow": "handoff",
       "writes": "none"
@@ -250,7 +250,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
-      "role-sha": "2c8056e0bad1",
+      "role-sha": "6fced8c2e5a0",
       "shapes": [
         "panel",
         "twin"
@@ -267,7 +267,7 @@
         "spec tokens (a spec's own names resolve)"
       ],
       "layer": "layer.roles",
-      "role-sha": "a05a716a4853",
+      "role-sha": "cbcb39d1d690",
       "shapes": [
         "per-unit"
       ],
@@ -279,7 +279,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
-      "role-sha": "9d630acebb0d",
+      "role-sha": "d6884a72e9b4",
       "shapes": [
         "panel",
         "twin"
@@ -292,7 +292,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
-      "role-sha": "5bb27d79c42a",
+      "role-sha": "e43db65760fd",
       "shapes": [
         "single"
       ],

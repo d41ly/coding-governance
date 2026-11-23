@@ -8563,6 +8563,11 @@
       "file": "tools/loop/position.py"
     },
     {
+      "id": "check_refusal_arm",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_refusal_sites",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -13793,6 +13798,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "derive_refusal_kind",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "derive_refusal_reason",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -15938,6 +15948,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "extract_upstream_item",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "extract_work_order_parts",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -17216,6 +17231,11 @@
       "id": "load_reference_reader",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "load_refusal_arm",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "load_registry",
@@ -20578,6 +20598,11 @@
       "file": "tools/run-gates/run-held-wsl.sh"
     },
     {
+      "id": "print_refusal_route",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "print_registry",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -21316,6 +21341,11 @@
       "id": "read_anchor_unit",
       "kind": "function",
       "file": "tools/loop/claim.py"
+    },
+    {
+      "id": "read_answered_work_order",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "read_api",
@@ -29928,6 +29958,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "render_refusal_arm",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "render_refusal_recipe",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -32551,6 +32586,11 @@
       "id": "resolve_recorded_introduced",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "resolve_refusal_route",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "resolve_registry",

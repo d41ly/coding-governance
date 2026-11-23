@@ -90,4 +90,6 @@ wider prose, and anything outside the findings you were handed, out of what you 
 ## Return
 
 Return one object holding these fields, in this order: outcome (one of reported); report (a path); items (a list).
+
+Or refuse, returning outcome: refused; rule (text); remedy (text); actor (one of self, producer, driver, owner, build:<slug>).
 [/.claude/agents/gov-synthesizer.md]

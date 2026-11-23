@@ -90,4 +90,6 @@ the question you were handed, out of what you write and return.
 ## Return
 
 Return one object holding these fields, in this order: outcome (one of picked, none); candidates (a list); pick (text, optional); reason (text).
+
+Or refuse, returning outcome: refused; rule (text); remedy (text); actor (one of self, producer, driver, owner, build:<slug>).
 [/.claude/agents/gov-researcher.md]
