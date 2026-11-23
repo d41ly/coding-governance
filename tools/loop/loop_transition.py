@@ -84,12 +84,17 @@ answered, its record's `State` reading `expired`.
 THE NOTICES (KICK-dKeptSession-7 S4, S9). On a move from designing to building, after the card follow,
 `write_dependency_notices` posts the build's frozen interfaces to each dependent `dependents --build <slug>`
 lists, every build whose README's `parents:` names it: the driver's `--mail post <slug> --to
-build:<dependent> --kind confirmed --subject "interfaces <slug>" --interface <listing>`, the listing the
-bytes of `git ls-tree -r` over the build's `spec/` folder at the transition commit (at HEAD where the set
-makes none) and the body that commit's sha, `changed` where the dependent's mailbox already holds a
-`confirmed` of that subject from the build. A dependent whose mailbox does not read gets nothing and one
-`loop: notice · unread · <dependent> · <why>` line; a failed post prints its line; neither fails the move.
-`--fixture --plant deps-notices` holds both notices' keys over a two-build scratch.
+build:<dependent> --kind confirmed --subject "interfaces <slug>" --interface <listing> --pass <n>`, the
+listing the bytes of `git ls-tree -r` over the build's `spec/` folder at the transition commit (at HEAD
+where the set makes none), the body that commit's sha, and `<n>` the Design-exit ordinal, one plus the
+moves from designing to building the build recorded before this one (KICK-dKeptSession-35 S1), so a
+later exit is never refused as a repeat of an earlier one; `changed` where the dependent's mailbox
+already holds a `confirmed` of that subject from the build. A dependent whose mailbox does not read gets
+nothing and one `loop: notice · unread · <dependent> · <why>` line; a failed post prints its line and,
+where it exits non-zero, `notice — not posted <kind> to build:<dependent> · rc <n> · <its first line>`;
+neither fails the move. `--fixture --plant deps-notices` holds both notices' keys over a two-build
+scratch, `notices-two-dependents` six posts to two dependents over three Design exits, their passes 1, 2
+and 3, and `notices-refused` the refused post's line under a move that still records.
 
 Exit: `record` 0 recorded, 1 refused by the table or held by open mail; `check` 0 clean, 1 on a finding, `pending` or
 `unstored`; `dependents` 0 with one slug per line. Both exit 2 printing `loop: unanswered · <why>` on a value outside its grammar, a witness
@@ -206,7 +211,12 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
           "mail-no-bash": "the driver's conf and resolve_bash answering None: B4 refused as mail unknown, no commit",
           "deps-notices": "the driver's conf with RUN_CLAIMS on, a bare remote and tDep naming tFix in parents: B5 at "
                           "an older --witness posts one confirmed to build:tDep keyed over tFix's spec listing at the "
-                          "transition commit; B8 back and B5 again post changed with another key, no second confirmed"}
+                          "transition commit; B8 back and B5 again post changed with another key, no second confirmed",
+          "notices-two-dependents": "the driver's conf with RUN_CLAIMS on, a bare remote and dA and dB naming tFix in "
+                                    "parents: B5, B21 back, B5, B21 back and B5, each exit over a new spec, post one "
+                                    "confirmed and two changed to each, passes 1, 2 and 3, every post posted",
+          "notices-refused": "the same two dependents and the post to dA answering 1: B5 records, printing "
+                             "notice — not posted confirmed to build:dA · rc 1, and dB's post is posted"}
 #: The mail plants' messages, each `(ref, build, id, to, kind, subject, answers)`, put straight on the fixture's
 #: remote; `mail-disposed` adds the ack. `mail-expired` writes the question with `FX_DEADLINE`'s two keys and
 #: its first sighting `FX_SIGHTED_HOURS` back in the fixture's feed, past the 30-hour deadline.
@@ -230,6 +240,8 @@ FX_SPEC = "memory/builds/tFix/spec/2026-01-01-spec-%s.md" % FX_UNIT
 #: and the session its posts run as.
 FX_DEPENDENT = "tDep"
 FX_SESSION = "s-notice"
+#: The two dependents of the `notices-` plants (KICK-dKeptSession-35 AC1, AC3), each README naming `FX_BUILD`.
+FX_DEPENDENTS = ("dA", "dB")
 
 
 # ------------------------------------------------------------------------------------------ the grammar
@@ -647,13 +659,16 @@ def check_parent_interfaces(root, slug, parent):
     return (rc, line) if rc in (0, 1) else (2, line)
 
 
-def write_dependency_notices(root, build, commit):
+def write_dependency_notices(root, build, commit, ordinal):
     """The notices of `build`'s frozen interfaces (KICK-dKeptSession-7 S4): per dependent of `read_dependents`,
     one post of `derive_interface_listing` at `commit` as its interface and `commit`'s full sha as its body,
-    `--mail post <build> --to build:<dependent> --kind <kind> --subject "interfaces <build>"`, `<kind>` `changed`
-    where `read_mail_rows` over the dependent holds a `confirmed` row from `build` with that subject, else
-    `confirmed`. -> the posts' lines; a read answering unarmed or raising, or a raising `read_dependents`,
-    posts nothing to whom it covers and adds one `loop: notice · unread · <whom> · <why>`. Never raises."""
+    `--mail post <build> --to build:<dependent> --kind <kind> --subject "interfaces <build>" --pass <ordinal>`,
+    `<kind>` `changed` where `read_mail_rows` over the dependent holds a `confirmed` row from `build` with that
+    subject, else `confirmed`, and `ordinal` the Design-exit ordinal its caller counts (KICK-dKeptSession-35
+    S1), so two exits never share a message id. -> the posts' lines, and after a post exiting non-zero one
+    `notice — not posted <kind> to build:<dependent> · rc <n> · <the post's first line>`; a read answering
+    unarmed or raising, or a raising `read_dependents`, posts nothing to whom it covers and adds one
+    `loop: notice · unread · <whom> · <why>`. Never raises."""
     import subprocess
     from breakpoints import run_sourced   # it imports this module at its top, so here
     subject = "interfaces %s" % build
@@ -686,13 +701,18 @@ def write_dependency_notices(root, build, commit):
             kind = "changed" if any(r.get("kind") == "confirmed" and r.get("from-build") == build
                                     and r.get("subject") == subject for r in rows) else "confirmed"
             try:
-                _rc, out = run_sourced(root, '( load_driver_conf && main --mail post "$2" --to "$3" --kind "$4" '
-                                             '--subject "$5" --interface "$6" "$7" )',
-                                       args=(build, "build:%s" % dependent, kind, subject, listing.as_posix(),
-                                             body.as_posix()), timeout=MAIL_GUARD_SECONDS)
+                rc, out = run_sourced(root, '( load_driver_conf && main --mail post "$2" --to "$3" --kind "$4" '
+                                            '--subject "$5" --interface "$6" "$7" "$8" "$9" )',
+                                      args=(build, "build:%s" % dependent, kind, subject, listing.as_posix(),
+                                            "--pass", str(ordinal), body.as_posix()), timeout=MAIL_GUARD_SECONDS)
             except (LookupError, OSError, subprocess.TimeoutExpired) as e:
-                out = "%s: notice · %s · the post did not answer: %s" % (SAY, dependent, str(e) or type(e).__name__)
-            said += [ln.rstrip("\r") for ln in out.splitlines() if ln.strip()]
+                said.append("%s: notice · %s · the post did not answer: %s" % (SAY, dependent, str(e) or type(e).__name__))
+                continue
+            lines = [ln.rstrip("\r") for ln in out.splitlines() if ln.strip()]
+            said += lines
+            if rc != 0:   # a refused post stays visible (KICK-dKeptSession-35 S3); the move stands
+                said.append("notice — not posted %s to build:%s · rc %d · %s" % (
+                    kind, dependent, rc, lines[0] if lines else "no output"))
     finally:
         remove_tree(top)
     return said
@@ -714,8 +734,11 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     per `item-ended` order or one `loop: composition · unread · <why>`, after a `loop: scenario · unread`
     line where the scenario composition is unarmed, then the build card follow's `card —` lines
     (`write_card_follow`, TOOL-dPlacedRequest-2 S4), a `loop: mail · unarmed` line first where the mailbox
-    was not read, and on a move from designing to building the notices' lines last, each dependent's post or
-    its `loop: notice · unread` line (`write_dependency_notices`, KICK-dKeptSession-7 S4). TransitionRefused where no row holds the move, `MailHeld` where a message addressed to the
+    was not read, and on a move from designing to building the notices' lines last, each dependent's post,
+    carrying `--pass <n>`, `<n>` one plus the moves from designing to building in `before` (KICK-dKeptSession-35
+    S1), then a `notice — not posted <kind> to build:<dependent> · rc <n> · <its first line>` line where the
+    post exits non-zero, or its `loop: notice · unread` line (`write_dependency_notices`, KICK-dKeptSession-7
+    S4). TransitionRefused where no row holds the move, `MailHeld` where a message addressed to the
     build is open; ValueError on a value, witness, index, policy read, tag resolver, scenario conflict or
     unknown mailbox refused, writing no record; LookupError where a kit it reads does not resolve."""
     from composition import PINNED, derive_composition_revision, read_step_composition, write_ended_orders
@@ -905,9 +928,11 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     # the build's card follows the move, its last step (TOOL-dPlacedRequest-2 S4); the move stands whatever it prints
     said += write_card_follow(root, build, to, to in read_transition_rows(data, where)["terminal"])
     # Design's exit posts the frozen interfaces to each dependent (KICK-dKeptSession-7 S4), the listing at the
-    # transition commit, at HEAD where the set makes none; the move stands whatever a notice prints
+    # transition commit, at HEAD where the set makes none; the move stands whatever a notice prints. Its pass
+    # is the Design-exit ordinal, counted off `before`, read above, never a second read (KICK-dKeptSession-35 S1)
     if (state, to) == ("designing", "building"):
-        said += write_dependency_notices(root, build, commit or "HEAD")
+        ordinal = 1 + sum((m.get("from"), m.get("to")) == ("designing", "building") for m in before)
+        said += write_dependency_notices(root, build, commit or "HEAD", ordinal)
     return move, commit, wrote, render_transition_line(move) if "micro-format" in chosen else None, said
 
 
@@ -1025,26 +1050,28 @@ def write_transition_plant(top, case):
         files[".governance/policy.toml"] = "[transitions]\nrecord = %s\n" % PLANT_SETS[case]
     if case == "descope-spent":
         files[".governance/policy.toml"] = "[flow]\nrework-budget = 0\n"
-    if case.startswith("mail-") or case == "deps-notices":   # the driver's conf, RUN_CLAIMS on, as the placement plants copy it
+    notices = case == "deps-notices" or case.startswith("notices-")
+    if case.startswith("mail-") or notices:   # the driver's conf, RUN_CLAIMS on, as the placement plants copy it
         src = next((d for d in (KIT, *KIT.parents) if (d / ".unattended.conf").is_file()), None)
         if src is None:
             raise LookupError("the mail plants copy .unattended.conf from this tree, which holds none")
         files[".unattended.conf"] = (src / ".unattended.conf").read_text(encoding="utf-8") + \
             '\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="on"\n'
-    if case == "deps-notices":   # KICK-dKeptSession-7 AC7: the second build, its README naming tFix a parent
-        files["memory/builds/%s/README.md" % FX_DEPENDENT] = (
+    # KICK-dKeptSession-7 AC7: the second build, its README naming tFix a parent; KICK-dKeptSession-35 AC1, AC3: two
+    for dependent in (FX_DEPENDENT,) if case == "deps-notices" else FX_DEPENDENTS if notices else ():
+        files["memory/builds/%s/README.md" % dependent] = (
             "---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: TOOL\nids: TOOL-%s-1\nparents: %s\n"
-            "---\n# %s\n" % (FX_DEPENDENT, FX_DEPENDENT, FX_BUILD, FX_DEPENDENT))
+            "---\n# %s\n" % (dependent, dependent, FX_BUILD, dependent))
     write_fixture_files(top, files)
     run_fixture_git(top, "add", "-A")
     run_fixture_git(top, "commit", "-q", "-m", "fixture")
-    if case in ("mail-open", "mail-disposed", "mail-expired", "deps-notices"):   # a bare remote inside the git dir, so the scratch's removal takes it too
+    if case in ("mail-open", "mail-disposed", "mail-expired") or notices:   # a bare remote inside the git dir, so the scratch's removal takes it too
         from placement import write_fixture_gov_ref
         origin = top / ".git" / "fx-origin.git"
         run_fixture_git(top, "init", "-q", "--bare", "--template=", str(origin))
         run_fixture_git(top, "remote", "add", FIXTURE_REMOTE, str(origin))
         run_fixture_git(top, "push", "-q", FIXTURE_REMOTE, "main")
-        for ref, *mail in () if case == "deps-notices" else (FX_QUESTION, FX_ACK) if case == "mail-disposed" else (FX_QUESTION,):
+        for ref, *mail in () if notices else (FX_QUESTION, FX_ACK) if case == "mail-disposed" else (FX_QUESTION,):
             write_fixture_gov_ref(top, ref, render_fixture_mail(*mail, **(FX_DEADLINE if case == "mail-expired" else {})))
         if case == "mail-expired":
             # its first sighting, the six-field line `claim.py`'s stale-holder plant writes for a lease: the commit
@@ -1168,6 +1195,80 @@ def run_transition_fixture(case):
         if case == "deps-notices":   # KICK-dKeptSession-7 AC7: Design's exits notify the dependent
             misses = run_notice_plant(top, witness)
             print("%s: fixture · deps-notices · %s" % (SAY, "held" if not misses else "MISSED " + "; ".join(misses)))
+            return 0 if not misses else 1
+        if case in ("notices-two-dependents", "notices-refused"):   # KICK-dKeptSession-35 AC1, AC3: each plant
+            # rebinds the launcher the writer imports inside its function, recording every post, and restores it
+            import os
+            import breakpoints
+            from placement import read_fleet_user
+            real, posts, refused = breakpoints.run_sourced, [], "build:%s" % FX_DEPENDENTS[0]
+            b5 = ["record", *at, *BACKWARD_MOVES[1], "--witness", "HEAD"]
+            b21 = ["record", *at, "--from", "building", "--item", "item.build.unit-pass", "--outcome",
+                   "interface-change", "--witness", "HEAD"]
+
+            def run_recorded_post(repo, script, *rest, **kw):
+                """The landed launcher, each post's argv, exit and output recorded; under `notices-refused` the
+                first post to dA answers 1 and launches nothing."""
+                if "--mail post" not in script:
+                    return real(repo, script, *rest, **kw)
+                argv = [str(a) for a in kw.get("args", ())]
+                if case == "notices-refused" and argv[1:2] == [refused] and not any(p[0][1] == refused for p in posts):
+                    got = (1, "mail — duplicate 000000000000 · the plant's refusal\n")
+                else:
+                    got = real(repo, script, *rest, **kw)
+                posts.append((argv,) + tuple(got))
+                return got
+            kept = {k: os.environ.get(k) for k in ("USERNAME", "CLAUDE_CODE_SESSION_ID")}
+            os.environ.update(USERNAME=read_fleet_user(), CLAUDE_CODE_SESSION_ID=FX_SESSION)
+            breakpoints.run_sourced = run_recorded_post
+            exits, rows = [], {}
+            try:
+                for n in range(2, 5 if case == "notices-two-dependents" else 3):   # each exit over a new spec
+                    if n > 2:   # B21, back into designing on an interface change
+                        exits.append(run_verb(b21))
+                    uid = "TOOL-%s-%d" % (FX_BUILD, n)
+                    write_fixture_files(top, {"memory/builds/%s/spec/2026-01-0%d-spec-%s.md" % (FX_BUILD, n, uid):
+                                              "# %s — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n" % uid})
+                    write_commit("a spec of %s" % uid)
+                    exits.append(run_verb(b5))
+                for dependent in FX_DEPENDENTS if case == "notices-two-dependents" else ():
+                    _rc, out = real(top, '( load_driver_conf && main --mail read "$2" )', args=(dependent,),
+                                    timeout=MAIL_GUARD_SECONDS)
+                    held = [ln.rstrip("\r").split("\t") for ln in out.splitlines() if ln.count("\t") >= 13]
+                    held = [r for r in held if r[2] == "build:%s" % dependent and r[6] == "interfaces %s" % FX_BUILD]
+                    rows[dependent] = sorted(held, key=lambda r: int(r[11]) if r[11].isdigit() else 0)
+            finally:
+                breakpoints.run_sourced = real
+                for k, v in kept.items():
+                    if v is None:
+                        os.environ.pop(k, None)
+                    else:
+                        os.environ[k] = v
+            said = {}
+            for dependent, held in rows.items():   # each row's pass, read off its commit, column 10
+                said[dependent] = [(r[1], (re.findall(r"^pass: (\S+)$", run_fixture_git(top, "log", "-1", "--format=%B",
+                                                                                      r[9]), re.M) or ["none"])[0])
+                                   for r in held]
+                print("%s: fixture · %s · %s" % (SAY, dependent, " · ".join("%s pass %s" % k for k in said[dependent])
+                                                   or "no row"))
+            print("%s: fixture · posts %d · %s" % (SAY, len(posts), " · ".join(
+                "%s rc %d" % (p[0][1], p[1]) for p in posts) or "none"))
+            posted = [p for p in posts if any(ln.startswith("mail — posted ") for ln in p[2].splitlines())]
+            if case == "notices-two-dependents":
+                owed = [("confirmed", "1"), ("changed", "2"), ("changed", "3")]
+                checks = ((exits == [0] * 5, "the five moves exited %s" % exits),
+                          (len(posts) == 6 and len(posted) == 6, "%d of %d posts printed mail — posted, owed 6 of 6"
+                           % (len(posted), len(posts))),
+                          (all(said.get(d) == owed for d in FX_DEPENDENTS), "the rows read %s, owed %s to each"
+                           % (said, owed)))
+            else:
+                checks = ((exits == [0], "the move exited %s" % exits),
+                          ([p[0][1] for p in posts if p[1] == 1] == [refused], "the refused posts are %s, owed %s"
+                           % ([p[0][1] for p in posts if p[1] == 1], refused)),
+                          ([p[0][1] for p in posted] == ["build:%s" % FX_DEPENDENTS[1]], "the posted ones are %s"
+                           % [p[0][1] for p in posted]))
+            misses = [why for ok, why in checks if not ok]
+            print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
             return 0 if not misses else 1
         if case == "mail-open":   # KICK-dKeptSession-5 AC6: the open question refuses B4, writing nothing
             before = read_count()
@@ -1403,7 +1504,14 @@ def run_selftest():
              ("mail-no-bash", fx("mail-no-bash"), 2, "%s: unanswered · mail unknown: no bash that can see " % SAY,
               "unattended.sh"),
              ("mail-no-bash commits", fx("mail-no-bash"), 2, "%s: fixture · commits unchanged" % SAY, ""),
-             ("deps-notices", fx("deps-notices"), 0, "%s: fixture · deps-notices · held" % SAY, "")]
+             ("deps-notices", fx("deps-notices"), 0, "%s: fixture · deps-notices · held" % SAY, ""),
+             ("notices-two-dependents", fx("notices-two-dependents"), 0,
+              "%s: fixture · notices-two-dependents · held" % SAY, ""),
+             ("notices-two-dependents passes", fx("notices-two-dependents"), 0, "%s: fixture · %s · " % (
+                 SAY, FX_DEPENDENTS[1]), "confirmed pass 1 · changed pass 2 · changed pass 3"),
+             ("notices-refused", fx("notices-refused"), 0, "%s: fixture · notices-refused · held" % SAY, ""),
+             ("notices-refused line", fx("notices-refused"), 0,
+              "notice — not posted confirmed to build:%s · rc 1 · " % FX_DEPENDENTS[0], "mail — duplicate")]
     return run_selftest_cases(run_cached_case, cases, "%s: transition selftest" % SAY)
 
 

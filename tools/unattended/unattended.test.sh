@@ -18135,6 +18135,42 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# KICK-dKeptSession-35 AC2 — A RE-LANDING IS A NEW `landed`. KICK-dKeptSession-7 AC8's fixture, tRun's
+# LANDING record beside tDep, lands twice: the first `--landed` posts its notice; the fixture is built
+# again for the second, which clears the origin's claim refs, so one more empty commit makes the two
+# landed shas differ and the mail ref the first post wrote is put back on the origin, where the second
+# post's duplicate check reads it. Each notice passes its landing's sha8 as `--pass`, so the second is
+# posted, never refused, and `--mail read tDep` lists two `landed` rows whose commits' `pass:` lines
+# read the two sha8s in landing order. STAGED: a scratch copy of the driver dropping `--pass`, whose
+# second landing prints `mail — duplicate`; RED, observed at the close. WHAT THIS BLOCK DOES NOT DRIVE:
+# the in-place exit, whose call is the same function.
+# ==================================================================================================
+kd35_ref=refs/gov/mail/tRun/a/fixture-session
+write_landed_dependent
+kd35_one=$(git rev-parse HEAD)
+kd35_out=$(USERNAME=daily-agent bash "$SCRIPT" --landed tRun 2>&1)
+kd35_mail=$(git --git-dir="$ORIGIN" rev-parse -q --verify "$kd35_ref")
+same "KDS35 AC2 the first landing posts its notice on the session's mail ref" \
+  "$(grep -c '^mail — posted ' <<<"$kd35_out") ${kd35_mail:+held}" "1 held"
+remove_claim_landing
+write_landed_dependent
+git commit -q --allow-empty -m "the second landing" --no-verify; git push -q -f origin HEAD:main
+kd35_two=$(git rev-parse HEAD)
+[ -z "$kd35_mail" ] || git --git-dir="$ORIGIN" update-ref "$kd35_ref" "$kd35_mail"
+kd35_out=$(USERNAME=daily-agent bash "$SCRIPT" --landed tRun 2>&1); kd35_rc=$?
+same "KDS35 AC2 the second landing exits 0 and posts its notice, neither refused nor a duplicate" \
+  "$kd35_rc $(grep -c '^mail — posted ' <<<"$kd35_out") $(grep -c '^mail — duplicate \|^notice — not posted ' <<<"$kd35_out")" "0 1 0"
+kd35_rows=$(USERNAME=daily-agent bash "$SCRIPT" --mail read tDep 2>/dev/null | awk -F'\t' '$2 == "landed" { print $12 "\t" $10 }' | sort -n | cut -f2)
+kd35_pass=""
+for kd35_c in $kd35_rows; do kd35_pass="$kd35_pass $(git log -1 --format=%B "${kd35_c%$'\r'}" -- 2>/dev/null | sed -n 's/^pass: //p')"; done
+same "KDS35 AC2 tDep holds two landed messages, each row's commit passing its landing's sha8" \
+  "$kd35_pass" " ${kd35_one:0:8} ${kd35_two:0:8}"
+remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"; reset_tree
+
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-13 — THE CHANGE FEED. One subshell drives the `gov_feed_sh` block the driver
 # carries, sourced above with it, over the suite's bare origin and a second clone of it: GOVFEED_DIR
 # names a fresh scratch dir, so no earlier arm's claim write is in the feed, and the cache namespace is
@@ -24970,7 +25006,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4162 -> 4170 by KICK-dKeptSession-7 on 2026-11-23: the landed-notice and witness-read blocks' 8
 # region-eight `same` (AC8 3, AC11 5), each unconditional and outside any loop, off the diff's own lines;
 # no skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4170
+# RAISED 4170 -> 4173 by KICK-dKeptSession-35 on 2026-11-23: the re-landing block's 3 region-eight `same`
+# (AC2 3), each unconditional and outside any loop, off the diff's own lines; no skip branch. No suite
+# ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4173
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25265,7 +25304,8 @@ FLOOR_SHARD_7=311
 # RAISED 1354 -> 1373 by KICK-dKeptSession-21: the same 19 region-eight notice assertions, see FLOOR_ASSERTIONS.
 # RAISED 1373 -> 1379 by KICK-dKeptSession-6: the same 6 region-eight ring assertions, see FLOOR_ASSERTIONS.
 # RAISED 1379 -> 1387 by KICK-dKeptSession-7: the same 8 region-eight landed-notice and witness-read assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1387
+# RAISED 1387 -> 1390 by KICK-dKeptSession-35: the same 3 region-eight re-landing assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1390
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
