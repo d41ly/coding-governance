@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-24 — every landed commit that touches a record appended to the change feed
 
-**Status:** DEFERRED · rev-2 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-2 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0235@dba1fb83 whole
 
@@ -15,6 +15,7 @@
 | [2026-11-22-build-TOOL-dTotalRecall-24-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-24-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-24-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-24-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-24-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-24-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-24-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-24-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
