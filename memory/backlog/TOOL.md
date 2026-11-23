@@ -439,10 +439,10 @@ Cite ids, never line numbers.
 | [TOOL-dBoundRoles-74](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE plan WORKFLOW HAS NO LOOP ROW. TOOL-dBoundRoles-1 S4 adds the plan… |
 | [TOOL-dBoundRoles-75](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE BREAKER'S BUDGET DRAW HAS NO DRAWER. cl-dClosedLoop-0327 has an act… |
 | [TOOL-dBoundRoles-76](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE. TOOL-dWitnessedBar-84 S9 put… |
-| [TOOL-dBoundRoles-77](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | THE COMPOSE VERB READS NO FRONT-MATTER KIND. TOOL-dBoundRoles-20 §8 F8… |
-| [TOOL-dBoundRoles-78](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | A SCALAR CANNOT WIDEN AS IT RISES. TOOL-dBoundRoles-20 §8 F8 (ii): a… |
-| [TOOL-dBoundRoles-79](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | THE EXCLUSION WALK COMPARES TAGS THE REQUIRERS DO NOT SPELL.… |
-| [TOOL-dBoundRoles-80](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | AN ADOPTER RULE TYPES ONLY A LEVEL-0 UNIT. TOOL-dBoundRoles-19 §8 F4:… |
+| [TOOL-dBoundRoles-77](../builds/dBoundRoles/BACKLOG.md) | SPECCED | MED | TOOL-dBoundRoles-81 | 2026-11-23 | THE COMPOSE VERB READS NO FRONT-MATTER KIND. TOOL-dBoundRoles-20 §8 F8… |
+| [TOOL-dBoundRoles-78](../builds/dBoundRoles/BACKLOG.md) | SPECCED | MED | TOOL-dBoundRoles-82 | 2026-11-23 | A SCALAR CANNOT WIDEN AS IT RISES. TOOL-dBoundRoles-20 §8 F8 (ii): a… |
+| [TOOL-dBoundRoles-79](../builds/dBoundRoles/BACKLOG.md) | SPECCED | MED | TOOL-dBoundRoles-83 | 2026-11-23 | THE EXCLUSION WALK COMPARES TAGS THE REQUIRERS DO NOT SPELL.… |
+| [TOOL-dBoundRoles-80](../builds/dBoundRoles/BACKLOG.md) | SPECCED | MED | TOOL-dBoundRoles-85 | 2026-11-23 | AN ADOPTER RULE TYPES ONLY A LEVEL-0 UNIT. TOOL-dBoundRoles-19 §8 F4:… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | DEFERRED | MED | TOOL-dCalibratedLens-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
@@ -475,7 +475,7 @@ Cite ids, never line numbers.
 | [TOOL-dDeclaredLoop-114](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-16 | A NUMERIC PATCH DIRECTION FOR THE CLASSIFIER. TOOL-dDeclaredLoop-33's… |
 | [TOOL-dDeclaredLoop-118](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | AN ITEM ROW MAY NAME A PROGRAM OUTSIDE THE FIVE STEPS.… |
 | [TOOL-dDeclaredLoop-119](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | AN ITEM THAT WRITES NO RECORD KIND HAS NO RETURNS VALUE.… |
-| [TOOL-dDeclaredLoop-120](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | THE ITEM ACTOR TAKES NO REPOSITORY ROLE. TOOL-dBoundRoles-20 §8 F8… |
+| [TOOL-dDeclaredLoop-120](../builds/dDeclaredLoop/BACKLOG.md) | SPECCED | MED | TOOL-dBoundRoles-84 | 2026-11-23 | THE ITEM ACTOR TAKES NO REPOSITORY ROLE. TOOL-dBoundRoles-20 §8 F8… |
 | [TOOL-dDerivedDocket-38](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/run-gates/run-selftests.sh SELECTS SUITES ONLY BY A --kit <dir>… |
 | [TOOL-dDerivedDocket-39](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | govkit's requires_if SELECTS NO KIT AT APPLY. Its one reader is… |
 | [TOOL-dDerivedDocket-40](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO LEASE-MATRIX ROW NAMES WHO REACHES IT, AND NOTHING COUNTS ROWS… |
