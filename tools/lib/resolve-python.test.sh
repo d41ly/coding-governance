@@ -1320,11 +1320,12 @@ for (const line of require("fs").readFileSync(0, "utf8").split("\n").filter(Bool
 # ---- 2o. THE BASELINE LEDGER FACTORY, BEHAVIOUR (TOOL-dWitnessedBar-13) ------------------------------
 # Parity holds the two kit copies to the canonical; this holds the canonical's CLI to the spec's AC1 to
 # AC4, AC9 and AC10 over one fixture repo whose `main` sits on a bare remote it has fetched, so
-# `resolve_compare_base` resolves, with every edit made on a branch off it and reset after its arm. Four
+# `resolve_compare_base` resolves, with every edit made on a branch off it and reset after its arm. Five
 # registrations: `fx-sites` (site, shrink-only) and `fx-refs` (record, append-only, `ref` verbatim) in
-# tools/fx/kit.toml, `fx-keys` (key, declared-set, `ref` verbatim) in the fixture's govkit registry, and
-# `fx-recall` (key, append-only) in scripts/recall/kit.toml, outside the directory holding the other
-# kit. Then AC7: one byte changed in a scratch copy of the gate-lint copy reads as drift through `blk`.
+# tools/fx/kit.toml, `fx-keys` (key, declared-set, `ref` verbatim) and `fx-merged` (record over `path`,
+# `section` and `check`, shrink-only, `section` verbatim, shaped as the merged legacy registration of
+# TOOL-dTotalRecall-52) in the fixture's govkit registry, and `fx-recall` (key, append-only) in
+# scripts/recall/kit.toml, outside the directory holding the other kit. Then AC7: one byte changed in a scratch copy of the gate-lint copy reads as drift through `blk`.
 # WHAT THIS DOES NOT CHECK: a ledger merge, merge-rows.test.sh's group 1l; and AC8, the two scanners'
 # own legs at the pass tip. A registration's `seed` argv is run by the seed cases at this part's end.
 T=$'\t'
@@ -1350,11 +1351,14 @@ mkdir -p "$LLR/tools/fx" "$LLR/tools/$LL_DEPLOYER" "$LLR/scripts/recall" "$LLR/m
 { printf 'id = "fx"\n\n'; build_ll_table fx-sites site '"path", "delimiter"' shrink-only memory/project/fx-sites.txt
   build_ll_table fx-refs record '"ref", "note"' append-only memory/project/fx-refs.txt '"ref"'; } > "$LLR/tools/fx/kit.toml"
 build_ll_table fx-keys key '"ref"' declared-set memory/project/fx-keys.txt '"ref"' > "$LLR/tools/$LL_DEPLOYER/registry.toml"
+build_ll_table fx-merged record '"path", "section", "check"' shrink-only memory/project/fx-merged.txt '"section"' >> "$LLR/tools/$LL_DEPLOYER/registry.toml"
 build_ll_table fx-recall key '"name"' append-only memory/project/fx-recall.txt > "$LLR/scripts/recall/kit.toml"
 { build_ll_ledger fx-sites site path,delimiter shrink-only; printf 'a.sh\tEOF\t2\tabcdef12\tseeded\nc.sh\tEOF\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-sites.txt"
 { build_ll_ledger fx-refs record ref,note append-only; printf 'y:7\tnote\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-refs.txt"
 { build_ll_ledger fx-keys key ref declared-set; printf 'x:120\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-keys.txt"
 { build_ll_ledger fx-recall key name append-only; printf 'alpha\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-recall.txt"
+{ build_ll_ledger fx-merged record path,section,check shrink-only
+  printf 'a.md\tspec-audit\tkind-schema\t1\tabcdef12\tseeded\na.md\t-\tcauses\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-merged.txt"
 printf 'echo the a script\n' > "$LLR/a.sh"; printf 'echo the c script\n' > "$LLR/c.sh"
 git -C "$LLR" add -A && git -C "$LLR" -c user.email=t@e -c user.name=t commit -q --no-verify -m fixture \
   && git -C "$LLR" remote add origin ../remote.git && git -C "$LLR" push -q origin main 2>/dev/null \
@@ -1397,6 +1401,17 @@ git -C "$LLR" update-ref -d refs/remotes/origin/main
 out=$(run_ll compare fx-sites); git -C "$LLR" fetch -q origin
 { grep -q 'unresolved — no origin/main ref to compare against' <<<"$out" && [ "${out##*$'\n'}" = rc=1 ]; } \
   || bad "2o AC3: a compare with no base did not print unresolved and its reason: ${out//$'\n'/ | }"; ok
+# The case `merged-home-gained` (TOOL-dTotalRecall-59 S3, AC3): `shrink-only` over the merged
+# registration's triple key, where the fixture's base holds `fx-merged`'s two-row home. A planted third
+# `causes` row is named gained; the unchanged home names none. RED against a triple-keyed row the base
+# home lacked passing `shrink-only`.
+printf 'b.md\t-\tcauses\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-merged.txt"
+out=$(run_ll compare fx-merged); run_ll_reset
+{ grep -qxF "fx-merged (shrink-only): gained b.md${T}-${T}causes" <<<"$out" && [ "${out##*$'\n'}" = rc=1 ]; } \
+  || bad "2o merged-home-gained: a causes row the base home lacked was not named gained with rc=1: ${out//$'\n'/ | }"; ok
+out=$(run_ll compare fx-merged)
+{ ! grep -q 'gained' <<<"$out" && [ "${out##*$'\n'}" = rc=0 ]; } \
+  || bad "2o merged-home-gained: the merged home unchanged from its base named a gain or did not exit 0: ${out//$'\n'/ | }"; ok
 # AC4 — a staged rename carried, then compared clean; an untracked home is never written.
 git -C "$LLR" mv a.sh b.sh
 out=$(run_ll carry fx-sites)
