@@ -9,11 +9,21 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dQuietDisk-20=OPEN TOOL-dQuietDisk-21=OPEN TOOL-dQuietDisk-22=OPEN TOOL-dQuietDisk-23=OPEN TOOL-dQuietDisk-24=OPEN TOOL-dQuietDisk-25=OPEN TOOL-dQuietDisk-27=CLOSED TOOL-dQuietDisk-29=OPEN TOOL-dQuietDisk-30=OPEN TOOL-dQuietDisk-31=OPEN TOOL-dQuietDisk-32=OPEN TOOL-dQuietDisk-33=DEFERRED TOOL-dQuietDisk-34=OPEN TOOL-dQuietDisk-35=OPEN TOOL-dQuietDisk-38=OPEN TOOL-dQuietDisk-39=OPEN TOOL-dQuietDisk-40=OPEN TOOL-dQuietDisk-41=OPEN TOOL-dQuietDisk-42=OPEN TOOL-dQuietDisk-43=OPEN TOOL-dQuietDisk-44=OPEN TOOL-dQuietDisk-45=OPEN TOOL-dQuietDisk-46=OPEN TOOL-dQuietDisk-47=OPEN TOOL-dQuietDisk-48=OPEN TOOL-dQuietDisk-49=OPEN TOOL-dQuietDisk-50=OPEN TOOL-dQuietDisk-51=OPEN TOOL-dQuietDisk-52=OPEN
+units-at-landing: TOOL-dQuietDisk-1 TOOL-dQuietDisk-14 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-10 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-18 TOOL-dQuietDisk-28 TOOL-dQuietDisk-6 TOOL-dQuietDisk-11 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-26 TOOL-dQuietDisk-17 TOOL-dQuietDisk-9 TOOL-dQuietDisk-19 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37
+hold-run: 
+hold-streak: 1 · at 90563a6f
+resume-owed: none · owner
+held-at: 2026-11-23T12:46:30Z
+hold-reason: the work is sound and the flagged bar's reds are hand-attributed (36 inherited from main's held run, 3 own fixed in 602294909/8dbcc3586/864d8fa5d, 1 flake), but this build edits run-gates.sh, so its own bar reads every red OWN by KF3 and it cannot land itself (SESSION-KICKOFF correction 2026-11-08): the owner decides landing over the parked item
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 gates-run: unattended-179540992358805920005-2030153 87fdd849
-refreshed-at: a315474f499e99df0c72b9df9204ed01194bf57b · park · 4 touching
+refreshed-at: a315474f499e99df0c72b9df9204ed01194bf57b · handoff · 4 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: a19951cd998524932e849650675c48b18729b0b8
-phase: VERIFYING
+witness: 90563a6f5daed4d3e56a8cd0992538745f5f64ae
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/disk-churn-fixes-40450b
@@ -192,3 +202,7 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-23T10:44:27Z decision · item brief item 23: the R1 to R8 design rules and the G-A and G-B budgets · reason they change governance carriers a run may not change (BUILD-METHOD M3 veto 2); filed as asks TOOL-dQuietDisk-20 and the G-A/G-B asks for the owner
 
 2026-11-23T12:46:05Z decision · item landing over the flagged bar's KF3 reds · reason the flagged close (GATE_FULL=1 GATE_SELFTESTS=1) over 87fdd8497 read 40/226 red and labelled all OWN by KF3 because run-gates.sh is in the diff, so no re-run can read INHERITED. Hand attribution: 36 legs red on main's held run 45023650426 at 35d0dc3f (govkit selftest 96 FAILs, policy fixtures 2 wrong and upgrade-walk measured identical at origin/main 4b5054df); selftest harness self-test OWN, fixed 602294909; loop factories fixtures OWN with a third policy-fixtures wrong (TOOL-dQuietDisk-8's sparse snapshot), fixed 8dbcc3586; kickoff-manifest ratchet re-stamped 864d8fa5d; run-gates turnstile a flake (2 of 4 runs pass at HEAD, 2 of 2 at main, different arms each failure). Options: land as is through the owner hand-off recipe (prepare, close with the gates-green override this attribution supports, one land with the hooks off), or re-run the flagged bar first
+
+2026-11-23T12:46:32Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dQuietDisk && bash tools/push-main.sh --land --slug dQuietDisk && bash tools/unattended/unattended.sh --settle dQuietDisk
+
+2026-11-23T12:46:32Z hold · item owner-decision · reason until owner · reaped c0718341 · resume none(owner)
