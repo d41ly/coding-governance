@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-56 — the alias census keeps the pinned departures instrument's `journal` compare by its path-keyed row, never by a marker in its bytes
 
-**Status:** DEFERRED · rev-5 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-6 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -23,39 +23,53 @@ The round-1 spec audit of units 44 to 53
 (`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md`)
 confirmed finding **id 15 at HIGH**. It shares item **H1** with ids 4, 24 and 37, which
 `TOOL-dTotalRecall-57`, `TOOL-dTotalRecall-58` and `TOOL-dTotalRecall-55` close.
-`TOOL-dTotalRecall-53` S22 widens the alias census to `memory/builds/*/build/*.py` and keeps the
-pinned departures instrument's compare,
-`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py:380`
-(`if read_serves(text, fam_re)[0] != "journal":`, read at base `462d20f3`), with the reason
-`pinned instrument`. S34 then makes that keep an in-file marker, and AC22 observes it. The file's
-blob, `30a1f15b`, is one of the packet's instrument pins, which only the owner's
-`packet.py --repin` moves, and the file sits outside this build's write set. Marking line 380 moves
-a pinned blob; leaving it unmarked leaves the census with no disposition for it. This unit keeps
-that hit by the path-keyed row `TOOL-dTotalRecall-55` mints. It repairs `TOOL-dTotalRecall-53`.
+`TOOL-dTotalRecall-53` (CLOSED at `6db81d070`) widened the alias census to the build folders' Python
+scripts. It keeps the pinned departures instrument's compare,
+`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py:380` at blob
+`30a1f15b` (`if read_serves(text, fam_re)[0] != "journal":`, read at HEAD `69d8787a3`), with the
+reason `pinned instrument`. That blob is one of the packet's `INSTRUMENTS`
+(`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py#INSTRUMENTS`), which
+only the owner's `packet.py --repin` moves, and the file sits outside this build's write set. Unit
+53's marker, read through `tools/memory-tree/id_grammar.py#read_kept_reason`, keeps only hits under
+the tool root, so it left this hit in the file-keyed constant
+`tools/memory-tree/record_kinds.py#ALIAS_COMPARE_KEPT`, as its only row. So at HEAD the hit is kept
+and not red: what the audit asked for still stands, a second file-keyed constant beside the cause
+census's. This unit keeps that hit by the path-keyed row `TOOL-dTotalRecall-55` mints and ends the
+constant. It repairs `TOOL-dTotalRecall-53`.
 
 ## 2. Scope (IN)
 
-- **S1** — The alias census reads the table. `check_alias_compares` in
-  `tools/memory-tree/record_kinds.py` keeps a hit in a file under `memory/builds/*/build/` only when
-  `tree_lib.read_kept_path("check_alias_compares", path)` answers for it, and prints `kept <reason>`.
-  Such a hit is red otherwise. Observed by AC1 and AC2.
+- **S1** — The alias census reads the table. In `record_kinds.py#check_alias_compares`, the build
+  folders' walk keeps a hit only when `tree_lib.read_kept_path("check_alias_compares", path)` answers
+  for its file, and prints `kept <reason>`. That replaces the test `path in ALIAS_COMPARE_KEPT`. An
+  unkept hit stays red, as unit 53 built it. Its red message names `CENSUS_KEPT_PATHS` where it now
+  names `ALIAS_COMPARE_KEPT`. The record-kinds fixture gains the plant `unkept-build-alias`: a
+  build-folder script with a raw compare below its `tree_lib.py#BIND_HEAD_LINES` head and no row.
+  Observed by AC1 and AC2.
 - **S2** — The row. `CENSUS_KEPT_PATHS` gains
-  `("check_alias_compares", "<the deviations.py path>", "pinned instrument")`. The ask S22 files in
-  `memory/builds/dClosedLoop/BACKLOG.md`, asking the owner to compare through `canonical_kind` and
-  repin, stands as written. The row moves out of `ALIAS_COMPARE_KEPT`, whose last row it is after
-  unit 53, so the constant ends at this pass. Observed by AC1 and AC4.
+  `("check_alias_compares", "<the deviations.py path>", "pinned instrument")`. The row moves out of
+  `ALIAS_COMPARE_KEPT`, which ends at this pass, together with every spelling of it in
+  `record_kinds.py`: the constant and its comment, the module docstring's alias-census paragraph,
+  `check_alias_compares`'s docstring, its keep test and its red message. At HEAD `69d8787a3` no other
+  file under `tools/` names it (`git grep -ln ALIAS_COMPARE_KEPT -- tools`). `build_fixture`'s alias
+  plants write only under the fixture's tool root (`record_kinds.py#ALIAS_PLANTS`), so nothing plants
+  under the constant's key. Unit 53 filed the owner's ask as `PLAY-dClosedLoop-1003` in
+  `memory/builds/dClosedLoop/BACKLOG.md`: compare through `tree_lib.resolve_kind` and repin. It stays
+  as written. Its accept clause, "the alias census's pinned-instrument row for it is gone", still
+  reads true once the row sits in `tree_lib.py`. Observed by AC1, AC3 and AC4.
 
 ## 3. Non-goals (OUT)
 
 - The table, its accessor and the cause census's rows: `TOOL-dTotalRecall-55`'s.
-- The ask row and the widened alias population: `TOOL-dTotalRecall-53` S22's.
-- The marker for a file under `tools/`: S34's.
-- Editing `deviations.py` or moving its pin: the owner's.
+- The ask row and the widened alias population: `TOOL-dTotalRecall-53` S22's, built.
+- The marker for a file under `tools/`: `TOOL-dTotalRecall-53` S34's, built.
+- Editing `deviations.py`, moving its pin or rewording its ask: the owner's.
 
 ### Edges
 
-- **consumes-from** `TOOL-dTotalRecall-53` — S22's alias census over the build folders and its ask,
-  and S34's marker, which cannot be written into this pinned file
+- **consumes-from** `TOOL-dTotalRecall-53` — S22's build-folder walk in `check_alias_compares` and
+  its ask `PLAY-dClosedLoop-1003`, and S34's marker (`id_grammar.py#read_kept_reason`), which keeps
+  only tool-root hits and left this pinned file's hit as `ALIAS_COMPARE_KEPT`'s only row
 - **consumes-from** `TOOL-dTotalRecall-55` — `CENSUS_KEPT_PATHS` and `read_kept_path`; without them the
   hit has no keep outside the file's bytes
 - **consumes-from** `TOOL-dTotalRecall-61` — S2 as that unit amends it in step 19, so this pass moves the last row of `ALIAS_COMPARE_KEPT` into the table (the round-1 audit of units 54 to 60, id 1)
@@ -69,10 +83,15 @@ that hit by the path-keyed row `TOOL-dTotalRecall-55` mints. It repairs `TOOL-dT
 
 ### The census read
 
-`check_alias_compares` asks `read_kept_path` for any hit whose path matches `memory/builds/*/build/`
-before it reports the hit red, exactly as `check_cause_writers` does after `TOOL-dTotalRecall-55`.
-A hit under `tools/` is kept by S34's marker alone; the table is consulted only for the build
-folders.
+The build folders' walk of `check_alias_compares` asks `read_kept_path` about each hit before it
+reports the hit red, as `check_cause_writers` does after `TOOL-dTotalRecall-55`. It keeps the two
+walks it has at HEAD. The tool-root walk is kept by S34's marker alone and never reads the table, and
+the build folders' walk never reads a marker. The table is a module constant of the real
+`tree_lib.py`, so the fixture's tree holds no row for its plant. The plant
+`unkept-build-alias` writes one script under `memory/builds/<FIXTURE_BUILD>/build/`. Its compare of
+`sorted(KIND_ALIASES)[0]` sits past the binding head, the token spelled at plant time as
+`ALIAS_PLANTS` spells it. It joins `PLANTS` and `run_selftest`'s `want`, red naming
+`alias-compare` and the script's `path:line`.
 
 ### Inventory
 
@@ -93,6 +112,9 @@ sequences the passes; this one follows unit 55.
   55's table already holds.
 - **Exclude the build folders from the alias census.** It drops the population S22 added for id 36,
   so a future build-folder compare against `journal` would pass unread.
+- **Plant the fixture's script at the row's own path, to show it kept.** The fixture would then read
+  the live table's contents and break when the owner's repin drains the row; AC1 observes the kept
+  row on the real tree.
 
 ## 5. Production-readiness checklist
 
@@ -100,32 +122,39 @@ sequences the passes; this one follows unit 55.
 - perf / scale — one tuple lookup per build-folder hit.
 - error / empty / loading states — an unkept build-folder compare is red and named.
 - observability — the kept hit prints `pinned instrument`.
-- risks — the row stands until the owner repins; S22's ask carries the change that drains it.
+- risks — the row stands until the owner repins; the ask `PLAY-dClosedLoop-1003` carries the change
+  that drains it.
 - testing — AC1 to AC4 by the pass; the arm of §7 at the close.
 - migration — none.
 - user docs — none under `help/`.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `check_alias_compares` from `record_kinds.py` runs at the pass tip, it lists
-  `deviations.py:380` as `kept pinned instrument`, and `git grep -c "census: kept"` over that file
-  prints `0`.
+- **AC1** — When `python record_kinds.py --check` runs from `tools/memory-tree/` at the pass tip, its
+  census lists the deviations instrument's line 380 as `kept pinned instrument` and reds no
+  build-folder hit. And `git grep -c "census: kept" -- memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py`
+  prints nothing and exits 1.
   Red when: the hit is red, or is kept by a marker written into the instrument.
-- **AC2** — When the record-kinds fixture plants `unkept-build-alias`, a build-folder script that
-  compares a `KIND_ALIASES` key raw with no row, `python record_kinds.py --check` run from
-  `tools/memory-tree/` exits 1 naming that line.
-  Red when: a build-folder hit with no row passes.
+  fixture: at HEAD `69d8787a3` the hit already prints `kept pinned instrument`, read from
+  `ALIAS_COMPARE_KEPT`, so this is a regression check and AC4 is the red-first one.
+- **AC2** — When `python record_kinds.py --fixture --plant unkept-build-alias` runs from
+  `tools/memory-tree/`, it exits 1 with a `RED alias-compare` line naming the planted script's
+  `path:line`. That script is a build-folder script that compares a `KIND_ALIASES` key raw and has no
+  row.
+  Red when: a build-folder hit with no row passes, or the plant is refused (exit 2, its reading at
+  HEAD `69d8787a3`).
 - **AC3** — When `git hash-object` runs on the deviations instrument at the pass tip, it prints
   `30a1f15bf67566aeaf5b7e1628483c630b23b416`, the packet's pin.
   Red when: the pass wrote into the pinned file.
 - **AC4** — When `git grep -n ALIAS_COMPARE_KEPT -- tools` runs at the pass tip it prints nothing.
-  Red when: the constant survives.
+  Red when: the constant or any spelling of it survives. At HEAD `69d8787a3` it prints
+  `record_kinds.py`'s lines.
 
 ## 7. Gates
 
-`memory hygiene` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
+`memory hygiene` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `record-kinds`
 
-New arm: tools/memory-tree/record_kinds.py · covers AC2 · the plant `unkept-build-alias`, staged by skipping the table read · none
+New arm: tools/memory-tree/record_kinds.py · covers AC2 · `--selftest`'s `want` gains the plant `unkept-build-alias`, staged by the build folders' walk keeping every hit · none
 
 ## 8. Open questions
 
@@ -147,13 +176,25 @@ New arm: tools/memory-tree/record_kinds.py · covers AC2 · the plant `unkept-bu
   `2026-11-22-prompt-TOOL-dTotalRecall-61-build-spec-writer`: the row moves out of `ALIAS_COMPARE_KEPT`,
   its last after unit 53, so the constant ends at this pass; AC4 observes it gone, §3 gains the hands-off
   to unit 57, and §5's testing line counts AC4.
+- rev-6 · 2026-11-23 · §1 · S1 S2 · §3 · §4 · §5 · AC1 AC2 AC4 · §7 · §10 · re-grounded over HEAD
+  `69d8787a3` per `2026-11-23-prompt-TOOL-dTotalRecall-56-reground-spec-writer`: unit 53 CLOSED at
+  `6db81d070` keeps the hit by `ALIAS_COMPARE_KEPT`, not a marker, so §1 says the hit is kept today and
+  S1's red stays an observation. S2 names every spelling of the constant, its ask
+  `PLAY-dClosedLoop-1003` and `tree_lib.resolve_kind`. AC1 reads `--check` and its `git grep -c`
+  printing nothing, exit 1. AC2 reads `--fixture --plant`. §7 adds `record-kinds` and stages the arm
+  by the walk keeping every hit. §4 gains the fixture's design and a rejected alternative; §10
+  re-runs the probe.
 
 ## 10. Reuse audit
 
 The seam extended is `check_alias_compares` (`TOOL-dTotalRecall-40` S2, widened by
-`TOOL-dTotalRecall-53` S22), read through `TOOL-dTotalRecall-55`'s `read_kept_path`, the one table of
-keeps outside a file's bytes. `python tools/codebase-map/reuse_lookup.py "keep a census hit in a file that cannot be edited"`
-ranked name-stem neighbours (`hit`, `census`, `corpus_files`) and no path-keyed keep list, so the
+`TOOL-dTotalRecall-53` S22), whose build folders' keep test reads `TOOL-dTotalRecall-55`'s
+`read_kept_path`, the one table of keeps outside a file's bytes. The fixture extends
+`record_kinds.py#build_fixture` and `run_selftest` by one plant beside `ALIAS_PLANTS`.
+`python tools/codebase-map/reuse_lookup.py "keep a census hit in a file that cannot be edited"`,
+re-run on 2026-11-23, ranks name-stem neighbours (`hit`, `census`, `write_fixture_files`,
+`corpus_files`) and no path-keyed keep list. Its one keep-named file,
+`tools/unattended/fix_keeps.py`, prints a fix pass's kept write set, not a census's kept hits. So the
 table unit 55 mints is the seam and no other fits.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a record written by a pinned instrument given its cause and kept green by the causes check" --terms "Caused-by causes legacy-records backfill instrument pinned repin departures record_causes census kept"`

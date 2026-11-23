@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-57 — a path-keyed keep row is admitted only for a file no pass may edit, so every editable file is kept by the one marker
 
-**Status:** DEFERRED · rev-5 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-6 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -23,24 +23,43 @@ The round-1 spec audit of units 44 to 53
 (`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md`)
 confirmed finding **id 4 at HIGH**. It shares item **H1** with ids 15, 24 and 37, which
 `TOOL-dTotalRecall-56`, `TOOL-dTotalRecall-58` and `TOOL-dTotalRecall-55` close.
-`TOOL-dTotalRecall-53` S34 makes one in-file marker the keep for the three code censuses, and its
-AC34 reds any remaining file-keyed exemption. Nothing in S34 exempts a file that cannot carry the
-marker, so the unit must either move pinned blobs or fail AC34. `TOOL-dTotalRecall-55` gives those
-files a path-keyed row outside their bytes. A path-keyed row is the very exemption S34 retired,
-though, and with no bound on it any file could be kept by a row again. This unit bounds the table to
-the files the marker cannot reach and re-observes AC34 under that carve-out. It repairs
-`TOOL-dTotalRecall-53`.
+`TOOL-dTotalRecall-53` S34, built at `6db81d070`, makes one in-file marker,
+`<lead> census: kept <census> <reason>` read by `id_grammar.py#read_kept_reason`, the keep for the
+three code censuses under the tool root. A build-folder script cannot carry it: the pinned
+instruments among them would move their blob, and all of them sit outside this build's write set. So
+unit 53 left their rows in `record_causes.py#CAUSE_WRITER_KEPT` and
+`record_kinds.py#ALIAS_COMPARE_KEPT`, and its AC34 reads every remaining row as a file under
+`memory/builds/*/build/`. `TOOL-dTotalRecall-55` and `TOOL-dTotalRecall-56` move those rows to one
+path-keyed table outside the files' bytes and end both constants. A path-keyed row is the very
+exemption S34 retired under the tool root, though, and with no bound on the table any file could be
+kept by a row again. This unit bounds the table to the files the marker cannot reach and re-observes
+AC34 under that carve-out. It repairs `TOOL-dTotalRecall-53`.
 
 ## 2. Scope (IN)
 
-- **S1** — The domain rule. `read_kept_path` in `tools/memory-tree/tree_lib.py` refuses, by name, any
-  `CENSUS_KEPT_PATHS` row whose path does not match `memory/builds/*/build/*`, the files the README's
-  write rule (README:50) and the packet's non-goals put outside every pass of this build. The refusal
-  reaches both censuses as a red finding naming the row and the remedy `mark the kept line with
-  # census: kept`. Observed by AC1.
+- **S1** — The domain rule. `read_kept_rows` in `tools/memory-tree/tree_lib.py`, the table's one
+  reader (`TOOL-dTotalRecall-55` S1, which `read_kept_path` reads through), raises `ValueError` for
+  any row of the table it reads whose path does not match `KEPT_PATH_DOMAIN`,
+  `memory/builds/*/build/*`, the files the README's write rule (README:49) and the packet's non-goals
+  put outside every pass of this build. `check_cause_writers` (`tools/memory-tree/record_causes.py`)
+  and `check_alias_compares` (`tools/memory-tree/record_kinds.py`) each call it once, before their
+  build-folder walk, whatever hits that walk finds. On the refusal a census appends it to its reds,
+  naming the row and the remedy `mark the kept line # census: kept <census> <reason>`, and walks on
+  with an empty table, so every build-folder hit it finds reads unkept. So `--check` exits 1 with a
+  finding, never 2 as a refusal (`record_causes.py#run_check` maps a `ValueError` out of the census
+  to exit 2) nor a traceback (`record_kinds.py#check_record_kinds` catches no `ValueError` around the
+  alias census). Observed by AC1 and AC3.
 - **S2** — AC34 under the carve-out. At the tip no constant named `ALIAS_COMPARE_KEPT` or
   `CAUSE_WRITER_KEPT` exists under `tools`, and every row of `CENSUS_KEPT_PATHS` names a file under
-  `memory/builds/*/build/`. So a file under `tools/` is kept by S34's marker only. Observed by AC2.
+  `memory/builds/*/build/`. So a file under `tools/` is kept by S34's marker only. Unit 53 already
+  narrowed both constants to build-folder rows, and units 55 and 56 end them, so S2 writes nothing:
+  it is an observation, AC2 kept as its check. Observed by AC2.
+- **S3** — The planted row. `check_alias_compares` takes `kept`, defaulting to
+  `tree_lib.CENSUS_KEPT_PATHS`, and passes it to the reader as `table`; its local count `kept` takes
+  another name. `TOOL-dTotalRecall-55` S2 already threads `kept` through `check_cause_writers` and
+  `run_check`, the way both take `pinned` (`record_causes.py#run_check`,
+  `record_causes.py#check_pinned_plant`), so on that side S3 is an observation. A fixture or probe
+  plants a row without writing the module. Observed by AC1 and AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -51,10 +70,9 @@ the files the marker cannot reach and re-observes AC34 under that carve-out. It 
 
 ### Edges
 
-- **consumes-from** `TOOL-dTotalRecall-55` — `CENSUS_KEPT_PATHS` and `read_kept_path`, whose rows this
-  unit bounds
-- **consumes-from** `TOOL-dTotalRecall-53` — S34's marker and AC34's retirement of the two constants,
-  which this unit re-observes under the carve-out
+- **consumes-from** `TOOL-dTotalRecall-55` — `CENSUS_KEPT_PATHS` and its one reader `read_kept_rows`,
+  with the `kept` argument of `check_cause_writers` and `run_check`, whose rows this unit bounds
+- **consumes-from** `TOOL-dTotalRecall-53` — S34's marker as built, `id_grammar.py#read_kept_reason`, and AC34's narrowing of both constants to build-folder rows, which this unit re-observes under the carve-out
 - **consumes-from** `TOOL-dTotalRecall-56` — S2's end of `ALIAS_COMPARE_KEPT`, since AC2 reads both constants gone (the round-1 audit of units 54 to 60, id 1)
 - **consumes-from** `TOOL-dTotalRecall-61` — the edge to unit 56 that unit writes in step 19, since AC2 reads both constants gone (the round-1 audit of units 54 to 60, id 1)
 - **hands-off** `TOOL-dTotalRecall-65` — `KEPT_PATH_DOMAIN`, which that unit keeps over its registry's rows (the round-1 audit of units 54 to 60, id 27)
@@ -69,65 +87,97 @@ the files the marker cannot reach and re-observes AC34 under that carve-out. It 
 ```python
 KEPT_PATH_DOMAIN = "memory/builds/*/build/*"
 
-def read_kept_path(census, path):
-    for c, p, reason in CENSUS_KEPT_PATHS:
+def read_kept_rows(census, table=CENSUS_KEPT_PATHS) -> dict:
+    for _c, p, _reason in table:
         if not fnmatch.fnmatchcase(p, KEPT_PATH_DOMAIN):
             raise ValueError(f"CENSUS_KEPT_PATHS row {p}: an editable file is kept by "
-                             "marking its line `# census: kept`")
-        ...
+                             "marking its line `# census: kept <census> <reason>`")
+    ...   # unit 55's body: the census's rows as {path: reason}
 ```
 
-The refusal is raised on every call, so either census reds on the first bad row whatever hit it was
-asked about, and the census reports it as a finding rather than aborting its walk.
+The whole table is read on every call, whatever census asked, so a bad row is refused by both. Each
+census asks once, before its build-folder walk:
+
+```python
+try:
+    tree_lib.read_kept_rows("check_alias_compares", kept)
+except ValueError as exc:
+    reds.append(f"alias-compare {exc}")
+    kept = ()
+```
+
+`check_cause_writers` does the same under its own census name and head. `tree_lib.py` imports
+`fnmatch` for the rule. What it does not check: whether a build-folder row's file exists, is tracked
+or is pinned (unit 55 S4 and unit 66 drain such rows); a row in the domain filed under the wrong
+census; and whether the README's write rule still names the build folders (unit 66 derives the
+domain from the memory root).
 
 ### Inventory
 
-Minted: `KEPT_PATH_DOMAIN` in `tools/memory-tree/tree_lib.py`; the fixture plant
-`kept-row-editable`. Naming cell: none, no function being minted.
+Minted: `KEPT_PATH_DOMAIN` in `tools/memory-tree/tree_lib.py`; the `kept` argument of
+`check_alias_compares`; the fixture plant `kept-row-editable` in `record_causes.py`, whose table is
+one `check_cause_writers` row naming a Python file in the `planted` folder under the fixture's tool
+root, passed to `run_check` as `kept`. Naming cell: none, no function being minted.
 
 ### Files touched (estimate)
 
 - `tools/memory-tree/tree_lib.py`
 - `tools/memory-tree/record_causes.py`
+- `tools/memory-tree/record_kinds.py`
 
 `TOOL-dTotalRecall-55`, `-56` and `-58` also write these modules at order 30, so BUILD-METHOD M6
 sequences the passes; this one follows units 55 and 56.
 
 ### Alternatives rejected
 
-- **Bound the rows by a list of pinned instruments.** Five of the eight files are unpinned and still
-  outside this build's write set; the folder glob is the rule the README states.
+- **Bound the rows by a list of pinned instruments.** Five of the eight cause files are unpinned
+  (`record_causes.py#CAUSE_WRITER_KEPT` keys them `outside the write set`) and still outside this
+  build's write set; the folder glob is the rule the README states.
 - **Leave the table unbounded.** A row would again keep an editable file without a marker, the
   two-grammar state S34 removed.
+- **Let the refusal leave the census.** `run_check` turns it into exit 2, a refused run naming no
+  finding, and the alias census would raise through `check_record_kinds`.
+- **Refuse only in `read_kept_path`, per hit.** A bad row would go unread in a walk that finds no
+  build-folder hit, and would red once per hit where it is read.
+- **Rebind `tree_lib.CENSUS_KEPT_PATHS` in the fixture.** The plant would share state with the table
+  it guards; a passed table is the shape `pinned` already has.
 
 ## 5. Production-readiness checklist
 
 - security — no new surface.
-- perf / scale — one glob match per row per call; the table holds nine rows.
-- error / empty / loading states — a row outside the domain is a red finding naming it.
+- perf / scale — one glob match per row per call; the table holds nine rows (DERIVED: the eight
+  `CAUSE_WRITER_KEPT` rows and the one `ALIAS_COMPARE_KEPT` row at HEAD `69d8787a3`).
+- error / empty / loading states — a row outside the domain is a red finding naming it; an empty
+  table fails AC2's probe rather than passing it.
 - observability — the finding prints the row's path and the remedy.
 - risks — an adopter's own build-folder scripts are admitted by the same glob, which is the folder
   shape the memory tree declares for every build.
-- testing — AC1 and AC2 by the pass; the arm of §7 at the close.
+- testing — AC1 to AC3 by the pass; the arm of §7 at the close.
 - migration — none.
 - user docs — none under `help/`.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `python record_causes.py --fixture --plant kept-row-editable` runs from
-  `tools/memory-tree/` and builds a fixture whose table holds a row naming a Python file directly
-  under the fixture's `tools/` folder, `--check` exits 1 naming that row and the marker remedy.
-  Red when: a row naming an editable file keeps it.
+  `tools/memory-tree/`, its `--check` reading a table whose one row names a Python file in the
+  `planted` folder under the fixture's tool root, it exits 1 and prints one `RED` line naming that row's path and
+  `census: kept`.
+  Red when: a row naming an editable file is read as a keep, or the refusal exits 2 or raises.
 - **AC2** — When `git grep -nE "ALIAS_COMPARE_KEPT|CAUSE_WRITER_KEPT" -- tools` runs at the pass tip it
-  prints nothing, and a `python -c` probe over `tree_lib.CENSUS_KEPT_PATHS` finds every path matching
-  `memory/builds/*/build/*`.
-  Red when: either retired constant survives, or a row names a file under `tools/`.
+  prints nothing, and `python -c "import fnmatch, tree_lib as t; bad = [p for _, p, _ in t.CENSUS_KEPT_PATHS if not fnmatch.fnmatchcase(p, 'memory/builds/*/build/*')]; print(bad); raise SystemExit(bool(bad) or not t.CENSUS_KEPT_PATHS)"`
+  run from `tools/memory-tree/` prints `[]` and exits 0. The glob is spelled, never read from
+  `KEPT_PATH_DOMAIN`, so the probe shares no state with the rule.
+  Red when: either retired constant survives, a row names a file outside the build folders, or the
+  table is empty.
+- **AC3** — When `python -c "import record_kinds as rk, tree_lib as t; from id_grammar import repo_root; _, reds = rk.check_alias_compares(repo_root(), rk.derive_tool_rel(rk.derive_kit_rel()), kept=t.CENSUS_KEPT_PATHS + (('check_alias_compares', 'tools/memory-tree/tree_lib.py', 'x'),)); print(len([r for r in reds if 'tools/memory-tree/tree_lib.py' in r and 'census: kept' in r]))"`
+  runs from `tools/memory-tree/` at the pass tip, it prints `1`.
+  Red when: the alias census honours, skips or raises on a row naming an editable file.
 
 ## 7. Gates
 
-`memory hygiene` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
+`memory hygiene` · `memory-hygiene self-test` · `record-kinds` · `record causes (causes and orphans over the legacy population)` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
 
-New arm: tools/memory-tree/record_causes.py · covers AC1 · the plant `kept-row-editable`, staged by skipping the domain match · none
+New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 · the plant `kept-row-editable` of `record_causes.py --fixture --plant <case>`, staged by skipping the domain match · none
 
 ## 8. Open questions
 
@@ -149,12 +199,21 @@ New arm: tools/memory-tree/record_causes.py · covers AC1 · the plant `kept-row
   `2026-11-22-prompt-TOOL-dTotalRecall-61-build-spec-writer`: §3 gains the consumes-from edge to unit 56,
   whose pass ends `ALIAS_COMPARE_KEPT` that AC2 reads gone, and §4's sequencing line follows units 55
   and 56.
+- rev-6 · 2026-11-23 · §1 S1 S2 S3 §3 §4 §5 AC1 AC2 AC3 §7 §10 · re-grounded at HEAD `69d8787a3` per
+  `2026-11-23-prompt-TOOL-dTotalRecall-57-reground-spec-writer`: the remedy spells unit 53's marker as
+  built; README:50 is README:49; the rule sits in unit 55's one reader `read_kept_rows`, asked once per
+  census before its build-folder walk, and each census catches it (a `ValueError` is exit 2 in
+  `run_check` and uncaught in the alias census), so `record_kinds.py` joins Files touched and AC3 observes
+  the alias side; S2 is an observation, unit 53 having narrowed both constants; S3 gives
+  `check_alias_compares` the `kept` argument unit 55 threads through the cause census; AC2's probe is
+  spelled; the arm names its suite and §7 the legs that run it and both censuses.
 
 ## 10. Reuse audit
 
-The seam extended is `read_kept_path` (`TOOL-dTotalRecall-55` S1), the one reader of the keep table,
-so the bound lives once and both censuses inherit it. `python tools/codebase-map/reuse_lookup.py "keep a census hit in a file that cannot be edited"`
-ranked name-stem neighbours and no existing bound on an exemption list; no existing seam fits for the
-domain rule beyond the accessor it sits in.
+The seam extended is `read_kept_rows` (`TOOL-dTotalRecall-55` S1), the one reader of the keep table,
+which `read_kept_path` reads through, so the bound lives once and both censuses inherit it; the
+planted table rides the `kept` argument unit 55 threads beside `pinned` (`record_causes.py#run_check`). `python tools/codebase-map/reuse_lookup.py "bound a path-keyed keep table to the files a census marker cannot reach"`
+ranked name-stem neighbours (`key`, `census`, `write_fixture_files`) and no existing bound on an
+exemption list; no existing seam fits for the domain rule beyond the accessor it sits in.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a record written by a pinned instrument given its cause and kept green by the causes check" --terms "Caused-by causes legacy-records backfill instrument pinned repin departures record_causes census kept"`
