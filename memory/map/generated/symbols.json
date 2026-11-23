@@ -1248,6 +1248,11 @@
       "file": "tools/playbook/overlay.py"
     },
     {
+      "id": "arm_adopter_rule_levels",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "arm_alias_copy",
       "kind": "function",
       "file": "tools/playbook/fixtures/composition.py"

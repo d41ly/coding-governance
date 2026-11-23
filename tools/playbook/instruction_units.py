@@ -48,8 +48,9 @@ by selector, and `render_unit` gives the line each loads as, a derived unit's fr
 
 THE STATEMENT GRAMMAR. Every loaded unit is one of `STATEMENT_TYPES`; `check_statement` grades a unit row
 against its type and `check_document` a rendered document for the four shapes that load without giving
-direction. An `adopter-rule` is an adopter's own rule carried as written, legal on a level-0 `repo` unit
-only, which `check_unit_row` holds it to. GRAMMAR grades every unit row `read_units` returns, `unarmed`
+direction. An `adopter-rule` is an adopter's own rule carried as written, legal on a level-0 `repo` unit,
+or a level-5 one under `budget = "block"`, the levels and budgets `ADOPTER_RULE_LEVELS` declares and
+`check_unit_row` holds it to. GRAMMAR grades every unit row `read_units` returns, `unarmed`
 while the tree holds none, every lock row whose `units` is non-empty through `check_document`, and the
 lock; `--doc` grades one document.
 
@@ -211,6 +212,8 @@ DERIVED_UNIT_KEYS = ("origin", "status")
 UNIT_REQUIRED = ("tag", "level", "type")
 UNIT_CLASSES = ("fixed", "open")
 BUDGET_BYTES = {"line": 200, "block": 600}
+#: Each level an `adopter-rule` may sit at -> the budget class it owes there, None for any (TOOL-dBoundRoles-85 S1).
+ADOPTER_RULE_LEVELS = {0: None, LEVELS.index("role"): "block"}
 TYPED_TYPES = (DIRECTIVE, CONSTRAINT, DEFINITION, POINTER, ADOPTER_RULE)
 #: A change record's `Action` values that end a tag; every other leaves it active.
 ENDING_ACTIONS = ("remove", "rename", "split")
@@ -945,9 +948,16 @@ def check_unit_row(unit, row, ns="unit") -> list[str]:
             add_red("tag", f"{unit.tag!r} is no tag of the `{ns}` namespace", f"spell it {ns}.<name>")
     if unit.type is not None and unit.type not in STATEMENT_TYPES:
         add_red("type", f"{unit.type!r} is no statement type", f"type it one of {', '.join(STATEMENT_TYPES)}")
-    if unit.type == ADOPTER_RULE and (ns != "repo" or unit.level != 0):
-        add_red("type", f"{unit.type!r} types a level-0 `repo` unit only",
-                f"type it one of {', '.join(t for t in STATEMENT_TYPES if t != ADOPTER_RULE)}")
+    if unit.type == ADOPTER_RULE:
+        owed = ADOPTER_RULE_LEVELS.get(unit.level, "-")
+        held = " or ".join(str(n) for n in ADOPTER_RULE_LEVELS)
+        if ns != "repo" or owed == "-":
+            add_red("type", f"{unit.type!r} types a `repo` unit at level {held}; this is a `{ns}` unit at level "
+                            f"{unit.level}",
+                    f"type it one of {', '.join(t for t in STATEMENT_TYPES if t != ADOPTER_RULE)}")
+        elif owed and unit.budget != owed:
+            add_red("budget", f"an {unit.type} at level {unit.level} owes budget {owed!r}, not "
+                              f"{unit.budget or 'line'!r}", f"give it budget = {owed!r}")
     if unit.budget is not None and unit.budget not in BUDGET_BYTES:
         add_red("budget", f"{unit.budget!r} is no budget class", f"use one of {', '.join(BUDGET_BYTES)}")
     limit = BUDGET_BYTES.get(unit.budget or "line")
@@ -2176,6 +2186,34 @@ def arm_schema(c):
                 " | ".join(lines))
 
 
+ADOPTER_LEVEL_CASES = (
+    # (the row's level, its budget or None, the namespace graded, the field its red names or None, the words it names)
+    (5, "block", "repo", None, ""),
+    (0, None, "repo", None, ""),
+    (3, "block", "repo", "type", "level 3"),
+    (5, "block", "unit", "type", "`unit`"),
+    (5, "line", "repo", "budget", "'block'"),
+    (5, None, "repo", "budget", "'block'"),
+)
+
+
+def arm_adopter_rule_levels(c):
+    """TOOL-dBoundRoles-85: an `adopter-rule` row read at the overlay's path passes at each level
+    `ADOPTER_RULE_LEVELS` holds under the budget owed there, and reds naming the field and value elsewhere."""
+    for level, budget, ns, field, words in ADOPTER_LEVEL_CASES:
+        tag = ".".join((ns, "house-fx"))
+        text = (f'{UNIT_HEADER}\ntag = "{tag}"\nlevel = {level}\ntype = "{ADOPTER_RULE}"\n'
+                + (f'budget = "{budget}"\n' if budget else "") + 'text = "Read the house file before the first edit."\n')
+        units, faults = parse_unit_rows(text, OVERLAY)
+        reds = [str(f) for f in faults] + (check_unit_row(units[0], tomllib.loads(text)["unit"][0], ns) if units else [])
+        said = f"a `{ns}` {ADOPTER_RULE} at level {level} under budget {budget or 'none'}"
+        if field is None:
+            c.check(f"{said} carries no red", not reds, " | ".join(reds))
+        else:
+            c.check(f"{said} reds `{field}` naming {words}",
+                    any(f"`{field}`" in r and words in r and tag in r for r in reds), " | ".join(reds) or "passed")
+
+
 def arm_one_fact(c):
     for rows, tags, what in ((ONE_FACT_ROWS, ("unit.a", "unit.b"), "two directives of one normalised text"),
                              (TWO_TERMS, ("unit.c", "unit.d"), "two definitions of one term")):
@@ -2809,7 +2847,7 @@ PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "state
           "document": arm_document, "lock": arm_lock, "row": arm_row, "row-removal": arm_row_removal,
           "two-kits": arm_two_kits,
           "unreadable": arm_unreadable, "arms": arm_arms, "render": arm_render, "extractor": arm_extractor,
-          "schema": arm_schema, "one-fact": arm_one_fact, "status": arm_status, "renderers": arm_renderers,
+          "schema": arm_schema, "adopter-rule-levels": arm_adopter_rule_levels, "one-fact": arm_one_fact, "status": arm_status, "renderers": arm_renderers,
           "regenerate-unclaimed": arm_regenerate_unclaimed,
           "work-order": arm_work_order, "slots": arm_slots, "legacy": arm_legacy,
           "git-env": arm_git_env, "cmd-source": arm_cmd_source, "envelope-missing": arm_envelope_missing,
