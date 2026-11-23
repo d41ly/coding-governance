@@ -85,6 +85,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every new Python text read or write, subprocess call included, names `encoding="utf-8"`. No shipped file spells a
   kit path literally: build a path from a variable or from the file's own location. Every code citation in a record
   names its full path. The pass legs red on each of these.
+- This is round two. Round one (`wf_12c923d2-cca`) built the whole unit, saved it as the patch
+  `C:/Users/d41ly/AppData/Local/Temp/claude/bf1faa02b154e3ee/b48c5b81-0c25-4457-90e8-da811a25e0e9/scratchpad/unit19-round1.patch`,
+  reset its tree and handed back the places the spec does not cover. The main loop decided each in
+  `build/2026-11-23-build-TOOL-dBoundRoles-19-3-main-loop-decision.md`, which binds over the spec as the owner's
+  ruling does: read it whole before you write. Start from that patch (`git apply --3way`), check it against this
+  dispatch's base, then add what the decision asks: `tools/check-spec-tokens.test.sh`'s SD8 AC2 block reading its
+  two spans from the overlay unit, the witness reading a unit's tag, and the step's before-image and receipt row
+  on gov's tree.
 - The owner ruled on 2026-11-23, "Build gaps here", and that ruling binds over this spec wherever it still says the
   unit waits on an ask: read `build/2026-11-23-build-TOOL-dBoundRoles-20-2-owner-ruling.md` whole before you write.
   Section 8 F4's pick moved from (a), wait on the ask, to (c), the change made here, and TOOL-dBoundRoles-85 made it
