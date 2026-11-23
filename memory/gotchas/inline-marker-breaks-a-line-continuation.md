@@ -43,7 +43,8 @@ continued lines:
 - `tools/roles/spawn-guard.test.sh` — the last-resort `git ls-files` fallback for locating the hook.
 
 The first two were caught because `check-wiring.test.sh` went from 92 arms passing to `91 passed,
-1 failed`. The third was caught by reading, not by a suite: `agent-cap.test.sh` reported
+1 failed`. The third was caught by reading, not by a suite: the hook's suite, now
+`tools/roles/spawn-guard.test.sh`, reported
 `215 passed, 0 failed` both before and after, because the fallback only fires at a prefix no fixture
 builds. The repair of the first two then reintroduced the class in its heredoc form, and the gate
 itself caught that by naming the same two lines as unmarked again.

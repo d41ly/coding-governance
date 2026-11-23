@@ -56,8 +56,8 @@ It bit again in the night pass two's closing review, 2026-10-19
 (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
 Folds landed in v2 and stopped there. The over-budget refusal survived in layer-instruction, layer-roles and the
 adopter record; `FANOUT_CAP` in the systems and adoption records; agent-cap as the slot counter in the review-system
-and adoption records; and the replaced fates of `agent-cap.js` and `gotchas.py`. dGroundRules also never carried the
-two agent-cap rules point 7's table gave it.
+and adoption records; and the replaced fates of the agent-cap hook, now `tools/roles/spawn-guard.js`, and `gotchas.py`.
+dGroundRules also never carried the two agent-cap rules point 7's table gave it.
 
 It bit again in the flow and roles adoption's closing review, 2026-10-19
 (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).

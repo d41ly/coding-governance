@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-44 — the round-1 audit's 11 docs-and-records minors: memory readers re-derived, frozen receipt waived, gotcha pages re-pointed, two Skills fitted, legacy registry named, workflow suites re-keyed and the close's harness swap checked
 
-**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dBoundRoles-27
+**Status:** CLOSED · rev-6 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,7 +13,10 @@
 | [2026-10-26-build-TOOL-dBoundRoles-43-round1-size-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-43-round1-size-return.md) | research | TOOL-dBoundRoles-3 TOOL-dBoundRoles-24 TOOL-dBoundRoles-43 |
 | [2026-10-26-build-TOOL-dBoundRoles-44-deviation-441.md](../build/2026-10-26-build-TOOL-dBoundRoles-44-deviation-441.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-44-deviation-442.md](../build/2026-10-26-build-TOOL-dBoundRoles-44-deviation-442.md) | deviation | — |
+| [2026-11-22-build-TOOL-dBoundRoles-44-2-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dBoundRoles-44-2-acceptance-ledger.md) | journal | — |
 | [2026-11-23-build-TOOL-dBoundRoles-44-1-main-loop-decision.md](../build/2026-11-23-build-TOOL-dBoundRoles-44-1-main-loop-decision.md) | journal | — |
+| [2026-11-23-build-TOOL-dBoundRoles-44-deviation-443.md](../build/2026-11-23-build-TOOL-dBoundRoles-44-deviation-443.md) | deviation | — |
+| [2026-11-23-build-TOOL-dBoundRoles-44-widen-13.md](../build/2026-11-23-build-TOOL-dBoundRoles-44-widen-13.md) | widen | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-20-spec-tokens-d-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-20-spec-tokens-d-brief.md) | journal | TOOL-dBoundRoles-20 TOOL-dBoundRoles-19 TOOL-dBoundRoles-18 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-50 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-44-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-44-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-44-fix-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-44-fix-1-spec-writer.md) | journal | — |

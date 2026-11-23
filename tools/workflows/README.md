@@ -788,11 +788,11 @@ under `workerType` in the review harness, and each harness logs one line per sta
 // unattended-build.js: specWriter, committer and disposal spawn here; builder travels in
 // dispatch.args to each unit; specFinder, skeptic and synthesis are forwarded to the audit's review call
 args: { repo, slug, scratch, units, roles: { specWriter: 'gov-spec-writer', disposal: 'gov-spec-writer',
-        builder: 'gov-builder', specFinder: 'gov-spec-reviewer', skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' } }
+        builder: 'gov-builder', specFinder: 'gov-reviewer', skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' } }
 // unattended-unit.js: its one key, with the `facts` list `handoff.py facts` prints beside it
 args: { ..., roles: { builder: 'gov-builder' }, facts: [{ name: 'input:prompt', ... }, { name: 'input:spec', ... }] }
 // tier2-review.js: its four keys, only the running kind's finder key read
-args: { repo, base, head, reviewDir, roles: { diffFinder: 'gov-diff-reviewer', specFinder: 'gov-spec-reviewer',
+args: { repo, base, head, reviewDir, roles: { diffFinder: 'gov-reviewer', specFinder: 'gov-reviewer',
         skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' } }
 ```
 
