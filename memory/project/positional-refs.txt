@@ -37528,3 +37528,6 @@ tools/workflows/tier2-review.test.sh	p.js:9	1	9e21ac760dc0a43d6ed007396922722cce
 tools/workflows/tier2-review.test.sh	security.js:1	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh32-pathless.js:3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh36-mid.js:2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+tools/memory-tree/check-memory-hygiene.test.sh	/asbuilt_view.py:2	1	60424d69e5b45453e89edd5ce4aa4711a3c08916	widened:2026-11-23-build-TOOL-dTotalRecall-49-widen-8
+memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-49-widen-8.md	/asbuilt_view.py:2	1	60424d69e5b45453e89edd5ce4aa4711a3c08916	widened:2026-11-23-build-TOOL-dTotalRecall-49-widen-9
+memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-49-widen-9.md	/asbuilt_view.py:2	1	60424d69e5b45453e89edd5ce4aa4711a3c08916	widened:2026-11-23-build-TOOL-dTotalRecall-49-widen-9
