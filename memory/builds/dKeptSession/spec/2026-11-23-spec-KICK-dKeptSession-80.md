@@ -12,6 +12,8 @@
 | [2026-11-23-build-KICK-dKeptSession-80-widen-4.md](../build/2026-11-23-build-KICK-dKeptSession-80-widen-4.md) | widen | — |
 | [2026-11-21-prompt-KICK-dKeptSession-80-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-80-build-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-80-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-80-1-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-80-2-builder.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-80-2-builder.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-80-reconcile-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-80-reconcile-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-80-spec-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-80-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
