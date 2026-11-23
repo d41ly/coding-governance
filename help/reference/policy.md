@@ -40,6 +40,9 @@ Whether a hook bypass is only recorded or also refused. Under both values each o
 hooks.bypass = "refused"
 ```
 
+## `deps.messaging`
+Documented on [help/loop.md](../loop.md).
+
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
 
@@ -309,7 +312,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (220)
+## Not yet summarised (219)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -330,7 +333,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `leases.offer-seconds`
 - `deps.coordination`
 - `deps.early-build`
-- `deps.messaging`
 - `landing.order`
 - `card.follows`
 - `placement`

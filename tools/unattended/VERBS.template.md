@@ -619,10 +619,18 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   otherwise; `content-key` the 12 hex digits `derive_gov_id --file` prints over the interface file,
   `none` on any other kind. The body is refused over
   4096 bytes (PINNED) or carrying a NUL or a control byte other than tab and newline, or holding a
-  line the record factory would read as a field or its `~~~~` fence. It prints ONE line: `mail —
-  posted <id> · <ref>` (exit 0); `mail — duplicate <id> · <ref>` or `mail — lost <id> · <ref> ·
-  <why>` (exit 1); or `mail — not written · <why>`, `mail — not written: no session id` or `mail —
-  off` (exit 2). `--mail read <who> [--open] [--ids]` reads a build's mailbox, `<who>` a slug, read
+  line the record factory would read as a field or its `~~~~` fence. It prints one outcome line:
+  `mail — posted <id> · <ref>` (exit 0), followed by one `ring —` line; `mail — duplicate <id> ·
+  <ref>` or `mail — lost <id> · <ref> · <why>` (exit 1); or `mail — not written · <why>`, `mail — not
+  written: no session id` or `mail — off` (exit 2). The ring comes only after the message is
+  written, so the mailbox is written first under every value of the `deps.messaging` policy key,
+  which picks the live channels it rings with the message's two fields, its mail ref and its id, and
+  nothing else: `live-and-mailbox` (the default) and `live-only` ring each live channel the harness
+  offers, none in this one, and print `ring — none · no live channel in this harness (stand-in
+  dWellOiledMachine)` until dWellOiledMachine's Runtime declares its doorbell point;
+  `mailbox-only` rings nothing and prints `ring — off (deps.messaging: mailbox-only)`. A
+  `deps.messaging` that does not read rings as `live-and-mailbox` under one `unattended: NOTE -`
+  line on stderr, and a ring never changes the post's exit. `--mail read <who> [--open] [--ids]` reads a build's mailbox, `<who>` a slug, read
   as `build:<slug>`, or one of the recipient forms: one bounded, pruned fetch of every build's mail
   refs into this node's cache, then one TAB row per message addressed to `<who>`, a build reading
   its units' messages too: `id`, `kind`, `to`, `state`, `first-seen`, `from-build`, `subject`,
@@ -651,7 +659,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   <path>@<sha> names no file this clone holds at that commit`, and an unreadable body file `mail —
   not written · the body file cannot be read: <file>`. Then it posts as an ack does, of kind `answer`
   to the asker's build with the question's subject, its body the file and one `cites <path>@<sha>`
-  line per cite in flag order, so the post's line and exits are the answer's. Each refusal exits 2
+  line per cite in flag order, so the post's lines and exits are the answer's. Each refusal exits 2
   writing nothing. `--cite` with no value prints `mail — not written · --cite takes a value`, the
   `post`, `read` and `ack` forms refuse it, and an `answer` with any other flag, or other than three
   words, prints its form. `--mail notice <slug> [--item <instance key>] [--local] [--ring <ref>

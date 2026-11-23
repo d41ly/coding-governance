@@ -23998,6 +23998,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_lease_policy",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_lease_renewal",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -35333,6 +35338,16 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "run_mail_ring",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "run_mail_ring",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_main",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -36316,6 +36331,11 @@
       "id": "run_rf31_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "run_ring_arm",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_rm",

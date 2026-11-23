@@ -40,7 +40,6 @@ deploy.runs
 deps.coordination
 deps.early-build
 deps.landing
-deps.messaging
 deps.on-parent-withdrawn
 design.coverage
 design.coverage.semantic

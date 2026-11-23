@@ -21339,6 +21339,76 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# KICK-dKeptSession-6 — A POST'S TAIL RINGS THE CHANNELS `deps.messaging` PICKS, WITH ONLY THE REF AND
+# THE ID. The lease fixture's clone c1, RUN_CLAIMS on and USERNAME daily-agent, so its fleet tag is
+# `a`, each post a `landed` one to build:fy on a session of its own; a value lands through
+# `write_lease_policy`. AC1: with no `deps.messaging` set the post's last two lines are its posted line
+# and `ring — none …`, exit 0; under `mailbox-only` its last line is `ring — off …`, exit 0. AC3: under
+# `live-only` the mail ref still moves on the origin and the ring line is `ring — none …`. AC2: a
+# sourced driver whose `run_mail_ring` is a recorder holds one call of two arguments, the ref and the
+# id, the origin already at the message commit when it runs; with `write_gov_ref` returning 1 the
+# recorder holds nothing and the post prints `mail — lost`, exit 1. AC4: a sourced driver whose
+# `read_lease_policy` refuses `deps.messaging` alone prints S2's NOTE naming the planted refusal and
+# the `live-and-mailbox` ring line, exit 0. RED, observed at the close, is the base driver, which
+# prints no ring line. WHAT THIS BLOCK DOES NOT DRIVE: a live channel, since this harness offers none
+# (the spec's F1); the texts and generated copies (AC5 to AC7), probed in the unit's acceptance ledger.
+# ==================================================================================================
+LF=$(mktemp -d); write_lease_fixture
+printf 'a message body\n' > "$LF/body.txt"
+mr_none='ring — none · no live channel in this harness (stand-in dWellOiledMachine)'
+run_ring_arm() { # session · subject -> the post's stdout and exit
+  ( cd "$LF/c1" && USERNAME=daily-agent CLAUDE_CODE_SESSION_ID=$1 GOV_RUNLOG=0 \
+      bash "$SCRIPT" --mail post tFix --to build:fy --kind landed --subject "$2" "$LF/body.txt" 2>/dev/null )
+}
+# ---- AC1
+mr_out=$(run_ring_arm r1 'ring default'); mr_rc=$?
+mr_ref=refs/gov/mail/tFix/a/r1; mr_id=$(sed -n 's/^mail — posted \([0-9a-f]*\) · .*/\1/p' <<<"$mr_out")
+same "KDS6 AC1 with no deps.messaging set the post ends in its posted line and the ring-none line, exit 0" \
+  "$mr_rc [$(tail -n 2 <<<"$mr_out" | tr '\n' '|')]" "0 [mail — posted ${mr_id:-unposted} · $mr_ref|$mr_none|]"
+write_lease_policy '[deps]
+messaging = "mailbox-only"'
+mr_out=$(run_ring_arm r2 'ring off'); mr_rc=$?
+same "KDS6 AC1 under mailbox-only the post's last line is the ring-off line, exit 0" \
+  "$mr_rc [$(tail -n 1 <<<"$mr_out")]" "0 [ring — off (deps.messaging: mailbox-only)]"
+# ---- AC3
+write_lease_policy '[deps]
+messaging = "live-only"'
+mr_out=$(run_ring_arm r3 'ring live'); mr_rc=$?
+same "KDS6 AC3 under live-only the mail ref still moves on the origin and the ring line is ring-none, exit 0" \
+  "$mr_rc $(git --git-dir="$LF/origin.git" for-each-ref --format=x refs/gov/mail/tFix/a/r3 | grep -c .) [$(tail -n 1 <<<"$mr_out")]" \
+  "0 1 [$mr_none]"
+# ---- AC2
+mr_got=$( cd "$LF/c1" || exit 1; export USERNAME=daily-agent CLAUDE_CODE_SESSION_ID=r4 GOV_RUNLOG=0
+  set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  run_mail_ring() { printf '%s ' "$#" "$@" "$(git ls-remote origin "$1" | cut -f1)" > "$LF/rec"; }
+  write_mail_post tFix build:fy landed 'ring recorded' none none none "$LF/body.txt" none >/dev/null; echo "$?" )
+mr_id=$(git --git-dir="$LF/origin.git" log -1 --format=%B refs/gov/mail/tFix/a/r4 -- 2>/dev/null | sed -n 's/^id: //p')
+same "KDS6 AC2 the recorder holds one call of the ref and the id, the origin already at the message commit" \
+  "$mr_got [$(cat "$LF/rec" 2>/dev/null)]" \
+  "0 [2 refs/gov/mail/tFix/a/r4 ${mr_id:-unposted} $(git --git-dir="$LF/origin.git" rev-parse --verify -q refs/gov/mail/tFix/a/r4) ]"
+rm -f "$LF/rec"
+mr_got=$( cd "$LF/c1" || exit 1; export USERNAME=daily-agent CLAUDE_CODE_SESSION_ID=r5 GOV_RUNLOG=0
+  set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  run_mail_ring() { printf '%s ' "$#" "$@" > "$LF/rec"; }
+  write_gov_ref() { return 1; }
+  mr_o=$(write_mail_post tFix build:fy landed 'ring lost' none none none "$LF/body.txt" none); echo "$? $(grep -c '^mail — lost ' <<<"$mr_o")" )
+same "KDS6 AC2 a lost write prints mail — lost, exit 1, and the recorder holds no call" \
+  "$mr_got $([ -e "$LF/rec" ] && echo rung || echo silent)" "1 1 silent"
+# ---- AC4
+mr_got=$( cd "$LF/c1" || exit 1; set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  eval "$(declare -f read_lease_policy | sed '1s/^read_lease_policy /read_lease_policy_once /')"
+  read_lease_policy() { [ "${1:-}" = deps.messaging ] || { read_lease_policy_once "$@"; return; }
+    LP_VALUE="a planted refusal"; printf '%s\n' "$LP_VALUE"; return 1; }
+  run_mail_ring refs/gov/mail/fx/a/s1 0123456789ab 2>&1; echo "rc=$?" )
+same "KDS6 AC4 a refused read prints one NOTE naming the key and the refusal, then the live-and-mailbox line, exit 0" \
+  "$mr_got" "unattended: NOTE - deps.messaging did not read, so the ring takes live-and-mailbox: a planted refusal
+$mr_none
+rc=0"
+rm -rf "$LF"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-18 — THE CADENCE SEGMENT IS THE TAG GRAMMAR'S. The sourced driver's
 # `check_cadence_segment` over the spec's probe set, each refusal naming its rule (AC1); the playbook
 # kit's `parse_tag` over each `unit.<name>`, a name admitted there when the tag reads as namespace
@@ -24835,7 +24905,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # (AC1 4, AC2 2, AC4 4, AC5 3, AC6 2, AC7 4), each unconditional and outside any loop, off the diff's
 # own lines; the KDS25 read-form arm re-armed for `[--local]` adds none. No skip branch. No suite ran,
 # and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4156
+# RAISED 4156 -> 4162 by KICK-dKeptSession-6 on 2026-11-23: the ring block's 6 region-eight `same`
+# (AC1 2, AC2 2, AC3 1, AC4 1), each unconditional and outside any loop, off the diff's own lines; no
+# skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4162
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25128,7 +25201,8 @@ FLOOR_SHARD_7=311
 # RAISED 1325 -> 1337 by KICK-dKeptSession-24: the same 13 region-eight deadline assertions less 1 retired, see FLOOR_ASSERTIONS.
 # RAISED 1337 -> 1354 by KICK-dKeptSession-25: the same 17 region-eight answer and wait assertions, see FLOOR_ASSERTIONS.
 # RAISED 1354 -> 1373 by KICK-dKeptSession-21: the same 19 region-eight notice assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1373
+# RAISED 1373 -> 1379 by KICK-dKeptSession-6: the same 6 region-eight ring assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1379
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
