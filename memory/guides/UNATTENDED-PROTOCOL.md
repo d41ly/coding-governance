@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.136 -->
+<!-- gov:kit unattended@1.137 -->
 [memory/guides/UNATTENDED-PROTOCOL.md · Level 3 · Binding for a run that merges and pushes with no owner turn; yields to levels 0 to 2]
 # Unattended runs — the protocol
 

@@ -14,3 +14,4 @@ tools/run-gates/run-gates.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d
 tools/runlog/adopt-runlog.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/unattended/adopt-unattended.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/unattended/lib-unattended.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/run-gates/run-selftests.sh	fixed-temp	1	40607fd2a4765daba384ddfd0917bea00d70ed80	widened:2026-11-22-build-TOOL-dQuietDisk-9-widen-26

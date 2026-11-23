@@ -73,6 +73,149 @@ import legacy_ledger as LL  # noqa: E402  the ledger factory, this kit's copy
 from build_records import derive_record_name, read_record, write_record  # noqa: E402  the record factory
 from tree_lib import parse_conf_line, read_policy_value  # noqa: E402  the kit's one conf line and policy read
 from seen_red import read_seen_red_records  # noqa: E402  the one seen-red record reader (unit 7)
+import atexit
+import contextlib
+import time
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
+# >>> owned_work_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# THE OWNED ROOT A PROCESS SITS IN: the nearest of `path` and its parents named `gate-work.*` and
+# holding an `owner` file, a bar's `$WORK` or a suite's own root (TOOL-dQuietDisk-9 S2).
+def resolve_owned_work(path):
+    """The owned `gate-work.*` directory at or above `path`, a pathlib.Path, or None."""
+    here = pathlib.Path(path).absolute()
+    for d in (here, *here.parents):
+        if d.name.startswith("gate-work.") and (d / "owner").is_file():
+            return d
+    return None
+# <<< owned_work_py
+
+# >>> owned_tempdir_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A PYTHON SUITE'S OWNED ROOT (TOOL-dQuietDisk-9 S2, S9). Nested in an owned root, a bar's or another
+# suite's, it takes that temp dir and makes nothing. Otherwise it sweeps each dead `py:` owner's root
+# of this repository, or of a common dir that names no directory, makes `gate-work.*` with an owner
+# line and `tmp`, points `tempfile` and the `TMPDIR`, `TEMP` and `TMP` its children read there, and
+# removes the whole root at exit. A kill leaves the root with its owner, for the next suite to sweep.
+def read_pid_alive(pid) -> bool:
+    """False only when `pid` is provably gone; any error reads as alive, so a sweep can only keep."""
+    if os.name == "nt":
+        # Never `os.kill` here: signal 0 on Windows is CTRL_C_EVENT, sent to the pid's console group.
+        try:
+            import ctypes
+            k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            k32.OpenProcess.restype = ctypes.c_void_p
+            handle = k32.OpenProcess(0x1000, False, int(pid))  # PROCESS_QUERY_LIMITED_INFORMATION
+            if not handle:
+                return ctypes.get_last_error() != 87  # ERROR_INVALID_PARAMETER: no such process
+            try:
+                code = ctypes.c_ulong()
+                if not k32.GetExitCodeProcess(ctypes.c_void_p(handle), ctypes.byref(code)):
+                    return True
+                return code.value == 259  # STILL_ACTIVE
+            finally:
+                k32.CloseHandle(ctypes.c_void_p(handle))
+        except (OSError, AttributeError, ValueError):
+            return True
+    try:
+        os.kill(int(pid), 0)
+    except ProcessLookupError:
+        return False
+    except (OSError, ValueError):
+        return True
+    return True
+
+
+def scan_dead_scratch(ambient, common) -> list:
+    """Removes each `gate-work.*` directly under `ambient` whose owner names a dead `py:` pid and
+    `common`, or an absolute common dir that names no directory; an empty `common` removes nothing.
+    Returns the roots removed, and says one stderr line per root it sweeps."""
+    removed = []
+    if not common:
+        return removed
+    try:
+        names = sorted(os.listdir(ambient))
+    except OSError:
+        return removed
+    for name in names:
+        root = os.path.join(ambient, name)
+        if not name.startswith("gate-work.") or not os.path.isdir(root):
+            continue
+        try:
+            with open(os.path.join(root, "owner"), encoding="utf-8") as fh:
+                fields = fh.readline().rstrip("\r\n").split("\t")
+        except (OSError, UnicodeDecodeError):
+            continue
+        pid = fields[0][3:] if fields[0].startswith("py:") else ""
+        if len(fields) < 2 or not (pid.isascii() and pid.isdigit()):
+            continue
+        if fields[1] != common and (not os.path.isabs(fields[1]) or os.path.isdir(fields[1])):
+            continue
+        if read_pid_alive(int(pid)):
+            continue
+        print(f"owned-scratch: sweeping the scratch of a dead suite (pid {pid}): {root}", file=sys.stderr)
+        if remove_tree(root):
+            removed.append(root)
+    return removed
+
+
+def init_owned_tempdir() -> str:
+    """The temp dir this process's scratch lands in, owned and removed at exit; see the block's head."""
+    ambient = tempfile.gettempdir()
+    if resolve_owned_work(ambient) is not None:
+        tempfile.tempdir = ambient
+        return ambient
+    try:
+        got = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                             capture_output=True, text=True, encoding="utf-8", errors="replace",
+                             check=False, stdin=subprocess.DEVNULL)
+        common = got.stdout.strip() if got.returncode == 0 else ""
+    except OSError:
+        common = ""
+    scan_dead_scratch(ambient, common)
+    root = tempfile.mkdtemp(prefix="gate-work.", dir=ambient)
+    atexit.register(remove_tree, root)
+    staged = os.path.join(root, f"owner.{os.getpid()}.tmp")
+    with open(staged, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(f"py:{os.getpid()}\t{common}\t{int(time.time())}\n")
+    os.replace(staged, os.path.join(root, "owner"))
+    tmp = os.path.join(root, "tmp")
+    os.mkdir(tmp)
+    tempfile.tempdir = tmp
+    for name in ("TMPDIR", "TEMP", "TMP"):
+        os.environ[name] = tmp
+    return tmp
+# <<< owned_tempdir_py
+
 
 SAY = "ratchet"
 LEGS = {  # verb -> the leg it is
@@ -419,16 +562,38 @@ def run_populated(root):
     return print_verdict(leg, red, len(regs))
 
 
+def read_base_paths(root, sha, seen):
+    """Fill `seen` once per run: the base's tracked paths (None when the base does not list), the widen
+    policy and the working tree's tracked paths, which `check_marker_repaired` and `check_widen_rewrite`
+    share."""
+    if "base" not in seen:
+        rc, out = LL._run_git(root, "ls-tree", "-r", "-z", "--name-only", sha)
+        seen.update(base=[p for p in out.split("\0") if p] if rc == 0 else None,
+                    policy=read_widen_policy(root), tracked=read_tracked_paths(root))
+
+
+def check_widen_rewrite(root, reg, key, was, now, sha, seen):
+    """-> True when a base row's rewrite is a raise through the door: its disposition moved to a
+    `widened:` marker naming a widen record the base's tree does not hold and that `check_widen_admitted`
+    admits, so its sha moved with it. `widen` writes exactly this rewrite (the module docstring), and
+    `never gains` admits it by the same record; a row re-dated under its base marker, or a marker turned
+    back to `seeded`, stays laundering."""
+    if reg.direction not in WIDEN_DIRECTIONS or now[1] == was[1] or not now[1].startswith(WIDENED_LEAD):
+        return False
+    read_base_paths(root, sha, seen)
+    named, stem = derive_record_name(WIDEN_KIND), now[1][len(WIDENED_LEAD):]
+    if seen["base"] is None or any(p.rsplit("/", 1)[-1] == stem + ".md" and named.search(p) for p in seen["base"]):
+        return False
+    return check_widen_admitted(root, reg, key, stem, seen["policy"], sha, seen["tracked"])[0]
+
+
 def check_marker_repaired(root, reg, key, was, now, sha, seen):
     """-> True when a rewritten disposition only repairs a base `widened:` marker that names no widen
     record in the base's tree into one that admits the key now: the rewrite never gains demands, and
     no laundering, since the base row admitted nothing. `seen` caches the policy and both path sets."""
     if reg.direction not in WIDEN_DIRECTIONS or not (was.startswith(WIDENED_LEAD) and now.startswith(WIDENED_LEAD)):
         return False
-    if "base" not in seen:
-        rc, out = LL._run_git(root, "ls-tree", "-r", "-z", "--name-only", sha)
-        seen.update(base=[p for p in out.split("\0") if p] if rc == 0 else None,
-                    policy=read_widen_policy(root), tracked=read_tracked_paths(root))
+    read_base_paths(root, sha, seen)
     named, stem = derive_record_name(WIDEN_KIND), was[len(WIDENED_LEAD):]
     if seen["base"] is None or any(p.rsplit("/", 1)[-1] == stem + ".md" and named.search(p) for p in seen["base"]):
         return False
@@ -468,6 +633,9 @@ def run_seed_laundering(root):
                 removed.append(key)
                 continue
             now = work[key][1]
+            if check_widen_rewrite(root, reg, key, values, now, sha, seen):
+                print_line(leg, reg.population, "widened", render_key(key), "%s -> %s" % (values[1], now[1]))
+                continue
             if now[0] != values[0]:
                 print_line(leg, reg.population, "re-dated", render_key(key), "%s -> %s" % (values[0], now[0]))
                 red = 1
@@ -1074,6 +1242,16 @@ def run_plant_laundering(top, results):
     write_files(top, {"pop/rows.txt": render_rows(base[1:])})
     check_plant_case(results, "laundering", "a row removed while its seed still measures it", top,
                      ["seed-laundering"], 1, ["removed while its seed still measures it · alpha"])
+    stem = pathlib.PurePosixPath(FIX_RECORD).stem
+    widened = render_rows([build_row("alpha", sha=SHA_B, disposition=WIDENED_LEAD + stem)] + base[1:])
+    write_files(top, {FIX_RECORD: render_widen_record(key="alpha"), "pop/rows.txt": widened})
+    run_git_in(top, "add", "--", FIX_RECORD)
+    check_plant_case(results, "laundering", "a row raised through a tracked widen record", top,
+                     ["seed-laundering"], 0, ["widened · alpha"], ["re-dated · alpha"])
+    write_files(top, {FIX_RECORD: None})
+    run_git_in(top, "rm", "-q", "--cached", "--", FIX_RECORD)
+    check_plant_case(results, "laundering", "the same rewrite with its widen record gone", top,
+                     ["seed-laundering"], 1, ["re-dated · alpha", "disposition rewritten · alpha"])
 
 
 def run_plant_rename(top, results):
@@ -1272,14 +1450,6 @@ PLANTS = {
 }
 
 
-def remove_tree(path):
-    """Remove a fixture tree, read-only git objects included."""
-    def remove_readonly(func, p, _exc):
-        os.chmod(p, stat.S_IWRITE)
-        func(p)
-    shutil.rmtree(path, onexc=remove_readonly)
-
-
 def run_fixture(cases):
     """Each named plant in its own scratch repository. -> 0 when every check held, else 1."""
     results = []
@@ -1309,6 +1479,7 @@ def main(argv=None):
             stream.reconfigure(encoding="utf-8")
     args = list(sys.argv[1:] if argv is None else argv)
     if args[:1] == ["--fixture"]:
+        init_owned_tempdir()
         if len(args) == 1:
             return run_fixture(list(PLANTS))
         if len(args) == 3 and args[1] == "--plant" and args[2] in PLANTS:

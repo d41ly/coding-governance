@@ -594,6 +594,34 @@ Cite ids, never line numbers.
 | [TOOL-dPolishedVitrine-11](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | THE UNATTENDED ADOPTER DELETES FIXTURE RECORDS GOVKIT SHIPS AS ENGINE… |
 | [TOOL-dPolishedVitrine-15](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-13 | A FINISHED CLAIM THAT STANDS AT HEAD IS TRUSTED, AND THE KIT GATE WOULD… |
 | [TOOL-dPolishedVitrine-16](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE TWO CONSUMERS HOLD AN unattended@1.20 THAT GOV NUMBERS TWICE. inCMS… |
+| [TOOL-dQuietDisk-20](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | THE R1 TO R8 DESIGN RULES FOR SPEC AUTHORS ARE NOT WRITTEN DOWN. The… |
+| [TOOL-dQuietDisk-21](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | NO SELF-TEST ROW DECLARES A TEMP-ENTRY OR RESIDUE CEILING (G-A).… |
+| [TOOL-dQuietDisk-22](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | NO LEG DECLARES A GIT-PROCESS CEILING (G-B). The bar measures seconds… |
+| [TOOL-dQuietDisk-23](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE REST OF THE G-C STATIC LINT IS UNBUILT. TOOL-dQuietDisk-9 lands… |
+| [TOOL-dQuietDisk-24](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | unattended.test.sh REBUILDS ITS PROLOGUE IN EVERY SHARD (K2). Each of… |
+| [TOOL-dQuietDisk-25](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | check-unattended.test.sh BUILDS A REPOSITORY PER CASE. It has 13 git… |
+| [TOOL-dQuietDisk-29](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | A HISTORY-STORE HIT NEVER REFRESHES ITS ITEM.… |
+| [TOOL-dQuietDisk-30](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE HELD SELECTION MATCHES A DIRECTORY GUARD AGAINST A FILE OF THE SAME… |
+| [TOOL-dQuietDisk-31](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE RUNNER'S REUSE KEY HASHES GATE_REGEN_CHECK, SO A GOVKIT APPLY'S… |
+| [TOOL-dQuietDisk-32](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE TEMPLATE CACHE HANDS OUT ONLY A CLONE, AT THREE GIT PROCESSES A… |
+| [TOOL-dQuietDisk-33](../builds/dQuietDisk/BACKLOG.md) | DEFERRED | LOW | TOOL-dQuietDisk-15 | 2026-11-22 | AN ATTESTED KIT'S SELF-TEST LEG HOLDS ONLY ONCE A BAR IS HANDED A… |
+| [TOOL-dQuietDisk-34](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | A KIT'S [check] RESULT IS NEVER REUSED ACROSS SEPARATE govkit update… |
+| [TOOL-dQuietDisk-35](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | A HELD KIT'S VERIFY CHECK RUNS THOUGH IT DECIDES NOTHING.… |
+| [TOOL-dQuietDisk-38](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-22 | A FIXTURE BUILDER OUTSIDE THE TEMPLATE CACHE STILL RUNS UNDER AN… |
+| [TOOL-dQuietDisk-39](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-22 | THE HISTORY-STORE ARMS CANNOT TELL A STORE THAT SERVES HITS FROM ONE… |
+| [TOOL-dQuietDisk-40](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE CLOSING REVIEW'S TWO LEFT-SHIFT GATES ARE UNBUILT. Round 1 of the… |
+| [TOOL-dQuietDisk-41](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | derive_kit_attestations SENDS A NAME HOLDING A CR TO ITS BATCH READ.… |
+| [TOOL-dQuietDisk-42](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite check-arms selftest red at 35d0dc3f on the daily held… |
+| [TOOL-dQuietDisk-43](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite loop splice check red at 35d0dc3f on the daily held… |
+| [TOOL-dQuietDisk-44](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite dead-path carriers self-test red at 35d0dc3f on the… |
+| [TOOL-dQuietDisk-45](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite loop item kind red at 35d0dc3f on the daily held job,… |
+| [TOOL-dQuietDisk-46](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite loop budget fixtures red at 35d0dc3f on the daily held… |
+| [TOOL-dQuietDisk-47](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite branch-guard self-test red at 35d0dc3f on the daily… |
+| [TOOL-dQuietDisk-48](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite drift-audit selftest red at 35d0dc3f on the daily held… |
+| [TOOL-dQuietDisk-49](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite roles adopter self-test red at 35d0dc3f on the daily… |
+| [TOOL-dQuietDisk-50](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite row-keyed merge driver replay red at 35d0dc3f on the… |
+| [TOOL-dQuietDisk-51](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite run-gates adopter e2e red at 35d0dc3f on the daily held… |
+| [TOOL-dQuietDisk-52](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite run-gates evidence red at 35d0dc3f on the daily held… |
 | [TOOL-dRankedPlan-17](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dRankedPlan-18](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-6 | 2026-10-26 | A PLAN REVIEW'S FINDINGS HAVE NO DISPOSAL ROUTE. review.dispose… |
 | [TOOL-dRemeasuredRender-2](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the location-probe scanner does not see a probe whose cd <dir> carries… |

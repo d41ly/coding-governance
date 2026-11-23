@@ -377,6 +377,12 @@
       "source": "tools/memory-tree/gotchas.py"
     },
     {
+      "path": "tools/memory-tree/history_store.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/history_store.py"
+    },
+    {
       "path": "tools/memory-tree/id_grammar.py",
       "kit": "memory-tree",
       "role": "engine",
@@ -1755,6 +1761,12 @@
       "kit": "unattended",
       "role": "engine",
       "source": "tools/unattended/gate-guard.js"
+    },
+    {
+      "path": "tools/unattended/history_store.py",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/history_store.py"
     },
     {
       "path": "tools/unattended/kit.toml",

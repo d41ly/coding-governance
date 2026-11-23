@@ -32,13 +32,21 @@
 #     are read at all — which closes the edit-and-run bypass and NOT the class: the
 #     graded run still authors the value it commits. Narrowing, not removal, and it is said here
 #     because a gate's header states what it does not check.
+#   - a unit the history verdict store answers (TOOL-dQuietDisk-2). Its build commit, its spec at the
+#     parent and its pre-anchor probe are not re-read: the stored outcome is keyed by every input they
+#     read (the id, the folder, the base, the range mode and window tip, the conf values, the unit's
+#     candidate commits) and by the bytes of this leg, its library, the driver and the trailer
+#     reader. `tests.history-verdicts = "regraded"` turns it off and every unit is regraded.
+#     RESIDUAL: the walk lists commits in committer-date order, so a history whose dates run
+#     backwards along ancestry can order two candidates unlike the run that stored them; only
+#     candidates sharing a second are kept out of the store.
 #
 # TOOL-aStagedLane-1 WIDENED THE POPULATION to builds with no run-state file. The range for those is
 # derived from the build FOLDER's own first commit instead of a run's pinned BASE; see THE RANGE
 # below. `--preview` grades the live tree and prints violations without setting exit status, which is
 # how a candidate predicate gets run over the real tree before it is wired.
 set -u
-KIT_UNATTENDED_VERSION=1.136 # gov:kit unattended@1.136 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.137 # gov:kit unattended@1.137 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong
@@ -450,8 +458,20 @@ esac
 # exactly the shape this file's own liveness doctrine exists to refuse. Equality is exact because
 # shas are unique, so this cannot pass on a partial cache.
 declare -A _SUBJ=()
+# THE CANDIDATE MAP (TOOL-dQuietDisk-2 S4), filled from the same stream: id-shaped token -> the
+# commits carrying it, which is what a stored outcome is keyed by. `[A-Z]*-*[0-9]` admits every id
+# the CLOSED-row match below can print. `_po_top` is the stream's first line, the tip it was read at.
+declare -A PO_CANDS=()
+_po_top=""
 while IFS= read -r _cl; do
   _SUBJ[${_cl%% *}]=" ${_cl#* } "
+  [ -n "$_po_top" ] || _po_top=${_cl%% *}
+  for _t in ${_cl#* }; do
+    case $_t in
+      [A-Z]*-*[0-9])
+        case "${PO_CANDS[$_t]-} " in *" ${_cl%% *} "*) ;; *) PO_CANDS[$_t]="${PO_CANDS[$_t]-} ${_cl%% *}" ;; esac ;;
+    esac
+  done
 done < <(read_attribution_tokens HEAD)
 _n_hist=$(GIT rev-list --count HEAD 2>/dev/null)
 case "$_n_hist" in ''|*[!0-9]*) _n_hist=-1 ;; esac
@@ -480,7 +500,7 @@ violations=""; waived_seen=""; previews=""; inrange_ids=""; not_judged=0
 # constants, and never a local ref or an environment variable the graded run controls.
 read_history_range "$DRIVER"
 PS_DIR=$(mktemp -d) || { echo "pass-order: cannot make a scratch directory for the historical spec blobs, so no unit could be classified"; exit 2; }
-trap 'rm -rf "$PS_DIR"' EXIT
+trap 'remove_bh; rm -rf "$PS_DIR"' EXIT
 
 # ------------------------------------------------------------------- THE UNWITNESSED PASS COMMITS
 # TOOL-dWitnessedBar-2 S7. The driver's commit check writes `Commit-Checked: unattended@<version>` onto
@@ -513,6 +533,56 @@ if [ -n "$BYPASS_ANCHOR" ]; then
   esac
 fi
 
+# ------------------------------------------------------------------- THE HISTORY VERDICT STORE
+# TOOL-dQuietDisk-2. A unit is graded only where its stored outcome is absent or its key moved: the
+# store is TOOL-dQuietDisk-1's, through the library's bash face, and it is keyed by the bytes of the
+# four files below. The per-build reads go through one `cat-file --batch` coprocess, pinned against
+# replace refs as `GIT` is. Any failure here leaves PO_ON at 0, so every read misses and the leg
+# grades as it did before the store; nothing about the store is printed, and its stderr is dropped.
+# G is the graded commit, L the tip this worktree last graded, PO_LIN whether L's folder anchors
+# carry to G (L is G, or `L..G` is a single-parent chain ending at L).
+PO_ON=0; G=""; L=""; PO_LIN=0; PO_M=$'\001'; PO_Q=""; PO_W=""; PO_SHAS=""; PO_NA=0; PO_ANC_W=""; PO_CTL=0
+T=$'\t'; N=$'\n'
+declare -A PO_HIT=() PO_ANC=() PO_OUT=() PO_CT=()
+GIT_NO_REPLACE_OBJECTS=1 init_bh 2>/dev/null || :
+if init_hs pass-order "$HERE/${BASH_SOURCE[0]##*/}" "$_LIB_DIR/lib-unattended.sh" "$DRIVER" "$HERE/commit_trailers.py" 2>/dev/null \
+   && read_bh_info HEAD && [ "$BH_TYPE" = commit ] && [ "$BH_OID" = "$_po_top" ] \
+   && L=$(read_hs_tip 2>/dev/null); then
+  G=$BH_OID; L=${L%$'\r'}; PO_ON=1
+  [[ $L =~ ^[0-9a-f]{40}([0-9a-f]{24})?$ ]] || L=""
+  # THE KEYS' FIELDS ARE TAB-FRAMED, and a body is space-separated cells, so a value holding a tab, a
+  # newline or a backslash, or a space where its grammar has none, is never looked up or stored.
+  case "$MEMORY_ROOT$FORK_CUTOFF" in *[[:space:]\\]*) PO_ON=0 ;; esac
+  case "$GENERATED_INDEXES$SHARED_RECORDS" in *[$'\t\n\r\\']*) PO_ON=0 ;; esac
+  if [ "$L" = "$G" ]; then
+    PO_LIN=1
+  elif [ -n "$L" ]; then
+    _po_next=$G; PO_LIN=1
+    while read -r _c _p _x; do
+      if [ "$_c" = "$_po_next" ] && [ -n "$_p" ] && [ -z "$_x" ]; then _po_next=$_p; else PO_LIN=0; break; fi
+    done < <(GIT rev-list --parents "$L..$G" 2>/dev/null)
+    [ "$_po_next" = "$L" ] || PO_LIN=0
+  fi
+  # S3 - L's folder anchors, one `<build>=<base or none>` cell per build with no run-state file.
+  if [ "$PO_ON" = 1 ] && [ "$PO_LIN" = 1 ]; then
+    printf 'a\tanchors\t%s\t%s\n' "$MEMORY_ROOT" "$L" > "$PS_DIR/hs-a"
+    if read_hs_items "$PS_DIR/hs-a" > "$PS_DIR/hs-b" 2>/dev/null; then
+      while IFS=$'\t' read -r _lid _lhm _lb; do
+        [ "$_lid:$_lhm" = a:hit ] || continue
+        for _cell in ${_lb%$'\r'}; do
+          [[ $_cell =~ ^[^=]+=(none|[0-9a-f]{40}([0-9a-f]{24})?)$ ]] && PO_ANC[${_cell%%=*}]=${_cell#*=}
+        done
+      done < "$PS_DIR/hs-b"
+    else
+      PO_ON=0
+    fi
+  fi
+  # A RANGE run keys a unit by its candidates outside the advertised tip's history, read once.
+  if [ "$PO_ON" = 1 ] && [ "$HR_MODE" = range ]; then
+    while IFS= read -r _c; do PO_OUT[$_c]=1; done < <(GIT rev-list "$HR_TIP..HEAD" 2>/dev/null)
+  fi
+fi
+
 # THE POPULATION COMES FROM THE GRADED COMMIT TOO, and this line was the last one left behind.
 # The fold moved four record READS to `HEAD:` and left the SELECTOR that decides which builds are
 # read at all on `git ls-files`, which enumerates the INDEX. So one `git rm --cached` of a build
@@ -524,6 +594,11 @@ fi
 # The self-test arms could not see it either. They mutate file CONTENT with `sed -i`, which leaves
 # the path in the index; only an INDEX mutation reaches this line, so the arm below uses
 # `git rm --cached`.
+# THE WALK RUNS TWICE (TOOL-dQuietDisk-2 S2). The first pass reads each build's records and derives
+# every item key, so ONE store lookup answers them all; the second grades, in the same order, each
+# unit the lookup did not answer. `nb` counts the builds the first pass keeps and `nu` their units.
+nb=0; nu=0
+declare -a B_DIR=() B_BASE=() B_BK=() B_NORUN=() B_IDS=() B_KOK=() U_KEY=()
 for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/null | grep -E "/README\.md$"); do
   bdir=${readme%/README.md}
   slug=${bdir##*/}
@@ -531,7 +606,11 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
   # let one uncommitted character exempt a build from this leg, and the widening multiplies the
   # population that field governs. One object read per build, none per unit. The residual - the run
   # still authors the value it COMMITS - is in this file's header rather than left to be discovered.
-  opened=$(GIT show "HEAD:$readme" 2>/dev/null | sed -n 's/^opened:[[:space:]]*//p' | head -1)
+  # THROUGH THE COPROCESS, once for both this field and the CLOSED ids below; status 2 or 3 (no
+  # coprocess, or a blob bash cannot hold) falls back to the one read this was before.
+  read_bh_blob "HEAD:$readme"
+  case $? in 0) _rd=$BH_TEXT ;; 1) _rd="" ;; *) _rd=$(GIT show "HEAD:$readme" 2>/dev/null) ;; esac
+  opened=$(printf '%s\n' "$_rd" | sed -n 's/^opened:[[:space:]]*//p' | head -1)
   case "$opened" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) skipped_cutoff=$((skipped_cutoff+1)); continue ;; esac
   # Both values passed an ISO-date shape check, so a bash string compare is their date order and
   # spawns nothing per README (TOOL-aMeasuredDrag-8); a build opened BEFORE the cutoff is skipped.
@@ -559,28 +638,141 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
   # that cites the rule.
   run="$bdir/RUN.md"
   base=""; norun=1
-  _runblob=$(GIT show "HEAD:$run" 2>/dev/null || true)
+  # `_bk` is the base as the item keys spell it, a full sha; `_kok` 0 keeps this build out of the store.
+  _bk=""; _kok=1
+  case "$bdir" in *[[:space:]\\=]*) _kok=0 ;; esac
+  read_bh_blob "HEAD:$run"
+  case $? in 0) _runblob=$BH_TEXT ;; 1) _runblob="" ;; *) _runblob=$(GIT show "HEAD:$run" 2>/dev/null || true) ;; esac
   if [ -n "$_runblob" ]; then
     base=$(printf '%s\n' "$_runblob" | extract_run_facts | sed -n 's/^base:[[:space:]]*//p' | head -1)
     case "$base" in
-      [0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) GIT cat-file -e "$base^{commit}" 2>/dev/null && norun=0 || base="" ;;
+      [0-9a-f][0-9a-f][0-9a-f][0-9a-f]*)
+        read_bh_info "$base^{commit}"
+        case $? in
+          0) norun=0; _bk=$BH_OID ;;
+          1) base="" ;;
+          *) _kok=0; GIT cat-file -e "$base^{commit}" 2>/dev/null && norun=0 || base="" ;;
+        esac ;;
       *) base="" ;;
     esac
   fi
   first=""
   if [ "$norun" = 1 ]; then
-    first=$(GIT rev-list --reverse HEAD -- "$bdir" 2>/dev/null | head -1)
-    [ -n "$first" ] || { skipped_cutoff=$((skipped_cutoff+1)); continue; }
-    base=$(GIT rev-parse "$first^" 2>/dev/null) || base=""
+    # S3 - CARRIED from L's anchors item where the chain allows, else computed as before.
+    _bn=${bdir#"$MEMORY_ROOT/builds/"}
+    if [ "$_kok" = 1 ] && [ -n "${PO_ANC[$_bn]-}" ]; then
+      base=${PO_ANC[$_bn]}; [ "$base" != none ] || base=""
+    else
+      first=$(GIT rev-list --reverse HEAD -- "$bdir" 2>/dev/null | head -1)
+      [ -n "$first" ] || { skipped_cutoff=$((skipped_cutoff+1)); continue; }
+      base=$(GIT rev-parse "$first^" 2>/dev/null) || base=""
+      [ "$_kok" = 0 ] || PO_NA=1
+    fi
+    _bk=$base
+    [ "$_kok" = 0 ] || PO_ANC_W="$PO_ANC_W $_bn=${base:-none}"
     norun_graded=$((norun_graded+1))
   fi
 
+  # The CLOSED units, from the generated region. A row's id is spelled twice, so `match` takes the
+  # first occurrence per row rather than a `grep -o` that would emit each unit twice.
+  # ALSO FROM THE GRADED COMMIT. This read selects the POPULATION, so an uncommitted deletion of a
+  # ` CLOSED ` row dropped that unit from grading entirely — the same class as the `base:` read
+  # above and strictly earlier in the pipeline.
+  ids=$(printf '%s\n' "$_rd" | awk -v s="$slug" '
+      /<!-- gen:build-units -->/ { inr=1; next }
+      /<!-- \/gen:build-units -->/ { inr=0 }
+      inr && / CLOSED / { if (match($0, "[A-Z]+-" s "-[0-9]+")) print substr($0, RSTART, RLENGTH) }' | sort -u)
+
+  # THE ITEM KEYS (TOOL-dQuietDisk-2 S4, S5), each as its own line of the one lookup below. The
+  # window tip is `-` unless a RANGE run grades a folder-anchored build whose base the tip lacks.
+  if [ "$PO_ON" = 1 ] && [ "$_kok" = 1 ]; then
+    if [ -n "$BYPASS_ANCHOR" ] && [ -n "$base" ]; then
+      PO_Q+="r$nb${T}bypass-range$T$BYPASS_ANCHOR$T$_bk$N"
+      PO_Q+="c$nb${T}unchecked$T$_bk$T$G$N"
+    fi
+    _wt=-
+    if [ "$HR_MODE" = range ] && [ "$norun" = 1 ]; then
+      [ -n "$_bk" ] && [ -n "${_SUBJ[$_bk]+set}" ] && [ -z "${PO_OUT[$_bk]+set}" ] || _wt=$HR_TIP
+    fi
+  fi
+  for id in $ids; do
+    U_KEY[nu]=""
+    if [ "$PO_ON" = 1 ] && [ "$_kok" = 1 ]; then
+      # The candidates, sorted in place: a key is one spelling of a set, whatever order history lists it.
+      _po_cl=()
+      for _c in ${PO_CANDS[$id]-}; do
+        [ "$HR_MODE" != range ] || [ -n "${PO_OUT[$_c]+set}" ] || continue
+        _i=${#_po_cl[@]}
+        while [ "$_i" -gt 0 ] && [[ ${_po_cl[_i-1]} > $_c ]]; do _po_cl[_i]=${_po_cl[_i-1]}; _i=$((_i-1)); done
+        _po_cl[_i]=$_c
+      done
+      _c="${_po_cl[*]}"
+      U_KEY[nu]="unit$T$id$T$bdir$T${_bk:--}$T$norun$T$HR_MODE$T$_wt$T${FORK_CUTOFF:--}"
+      U_KEY[nu]+="$T$GENERATED_INDEXES$T$SHARED_RECORDS$T$PREANCHOR_CAP$T${_c:--}"
+      PO_Q+="u$nu$T${U_KEY[nu]}$N"
+    fi
+    nu=$((nu+1))
+  done
+  B_DIR[nb]=$bdir; B_BASE[nb]=$base; B_BK[nb]=$_bk; B_NORUN[nb]=$norun; B_IDS[nb]=$ids; B_KOK[nb]=$_kok
+  nb=$((nb+1))
+done
+
+# ONE LOOKUP for every unit, bypass-range and unchecked item; a store verb that fails reads as all miss.
+if [ "$PO_ON" = 1 ] && [ -n "$PO_Q" ]; then
+  printf '%s' "$PO_Q" > "$PS_DIR/hs-q"
+  if read_hs_items "$PS_DIR/hs-q" > "$PS_DIR/hs-r" 2>/dev/null; then
+    while IFS=$'\t' read -r _lid _lhm _lb; do
+      [ "$_lhm" = hit ] && PO_HIT[$_lid]=${_lb%$'\r'}
+    done < "$PS_DIR/hs-r"
+  else
+    PO_ON=0; PO_HIT=()
+  fi
+fi
+
+PO_SHA='^[0-9a-f]{40}([0-9a-f]{24})?$'
+nu=0
+for ((_b = 0; _b < nb; _b++)); do
+  bdir=${B_DIR[_b]}; slug=${bdir##*/}; base=${B_BASE[_b]}; _bk=${B_BK[_b]}; norun=${B_NORUN[_b]}; _kok=${B_KOK[_b]}
+  [ "$PO_ON" = 1 ] || _kok=0
   # S7 - THE UNWITNESSED PASS COMMITS of this build's range, graded only past the anchor (above).
-  if [ -n "$BYPASS_ANCHOR" ] && [ -n "$base" ] && GIT merge-base --is-ancestor "$BYPASS_ANCHOR" "$base" 2>/dev/null; then
+  # S5 - both answers are items: the ancestry under `bypass-range`, the reader's lines under `unchecked`.
+  _brc=1
+  if [ -n "$BYPASS_ANCHOR" ] && [ -n "$base" ]; then
+    case "${PO_HIT[r$_b]-}" in
+      graded) _brc=0 ;;
+      skipped) _brc=1 ;;
+      *) GIT merge-base --is-ancestor "$BYPASS_ANCHOR" "$base" 2>/dev/null; _brc=$?
+         if [ "$_kok" = 1 ]; then
+           case $_brc in
+             0) PO_W+="r$_b${T}bypass-range$T$BYPASS_ANCHOR$T$_bk${T}graded$N" ;;
+             1) PO_W+="r$_b${T}bypass-range$T$BYPASS_ANCHOR$T$_bk${T}skipped$N" ;;
+           esac
+         fi ;;
+    esac
+  fi
+  if [ "$_brc" = 0 ]; then
     bypass_graded=$((bypass_graded+1))
-    if [ -z "$BYPASS_PY" ] || ! _uc_out=$("$BYPASS_PY" "$HERE/commit_trailers.py" unchecked "$base..HEAD" 2>&1); then
-      echo "pass-order: the unwitnessed pass commits of $slug cannot be read, so this leg would grade the hook bypass by nothing: ${_uc_out:-no python launcher resolved}"
-      exit 2
+    _uc_out=""; _po_ok=0
+    if [ -n "${PO_HIT[c$_b]+set}" ]; then
+      _po_ok=1
+      for _cell in ${PO_HIT[c$_b]}; do
+        [[ $_cell =~ ^[0-9a-f]{40}([0-9a-f]{24})?:[A-Za-z0-9,-]*$ ]] || { _po_ok=0; break; }
+        _c=${_cell#*:}; _uc_out+="${_cell%%:*} ${_c//,/ }"$'\n'
+      done
+    fi
+    if [ "$_po_ok" = 0 ]; then
+      if [ -z "$BYPASS_PY" ] || ! _uc_out=$("$BYPASS_PY" "$HERE/commit_trailers.py" unchecked "$base..HEAD" 2>&1); then
+        echo "pass-order: the unwitnessed pass commits of $slug cannot be read, so this leg would grade the hook bypass by nothing: ${_uc_out:-no python launcher resolved}"
+        exit 2
+      fi
+      # Stored as one `<sha>:<id>,<id>` cell per sha line, only where every line reads back the same.
+      _po_ok=$_kok; _po_b=""
+      while read -r _uc _uids; do
+        case "${#_uc}:$_uc" in 40:*[!0-9a-f]*|64:*[!0-9a-f]*) continue ;; 40:*|64:*) ;; *) continue ;; esac
+        [[ $_uids =~ ^([A-Za-z0-9-]+( [A-Za-z0-9-]+)*)?$ ]] || _po_ok=0
+        _po_b+=" $_uc:${_uids// /,}"
+      done <<< "${_uc_out//$'\r'/}"
+      [ "$_po_ok" = 0 ] || PO_W+="c$_b${T}unchecked$T$_bk$T$G$T${_po_b# }$N"
     fi
     while read -r _uc _uids; do
       # A SHA LINE ONLY: the reader's own stderr note, merged into this capture, is no commit.
@@ -592,18 +784,35 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
     done <<< "${_uc_out//$'\r'/}"
   fi
 
-  # The CLOSED units, from the generated region. A row's id is spelled twice, so `match` takes the
-  # first occurrence per row rather than a `grep -o` that would emit each unit twice.
-  # ALSO FROM THE GRADED COMMIT. This read selects the POPULATION, so an uncommitted deletion of a
-  # ` CLOSED ` row dropped that unit from grading entirely — the same class as the `base:` read
-  # above and strictly earlier in the pipeline.
-  ids=$(GIT show "HEAD:$readme" 2>/dev/null | awk -v s="$slug" '
-      /<!-- gen:build-units -->/ { inr=1; next }
-      /<!-- \/gen:build-units -->/ { inr=0 }
-      inr && / CLOSED / { if (match($0, "[A-Z]+-" s "-[0-9]+")) print substr($0, RSTART, RLENGTH) }' | sort -u)
-
-  for id in $ids; do
+  for id in ${B_IDS[_b]}; do
+    # EVERY VIOLATION ROUTES THROUGH THE WAIVER, and one helper does it so a future violation class
+    # cannot be added on a path that forgets to consult the registry. A report row names each sha as
+    # `PO_M<sha>PO_M`, and one `log --no-walk=unsorted --format=%h` after the walk spells them all (S6).
+    _report() {
+      previews="$previews
+$1"
+      case " $waived_ids " in
+        *" $id "*) waived_n=$((waived_n+1)); waived_seen="$waived_seen $id" ;;
+        *) violations="$violations
+$1" ;;
+      esac
+    }
     graded=$((graded+1))
+    _po_k=$nu; nu=$((nu+1))
+    # S4 - A STORED OUTCOME, read back only in the shape this leg writes; any other body regrades.
+    _po_kind=""; _po_c1=""; _po_c2=""; _po_st=""; _po_sp=""
+    if [ "$_kok" = 1 ] && [ -n "${PO_HIT[u$_po_k]+set}" ]; then
+      read -r -a _po_f <<< "${PO_HIT[u$_po_k]}"
+      case "${#_po_f[@]}:${_po_f[0]-}" in
+        1:unbuilt|1:truncated) _po_kind=${_po_f[0]} ;;
+        2:preanchor) [[ ${_po_f[1]} =~ $PO_SHA ]] && _po_kind=preanchor ;;
+        3:nospec) [[ ${_po_f[1]} =~ $PO_SHA && ${_po_f[2]} =~ $PO_SHA ]] && _po_kind=nospec ;;
+        5:spec) [[ ${_po_f[1]} =~ $PO_SHA && ${_po_f[2]} =~ $PO_SHA && ${_po_f[3]} =~ ^([A-Z]+|-)$ ]] && _po_kind=spec ;;
+      esac
+      _po_c1=${_po_f[1]-}; _po_c2=${_po_f[2]-}; _po_st=${_po_f[3]-}; _po_sp=${_po_f[4]-}
+      [ "$_po_st" != - ] || _po_st=""
+    fi
+    if [ -z "$_po_kind" ]; then
     # STEP 1 - the BUILD commit: the earliest commit in BASE..HEAD whose SUBJECT carries this id as a
     # WHOLE TOKEN and which touched a path outside the RECORD SURFACE below. The whole-token match is
     # `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up sequence is a prefix of
@@ -614,19 +823,12 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
     # `_find_build_commit` body — was INDENTED inside this loop, so it existed only while this block
     # ran and no sibling script could source this file and reuse it. The rationale comments moved
     # with the code rather than being left behind as prose about somewhere else.
-    _report() {
-      previews="$previews
-$1"
-      case " $waived_ids " in
-        *" $id "*) waived_n=$((waived_n+1)); waived_seen="$waived_seen $id" ;;
-        *) violations="$violations
-$1" ;;
-      esac
-    }
+    # A MISS GRADES AS BEFORE, to an outcome in `_po_kind` and its cells, applied below with a hit's.
     # THE IN-RANGE WINDOW, which is `build_commit`'s default: unbounded, `--reverse`, so the
     # EARLIEST qualifying commit wins.
     build_commit "${base:+$base..}HEAD $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" >/dev/null
     build_c=$_BC_OUT
+    _po_kind=unbuilt; _po_c1=""; _po_c2=""; _po_st=""; _po_sp=""
     if [ -z "$build_c" ]; then
       # S2c - THE PRE-ANCHOR PROBE, and it runs ONLY for the derived-range population. A commit that
       # writes product code for a unit touches nothing under the build folder, so it sits STRICTLY
@@ -646,26 +848,19 @@ $1" ;;
         build_commit "$base $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "" >/dev/null
         pre_c=$_BC_OUT
         if [ "$pre_c" = TRUNCATED ]; then
-          truncated=$((truncated+1))
+          _po_kind=truncated
         elif [ -n "$pre_c" ]; then
-          preanchor_hits=$((preanchor_hits+1)); inrange_ids="$inrange_ids $id"
-          # ROUTED THROUGH `_report` like every other violation. This path duplicated the waiver
-          # bookkeeping inline, beside a helper whose own comment says it exists so that a future
-          # violation class cannot be added on a path that forgets to consult the registry — and then
-          # this class was added on exactly such a path.
-          _report "  $id — BUILT at $(GIT rev-parse --short "$pre_c") BEFORE this build's folder existed, so no spec for it can have existed either"
-          continue
+          _po_kind=preanchor; _po_c1=$pre_c
         fi
       fi
-      unbuilt=$((unbuilt+1)); continue
-    fi
-
-    inrange_ids="$inrange_ids $id"
     # STEP 2 - at the build commit's FIRST PARENT, a tracked spec under this build must carry the id
     # in a conforming status header and must not grade MISSING or THIN. The first parent and not the
     # BASE: the build method REQUIRES a run to author a missing spec, so a BASE-anchored test would
     # refuse the shape the method mandates. What this anchor refuses is authoring it AFTERWARDS.
-    parent=$(GIT rev-parse "$build_c^" 2>/dev/null) || { unbuilt=$((unbuilt+1)); continue; }
+    # A ROOT build commit has no parent: in range and unbuilt, as before, and never stored.
+    elif ! parent=$(GIT rev-parse "$build_c^" 2>/dev/null); then
+      _po_kind=rootbuilt
+    else
     found=""; state=""
     # THE CANDIDATE FILTER, and it is a filter rather than the selection itself. Reading every spec
     # blob under the build to find the one naming the id is quadratic in a build's own size: a
@@ -706,19 +901,92 @@ $1" ;;
       state=$(plan_state "$tmp" "$FORK_CUTOFF"); rm -f "$tmp"
       found="$sp"; break
     done
-    # EVERY VIOLATION ROUTES THROUGH THE WAIVER, and one helper does it so a future violation class
-    # cannot be added on a path that forgets to consult the registry.
-    if [ -z "$found" ]; then
-      _report "  $id — BUILT at $(GIT rev-parse --short "$build_c") with NO tracked spec at that commit's parent $(GIT rev-parse --short "$parent"); the spec was written after the code, which is the same act with the record written last"
-      continue
+    _po_c1=$build_c; _po_c2=$parent; _po_st=$state; _po_sp=$found
+    if [ -z "$found" ]; then _po_kind=nospec; else _po_kind=spec; fi
     fi
-    case "$state" in
-      MISSING|THIN)
-        _report "  $id — BUILT at $(GIT rev-parse --short "$build_c") against a spec that graded $state at the parent $(GIT rev-parse --short "$parent") ($found); nothing stated what done meant for it before it was built"
-        ;;
+    # S4 - WHAT A MISS STORES: its outcome, where the key was derived, every cell is one the key's
+    # grammar admits, and a chosen commit is one of the key's candidates. A build commit whose
+    # in-range candidates share a committer second is not stored, because the walk's order between
+    # them is then git's queue order rather than their dates (section 4's date-order residual).
+    _po_body=""
+    case $_po_kind in
+      unbuilt|truncated) _po_body=$_po_kind ;;
+      preanchor) _po_body="preanchor $_po_c1" ;;
+      nospec) _po_body="nospec $_po_c1 $_po_c2" ;;
+      spec) [[ $_po_st =~ ^([A-Z]+)?$ && $_po_sp =~ ^[^[:space:]\\]+$ ]] && _po_body="spec $_po_c1 $_po_c2 ${_po_st:--} $_po_sp" ;;
+    esac
+    _po_cs=" ${U_KEY[_po_k]##*$T} "
+    if [ -z "${U_KEY[_po_k]}" ]; then
+      _po_body=""
+    elif [ -n "$_po_c1" ] && { ! [[ $_po_c1 =~ $PO_SHA ]] || [[ $_po_cs != *" $_po_c1 "* ]]; }; then
+      _po_body=""
+    elif [ "$_po_kind" = nospec ] || [ "$_po_kind" = spec ]; then
+      [[ $_po_c2 =~ $PO_SHA ]] || _po_body=""
+      read -r -a _po_f <<< "$_po_cs"
+      if [ -n "$_po_body" ] && [ "${#_po_f[@]}" -ge 2 ]; then
+        if [ "$PO_CTL" = 0 ]; then
+          while read -r _c _i; do PO_CT[$_c]=$_i; done < <(GIT log --format='%H %ct' HEAD 2>/dev/null)
+          PO_CTL=1
+        fi
+        # A second shared by two candidates is a tie only where both are in this unit's range.
+        declare -A _po_tn=() _po_ti=()
+        for _c in "${_po_f[@]}"; do
+          _i=${PO_CT[$_c]-x}; _po_tn[$_i]=$(( ${_po_tn[$_i]-0} + 1 ))
+        done
+        [ -z "${_po_tn[x]-}" ] || _po_body=""
+        _po_rl="--reverse||${base:+$base..}HEAD $HR_EXCL"
+        [ -n "${_BC_MEMO[$_po_rl]+set}" ] || _po_body=""
+        _po_rl=${_BC_MEMO[$_po_rl]-}
+        for _c in "${_po_f[@]}"; do
+          _i=${PO_CT[$_c]-x}
+          [ "${_po_tn[$_i]}" -ge 2 ] || continue
+          case "$N$_po_rl$N" in *"$N$_c$N"*) _po_ti[$_i]=$(( ${_po_ti[$_i]-0} + 1 )) ;; esac
+          [ "${_po_ti[$_i]-0}" -lt 2 ] || _po_body=""
+        done
+      fi
+    fi
+    [ -z "$_po_body" ] || PO_W+="u$_po_k$T${U_KEY[_po_k]}$T$_po_body$N"
+    fi
+    # THE OUTCOME, a hit's or a miss's, applied with today's counters. EVERY VIOLATION ROUTES THROUGH
+    # `_report`: the pre-anchor path once duplicated the waiver bookkeeping inline, beside a helper
+    # that exists so a new violation class cannot be added on a path that forgets the registry.
+    case $_po_kind in
+      unbuilt) unbuilt=$((unbuilt+1)) ;;
+      truncated) truncated=$((truncated+1)); unbuilt=$((unbuilt+1)) ;;
+      rootbuilt) inrange_ids="$inrange_ids $id"; unbuilt=$((unbuilt+1)) ;;
+      preanchor)
+        preanchor_hits=$((preanchor_hits+1)); inrange_ids="$inrange_ids $id"; PO_SHAS+=" $_po_c1"
+        _report "  $id — BUILT at $PO_M$_po_c1$PO_M BEFORE this build's folder existed, so no spec for it can have existed either" ;;
+      nospec)
+        inrange_ids="$inrange_ids $id"; PO_SHAS+=" $_po_c1 $_po_c2"
+        _report "  $id — BUILT at $PO_M$_po_c1$PO_M with NO tracked spec at that commit's parent $PO_M$_po_c2$PO_M; the spec was written after the code, which is the same act with the record written last" ;;
+      spec)
+        inrange_ids="$inrange_ids $id"
+        case "$_po_st" in
+          MISSING|THIN)
+            PO_SHAS+=" $_po_c1 $_po_c2"
+            _report "  $id — BUILT at $PO_M$_po_c1$PO_M against a spec that graded $_po_st at the parent $PO_M$_po_c2$PO_M ($_po_sp); nothing stated what done meant for it before it was built" ;;
+        esac ;;
     esac
   done
 done
+
+# S6 - THE SHORT SHAS, all of them by one `log --no-walk=unsorted --format=%h`, in argument order;
+# `rev-parse --short` takes one revision. The log prints a repeated sha once, so each distinct sha is
+# passed once and every row is filled from the sha-to-short map. A batch that does not answer one
+# line per sha falls back to one `rev-parse --short` per sha, as before.
+if [ -n "${PO_SHAS// /}" ]; then
+  declare -A _po_seen=(); _po_u=(); _po_sh=()
+  for _c in $PO_SHAS; do [ -n "${_po_seen[$_c]-}" ] || { _po_seen[$_c]=1; _po_u+=("$_c"); }; done
+  mapfile -t _po_sh < <(GIT log --no-walk=unsorted --format=%h "${_po_u[@]}" -- 2>/dev/null)
+  if [ "${#_po_sh[@]}" -ne "${#_po_u[@]}" ]; then
+    _po_sh=(); for _c in "${_po_u[@]}"; do _po_sh+=("$(GIT rev-parse --short "$_c")"); done
+  fi
+  for _i in "${!_po_u[@]}"; do
+    previews=${previews//"$PO_M${_po_u[_i]}$PO_M"/"${_po_sh[_i]%$'\r'}"}
+    violations=${violations//"$PO_M${_po_u[_i]}$PO_M"/"${_po_sh[_i]%$'\r'}"}
+  done
+fi
 
 # ------------------------------------------------------------------------------- THE LIVENESS LINE
 # ONE COUNT PER POPULATION THIS LEG WALKS, because a liveness line naming fewer populations than the
@@ -773,6 +1041,18 @@ if [ "$PREVIEW" = 1 ]; then
   [ -n "$unwitnessed" ] && echo "pass-order --preview: unwitnessed pass commits, under hooks.bypass $BYPASS_POLICY:$unwitnessed"
   echo "pass-order --preview: exit status is NOT set in this mode"
   exit 0
+fi
+
+# S7 - THE ONE WRITE, past every refusal and `--preview`, and only while HEAD still reads G: every
+# item this run computed that was not a hit, the anchors at G, then G as this worktree's tip.
+if [ "$PO_ON" = 1 ]; then
+  if [ -n "$PO_ANC_W" ] && { [ "$L" != "$G" ] || [ "$PO_NA" = 1 ]; }; then
+    PO_W+="a${T}anchors$T$MEMORY_ROOT$T$G$T${PO_ANC_W# }$N"
+  fi
+  if { [ -n "$PO_W" ] || [ "$L" != "$G" ]; } && read_bh_info HEAD && [ "$BH_OID" = "$G" ]; then
+    printf '%s' "$PO_W" > "$PS_DIR/hs-w"
+    write_hs_items "$PS_DIR/hs-w" "$G" >/dev/null 2>&1 || :
+  fi
 fi
 
 if [ -n "$unwitnessed" ] && [ "$BYPASS_POLICY" != refused ]; then

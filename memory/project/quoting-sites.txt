@@ -32,8 +32,8 @@ tools/run-gates/post-merge.sh	tab-ifs-read	2	ea0c6868d78283c542daa710e6678851292
 tools/run-gates/profile_bar.test.sh	heredoc-source	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/run-gates.runlog.test.sh	heredoc-source	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/run-gates.runlog.test.sh	tab-ifs-read	2	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/run-gates/run-gates.sh	tab-ifs-read	12	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/run-gates/run-gates.test.sh	heredoc-source	4	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/run-gates/run-gates.sh	tab-ifs-read	14	40607fd2a4765daba384ddfd0917bea00d70ed80	widened:2026-11-22-build-TOOL-dQuietDisk-5-widen-27
+tools/run-gates/run-gates.test.sh	heredoc-source	5	40607fd2a4765daba384ddfd0917bea00d70ed80	widened:2026-11-22-build-TOOL-dQuietDisk-37-widen-28
 tools/run-gates/run-gates.turnstile.test.sh	heredoc-source	2	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/run-selftests.sh	tab-ifs-read	8	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/run-selftests.test.sh	heredoc-source	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
@@ -53,3 +53,4 @@ tools/workflows/check-review-join.test.sh	heredoc-source	9	85a1c45076fd9093f1b9a
 tools/workflows/check-verifier-fanout.test.sh	heredoc-source	14	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/tier2-review.test.sh	heredoc-source	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/unattended-build.test.sh	tab-ifs-read	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/unattended/check-pass-order.sh	tab-ifs-read	2	40607fd2a4765daba384ddfd0917bea00d70ed80	widened:2026-11-22-build-TOOL-dQuietDisk-2-widen-29

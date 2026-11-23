@@ -310,7 +310,10 @@ fi
 # for the open asks refuses a build whose status it can derive from nothing.
 T=$base/t
 HEADSHA=$(git -C "$ROOT" rev-parse HEAD)
-git clone -q --no-hardlinks "$ROOT" "$T" || { echo "chain-packet.test: could not clone $ROOT"; exit 2; }
+# --shared (TOOL-dQuietDisk-8 S1): the clone reads $ROOT's objects through objects/info/alternates
+# rather than copying the store, and fixture T's one commit lands in its own; it sits under $base,
+# which the exit trap removes. --no-checkout because the checkout -B below checks out the full tree once.
+git clone -q --shared --no-checkout "$ROOT" "$T" || { echo "chain-packet.test: could not clone $ROOT"; exit 2; }
 git -C "$T" checkout -q -B chain-packet "$HEADSHA" || { echo "chain-packet.test: the clone cannot check out HEAD $HEADSHA"; exit 2; }
 git -C "$T" config user.email t@t.test; git -C "$T" config user.name t
 declare -A kept=()

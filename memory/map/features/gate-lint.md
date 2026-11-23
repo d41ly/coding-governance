@@ -21,6 +21,7 @@ gate-legs = [
   "spawn budget (forks per hot entrypoint)",
   "encoding posture (an entry point writes stdout as UTF-8)",
   "encoding posture (JavaScript text IO names its encoding)",
+  "cleanup posture (a tree removal that swallows its error)",
   "shell hygiene (a backslashed path handed to bash)",
   "shell hygiene (a quoting hazard)",
   "portability (shell lines only shrink)",
