@@ -21,7 +21,8 @@
 
 // The review kit's one scanner, beside this file (TOOL-dBoundRoles-25 S4); the rule reads its exports by these names.
 // A module that does not load is kept as its error, which `main` refuses naming it, never node's own exit 1.
-const VIEWS = (() => { try { return require(require('path').join(__dirname, 'script-views.js')) } catch (e) { return e } })()
+function readScriptViews() { try { return require(require('path').join(__dirname, 'script-views.js')) } catch (e) { return e } }
+const VIEWS = readScriptViews()
 const { renderBlankedLiterals, renderStrippedView, runBothViews, resolveHarnessName } = VIEWS instanceof Error ? {} : VIEWS
 
 // TOOL-aWeldedTribunal-3 — THE FALLBACK VIEW for the blanked readers, and it is NOT

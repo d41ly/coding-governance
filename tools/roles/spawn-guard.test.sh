@@ -6,7 +6,7 @@
 # against its model's (TOOL-aGuardedEffort-1), and rule 7, the settings in force against the landed agent
 # limit, plus the readers the pack exports, its refusal of every `--only=`, and its refusal of a
 # spec-audit call with no opt-in pack beside it (TOOL-dFairHearing-22). Every arm runs a COPY of the
-# pack beside a copy of the hooks kit's scratch-guard.js, the layout `mkpack` builds, since the pack
+# pack beside a copy of the hooks kit's scratch-guard.js, the layout `build_pack` builds, since the pack
 # reads that file's exports. The arms over the retired hook's own copies and its frozen script views
 # did not move: the views are the review kit's script-views.js now, and their arm is its suite's.
 # Run from the kit directory: bash ./spawn-guard.test.sh   (exit 0 = all pass)
@@ -288,7 +288,7 @@ SG_DIR=$(resolve_kit_dir "$TESTPY" hooks scratch-guard.js "$HERE") || { echo "sp
 SG_SRC="$ROOTDIR/$SG_DIR/scratch-guard.js"
 # Kit directory names, read from where each kit sits and never typed (the install-prefix ban).
 RKN=${KIT_REL##*/}; HKN=${SG_DIR##*/}; WKN=workflows; LBW="${PFX}$WKN"
-mkpack() { # <kits dir> -> prints the pack copied into <kits dir>, beside a copy of the hooks kit's scratch-guard.js
+build_pack() { # <kits dir> -> prints the pack copied into <kits dir>, beside a copy of the hooks kit's scratch-guard.js
   mkdir -p "$1/$RKN" "$1/$HKN" && cp "$KIT_HOOK" "$1/$RKN/" && cp "$SG_SRC" "$1/$HKN/" && printf '%s\n' "$1/$RKN/spawn-guard.js"
 }
 # THE ARMS RUN A COPY (TOOL-dGroundRules-21 S38): rule 7 refuses a payload cwd that lies in no checkout
@@ -296,7 +296,7 @@ mkpack() { # <kits dir> -> prints the pack copied into <kits dir>, beside a copy
 # holds. The copy sits beside scratch-guard.js and no policy kit, where rule 7 adds no rule, so each arm
 # judges the rule it names; the sections that arm rule 7 or admit a harness build their own copies beside
 # a policy kit, since a declared harness is admitted only at its landed blob, which the policy kit reads.
-HOOK=$(mkpack "$TMP/arms-kits")
+HOOK=$(build_pack "$TMP/arms-kits")
 check() { # name expected_exit json
   # FROM "$TMP", not from wherever the suite was launched: a payload with no `cwd` judges the
   # caller's checkout, whose roles index arms rule 6 and whose settings rule 7 reads. The scratch dir
@@ -342,7 +342,7 @@ SA0="$TMP/sa0"; mkdir -p "$SA0/memory/builds/tSA/reviews"; printf -- '---\nslug:
 # $TMP/pack-hooks/hooks, with the tree's own pack copied beside it. Against a hook with no presence
 # check, the dated call and the `specAudit` call are admitted, and the first and third arms red.
 PKWF=$(resolve_kit_dir "$TESTPY" workflows spec-audit-optin.js "$HERE") || PKWF=""
-PACK_HOOK=$(mkpack "$TMP/pack-kits"); mkdir -p "$TMP/pack-kits/workflows"
+PACK_HOOK=$(build_pack "$TMP/pack-kits"); mkdir -p "$TMP/pack-kits/workflows"
 [ -n "$PKWF" ] && cp "$ROOTDIR/$PKWF/spec-audit-optin.js" "$TMP/pack-kits/workflows/"
 run_pack() { # name expected_exit hook payload-json [text stderr must carry ...]
   local name=$1 want=$2 hk=$3 body=$4 got miss=""; shift 4
@@ -362,7 +362,7 @@ run_pack "pack AC1: a dated spec-audit call with no pack beside the hook is refu
 # it named `update` for an unclaimed kit and denied the pack the receipt names.
 RWK=workflows
 RCP="$TMP/rcpt/p"; mkdir -p "$RCP/.git" "$RCP/.governance" "$RCP/tools/$RWK"
-RCP_HOOK=$(mkpack "$RCP/.claude")
+RCP_HOOK=$(build_pack "$RCP/.claude")
 RCP_ROW="{\"path\":\"tools/$RWK/spec-audit-optin.js\",\"kit\":\"review-harness\",\"role\":\"engine\",\"source\":\"tools/$RWK/spec-audit-optin.js\"}"
 printf '{"kits":["agent-cap"],"files":[]}' > "$RCP/.governance/install.json"
 run_pack "FH27 AC8: a receipt claiming agent-cap alone names the apply remedy" 2 "$RCP_HOOK" "$SA_DATED" 'govkit apply --kits review-harness'
@@ -425,7 +425,7 @@ fi
 # run a COPY of the hook beside a copy of scratch-guard.js and nothing else, so rule 7 finds no policy
 # kit and adds no rule, in a checkout that is a bare `.git` directory, which is all the root walk
 # looks for. The last arm puts a policy kit beside the copy, in a real repository, and rule 7 arms.
-LIMHOOK=$(mkpack "$TMP/limit-kits")
+LIMHOOK=$(build_pack "$TMP/limit-kits")
 LIMREPO="$TMP/limitrepo"; mkdir -p "$LIMREPO/.git" "$LIMREPO/sub"
 LIMJ="$NODEDIR/limitrepo/sub"
 run_limit_call() { # name expected_exit payload-json [hook] [text stderr must carry]
@@ -462,7 +462,7 @@ if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
   echo "FAIL limit: no policy kit beside this hooks kit, so rule 7 has nothing to arm with"; fail=$((fail+1))
 else
   R7="$TMP/r7"; mkdir -p "$R7/.governance" "$R7/kits/policy" "$R7/.claude" "$R7/$LBW"
-  R7_HOOK=$(mkpack "$R7/kits")
+  R7_HOOK=$(build_pack "$R7/kits")
   # The harness rule 8's order arm names below, committed so its blob is the landed one (S3).
   printf 'const s = await agent("one")\n' > "$R7/$LBW/h.js"
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$R7/kits/policy/"; done
@@ -502,7 +502,7 @@ if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
   echo "FAIL prompts.author: no policy kit beside this hooks kit, so rule 6 has no key to read"; fail=$((fail+1))
 else
   PA="$TMP/pa"; mkdir -p "$PA/.governance" "$PA/kits/policy" "$PA/.claude"
-  PA_HOOK=$(mkpack "$PA/kits")
+  PA_HOOK=$(build_pack "$PA/kits")
   PA_NODE_HOOK="$(cd "$PA/kits/roles" && pwd -W 2>/dev/null || printf '%s' "$PA/kits/roles")/spawn-guard.js"
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$PA/kits/policy/"; done
   printf '[prompts]\nauthor = "requesting-worker-rendered"\n' > "$PA/.governance/policy.toml"
@@ -538,7 +538,7 @@ if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
   echo "FAIL prompt framing: no policy kit beside this hooks kit, so rule 6 has no prompts.author to read"; fail=$((fail+1))
 else
   PF="$TMP/pf"; mkdir -p "$PF/.governance" "$PF/kits/policy" "$PF/.claude" "$PF/memory/builds/bx/prompts"
-  PF_HOOK=$(mkpack "$PF/kits")
+  PF_HOOK=$(build_pack "$PF/kits")
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$PF/kits/policy/"; done
   printf '[prompts]\nauthor = "requesting-worker-rendered"\n' > "$PF/.governance/policy.toml"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$PF/.claude/settings.json"
@@ -597,7 +597,7 @@ fi
 # THE SECTION RUNS A COPY OF THE HOOK (TOOL-dGroundRules-10): its checkout is a bare `.git` directory
 # with no settings, which rule 7 would refuse, so the copy sits beside scratch-guard.js and no policy
 # kit, where rule 7 adds no rule. Its refusal arms are rule 6's, which decides before rule 7.
-HOOK=$(mkpack "$TMP/rule6-hooks")
+HOOK=$(build_pack "$TMP/rule6-hooks")
 HOREPO="$TMP/horepo"
 HO_WF=workflows
 mkdir -p "$HOREPO/.claude" "$HOREPO/.governance" "$HOREPO/sub" "$HOREPO/tools/$HO_WF" \
@@ -614,7 +614,7 @@ printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/other.js"
 for _h in h2 h3 h4; do printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/$_h.js"; done
 printf '[runtime]\nagents-in-flight = 2\n' > "$HOREPO/.governance/policy.toml"
 printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$HOREPO/.claude/settings.json"
-HOOKL=$(mkpack "$HOREPO/kits"); mkdir -p "$HOREPO/kits/policy"
+HOOKL=$(build_pack "$HOREPO/kits"); mkdir -p "$HOREPO/kits/policy"
 for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do [ -n "$LIMPK" ] && cp "$ROOTDIR/$LIMPK/$f" "$HOREPO/kits/policy/"; done
 ( cd "$HOREPO" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
     && git config user.name t && git add -A && git commit -qm landed --no-verify )
@@ -1180,7 +1180,7 @@ if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
 else
   LB="$TMP/lb"; LBR="$TMP/lb-remote.git"; LBJ="$NODEDIR/lb"
   mkdir -p "$LB/.claude" "$LB/.governance" "$LB/$LBW"
-  LB_HOOK=$(mkpack "$LB/kits"); mkdir -p "$LB/kits/policy"
+  LB_HOOK=$(build_pack "$LB/kits"); mkdir -p "$LB/kits/policy"
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$LB/kits/policy/"; done
   printf '[runtime]\nagents-in-flight = 2\n' > "$LB/.governance/policy.toml"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$LB/.claude/settings.json"
@@ -1215,7 +1215,7 @@ else
   # landed, is admitted; so is a CRLF checkout of the same LF blob, read through the repository's clean filter.
   AD="$TMP/ad"; ADR="$TMP/ad-remote.git"; ADJ="$NODEDIR/ad"
   mkdir -p "$AD/.claude" "$AD/.governance" "$AD/scripts/$WKN"
-  AD_HOOK=$(mkpack "$AD/scripts"); mkdir -p "$AD/scripts/policy"
+  AD_HOOK=$(build_pack "$AD/scripts"); mkdir -p "$AD/scripts/policy"
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$AD/scripts/policy/"; done
   printf '[runtime]\nagents-in-flight = 2\n' > "$AD/.governance/policy.toml"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$AD/.claude/settings.json"

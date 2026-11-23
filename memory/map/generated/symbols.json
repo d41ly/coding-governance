@@ -683,16 +683,6 @@
       "file": "tools/playbook/check_layers.py"
     },
     {
-      "id": "VIEWS",
-      "kind": "function",
-      "file": "tools/workflows/check-review-join.js"
-    },
-    {
-      "id": "VIEWS",
-      "kind": "function",
-      "file": "tools/workflows/check-verifier-fanout.js"
-    },
-    {
       "id": "ViewShardRefused",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
@@ -3801,6 +3791,11 @@
       "id": "build_owner_positions",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "build_pack",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "build_parser",
@@ -19428,11 +19423,6 @@
       "file": "tools/unattended/check-pass-order.test.sh"
     },
     {
-      "id": "mkpack",
-      "kind": "function",
-      "file": "tools/roles/spawn-guard.test.sh"
-    },
-    {
       "id": "mkrepo",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -21406,6 +21396,16 @@
       "id": "readResult",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "readScriptViews",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "readScriptViews",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
       "id": "readSegment",
