@@ -1,6 +1,6 @@
 # KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built
 
-**Status:** DEFERRED · rev-3 · 2026-11-23 · node a · Tier-2 · base f5beae3d · streams kickoff · order 36 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-23 · node a · Tier-2 · base f5beae3d · streams kickoff · order 36 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -19,6 +19,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-57-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-57-precheck-brief.md) | research | KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 |
 | [2026-11-22-prompt-KICK-dKeptSession-65-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-65-reground-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-65-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-65-1-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-65-2-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-65-2-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-65-count-fix-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-65-count-fix-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -101,11 +103,14 @@ rev no longer holds gets a `GONE —` line. Every unit whose text an item answer
   block's cases, including this unit's, sit in region 8, so today `FLOOR_SHARD_8` is the one line
   that moves. Observed by AC7.
 - **S10** — id 4, M7. Unit 64 rev-4 AC9 now copies unit 61's spec, so its loop half has a subject.
-  AC9 reads as also holding tracked stubs at unit 61's loop-kit paths: `tools/loop/loop_transition.py`,
-  `tools/loop/placement.py` and `tools/loop/README.md`, as AC8 holds them at its policy paths. The
-  join matches by shape and needs no file on disk; the stubs keep `path` hits out of the copy's
-  output. Observed by AC6.
-- **S11** — id 16, M8. Met by unit 64 rev-4 S5 and AC5, over `KICK-dKeptSession-61` rev-9 S1. No
+  AC9 reads as also holding tracked stubs at unit 61's two loop-kit paths,
+  `tools/loop/loop_transition.py` and `tools/loop/README.md`, as AC8 holds them at its policy paths
+  (DERIVED, the `tools/loop/` paths of unit 61's `### Files touched (estimate)` at `db1b5eb7`,
+  2026-11-23). The join matches by shape and needs no file on disk; the stubs keep `path` hits out
+  of the copy's output. No stub sits at `tools/loop/placement.py`: unit 61 no longer edits it, and
+  neither its Files touched nor any criterion of its §6 names it, so the copy grades no `path` hit
+  there. Observed by AC6.
+- **S11** — id 16, M8. Met by unit 64 rev-4 S5 and AC5, over `KICK-dKeptSession-61` S1. No
   `read_mail_chain` or `--mail chain` is minted. `write_consumed_acks` and `derive_mail_chain` read
   a parent's chain through `read_mail_rows(..., local=True, sent=True)`, and AC5 greps
   `tools/loop/loop_transition.py`. AC5's hand list reads as one `git grep` over the tracked tree.
@@ -397,10 +402,10 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
   line, and no `guards` hit once the name is on the leg line.
   Red when: the manifest declares only the directory guard, so unit 64's copy prints no hit.
   fixture: built by the probe; the tree holds none today.
-- **AC6** — When AC5's fixture also holds a copy of unit 61's spec with tracked stubs at its three
-  `tools/loop/` paths, and a reconciled manifest declares `planted leg` with the guard
+- **AC6** — When AC5's fixture also holds a copy of unit 61's spec with tracked stubs at its two
+  `tools/loop/` paths (S10), and a reconciled manifest declares `planted leg` with the guard
   `{prefix}/loop/`, the checker prints `planted leg <- tools/loop/loop_transition.py` before the step
-  and no `guards` hit after it. It prints no `path` hit for those three paths. And when a reconciled
+  and no `guards` hit after it. It prints no `path` hit under `tools/loop/`. And when a reconciled
   manifest renames `real leg` to `real leg two` over a copy naming `real leg`, the checker prints a
   `leg` hit for `real leg` before the step, and neither a `leg` nor a `guards` hit after it.
   Red when: the step only adds names, so the old name's `leg` hit stands.
@@ -525,6 +530,9 @@ New arm: tools/runlog/selftest.py · covers AC4 · `test_gov_remote_scrub`, `mai
   `path#symbol` or a blob-pinned line. §7 drops the legs the old write set tripped, gains
   `codebase-map coverage + freshness`, `docs` and `unattended kit gate`, and names no
   `loop selftest`. The consumes-from to 64 names what 64 rev-4 hands off.
+- rev-4 · 2026-11-23 · S10 · S11 · AC6 · unit 61's loop-kit paths are two, `placement.py` gone from
+  its Files touched, and the fixture's stub there is dropped; S11 cites unit 61 without a stale rev,
+  under `2026-11-23-prompt-KICK-dKeptSession-65-count-fix-brief`.
 
 ## 10. Reuse audit
 

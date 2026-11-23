@@ -122,8 +122,8 @@ builder does not stop.
    true. A help page anchor carries a fingerprint taken at build time.
 3. F-ceiling: if the unit edits `tools/unattended/unattended.sh`, say whether it adds a `fail`, `exit 1` or `status=1`
    site and how the 347/347 ceiling is met; name each suite floor it raises (the driver suite's `FLOOR_ASSERTIONS` is 4156
-   and `FLOOR_SHARD_8` 1373 at this tree) and each budget row it re-prices. The `loop transition record` leg's 120 s
-   ceiling stays parked for the owner.
+   and `FLOOR_SHARD_8` 1373 at this tree) and each budget row it re-prices. The `loop transition record` leg's 120 s (PINNED
+   2026-11-23, tools/gate-legs.json) ceiling stays parked for the owner.
 4. Bump the spec one rev, with one revision-log line naming this brief by its file stem. Cite code by `path#symbol`, pin
    every figure with DERIVED or PINNED, write no `[..](..)` link shape outside the generated records table, keep within
    the live-spec size cap, leave no fork open, and leave no bare `path:line` citation that the positional ledger would
