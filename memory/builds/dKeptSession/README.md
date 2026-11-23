@@ -167,7 +167,7 @@ ids KICK-dKeptSession-71 KICK-dKeptSession-72 KICK-dKeptSession-73 KICK-dKeptSes
 | [KICK-dKeptSession-79 — the closing diff review's eight minors: a fetched mail record validated once, a refused move posting no ack, a failed fetch spacing the next, and the gaps the review found](spec/2026-11-23-spec-KICK-dKeptSession-79.md) | 37 | 2 | CLOSED | rev-2 | 2026-11-23 |
 <!-- /gen:build-units -->
 
-Records: 496 bound to this build, across 4 record folder(s).
+Records: 497 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

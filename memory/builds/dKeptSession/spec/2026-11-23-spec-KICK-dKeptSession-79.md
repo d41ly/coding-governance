@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-23-build-KICK-dKeptSession-79-1-acceptance-ledger.md](../build/2026-11-23-build-KICK-dKeptSession-79-1-acceptance-ledger.md) | journal | — |
+| [2026-11-23-build-KICK-dKeptSession-79-red-fix-19.md](../build/2026-11-23-build-KICK-dKeptSession-79-red-fix-19.md) | red-fix | — |
 | [2026-11-23-build-KICK-dKeptSession-79-widen-3.md](../build/2026-11-23-build-KICK-dKeptSession-79-widen-3.md) | widen | — |
 | [2026-11-21-prompt-KICK-dKeptSession-79-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-79-build-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-79-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-79-1-spec-writer.md) | journal | — |
