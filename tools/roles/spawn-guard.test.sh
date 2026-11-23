@@ -774,6 +774,7 @@ prompts = {
     "moved": MM + "\n\n" + mtask,
     "open": MO + "\n\n" + otask,
 }
+
 prompts.update({name: typed[name] + "\n\n" + sec for name, sec in tvars.items()})
 prompts.update({name: mark + "\n\n" + sec for name, (mark, sec) in flips.items()})
 for k, v in prompts.items():
