@@ -6,7 +6,6 @@
 .githooks/pre-push.test.sh
 tools/check-wiring.test.sh
 tools/codebase-map/adopt-codebase-map.test.sh
-tools/hooks/agent-cap.test.sh
 tools/lib/resolve-python.test.sh
 tools/memory-tree/check-method-carriers.test.sh
 tools/memory-tree/check-verdict-epoch.test.sh
@@ -14,6 +13,7 @@ tools/memory-tree/kit-dogfood-parity.test.sh
 tools/memory-tree/marker-contract.test.sh
 tools/memory-tree/merge-rows.test.sh
 tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh
+tools/roles/spawn-guard.test.sh
 tools/workflows/check-protocol-parity.test.sh
 tools/workflows/check-review-join.test.sh
 tools/workflows/check-verifier-fanout.test.sh
