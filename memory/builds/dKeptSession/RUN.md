@@ -385,3 +385,5 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T17:14:17Z dispatch · item deca46e1 KICK-dKeptSession-65 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/runlog/selftest.py memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-65-1-acceptance-ledger.md memory/builds/dKeptSession/BACKLOG.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/LIVE.md
 
 2026-11-23T18:02:54Z review · item dKeptSession · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 0 · round-minors 8 · CONVERGED · highs 0 · minors 8 · to units · disposition promote
+
+2026-11-23T18:27:34Z rescope · item add KICK-dKeptSession-79 · reason the closing diff review's round 1 (c3ba5199b, wf_72f622df-161) exited CONVERGED with 5 mediums and 3 lows confirmed; --disposition promote batches them into one unit, the eight sharing tools/run-gates/selftest-budgets.txt
