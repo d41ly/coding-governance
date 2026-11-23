@@ -457,3 +457,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T10:59:34Z dispatch · item fa521904 TOOL-dBoundRoles-84 · reason tools/loop/item-schema.toml tools/playbook/row_checks.py tools/playbook/overlay_rows.py tools/loop/loop_items.py help/loop.md memory/project/docs-undocumented.txt memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-84-deviation-841.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-84-1-acceptance-ledger.md memory/map/generated/symbols.json
 
 2026-11-23T10:59:35Z brief · item TOOL-dBoundRoles-84 · reason 67a9bbc83b57 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-84-build-brief.md
+
+2026-11-23T11:20:56Z brief · item TOOL-dBoundRoles-83 · reason 100c4a84d2ab memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-83-build-brief.md
+
+2026-11-23T11:26:56Z dispatch · item 140e49a8 TOOL-dBoundRoles-83 · reason tools/playbook/row_checks.py tools/playbook/overlay_rows.py tools/playbook/fixtures/row_kind.py tools/playbook/render_playbook.py help/overlay-rows.md memory/project/docs-undocumented.txt memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-83-deviation-831.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-83-1-acceptance-ledger.md memory/map/generated/symbols.json

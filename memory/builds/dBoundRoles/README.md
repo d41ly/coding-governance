@@ -86,7 +86,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 64 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 64 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
@@ -137,7 +137,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-59 — unit 53's read check folds each `reads` entry through `roles_lib.parse_read_key`, so the tag spelling unit 14 writes passes and the read-key grammar keeps one owner](spec/2026-10-26-spec-TOOL-dBoundRoles-59.md) | 23 | 2 | CLOSED | rev-3 | 2026-11-23 |
 | [TOOL-dBoundRoles-81 — the compose verb reads gov's role files and workflow entries as rows, through a reader the namespace row declares](spec/2026-11-23-spec-TOOL-dBoundRoles-81.md) | 23 | 2 | OPEN | rev-1 | 2026-11-23 |
 | [TOOL-dBoundRoles-82 — a scalar field declares `widens = "rises-only"`, so an overlay may raise its number and never lower it](spec/2026-11-23-spec-TOOL-dBoundRoles-82.md) | 23 | 2 | CLOSED | rev-1 | 2026-11-23 |
-| [TOOL-dBoundRoles-83 — the exclusion walk reads a requirer's member in its own spelling, an actor's `role:<slot>` and a grant's leg name, as the tag it names](spec/2026-11-23-spec-TOOL-dBoundRoles-83.md) | 23 | 2 | OPEN | rev-1 | 2026-11-23 |
+| [TOOL-dBoundRoles-83 — the exclusion walk reads a requirer's member in its own spelling, an actor's `role:<slot>` and a grant's leg name, as the tag it names](spec/2026-11-23-spec-TOOL-dBoundRoles-83.md) | 23 | 2 | INPROGRESS | rev-1 | 2026-11-23 |
 | [TOOL-dBoundRoles-84 — the item schema opens `actor` on `widens = "changes"`, so a patch of a gov item's actor reaches the actor-patch check, which alone admits or refuses it](spec/2026-11-23-spec-TOOL-dBoundRoles-84.md) | 23 | 2 | CLOSED | rev-1 | 2026-11-23 |
 | [TOOL-dBoundRoles-85 — an `adopter-rule` types a level-5 `repo` unit under `budget = "block"`, beside the level-0 one it types today](spec/2026-11-23-spec-TOOL-dBoundRoles-85.md) | 23 | 2 | CLOSED | rev-1 | 2026-11-23 |
 | [TOOL-dBoundRoles-19 — the roles kit's house text files moved into the overlay as level-5 units selecting their role, by their own upgrade step](spec/2026-10-25-spec-TOOL-dBoundRoles-19.md) | 24 | 2 | DEFERRED | rev-7 | 2026-11-22 |
@@ -163,7 +163,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 442 bound to this build, across 4 record folder(s).
+Records: 444 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
