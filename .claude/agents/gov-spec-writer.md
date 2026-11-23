@@ -126,4 +126,6 @@ refusing, not a hit: name it in your return.
 ## Return
 
 Return one object holding these fields, in this order: outcome (one of done); authored (a list); alreadyPresent (a list); refused (a list); summary (text).
+
+Or refuse, returning outcome: refused; rule (text); remedy (text); actor (one of self, producer, driver, owner, build:<slug>).
 [/.claude/agents/gov-spec-writer.md]

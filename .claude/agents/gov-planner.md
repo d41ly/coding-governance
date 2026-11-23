@@ -89,4 +89,6 @@ anything outside the question you were handed, out of what you write and return.
 ## Return
 
 Return one object holding these fields, in this order: outcome (one of select, defer, retire, refuse, drafted, research, owner-question, review, no-review, grouped, probe); record (a path, optional); reason (text).
+
+Or refuse, returning outcome: refused; rule (text); remedy (text); actor (one of self, producer, driver, owner, build:<slug>).
 [/.claude/agents/gov-planner.md]

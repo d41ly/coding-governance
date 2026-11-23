@@ -92,7 +92,8 @@ reference; this page is the short version.
    `input:question` and the role's whole work order under `input:work-order`: its role text, every input
    it reads, its allowance and its return template. Only `--for` fills that input, and
    `--input work-order=` is refused. The prompt writer writes nothing. It returns `framed` with `job` and
-   `nostop`, and `population` and `added` where it has them, or `refused` with `why`. Then
+   `nostop`, and `population` and `added` where it has them, or a refusal (see "When a role refuses
+   its item"). Then
    `handoff.py render --role <role> ... --framed-by <the prompt writer's agent id>` reads that return
    from the prompt writer's own transcript in your session, so you retype none of it, and you spawn the
    role with that task. The agent must be typed `gov-prompt-writer`, its first message a prompt writer's
@@ -331,7 +332,39 @@ the waiver row decides, as before the key. A waiver never admits a write the hoo
 row grammar, read the roles README's "Standing in for a role" section; no tree holds the registry
 until an owner writes its first row.
 
-A fork a role meets while you are away is answered by the policy key `run.on-owner-question`, which `handoff.py owner-question --kind fork` prints: under the default, `best-effort-recorded`, it prints `resolve`, and the role resolves the fork by `principle.p18` and writes its record in the spec's open-questions item, `options: <o1> > <o2> · pick: <o1> · admitted-by: principle.<tag>`; `park-item`, `park-build` and `stop-run` print themselves. `--kind owner-gate` reads the same key, while `--kind ratification`, `--kind owner-write` and `--attended` always print `owner`, and an unknown kind exits 2. `unattended.sh --dispatch` refuses a FORKED unit with check 49 under every answer: `resolve` names the record each open fork owes, `park-item` parks the unit as a decision row naming its open forks, `park-build` parks the build as one decision row naming every FORKED unit, and `stop-run` names `--abort` as the next verb. <!-- usage: policy:run.on-owner-question c89d20e3 -->
+A fork a role meets while you are away is answered by the policy key `run.on-owner-question`, which `handoff.py owner-question --kind fork` prints: under the default, `best-effort-recorded`, it prints `resolve`, and the role resolves the fork by `principle.p18` and writes its record in the spec's open-questions item, `options: <o1> > <o2> · pick: <o1> · admitted-by: principle.<tag>`; `park-item`, `park-build` and `stop-run` print themselves. `--kind owner-gate` and `--kind refusal`, an `owner` refusal's, read the same key, while `--kind ratification`, `--kind owner-write` and `--attended` always print `owner`, and an unknown kind exits 2. `unattended.sh --dispatch` refuses a FORKED unit with check 49 under every answer: `resolve` names the record each open fork owes, `park-item` parks the unit as a decision row naming its open forks, `park-build` parks the build as one decision row naming every FORKED unit, and `stop-run` names `--abort` as the next verb. <!-- usage: policy:run.on-owner-question c89d20e3 -->
+
+## When a role refuses its item
+
+Every role's return carries one more shape beside its own: the refusal. An agent that cannot do its
+item returns `outcome: refused` with three fields: `rule`, the name of the rule that refused; `remedy`,
+one line saying what would let the item go on; and `actor`, who can perform that remedy: `self`, the
+agent itself; `producer`, the item whose output it was handed; `driver`; `owner`; or `build:<slug>`,
+another build. The shape is declared once, in the roles kit's `role-schema.toml`, and every agent file
+shows it at the end of `## Return`. A role file whose own `outcome` set holds `refused` is refused by
+the catalogue checker. The return check refuses a refusal whose actor is none of the five, whose
+`build:` slug is not letters alone, or whose rule or remedy is empty, naming the field.
+
+`handoff.py route-refusal --return <file>` reads such a return and prints one `refusal —` line saying
+where it goes:
+
+- `self`: `route retry · re-offer bounded`. The same item goes back to the agent, at most
+  `roles.retries` times; past that, the driver takes it.
+- `producer`: `route route-back · re-offer never · item <tag>`. It goes back to the item of the first
+  upstream row of the work order the return answers. With no such row it is `route driver`, and the
+  line says why.
+- `driver`: `route driver · re-offer never`. The driver performs the remedy, then dispatches afresh.
+- `owner`: `route owner · re-offer never`, with the answer `run.on-owner-question` gives the kind
+  `refusal` while you are away. Add `--budget-spent` once the build's rework budget is spent: the
+  default then answers `choose-ending · endings park-item > park-build > stop-run`, never `resolve`, so
+  best effort picks one ending, most work kept first, records the pick as a fork's record, and takes
+  no further lap.
+- `build:<slug>`: `route ask build:<slug> · re-offer never`. The main loop files an ask for that build.
+
+Only a `self` refusal ever goes back to the agent that refused. Each line ends with the build and the
+rework draw. Record the refusal with the unattended driver's `--refused` and its `--rule`, `--remedy`
+and `--actor` flags, as the loop page says. The verb exits 0 printing the line, 1 naming each defect
+of a return that is no valid refusal, and 2 when a reader it asks refuses.
 
 ## What the hooks refuse
 

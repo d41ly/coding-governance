@@ -111,4 +111,6 @@ were handed, out of what you write and return.
 ## Return
 
 Return one object holding these fields, in this order: outcome (one of findings, clean); findings (a list).
+
+Or refuse, returning outcome: refused; rule (text); remedy (text); actor (one of self, producer, driver, owner, build:<slug>).
 [/.claude/agents/gov-reviewer.md]

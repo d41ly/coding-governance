@@ -99,4 +99,6 @@ task you were handed, out of what you write and return.
 ## Return
 
 Return one object holding these fields, in this order: outcome (one of oriented, placed); card (text, optional); disposition (text, optional); reason (text, optional); evidence (text, optional); observations (text, optional); scenarios (text, optional); facts (text, optional).
+
+Or refuse, returning outcome: refused; rule (text); remedy (text); actor (one of self, producer, driver, owner, build:<slug>).
 [/.claude/agents/gov-orienter.md]

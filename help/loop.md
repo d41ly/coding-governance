@@ -937,7 +937,13 @@ witnessed, in the order the composition lists them; the next item is its first e
 stays on it, because its witness still does not hold, so one refusal never leaves the build with
 nowhere to go. Record a refusal with the unattended driver's `--refused <slug> --item <tag> --key
 <instance key> --reason <text>`: it writes one `refusal` row to the run-state file, and only where
-the engine holds the tag as one your composition declares and the key as that tag's instance shape. <!-- usage: verb:unattended.sh:--refused 4c50a2c8 -->
+the engine holds the tag as one your composition declares and the key as that tag's instance shape. <!-- usage: verb:unattended.sh:--refused 0b91a77d -->
+To record a typed refusal, add `--rule <the rule that refused> --remedy <one line> --actor <who can
+perform it>`, all three together: the row's reason then ends ` · rule <r> · remedy <m> · actor <a>`.
+The actor is one of `self`, `producer`, `driver`, `owner` or `build:<slug>`; any other actor, a
+missing one of the three, or a rule or remedy holding ` · ` is refused and nothing is written. The
+position engine reads the three back beside the reason, and its `refusal —` line still prints the
+reason alone. The roles page says where each actor's refusal goes.
 
 The unattended driver's `--plan` prints the engine's answer as its `next:` line, in the same five
 shapes it always printed, and beneath it a `frontier:` line naming the frontier's tags, or

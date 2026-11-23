@@ -242,6 +242,49 @@ def load_role_schema():
 
 #: Every front-matter key a role file may carry, in the schema's order: derived from it, never typed.
 FRONT_MATTER_KEYS = tuple(r["key"] for r in load_role_schema())
+
+#: THE OUTCOME TABLE (TOOL-dBoundRoles-26 S3, §4): each refusal arm's actor kind, a `build:<slug>` actor's kind
+#: `build`, mapped to its route, whether the item goes back to the refused agent (`bounded` by `roles.retries`,
+#: or `never`) and the rework draw TOOL-dDeclaredLoop-30 takes for it. Only `self` re-offers the item; every
+#: other route is taken in the driver step that read the return. `load_refusal_arm` holds its keys to the
+#: arm's actor kinds both ways, and `resolve_refusal_route` is its one reader.
+REFUSAL_ROUTES = {"self": ("retry", "bounded", "re-dispatch"),
+                  "producer": ("route-back", "never", "route-back"),
+                  "driver": ("driver", "never", "re-dispatch"),
+                  "owner": ("owner", "never", "none"),
+                  "build": ("ask", "never", "none")}
+
+
+def load_refusal_arm():
+    """The `[return.refusal]` table of `role-schema.toml` beside this file (TOOL-dBoundRoles-26 S1), the arm
+    every role's `return` carries, as `{"outcome", "fields", "actors"}`: `outcome` one closed-set value,
+    `fields` its named fields, `actor` among them, and `actors` each actor form, a `<kind>:<slug>` form
+    naming its slug by the placeholder `<slug>`. RolesError, R2, naming the file where the table is absent
+    or breaks one of those shapes, or where the actor kinds are not `REFUSAL_ROUTES`' keys, both ways."""
+    path = pathlib.Path(__file__).absolute().parent / ROLE_SCHEMA
+    where = path.as_posix()
+    try:
+        with open(path, "rb") as fh:
+            arm = (tomllib.load(fh).get("return") or {}).get("refusal")
+    except (OSError, tomllib.TOMLDecodeError) as e:
+        raise RolesError("%s: R2 — the role schema does not read — %s" % (where, getattr(e, "strerror", None) or e))
+    if not isinstance(arm, dict):
+        raise RolesError("%s: R2 — [return.refusal] is absent, so no role's return carries the refusal arm" % where)
+    outcome, fields, actors = arm.get("outcome"), arm.get("fields"), arm.get("actors")
+    if not isinstance(outcome, str) or not RETURN_VALUE_RE.match(outcome):
+        raise RolesError("%s: R2 — [return.refusal] outcome %r is not %s" % (where, outcome, RETURN_VALUE_RE.pattern))
+    if not isinstance(fields, list) or "actor" not in fields or not all(
+            isinstance(f, str) and RETURN_NAME_RE.match(f) and f != "outcome" for f in fields):
+        raise RolesError("%s: R2 — [return.refusal] fields %r is no list of field names holding actor" % (where, fields))
+    if not isinstance(actors, list) or not actors or not all(
+            isinstance(a, str) and re.fullmatch(r"[a-z]+(:<slug>)?", a) for a in actors):
+        raise RolesError("%s: R2 — [return.refusal] actors %r is no list of <kind> or <kind>:<slug> forms"
+                         % (where, actors))
+    kinds = [a.split(":")[0] for a in actors]
+    if sorted(kinds) != sorted(REFUSAL_ROUTES):
+        raise RolesError("%s: R2 — [return.refusal] actors name the kinds %s, and REFUSAL_ROUTES routes %s"
+                         % (where, ", ".join(kinds), ", ".join(REFUSAL_ROUTES)))
+    return {"outcome": outcome, "fields": list(fields), "actors": list(actors)}
 #: Where each writer class's output lives, spelled as `output` must carry it (R14) and as a rendered
 #: role's ceiling names it. The product class has no single folder, so its spelling is the conf key
 #: that declares its paths.
@@ -379,10 +422,49 @@ def parse_return_template(value):
     return out
 
 
+def render_refusal_arm(arm):
+    """The one line naming the refusal arm `arm`, `load_refusal_arm`'s, that `## Return` closes with
+    (TOOL-dBoundRoles-26 S1): its `outcome: <value>`, then each field, `actor` as one of its forms."""
+    fields = ["%s (%s)" % (f, "one of " + ", ".join(arm["actors"]) if f == "actor" else "text") for f in arm["fields"]]
+    return "Or refuse, returning outcome: %s; %s." % (arm["outcome"], "; ".join(fields))
+
+
+def check_refusal_arm(obj, arm=None):
+    """The defect lines of a refused return object `obj` read against the refusal arm (TOOL-dBoundRoles-26 S2),
+    `arm` `load_refusal_arm`'s when None; `[]` for a valid refusal. Each arm field absent or not a non-empty
+    string, a `remedy` spelling the record's separator ` · ` or a line break, and an `actor` none of the arm's
+    forms, a `<kind>:<slug>` form's slug off `SLUG_RE` included, is one line naming the field."""
+    arm = arm or load_refusal_arm()
+    defects = []
+    for name in arm["fields"]:
+        value = obj.get(name)
+        if not isinstance(value, str) or not value.strip():
+            defects.append("%s — the refusal arm's %s is absent or empty" % (name, name))
+        elif name != "actor" and (" · " in value or "\n" in value or "\r" in value):
+            defects.append("%s — %s spells the record's separator ' · ' or a line break; it is one line"
+                           % (name, json.dumps(value, ensure_ascii=False)[:80]))
+    actor = obj.get("actor")
+    if isinstance(actor, str) and actor.strip() and derive_refusal_kind(actor, arm) is None:
+        defects.append("actor — %s is none of %s" % (json.dumps(actor, ensure_ascii=False)[:80], ", ".join(arm["actors"])))
+    return defects
+
+
+def derive_refusal_kind(actor, arm):
+    """The kind of the refusal actor `actor` under `arm`'s forms: the form itself for a bare one, `<kind>` for
+    `<kind>:<slug>` whose slug matches `SLUG_RE`; None for any other value."""
+    for form in arm["actors"]:
+        kind, sep, _slug = form.partition(":")
+        if (not sep and actor == form) or (sep and actor.startswith(kind + ":")
+                                           and SLUG_RE.match(actor[len(kind) + 1:])):
+            return kind
+    return None
+
+
 def render_role_fields(keys, gates=()):
     """The `## Never`, `## Ceiling` and `## Return` sections of a role's front matter `keys`
     (TOOL-dBoundRoles-2 S6), the gate legs `gates` granted it. `## Never` and `## Return` render only
-    where their key is non-empty; the ceiling always renders, an absent value as `none`."""
+    where their key is non-empty; the ceiling always renders, an absent value as `none`. `## Return` closes
+    with `render_refusal_arm`'s line, the refusal arm every role carries (TOOL-dBoundRoles-26 S1)."""
     out = []
     entries = parse_never_entries(keys.get("never", ""))
     if entries:
@@ -403,7 +485,8 @@ def render_role_fields(keys, gates=()):
         for name, kind, optional in parse_return_template(keys["return"]):
             what = "one of " + ", ".join(kind) if isinstance(kind, tuple) else RETURN_TYPE_WORDS[kind]
             fields.append("%s (%s%s)" % (name, what, ", optional" if optional else ""))
-        out.append("## Return\n\nReturn one object holding these fields, in this order: %s." % "; ".join(fields))
+        out.append("## Return\n\nReturn one object holding these fields, in this order: %s.\n\n%s"
+                   % ("; ".join(fields), render_refusal_arm(load_refusal_arm())))
     return "\n\n".join(out)
 
 
@@ -600,23 +683,29 @@ def read_policy_setting(key, root, with_default=False):
 
 #: TOOL-dBoundRoles-11 S5: the question kinds the owner-question reader answers, and the answer words.
 OWNER_QUESTION_KEY = "run.on-owner-question"
-OWNER_QUESTION_KINDS = ("fork", "owner-gate", "ratification", "owner-write")
-OWNER_QUESTION_ANSWERS = ("resolve", "park-item", "park-build", "stop-run", "owner")
+OWNER_QUESTION_KINDS = ("fork", "owner-gate", "ratification", "owner-write", "refusal")
+OWNER_QUESTION_ANSWERS = ("resolve", "park-item", "park-build", "stop-run", "owner", "choose-ending")
+#: The endings best effort chooses among once the build's rework budget is spent (TOOL-dBoundRoles-26 S5, §8 F3),
+#: ranked most work kept first: the key's three ending values, in this order.
+OWNER_ENDINGS = OWNER_QUESTION_ANSWERS[1:4]
 
 
-def resolve_owner_question(kind, attended, repo):
-    """'resolve' | 'park-item' | 'park-build' | 'stop-run' | 'owner', the key read once by `read_policy_setting`
-    (TOOL-dBoundRoles-11 S5). A question of kind `fork` or `owner-gate` raised while the owner is away answers
+def resolve_owner_question(kind, attended, repo, budget_spent=False):
+    """'resolve' | 'park-item' | 'park-build' | 'stop-run' | 'owner' | 'choose-ending', the key read once by
+    `read_policy_setting` (TOOL-dBoundRoles-11 S5). A question of kind `fork`, `owner-gate` or `refusal`, an
+    `owner` refusal's (TOOL-dBoundRoles-26 S5), raised while the owner is away answers
     `run.on-owner-question`'s value at the landed revision of `repo`, its catalogue default
     `best-effort-recorded` read as `resolve`: the role that meets the fork resolves it by `principle.p18` and
-    records it. A question raised while the owner attends, a `ratification` and an `owner-write` each answer
-    `owner`, the cases the key leaves to the owner and `run.on-owner-silence`. An unknown kind raises
-    RolesError naming it; a refused read raises the reader's RolesError, naming the key and the reader's line;
-    no policy kit, the reader's None, raises RolesError naming the key and the absent kit. A value outside the
-    catalogue's four raises RolesError naming it.
+    records it. With `budget_spent`, the build's rework budget spent as `budget.py`'s `ending` line states,
+    `best-effort-recorded` answers `choose-ending` instead, its options `OWNER_ENDINGS` alone and never
+    `resolve`, so best effort takes no further lap. A question raised while the owner attends, a
+    `ratification` and an `owner-write` each answer `owner`, the cases the key leaves to the owner and
+    `run.on-owner-silence`. An unknown kind raises RolesError naming it; a refused read raises the reader's
+    RolesError, naming the key and the reader's line; no policy kit, the reader's None, raises RolesError
+    naming the key and the absent kit. A value outside the catalogue's four raises RolesError naming it.
 
-    WHAT THIS DOES NOT CHECK: which build or item asked, or whether the rework budget is spent, whose ending
-    branch TOOL-dBoundRoles-26 adds here."""
+    WHAT THIS DOES NOT CHECK: which build or item asked, or that `budget_spent` is true of the build, which
+    the caller reads."""
     if kind not in OWNER_QUESTION_KINDS:
         raise RolesError("%s — the question kind '%s' is none of %s" % (OWNER_QUESTION_KEY, kind,
                                                                         ", ".join(OWNER_QUESTION_KINDS)))
@@ -630,7 +719,7 @@ def resolve_owner_question(kind, attended, repo):
     if answer not in OWNER_QUESTION_ANSWERS[:4]:   # the four the key's values answer; `owner` is never one
         raise RolesError("%s — reads %r, none of best-effort-recorded, park-item, park-build and stop-run"
                          % (OWNER_QUESTION_KEY, value))
-    return answer
+    return "choose-ending" if answer == "resolve" and budget_spent else answer
 
 
 def check_effort_floor(level, source, root=None):
@@ -1588,6 +1677,11 @@ def check_return(role, text, root=None, work_order=None):
     for it, `read_return_bounds`' read of that file under `root`, is a defect naming the field and the
     bound (TOOL-dBoundRoles-23 S3).
 
+    A return whose `outcome` is the refusal arm's, `load_refusal_arm`'s `refused`, is read against that arm
+    rather than the role's template, the role's own `answers` field kept beside it: each arm field is graded
+    by `check_refusal_arm`, an `actor` outside the arm's five forms and an empty `rule` or `remedy` each a line
+    naming the field, and a field neither names is a defect as above (TOOL-dBoundRoles-26 S2).
+
     WHAT THIS DOES NOT CHECK: that an `answers` is present where the work order is given, the field's
     presence being TOOL-dBoundRoles-17's; what a `text` value says; nor which commit a `sha` names; nor a
     bound where the work order file does not read or its `### return` block states none."""
@@ -1604,11 +1698,25 @@ def check_return(role, text, root=None, work_order=None):
         except OSError:
             root = "."
     obj, why = extract_return_object(text, template)
+    # TOOL-dBoundRoles-26 S2: a return whose `outcome` is the refusal arm's is read against the arm, not the
+    # role's template: its fields read again under the arm's names, the role's own `answers` kept beside them,
+    # and each arm field graded by `check_refusal_arm` alone
+    arm = load_refusal_arm()
+    refusing = False
+    if obj is None or obj.get("outcome") == arm["outcome"]:
+        shape = [("outcome", (arm["outcome"],), False)] + [(f, "text", False) for f in arm["fields"]] \
+            + [t for t in template if t[0] == "answers"]
+        refused, _why = extract_return_object(text, shape + ([] if any(t[0] == "answers" for t in shape)
+                                                             else [("answers", "text", True)]))
+        if isinstance(refused, dict) and refused.get("outcome") == arm["outcome"]:
+            template, obj, refusing = shape, refused, True
     if obj is None:
         return ["return object — %s" % why]
     kinds = {name: kind for name, kind, _optional in template}
-    defects = []
+    defects = check_refusal_arm(obj, arm) if refusing else []
     for name, kind, optional in template:
+        if refusing and name in arm["fields"]:
+            continue
         if name in obj:
             defects += check_return_value(name, kind, obj[name], root)
         elif not optional:
@@ -1659,6 +1767,101 @@ def read_return_bounds(root, work_order):
         if m:
             bounds[m.group("field")] = int(m.group("bound"))
     return bounds
+
+
+def read_answered_work_order(root, said):
+    """`(rel, text, marker, why)` of the work order a return's `answers` value `said` names, read under `root`
+    (TOOL-dBoundRoles-12 S3, and TOOL-dBoundRoles-26 S4's producer route): `rel` its repo-relative path, `text`
+    its text with CRLF folded, `marker` its first `MARKER_RE` line outside a fence. Where one fails, `why` is the
+    `answers — ` line naming it and the items not reached are None: a value off `ANSWERS_VALUE_RE`, a path that
+    is not repo-relative and free of `..` segments, a file that does not read as UTF-8, and no marker line;
+    `why` is '' for a work order that reads with its marker."""
+    m = ANSWERS_VALUE_RE.fullmatch(said) if isinstance(said, str) else None
+    if not m:
+        return None, None, None, ("answers — %s is not `<work order path> task-sha=<12 hex>`"
+                                  % json.dumps(said, ensure_ascii=False)[:80])
+    rel = m.group("path")
+    if rel.startswith("/") or re.match(r"^[A-Za-z]:", rel) or ".." in rel.split("/"):
+        return rel, None, None, "answers — %s is not a repo-relative path free of `..` segments" % rel
+    try:
+        text = (pathlib.Path(root) / rel).read_bytes().decode("utf-8").replace("\r\n", "\n")
+    except (OSError, UnicodeDecodeError) as e:
+        return rel, None, None, ("answers — the work order %s cannot be read under %s: %s"
+                                 % (rel, pathlib.Path(root).as_posix(), getattr(e, "strerror", None) or e))
+    marker = next((mk for _n, line in read_unfenced_lines(text) if line is not None
+                   for mk in [MARKER_RE.fullmatch(line)] if mk), None)
+    if marker is None:
+        return rel, text, None, ("answers — %s carries no gov:handoff marker line outside a fence, so it is no "
+                                 "rendered work order and names no role" % rel)
+    return rel, text, marker, ""
+
+
+#: A work order's upstream rows block, and one of its rows, `- <upstream item>#<row id> · <kind> · <text>`, the
+#: loop kit's `upstream.py rows` line (TOOL-dDeclaredLoop-29), its item read by `extract_upstream_item`.
+UPSTREAM_ROWS_KEY = "upstream:rows"
+UPSTREAM_ROW_RE = re.compile(r"^- (?P<item>item(?:\.[a-z0-9][a-z0-9-]*){2,})#\S+ · ")
+
+
+def extract_upstream_item(text):
+    """The upstream item of the first row of the work order `text`'s `### upstream:rows` block, in the rows' own
+    order (TOOL-dBoundRoles-26 §4, the producer route): the first `UPSTREAM_ROW_RE` line, handed content inside
+    the block's fence included, between that heading outside a fence and the next heading outside one; None
+    where the work order holds no such block or the block no row."""
+    lines = str(text or "").split("\n")
+    heads = [n for n, line in read_unfenced_lines(text or "") if line is not None and line.startswith("#")]
+    start = next((n for n in heads if lines[n - 1].rstrip() == "### " + UPSTREAM_ROWS_KEY), None)
+    if start is None:
+        return None
+    end = next((n for n in heads if n > start), len(lines) + 1)
+    return next((m.group("item") for line in lines[start:end - 1] for m in [UPSTREAM_ROW_RE.match(line)] if m), None)
+
+
+#: The policy key bounding how often an item goes back to the agent that returned it (TOOL-dBoundRoles-5 S3).
+RETRIES_KEY = "roles.retries"
+
+
+def resolve_refusal_route(refusal, role, build, repo, budget_spent=False):
+    """The route of the refused return object `refusal` by its `actor`, `REFUSAL_ROUTES`' one reader
+    (TOOL-dBoundRoles-26 S3): `{"actor", "route", "reoffer", "draw", "fields"}`, `fields` the route line's
+    trailing fields in order. `role` and `build` are the answered work order's marker's, `-` with none; `repo`
+    the repository whose policy keys are read. `self` is `retry`, re-offered `bounded`, its field the
+    `roles.retries` bound and the role; `producer` is `route-back` to the item of the first upstream row of the
+    work order the return's `answers` names, `extract_upstream_item`'s, and with no such item `driver`, its
+    field saying why; `owner` is `owner`, its field `resolve_owner_question(kind="refusal")`'s answer with the
+    owner away and `budget_spent` handed on, and `choose-ending` names `OWNER_ENDINGS` in rank; `build:<slug>`
+    is `ask build:<slug>`. Every route but `retry` re-offers `never`. Each closes with `build <build>` and the
+    draw TOOL-dDeclaredLoop-30 takes. RolesError naming the actor where it is none of the arm's forms, and the
+    owner reader's own refusal."""
+    arm = load_refusal_arm()
+    actor = refusal.get("actor")
+    kind = derive_refusal_kind(actor, arm) if isinstance(actor, str) else None
+    if kind is None:
+        raise RolesError("actor — %s is none of %s" % (json.dumps(actor, ensure_ascii=False)[:80],
+                                                       ", ".join(arm["actors"])))
+    route, reoffer, draw = REFUSAL_ROUTES[kind]
+    fields = []
+    if kind == "self":
+        retries = read_policy_setting(RETRIES_KEY, repo, with_default=True)
+        fields.append("retries %s · role %s" % ("unread" if retries is None else retries, role))
+    elif kind == "producer":
+        said = refusal.get("answers")
+        _rel, text, _marker, why = read_answered_work_order(repo, said) if said is not None else (
+            None, None, None, "the return names no work order it answers")
+        item = extract_upstream_item(text) if text is not None else None
+        if item:
+            fields.append("item %s" % item)
+        else:
+            route, reoffer, draw = REFUSAL_ROUTES["driver"]
+            fields.append("item none — %s, so the driver performs the remedy" % (
+                why.split("answers — ", 1)[-1] or "the work order %s holds no %s row" % (_rel, UPSTREAM_ROWS_KEY)))
+    elif kind == "owner":
+        answer = resolve_owner_question("refusal", False, repo, budget_spent)
+        fields.append("answer %s" % answer + (" · endings %s" % " > ".join(OWNER_ENDINGS)
+                                              if answer == "choose-ending" else ""))
+    elif kind == "build":
+        route = "%s %s" % (route, actor)
+    fields += ["build %s" % build, "draw %s" % draw]
+    return {"actor": actor, "route": route, "reoffer": reoffer, "draw": draw, "fields": fields}
 
 
 def derive_frame(blocks):

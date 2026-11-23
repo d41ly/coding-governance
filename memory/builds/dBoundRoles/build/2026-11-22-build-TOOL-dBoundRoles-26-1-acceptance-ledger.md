@@ -1,0 +1,22 @@
+**Serves:** journal TOOL-dBoundRoles-26
+
+# TOOL-dBoundRoles-26 — acceptance ledger
+
+Each criterion of section 6, read by the pass that built the unit with a probe of the code it changed, on the
+worktree before the pass commit at base `208a53c4d`. The roles probes ran this tree's `tools/roles/roles_lib.py`
+in process and its `tools/roles/handoff.py route-refusal` as a process in a fixture repository under the host temp
+folder, its policy committed on `main` with no `run.on-owner-question` set, holding one work order with an
+`### upstream:rows` block and one with none; the catalogue probe ran a copy of the roles kit whose `gov-builder`
+role file carries `refused` in its `outcome` set; the driver probe sliced
+`tools/unattended/unattended.sh#write_refusal` out of this tree and ran it with its run-state helpers stubbed, the
+row writer replaced by a line printing the composed reason; the record probe ran
+`tools/loop/position.py#read_refusals` over planted `refusal` rows. No gate, suite or bar ran in the pass: the
+`New arm:` arms the spec's gate line declares, their RED-first observations and the legs that line lists are owed to the
+main loop at the close.
+
+**Evidences:** TOOL-dBoundRoles-26
+- AC1 — `route retry · re-offer bounded` — `route-refusal` printed `refusal — self · route retry · re-offer bounded · retries 3 · role - · build - · draw re-dispatch`; the producer plant answering the work order with rows printed `refusal — producer · route route-back · re-offer never · item item.design.unit-spec · build tFix · draw route-back`, and with no row or no `answers` it printed `route driver · re-offer never` and an `item none — ` field naming why; `driver` printed `route driver · re-offer never`; `owner` printed `route owner · re-offer never · answer resolve`; `build:dPlanted` printed `route ask build:dPlanted · re-offer never`; `nobody` exited 1 naming the actor. With every `REFUSAL_ROUTES` row staged to `bounded` in process, the `driver` route answered `bounded`, the break the arm reds on. OWED: arm 43 of `tools/roles/adopt-roles.test.sh` and its RED-first observation at the close.
+- AC2 — `nobody` — `check_return("gov-builder", ...)` over a refusal whose actor is `nobody` returned the one line `actor — "nobody" is none of self, producer, driver, owner, build:<slug>`, over one with an empty `remedy` the one line `remedy — the refusal arm's remedy is absent or empty`, and over `actor: build:dPlanted` with both fields set no line; `build:d-1` was refused naming `actor`, a remedy holding ` · ` naming `remedy`, and a framed prompt writer return and a builder `returned` return each drew no line. OWED: as AC1.
+- AC3 — `outcome: refused` — after `render_agents.py --write`, `grep -c "outcome: refused"` over each file of `.claude/agents/` counted 1 in every file; `check_roles.py` with the copied kit's `gov-builder` holding `outcome:committed|returned|refused` exited 1 with the line `gov-builder.agent.md: R2 — return '...': role gov-builder's outcome set holds refused, which the refusal arm [return.refusal] of role-schema.toml declares once for every role`. OWED: as AC1.
+- AC4 — `actor driver` — the sliced `write_refusal` composed the reason `x · rule r1 · remedy render the handoff · actor driver` and reached the row writer; with `--actor nobody` it printed `UNATTENDED check 48 FAILED — the typed refusal is malformed, so nothing is recorded and the run-state file is unchanged: the actor nobody is none of self, producer, driver, owner, build:<slug>` and returned 1 before the writer, as it did for an empty remedy, a remedy holding ` · ` and `build:d-1`; with none of the three flags the reason reached the writer unchanged. `read_refusals` split the typed row into `reason x`, `rule r1`, `remedy render the handoff` and `actor driver`, and read an untyped row's whole reason with the three empty. The `fail 48` branch is armed by the suite's assertion of its text (DERIVED: `check-arms.py`'s `classify` over the pass tree). OWED: the AC4 arm of `tools/unattended/unattended.test.sh` over the `tRun` fixture, and its RED-first observation at the close.
+- AC5 — `choose-ending` — the owner plant with `--budget-spent` printed `refusal — owner · route owner · re-offer never · answer choose-ending · endings park-item > park-build > stop-run · build - · draw none`, holding no `resolve`; without the flag it printed `answer resolve`; `handoff.py owner-question --kind refusal` printed `resolve`. OWED: as AC1.

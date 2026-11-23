@@ -16,7 +16,8 @@
     python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]
     python handoff.py check-return < <SubagentStop hook payload>
     python handoff.py check-return-file --role <slot> --file <return file>
-    python handoff.py owner-question --kind <fork|owner-gate|ratification|owner-write> [--attended]
+    python handoff.py owner-question --kind <fork|owner-gate|ratification|owner-write|refusal> [--attended]
+    python handoff.py route-refusal --return <return file> [--budget-spent]
 
 `render` fills the work-order template, `templates/work-order.template.md` in this kit, whose slots are
 `role`, `roles_lib.render_role`'s output, closing with the role's `## Never`, `## Ceiling` and `## Return`
@@ -187,6 +188,22 @@ typed passes as the slot's. A relative `--file` is read from the repository root
 for a return passing both, 1 with a line per defect, an unreadable return file one, and 2 on a slot the
 catalogue lacks or outside a repository.
 
+`route-refusal` is the driver's door to the outcome table (TOOL-dBoundRoles-26 S3, S4). It reads the return in
+`--return`'s file, a relative path read from the repository root, as a refusal: its `outcome` the refusal arm's,
+`roles_lib.load_refusal_arm`'s `refused`, and its `rule`, `remedy` and `actor` passing
+`roles_lib.check_refusal_arm`. It prints one line, `refusal — <actor> · route <route> · re-offer
+<bounded|never>`, then the route's own fields, from `roles_lib.resolve_refusal_route`: `self` is `route retry ·
+re-offer bounded` with the `roles.retries` bound and the role; `producer` is `route route-back · re-offer never ·
+item <tag>`, the item of the first upstream row of the work order the return's `answers` names, and with no
+such item `route driver`, its `item none — ` field saying why; `driver` is `route driver`; `owner` is `route
+owner` with the owner-question reader's answer for the kind `refusal`, the owner away, and with
+`--budget-spent`, the build's rework budget spent as the loop kit's `budget.py` states it, an answer of
+`best-effort-recorded` is `choose-ending · endings park-item > park-build > stop-run`; `build:<slug>` is `route
+ask build:<slug>`. Every route but `retry` re-offers `never`, and each line closes with `build <slug>`, the
+answered marker's or `-`, and the rework draw. It performs no remedy and writes nothing. Exit 0 printing the
+line, 1 with one line per defect for a return that does not read or is no valid refusal, and 2 where the arm
+or a reader the route asks refuses, naming it.
+
 Sources, by key family: `task:` the card's `## task` field, read by the kickoff checker's grammar
 (stated above its `check_card_task`, and ported here because that one is shell) under the labels
 that checker's `--task-skeleton` prints, so a skeleton that does not yield eight refuses; `card:` the lines
@@ -243,7 +260,9 @@ so a caller granting a whole `ROUTED_PATHS` entry is admitted. For `--framed-by`
 anything the work order supports, a heading, fact or marker line inside a framing field, which only the fence
 walk reads, and whether the session read is the one that spawned the prompt writer. For `check-return-file`:
 that the return's `task-sha` is the answered marker's, and that the agent which wrote the file was spawned
-from the work order it names, since the file carries no transcript.
+from the work order it names, since the file carries no transcript. For `route-refusal`: that the actor a
+refusal names can truly perform its remedy, which its writer declares, that `--budget-spent` is true of the
+build, which the driver reads, and that the work order's upstream rows are current.
 """
 import argparse
 import datetime
@@ -275,7 +294,7 @@ TYPED_INPUTS = tuple(n for n in INPUT_NAMES if n not in PATH_INPUTS)
 CODE_INPUT = "code"
 #: The `upstream:rows` key (TOOL-dDeclaredLoop-29): its block is the rows file `--upstream` names, then this
 #: contract, so the return answers exactly the ids the block lists.
-UPSTREAM_KEY = "upstream:rows"
+UPSTREAM_KEY = lib.UPSTREAM_ROWS_KEY
 UPSTREAM_CONTRACT = ("Answer every row id above exactly once, in a `## Upstream` section of your return, one line "
                      "per row: `- <row id> · used|bypassed|not-applicable · <reason>`, a reason on every line, "
                      "and no row id this block does not list. `used` means your work honours the row, "
@@ -354,7 +373,7 @@ SESSION_RECORD_KEYS = frozenset(("parser", "session", "offset", "prefix", "calls
 #: TOOL-dBoundRoles-5 S3: the folder under the git common dir holding one return-check record per agent,
 #: and the policy key bounding how often a failed return is sent back.
 RETURN_CHECK_DIR = "return-check"
-RETRIES_KEY = "roles.retries"
+RETRIES_KEY = lib.RETRIES_KEY
 #: TOOL-dBoundRoles-10 S4: the policy key saying what an item a role must perform becomes when no agent
 #: can be spawned, read before `--stand-in`'s waiver check.
 NO_SPAWN_KEY = "roles.no-spawn"
@@ -920,11 +939,15 @@ def read_framing(root, slug, agent_id):
     if defects:
         raise lib.RolesError("--framed-by %s: the prompt writer's return fails its template: %s"
                              % (agent_id, "; ".join(defects)))
+    # TOOL-dBoundRoles-26: the prompt writer refuses through the refusal arm, so its fields are read beside the
+    # template's and a refusal is named by its `remedy`
+    arm = lib.load_refusal_arm()
     template = lib.parse_return_template(lib.load_roles(KIT_DIR)[PROMPT_WRITER]["keys"].get("return"))
-    fields, _why = lib.extract_return_object(last, template)
+    fields, _why = lib.extract_return_object(last, [t for t in template if t[0] not in arm["fields"]]
+                                             + [(f, "text", True) for f in arm["fields"]])
     if fields.get("outcome") != "framed":
         raise lib.RolesError("--framed-by %s: the prompt writer returned outcome %s, not framed: %s"
-                             % (agent_id, fields.get("outcome"), fields.get("why") or "it gave no why"))
+                             % (agent_id, fields.get("outcome"), fields.get("remedy") or "it gave no remedy"))
     lacking = [f for f in ("job", "nostop") if f not in fields]
     if lacking:
         raise lib.RolesError("--framed-by %s: the prompt writer's framed return lacks %s, which every framing "
@@ -1887,26 +1910,46 @@ def check_return_file(root, slot, path):
         return defects + ["answers — the return names no work order it answers, so no %s work order stands "
                           "behind it; the agent answers the marker's path and task-sha of the work order it "
                           "was handed" % slot]
-    if not m:
-        return defects + ["answers — %s is not `<work order path> task-sha=<12 hex>`"
-                          % json.dumps(said, ensure_ascii=False)[:80]]
-    rel = m.group("path")
-    if rel.startswith("/") or re.match(r"^[A-Za-z]:", rel) or ".." in rel.split("/"):
-        return defects + ["answers — %s is not a repo-relative path free of `..` segments" % rel]
-    try:
-        order = (root / rel).read_bytes().decode("utf-8").replace("\r\n", "\n")
-    except (OSError, UnicodeDecodeError) as e:
-        return defects + ["answers — the work order %s cannot be read under %s: %s"
-                          % (rel, root.as_posix(), getattr(e, "strerror", None) or e)]
-    marker = next((mk for _n, line in lib.read_unfenced_lines(order) if line is not None
-                   for mk in [MARKER_RE.fullmatch(line)] if mk), None)
-    if marker is None:
-        return defects + ["answers — %s carries no gov:handoff marker line outside a fence, so it is no rendered "
-                          "work order and names no role" % rel]
+    rel, _order, marker, why = lib.read_answered_work_order(root, said)
+    if why:
+        return defects + [why]
     if marker.group("role") != slot:
         return defects + ["answers — the return answers a %s work order, %s, not a %s one"
                           % (marker.group("role"), rel, slot)]
     return defects
+
+
+def print_refusal_route(root, path, budget_spent=False):
+    """`route-refusal`'s exit status (TOOL-dBoundRoles-26 S4), as the module doc states: the refused return in
+    the file `path`, read from `root` when relative, routed by `lib.resolve_refusal_route` and printed as one
+    `refusal — <actor> · route <route> · re-offer <bounded|never>` line and its trailing fields; its role and
+    build the marker's of the work order its `answers` names, `lib.read_answered_work_order`'s, else `-`. A
+    return that does not read, is no refusal or fails `lib.check_refusal_arm` prints one line per defect and
+    exits 1; a refusal of the reader the route asks, the owner-question reader's, raises RolesError."""
+    arm = lib.load_refusal_arm()
+    p = pathlib.Path(path)
+    p = p if p.is_absolute() else root / p
+    try:
+        text = p.read_bytes().decode("utf-8-sig").replace("\r\n", "\n")
+    except (OSError, UnicodeDecodeError) as e:
+        print("return object — %s cannot be read as UTF-8: %s" % (p.as_posix(), getattr(e, "strerror", None) or e))
+        return 1
+    obj, why = lib.extract_return_object(text, [("outcome", (arm["outcome"],), False), ("answers", "text", True)]
+                                         + [(f, "text", False) for f in arm["fields"]])
+    if obj is None or obj.get("outcome") != arm["outcome"]:
+        print("outcome — %s" % (why if obj is None else "%s is not %s, so the return is no refusal to route"
+                                % (json.dumps(obj.get("outcome"), ensure_ascii=False)[:80], arm["outcome"])))
+        return 1
+    defects = lib.check_refusal_arm(obj, arm)
+    if defects:
+        sys.stdout.buffer.write(("\n".join(defects) + "\n").encode("utf-8"))
+        return 1
+    marker = lib.read_answered_work_order(root, obj["answers"])[2] if obj.get("answers") is not None else None
+    route = lib.resolve_refusal_route(obj, marker.group("role") if marker else "-",
+                                      marker.group("build") if marker else "-", root, budget_spent)
+    line = "refusal — %s · route %s · re-offer %s" % (route["actor"], route["route"], route["reoffer"])
+    sys.stdout.buffer.write(("".join([line] + [" · " + f for f in route["fields"]]) + "\n").encode("utf-8"))
+    return 0
 
 
 def load_run_journal(path):
@@ -2205,6 +2248,9 @@ def main(argv):
     oq = sub.add_parser("owner-question")
     oq.add_argument("--kind", required=True)
     oq.add_argument("--attended", action="store_true")
+    rr = sub.add_parser("route-refusal")
+    rr.add_argument("--return", dest="return_file", required=True)
+    rr.add_argument("--budget-spent", action="store_true")
     a = ap.parse_args(argv)
     if a.verb == "check-return":
         # TOOL-dBoundRoles-5 S5 - a broken return check never blocks a stop: every failure exits 0.
@@ -2282,6 +2328,14 @@ def main(argv):
             print("handoff: owner-question: %s" % e, file=sys.stderr)
             return 2
         return 0
+    if a.verb == "route-refusal":
+        # TOOL-dBoundRoles-26 S4: the driver's door of `resolve_refusal_route`; a refusal of a reader it asks,
+        # the arm's table or the owner-question reader, exits 2 naming it.
+        try:
+            return print_refusal_route(root, a.return_file, a.budget_spent)
+        except lib.RolesError as e:
+            print("handoff: route-refusal: %s" % e, file=sys.stderr)
+            return 2
     conf = root / ".memory-tree.conf"
     memory_root = lib.read_conf_key(conf, "MEMORY_ROOT") if conf.is_file() else None
     try:

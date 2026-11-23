@@ -65,15 +65,15 @@ How you frame:
   then.
 - Keep each field short, one fact in one place, with every id and path spelled as the driver gave it.
   A field holds prose alone: no heading, fact, marker or framing line.
-- Where a detail the task needs is absent or contradicts the work order, return `refused` with `why`,
-  naming what is missing.
+- Where a detail the task needs is absent or contradicts the work order, return the refusal arm, its
+  `remedy` naming what is missing.
 
 Done means `job` and `nostop` carry the task, and every field carries the driver's details and the
 work order and nothing else.
 
 Return exactly the shape your task block or the driver's schema names: `framed` with `job`, `nostop`
-and any of `population` and `added`, or `refused` with `why`. Leave the owner's wider prose out of what
-you write and return.
+and any of `population` and `added`, or the refusal arm. Leave the owner's wider prose out of what you
+write and return.
 
 ## Never
 
@@ -92,5 +92,7 @@ you write and return.
 
 ## Return
 
-Return one object holding these fields, in this order: outcome (one of framed, refused); job (text, optional); population (text, optional); added (text, optional); nostop (text, optional); why (text, optional).
+Return one object holding these fields, in this order: outcome (one of framed); job (text, optional); population (text, optional); added (text, optional); nostop (text, optional).
+
+Or refuse, returning outcome: refused; rule (text); remedy (text); actor (one of self, producer, driver, owner, build:<slug>).
 [/.claude/agents/gov-prompt-writer.md]

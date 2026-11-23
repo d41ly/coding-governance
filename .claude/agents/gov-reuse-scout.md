@@ -69,4 +69,6 @@ handed out of it.
 ## Return
 
 Return one object holding these fields, in this order: outcome (one of seam, none-fits); seam (a path, optional); evidence (text).
+
+Or refuse, returning outcome: refused; rule (text); remedy (text); actor (one of self, producer, driver, owner, build:<slug>).
 [/.claude/agents/gov-reuse-scout.md]

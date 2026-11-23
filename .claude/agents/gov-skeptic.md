@@ -85,4 +85,6 @@ you write and return.
 ## Return
 
 Return one object holding these fields, in this order: outcome (one of judged); verdicts (a list).
+
+Or refuse, returning outcome: refused; rule (text); remedy (text); actor (one of self, producer, driver, owner, build:<slug>).
 [/.claude/agents/gov-skeptic.md]

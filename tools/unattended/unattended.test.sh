@@ -6798,6 +6798,18 @@ hit "$(run --refused tRun --item item.build.nowhere --key "item.build.nowhere@AR
 # ...and `check_step_fields`, the guards `--propose` shares, over the key in the step's place.
 hit "$(run --refused tRun --item item.build.base --key "$_rf_key · reason forged" --reason r)" "an item or step spells the record's own field separator ' · '"
 same "a refused --refused wrote nothing" "$(sum)" "$before"
+# ---- TOOL-dBoundRoles-26 AC4: the typed refusal. `--rule`, `--remedy` and `--actor` ride inside the line-final
+# ---- reason, on the item and key the tRun fixture's engine holds; an actor outside the five forms is the ONE
+# ---- refusal, naming the actor, and leaves the bytes. The failing case, owed at the close and not observed by
+# ---- the pass that wrote this: `write_refusal` with the actor check removed, under which `nobody` is recorded.
+out=$(run --refused tRun --item item.build.base --key "$_rf_key" --reason x --rule r1 --remedy "render the handoff" --actor driver)
+hit "$out" "refusal recorded against $_rf_key"
+same "the typed row ends with its rule, remedy and actor" "$(grep -c " refusal · item item.build.base · step $_rf_key · reason x · rule r1 · remedy render the handoff · actor driver\$" memory/builds/tRun/RUN.md)" "1"
+before=$(sum)
+out=$(run --refused tRun --item item.build.base --key "$_rf_key" --reason y --rule r1 --remedy "render the handoff" --actor nobody); _rc=$?
+hit "$out" "the typed refusal is malformed, so nothing is recorded and the run-state file is unchanged: the actor nobody is none of self, producer, driver, owner, build:<slug>"
+same "an actor outside the five forms exits non-zero" "$([ "$_rc" -ne 0 ] && echo 1 || echo 0)" "1"
+same "an actor outside the five forms wrote nothing" "$(sum)" "$before"
 
 # ---- TOOL-dDeclaredLoop-28: `--rescope --flow`, a build's own flow change proposed through the loop
 # ---- kit's `adapt.py propose`. Its ONE refusal relays the verb's first line: an `add` over a row whose
@@ -24041,7 +24053,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # floor where it was: its AC16 AC31 arm's two `hit` lines in region three, the light-profile and
 # writes-fixture plants of fix_keeps.py, each unconditional, so FLOOR_SHARD_3 carries the same +2. COUNTED
 # off the block's own lines; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=4067
+# RAISED 4067 -> 4072 by TOOL-dBoundRoles-26 on 2026-11-23: its AC4 arm's 5 region-three assertions, 2 `hit`
+# and 3 `same` off the block's own lines, no loop and no skip branch, so FLOOR_SHARD_3 carries the same +5.
+# No suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=4072
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24263,7 +24278,8 @@ FLOOR_SHARD_2=229
 # RAISED 445 -> 463 by TOOL-aTrimmedWait-1: the same 18 region-three --check-specs assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 445, plus main's 6, plus this branch's 18 = 469.
 # RAISED 469 -> 471 by TOOL-dWitnessedBar-56 on 2026-11-20: TOOL-dWitnessedBar-51's AC16 AC31 arm, two `hit`s in region three, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=471
+# RAISED 471 -> 476 by TOOL-dBoundRoles-26 on 2026-11-23: its AC4 arm, 5 region-three assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=476
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
 # RAISED 383 -> 386 by TOOL-aSmoothedDispatch-1 on 2026-11-10: the same net 3 region-four --writes split assertions, see FLOOR_ASSERTIONS.

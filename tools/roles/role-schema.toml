@@ -137,3 +137,13 @@ key = "budget"
 owner = "gov"
 shape = "text"
 required = "every"
+
+# THE REFUSAL ARM (TOOL-dBoundRoles-26 S1), read through roles_lib.load_refusal_arm only: the typed refusal
+# every role's `return` carries beside its own template, declared once here and rendered under each
+# role's `## Return`. `actors` names who can perform the remedy, `build:<slug>` another build by its slug,
+# and roles_lib.REFUSAL_ROUTES routes each; a role whose own `outcome` set holds the arm's `outcome` value
+# is refused by check_roles.py's R2, so the arm cannot drift per role.
+[return.refusal]
+outcome = "refused"
+fields = ["rule", "remedy", "actor"]
+actors = ["self", "producer", "driver", "owner", "build:<slug>"]
