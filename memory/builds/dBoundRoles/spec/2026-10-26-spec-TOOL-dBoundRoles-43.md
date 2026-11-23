@@ -22,6 +22,7 @@
 | [2026-11-23-build-TOOL-dBoundRoles-43-deviation-435.md](../build/2026-11-23-build-TOOL-dBoundRoles-43-deviation-435.md) | deviation | — |
 | [2026-11-23-build-TOOL-dBoundRoles-43-red-fix-46.md](../build/2026-11-23-build-TOOL-dBoundRoles-43-red-fix-46.md) | red-fix | — |
 | [2026-11-23-build-TOOL-dBoundRoles-43-red-fix-47.md](../build/2026-11-23-build-TOOL-dBoundRoles-43-red-fix-47.md) | red-fix | — |
+| [2026-11-23-build-TOOL-dBoundRoles-43-red-fix-48.md](../build/2026-11-23-build-TOOL-dBoundRoles-43-red-fix-48.md) | red-fix | — |
 | [2026-11-23-build-TOOL-dBoundRoles-43-widen-10.md](../build/2026-11-23-build-TOOL-dBoundRoles-43-widen-10.md) | widen | — |
 | [2026-11-23-build-TOOL-dBoundRoles-43-widen-11.md](../build/2026-11-23-build-TOOL-dBoundRoles-43-widen-11.md) | widen | — |
 | [2026-11-23-build-TOOL-dBoundRoles-43-widen-12.md](../build/2026-11-23-build-TOOL-dBoundRoles-43-widen-12.md) | widen | — |
