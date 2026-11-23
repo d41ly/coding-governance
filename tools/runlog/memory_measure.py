@@ -77,6 +77,9 @@ DAY_SECONDS = 86400
 VERDICT_EXITS = {"pass": 0, "fail": 1, "not-due": 3, "unarmed": 3, "empty": 3}
 PROJECT_NAME_RE = re.compile(r"[^A-Za-z0-9-]")
 WORKTREE_INFIX = "--claude-worktrees-"
+# The harness's folder for a Workflow run's agent transcripts under a session's `subagents/`: a transcript
+# layout name, not a kit, so the fixture names it once here.
+HARNESS_RUN_DIR = "workflows"
 POOLED = "all, pooled"
 UNKNOWN_TYPE = "unknown"
 
@@ -473,7 +476,7 @@ def write_memory_fixture(base, case):
                                                      "message": {"role": "user", "content": "main"}}])
         sub = home / sid / "subagents"
         if where == "workflow":
-            sub = sub / "workflows" / "wf_fixture"
+            sub = sub / HARNESS_RUN_DIR / "wf_fixture"
         name = f"agent-fx{n}"
         records = build_fixture_agent(start, calls)
         if plant.get("torn") and n == 0:
