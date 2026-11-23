@@ -341,3 +341,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T10:36:41Z brief · item KICK-dKeptSession-61 · reason ff61539ec7dd memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-61-build-brief.md
 
 2026-11-23T10:40:19Z dispatch · item 16e8868c KICK-dKeptSession-61 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/loop/loop_transition.py tools/loop/README.md tools/run-gates/selftest-budgets.txt tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-61-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T11:13:13Z brief · item KICK-dKeptSession-18 · reason 635a80244df0 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-18-build-brief.md
+
+2026-11-23T11:16:08Z dispatch · item 76ed28fd KICK-dKeptSession-18 · reason tools/loop/loop_table.py tools/loop/README.md memory/map/generated/symbols.json help/loop.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-18-1-acceptance-ledger.md
