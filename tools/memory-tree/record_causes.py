@@ -45,9 +45,11 @@ instrument's bytes (`KEPT_INSTRUMENT`, TOOL-dTotalRecall-49 S3) is red where tha
 names has no `<path> -` row of the `record-kinds-legacy` population's `causes` slice. Then the build
 folders' scripts (TOOL-dTotalRecall-50 S1), every tracked
 `*.py`, `*.sh` or `*.js` file under `<memory root>/builds/*/build/`, test-named files excepted, read past their `BIND_HEAD_LINES`
-binding window by both tests, so a file's own binding is never a hit; each census file is kept by its
-repository path in `CAUSE_WRITER_KEPT` or is the instrument of a `CAUSE_WRITER_PINNED` row, and its count
-line counts them apart.
+binding window by both tests, so a file's own binding is never a hit; each census file is the instrument of
+a `CAUSE_WRITER_PINNED` row or is kept by its path-keyed row of `tree_lib.CENSUS_KEPT_PATHS`
+(TOOL-dTotalRecall-55 S2), held outside its bytes because no pass may edit it, and its count line counts them
+apart. A row cannot outlive its hit (S4): a row whose file the build-folder walk reads and which spells no
+Serves literal past its binding window is red, named `CENSUS_KEPT_PATHS` and its path: drain the row.
 
 THE PINNED WRITERS (`CAUSE_WRITER_PINNED`, TOOL-dTotalRecall-50 S2 S3). One `(instrument, glob, ask id)` row
 per pinned instrument that writes a record with no cause, whose owner alone moves its pin. `--check` prints
@@ -114,7 +116,7 @@ AUTHORED_TAG_RE = re.compile(r"\[section\.(?P<seg>[a-z0-9][a-z0-9-]*)\](?:[ \t]|
 PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "none", "writer-without-cause",
           "bulleted-cause", "bulleted-twice", "script-cause-prefixed", "script-cause-bare", "script-causeless",
           "backfill-selection", "backfill-refusals", "kept-instrument-not-legacy", "pinned-writer-drained",
-          "departures-pinned", "literal-without-cause", "duplicate-cause", "unmarked-writer")
+          "departures-pinned", "literal-without-cause", "duplicate-cause", "unmarked-writer", "kept-row-drained")
 #: TOOL-dTotalRecall-47 S1: the causes check's absent-cause rule, the one finding `--backfill` selects;
 #: TOOL-dTotalRecall-53 S4: it names its remedy, and stays the one spelling the backfill selects by
 ABSENT_CAUSE = "names no Caused-by, and its kind is no root; run record_causes.py --backfill"
@@ -166,25 +168,7 @@ CLAIM_NS = "refs/gov/claims/"
 #: path, is where the fixture plants it); the census reds the reason where DESIGN_VIEW is no legacy record
 KEPT_INSTRUMENT = "renders a pinned instrument's bytes; its one output is a legacy record"
 KEPT_INSTRUMENT_KEY = "/".join(("memory-tree", "asbuilt_view.py"))
-#: TOOL-dTotalRecall-50 S1: a build folder's census file is kept by its repository path, as a `pinned
-#: instrument` the dClosedLoop packet's INSTRUMENTS names or as `outside the write set`.
-KEPT_PINNED = "pinned instrument"
-KEPT_OUTSIDE = "outside the write set"
 CLOSED_LOOP = "memory/builds/dClosedLoop/build/"
-#: TOOL-dTotalRecall-53 S34: a file under the tool root keeps a literal by the census marker on its line
-#: (`id_grammar.read_kept_reason`, census `cause-writer`), so this holds the build folders' rows alone, each
-#: keyed by its repository path, whose bytes no pass writes; TOOL-dTotalRecall-55 moves them to the
-#: path-keyed table.
-CAUSE_WRITER_KEPT = {
-    CLOSED_LOOP + "2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py": KEPT_PINNED,
-    CLOSED_LOOP + "2026-10-20-build-PLAY-dClosedLoop-1-packet.py": KEPT_PINNED,
-    CLOSED_LOOP + "2026-10-19-build-PLAY-dClosedLoop-1-walk.py": KEPT_OUTSIDE,
-    CLOSED_LOOP + "2026-10-20-build-PLAY-dClosedLoop-1-fold-inventory.py": KEPT_OUTSIDE,
-    CLOSED_LOOP + "2026-10-20-build-PLAY-dClosedLoop-1-walk-seed.py": KEPT_OUTSIDE,
-    "memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-73-harness.py": KEPT_OUTSIDE,
-    "memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-93-ab.py": KEPT_OUTSIDE,
-    "memory/builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signer.py": KEPT_OUTSIDE,
-}
 #: the census's test-named files, never census members: `*.test.sh`, `selftest.py`, `test_*.py`
 CAUSE_WRITER_TEST_RE = re.compile(r"(?:^|/)(?:[^/]*\.test\.sh|selftest\.py|test_[^/]*\.py)$")
 SERVES_LITERAL = "**Serves:** "
@@ -626,7 +610,7 @@ def check_kept_instrument(root) -> str | None:
     return None
 
 
-def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED) -> tuple:
+def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED, kept=tree_lib.CENSUS_KEPT_PATHS) -> tuple:
     """S7's writer census: `(lines, reds)` over the alias census's population, every tracked `*.py`, `*.sh`
     and `*.js` file under the tool root (`record_kinds.read_code_paths`), test-named files excepted. It grades
     each `**Serves:** ` literal, never each file (TOOL-dTotalRecall-53 S9): a literal is answered by a
@@ -637,10 +621,12 @@ def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED) -> tuple:
     A literal kept for `KEPT_INSTRUMENT` (TOOL-dTotalRecall-49 S3) is red, named with why, where
     `check_kept_instrument` says the reason no longer holds.
     TOOL-dTotalRecall-50 S1 S2: then the build folders' code files (`read_build_code_paths`), both tests read
-    past each file's `BIND_HEAD_LINES` binding window, each census file kept by its repository path in
-    `CAUSE_WRITER_KEPT` or the instrument of a `pinned` row; each row is printed with its ask id and the
-    records its glob reads, and is red where its instrument is untracked or spells `Caused-by` past the
-    window, or its ask is not filed; then the build folders' own count line."""
+    past each file's `BIND_HEAD_LINES` binding window, each census file the instrument of a `pinned` row or
+    kept by its `kept` row (`tree_lib.read_kept_path`, census `check_cause_writers`, TOOL-dTotalRecall-55 S2);
+    each pinned row is printed with its ask id and the records its glob reads, and is red where its
+    instrument is untracked or spells `Caused-by` past the window, or its ask is not filed. A `kept` row whose
+    file the walk reads and which spells no Serves literal past the window is red, drained (S4); then the
+    build folders' own count line."""
     import record_kinds   # noqa: E402  the tool root and the code census's one walk
     tool_rel = record_kinds.derive_tool_rel(record_kinds.derive_kit_rel())
     try:
@@ -649,7 +635,7 @@ def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED) -> tuple:
         raise ValueError(str(exc)) from None
     folder, build_paths = read_build_code_paths(root)
     records = read_pinned_records(root, pinned)
-    lines, reds, kept, files, instrument = [], [], 0, 0, []
+    lines, reds, n_kept, files, instrument = [], [], 0, 0, []
     for path in paths:
         text = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace")
         if SERVES_LITERAL not in text:
@@ -667,14 +653,14 @@ def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED) -> tuple:
                 instrument.append(check_kept_instrument(root))
             why = instrument[0] if reason == KEPT_INSTRUMENT else None
             if why is None:
-                kept += 1
+                n_kept += 1
                 lines.append(f"cause-writer · {path}:{n} · kept {reason}")
                 continue
             lines.append(f"cause-writer · {path}:{n} · red · kept {reason}, but {why}")
             reds.append(f"cause-writer {path}:{n}: kept because it {reason}, but {why}; restore the record's "
                         f"legacy row or write the cause line under its Serves line")
     lines.append(f"cause-writer · {len(paths)} code files under {tool_rel or '.'} · {files} census "
-                 f"file(s) · {kept} kept · {len(reds)} red")
+                 f"file(s) · {n_kept} kept · {len(reds)} red")
     rows = {}   # S2: {instrument: (ask id, glob, why red or None)}
     for instrument, glob, ask in pinned:
         try:
@@ -697,32 +683,43 @@ def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED) -> tuple:
         if why:
             reds.append(f"cause-writer CAUSE_WRITER_PINNED {instrument} (ask {ask}): {why}")
     b_kept = b_pinned = b_red = 0
+    serving = set()   # S4: the walked files spelling a Serves literal past their binding window
     for path in build_paths:
         body = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace").splitlines()
         past = body[tree_lib.BIND_HEAD_LINES:]
-        if not any(SERVES_LITERAL in ln for ln in past) or any(CAUSE_LITERAL in ln for ln in past):
+        if any(SERVES_LITERAL in ln for ln in past):
+            serving.add(path)
+        if path not in serving or any(CAUSE_LITERAL in ln for ln in past):
             continue
         n = next(i for i, ln in enumerate(past, tree_lib.BIND_HEAD_LINES + 1) if SERVES_LITERAL in ln)
+        reason = tree_lib.read_kept_path("check_cause_writers", path, kept)
         if path in rows:
             b_pinned += 1
             lines.append(f"cause-writer · {path}:{n} · pinned CAUSE_WRITER_PINNED · ask {rows[path][0]}")
-        elif path in CAUSE_WRITER_KEPT:
+        elif reason is not None:
             b_kept += 1
-            lines.append(f"cause-writer · {path}:{n} · kept {CAUSE_WRITER_KEPT[path]}")
+            lines.append(f"cause-writer · {path}:{n} · kept {reason}")
         else:
             b_red += 1
             lines.append(f"cause-writer · {path}:{n} · red")
             reds.append(f"cause-writer {path}:{n}: spells a Serves line past its binding window and no Caused-by; "
-                        f"write the cause line under its Serves line, key the file in CAUSE_WRITER_KEPT with its "
+                        f"write the cause line under its Serves line, key the file in CENSUS_KEPT_PATHS with its "
                         f"reason, or declare its CAUSE_WRITER_PINNED row")
+    walked = set(build_paths)
+    for path in tree_lib.read_kept_rows("check_cause_writers", kept):   # S4: a row cannot outlive its hit
+        if path in walked and path not in serving:
+            lines.append(f"cause-writer · kept row · {path} · red · drained")
+            reds.append(f"cause-writer CENSUS_KEPT_PATHS {path}: spells no Serves line past its binding window, so "
+                        f"the row keeps nothing; drain the row")
     lines.append(f"cause-writer · {len(build_paths)} code files under {folder} · {b_kept + b_pinned + b_red} census "
                  f"file(s) · {b_kept} kept · {b_pinned} pinned · {b_red} red")
     return lines, reds
 
 
-def run_check(root, pinned=CAUSE_WRITER_PINNED) -> tuple:
-    """`--check`: `(lines, exit)`, `pinned` the pinned-writer rows read (TOOL-dTotalRecall-50 S2 S3), a
-    fixture's own where it plants one; an unarmed tree reads none."""
+def run_check(root, pinned=CAUSE_WRITER_PINNED, kept=tree_lib.CENSUS_KEPT_PATHS) -> tuple:
+    """`--check`: `(lines, exit)`, `pinned` the pinned-writer rows read (TOOL-dTotalRecall-50 S2 S3) and
+    `kept` the path-keyed keep rows (TOOL-dTotalRecall-55 S2), each a fixture's own where it plants one; an
+    unarmed tree reads none."""
     try:
         g = read_grading(root, pinned)
     except ValueError as exc:
@@ -731,7 +728,7 @@ def run_check(root, pinned=CAUSE_WRITER_PINNED) -> tuple:
         return [f"{SAY}: unarmed · {g['note']}"], 0
     causes, orphans = check_causes(root, g), check_orphans(root, g)
     try:
-        writer_lines, writer_reds = check_cause_writers(root, pinned)
+        writer_lines, writer_reds = check_cause_writers(root, pinned, kept)
     except ValueError as exc:
         return [f"{SAY}: refused · {exc}"], 2
     script = sum(1 for p in g["texts"] if not p.endswith(".md"))
@@ -812,6 +809,10 @@ PINNED_ASK = "TOOL-fRoot-2"
 FIXTURE_PINNED = ((PINNED_INSTRUMENT, DEPARTURES_GLOB, PINNED_ASK),)
 PINNED_RECORD = f"memory/builds/fRoot/build/2026-01-02-build-{FIXTURE_UNIT}-departures-build.md"
 PINNED_BACKLOG = "memory/builds/fRoot/BACKLOG.md"
+#: TOOL-dTotalRecall-55 AC2: the drained plant's build-folder script, a one-line docstring spelling no Serves
+#: literal, and the one `check_cause_writers` row keeping it, which S4 reds as a row with no hit behind it
+KEPT_SCRIPT = f"memory/builds/fRoot/build/2026-01-01-build-{FIXTURE_UNIT}-kept.py"
+FIXTURE_KEPT = (("check_cause_writers", KEPT_SCRIPT, "outside the write set"),)
 
 
 def render_pinned_instrument(drained) -> str:
@@ -934,6 +935,8 @@ def write_fixture(top, plant) -> pathlib.Path:
     if plant == "writer-without-cause":   # TOOL-dTotalRecall-36 S7: a code file spelling a Serves literal, no cause
         write_file(f"{tool_rel}/{CAUSE_WRITER_PLANT}" if tool_rel else CAUSE_WRITER_PLANT,
                    f'"""A record writer."""\nHEAD = "{SERVES_LITERAL}log {FIXTURE_UNIT}\\n"\n')
+    if plant == "kept-row-drained":   # TOOL-dTotalRecall-55 AC2: a kept script whose hit is gone
+        write_file(KEPT_SCRIPT, '"""A script its row keeps, spelling no record head."""\n')
     if plant == "kept-instrument-not-legacy":   # the four design keys set over the view, its `-` row cut
         pin = run_git(root, "rev-parse", "HEAD").stdout.strip()
         home = root / reg.home
@@ -1084,7 +1087,10 @@ def run_fixture(plant) -> tuple:
             if plant in CENSUS_PLANTS:
                 lines, ok = check_census_plant(root, plant)
                 return head + lines, 0 if ok else 1
-            lines, rc = run_check(root, ())
+            if plant == "kept-row-drained":   # TOOL-dTotalRecall-55 AC2: the plant's own row; the rest read the default
+                lines, rc = run_check(root, (), FIXTURE_KEPT)
+            else:
+                lines, rc = run_check(root, ())
             if plant in BULLETED_PLANTS:
                 walk, ok = check_plant_walk(root, plant, lines, rc)
                 return head + lines + walk, 0 if ok else 1

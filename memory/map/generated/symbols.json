@@ -24708,9 +24708,19 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_kept_path",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "read_kept_reason",
       "kind": "function",
       "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
+      "id": "read_kept_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "read_key",

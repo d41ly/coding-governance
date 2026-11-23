@@ -649,6 +649,38 @@ RECORD_KEY_RE = re.compile(r"\d{4}-\d{2}-\d{2}-(?:build|review|prompt)-[A-Za-z0-
 # TOOL-dTotalRecall-19 S1, TOOL-dTotalRecall-51 S1: an untyped record's header edge lines in its head, behind
 # the prefix its Serves line wears
 HEAD_EDGE_RE = re.compile(BIND_PREFIX + r"\*\*(?P<key>Made-by|Caused-by):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$")
+# TOOL-dTotalRecall-55 S1 S3: a census keeps a hit in a file no pass may edit by one path-keyed row held
+# outside the file's bytes, `(census, path, reason)`: the census named by its function, one tracked file, and
+# the reason printed beside the hit. A file a pass may edit keeps its hit by the census marker on its line
+# instead (`id_grammar.read_kept_reason`, TOOL-dTotalRecall-53 S34). `read_kept_rows` is the table's one reader.
+CENSUS_KEPT_PATHS = (
+    ("check_cause_writers", "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py",
+     "pinned instrument"),
+    ("check_cause_writers", "memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py",
+     "pinned instrument"),
+    ("check_cause_writers", "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py",
+     "outside the write set"),
+    ("check_cause_writers", "memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-fold-inventory.py",
+     "outside the write set"),
+    ("check_cause_writers", "memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-walk-seed.py",
+     "outside the write set"),
+    ("check_cause_writers", "memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-73-harness.py",
+     "outside the write set"),
+    ("check_cause_writers", "memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-93-ab.py",
+     "outside the write set"),
+    ("check_cause_writers", "memory/builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signer.py",
+     "outside the write set"),
+)
+
+
+def read_kept_rows(census, table=CENSUS_KEPT_PATHS) -> dict:
+    """`{path: reason}`: the rows of `table` naming `census`; the table's one reader (TOOL-dTotalRecall-55 S1)."""
+    return {path: reason for c, path, reason in table if c == census}
+
+
+def read_kept_path(census, path, table=CENSUS_KEPT_PATHS):
+    """The reason `table` keeps `path` by for `census`, or None (TOOL-dTotalRecall-55 S1)."""
+    return read_kept_rows(census, table).get(path)
 
 
 def read_header_edges(text: str, path: str, binding=None) -> list:

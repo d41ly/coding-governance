@@ -3867,6 +3867,15 @@ n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant d
 hit 'check 1 · record causes: 0 causeless · 0 orphan(s)'
 hit 'check 2 · record causes: causes · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-departures-build.md · names no Caused-by'
 hit 'check 1 exit 0 · check 2 exit 1'; hit 'record causes: fixture departures-pinned · PASS'
+# --- TOOL-dTotalRecall-55 AC2 — a census keep row cannot outlive its hit: a build-folder script kept by a
+# --- FIXTURE_KEPT row while it spells no Serves literal past its binding window is one red naming
+# --- CENSUS_KEPT_PATHS and its path, and the run exits 1. Red on S4's drain test skipped, which exits the plant 0.
+_krd='memory/builds/fRoot/build/2026-01-01-build-TOOL-fRoot-1-kept.py'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-row-drained 2>&1); _brc=$?   # AC2
+n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL record_causes.py --fixture --plant kept-row-drained exited $_brc, expected 1"; st=1; }
+hit "record causes: cause-writer · kept row · $_krd · red · drained"
+hit "record causes: RED cause-writer CENSUS_KEPT_PATHS $_krd: spells no Serves line past its binding window"
+n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = 1 ] || { echo "FAIL kept-row-drained: want exactly one red"; st=1; }
 
 # --- TOOL-dTotalRecall-7 (AC4 AC5 AC6 AC7 AC10 AC11 AC12) — the ask door, `gov_record.py new ask`: the plant
 # --- runs the refuse, undeclared-family, file, replay, grade, refused-read and refused-filing-on-a-remote
