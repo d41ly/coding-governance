@@ -67,10 +67,16 @@ moves newest first, from the trailer where one was written and from the record o
 its `direction` derived over this kit's definition.
 
 THE MAIL GUARD (KICK-dKeptSession-5 S9, S10): after the set is read and before the table answers, `record`
-runs the unattended driver's `--mail read <slug>` once (`read_mail_rows`, under `MAIL_GUARD_SECONDS`). A
-row reading `open`, a message addressed to the build or one of its units neither answered, acknowledged
-nor past its deadline, refuses the move as `refused — <slug> · mail open <id> …`, exit 1, writing nothing
-(`MailHeld`); a message this node first saw more than its `deadline` hours ago reads `expired`
+runs the unattended driver's `--mail read <slug>` once (`read_mail_rows`, under `MAIL_GUARD_SECONDS`).
+Over that read the move first acknowledges each notice it has consumed (`write_consumed_acks`,
+KICK-dKeptSession-42): every open `landed`, `superseded` or `withdrawn`, and per parent with an open
+`confirmed` or `changed` of subject `interfaces <parent>`, `check_parent_interfaces` once, the row its
+`interface — current <id>` line names and every such row of that parent sighted strictly earlier, each by
+the driver's `--mail ack <slug> <id>`; a failed ack prints `mail — ack not posted <id> · rc <n|->` on
+stderr, and a check other than confirmed or awaiting `mail — interfaces <parent> unread · <why>`. A row
+still reading `open`, a message addressed to the build or one of its units neither answered,
+acknowledged nor past its deadline, refuses the move as `refused — <slug> · mail open <id> …`, exit 1,
+writing nothing (`MailHeld`); a row acknowledged here is disposed by the build's next move. A message this node first saw more than its `deadline` hours ago reads `expired`
 (KICK-dKeptSession-24 S5), its asker's `default` the answer, and holds nothing. `mail — off`, no driver, or a root with no `.unattended.conf` passes with one `loop: mail ·
 unarmed · <why>` line; a driver no bash sees, a read silent within the bound, or a non-zero read with no
 row is `loop: unanswered · mail unknown: ...`, exit 2. Past the guard, each `answered`, `acked` or
@@ -79,7 +85,11 @@ set holds `log` one `mailbox-message` record per id is written after the move's 
 with it (`write_mail_records`). `--fixture --plant mail-open` holds the refusal over an open question on
 a bare remote, `mail-disposed` the disposal after its `ack` and a second move that disposes nothing, and
 `mail-expired` the disposal of a question carrying `deadline: 30`, first sighted 31 hours ago and never
-answered, its record's `State` reading `expired`.
+answered, its record's `State` reading `expired`; `acks-landed` a `landed` the move acknowledges and
+records past, `acks-confirmed` a `confirmed` whose key recomputes at the parent lease's witness acknowledged
+over the real chain, `acks-superseded` a `confirmed` and the later `changed` the stood-in check names
+current both acknowledged, then another parent's pair held under an unconfirmed check, and `acks-failed`
+one ack across two moves, then a refused and a raising ack, each on stderr, holding the third move.
 
 THE NOTICES (KICK-dKeptSession-7 S4, S9). On a move from designing to building, after the card follow,
 `write_dependency_notices` posts the build's frozen interfaces to each dependent `dependents --build <slug>`
@@ -216,7 +226,15 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
                                     "parents: B5, B21 back, B5, B21 back and B5, each exit over a new spec, post one "
                                     "confirmed and two changed to each, passes 1, 2 and 3, every post posted",
           "notices-refused": "the same two dependents and the post to dA answering 1: B5 records, printing "
-                             "notice — not posted confirmed to build:dA · rc 1, and dB's post is posted"}
+                             "notice — not posted confirmed to build:dA · rc 1, and dB's post is posted",
+          "acks-landed": "the driver's conf with RUN_CLAIMS on and a bare remote holding fy's landed to build:tFix: "
+                         "B4 acknowledges it and records, the read after it reading the row acked",
+          "acks-confirmed": "fy's spec committed, its lease witnessing that commit and fy's confirmed keyed over its "
+                            "listing there: B4 acknowledges it over the real chain and records, the row read acked",
+          "acks-superseded": "the interfaces check stood in: fy's confirmed sighted, then fy's changed it names "
+                             "current, B4 acking both; then fz's pair under an unconfirmed check, B5 refused",
+          "acks-failed": "one landed, B4 acking it and B5 posting nothing; then two landed whose acks exit 1 and "
+                         "raise LookupError, B7 refused naming both, each failure on stderr"}
 #: The mail plants' messages, each `(ref, build, id, to, kind, subject, answers)`, put straight on the fixture's
 #: remote; `mail-disposed` adds the ack. `mail-expired` writes the question with `FX_DEADLINE`'s two keys and
 #: its first sighting `FX_SIGHTED_HOURS` back in the fixture's feed, past the 30-hour deadline.
@@ -659,6 +677,64 @@ def check_parent_interfaces(root, slug, parent):
     return (rc, line) if rc in (0, 1) else (2, line)
 
 
+def write_consumed_acks(root, build, rows):
+    """The ids of `rows`, the guard's one `read_mail_rows` read of `build`'s mailbox, that the dependent's
+    transition has consumed and acknowledged with exit 0 (KICK-dKeptSession-42 S1 to S3). Consumed: every
+    `open` `landed`, `superseded` or `withdrawn` row; and per parent, the `from-build` of an `open` `confirmed` or `changed`
+    row whose subject is `interfaces <parent>`, one `check_parent_interfaces` call, whose `rc` 0 line
+    `interface — current <id> · <kind> · key <k>`, `<id>` an `open` row of the read, consumes that row and
+    every `open` `confirmed` or `changed` of that parent and subject whose `first-seen` is strictly earlier,
+    as `read_mailbox` orders it, so a tie or a `-` stamp stays open. Any other answer consumes nothing from
+    that parent: `rc` 1 silently, any other `rc` or a raise with one `mail — interfaces <parent> unread ·
+    <line or why>` on stderr. Each consumed id is posted once, `--mail ack <build> <id>` through
+    `breakpoints.run_sourced` under `MAIL_GUARD_SECONDS`; a post exiting non-zero, or a launch raising, writes
+    `mail — ack not posted <id> · rc <n|->` on stderr and leaves the row open. Never raises."""
+    import subprocess
+    from breakpoints import run_sourced   # it imports this module at its top, so here
+    open_rows = [r for r in rows if r.get("state") == "open"]
+    consumed = [r["id"] for r in open_rows if r.get("kind") in ("landed", "superseded", "withdrawn")]
+    notices = {}
+    for r in open_rows:
+        parent = r.get("from-build") or ""
+        if r.get("kind") in ("confirmed", "changed") and parent and r.get("subject") == "interfaces %s" % parent:
+            notices.setdefault(parent, []).append(r)
+    by_id = {r["id"]: r for r in open_rows}
+
+    def read_stamp(row):
+        """`first-seen` as `read_mailbox` orders it, a `-` or empty stamp after every other."""
+        seen = row.get("first-seen") or "-"
+        return "~" if seen == "-" else seen
+    for parent, held in notices.items():
+        try:
+            rc, line = check_parent_interfaces(root, build, parent)
+        except (LookupError, OSError, ValueError, subprocess.TimeoutExpired) as e:
+            rc, line = None, str(e) or type(e).__name__
+        if rc == 1:
+            continue
+        hit = re.fullmatch(r"interface — current (\S+) · (?:confirmed|changed) · key \S+", line or "") if rc == 0 else None
+        if hit is None:
+            if rc != 0:
+                print("mail — interfaces %s unread · %s" % (parent, line), file=sys.stderr)
+            continue
+        current = by_id.get(hit.group(1))
+        if current is None:
+            continue
+        consumed.append(current["id"])
+        consumed += [r["id"] for r in held if read_stamp(r) < read_stamp(current)]
+    acked = set()
+    for mid in dict.fromkeys(consumed):   # once per id, in the order consumed
+        try:
+            rc, _out = run_sourced(root, '( load_driver_conf && main --mail ack "$2" "$3" )', args=(build, mid),
+                                   timeout=MAIL_GUARD_SECONDS)
+        except (LookupError, OSError, subprocess.TimeoutExpired):
+            rc = None
+        if rc == 0:
+            acked.add(mid)
+        else:
+            print("mail — ack not posted %s · rc %s" % (mid, "-" if rc is None else rc), file=sys.stderr)
+    return acked
+
+
 def write_dependency_notices(root, build, commit, ordinal):
     """The notices of `build`'s frozen interfaces (KICK-dKeptSession-7 S4): per dependent of `read_dependents`,
     one post of `derive_interface_listing` at `commit` as its interface and `commit`'s full sha as its body,
@@ -739,19 +815,26 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     S1), then a `notice — not posted <kind> to build:<dependent> · rc <n> · <its first line>` line where the
     post exits non-zero, or its `loop: notice · unread` line (`write_dependency_notices`, KICK-dKeptSession-7
     S4). TransitionRefused where no row holds the move, `MailHeld` where a message addressed to the
-    build is open; ValueError on a value, witness, index, policy read, tag resolver, scenario conflict or
+    build is still open once `write_consumed_acks` has acknowledged the notices the move consumed, a
+    `landed`, `superseded` or `withdrawn` row and a `confirmed` or `changed` its parent's interfaces check
+    names current or supersedes (KICK-dKeptSession-42), each failed ack a `mail — ack not posted` line on
+    stderr; ValueError on a value, witness, index, policy read, tag resolver, scenario conflict or
     unknown mailbox refused, writing no record; LookupError where a kit it reads does not resolve."""
     from composition import PINNED, derive_composition_revision, read_step_composition, write_ended_orders
     from scenario import derive_move_scenarios   # it imports this module through composition.py, so here
     cache = {}
     chosen = read_cached_channels(root, "HEAD", cache)
     # the mail guard (KICK-dKeptSession-5 S9): one read of the build's mailbox, its open rows refusing the
-    # move before any write and its answered and acknowledged rows disposed below; an unarmed mailbox is a line
+    # move before any write and its answered and acknowledged rows disposed below; an unarmed mailbox is a line.
+    # Between the read and the refusal the move acknowledges each notice it has consumed, a landed, superseded
+    # or withdrawn row and a confirmed or changed its parent's interfaces check names current or supersedes
+    # (`write_consumed_acks`, KICK-dKeptSession-42): those leave the refusal, and the next move disposes of them
     said = []
     mail, unarmed = read_mail_rows(root, build)
     if unarmed:
         said.append("%s: mail · unarmed · %s" % (SAY, unarmed))
-    held = [r["id"] for r in mail if r.get("state") == "open"]
+    acked = write_consumed_acks(root, build, mail) if mail else set()
+    held = [r["id"] for r in mail if r.get("state") == "open" and r.get("id") not in acked]
     if held:
         raise MailHeld(build, held)
     data, where = read_definition(KIT)
@@ -1051,7 +1134,11 @@ def write_transition_plant(top, case):
     if case == "descope-spent":
         files[".governance/policy.toml"] = "[flow]\nrework-budget = 0\n"
     notices = case == "deps-notices" or case.startswith("notices-")
-    if case.startswith("mail-") or notices:   # the driver's conf, RUN_CLAIMS on, as the placement plants copy it
+    acks = case.startswith("acks-")
+    if case == "acks-confirmed":   # KICK-dKeptSession-42 AC2: the parent fy's spec, its lease's witness this commit
+        files["memory/builds/fy/spec/2026-01-01-spec-TOOL-fy-1.md"] = (
+            "# TOOL-fy-1 — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n")
+    if case.startswith("mail-") or notices or acks:   # the driver's conf, RUN_CLAIMS on, as the placement plants copy it
         src = next((d for d in (KIT, *KIT.parents) if (d / ".unattended.conf").is_file()), None)
         if src is None:
             raise LookupError("the mail plants copy .unattended.conf from this tree, which holds none")
@@ -1065,13 +1152,13 @@ def write_transition_plant(top, case):
     write_fixture_files(top, files)
     run_fixture_git(top, "add", "-A")
     run_fixture_git(top, "commit", "-q", "-m", "fixture")
-    if case in ("mail-open", "mail-disposed", "mail-expired") or notices:   # a bare remote inside the git dir, so the scratch's removal takes it too
+    if case in ("mail-open", "mail-disposed", "mail-expired") or notices or acks:   # a bare remote inside the git dir, so the scratch's removal takes it too
         from placement import write_fixture_gov_ref
         origin = top / ".git" / "fx-origin.git"
         run_fixture_git(top, "init", "-q", "--bare", "--template=", str(origin))
         run_fixture_git(top, "remote", "add", FIXTURE_REMOTE, str(origin))
         run_fixture_git(top, "push", "-q", FIXTURE_REMOTE, "main")
-        for ref, *mail in () if notices else (FX_QUESTION, FX_ACK) if case == "mail-disposed" else (FX_QUESTION,):
+        for ref, *mail in () if notices or acks else (FX_QUESTION, FX_ACK) if case == "mail-disposed" else (FX_QUESTION,):
             write_fixture_gov_ref(top, ref, render_fixture_mail(*mail, **(FX_DEADLINE if case == "mail-expired" else {})))
         if case == "mail-expired":
             # its first sighting, the six-field line `claim.py`'s stale-holder plant writes for a lease: the commit
@@ -1268,6 +1355,142 @@ def run_transition_fixture(case):
                           ([p[0][1] for p in posted] == ["build:%s" % FX_DEPENDENTS[1]], "the posted ones are %s"
                            % [p[0][1] for p in posted]))
             misses = [why for ok, why in checks if not ok]
+            print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
+            return 0 if not misses else 1
+        if case.startswith("acks-"):   # KICK-dKeptSession-42 AC1 to AC4: a move acknowledges what it consumed, run
+            # as the fleet registry's first user and FX_SESSION, the launcher the writer imports inside its function
+            # rebound to record each ack and, under acks-superseded, the interfaces check stood in; all restored
+            import os
+            import time
+            import breakpoints
+            from placement import read_fleet_user, write_fixture_gov_ref, write_foreign_lease
+            real_run, real_check = breakpoints.run_sourced, globals()["check_parent_interfaces"]
+            ids = {"landed": "a1a2a3a4a5a6", "confirmed": "c1c2c3c4c5c6", "changed": "d1d2d3d4d5d6",
+                   "fz confirmed": "e1e2e3e4e5e6", "fz changed": "f1f2f3f4f5f6", "lost": "b1b2b3b4b5b6",
+                   "raised": "b7b8b9b0b1b2"}
+            acked, checked, failing, exits, refused = [], [], {}, [], []
+            b5 = ["record", *at, *BACKWARD_MOVES[1], "--witness", "HEAD"]
+            b7 = ["record", *at, *BACKWARD_MOVES[2], "--witness", "HEAD"]
+
+            def write_notice(n, parent, name, key=None):
+                """The message `ids[name]` from `parent` to build:tFix on its own ref, a `landed` of subject
+                `landing <parent>` or a `confirmed` or `changed` of `interfaces <parent>` keyed `key`."""
+                kind = name.split()[-1] if name.split()[-1] in ("confirmed", "changed") else "landed"
+                subject = ("interfaces %s" if kind != "landed" else "landing %s") % parent
+                write_fixture_gov_ref(top, "refs/gov/mail/%s/z/s-%d" % (parent, n), render_fixture_mail(
+                    parent, ids[name], "build:%s" % FX_BUILD, kind, subject, content_key=key))
+
+            def run_recorded_ack(repo, script, *rest, **kw):
+                """The landed launcher, each `--mail ack` recorded as `(id, exit)`; an id `failing` names answers
+                exit 1 with the post's lost line, or raises LookupError, launching nothing."""
+                if "--mail ack" not in script:
+                    return real_run(repo, script, *rest, **kw)
+                mid = ([str(a) for a in kw.get("args", ())][1:2] or ["-"])[0]
+                if failing.get(mid) == "raise":
+                    acked.append((mid, "-"))
+                    raise LookupError("the plant's driver does not resolve")
+                got = (1, "mail — lost %s · the plant's refusal\n" % mid) if failing.get(mid) == "lost" else \
+                    real_run(repo, script, *rest, **kw)
+                acked.append((mid, got[0]))
+                return got
+
+            def check_stood_in(root, slug, parent):
+                """The interfaces check stood in, each parent recorded: fy's `changed` current, any other unconfirmed."""
+                checked.append(parent)
+                if parent == "fy":
+                    return 0, "interface — current %s · changed · key 0123456789ab" % ids["changed"]
+                return 1, "interface — unconfirmed · key 0123456789ab"
+
+            def run_held_verb(argv):
+                """`run_verb` with its output echoed and kept, so a refusal's line is read."""
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    rc = run_verb(argv)
+                sys.stdout.write(out.getvalue())
+                exits.append(rc)
+                refused.extend(ln for ln in out.getvalue().splitlines() if ln.startswith("refused — "))
+                return rc
+
+            def read_row_state(name):
+                """The row `ids[name]` as `read_mail_rows` reads it now, printed."""
+                state = next((r.get("state") for r in read_mail_rows(top, FX_BUILD)[0] if r.get("id") == ids[name]),
+                             "none")
+                print("%s: fixture · state %s · %s" % (SAY, ids[name], state))
+                return state
+            err = io.StringIO()
+            kept = {k: os.environ.get(k) for k in ("USERNAME", "CLAUDE_CODE_SESSION_ID")}
+            os.environ.update(USERNAME=read_fleet_user(), CLAUDE_CODE_SESSION_ID=FX_SESSION)
+            breakpoints.run_sourced = run_recorded_ack
+            if case == "acks-superseded":
+                globals()["check_parent_interfaces"] = check_stood_in
+            try:
+                with contextlib.redirect_stderr(err):
+                    if case == "acks-landed":   # AC1
+                        write_notice(1, "fy", "landed")
+                        run_held_verb(b4)
+                        states = [read_row_state("landed")]
+                        checks = ((acked == [(ids["landed"], 0)], "the acks are %s" % acked),)
+                    elif case == "acks-confirmed":   # AC2: the real chain, its key the driver's over fy's listing
+                        write_foreign_lease(top, "fy", fields=(("witness", witness),))
+                        listing = top / ".git" / "fx-listing-fy"
+                        listing.write_bytes(derive_interface_listing(top, "fy", witness))
+                        rc, out = real_run(top, 'load_driver_conf && derive_gov_id --file "$2"', args=(listing.as_posix(),),
+                                           timeout=MAIL_GUARD_SECONDS)
+                        key = (out.strip().splitlines() or ["unkeyed"])[-1].strip() if rc == 0 else "unkeyed"
+                        print("%s: fixture · key %s" % (SAY, key))
+                        write_notice(1, "fy", "confirmed", key)
+                        run_held_verb(b4)
+                        states = [read_row_state("confirmed")]
+                        checks = ((acked == [(ids["confirmed"], 0)], "the acks are %s" % acked),)
+                    elif case == "acks-superseded":   # AC3: the confirmed sighted a second before the changed
+                        write_notice(1, "fy", "confirmed")
+                        read_mail_rows(top, FX_BUILD)
+                        time.sleep(1.1)   # a sighting is stamped to the second, and a tie is never earlier
+                        write_notice(2, "fy", "changed")
+                        run_held_verb(b4)
+                        write_notice(3, "fz", "fz confirmed")
+                        write_notice(4, "fz", "fz changed")
+                        run_held_verb(b5)
+                        states = [read_row_state(n) for n in ("confirmed", "changed", "fz changed")]
+                        checks = ((sorted(acked) == sorted([(ids["confirmed"], 0), (ids["changed"], 0)]),
+                                   "the acks are %s, owed fy's confirmed and changed, each exit 0" % acked),
+                                  (len(refused) == 1 and refused[0].startswith("refused — %s · mail open " % FX_BUILD)
+                                   and ids["fz changed"] in refused[0].split(" · ")[1], "B5's refusal read %s" % refused),
+                                  (checked == ["fy", "fz"], "the check ran for %s, owed fy then fz" % checked))
+                    else:   # AC4: one ack across B4 and B5, then a lost ack and a raising one holding B7
+                        write_notice(1, "fy", "landed")
+                        run_held_verb(b4)
+                        run_held_verb(b5)
+                        failing.update({ids["lost"]: "lost", ids["raised"]: "raise"})
+                        write_notice(2, "fy", "lost")
+                        write_notice(3, "fz", "raised")
+                        run_held_verb(b7)
+                        states = [read_row_state(n) for n in ("landed", "lost", "raised")]
+                        said = err.getvalue()
+                        checks = (([a for a in acked if a[0] == ids["landed"]] == [(ids["landed"], 0)],
+                                   "the first landed's acks are %s, owed one" % acked),
+                                  (len(refused) == 1 and all(ids[n] in refused[0].split(" · ")[1] for n in ("lost", "raised")),
+                                   "B7's refusal read %s" % refused),
+                                  ("mail — ack not posted %s · rc 1" % ids["lost"] in said
+                                   and "mail — ack not posted %s · rc -" % ids["raised"] in said,
+                                   "stderr read %r" % said))
+            finally:
+                breakpoints.run_sourced = real_run
+                globals()["check_parent_interfaces"] = real_check
+                for k, v in kept.items():
+                    if v is None:
+                        os.environ.pop(k, None)
+                    else:
+                        os.environ[k] = v
+            for line in err.getvalue().splitlines():
+                print("%s: fixture · stderr · %s" % (SAY, line))
+            owed = {"acks-landed": ([0], ["acked"]), "acks-confirmed": ([0], ["acked"]),
+                    "acks-superseded": ([0, 1], ["acked", "acked", "open"]),
+                    "acks-failed": ([0, 0, 1], ["acked", "open", "open"])}[case]
+            print("%s: fixture · acks %s" % (SAY, " · ".join("%s rc %s" % a for a in acked) or "none"))
+            misses = [why for ok, why in ((exits == owed[0], "the moves exited %s, owed %s" % (exits, owed[0])),
+                                          (states == owed[1], "the rows read %s, owed %s" % (states, owed[1])),
+                                          *checks) if not ok]
             print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
             return 0 if not misses else 1
         if case == "mail-open":   # KICK-dKeptSession-5 AC6: the open question refuses B4, writing nothing
@@ -1511,7 +1734,15 @@ def run_selftest():
                  SAY, FX_DEPENDENTS[1]), "confirmed pass 1 · changed pass 2 · changed pass 3"),
              ("notices-refused", fx("notices-refused"), 0, "%s: fixture · notices-refused · held" % SAY, ""),
              ("notices-refused line", fx("notices-refused"), 0,
-              "notice — not posted confirmed to build:%s · rc 1 · " % FX_DEPENDENTS[0], "mail — duplicate")]
+              "notice — not posted confirmed to build:%s · rc 1 · " % FX_DEPENDENTS[0], "mail — duplicate"),
+             ("acks-landed", fx("acks-landed"), 0, "%s: fixture · acks-landed · held" % SAY, ""),
+             ("acks-landed state", fx("acks-landed"), 0, "%s: fixture · state " % SAY, " · acked"),
+             ("acks-confirmed", fx("acks-confirmed"), 0, "%s: fixture · acks-confirmed · held" % SAY, ""),
+             ("acks-superseded", fx("acks-superseded"), 0, "%s: fixture · acks-superseded · held" % SAY, ""),
+             ("acks-superseded refused", fx("acks-superseded"), 0, "refused — %s · mail open " % FX_BUILD, ""),
+             ("acks-failed", fx("acks-failed"), 0, "%s: fixture · acks-failed · held" % SAY, ""),
+             ("acks-failed stderr", fx("acks-failed"), 0, "%s: fixture · stderr · mail — ack not posted " % SAY,
+              " · rc -")]
     return run_selftest_cases(run_cached_case, cases, "%s: transition selftest" % SAY)
 
 

@@ -399,9 +399,18 @@ from a `--field` as well, and `disposed`, the mail the move disposed, derived an
 
 **The mail guard** (KICK-dKeptSession-5 S9, S10). After the set is read and before `derive_move`, the
 writer runs the unattended kit's `--mail read <slug>` once, `read_mail_rows`, under
-`MAIL_GUARD_SECONDS`, its bash the inline resolver's. A row reading `open`, a message addressed to the
+`MAIL_GUARD_SECONDS`, its bash the inline resolver's. Over that read the move first acknowledges each
+notice it has consumed, `write_consumed_acks` (KICK-dKeptSession-42): every open `landed`, `superseded`
+or `withdrawn`, and per parent holding an open `confirmed` or `changed` of subject `interfaces
+<parent>`, one `check_parent_interfaces` call, whose `interface — current <id>` line consumes that row
+and every such row of the parent sighted strictly earlier; each consumed id is posted once as the
+unattended kit's `--mail ack <slug> <id>` through `breakpoints.py`'s `run_sourced`, a failed ack
+printing `mail — ack not posted <id> · rc <n|->` on stderr and a check that does not read `mail —
+interfaces <parent> unread · <why>`. A `question`, `intake` or `overlap` is never acknowledged, nor a
+`changed` the check does not name. A row still reading `open`, a message addressed to the
 build or one of its units neither answered, acknowledged nor past its deadline, raises `MailHeld`, a
-`TransitionRefused` printed `refused — <slug> · mail open <id> …`, exit 1, writing nothing; `claim.py`
+`TransitionRefused` printed `refused — <slug> · mail open <id> …`, exit 1, writing nothing; a row
+acknowledged here is disposed by the build's next move; `claim.py`
 catches it before a row miss and prints `claim held`. A message this node first saw more than its
 `deadline` hours ago reads `expired` (KICK-dKeptSession-24) and holds nothing. `mail — off`, no unattended kit, or a repository with no
 `.unattended.conf` pass with one `loop: mail · unarmed · <why>` line; a driver no bash sees, a read
@@ -457,7 +466,13 @@ over the listing at the move's commit and a second exit posting `changed`; `noti
 two dependents and three exits from Design, back through B21 between them, each dependent reading one
 `confirmed` and two `changed` whose commits carry `pass:` 1, 2 and 3; and `notices-refused`, the post
 to the first dependent rebound to exit 1, the move still recording and printing its `notice — not
-posted` line. `check --selftest` holds the tree's own definition, then runs every plant, and
+posted` line; and the four over `write_consumed_acks`, each rebinding the launcher to record every ack
+and restoring it: `acks-landed`, a parent's `landed` acknowledged by the move that records past it;
+`acks-confirmed`, a `confirmed` keyed over the parent's listing at its lease's witness, acknowledged
+over the real chain; `acks-superseded`, `check_parent_interfaces` stood in, a `confirmed` and the later
+`changed` it names current both acknowledged, then another parent's pair under an unconfirmed check
+refusing B5; and `acks-failed`, one ack across B4 and B5, then an ack exiting 1 and one raising
+`LookupError`, each on stderr, refusing B7. `check --selftest` holds the tree's own definition, then runs every plant, and
 is gov's `loop transition record` leg.
 
 ```bash
