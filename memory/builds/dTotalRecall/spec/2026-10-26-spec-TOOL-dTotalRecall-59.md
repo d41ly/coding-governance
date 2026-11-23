@@ -1,6 +1,6 @@
-# TOOL-dTotalRecall-59 — the merged legacy registration is judged at the run's real compare base, a first seed, and the `absorbs` read that base can never feed is cut
+# TOOL-dTotalRecall-59 — the merged legacy registration is judged at the run's real compare base, where it is new, and its `shrink-only` is proved on a fixture base that holds it
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -22,30 +22,25 @@ The round-1 spec audit of units 44 to 53
 confirmed finding **id 13 at HIGH**, its item **H3**, alone in that item. `TOOL-dTotalRecall-52`
 (order 28) says the merged home "gains every causes row its base lacked" and is refused `gained`,
 and S2 builds an `absorbs` read of the absorbed population's home at the compare base to prevent
-that. `compare_to_base` judges at `resolve_compare_base` (`tools/codebase-map/map_lib.py:1502`,
-`TOOL-dWitnessedBar-13` §4), HEAD's merge-base with `origin/main`, which is `462d20f3` throughout
-this run. Neither home exists there: units 1 and 19 mint both on the unmerged run branch. The
-factory reads a home absent at the base as a first seed, every row `seeded`
-(`TOOL-dWitnessedBar-51` S30), never as `gained`. So unit 52's AC2 prints `first seed`, and its
-`absorbs` read reads nothing. After the close merge, `legacy-records` never reaches `main`, because
-unit 52 S3 deletes its home first, so no base anywhere will ever hold it. This unit grounds the
-judgement on the real base, cuts `absorbs`, and proves `shrink-only` on a fixture base that does
-hold the merged home. It repairs `TOOL-dTotalRecall-52`.
+that. `compare_to_base` judges at `tools/lib/compare_base.py#resolve_compare_base`
+(`TOOL-dWitnessedBar-13` §4), HEAD's merge-base with `origin/main`, `8b8b1374c` at 2026-11-23
+(DERIVED by `git merge-base HEAD origin/main`). Neither home exists there: units 1 and 19 mint both
+on the unmerged run branch. The ratchet reads a home absent at the base `new at <sha12>` with its row
+count, graded no further (`ratchet.py#check_new_at_base`, `TOOL-dWitnessedBar-51` S30; its §8 F7
+minted no `first seed` reading), and `compare_to_base` returns no findings, never `gained`. So an
+`absorbs` read would read nothing. After the close merge, `legacy-records` never reaches `main`,
+because unit 52 S3 deletes its home first, so no base anywhere will ever hold it. It repairs
+`TOOL-dTotalRecall-52`. Unit 52 builds no `absorbs` field (`TOOL-dTotalRecall-62`), so this unit
+grounds the judgement on the real base and proves `shrink-only` on a fixture base.
 
 ## 2. Scope (IN)
 
 - **S1** — The judgement at the run's base. At this run's compare base the merged
-  `record-kinds-legacy` home is absent, so `compare_to_base` reads it as a first seed and names no
-  `gained` key. Nothing is added to make that so: it is the factory's S30 rule, observed. Observed by
-  AC1.
-- **S2** — `absorbs` is cut. The registration field `absorbs`, its read in `compare_to_base`, its
-  refusal of a live or tracked absorbed population, and the `absorbs` line of the
-  `record-kinds-legacy` table in `tools/memory-tree/kit.toml` are deleted, as is the §7 arm unit 52
-  added for them. Observed by AC2.
-  **Readers:** by name: READER NOT IN TREE — `absorbs` is minted by `TOOL-dTotalRecall-52` in this
-  build and is absent at base `462d20f3` · by value: NO VALUE READERS — no compare base this run or
-  any adopter reaches holds the absorbed home, so the union it built was always the registration's
-  own base rows.
+  `record-kinds-legacy` home is absent, so `ratchet.py#check_new_at_base` reads it `new at <sha12>`
+  (`TOOL-dWitnessedBar-51` §8 F7) and `compare_to_base` names no `gained` key. Nothing is added to make
+  that so: it is the S30 rule, observed. Observed by AC1.
+- **S2** — `absorbs` is absent. Unit 52 builds no such field, so the registration and the factory
+  carry none. Observed by AC2.
 - **S3** — `shrink-only` proved where it can bite. A fixture whose base commit holds the merged home
   shows a planted extra `causes` row named `gained`, and an unchanged home naming none. Observed by
   AC3.
@@ -54,30 +49,33 @@ hold the merged home. It repairs `TOOL-dTotalRecall-52`.
 
 - The triple key and the old name's carriers: `TOOL-dTotalRecall-52` S1 and S3, unchanged.
 - The factory's absent-home and legacy-grammar rules: `TOOL-dWitnessedBar-51` S30's.
-- Re-keying any base that holds `legacy-records`: no such base exists, which is S2's reason.
+- Re-keying any base that holds `legacy-records`: no such base exists, which is why unit 52 builds
+  none.
 
 ### Edges
 
-- **consumes-from** `TOOL-dTotalRecall-52` — the merged registration and its `absorbs` field, read
-  and refusal in `tools/lib/legacy_ledger.py`, which this unit cuts; without them there is nothing
-  to remove and S1 has no registration to judge
-- **hands-off** `TOOL-dTotalRecall-60` — the registration with `absorbs` cut, against which that unit
-  re-observes unit 52's AC3 grep for ids 6 and 12
+- **consumes-from** `TOOL-dTotalRecall-52` — the merged registration, judged here at the real base
+  and on a fixture base
+- **hands-off** `TOOL-dTotalRecall-60` — the merged registration with `absorbs` absent, against which
+  that unit re-observes unit 52's AC3 grep for ids 6 and 12
 - **consumes-from** `TOOL-dTotalRecall-62` — S2 as that unit amends it in step 28, observing `absorbs` absent (the round-1 audit of units 54 to 60, id 2)
 - **hands-off** `TOOL-dTotalRecall-66` — the fixture and its plant `merged-home-gained`, which that unit moves into the factory's arm and scrubs of the caller's environment (the round-1 audit of units 54 to 60, ids 6, 19, 31, 34 and 37)
 
 ## 4. Design
 
-### The registration after this unit
+### The registration
 
-```toml
-[[ledger]]
-population = "record-kinds-legacy"
-key = "record"
-fields = ["path", "section", "check"]     # check: kind-schema | causes
-drain = "key"
-direction = "shrink-only"
+The registration is `TOOL-dTotalRecall-52` §4's block, unchanged by this unit.
+
+### The probe
+
+AC1 and AC3 read one probe, run from `tools/memory-tree/`:
+
 ```
+python -c "import ratchet, legacy_ledger as LL; root = ratchet.resolve_root('.'); sha, why = LL.resolve_compare_base(root); reg = [r for r in LL.read_registrations(root) if r.population == 'record-kinds-legacy'][0]; print(ratchet.check_new_at_base(root, reg, sha), LL.compare_to_base(root, reg))"
+```
+
+At the run's base it prints `True` and `compare_to_base`'s `(None, 'no memory/project/record-kinds-legacy.txt at <sha12> (merge-base of HEAD and origin/main)')`; at a base holding the home it prints `False` and the findings.
 
 ### The fixture
 
@@ -88,13 +86,11 @@ run there resolves the merge-base as its base, as it does in this repository.
 
 ### Inventory
 
-Minted: the fixture plant `merged-home-gained` in `legacy_ledger.py`'s self-test. Deleted: the
-`absorbs` field, its read and its refusal. Naming cell: none.
+Minted: the fixture plant `merged-home-gained` in `legacy_ledger.py`'s self-test. Naming cell: none.
 
 ### Files touched (estimate)
 
 - `tools/lib/legacy_ledger.py`
-- `tools/memory-tree/kit.toml`
 - `memory/map/generated/` (regenerated by `python tools/codebase-map/gen_map.py --write`)
 
 `TOOL-dTotalRecall-53` builds at order 29 too and writes `legacy_ledger.py` (S6), so BUILD-METHOD M6
@@ -109,24 +105,24 @@ sequences the two passes.
 
 ## 5. Production-readiness checklist
 
-- security — no new surface; a field and its read are removed.
-- perf / scale — one fewer home read per compare while the field stood.
-- error / empty / loading states — the first-seed reading prints `first seed record-kinds-legacy
-  <n> rows`.
-- observability — the first-seed line names the population and its count.
-- risks — none: the deleted read only ever read an absent home.
+- security — no new surface.
+- perf / scale — none: the fixture repository is made once per arm run.
+- error / empty / loading states — a home absent at the base reads `new at <sha12>`.
+- observability — `ratchet (never gains)` prints `record-kinds-legacy · new at <sha12> · <n> rows`.
+- risks — none beyond the window in which a home `new at` its base is graded no further, which the
+  batch `TOOL-dTotalRecall-66` bounds.
 - testing — AC1 to AC3 by the pass; the arm of §7 at the close.
-- migration — none: the field never reached `main`.
+- migration — none: no field is built or removed.
 - user docs — none under `help/`.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a `python -c` probe run from `tools/lib/` calls `compare_to_base` from
-  `legacy_ledger.py` for the `record-kinds-legacy` registration at the pass tip, it prints
-  `first seed record-kinds-legacy` with the working row count and names no `gained` key.
-  Red when: it names a `gained` key, or reads a base home this run's merge-base does not hold.
+- **AC1** — When §4's probe runs from `tools/memory-tree/` at the pass tip, it prints `True` for
+  `check_new_at_base`, the `new at` reading, and `compare_to_base` names no `gained` key.
+  Red when: it names a `gained` key, `check_new_at_base` prints `False`, or it reads a base home this
+  run's merge-base does not hold.
 - **AC2** — When `git grep -n "absorbs" -- legacy_ledger.py` runs from `tools/lib/`, and
-  `git grep -n "absorbs" -- tools/memory-tree/kit.toml` from the root, at the pass tip, each prints
+  `git grep -n "absorbs" -- tools/govkit/registry.toml` from the root, at the pass tip, each prints
   nothing.
   Red when: the field, its read or its refusal survives.
 - **AC3** — When the same probe runs in the fixture of §4, it names the planted `causes` key `gained`;
@@ -138,7 +134,7 @@ sequences the two passes.
 
 `memory hygiene` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e`
 
-New arm: tools/lib/legacy_ledger.py · covers AC3 · the plant `merged-home-gained`, a fixture base holding the merged home, staged by reading the base as absent; it replaces unit 52's absorbed-population arm · none
+New arm: tools/lib/legacy_ledger.py · covers AC3 · the plant `merged-home-gained`, a fixture base holding the merged home, staged by reading the base as absent · none
 
 ## 8. Open questions
 
@@ -154,13 +150,21 @@ New arm: tools/lib/legacy_ledger.py · covers AC3 · the plant `merged-home-gain
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 44 to 53, id 13
   (HIGH, item H3).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-62, TOOL-dTotalRecall-66, each the other end of an edge a unit the round-1 spec audit of units 54 to 60 promoted wrote; nothing else moved.
+- rev-3 · 2026-11-23 · title · §1 · S1 S2 · §3 · §4 · §5 · AC1 AC2 · §7 · §10 ·
+  amended by TOOL-dTotalRecall-62 (id 2, item H2) per
+  `2026-11-22-prompt-TOOL-dTotalRecall-62-build-brief`: unit 52 builds no `absorbs`, so S2 observes it absent and AC2's second grep reads
+  `tools/govkit/registry.toml`; S1, AC1 and §5 name the ratchet's `new at` reading through §4's probe
+  (`TOOL-dWitnessedBar-51` §8 F7); the title, §4, §5, the New arm and the edges carry no cut; §1 and
+  §10 cite `tools/lib/compare_base.py#resolve_compare_base` and the base `8b8b1374c`, and §4 points at
+  unit 52's registration block. S3 and AC3, the fixture proof, unchanged.
 
 ## 10. Reuse audit
 
-The seam is the ledger factory's own base read, `compare_to_base` at `resolve_compare_base`
-(`TOOL-dWitnessedBar-13` §4, `tools/codebase-map/map_lib.py:1502`), with its absent-home rule
-(`TOOL-dWitnessedBar-51` S30); this unit adds nothing to it and removes the one field unit 52 added.
-`python tools/codebase-map/reuse_lookup.py "a shrink-only keyed baseline of counted sites"` is the
-lookup the factory's own §10 records, and `git merge-base HEAD origin/main` printed `462d20f3` here.
+The seam is the ledger factory's own base read, `legacy_ledger.py#compare_to_base` at
+`tools/lib/compare_base.py#resolve_compare_base` (`TOOL-dWitnessedBar-13` §4), with the ratchet's
+absent-base reading `ratchet.py#check_new_at_base` (`TOOL-dWitnessedBar-51` S30); this unit adds
+nothing to either. `python tools/codebase-map/reuse_lookup.py "a shrink-only keyed baseline of counted sites"`
+is the lookup the factory's own §10 records, and `git merge-base HEAD origin/main` printed `8b8b1374c`
+here (DERIVED 2026-11-23).
 
 Recall terms used: `python tools/memory-recall/query.py "how is a record written by a pinned instrument given its cause and kept green by the causes check" --terms "Caused-by causes legacy-records backfill instrument pinned repin departures record_causes census kept"`
