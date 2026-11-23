@@ -577,6 +577,17 @@ recommendation. When resolved, mark it in place: RESOLVED (owner, <date>): <pick
 RESOLVED (agent, <date>, delegated): <pick> under a mandate. Write `none`
 when clear.
 
+**The fork record.** From `FORK_RECORD_CUTOFF`, an F-item an `agent` mark resolves carries, in its own
+span after the mark and unquoted, its record: options: (a) > (c) > (b) · pick: (a) · admitted-by: principle.p18
+— the options the core admits in ranked order, the most feature-rich first and then the most
+expandable, the pick, and the `principle.` tag of the registry that admits the set (`principle.p18`,
+the decision principles, unless another admits it). Both readers grade it: a record missing, a pick
+that is not one of its options, a pick that is not the first of them, or an `admitted-by` that is not
+a `principle.<seg>` tag is unresolved, and the hygiene gate also checks the tag is one the principle
+registry holds. One option is a legal ranking. An `(owner, …)` mark is never graded, since the owner's
+pick is the owner's. `widens:` and `relaxes:` fields may follow the tag and are not read. A record in
+backticks or double quotes records nothing, as a quoted mark resolves nothing.
+
 **Mark it in place**, naming resolver and authority, never `(owner, …)` for a decision the owner
 did not make. The mark must be the documented SHAPE — the word, then
 `(<owner|agent>, <date>[, delegated])` — and it may WRAP. From `FORK_ITEM_CUTOFF` both readers grade

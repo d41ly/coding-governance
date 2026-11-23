@@ -101,6 +101,10 @@ FORK_MARK_CUTOFF=""   # date; at/after it a terminal spec's §8 SECTION must car
 # At/after it §8 is F-item shaped and each F-item carries its own mark; it SUPERSEDES the key above for
 # the specs it reaches. The unattended planning verb reads this ONE declaration as text.
 FORK_ITEM_CUTOFF=""   # date; specs dated >= this grade §8 PER F-ITEM, and a Tier-2 §8 must be F-item shaped (check 12); blank = never required
+# TOOL-dBoundRoles-11, same RULE semantics: at/after it an F-item an `agent` mark resolves carries the fork
+# RECORD in its span, its ranked options, its pick and the principle admitting them. Graded inside the
+# per-item reading, so it reaches only specs FORK_ITEM_CUTOFF reaches too. The planning verb reads it as text.
+FORK_RECORD_CUTOFF="" # date; specs dated >= this grade each agent-resolved F-item's fork record (check 12); blank = never required
 REVIEW_VERDICT_CUTOFF="" # date; review records whose filename date >= this MUST carry one `## Verdict: <member>` line from the closed set (check 22); blank = never required
 # The FOURTH cutoff, and the only one that ships WITH a value. Its three siblings above are rules
 # that can be absent, so blank turns each of them off; this one SELECTS between two section canons
@@ -2278,6 +2282,35 @@ if [ "$SCOPED" = 1 ]; then
   fi
   case $'\n'"$c12_sel" in *$'\n'P$'\t'*) ;; *) echo "HYGIENE — cannot run: --$SCOPE_KIND '$SCOPE_ARG' leaves check 12 no spec to grade: every one is dated before SPEC_FORMAT_CUTOFF $SPEC_FORMAT_CUTOFF or absent from the worktree"; exit 2 ;; esac
 fi
+# TOOL-dBoundRoles-11 S2 - THE PRINCIPLE REGISTRY the fork record's `admitted-by` tag is graded against,
+# read as TEXT from the playbook kit's `principles.toml`, found through the kit resolver this engine's
+# sibling module carries, since a kit imports no sibling kit. Read only when a graded spec reaches
+# FORK_RECORD_CUTOFF, so a corpus the cutoff does not reach spawns nothing. Where no registry resolves,
+# an adopter without the playbook kit, the grade checks the tag's SHAPE alone and says so on one line,
+# never green silence. The tags ride into the awk space-delimited, so a membership test is one index().
+PRINCIPLE_TAGS=""
+if [ -n "$FORK_RECORD_CUTOFF" ] && [ -n "$c12_sel" ]; then
+  _fr_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$FORK_RECORD_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  if [ "${_fr_n:-0}" -gt 0 ]; then
+    if _fr_tags=$("$_PY" -B -c '
+import re, sys
+sys.path.insert(0, sys.argv[1])
+import backlog
+try:
+    kit = backlog.resolve_kit_dir("playbook", "principles.toml", sys.argv[1])
+except LookupError as e:
+    sys.exit(str(e))
+tags = re.findall(r"(?m)^tag = \"(principle\.[^\"]+)\"", (kit / "principles.toml").read_text(encoding="utf-8"))
+if not tags:
+    sys.exit("%s holds no principle tag" % (kit / "principles.toml").as_posix())
+print(" ".join(tags))' "$HERE" 2>&1); then
+      PRINCIPLE_TAGS=" ${_fr_tags%$'\r'} "
+    else
+      echo "memory-hygiene: note — the §8 fork records' admitted-by tags are graded by SHAPE alone, principle.<seg>, because no principle registry was read: ${_fr_tags//$'\n'/ }"
+    fi
+  fi
+fi
 bad12_raw=""
 if [ -n "$c12_sel" ]; then
 # Every array below is read only up to its own counter (n, ng, q), so entries left from a previous
@@ -2285,7 +2318,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v icut="$FORK_ITEM_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v t1cut="$SPEC_TIER1_CUTOFF" -v stg="$STAGED" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v icut="$FORK_ITEM_CUTOFF" -v frcut="$FORK_RECORD_CUTOFF" -v preg="$PRINCIPLE_TAGS" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v t1cut="$SPEC_TIER1_CUTOFF" -v stg="$STAGED" '
   # ---- The §8 grammar, ONCE for this program (TOOL-dDerivedDocket-31): the documented mark, the
   # ---- F-item opener, and a span resolved by its own mark. Removing code spans and double-quoted
   # ---- spans only DELETES text, so a stray delimiter pairing with a later one can hide a real mark,
@@ -2294,6 +2327,32 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
   function check_mark(s) { return (s ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) }
   function check_fitem_open(s) { return (s ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || s ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) }
   function check_span_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return check_mark(s) }
+  # ---- TOOL-dBoundRoles-11 S1 S2 - THE FORK RECORD, the tail an F-item an `agent` mark resolves carries:
+  # ---- `options: <o1> > <o2> · pick: <oN> · admitted-by: <tag>`, read from the span as `check_span_mark`
+  # ---- reads it, so a record quoted as an example records nothing. The LAST `options: ` before the first
+  # ---- ` · pick: ` opens it, so prose naming options earlier in the span cannot. `ok<TAB>tag` is a record
+  # ---- that holds; else `none`, `out<TAB>pick`, `first<TAB>pick<TAB>first option` or `tag<TAB>tag`, the
+  # ---- tag graded by SHAPE here and against the registry by the caller. The planning verb spells the
+  # ---- same two functions; the marker-contract table is what proves the two agree.
+  function check_agent_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return (s ~ /RESOLVED \(agent, [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) }
+  function check_fork_record(s,    p, k, o, pre, opts, rest, pick, tag, n, i, hit, opt) {
+    gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s)
+    p = index(s, " · pick: "); if (p == 0) return "none"
+    pre = substr(s, 1, p - 1); o = 0
+    while ((k = index(substr(pre, o + 1), "options: ")) > 0) o += k
+    if (o == 0) return "none"
+    opts = substr(pre, o + length("options: ")); rest = substr(s, p + length(" · pick: "))
+    k = index(rest, " · admitted-by: "); if (k == 0) return "none"
+    pick = substr(rest, 1, k - 1); tag = substr(rest, k + length(" · admitted-by: ")); sub(/ .*/, "", tag)
+    if (index(opts, " · ") || index(pick, " > ") || pick == "" || tag == "") return "none"
+    n = split(opts, opt, / > /)
+    for (i = 1; i <= n; i++) if (opt[i] == "") return "none"
+    hit = 0; for (i = 1; i <= n; i++) if (opt[i] == pick) hit = 1
+    if (!hit) return "out\t" pick
+    if (opt[1] != pick) return "first\t" pick "\t" opt[1]
+    if (tag !~ /^principle\.[a-z0-9][a-z0-9-]*$/) return "tag\t" tag
+    return "ok\t" tag
+  }
   # ---- TOOL-dGatedProse-1, CHECK 25: the TRIGGER, as two functions, because the arm calls it once
   # ---- per item and the word test once per stem. Both read the tables the arm builds ONCE from its
   # ---- literals, so the verb list and the kind nouns have one spelling in this file.
@@ -2857,6 +2916,24 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
             if (!check_span_mark(fi_sp[k])) { fi_nb++; fi_bad = (fi_nb == 1) ? fi_id[k] : fi_bad ", " fi_id[k] }
           if (fi_nb > 0)
             print f " (terminal Status, §8 F-items carrying no conforming resolution mark in their own span, at/after FORK_ITEM_CUTOFF " icut "): " fi_bad
+          # ---- TOOL-dBoundRoles-11 S2: THE FORK RECORD, from FORK_RECORD_CUTOFF, over each span an
+          # ---- `agent` mark resolves. An `owner` mark is never graded: the pick of the owner is theirs.
+          if (frcut != "" && fdate >= frcut) {
+            for (k = 1; k <= fi_n; k++) {
+              if (!check_agent_mark(fi_sp[k])) continue
+              fr = check_fork_record(fi_sp[k]); split(fr, frf, "\t")
+              if (fr == "none")
+                print f " (terminal Status, §8 " fi_id[k] " carries an agent mark and no fork record, at/after FORK_RECORD_CUTOFF " frcut ": the span owes options: <o1> > <o2> · pick: <o1> · admitted-by: principle.<tag>)"
+              else if (frf[1] == "out")
+                print f " (terminal Status, §8 " fi_id[k] " fork record, at/after FORK_RECORD_CUTOFF " frcut "): pick " frf[2] " is not an admitted option"
+              else if (frf[1] == "first")
+                print f " (terminal Status, §8 " fi_id[k] " fork record, at/after FORK_RECORD_CUTOFF " frcut "): pick " frf[2] " is not the first of its ranking " frf[3]
+              else if (frf[1] == "tag")
+                print f " (terminal Status, §8 " fi_id[k] " fork record, at/after FORK_RECORD_CUTOFF " frcut "): admitted-by " frf[2] " is not a principle.<seg> tag"
+              else if (preg != "" && index(preg, " " frf[2] " ") == 0)
+                print f " (terminal Status, §8 " fi_id[k] " fork record, at/after FORK_RECORD_CUTOFF " frcut "): admitted-by " frf[2] " is no tag the principle registry holds"
+            }
+          }
         }
       }
       else if (fcut != "" && fdate != "" && fdate >= fcut) {
@@ -3333,6 +3410,11 @@ if [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ] && [ -n "$FORK_ITEM_CUTOFF" ]; then
   _fi_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$FORK_ITEM_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_fi_n:-0}" -gt 0 ] || echo "memory-hygiene: the §8 F-item arms graded NO spec — FORK_ITEM_CUTOFF is $FORK_ITEM_CUTOFF and every tracked spec predates it. That is the intended state at adoption; their coverage is the self-test fixtures and the marker-contract table, not this corpus."
+fi
+# Same notice, same footing, for the §8 fork-record arm (TOOL-dBoundRoles-11), counted by the
+# `_fr_n` the registry read above already took over the same selection.
+if [ "$STAGED" = 0 ] && [ "$SCOPED" = 0 ] && [ -n "$FORK_RECORD_CUTOFF" ]; then
+  [ "${_fr_n:-0}" -gt 0 ] || echo "memory-hygiene: the §8 fork-record arm graded NO spec — FORK_RECORD_CUTOFF is $FORK_RECORD_CUTOFF and every tracked spec predates it. That is the intended state at adoption; its coverage is the self-test fixtures and the marker-contract table, not this corpus."
 fi
 # Same notice, same footing, for the Tier-1 micro-spec arm (TOOL-aRoutedQuill-1). Counted by date
 # alone, so Tier-2 specs inflate it: the safe direction, since it can only stay silent too OFTEN.

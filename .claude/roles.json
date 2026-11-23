@@ -153,7 +153,7 @@
         "lexicon naming predicates"
       ],
       "layer": "layer.roles",
-      "role-sha": "32bee7788860",
+      "role-sha": "71fd4d699559",
       "shapes": [
         "per-unit"
       ],
@@ -267,7 +267,7 @@
         "spec tokens (a spec's own names resolve)"
       ],
       "layer": "layer.roles",
-      "role-sha": "a1ec32699e57",
+      "role-sha": "a05a716a4853",
       "shapes": [
         "per-unit"
       ],

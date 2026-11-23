@@ -598,6 +598,41 @@ def read_policy_setting(key, root, with_default=False):
     return value
 
 
+#: TOOL-dBoundRoles-11 S5: the question kinds the owner-question reader answers, and the answer words.
+OWNER_QUESTION_KEY = "run.on-owner-question"
+OWNER_QUESTION_KINDS = ("fork", "owner-gate", "ratification", "owner-write")
+OWNER_QUESTION_ANSWERS = ("resolve", "park-item", "park-build", "stop-run", "owner")
+
+
+def resolve_owner_question(kind, attended, repo):
+    """'resolve' | 'park-item' | 'park-build' | 'stop-run' | 'owner', the key read once by `read_policy_setting`
+    (TOOL-dBoundRoles-11 S5). A question of kind `fork` or `owner-gate` raised while the owner is away answers
+    `run.on-owner-question`'s value at the landed revision of `repo`, its catalogue default
+    `best-effort-recorded` read as `resolve`: the role that meets the fork resolves it by `principle.p18` and
+    records it. A question raised while the owner attends, a `ratification` and an `owner-write` each answer
+    `owner`, the cases the key leaves to the owner and `run.on-owner-silence`. An unknown kind raises
+    RolesError naming it; a refused read raises the reader's RolesError, naming the key and the reader's line;
+    no policy kit, the reader's None, raises RolesError naming the key and the absent kit. A value outside the
+    catalogue's four raises RolesError naming it.
+
+    WHAT THIS DOES NOT CHECK: which build or item asked, or whether the rework budget is spent, whose ending
+    branch TOOL-dBoundRoles-26 adds here."""
+    if kind not in OWNER_QUESTION_KINDS:
+        raise RolesError("%s — the question kind '%s' is none of %s" % (OWNER_QUESTION_KEY, kind,
+                                                                        ", ".join(OWNER_QUESTION_KINDS)))
+    if attended or kind in ("ratification", "owner-write"):
+        return "owner"
+    value = read_policy_setting(OWNER_QUESTION_KEY, repo, with_default=True)
+    if value is None:
+        raise RolesError("%s — no policy kit answers it beside the roles kit, so no owner-question can be "
+                         "answered for the owner: install the policy kit, or the owner answers" % OWNER_QUESTION_KEY)
+    answer = "resolve" if value == "best-effort-recorded" else value
+    if answer not in OWNER_QUESTION_ANSWERS[:4]:   # the four the key's values answer; `owner` is never one
+        raise RolesError("%s — reads %r, none of best-effort-recorded, park-item, park-build and stop-run"
+                         % (OWNER_QUESTION_KEY, value))
+    return answer
+
+
 def check_effort_floor(level, source, root=None):
     """Refuse a level below `EFFORT_FLOOR` by its source (TOOL-dBoundRoles-23 S5, S6, §4 "The floor"). `source`
     names where the level was read: a `roles.effort.*` key, which `read_policy_setting` reads from the policy

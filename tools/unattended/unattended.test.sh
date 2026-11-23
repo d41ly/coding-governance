@@ -3865,11 +3865,30 @@ printf 'MEMORY_ROOT=memory\nFORK_ITEM_CUTOFF=""\n' > .memory-tree.conf
 hit "$(run --plan tPlan)" "next: ARCH-tPlan-1 (READY - build it)"
 printf 'MEMORY_ROOT=memory\nFORK_ITEM_CUTOFF="2026-07-01x"\n' > .memory-tree.conf
 out=$(run --plan tPlan)
-hit "$out" "the memory tree's FORK_ITEM_CUTOFF cannot be read as text, so section 8 would be graded here under a cutoff the hygiene gate does not use"
+hit "$out" "the memory tree's FORK_ITEM_CUTOFF or FORK_RECORD_CUTOFF cannot be read as text, so section 8 would be graded here under a cutoff the hygiene gate does not use"
 hit "$out" "which is neither blank nor a zero-padded ISO date"
 printf 'MEMORY_ROOT=memory\nexport FORK_ITEM_CUTOFF="2026-07-01"\n' > .memory-tree.conf
 hit "$(run --plan tPlan)" "in a spelling this text reader does not resolve: export FORK_ITEM_CUTOFF"
+# ...and the fork record's cutoff is read by the same reader under the same check 86 (TOOL-dBoundRoles-11).
+printf 'MEMORY_ROOT=memory\nFORK_ITEM_CUTOFF="2026-07-01"\nFORK_RECORD_CUTOFF="2026-07-01x"\n' > .memory-tree.conf
+out=$(run --plan tPlan)
+hit "$out" "the memory tree's FORK_ITEM_CUTOFF or FORK_RECORD_CUTOFF cannot be read as text"
+hit "$out" "declares FORK_RECORD_CUTOFF as 2026-07-01x, which is neither blank nor a zero-padded ISO date"
 git reset -q --hard HEAD~1; git clean -qfd
+
+# ---- TOOL-dBoundRoles-11 AC4 - THE FORK RECORD reaches --plan, as check 12 grades it. A LIVE spec, since
+# ---- --plan prints DONE for a terminal one, whose agent-resolved F1 carries a record past both cutoffs:
+# ---- a pick outside its options and a pick that is not the first read FORKED, the first option READY.
+# ---- The failing case, owed at the close: the record predicate dropped from `plan_state`, under which
+# ---- both failing picks read READY.
+for _fr in '(c)|FORKED)' '(b)|FORKED)' '(a)|READY - build it)'; do
+  reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 INPROGRESS "S1 a thing" "AC1 it works" "the bar" "- **F1 — a?** options.
+  RESOLVED (agent, 2026-08-01, delegated): ${_fr%%|*}.
+  options: (a) > (b) · pick: ${_fr%%|*} · admitted-by: principle.p18"
+  printf 'MEMORY_ROOT=memory\nFORK_ITEM_CUTOFF="2026-07-01"\nFORK_RECORD_CUTOFF="2026-07-01"\n' > .memory-tree.conf; fixture
+  hit "$(run --plan tPlan)" "next: ARCH-tPlan-1 (${_fr#*|}"
+  git reset -q --hard HEAD~1; git clean -qfd
+done
 
 # ...and THIN wins over FORKED, because M2 orders the checks and the first match wins. Without this
 # arm the two are indistinguishable whenever a spec is both.
@@ -9077,6 +9096,54 @@ write_tracking_policy() { # the policy file's text -> refs/remotes/origin/main a
   _tp_tree=$( { git ls-tree "$BASE" | grep -v "	.governance$"; printf '040000 tree %s\t.governance\n' "$_tp_gov"; } | git mktree)
   git update-ref refs/remotes/origin/main "$(git commit-tree "$_tp_tree" -p "$BASE" -m "the review bounds under test")"
 }
+
+# ---- TOOL-dBoundRoles-11 AC6 - THE HOLD AT ADMISSION. A live unit whose agent-resolved F1 picks the
+# ---- second of its ranked options grades FORKED past both cutoffs, and `--dispatch` refuses it with check
+# ---- 49 under every answer of `run.on-owner-question`, read through the roles kit's `handoff.py
+# ---- owner-question`, landed on the clone's tracking ref with the review bounds the base holds: the
+# ---- default names the record owed and parks nothing, `park-item` parks one decision row naming the
+# ---- unit and F1, `stop-run` names `--abort` and parks nothing, `park-build` parks one row naming the
+# ---- build and every FORKED unit. The passing case: the first option picked, the hold does not fire.
+# ---- The failing case, owed at the close: the FORKED case removed from `verb_dispatch`, under which the
+# ---- unit is admitted. WHAT IT DOES NOT CHECK: a reader refusal, or no roles kit beside the driver.
+reset_tree
+add_facts memory/builds/tRun/RUN.md "base: $(git rev-parse HEAD)"
+mkdir -p memory/builds/tRun/spec
+FK_SPEC=memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\n- **F1 — which way?** RESOLVED (agent, 2026-08-20, delegated): (b).\n  options: (a) > (b) · pick: (b) · admitted-by: principle.p18\n' > "$FK_SPEC"
+printf 'MEMORY_ROOT=memory\nFORK_ITEM_CUTOFF="2026-07-01"\nFORK_RECORD_CUTOFF="2026-07-01"\n' > .memory-tree.conf
+git add "$FK_SPEC" .memory-tree.conf >/dev/null 2>&1
+FK_HOLD="--dispatch declares a build pass for a unit whose spec grades FORKED, a section 8 fork that no conforming mark or fork record closes, and run.on-owner-question holds it before any code is written: "
+FK_BOUNDS='\n[review]\nmax-rounds = 7\n\n[review.design]\nrounds = "fixed-count"\nround-count = 7\n'
+fk_rows() { grep -c ' decision · ' memory/builds/tRun/RUN.md; }
+_fk0=$(fk_rows)
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
+hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
+hit "$o" "run.on-owner-question answers resolve: resolve each open F-item by principle.p18"
+hit "$o" "then dispatch again; ARCH-tRun-1 ($FK_SPEC) holds F1"
+miss "$o" "dispatch declared"
+same "fork hold: the default answer parks nothing" "$(fk_rows)" "$_fk0"
+write_tracking_policy "run.on-owner-question = \"park-item\"\n$FK_BOUNDS"
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
+hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
+hit "$o" "run.on-owner-question answers park-item, so ARCH-tRun-1 is parked as a decision row naming F1, for the owner at the close"
+same "fork hold: park-item parks one decision row" "$(fk_rows)" "$((_fk0 + 1))"
+hit "$(tail -n 1 memory/builds/tRun/RUN.md)" " decision · item ARCH-tRun-1 · reason open fork F1 held by run.on-owner-question"
+write_tracking_policy "run.on-owner-question = \"stop-run\"\n$FK_BOUNDS"
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
+hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
+hit "$o" "run.on-owner-question answers stop-run, so the run stops here: the next verb is --abort tRun"
+same "fork hold: stop-run parks nothing" "$(fk_rows)" "$((_fk0 + 1))"
+write_tracking_policy "run.on-owner-question = \"park-build\"\n$FK_BOUNDS"
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
+hit "$o" "run.on-owner-question answers park-build, so build tRun is parked as one decision row naming every FORKED unit: ARCH-tRun-1 (F1)"
+hit "$(tail -n 1 memory/builds/tRun/RUN.md)" " decision · item tRun · reason open forks in ARCH-tRun-1 (F1) held by run.on-owner-question"
+git update-ref refs/remotes/origin/main "$BASE"
+sed -i 's/delegated): (b)\./delegated): (a)./; s/pick: (b)/pick: (a)/' "$FK_SPEC"
+git add "$FK_SPEC" >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
+miss "$o" "grades FORKED"
+reset_tree
 
 # ---- THE SUBJECT IS NOT A REGEX, and CEILING is terminal. Interpolated into an ERE, a subject
 # ---- carrying `(` missed its OWN recorded terminal line and the loop accepted a further round.
