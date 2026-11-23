@@ -24473,6 +24473,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "read_mail_kinds",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_mail_refs",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"

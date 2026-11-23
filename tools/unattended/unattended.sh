@@ -3806,6 +3806,21 @@ write_mail_ref() { # ref · tip read or empty · message [message ...] -> 0 writ
   write_gov_ref "${1:-}" "${2:-}" "$c" "${made[@]:0:${#made[@]}-1}"
 }
 
+# The loop kit's closed `[mail]` kind set, as its `--mail-kinds` prints it (KICK-dKeptSession-79 S1): one
+# kind per line, rc 0; else the cause on stdout, rc 2, for no python, no loop kit beside this one, or a
+# `--mail-kinds` that fails. Its two callers prefix the cause: `write_mail_post` holds a post's kind to
+# the set, and `read_mailbox` a fetched record's.
+read_mail_kinds() { # -> 0 with one kind per line; 2 with the cause
+  local py d kinds
+  py=$(resolve_python 2>/dev/null) || py=""
+  [ -n "$py" ] || { echo "no python resolves, so the loop kit's mail kinds cannot be read"; return 2; }
+  d=$(resolve_kit_dir "$py" loop loop_lib.py "$KIT_DIR" 2>/dev/null) || d=""
+  [ -n "$d" ] || { echo "no loop kit resolves beside this one, so the mail kinds cannot be read"; return 2; }
+  [ -f "$d/loop_lib.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  kinds=$("$py" "$d/loop_lib.py" --mail-kinds 2>&1) || { echo "the loop kit's mail kinds did not read: ${kinds//$'\n'/ }"; return 2; }
+  printf '%s\n' "${kinds//$'\r'/}"
+}
+
 # --mail post, ONE MESSAGE ON THIS SESSION'S OWN MAIL REF (KICK-dKeptSession-5 S5), in this order: the
 # switch (`mail — off`, exit 2, nothing read or written); the slug; the session and this node's fleet
 # tag, which name the ref; the kind, one of the loop kit's closed `[mail]` set as its `--mail-kinds`
@@ -3845,7 +3860,7 @@ write_mail_ref() { # ref · tip read or empty · message [message ...] -> 0 writ
 # WHAT THIS DOES NOT CHECK: the body for secrets (gap-rt-44); that the recipient exists.
 write_mail_post() { # slug · to · kind · subject · item · pass · answers · body file · interface file or none · [default] · [to · subject · answers]... -> 0 posted, 1 duplicate or lost, 2 not written
   local slug="${1:-}" to="${2:-}" kind="${3:-}" sub="${4:-}" it="${5:-none}" ps="${6:-none}" an="${7:-none}" f="${8:-}" ifc="${9:-none}"
-  local sid="${CLAUDE_CODE_SESSION_ID:-}" tag py d kinds n v id tip rc ref ck=none seq=1 aft=none t dl df=ack k
+  local sid="${CLAUDE_CODE_SESSION_ID:-}" tag d kinds n v id tip rc ref ck=none seq=1 aft=none t dl df=ack k
   local forged='^[[:space:]]*[*][*][A-Za-z][A-Za-z-]*( [a-z]+)?:[*][*]'
   local -a tos=("$to") subs=("$sub") ans=("$an") ids=() msgs=()
   MAIL_DUPLICATE=""
@@ -3855,13 +3870,7 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
   tag=$(resolve_fleet_tag) || { echo "mail — not written: $tag"; return 2; }
   derive_mail_ref "$slug" "$tag" "$sid" >/dev/null || { echo "mail — not written: $MAIL_WHY"; return 2; }
   ref=$MAIL_REF
-  py=$(resolve_python 2>/dev/null) || py=""
-  [ -n "$py" ] || { echo "mail — not written · no python resolves, so the loop kit's mail kinds cannot be read"; return 2; }
-  d=$(resolve_kit_dir "$py" loop loop_lib.py "$KIT_DIR" 2>/dev/null) || d=""
-  [ -n "$d" ] || { echo "mail — not written · no loop kit resolves beside this one, so the mail kinds cannot be read"; return 2; }
-  [ -f "$d/loop_lib.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
-  kinds=$("$py" "$d/loop_lib.py" --mail-kinds 2>&1) || { echo "mail — not written · the loop kit's mail kinds did not read: ${kinds//$'\n'/ }"; return 2; }
-  kinds=${kinds//$'\r'/}
+  kinds=$(read_mail_kinds) || { echo "mail — not written · $kinds"; return 2; }
   case $'\n'"$kinds"$'\n' in
     *$'\n'"$kind"$'\n'*) ;;
     *) echo "mail — not written · the kind '$kind' is none of the closed set: ${kinds//$'\n'/ }"; return 2 ;;
@@ -4010,18 +4019,24 @@ check_mail_deadline() { # ref · commit · hours -> rc 0 passed, 1 not yet, 2 no
 # 2, 4, 6, 7 and 10. Under `soft` a failed fetch prints `mail — local
 # copy: <why>` on stderr and reads the cache; `strict` prints `mail — not read · <why>` and returns 2;
 # `local` (KICK-dKeptSession-21 S2) attempts no fetch, prints no cause and reads the cache.
-# While RUN_CLAIMS is not `on` it reads nothing and prints no row. WHAT THIS DOES NOT CHECK: a
-# message's id against its fields; a clock offset between nodes, since each node judges a deadline by
-# its own first sighting and its own clock.
+# While RUN_CLAIMS is not `on` it reads nothing and prints no row. ONE VALIDATION, AT THE READ
+# (KICK-dKeptSession-79 S1): after the who check the kinds `read_mail_kinds` prints, a read whose kinds do
+# not read printing `mail — not read · <why>` and returning 2 under every policy, before any fetch; a
+# cached ref whose slug segment fails `check_slug_shape` is never read; and a record prints a row only
+# where its header is `gov-mail <build>/<id>`, its six required keys are non-empty, its `id` is twelve
+# lower-case hex digits, its `kind` is one of those kinds and its `build` is the slug segment of the ref
+# it sits on, so no consumer of these rows reads one that is not. WHAT THIS DOES NOT CHECK: a clock
+# offset between nodes, since each node judges a deadline by its own first sighting and its own clock.
 read_mailbox() { # who · soft|strict|local · [sent] -> 0 with one TAB row per message addressed to <who>, or sent by it; 2 not read
-  local who="${1:-}" pol="${2:-soft}" sel="${3:-}" d rc why="" line t _st=$status _nc=${#RUNLOG_CHECKS[@]}
-  local -a refs=() f=()
+  local who="${1:-}" pol="${2:-soft}" sel="${3:-}" d rc why="" line t kinds r _st=$status _nc=${#RUNLOG_CHECKS[@]}
+  local -a refs=() f=() kept=()
   [ "$RUN_CLAIMS" = on ] || return 0
   if [ "$sel" = sent ]; then
     check_slug_shape "$who" || { echo "mail — not read · --sent reads one build's own mail refs, and '$who' is no build's slug"; return 2; }
   elif check_slug_shape "$who"; then who="build:$who"
   elif ! check_mail_recipient "$who" 2>/dev/null; then echo "mail — not read · '$who' is neither a build's slug nor a recipient"; return 2
   fi
+  kinds=$(read_mail_kinds) || { echo "mail — not read · $kinds"; return 2; }
   resolve_claim_remote >/dev/null; rc=$?
   status=$_st; RUNLOG_CHECKS=("${RUNLOG_CHECKS[@]:0:$_nc}")
   d=$(mktemp -d) || { echo "mail — not read · no scratch directory to bound the read in"; return 2; }
@@ -4044,13 +4059,22 @@ read_mailbox() { # who · soft|strict|local · [sent] -> 0 with one TAB row per 
   t=${t//$'\r'/}
   [ -n "$t" ] || { rm -rf "$d"; return 0; }
   mapfile -t refs <<<"$t"
-  GIT log --first-parent --source --format='%x01%S%x09%H%n%B' "${refs[@]}" -- >"$d/log" 2>/dev/null \
+  for r in "${refs[@]}"; do   # a ref whose slug segment is no build's slug is never read (KICK-dKeptSession-79 S1)
+    t=${r#refs/gov/remote/mail/}
+    if check_slug_shape "${t%%/*}"; then kept+=("$r"); fi
+  done
+  [ "${#kept[@]}" -gt 0 ] || { rm -rf "$d"; return 0; }
+  GIT log --first-parent --source --format='%x01%S%x09%H%n%B' "${kept[@]}" -- >"$d/log" 2>/dev/null \
     || { rm -rf "$d"; echo "mail — not read · git log over the cached mail refs failed"; return 2; }
-  MB_PAIRS="$d/pairs" awk -v pre="refs/gov/remote/" "$CLAIM_KV_AWK"'
-    function flush(   k, ok) {
+  MB_PAIRS="$d/pairs" awk -v pre="refs/gov/remote/" -v mk="${kinds//$'\n'/ }" "$CLAIM_KV_AWK"'
+    function flush(   k, ok, sg) {
       if (src == "") return
       ok = (hdr == "gov-mail " v["build"] "/" v["id"])
       for (k in want) if (!(k in v) || v[k] == "") ok = 0
+      # KICK-dKeptSession-79 S1: an id of twelve lower-case hex digits, a kind of the closed set, and a
+      # build equal to the slug segment of the ref the record sits on
+      split(substr(src, length(pre) + 1), sg, "/")
+      if (length(v["id"]) != 12 || v["id"] ~ /[^0-9a-f]/ || !(v["kind"] in mkind) || v["build"] != sg[2]) ok = 0
       if (ok) {
         r = "refs/gov/" substr(src, length(pre) + 1)
         printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", v["id"], v["kind"], v["to"], v["build"], v["subject"], v["answers"], r, sha
@@ -4061,7 +4085,8 @@ read_mailbox() { # who · soft|strict|local · [sent] -> 0 with one TAB row per 
       src = ""
     }
     BEGIN { split("id build to kind subject answers", K, " "); for (j in K) want[K[j]] = rd[K[j]] = 1
-            split("seq after content-key deadline default", O, " "); for (j in O) rd[O[j]] = 1 }
+            split("seq after content-key deadline default", O, " "); for (j in O) rd[O[j]] = 1
+            split(mk, M, " "); for (j in M) mkind[M[j]] = 1 }
     /^\001/ { flush(); split(substr($0, 2), a, "\t"); src = a[1]; sha = a[2]; sub(/\r$/, "", sha); split("", v); st = 0; next }
     { sub(/\r$/, "")
       if (st == 0) { hdr = $0; st = 1; next }
@@ -4302,11 +4327,13 @@ write_mail_notice() { # file · notice · fetch-seconds · [id kind to]... -> 0 
 # stamp rewritten from those rows, or, where the fetch failed and the reader printed `mail — local copy:
 # <why>`, which passes through on stderr, or under `--local`, ` · local copy <age>s old (<why>)`, the
 # age the stamp's by `stat`, ` · local copy age unknown (<why>)` with no stamp, the stamp untouched; then
-# ` · item <key>` with `--item`. Every path past the slug removes `<stamp>.fetching`, the hook's marker.
-# A refused read prints its line, exit 2. WHAT THIS DOES NOT CHECK: a message posted after the fetch;
+# ` · item <key>` with `--item`. A notice that fetched, an `off` notice and a `--local` notice remove
+# `<stamp>.fetching`, the hook's marker; a notice whose fetch failed, the local copy or a refused read,
+# keeps it, touched at its end, so the hook starts no fetch until it is twice `mailbox.fetch-seconds`
+# old (KICK-dKeptSession-79 S3). A refused read prints its line, exit 2. WHAT THIS DOES NOT CHECK: a message posted after the fetch;
 # that a ring's message exists, since the mailbox is read and the ring never.
 print_mail_notice() { # slug · item or empty · local 0|1 · ring ref or empty · ring id or empty -> 0 shown, off or the local copy; 2 not read
-  local slug="${1:-}" it="${2:-}" loc="${3:-0}" rr="${4:-}" ri="${5:-}" nv fs sd st d rows why="" line m n=0 ids="" rc=0
+  local slug="${1:-}" it="${2:-}" loc="${3:-0}" rr="${4:-}" ri="${5:-}" nv fs sd st d rows why="" line m n=0 ids="" rc=0 tried=0 fetched=0
   local -a parts=() lines=() row=() keep=()
   if [ -n "$rr$ri" ]; then
     IFS=/ read -r -a parts <<<"$rr"
@@ -4334,6 +4361,7 @@ print_mail_notice() { # slug · item or empty · local 0|1 · ring ref or empty 
       rows=$(read_mailbox "$slug" local) || rc=2; why=--local
     else
       rows=$(read_mailbox "$slug" soft 2>"$d/err") || rc=2
+      tried=1
       mapfile -t lines <"$d/err"
       for line in ${lines[@]+"${lines[@]}"}; do
         printf '%s\n' "$line" >&2
@@ -4357,13 +4385,16 @@ print_mail_notice() { # slug · item or empty · local 0|1 · ring ref or empty 
         else why=" · local copy age unknown ($why)"; fi
       else
         write_mail_notice "$st" "$nv" "$fs" ${keep[@]+"${keep[@]}"} || :
-        why=" · fetched"
+        why=" · fetched"; fetched=1
       fi
       if [ "$n" -gt 0 ]; then line="mail — $n unread for $slug · $ids$why"; else line="mail — none for $slug$why"; fi
       printf '%s%s\n' "$line" "${it:+ · item $it}"
     fi
   fi
-  rm -f "$st.fetching"
+  # KICK-dKeptSession-79 S3: a notice that tried the remote and did not rewrite the stamp keeps the
+  # hook's marker, touched at its end, so the hook spaces the next fetch; every other path removes it
+  if [ "$tried" = 1 ] && [ "$fetched" = 0 ]; then touch -- "$st.fetching" 2>/dev/null || :
+  else rm -f "$st.fetching"; fi
   return "$rc"
 }
 

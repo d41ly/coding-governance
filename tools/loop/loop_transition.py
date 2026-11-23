@@ -113,7 +113,11 @@ with no ack posted; `acks-withdrawn` a lone `withdrawn` acknowledged, its `mail 
 `acks-withdrawn-question` a `withdrawn` beside an open `question`, the move refused naming both, no ack
 posted and the `withdrawn` read open after it; `acks-no-session` `acks-landed`'s move with
 `CLAUDE_CODE_SESSION_ID` unset, refused naming the ack's `no session id` and the row read open after it
-(KICK-dKeptSession-56 AC27); and `chain-two-dependents` a parent writing to tFix and
+(KICK-dKeptSession-56 AC27); `acks-refused-witness`, `acks-refused-field` and `acks-refused-scenario`
+`acks-landed`'s `landed`, then B4 refused for `--witness deadbeef`, for `--field composition=3f9c2a71`
+or for a `ScenarioConflict` the stood-in placement raises, each posting no ack, the row read `open` and
+no ref under `refs/gov/mail/tFix/` on the remote, since the acks follow the computed move
+(KICK-dKeptSession-79 AC3); and `chain-two-dependents` a parent writing to tFix and
 tTwo, its take-over's first `after` naming the row to tTwo: each dependent's move acks both its rows over
 the chain read of every row the parent wrote, its chain line telling that read from tFix's rows alone,
 then that sent read's four rows read `acked` and `build:fy`'s sent read refused.
@@ -155,7 +159,9 @@ does not resolve is one `loop: progress · unread · <why>` line there that neve
 record B4 under one value, `NOTIFY_SETS` committing it and `notify-micro` committing none, then run
 `progress` for a park and a landing and print `loop: fixture · progress <n>`, the lines the three
 printed; `notify-shape`'s `AGENTS.md` drops ` · <detail>` from the progress definition, owing `check`
-one finding.
+one finding; `notify-composition-unread` records B4 under `every-transition`, then B5 through the pinned
+branch with `composition.write_ended_orders` answering unread, owing B5's progress line beside its
+`loop: composition · unread` line and no `loop: progress · unread` line (KICK-dKeptSession-79 AC6).
 
 Exit: `record` 0 recorded, 1 refused by the table or held by open mail; `check` 0 clean, 1 on a finding, `pending` or
 `unstored`; `dependents` 0 with one slug per line; `progress` 0, its line printed or not. Each exits 2 printing `loop: unanswered · <why>` on a value outside its grammar, a witness
@@ -321,6 +327,13 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
                                      "naming both, the read after it reading the withdrawn open",
           "acks-no-session": "acks-landed's landed with CLAUDE_CODE_SESSION_ID unset: B4's real ack refused, B4 "
                              "refused naming mail ack not posted and no session id, the row read open",
+          "acks-refused-witness": "fy's landed to build:tFix, then B4 with --witness deadbeef: refused naming the "
+                                  "witness, no ack called, the row read open and no ref under refs/gov/mail/tFix/",
+          "acks-refused-field": "the same landed, then B4 with --field composition=3f9c2a71: refused as derived, no "
+                                "ack called, the row read open and no ref under refs/gov/mail/tFix/",
+          "acks-refused-scenario": "the same landed, then B4 with scenario.derive_move_scenarios raising "
+                                   "ScenarioConflict: refused naming it, no ack called, the row read open and no "
+                                   "ref under refs/gov/mail/tFix/",
           "chain-two-dependents": "fy's session s-1 posting a1 confirmed to tFix and b1 to tTwo, the take-over s-2 "
                                   "a2 changed to tFix after b1 and b2 to tTwo: tFix's and tTwo's B4 each ack both "
                                   "over the chain read of every row fy wrote, then that sent read and build:fy's "
@@ -330,7 +343,10 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
           "notify-park-landing": "notify.owner = park-and-landing: B4, then progress park and landing, two lines",
           "notify-every": "notify.owner = every-transition: B4's progress line, then park and landing, three lines",
           "notify-park-only": "notify.owner = park-only: B4, then progress park and landing, the park line alone",
-          "notify-shape": "an AGENTS.md whose progress definition drops <detail>: one B4 move, then the check"}
+          "notify-shape": "an AGENTS.md whose progress definition drops <detail>: one B4 move, then the check",
+          "notify-composition-unread": "notify.owner = every-transition: B4, then B5 with "
+                                       "composition.write_ended_orders answering unread: B5's progress line and its "
+                                       "composition · unread line, no progress · unread line"}
 #: The mail plants' messages, each `(ref, build, id, to, kind, subject, answers)`, put straight on the fixture's
 #: remote; `mail-disposed` adds the ack. `mail-expired` writes the question with `FX_DEADLINE`'s two keys and
 #: its first sighting `FX_SIGHTED_HOURS` back in the fixture's feed, past the 30-hour deadline.
@@ -350,7 +366,9 @@ PLANT_SETS = {"subset-trailer-line": '["trailer", "micro-format"]', "subset-log"
 #: The notify plants' `notify.owner` values, committed as `.governance/policy.toml` `[notify]`; `notify-micro`
 #: commits none, so the catalogue default answers (KICK-dKeptSession-11 S9).
 NOTIFY_SETS = {"notify-park-landing": "park-and-landing", "notify-every": "every-transition",
-               "notify-park-only": "park-only"}
+               "notify-park-only": "park-only", "notify-composition-unread": "every-transition"}
+#: The `notify-composition-unread` plant's stand-in compose cause (KICK-dKeptSession-79 AC6).
+FX_COMPOSE_UNREAD = "the fixture's compose answered 1"
 FX_BUILD = "tFix"
 FX_UNIT = "TOOL-tFix-1"
 FX_SPEC = "memory/builds/tFix/spec/2026-01-01-spec-%s.md" % FX_UNIT
@@ -1047,34 +1065,28 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     every open row (KICK-dKeptSession-55), save where every row it holds is one whose owed ack was refused:
     then it names each ack's cause, `mail ack not posted: <id> · <the ack's first line>` (KICK-dKeptSession-56
     S32); ValueError on a value, witness, index, policy read, tag resolver, scenario conflict or
-    unknown mailbox refused, writing no record; LookupError where a kit it reads does not resolve."""
+    unknown mailbox refused, writing no record; LookupError where a kit it reads does not resolve. The
+    mailbox is read once, first, and the move is computed whole, each refusal of its row, patch hold,
+    witness, field, tree verdict, scenario, value or index raised, before `write_consumed_acks` posts any
+    ack, so a refused move acknowledges nothing (KICK-dKeptSession-79 S2)."""
     from composition import PINNED, derive_composition_revision, read_step_composition, write_ended_orders
     from scenario import derive_move_scenarios   # it imports this module through composition.py, so here
     cache = {}
     chosen = read_cached_channels(root, "HEAD", cache)
     # the owner's progress (KICK-dKeptSession-11 S4): `notify.owner` read once at HEAD, a refusal said as one
     # `unread` line and never refusing the move
+    # KICK-dKeptSession-79 S4: the pair is named apart, so the composition's `unread` never reaches the last step
     try:
-        events, unread = derive_owner_events(read_policy_value(root, NOTIFY_KEY, "HEAD")), None
+        progress_events, progress_unread = derive_owner_events(read_policy_value(root, NOTIFY_KEY, "HEAD")), None
     except ValueError as e:
-        events, unread = (), str(e)
-    # the mail guard (KICK-dKeptSession-5 S9): one read of the build's mailbox, its open rows refusing the
-    # move before any write and its answered and acknowledged rows disposed below; an unarmed mailbox is a line.
-    # Between the read and the refusal the move acknowledges each notice it has consumed, a landed, superseded
-    # or withdrawn row and a confirmed or changed its parent's interfaces check names current or supersedes
-    # (`write_consumed_acks`, KICK-dKeptSession-42): those leave the refusal, and the next move disposes of them.
-    # The acks are all or nothing (KICK-dKeptSession-55): posted only where every open row is consumed, each
-    # posted one a `mail — acked` line on stderr, which survives a refusal as `said` does not; else none
+        progress_events, progress_unread = (), str(e)
+    # the mail guard (KICK-dKeptSession-5 S9): one read of the build's mailbox, first, its open rows refusing
+    # the move before any write and its answered and acknowledged rows disposed below; an unarmed mailbox is a
+    # line. The acks and the refusal come once the move is computed whole (KICK-dKeptSession-79 S2), below
     said = []
     mail, unarmed = read_mail_rows(root, build)
     if unarmed:
         said.append("%s: mail · unarmed · %s" % (SAY, unarmed))
-    # A row held only because its owed ack was refused is named with that ack's cause (KICK-dKeptSession-56 S32)
-    refused = {}
-    acked = write_consumed_acks(root, build, mail, refused) if mail else set()
-    held = [r["id"] for r in mail if r.get("state") == "open" and r.get("id") not in acked]
-    if held:
-        raise MailHeld(build, held, refused=refused)
     data, where = read_definition(KIT)
     row, to = derive_move("build", state, item, outcome, facts, read_transition_rows(data, where))
     if to == "designing":   # a placed patch waits on its owner's ratification (TOOL-dPlacedRequest-21 S6)
@@ -1136,6 +1148,20 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         raise ValueError("the value of %s, %r, is outside [A-Za-z0-9._:+@-]+" % (bad[0], move[bad[0]]))
     if read_git(root, "diff", "--cached", "--quiet")[0] != 0:
         raise ValueError("the index holds staged changes, and a transition commit carries its own records alone")
+    # the acks, the last step before the first write (KICK-dKeptSession-79 S2): every check above reads and
+    # refuses, writing nothing, so a move refused for its item, outcome, witness, field, tree verdict,
+    # scenario or value posts no ack. The move then acknowledges each notice it has consumed, a landed,
+    # superseded or withdrawn row and a confirmed or changed its parent's interfaces check names current or
+    # supersedes (`write_consumed_acks`, KICK-dKeptSession-42): those leave the refusal, and the next move
+    # disposes of them. The acks are all or nothing (KICK-dKeptSession-55): posted only where every open row
+    # is consumed, each posted one a `mail — acked` line on stderr, which survives a refusal as `said` does
+    # not; else none. A row held only because its owed ack was refused is named with that ack's cause
+    # (KICK-dKeptSession-56 S32). `disposing`, above, is derived from the read's rows, before any ack
+    refused = {}
+    acked = write_consumed_acks(root, build, mail, refused) if mail else set()
+    held = [r["id"] for r in mail if r.get("state") == "open" and r.get("id") not in acked]
+    if held:
+        raise MailHeld(build, held, refused=refused)
     # the rework budget (TOOL-dDeclaredLoop-30): a backward move draws `route-back`, refused here before any
     # write where the budget is spent, and the move from designing to building freezes it, once. The rows
     # are lines of this move's record, the build's first record copying the rows before them, or, where the
@@ -1258,9 +1284,9 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         # posts again the latest exit's notice, at its commit and ordinal, to a dependent not holding it
         said += write_dependency_notices(root, build, exits[0]["commit"], len(exits), repost=True)
     # the owner's progress line, last, where the value selects the move's event (KICK-dKeptSession-11 S4)
-    if unread:
-        said.append("%s: progress · unread · %s" % (SAY, unread))
-    elif "transition" in events:
+    if progress_unread:
+        said.append("%s: progress · unread · %s" % (SAY, progress_unread))
+    elif "transition" in progress_events:
         said.append(render_progress_line(build, "transition", "%s → %s · %s" % (state, to, item)))
     return move, commit, wrote, render_transition_line(move) if "micro-format" in chosen else None, said
 
@@ -1774,6 +1800,35 @@ def run_transition_fixture(case):
                         run_held_verb(b4)
                         states = [read_row_state("landed")]
                         checks = ((acked == [(ids["landed"], 0)], "the acks are %s" % acked),)
+                    elif case.startswith("acks-refused-"):   # KICK-dKeptSession-79 AC3: a move refused after the
+                        # read, for its witness, a derived field or a scenario conflict, posts no ack
+                        import scenario
+                        real_scenarios = scenario.derive_move_scenarios
+
+                        def derive_conflicting_scenarios(*_args, **_kw):
+                            """The scenario placement stood in, refusing as a conflict."""
+                            raise scenario.ScenarioConflict("the fixture's scenario conflict")
+                        argv, cause = {"acks-refused-witness": (b4[:-1] + ["deadbeef"], "--witness deadbeef"),
+                                       "acks-refused-field": (b4 + ["--field", "composition=3f9c2a71"],
+                                                              "composition is derived"),
+                                       "acks-refused-scenario": (b4, "the fixture's scenario conflict")}[case]
+                        write_notice(1, "fy", "landed")
+                        out = io.StringIO()
+                        if case == "acks-refused-scenario":
+                            scenario.derive_move_scenarios = derive_conflicting_scenarios
+                        try:
+                            with contextlib.redirect_stdout(out):
+                                run_held_verb(argv)
+                        finally:
+                            scenario.derive_move_scenarios = real_scenarios
+                        sys.stdout.write(out.getvalue())
+                        states = [read_row_state("landed")]
+                        posted = [ln for ln in run_fixture_git(top, "ls-remote", FIXTURE_REMOTE).splitlines()
+                                  if "\trefs/gov/mail/%s/" % FX_BUILD in ln]
+                        checks = ((acked == [], "the acks are %s, owed none" % acked),
+                                  (any(ln.startswith("%s: unanswered · " % SAY) and cause in ln
+                                       for ln in out.getvalue().splitlines()), "B4 printed no refusal naming %r" % cause),
+                                  (not posted, "the remote holds %s under refs/gov/mail/%s/" % (posted, FX_BUILD)))
                     elif case == "acks-no-session":   # KICK-dKeptSession-56 AC27: the real ack refused for no
                         # session id, the move refused naming that cause and never `mail open`
                         write_notice(1, "fy", "landed")
@@ -1939,11 +1994,40 @@ def run_transition_fixture(case):
                     "acks-failed": ([0, 0, 1, 1], ["acked", "open", "open"]),
                     "acks-takeover": ([0], ["acked", "acked"]), "acks-later-key": ([1], []),
                     "acks-withdrawn": ([0], []), "acks-withdrawn-question": ([1], ["open", "open"]),
+                    "acks-refused-witness": ([2], ["open"]), "acks-refused-field": ([2], ["open"]),
+                    "acks-refused-scenario": ([2], ["open"]),
                     "chain-two-dependents": ([0, 0], ["acked"] * 4)}[case]
             print("%s: fixture · acks %s" % (SAY, " · ".join("%s rc %s" % a for a in acked) or "none"))
             misses = [why for ok, why in ((exits == owed[0], "the moves exited %s, owed %s" % (exits, owed[0])),
                                           (states == owed[1], "the rows read %s, owed %s" % (states, owed[1])),
                                           *checks) if not ok]
+            print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
+            return 0 if not misses else 1
+        if case == "notify-composition-unread":   # KICK-dKeptSession-79 AC6: B4, then B5 through the pinned branch
+            # with the composition's compose stood in to answer unread, restored after; the progress line stands
+            import composition
+            real_orders = composition.write_ended_orders
+
+            def write_unread_orders(_root, _build, _moves):
+                """The compose stood in, answering no order and the fixture's cause."""
+                return [], FX_COMPOSE_UNREAD
+            run_verb(b4)
+            out = io.StringIO()
+            composition.write_ended_orders = write_unread_orders
+            try:
+                with contextlib.redirect_stdout(out):
+                    rc = run_verb(["record", *at, *BACKWARD_MOVES[1], "--witness", "HEAD"])
+            finally:
+                composition.write_ended_orders = real_orders
+            sys.stdout.write(out.getvalue())
+            lines = out.getvalue().splitlines()
+            misses = [why for ok, why in (
+                (rc == 0, "B5 exited %d" % rc),
+                (sum(ln.startswith("progress — %s · transition · " % FX_BUILD) for ln in lines) == 1,
+                 "B5 printed no single progress line"),
+                ("%s: composition · unread · %s" % (SAY, FX_COMPOSE_UNREAD) in lines, "B5 printed no composition · unread line"),
+                (not any(ln.startswith("%s: progress · unread" % SAY) for ln in lines), "B5 printed a progress · unread line"))
+                if not ok]
             print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
             return 0 if not misses else 1
         if case.startswith("notify-") and case != "notify-shape":   # KICK-dKeptSession-11 AC1, AC2: B4, then a
@@ -2244,6 +2328,10 @@ def run_selftest():
               "9a9b9c9d9e9f"),
              ("acks-withdrawn-question state", fx("acks-withdrawn-question"), 0,
               "%s: fixture · state 9a9b9c9d9e9f · open" % SAY, ""),
+             *(case for plant in ("acks-refused-witness", "acks-refused-field", "acks-refused-scenario") for case in (
+                 (plant, fx(plant), 0, "%s: fixture · %s · held" % (SAY, plant), ""),
+                 ("%s none" % plant, fx(plant), 0, "%s: fixture · acks none" % SAY, ""),
+                 ("%s state" % plant, fx(plant), 0, "%s: fixture · state a1a2a3a4a5a6 · open" % SAY, ""))),
              ("chain-two-dependents", fx("chain-two-dependents"), 0, "%s: fixture · chain-two-dependents · held" % SAY,
               ""),
              ("chain-two-dependents record", fx("chain-two-dependents"), 0, "%s: fixture · record · exit 0" % SAY, ""),
@@ -2270,7 +2358,11 @@ def run_selftest():
               "%s: unanswered · the event lunch is none of park, landing, transition" % SAY, ""),
              ("notify-shape", fx("notify-shape"), 1, "%s: transition · definition · AGENTS.md reads %s, " % (
                  SAY, PROGRESS_LINE.replace(" · <detail>", "")), "while the renderer writes %s" % PROGRESS_LINE),
-             ("notify-shape check", fx("notify-shape"), 1, check, "· 1 finding(s)")]
+             ("notify-shape check", fx("notify-shape"), 1, check, "· 1 finding(s)"),
+             ("notify-composition-unread", fx("notify-composition-unread"), 0,
+              "%s: fixture · notify-composition-unread · held" % SAY, ""),
+             ("notify-composition-unread line", fx("notify-composition-unread"), 0, "%s: composition · unread · %s" % (
+                 SAY, FX_COMPOSE_UNREAD), "")]
     return run_selftest_cases(run_cached_case, cases, "%s: transition selftest" % SAY)
 
 

@@ -312,7 +312,10 @@ The fifth, `mail-notice.<slug>.log`, is the notice stamp (`KICK-dKeptSession-21`
 `--mail notice` after every notice that fetched, its first line the `mailbox.notice` and
 `mailbox.fetch-seconds` values that notice read and the bash that ran it, then one line per unread
 message; its mtime is the age of the build's local mail copy. Only the `mail-notice.js` hook reads it,
-at every tool call, and its `<stamp>.fetching` marker beside it lasts for one detached fetch.
+at every tool call, and its `<stamp>.fetching` marker beside it lasts for one detached fetch: a notice
+that fetched, an `off` notice and a `--local` notice remove it, and a notice whose fetch failed keeps
+it, touched at its end, so the hook starts no fetch until it is twice `mailbox.fetch-seconds` old
+(`KICK-dKeptSession-79`).
 
 ## The bar `--close` runs
 

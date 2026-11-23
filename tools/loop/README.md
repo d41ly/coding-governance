@@ -437,7 +437,11 @@ from a `--field` as well, and `disposed`, the mail the move disposed, derived an
 
 **The mail guard** (KICK-dKeptSession-5 S9, S10). After the set is read and before `derive_move`, the
 writer runs the unattended kit's `--mail read <slug>` once, `read_mail_rows`, under
-`MAIL_GUARD_SECONDS`, its bash the inline resolver's. Over that read the move first acknowledges each
+`MAIL_GUARD_SECONDS`, its bash the inline resolver's. The acks follow the computed move
+(KICK-dKeptSession-79 S2): `derive_move`, the patch hold, the witness checks, the field loop, the tree
+verdict, the stand-in, the composition, the disposal over the read's rows, `derive_move_scenarios`, the
+VALUE check and the staged-index check all run first, each reading and refusing and writing nothing,
+so a move refused by any of them posts no ack. Only then, over that one read, does the move acknowledge each
 notice it has consumed, `write_consumed_acks` (KICK-dKeptSession-42): every open `landed`, `superseded`
 or `withdrawn`, and per parent holding an open `confirmed` or `changed` of subject `interfaces
 <parent>`, one `check_parent_interfaces` call, whose `interface — current <id>` line consumes that row
@@ -570,16 +574,24 @@ swapped; `acks-later-key`, the check stood in naming the take-over's `changed` c
 `parent`, left open, so B4 posts no ack and is refused naming all three; `acks-withdrawn`, a parent's lone
 `withdrawn` acknowledged by B4, which records, its `mail — acked` line read off stderr;
 `acks-withdrawn-question`, a `withdrawn` beside another parent's open `question`, B4 posting no ack and
-refused naming both, the `withdrawn` read `open` after it; and `chain-two-dependents`, a parent's session
+refused naming both, the `withdrawn` read `open` after it; `acks-refused-witness`, `acks-refused-field`
+and `acks-refused-scenario`, `acks-landed`'s `landed`, then B4 refused for `--witness deadbeef`, for
+`--field composition=3f9c2a71`, or for a `ScenarioConflict` that `scenario.derive_move_scenarios`,
+stood in, raises, each recording no ack call, the row read `open` and no ref under
+`refs/gov/mail/tFix/` on the bare remote (KICK-dKeptSession-79 AC3); and `chain-two-dependents`, a parent's session
 posting a `confirmed` to `tFix` and then to `tTwo`, and its take-over a `changed` to each, the first
 naming in `after` the message to `tTwo`, so `tFix`'s own rows cannot place its `confirmed`: `tFix`'s and
 `tTwo`'s B4 each acknowledge both their rows over the chain read of every message the parent wrote, its
 chain line printing that read and `tFix`'s rows alone apart, then that sent read's four rows, each
-`acked`, and `build:fy`'s sent read refused; and the five over `notify.owner`: `notify-micro`,
+`acked`, and `build:fy`'s sent read refused; and the six over `notify.owner`: `notify-micro`,
 `notify-park-landing`, `notify-every` and `notify-park-only`, B4 under that value, `NOTIFY_SETS`
 committing it and `notify-micro` none, then a park and a landing run through `progress`, each printing
-`loop: fixture · progress <n>`, the progress lines the three printed, and `notify-shape`, an `AGENTS.md`
-whose progress definition drops ` · <detail>`, owing the check one finding. `check --selftest` holds the
+`loop: fixture · progress <n>`, the progress lines the three printed, `notify-shape`, an `AGENTS.md`
+whose progress definition drops ` · <detail>`, owing the check one finding, and
+`notify-composition-unread`, B4 under `every-transition`, then B5 through the pinned branch with
+`composition.write_ended_orders` stood in to answer unread, owing B5's progress line beside its
+`loop: composition · unread` line and no `loop: progress · unread` line, since the progress pair is
+bound as `progress_events` and `progress_unread` (KICK-dKeptSession-79 AC6). `check --selftest` holds the
 tree's own two definitions, then runs every plant, and is gov's `loop transition record` leg.
 
 ```bash

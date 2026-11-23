@@ -266,7 +266,7 @@ session of a model observed past 200000 under the root reads the 1M rung, a 200k
 model included; that session reads its own window only with `CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000`
 set (KICK-dKeptSession-48). The share passes 100% only where the variable is set below the
 context read or the transcript is outside the scan. `measure_context_fill(transcript, until=None)` is
-the same read for a caller, `(share, tokens, source)` at or before an epoch second, `(None, None,
+the same read for a caller, `(share, window, source)` at or before an epoch second, `(None, None,
 None)` with no main usage, and `derive_context_fill(ev, *, window=None, root=None)` the share of one
 event a caller already holds, over `window` or, when it is None, the window derived for the event's
 model under `root`, the projects root the caller resolved (KICK-dKeptSession-46); with neither it
