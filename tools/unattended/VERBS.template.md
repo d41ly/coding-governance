@@ -667,17 +667,21 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   '<who>' is no build's slug` (exit 2), and `post`, `ack`, `answer` and `notice` refuse the flag.
   `--mail ack <slug> [<id> ...]` posts an `ack` from `<slug>`
   answering each `<id>` to its sender's build, with its subject and an empty body, an id named twice
-  acked once, the first kept (KICK-dKeptSession-63). Per id, in order (KICK-dKeptSession-64): an
-  `<id>` that is no row addressed to `<slug>` refuses the batch, exit 2, before anything is written;
-  an id whose row reads `acked` is skipped and named on stderr as `mail — already acked <id>`, never
-  reaching the duplicate check; and a list given empty, or emptied by the skip, exits 0 and writes
-  nothing. Every ack left is one message of one chain on the session's ref, each parented on the one
+  acked once, the first kept (KICK-dKeptSession-63). A list given empty exits 0 before anything is
+  read. The batch then reads the mailbox once with one bounded fetch of every mail ref, and a remote
+  that does not answer prints `mail — not read · <why>` and refuses the ack, exit 2, nothing built
+  (KICK-dKeptSession-65); then `<slug>`'s own sent messages once from the cache that fetch filled.
+  Per id, in order (KICK-dKeptSession-64): an `<id>` that is no row addressed to `<slug>` refuses the
+  batch, exit 2, before anything is written; an id an `ack` sent by `<slug>` already answers,
+  whatever its row's state, is skipped and named on stderr as `mail — already acked <id>`, never
+  reaching the duplicate check; and a list emptied by the skip exits 0 and writes nothing. Every ack
+  left is one message of one chain on the session's ref, each parented on the one
   before, its `seq` one past the one before's, and the chain lands in one ref update, so every ack is
   posted or none is, a duplicate, a refused record or a lost update leaving every row open
   (KICK-dKeptSession-62), and a landed chain appends one feed line per ack, oldest first. One id
   prints the post's lines, several one line per ack. The ack's exits: 0 every ack posted, or every
-  id skipped; 1 a lost write; 2 a refusal, a duplicate of an id not read as acked among them, which
-  `--mail post` exits 1 on. `--mail answer <slug> <question id> <body file>
+  id skipped; 1 a lost write; 2 a refusal, an unreachable remote and a duplicate of an id no ack from
+  `<slug>` answers among them, the duplicate one `--mail post` exits 1 on. `--mail answer <slug> <question id> <body file>
   [--cite <path>@<sha>]...` answers a `question` addressed to `<slug>`, the answering build, the loop
   kit's item `item.entry.mailbox-answer` while no `next` dispatches it: each `--cite` splits at its
   last `@` into a non-empty path and a sha of 7 to 40 lower-case hex digits before anything is read,

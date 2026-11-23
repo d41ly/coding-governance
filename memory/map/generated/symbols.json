@@ -24493,6 +24493,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "read_main_scrub",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_manifest",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -40416,6 +40421,11 @@
       "id": "test_gov_only_files_are_withheld_on_both_paths",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gov_remote_scrub",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_handkept_name_sets",

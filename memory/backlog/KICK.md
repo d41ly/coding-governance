@@ -19,5 +19,14 @@ Cite ids, never line numbers.
 | [KICK-aHonedRuleset-1](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-06 | charter §1's merge exception still names the merge-base otherwise while… |
 | [KICK-aReplayedCard-4](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | KICK-aReplayedCard-3 AC1/AC2 and TOOL-aReplayedCard-3 AC2 are owed at… |
 | [KICK-aReplayedCard-5](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the engine is 63 B under its gate; the next engine edit splits Steps… |
-| [KICK-dKeptSession-29](../builds/dKeptSession/BACKLOG.md) | INPROGRESS | MED | KICK-dKeptSession-65 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [KICK-dKeptSession-29](../builds/dKeptSession/BACKLOG.md) | DEFERRED | MED | KICK-dKeptSession-69 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [KICK-dKeptSession-68](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE 45 POLICY NAMESPACES WITH NO PURPOSE, PUT TO THE OWNER.… |
+| [KICK-dKeptSession-70](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE LEDGER LINT FOR A LEG THE MANIFEST LACKS. An acceptance-ledger line… |
+| [KICK-dKeptSession-71](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE SPEC-TOKENS CHECK FOR A SUPERSEDING CLAUSE OUTSIDE THE LEDGER… |
+| [KICK-dKeptSession-72](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE SPEC-TOKENS CHECK FOR AN ARM'S SUITE NO LEG RUNS. A §7 New arm:… |
+| [KICK-dKeptSession-73](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE SPEC-TOKENS CHECK FOR A TEMPLATE'S RENDER. A Files touched list… |
+| [KICK-dKeptSession-74](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE SPEC-TOKENS CHECK FOR A NEW SYMBOL'S MAP ENTRY. An Inventory adding… |
+| [KICK-dKeptSession-75](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE LANDER'S RECONCILE STEP. At a reconcile the lander does not diff… |
+| [KICK-dKeptSession-76](../builds/dKeptSession/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | THE LEDGER LINT FOR A SUPERSEDED CRITERION'S MOVED SUBJECT. A… |
+| [KICK-dKeptSession-77](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE SPEC-TOKENS CHECK FOR A BARE SCOPE ITEM. A bare S<n> in a sentence… |
+| [KICK-dKeptSession-78](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE BUG-CLASS CHECKLIST ENTRIES OF THE ROUND-4 AND ROUND-5 AUDITS. The… |

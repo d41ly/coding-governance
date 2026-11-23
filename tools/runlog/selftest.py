@@ -395,7 +395,12 @@ from collections import Counter  # noqa: E402
 # of `main` resolves a remote-less repository to no remote and no refusal (AC10), and the same call with
 # `model` imported alone refusing naming GOV_REMOTE (liveness). Its decoy checks move it by 3.
 # 2 + 3 = 5
-ASSERTION_FLOOR = 1651
+# RAISED 1651 -> 1658 by KICK-dKeptSession-65, the minors batch: ONE new arm with 4 checks —
+# `test_gov_remote_scrub`'s scrub statements of `main` naming both variables in a no-raise form, run
+# alone in a child with neither set and in one with both planted (AC4), and a bare-`del` copy graded
+# raising (liveness). Its decoy checks move it by 3.
+# 4 + 3 = 7
+ASSERTION_FLOOR = 1658
 
 PASS = []
 FAIL = []
@@ -2370,6 +2375,71 @@ def test_extract_env_dropped():
     check("extract KICK-dKeptSession-64 AC10 liveness: model imported alone under the same plant refuses "
           "naming GOV_REMOTE",
           [ln.startswith("RESOLVED ('', '', '', 'GOV_REMOTE names planted,") for ln in got["alone"][1]], [True])
+
+
+#: The two variables `main` scrubs ahead of its `try` for `rl_model.resolve_remote` (KICK-dKeptSession-63 S14).
+GOV_SCRUB_VARS = ("GOV_REMOTE", "GOV_DEFAULT_BRANCH")
+
+
+def read_main_scrub(text):
+    """The statements of `main`'s body ahead of its `try` that hold a GOV_SCRUB_VARS name, read off
+    `text` by `ast` (KICK-dKeptSession-65 S14, S15), as `(source, names, no_raise)` triples. No-raise is
+    one of the two forms S14 admits: an `os.environ.pop(<name>, None)` call, or a lone
+    `del os.environ[<name>]` under an `if <name> in os.environ` guard with no `else`."""
+    tree = ast.parse(text)
+    main = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main")
+    out = []
+    for stmt in main.body:
+        if isinstance(stmt, ast.Try):
+            break
+        names = sorted({n.value for n in ast.walk(stmt) if isinstance(n, ast.Constant) and n.value in GOV_SCRUB_VARS})
+        if not names:
+            continue
+        call = stmt.value if isinstance(stmt, ast.Expr) else None
+        popped = (isinstance(call, ast.Call) and ast.unparse(call.func) == "os.environ.pop" and len(call.args) == 2
+                  and isinstance(call.args[1], ast.Constant) and call.args[1].value is None)
+        guarded = (len(names) == 1 and isinstance(stmt, ast.If) and not stmt.orelse
+                   and ast.unparse(stmt.test) == "%r in os.environ" % names[0]
+                   and [ast.unparse(s) for s in stmt.body] == ["del os.environ[%r]" % names[0]])
+        out.append((ast.unparse(stmt), names, popped or guarded))
+    return out
+
+
+def test_gov_remote_scrub():
+    """KICK-dKeptSession-65 S5, AC4: `main`'s statements ahead of its `try` that name GOV_REMOTE or
+    GOV_DEFAULT_BRANCH name both, each in a form that cannot raise, and compiled alone after `import os`
+    they raise nothing in a child started with neither variable set and leave neither set in a child
+    started with both planted. The liveness: the same reader over a copy of this file whose GOV_REMOTE
+    pop is a bare `del` grades that statement raising, and its child with neither set exits on KeyError.
+    One fact per arm: `test_extract_env_dropped` reads what `main`'s arms resolve under the plant; this
+    arm reads the scrub statements themselves. WHAT THIS DOES NOT CHECK: a scrub placed after the `try`."""
+    text = HERE.joinpath("selftest.py").read_text(encoding="utf-8")
+    bare = text.replace('os.environ.pop("GOV_REMOTE", None)', 'del os.environ["GOV_REMOTE"]')
+    scrub = read_main_scrub(text)
+    staged = read_main_scrub(bare)
+    tail = "\nprint(sorted(k for k in %r if k in os.environ))\n" % (GOV_SCRUB_VARS,)
+    clean = {k: v for k, v in os.environ.items() if k not in GOV_SCRUB_VARS}
+    clean["PYTHONIOENCODING"] = "utf-8"
+    got = {}
+    for name, rows, env in (("unset", scrub, clean),
+                            ("planted", scrub, dict(clean, GOV_REMOTE="planted", GOV_DEFAULT_BRANCH="planted")),
+                            ("bare", staged, clean)):
+        code = "import os\n" + "\n".join(src for src, _names, _ok in rows) + tail
+        r = subprocess.run([sys.executable, "-I", "-c", code], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        got[name] = (r.returncode, r.stdout.strip(), "KeyError" in r.stderr)
+    check("scrub KICK-dKeptSession-65 AC4: main's statements ahead of its try naming GOV_REMOTE or "
+          "GOV_DEFAULT_BRANCH name both, each an os.environ.pop(<name>, None) or a guarded del",
+          (sorted({n for _src, names, _ok in scrub for n in names}), all(ok for _src, _names, ok in scrub)),
+          (sorted(GOV_SCRUB_VARS), True))
+    check("scrub KICK-dKeptSession-65 AC4: compiled alone in a child with neither variable set, they raise nothing",
+          got["unset"], (0, "[]", False))
+    check("scrub KICK-dKeptSession-65 AC4: compiled alone in a child with both planted, they leave neither set",
+          got["planted"], (0, "[]", False))
+    check("scrub KICK-dKeptSession-65 AC4 liveness: a copy whose GOV_REMOTE pop is a bare del grades it raising, "
+          "and its child with neither set exits on KeyError",
+          ([ok for _src, names, ok in staged if names == ["GOV_REMOTE"]], got["bare"][0] != 0, got["bare"][2]),
+          ([False], True, True))
 
 
 # KICK-dKeptSession-9: the orientation report's fixture. Each design session starts between the two
