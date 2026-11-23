@@ -302,3 +302,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T01:07:12Z dispatch · item 03f2eb69 TOOL-dBoundRoles-4 · reason tools/roles/handoff.py tools/roles/roles_lib.py tools/roles/agents/gov-prompt-writer.agent.md tools/roles/README.md tools/roles/SKILL.template.md tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh help/roles.md tools/roles/render_agents.py memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-4-deviation-43.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-4-1-acceptance-ledger.md memory/map/generated/symbols.json
 
 2026-11-23T01:07:12Z brief · item TOOL-dBoundRoles-4 · reason 0334d1b37a55 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-4-build-brief.md
+
+2026-11-23T01:55:05Z dispatch · item f389b55d TOOL-dBoundRoles-23 · reason tools/roles/roles_lib.py tools/roles/handoff.py tools/roles/check_roles.py tools/roles/render_agents.py tools/roles/adopt-roles.test.sh tools/roles/README.md help/roles.md memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-23-deviation-234.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-23-1-acceptance-ledger.md memory/map/generated/symbols.json
+
+2026-11-23T01:55:06Z brief · item TOOL-dBoundRoles-23 · reason 027794368dee memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-23-build-brief.md
