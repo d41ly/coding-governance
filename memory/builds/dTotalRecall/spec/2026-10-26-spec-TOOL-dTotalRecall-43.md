@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-43 — the round-1 spec audit's 59 minors, batched
 
-**Status:** DEFERRED · rev-7 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-7 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -19,6 +19,7 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 |
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-43-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-43-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-43-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-43-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-43-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-43-reground-spec-writer.md) | log | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-brief.md) | journal | — |
