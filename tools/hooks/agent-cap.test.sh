@@ -488,16 +488,17 @@ if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
 else
   PA="$TMP/pa"; PA_HOOKS="$PA/kits/hooks"; mkdir -p "$PA/.governance" "$PA_HOOKS" "$PA/kits/policy" "$PA/.claude"
   cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$PA_HOOKS/"
+  PA_NODE_HOOK="$(cd "$PA_HOOKS" && pwd -W 2>/dev/null || printf '%s' "$PA_HOOKS")/agent-cap.js"
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$PA/kits/policy/"; done
   printf '[prompts]\nauthor = "requesting-worker-rendered"\n' > "$PA/.governance/policy.toml"
   printf '%s\n' '{"roles":{"gov-researcher":{"agent":true,"workflow":"research","writes":"none"}},"harnesses":[]}' > "$PA/.claude/roles.json"
   ( cd "$PA" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
       && git config user.name t && git add -A && git commit -qm author --no-verify \
       && git update-ref refs/heads/pa-unset "$(git commit-tree "$(git mktree </dev/null)" -m 'no policy file')" )
-  pa_got=$(cd "$TMP" && GOV_DEFAULT_BRANCH=pa-unset node -e 'console.log(require(process.argv[1]).resolvePromptsAuthor(process.argv[2]))' "$NODEDIR/pa/kits/hooks/agent-cap.js" "$NODEDIR/pa" 2>&1)
+  pa_got=$(cd "$TMP" && GOV_DEFAULT_BRANCH=pa-unset node -e 'console.log(require(process.argv[1]).resolvePromptsAuthor(process.argv[2]))' "$PA_NODE_HOOK" "$NODEDIR/pa" 2>&1)
   if [ "$pa_got" = prompt-writer ]; then echo "ok   AC4 resolvePromptsAuthor with prompts.author unset reads prompt-writer"; pass=$((pass+1))
   else echo "FAIL AC4 resolvePromptsAuthor with prompts.author unset read: $pa_got"; fail=$((fail+1)); fi
-  pa_got=$(cd "$TMP" && node -e 'console.log(require(process.argv[1]).resolvePromptsAuthor(process.argv[2]))' "$NODEDIR/pa/kits/hooks/agent-cap.js" "$NODEDIR/pa" 2>&1)
+  pa_got=$(cd "$TMP" && node -e 'console.log(require(process.argv[1]).resolvePromptsAuthor(process.argv[2]))' "$PA_NODE_HOOK" "$NODEDIR/pa" 2>&1)
   if [ "$pa_got" = requesting-worker-rendered ]; then echo "ok   AC4 resolvePromptsAuthor reads the landed requesting-worker-rendered"; pass=$((pass+1))
   else echo "FAIL AC4 resolvePromptsAuthor with prompts.author set read: $pa_got"; fail=$((fail+1)); fi
   PA_FREE='{"tool_name":"Agent","cwd":"'"$NODEDIR/pa"'","session_id":"pa","tool_input":{"subagent_type":"gov-researcher","prompt":"Research this freely.","description":"x"}}'
