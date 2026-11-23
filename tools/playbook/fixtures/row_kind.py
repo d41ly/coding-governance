@@ -236,8 +236,8 @@ FRONT_MATTER = "front-matter-"
 READER = "tag_index:read_roles_rows"
 FM_SOURCES = {"role": iu.derive_tool_rel(KIND, "agents", "*.agent.md"),
               "workflow": iu.derive_tool_rel(KIND, "workflows.toml")}
-FM_FIELDS = {"role": (("name", "scalar"), ("tools", "set"), ("writes", "set")),
-             "workflow": (("name", "scalar"), ("driver", "scalar"), ("roles", "set"))}
+FM_FIELDS = {"role": tuple(dict(name="scalar", tools="set", writes="set").items()),
+             "workflow": tuple(dict(name="scalar", driver="scalar", roles="set").items())}
 FM_ROLES = ("gov-alpha", "gov-beta")
 FM_FLOWS = "".join(f'[[workflow]]\nname = "{n}"\ndriver = "{d}"\nroles = {render_value(r)}\n\n'
                    for n, d, r in (("triage", "agent", list(FM_ROLES)), ("sweep", "program", [])))
