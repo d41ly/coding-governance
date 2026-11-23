@@ -22,7 +22,8 @@ text = "MUST verify against the staged bytes."
 
 An `adopter-rule` unit is one of your own rules carried as written. `update` writes one for each line it
 moves out of `[charter] adopter_rules`, and its text renders exactly as you wrote it. It needs no modal and
-no trigger, and only a level-0 `repo.` unit may carry the type: on any other unit it is refused.
+no trigger, and only a level-0 `repo.` unit, or a level-5 one under `budget = "block"`, may carry the type: on
+any other unit it is refused, and a level-5 one under `line` or no budget is refused naming `block`.
 
 ## Amend or replace one of gov's units
 
