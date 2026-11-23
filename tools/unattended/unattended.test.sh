@@ -21858,7 +21858,7 @@ IFS=$'\t' read -r -a nt_sp <"$LF/spawn.log"
 nt_sd=${nt_sp[2]:-}; nt_sd=${nt_sd%%/unattended.sh *}
 same "KDS79 S6 one detached spawn of the driver, hidden" \
   "$(grep -c '' "$LF/spawn.log") ${nt_sp[0]:-none} ${nt_sd##*/}/${nt_sp[2]##*/} ${nt_sp[3]:-} ${nt_sp[4]:-}" \
-  "1 spawn unattended/unattended.sh --mail notice tFix windowsHide=true detached=true"
+  "1 spawn ${HERE##*/}/unattended.sh --mail notice tFix windowsHide=true detached=true"
 rm -f "$nt_card" "$nt_st.fetching"
 run_notice_arm c1 a notice tFix >/dev/null; nt_now=$EPOCHSECONDS
 same "KDS79 S3 a failed fetch keeps the marker, touched" \
