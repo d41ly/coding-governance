@@ -431,6 +431,19 @@ ceiling = 2400
 stage = ["step.test"]
 
 [[exempt_leg]]
+name = "cleanup posture (a tree removal that swallows its error)"
+why = "its registry declares THIS repository's waived sites, by path, so the leg is gov-side only: an adopter has other files and no row for them. The scan itself, `encoding_posture.py --cleanup`, ships with the gate-lint kit and takes the registry as an argument, so an adopter that wants the lint declares its own rows and wires its own leg. TOOL-dQuietDisk-9."
+tag = "leg.gov.cleanup-posture-a-tree-removal-that-swallows-its-error"
+tests = ["feature.gate-lint"]
+purpose = "catches a tree removal that swallows its error"
+enforces = ["practice.portable.temp-files"]
+argv = ["python3", "{prefix}/gate-lint/encoding_posture.py", "--cleanup", "memory/project/cleanup-sites.txt", ".", "{prefix}", "skills", ".githooks"]
+chunk = "product"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
+
+[[exempt_leg]]
 name = "hook destinations self-test"
 why = "the arms for that gate; no descriptor can claim a leg whose script no adopter receives."
 tag = "leg.gov.hook-destinations-self-test"
@@ -812,6 +825,7 @@ guard = [
   "{prefix}/settings-merge.py",
   "{prefix}/codebase-map/kit.toml",
   "{prefix}/process-monitor/census.py",
+  "{prefix}/lib/template_cache.py",
 ]
 chunk = "selftests"
 subject = "kit"
@@ -847,6 +861,21 @@ subject = "kit"
 ceiling = 350
 enforces = ["practice.portable.launch", "practice.portable.interpreter-floor"]
 stage = ["step.test"]
+
+[[exempt_leg]]
+name = "history-store selftest"
+why = """
+self-tests <prefix>/lib/history_store.py, the history verdict store and its one `cat-file --batch` reader, in a scratch repository of its own. <prefix>/lib/ is the permanently exempt gov-internal directory and has no kit descriptor, so the leg is declared here; the kits that carry the module inline are graded against it by the python resolver's parity rows. TOOL-dQuietDisk-1.
+"""
+tag = "leg.gov.history-store-selftest"
+purpose = "self-tests the history verdict store and its batch reader"
+argv = ["python3", "{prefix}/lib/history_store.py", "--selftest"]
+guard = ["{prefix}/lib/history_store.py", "{prefix}/lib/history-store.sh"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 120
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "run-gates gov canary"
@@ -1638,7 +1667,7 @@ tag = "leg.gov.selftest-harness-self-test"
 tests = ["feature.run-gates"]
 purpose = "arms the shared self-test harness from outside it"
 argv = ["bash", "{prefix}/lib/lib-selftest.test.sh"]
-guard = ["{prefix}/lib/lib-selftest.sh", "{prefix}/lib/lib-selftest.test.sh"]
+guard = ["{prefix}/lib/lib-selftest.sh", "{prefix}/lib/lib-selftest.test.sh", "{prefix}/lib/template-cache.sh", "{prefix}/lib/template_cache.py"]
 chunk = "selftests"
 subject = "kit"
 ceiling = 370
@@ -1714,6 +1743,7 @@ guard = [
   "{prefix}/check-line-length.sh",
   "{prefix}/memory-tree/check-memory-hygiene.sh",
   "{prefix}/memory-tree/gen_build_index.py",
+  "{prefix}/memory-tree/history_store.py",
   "{prefix}/roles/check_roles.py",
   "{prefix}/playbook/render_playbook.py",
   "{prefix}/playbook/instruction_units.py",

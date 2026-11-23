@@ -468,7 +468,10 @@ case "$WIDTH" in ''|*[!0-9]*|0) echo "foreign-prefix: run-gates.sh --print-profi
 TMPD=$(mktemp -d) || { echo "foreign-prefix: mktemp failed"; exit 2; }
 [ "${GOV_FOREIGN_KEEP:-0}" = 1 ] || trap 'rm -rf "$TMPD"' EXIT
 G="$TMPD/g"
-git clone -q --no-hardlinks "$ROOT" "$G" || { echo "foreign-prefix: could not clone $ROOT"; exit 2; }
+# --shared (TOOL-dQuietDisk-8 S1): the clone reads $ROOT's objects through objects/info/alternates
+# rather than copying the store, and its own commits land in its own; the trap above removes it
+# before the leg ends. --no-checkout because the checkout -B below checks out the full tree once.
+git clone -q --shared --no-checkout "$ROOT" "$G" || { echo "foreign-prefix: could not clone $ROOT"; exit 2; }
 cd "$G" || exit 2
 # A named branch, not a detached HEAD: govkit's self-test pins a vintage some ref contains.
 git checkout -q -B foreign-prefix "$HEADSHA" || { echo "foreign-prefix: the clone cannot check out HEAD $HEADSHA"; exit 2; }

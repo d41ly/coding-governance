@@ -291,6 +291,30 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
+## `install.baseline`
+<!-- usage: policy:install.baseline aefb04bc -->
+Whether govkit apply's two reads of your runner, before and after it writes, reuse each leg your runner's reuse cache holds green for unchanged inputs, or execute every leg as before; a runner with no observed_reused template reads as run.
+
+```text
+install.baseline = "run"
+```
+
+## `tests.history-verdicts`
+<!-- usage: policy:tests.history-verdicts 67c74b61 -->
+Whether a history leg keeps each item's verdict in a store under the git common dir, keyed by the commit and blob ids the item reads and by the grading code's bytes, so a run grades only what is new, or regrades all of history on every run.
+
+```text
+tests.history-verdicts = "regraded"
+```
+
+## `tests.fixture-templates`
+<!-- usage: policy:tests.fixture-templates 5d36c962 -->
+Whether a self-test that opts into the template cache builds each base repository once per run, keyed by its builder and its inputs, and gives each case a shared clone of it, or builds and copies a fixture per case as before the cache.
+
+```text
+tests.fixture-templates = "per-case"
+```
+
 ## Not yet summarised (226)
 - `preset`
 - `design.forks`

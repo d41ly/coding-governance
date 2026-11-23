@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-23T11:35:05+02:00 @ 5c39a3381b80396288aa69a6078b95fb90e3df73
+last-audit: 2026-11-23T19:09:25+02:00 @ 5e070d40e99acc46bf915b233f39393d352ad760
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2c621083fd91278f33ba1baba1ea15f4dada31b0
+last-body-change: 8dbcc3586c259fbcd9f1c0137d4fd13c82f5f30f
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -195,8 +195,8 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
-- The bar owns its scratch (TOOL-dDerivedDocket-25): every leg's `TMPDIR` is the runner's own
-  `gate-work.*/tmp`, gone on exit; a SIGKILLed bar's is swept by the next once its pid is dead.
+- The bar owns its scratch (TOOL-dDerivedDocket-25): every leg's temp dirs are the runner's own
+  `gate-work.*/tmp`, gone on exit; a dead bar's is swept by the next, even if its repo is gone.
   `TMPDIR entries <n>` prints the ambient count, which now grows only from older bars or another
   repository's. The measured cost is in the run-gates kit README.
 - A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is

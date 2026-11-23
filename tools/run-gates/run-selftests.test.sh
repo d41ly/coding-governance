@@ -341,10 +341,11 @@ ATTR_BASE=fb07ca25
 # closing-fix ledger carries both counts.
 # MERGED with TOOL-dDerivedDocket-1/-23's floor: base 43, +26 from that build (69), +69 from
 # TOOL-aBatchedArm (112), so 43 + 26 + 69.
-SELFTEST_FLOOR=144
+SELFTEST_FLOOR=145
 # RAISED 138 -> 139 by the dDerivedDocket closing diff review's F5: the signalled --attribute arm.
 # RAISED 139 -> 141 by TOOL-aGraftedHelix-7: the sweep's memory pause at 95 % and at 10 % used.
 # RAISED 141 -> 144 by TOOL-aOrientedCast-12: the three row-shape arms, a hand count, not a run.
+# RAISED 144 -> 145 by TOOL-dQuietDisk-37 S11: the serial row under the runner's owned root, a hand count.
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -489,6 +490,14 @@ build_repo() {
     printf ' *) echo "FAIL scratch-escaped";; esac\n'
     printf 'exit 1\n'
   } > ${PFX}suite-tmpdir.sh
+  # TOOL-dQuietDisk-37 S11: the serial mode's row runs with TMPDIR, TEMP and TMP all naming the
+  # runner's owned root, a `gate-work.*` holding its `owner` record; anything else is outside it.
+  { printf '#!/usr/bin/env bash\n'
+    printf 'case "${TMPDIR##*/}" in gate-work.*) ;; *) echo "FAIL tmp-outside-runner-root"; exit 1 ;; esac\n'
+    printf '[ -f "$TMPDIR/owner" ] && [ "${TEMP:-}" = "$TMPDIR" ] && [ "${TMP:-}" = "$TMPDIR" ] && { echo "FAIL tmp-in-runner-root"; exit 1; }\n'
+    printf 'echo "FAIL tmp-outside-runner-root"\n'
+    printf 'exit 1\n'
+  } > ${PFX}suite-tmproot.sh
   # A GIT THAT ANSWERS EVERY SUBCOMMAND THE RUNNER NEEDS AND REFUSES `status`. Deleting the git
   # dir instead would break the runner's own root resolution, so the arm would observe a
   # different refusal than the one it is written for.
@@ -1009,6 +1018,13 @@ arm "each pooled suite gets its own TMPDIR, so a mktemp inside it cannot collide
     "FAIL scratch-under-tmpdir" \
     "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-tmpdir.sh|' $B" \
     "$R --sweep"
+
+# TOOL-dQuietDisk-37 S11: `--serial` runs its rows under the runner's own root too, so the EXIT trap
+# removes their scratch. Red when the export line is dropped, and the row reads the ambient TMPDIR.
+arm "each serial suite's TMPDIR, TEMP and TMP name the runner's owned gate-work root" 1 \
+    "FAIL tmp-in-runner-root" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-tmproot.sh|' $B" \
+    "$R --serial"
 
 arm "a suite that writes into a TRACKED file reds the sweep as UNSOUND after the pool drains" 1 \
     "THE SWEEP IS UNSOUND" \

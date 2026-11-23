@@ -89,6 +89,40 @@ import bench  # noqa: E402
 import extract  # noqa: E402
 import query  # noqa: E402
 import recall_conf  # noqa: E402
+import contextlib
+import os
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
 
 KIT = pathlib.Path(__file__).resolve().parent
 FIXTURE_NAME = "recall-fixture.json"
@@ -220,7 +254,7 @@ def build_data_dir(root: pathlib.Path) -> pathlib.Path:
         capture_output=True, text=True, cwd=str(root),
     )
     if proc.returncode != 0:
-        shutil.rmtree(out, ignore_errors=True)
+        remove_tree(out)
         # The LAST stderr line, not the whole stream. Embedding a subprocess traceback inside a
         # refusal makes the refusal read like a crash, which is the exact confusion this branch
         # exists to remove; the full trace is one `python extract.py <root> <dir>` away and the
@@ -281,7 +315,7 @@ def build_served_dir(root: pathlib.Path) -> pathlib.Path:
         files, declared = extract.corpus_inputs(root)
         query.build_cache(root, out, files, declared)
     except (OSError, ValueError, sqlite3.Error, subprocess.SubprocessError, SystemExit) as exc:
-        shutil.rmtree(out, ignore_errors=True)
+        remove_tree(out)
         raise CheckRefused(f"building the served sets under {root.as_posix()} failed: {exc}") from exc
     return out
 
@@ -559,7 +593,7 @@ def print_spec_probes(root: pathlib.Path) -> int:
               f"{run['h'] / n:.4f} (h {run['h']}, n {n}) -- a report, no floor")
         return 0
     finally:
-        shutil.rmtree(dirp, ignore_errors=True)
+        remove_tree(dirp)
 
 
 def main() -> int:
@@ -649,7 +683,7 @@ def main() -> int:
         return 0
     finally:
         if scratch is not None:
-            shutil.rmtree(scratch, ignore_errors=True)
+            remove_tree(scratch)
 
 
 if __name__ == "__main__":

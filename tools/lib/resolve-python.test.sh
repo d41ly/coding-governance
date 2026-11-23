@@ -442,6 +442,13 @@ selection_row|$ROOT/$RUNGATES_DIR/verdict_flow.py|$RUNGATES_DIR/verdict_flow
 gov_ref_sh|$ROOT/$KIT_REL/gov-ref.sh|$KIT_REL/gov-ref
 gov_feed_sh|$ROOT/$KIT_REL/gov-feed.sh|$KIT_REL/gov-feed
 home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
+history_store_py|$ROOT/$KIT_REL/history_store.py|$KIT_REL/history_store
+history_store_sh|$ROOT/$KIT_REL/history-store.sh|$KIT_REL/history-store
+template_cache_sh|$ROOT/$KIT_REL/template-cache.sh|$KIT_REL/template-cache
+remove_tree_py|$ROOT/$KIT_REL/owned_scratch.py|$KIT_REL/owned_scratch
+owned_work_py|$ROOT/$KIT_REL/owned_scratch.py|$KIT_REL/owned_scratch
+owned_tempdir_py|$ROOT/$KIT_REL/owned_scratch.py|$KIT_REL/owned_scratch
+owned_work_sh|$ROOT/$KIT_REL/owned-scratch.sh|$KIT_REL/owned-scratch
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -527,6 +534,16 @@ home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
 # gov_ref_sh (TOOL-dPlacedRequest-11 S1, S2) is the one compare-and-swap writer of a governance ref
 # and its parented commit: the unattended driver's claim write and post-merge's bar-red ref each carry
 # it inline, and part 2p below holds the canonical to its failed-build contract.
+# history_store_py and history_store_sh (TOOL-dQuietDisk-1 S10) are the history verdict store and its
+# `cat-file --batch` reader, and their bash face: the unattended kit's and the memory-tree kit's
+# history_store.py are the module whole, and the unattended kit's lib-unattended.sh carries the face.
+# template_cache_sh (TOOL-dQuietDisk-7 S6) is the suite template cache's bash face, which the shared
+# self-test harness lib-selftest.sh carries inline, so a copy-installed suite can carry it too.
+# remove_tree_py, owned_work_py and owned_tempdir_py (TOOL-dQuietDisk-9 S1, S2) are the tree removal that
+# clears git's read-only objects, the owned-root walk, and a Python suite's owned and swept temp root,
+# each canonical in owned_scratch.py; every file that removes a scratch tree carries the first inline,
+# the template cache the first two, and each Python suite entry point all three. owned_work_sh (S4) is
+# the bar's owner record and dead-owner sweep, which both run-gates runners carry inline.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -553,6 +570,54 @@ while IFS='|' read -r stem canon excl; do
     done
   done <<<"$copies"
 done <<<"$PARITY_ROWS"
+
+# THE BASH SCRUB'S NAMES ARE GIT_ENV_LEAKS (TOOL-dQuietDisk-36 S5). template_cache_sh's
+# remove_git_env_leaks unsets a list the Python canonical also spells, in a second language, and the
+# parity row above carries the bash list to its copies but compares it with nothing. This holds the
+# quoted GIT_ names of the canonical git_env_leaks_py block, member for member and in order, to the
+# GIT_ names in the body of remove_git_env_leaks in the canonical template-cache.sh; an empty list on
+# either side is a break, never a match. WHAT THIS DOES NOT CHECK: a copy's list, which the row reads.
+gel_py=$(blk git_env_leaks_py "$ROOT/$KIT_REL/git_env_leaks.py" | grep -oE '"GIT_[A-Z_]+"' | tr -d '"')
+gel_sh=$(awk '/^remove_git_env_leaks\(\) \{/{f=1; next} f && /^}/{exit} f' "$ROOT/$KIT_REL/template-cache.sh" \
+  | tr -d '\r' | grep -oE 'GIT_[A-Z_]+')
+{ [ -n "$gel_py" ] && [ -n "$gel_sh" ] && [ "$gel_py" = "$gel_sh" ]; } \
+  || bad "remove_git_env_leaks in $KIT_REL/template-cache.sh unsets '${gel_sh//$'\n'/ }', not GIT_ENV_LEAKS of $KIT_REL/git_env_leaks.py '${gel_py//$'\n'/ }'"; ok
+
+# THE PYTHON SWEEP'S PREDICATE, BY ITS SURVIVORS (TOOL-dQuietDisk-37 S3, the review's M2). A child
+# program imports the canonical owned_scratch.py, plants six gate-work roots under a scratch ambient
+# and calls scan_dead_scratch once: a live `py:` owner of the common dir, a dead one, a dead one of
+# another existing directory, a dead ORPHAN whose absolute common dir does not exist, a dead one with
+# a relative common dir, and a dead bash owner with no `py:`. The dead pid is a child it started and
+# waited for. It writes the survivors and its stderr to a file, so a widened predicate reds by name:
+# the `py:` test dropped sweeps bash-owned, the `isdir` test dead-other, the `isabs` test relative.
+# WHAT THIS DOES NOT CHECK: init_owned_tempdir's root-making branch, unreachable inside a bar.
+SW="$TMP/sweep"; mkdir -p "$SW/amb"
+( cd "$SW" && "$REALPY" -I -c 'import contextlib, io, os, subprocess, sys
+sys.path.insert(0, sys.argv[1])
+import owned_scratch
+amb, out = sys.argv[2], sys.argv[3]
+common, other = os.path.join(amb, "common"), os.path.join(amb, "other")
+os.mkdir(common); os.mkdir(other)
+child = subprocess.Popen([sys.executable, "-c", "pass"]); child.wait()
+rows = {"live": f"py:{os.getpid()}\t{common}", "dead-same": f"py:{child.pid}\t{common}",
+        "dead-other": f"py:{child.pid}\t{other}", "orphan": f"py:{child.pid}\t" + os.path.join(amb, "gone", ".git"),
+        "relative": f"py:{child.pid}\trel/.git", "bash-owned": f"{child.pid}\t{common}"}
+for name, line in rows.items():
+    os.mkdir(os.path.join(amb, "gate-work." + name))
+    with open(os.path.join(amb, "gate-work." + name, "owner"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(line + "\t0\n")
+said = io.StringIO()
+with contextlib.redirect_stderr(said):
+    owned_scratch.scan_dead_scratch(amb, common)
+with open(out, "w", encoding="utf-8", newline="\n") as fh:
+    fh.write("kept " + " ".join(sorted(n[len("gate-work."):] for n in os.listdir(amb) if n.startswith("gate-work."))) + "\n")
+    fh.write(said.getvalue())' "$HERE" "$SW/amb" "$SW/out" ) >/dev/null 2>&1
+[ "$(head -1 "$SW/out" 2>/dev/null)" = "kept bash-owned dead-other live relative" ] \
+  || bad "scan_dead_scratch kept '$(head -1 "$SW/out" 2>/dev/null)', not exactly the live, dead-other, relative and bash-owned roots"; ok
+sw_lines=$(grep '^owned-scratch: sweeping ' "$SW/out" 2>/dev/null)
+{ [ "$(printf '%s\n' "$sw_lines" | grep -c .)" = 2 ] && grep -q 'gate-work\.dead-same$' <<<"$sw_lines" \
+    && grep -q 'gate-work\.orphan$' <<<"$sw_lines"; } \
+  || bad "scan_dead_scratch did not say exactly two sweeping lines naming dead-same and orphan: ${sw_lines:-<none>}"; ok
 
 # THE WRONG-SHELL REFUSAL'S COVERAGE, BOTH WAYS (TOOL-dWitnessedBar-27 S5). The parity row above holds
 # every inline `refuse_wrong_shell` block to its canonical; this holds the population to the refusal,

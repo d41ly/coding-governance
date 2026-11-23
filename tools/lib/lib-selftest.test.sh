@@ -20,13 +20,15 @@ nope() { n=$((n+1)); bad=1; printf 'nope %s — %s\n' "$1" "${2:-}"; }
 
 # FLOOR_ASSERTIONS grades whether this SUITE still carries its arms, not whether this box could run
 # them. A suite that silently shrinks reports green over a population it stopped grading.
-FLOOR_ASSERTIONS=18
+FLOOR_ASSERTIONS=38
+# RAISED 34 -> 38 by TOOL-dQuietDisk-37 S7: three argument-key assertions and the race arm's built-2 line.
 
-# run_harness <name> <body> -> writes $TMP/<name>.out, returns the harness's exit status
+# run_harness <name> <body> [<dir>] -> writes $TMP/<name>.out, returns the harness's exit status; the
+# body runs in <dir>, the repository root by default, whose policy a `--template` batch reads
 run_harness() {
-  local name=$1 body=$2
+  local name=$1 body=$2 dir=${3:-$ROOT}
   { printf 'set -u\n. "%s"\n' "$LIB"; printf '%s\n' "$body"; } > "$TMP/$name.sh"
-  ( cd "$ROOT" && bash "$TMP/$name.sh" ) > "$TMP/$name.out" 2>&1
+  ( cd "$dir" && bash "$TMP/$name.sh" ) > "$TMP/$name.out" 2>&1
 }
 
 FIX='mkfix() { printf "base\n" > subject.txt; mkdir -p sub; }
@@ -160,6 +162,199 @@ rc=$?
   && [ "$(grep -c '^ok    batch' "$TMP/probe.out")" = 1 ] && grep -q '^PASS (1 arms' "$TMP/probe.out" \
   && ok "a probe runs one arm, prints the probe marker and exits before a second batch" \
   || nope "the probe flag did not stop the suite after one arm (exit $rc)" "$(cat "$TMP/probe.out")"
+
+# ---- 11. THE TEMPLATE MODE, TOOL-dQuietDisk-7 S10. Two scratch repositories decide the switch: DEF
+# ----    commits no policy, so `tests.fixture-templates` reads its default `shared`, and PC commits
+# ----    `per-case`. Each case names its own cache root, so a template a bar's other suites built
+# ----    cannot answer for this one. WHAT THIS DOES NOT CHECK: a bar's shared root across suites.
+DEF=$TMP/def; PC=$TMP/pc
+mkdir -p "$DEF" "$PC/.governance"
+printf 'tests.fixture-templates = "per-case"\n' > "$PC/.governance/policy.toml"
+printf 'x\n' > "$DEF/README"
+for r in "$DEF" "$PC"; do
+  git -C "$r" init -q -b main && git -C "$r" -c core.autocrlf=false add -A \
+    && git -C "$r" -c core.autocrlf=false -c core.hooksPath= -c commit.gpgsign=false -c user.name=t -c user.email=t@t \
+      commit -qm base || { echo "lib-selftest-test: cannot build the switch repositories"; exit 2; }
+done
+export TMP_IN=$TMP/key.in TMP_RACE=$TMP/race TMP_COST=$TMP/cost TMP_ARGS=$TMP/args
+TFIX='mkrepo() { git init -q && git config user.email t@t && printf "base\n" > subject.txt; }
+build_fixture --template "" mkrepo || exit 2'
+
+# A clone that copies objects or keeps its remote is the break: each arm asks it of its own clone. An
+# unmatched glob stays literal, so `! -d` over the loose-object directories holds only where none exist.
+mkdir -p "$TMP/tr.clone"
+SELFTEST_TEMPLATE_ROOT=$TMP/tr.clone run_harness tclone "$TFIX"'
+arm "no remote"            0 ""     "true" "[ -z \"\$(git remote)\" ]"
+arm "objects stay shared"  0 ""     "true" "[ -s .git/objects/info/alternates ] && [ ! -d .git/objects/[0-9a-f][0-9a-f] ] && [ -z \"\$(ls .git/objects/pack)\" ]"
+arm "the builder config"   0 "t@t"  "true" "git config user.email"
+arm "the committed file"   0 "base" "true" "git show HEAD:subject.txt"
+run_arms t' "$DEF"
+rc=$?
+[ "$rc" = 0 ] && ok "a --template clone keeps no remote, copies no object, and carries the builder's config" \
+              || nope "the template clone exited $rc" "$(cat "$TMP/tclone.out")"
+grep -qE '^template: [0-9a-f]{8} built$' "$TMP/tclone.out" \
+  && ok "and build_fixture --template says once that it built the template" \
+  || nope "no 'template: <key8> built' line" "$(cat "$TMP/tclone.out")"
+
+# Two builders colliding on one key: one name, two definitions; and one input byte moved.
+run_harness tkey 'mkk() { printf a > f; }
+printf "abc\n" > "$TMP_IN"
+k1=$(derive_template_key mkk "$TMP_IN") && k1b=$(derive_template_key mkk "$TMP_IN") || exit 2
+mkk() { printf b > f; }
+k2=$(derive_template_key mkk "$TMP_IN") || exit 2
+printf "abd\n" > "$TMP_IN"
+k3=$(derive_template_key mkk "$TMP_IN") || exit 2
+echo "keys $k1 $k1b $k2 $k3"' "$DEF"
+read -r _ k1 k1b k2 k3 < <(grep '^keys ' "$TMP/tkey.out")
+[ -n "${k1:-}" ] && [ "$k1" = "${k1b:-}" ] && ok "one builder and one input set give one key twice" \
+  || nope "the key is not stable" "$(cat "$TMP/tkey.out")"
+[ -n "${k2:-}" ] && [ "$k1" != "$k2" ] && ok "two builders of one name but two definitions never share a key" \
+  || nope "a redefined builder kept its key" "$(cat "$TMP/tkey.out")"
+[ -n "${k3:-}" ] && [ "$k2" != "$k3" ] && ok "one byte of one input file moves the key" \
+  || nope "a changed input kept its key" "$(cat "$TMP/tkey.out")"
+
+# THE BUILDER'S ARGUMENTS KEY ITS TEMPLATE (TOOL-dQuietDisk-37 S4, S7). `mka` writes its first argument,
+# so a key that ignored the arguments hands the second caller the first one's value; with none the key
+# is the caller's own. Red against the base block, which named the directory by the caller's key alone.
+mkdir -p "$TMP/tr.args"
+SELFTEST_TEMPLATE_ROOT=$TMP/tr.args run_harness targs 'mka() { printf "%s\n" "$1" > v; }
+build_fixture --template "" mka x || exit 2
+arm "the x batch" 0 "x" "true" "cat v"
+run_arms x
+build_fixture --template "" mka y || exit 2
+arm "the y batch" 0 "y" "true" "cat v"
+run_arms y' "$DEF"
+rc=$?
+[ "$rc" = 0 ] && grep -q '^ok    the x batch' "$TMP/targs.out" && grep -q '^ok    the y batch' "$TMP/targs.out" \
+  && ok "two build_fixture --template batches of one builder with two arguments each grade their own value" \
+  || nope "a second argument list was handed the first one's template (exit $rc)" "$(cat "$TMP/targs.out")"
+run_harness tdirect 'mka() { printf "%s\n" "${1-none}" > v; }
+k=$(derive_template_key mka) || exit 2
+a=$(resolve_template "$TMP_ARGS" "$k" mka x 2>/dev/null) && b=$(resolve_template "$TMP_ARGS" "$k" mka y 2>/dev/null) \
+  && c=$(resolve_template "$TMP_ARGS" "$k" mka 2>/dev/null) || exit 2
+[ "$a" != "$b" ] && echo "paths two $(cat "$a/v") $(cat "$b/v")"
+[ "$c" = "$TMP_ARGS/$k/repo" ] && echo "bare keyed"' "$DEF"
+grep -qx 'paths two x y' "$TMP/tdirect.out" \
+  && ok "two direct resolve_template calls of one key with arguments x and y print two templates, each its own value" \
+  || nope "one key with two argument lists resolved one template" "$(cat "$TMP/tdirect.out")"
+grep -qx 'bare keyed' "$TMP/tdirect.out" && ok "and a call with no argument still prints <root>/<key>/repo" \
+  || nope "a call with no argument moved its key" "$(cat "$TMP/tdirect.out")"
+
+# An exported GIT_DIR reaches none of the three git-running verbs (TOOL-dQuietDisk-36 S4). It names a
+# scratch SHA-256 repository with one commit and an origin remote, so a leak moves its HEAD, drops its
+# remote, or derives a 64-hex key; the body exports it only after the harness is sourced, and unsets it
+# for its own reads of the clone. WHAT THIS DOES NOT CHECK: read_template_mode, which runs no git here.
+LEAK=$TMP/leak/scratch; mkdir -p "$LEAK"; printf 's\n' > "$LEAK/s.txt"
+git -C "$LEAK" init -q --object-format=sha256 && git -C "$LEAK" -c core.autocrlf=false add -A \
+  && git -C "$LEAK" -c core.hooksPath= -c commit.gpgsign=false -c user.name=t -c user.email=t@t commit -qm scratch \
+  && git -C "$LEAK" remote add origin "$TMP/leak/origin.git" \
+  || { echo "lib-selftest-test: cannot build the scratch SHA-256 repository"; exit 2; }
+h0=$(git -C "$LEAK" rev-parse HEAD)
+export TMP_LEAK=$TMP/leak
+run_harness tleak 'mkg() { git init -q && printf g > g.txt && git -c core.autocrlf=false add -A \
+  && git -c core.hooksPath= -c commit.gpgsign=false -c user.name=t -c user.email=t@t commit -qm self; }
+k0=$(derive_template_key mkg)
+export GIT_DIR=$TMP_LEAK/scratch/.git
+k1=$(derive_template_key mkg)
+t=$(resolve_template "$TMP_LEAK/root" "$k1" mkg 2>/dev/null)
+build_template_clone "$t" "$TMP_LEAK/clone" 2>/dev/null
+unset GIT_DIR
+echo "clone $(git -C "$TMP_LEAK/clone" remote 2>/dev/null | grep -c .) $(cat "$TMP_LEAK/clone/g.txt" 2>/dev/null)"
+echo "keys $k0 $k1"' "$DEF"
+[ -n "$h0" ] && [ "$(git -C "$LEAK" rev-parse HEAD 2>/dev/null)" = "$h0" ] && [ "$(git -C "$LEAK" remote 2>/dev/null)" = origin ] \
+  && ok "an exported GIT_DIR keeps the scratch repository's HEAD and its origin remote unmoved" \
+  || nope "the template cache moved the HEAD or a remote of the repository GIT_DIR names" "$(cat "$TMP/tleak.out")"
+grep -qx 'clone 0 g' "$TMP/tleak.out" && ok "and the clone holds the builder's tree and no remote" \
+  || nope "the clone under an exported GIT_DIR is not the builder's tree without a remote" "$(cat "$TMP/tleak.out")"
+read -r _ lk0 lk1 < <(grep '^keys ' "$TMP/tleak.out")
+[[ ${lk0:-} =~ ^[0-9a-f]{40}$ ]] && [ "${lk1:-}" = "$lk0" ] && ok "and the key equals the key derived with GIT_DIR unset" \
+  || nope "the key moved under an exported GIT_DIR" "$(cat "$TMP/tleak.out")"
+
+# A racing stage left behind: two shells resolve one key at once in one root. THE BARRIER holds each
+# builder until both have entered (TOOL-dQuietDisk-37 S7): each leaves a marker named for its own
+# $BASHPID beside the root, never inside it, and builds only once two exist, so both are building at
+# once and the second rename meets the `mv -T` collision. A fixed sleep let a racer that forked after
+# the first had written `ready` reuse it and never build; `built <n>` is the marker count.
+run_harness trace 'mkr() { : > "$TMP_RACE.m.$BASHPID"; local i=0; local -a m
+  while m=("$TMP_RACE".m.*); [ "${#m[@]}" -lt 2 ] && [ "$i" -lt 300 ]; do sleep 0.1; i=$((i + 1)); done
+  git init -q && printf r > f; }
+k=$(derive_template_key mkr) || exit 2
+( resolve_template "$TMP_RACE" "$k" mkr > "$TMP_RACE.a" 2>/dev/null ) &
+( resolve_template "$TMP_RACE" "$k" mkr > "$TMP_RACE.b" 2>/dev/null ) &
+wait
+cmp -s "$TMP_RACE.a" "$TMP_RACE.b" && [ -s "$TMP_RACE.a" ] && echo "same template"
+echo "built $(ls "$TMP_RACE".m.* 2>/dev/null | wc -l)"
+echo "entries $(ls -A "$TMP_RACE" | wc -l) nested $(ls -A "$TMP_RACE/$k" | grep -c "^\.stage-")"' "$DEF"
+grep -q '^built 2$' "$TMP/trace.out" && ok "both racers built, so the arm below grades a real collision" \
+  || nope "one racer reused the other's template and never built, so no collision was met" "$(cat "$TMP/trace.out")"
+grep -q '^built 2$' "$TMP/trace.out" && grep -q '^entries 1 nested 0$' "$TMP/trace.out" \
+  && ok "two racing builds leave one key directory, and no stage beside it or inside it" \
+  || nope "a racing stage was left behind or renamed over the winner" "$(cat "$TMP/trace.out")"
+grep -q '^same template$' "$TMP/trace.out" && ok "and both racers get the same template" \
+  || nope "the racers got different templates" "$(cat "$TMP/trace.out")"
+
+# The cache root: a named directory, then a bar's owned gate-work, then the caller's own scratch.
+mkdir -p "$TMP/named" "$TMP/gate-work.t/tmp"; : > "$TMP/gate-work.t/owner"
+TMP_NAMED=$TMP/named TMP_BAR=$TMP/gate-work.t run_harness troot 'SELFTEST_ROOT=/sr
+echo "named $(SELFTEST_TEMPLATE_ROOT=$TMP_NAMED resolve_template_root)"
+echo "bar $(SELFTEST_TEMPLATE_ROOT= TMPDIR=$TMP_BAR/tmp resolve_template_root)"
+echo "own $(SELFTEST_TEMPLATE_ROOT= TMPDIR=/nowhere resolve_template_root)"' "$DEF"
+[ "$(cat "$TMP/troot.out")" = "named $TMP/named
+bar $TMP/gate-work.t/templates
+own /sr/templates" ] && ok "the cache root is the named directory, else the owned gate-work, else SELFTEST_ROOT" \
+  || nope "the cache root resolved elsewhere, so it could outlive the run" "$(cat "$TMP/troot.out")"
+
+# The saving itself: eight cases built per case, init, two configs, add and commit, against eight
+# clones of one template, counted as git's trace2 event files; the template's own build is in the count.
+run_harness tcost 'mkc() { git init -q --template= && git config user.email t@t && git config user.name t \
+  && printf 1 > a && mkdir d && printf 2 > d/b; }
+mkdir -p "$TMP_COST/p" "$TMP_COST/c"
+for i in 1 2 3 4 5 6 7 8; do mkdir "$TMP_COST/case.$i" && ( cd "$TMP_COST/case.$i" && GIT_TRACE2_EVENT=$TMP_COST/p mkc \
+  && GIT_TRACE2_EVENT=$TMP_COST/p git -c core.autocrlf=false add -A \
+  && GIT_TRACE2_EVENT=$TMP_COST/p git -c core.hooksPath= -c commit.gpgsign=false commit -qm base ) || exit 2; done
+export GIT_TRACE2_EVENT=$TMP_COST/c
+t=$(resolve_template "$TMP_COST/root" "$(derive_template_key mkc)" mkc 2>/dev/null) || exit 2
+for i in 1 2 3 4 5 6 7 8; do build_template_clone "$t" "$TMP_COST/clone.$i" || exit 2; done
+echo "cost $(ls "$TMP_COST/p" | wc -l) $(ls "$TMP_COST/c" | wc -l)"' "$DEF"
+read -r _ cp cc < <(grep '^cost ' "$TMP/tcost.out")
+[ -n "${cc:-}" ] && [ "$cc" -lt "${cp:-0}" ] && ok "eight clones of one template spend fewer git processes than eight builds ($cc against $cp)" \
+  || nope "the cache spent as many git processes as a build per case" "$(cat "$TMP/tcost.out")"
+
+# A reading arm that writes fails the suite under shared, naming the arm and the read checkout.
+RBODY="$TFIX"'
+arm         "a mutating arm" 0 "" "true" "printf x >> subject.txt"
+arm_reading "a reader"       0 "" "true" "cat subject.txt READ_WRITE"
+run_arms t'
+mkdir -p "$TMP/tr.read"
+SELFTEST_TEMPLATE_ROOT=$TMP/tr.read run_harness tread "${RBODY/ READ_WRITE/; printf w > leak.txt}" "$DEF"
+rc=$?
+[ "$rc" = 1 ] && grep -q '^FAIL  a reading arm wrote into the read checkout .*/read — a reader: ' "$TMP/tread.out" \
+  && ok "a reading arm that writes FAILs the suite, naming the arm and the read checkout" \
+  || nope "a reading arm's write exited $rc" "$(cat "$TMP/tread.out")"
+SELFTEST_TEMPLATE_ROOT=$TMP/tr.read run_harness tread0 "${RBODY/ READ_WRITE/}" "$DEF"
+rc=$?
+[ "$rc" = 0 ] && ok "and with the write removed the suite passes" || nope "a clean reader exited $rc" "$(cat "$TMP/tread0.out")"
+
+# One suite under --template in both values of the switch: the arm lines must not move.
+SBODY="$TFIX
+arm         \"green one\" 0 \"base\"       \"true\" \"cat subject.txt\"
+arm_reading \"green two\" 0 \"base\"       \"true\" \"cat subject.txt\"
+arm         \"the red\"   0 \"NOTPRESENT\" \"true\" \"cat subject.txt\"
+arm_reading \"a writer\"  0 \"\"           \"true\" \"printf w > leak.txt\"
+run_arms t"
+mkdir -p "$TMP/tr.sw"
+SELFTEST_TEMPLATE_ROOT=$TMP/tr.sw run_harness tshared "$SBODY" "$DEF"
+SELFTEST_TEMPLATE_ROOT=$TMP/tr.sw run_harness tpercase "$SBODY" "$PC"
+if diff <(grep -E '^(ok|FAIL)  ' "$TMP/tshared.out" | grep -v 'read checkout') \
+        <(grep -E '^(ok|FAIL)  ' "$TMP/tpercase.out") >/dev/null 2>&1 && grep -q '^FAIL  the red' "$TMP/tpercase.out"; then
+  ok "the arm lines are identical under shared and per-case, the same arm red in both"
+else
+  nope "an arm's result moved with the switch" "$(diff "$TMP/tshared.out" "$TMP/tpercase.out" | head -6)"
+fi
+! grep -q '^template: ' "$TMP/tpercase.out" && grep -q 'read checkout' "$TMP/tshared.out" \
+  && ! grep -q 'read checkout' "$TMP/tpercase.out" \
+  && ok "per-case builds no template and runs a reading arm in its own copy, as arm does" \
+  || nope "per-case still used the template" "$(cat "$TMP/tpercase.out")"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "lib-selftest-test: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }
