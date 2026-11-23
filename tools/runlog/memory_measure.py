@@ -463,7 +463,7 @@ FIXTURE_PLANTS = {
         ("Read", {"file_path": "/d/fx/repo/memory/LIVE.md"}, 450)], 0)]},
     "dot-relative": {"cwd": FIXTURE_MAIN, "agents": [("main", "gov-builder", 1, [
         ("Bash", {"command": "cat ./memory/LIVE.md"}, 300)], 0)]},
-    "parent-relative": {"cwd": FIXTURE_MAIN + "/tools/memory-tree", "agents": [("main", "gov-builder", 1, [
+    "parent-relative": {"cwd": FIXTURE_MAIN + "/sub/dir", "agents": [("main", "gov-builder", 1, [
         ("Bash", {"command": "cat ../../memory/LIVE.md"}, 250)], 0)]},
     "foreign-dir": {"agents": [("main", "gov-builder", 1, [("Read", {"file_path": FX_MEMORY_FILE}, 600)], 0),
                                ("foreign", "gov-builder", 1, [("Read", {"file_path": FX_MEMORY_FILE}, 5000)], 0)]},
