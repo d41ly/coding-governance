@@ -429,10 +429,15 @@ notice it has consumed, `write_consumed_acks` (KICK-dKeptSession-42): every open
 or `withdrawn`, and per parent holding an open `confirmed` or `changed` of subject `interfaces
 <parent>`, one `check_parent_interfaces` call, whose `interface — current <id>` line consumes that row
 and every such row of the parent it supersedes, one whose `content-key` equals the current row's or
-which `derive_mail_chain` places before it (KICK-dKeptSession-53): the chain is read off the parent's
-rows of the one read, a row preceding a later `seq` on its ref and, through the `after` of the ref's
+which `derive_mail_chain` places before it (KICK-dKeptSession-53): the chain is placed over every
+message the parent wrote, a row preceding a later `seq` on its ref and, through the `after` of the ref's
 `seq` 1 row, every row of the session it took over, transitively, never by `first-seen` or arrival, and
-a row the chain places after the current one or cannot place stays open. The acks are all or nothing
+a row the chain places after the current one or cannot place stays open. To order a parent's notices
+the move also reads every message that parent wrote, with the unattended kit's `--mail read <parent>
+--local --sent`, from the copy its first read fetched (KICK-dKeptSession-61), so a take-over naming its
+predecessor's message to another dependent still places it, while the ids acknowledged stay the rows of
+the build's own read; a chain read that does not answer prints `mail — interfaces <parent> unread ·
+<why>` and acknowledges nothing from that parent. The acks are all or nothing
 (KICK-dKeptSession-55): the consumed ids are computed first, posting nothing, and posted only where every
 `open` row of the read is consumed; otherwise none is posted and the refusal names every open row, so a
 consumed `withdrawn` beside an open `question` stays open and is never acknowledged unread. Each
@@ -517,7 +522,7 @@ two dependents and three exits from Design, back through B21 between them, each 
 to the first dependent rebound to exit 1, the move still recording and printing its `notice — not
 posted` line; `notices-repeat-key`, one dependent and three exits from Design, the spec edited after
 the first exit alone, so the third repeats the second's listing, kind and key, its pass `3` alone
-telling it apart, and every notice still posted; and the eight over `write_consumed_acks`, each rebinding the launcher to record every ack
+telling it apart, and every notice still posted; and the nine over `write_consumed_acks`, each rebinding the launcher to record every ack
 and restoring it: `acks-landed`, a parent's `landed` acknowledged by the move that records past it;
 `acks-confirmed`, a `confirmed` keyed over the parent's listing at its lease's witness, acknowledged
 over the real chain; `acks-superseded`, `check_parent_interfaces` stood in, a `confirmed` and the later
@@ -529,9 +534,14 @@ predecessor in `after`, keyed over the parent's listing and sighted before that 
 swapped; `acks-later-key`, the check stood in naming the take-over's `changed` current and a later
 `changed` pushed onto its ref as `seq` 2, through `placement.py`'s `write_fixture_gov_ref` and its
 `parent`, left open, so B4 posts no ack and is refused naming all three; `acks-withdrawn`, a parent's lone
-`withdrawn` acknowledged by B4, which records, its `mail — acked` line read off stderr; and
+`withdrawn` acknowledged by B4, which records, its `mail — acked` line read off stderr;
 `acks-withdrawn-question`, a `withdrawn` beside another parent's open `question`, B4 posting no ack and
-refused naming both, the `withdrawn` read `open` after it; and the five over `notify.owner`: `notify-micro`,
+refused naming both, the `withdrawn` read `open` after it; and `chain-two-dependents`, a parent's session
+posting a `confirmed` to `tFix` and then to `tTwo`, and its take-over a `changed` to each, the first
+naming in `after` the message to `tTwo`, so `tFix`'s own rows cannot place its `confirmed`: `tFix`'s and
+`tTwo`'s B4 each acknowledge both their rows over the chain read of every message the parent wrote, its
+chain line printing that read and `tFix`'s rows alone apart, then that sent read's four rows, each
+`acked`, and `build:fy`'s sent read refused; and the five over `notify.owner`: `notify-micro`,
 `notify-park-landing`, `notify-every` and `notify-park-only`, B4 under that value, `NOTIFY_SETS`
 committing it and `notify-micro` none, then a park and a landing run through `progress`, each printing
 `loop: fixture · progress <n>`, the progress lines the three printed, and `notify-shape`, an `AGENTS.md`

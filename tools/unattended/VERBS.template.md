@@ -642,7 +642,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   dWellOiledMachine)` until dWellOiledMachine's Runtime declares its doorbell point;
   `mailbox-only` rings nothing and prints `ring — off (deps.messaging: mailbox-only)`. A
   `deps.messaging` that does not read rings as `live-and-mailbox` under one `unattended: NOTE -`
-  line on stderr, and a ring never changes the post's exit. `--mail read <who> [--open] [--ids]` reads a build's mailbox, `<who>` a slug, read
+  line on stderr, and a ring never changes the post's exit. `--mail read <who> [--open] [--ids] [--local] [--sent]` reads a build's mailbox, `<who>` a slug, read
   as `build:<slug>`, or one of the recipient forms: one bounded, pruned fetch of every build's mail
   refs into this node's cache, then one TAB row per message addressed to `<who>`, a build reading
   its units' messages too: `id`, `kind`, `to`, `state`, `first-seen`, `from-build`, `subject`,
@@ -658,7 +658,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `reply` names the message that decided the state. `--open` prints only the open rows and `--ids`
   their ids on one line, or `none`. A failed fetch prints `mail — local copy: <why>` and reads the
   cache (exit 0); `--local` reads the cache with no fetch and prints no cause; a refused read exits
-  2. `--mail ack <slug> <id>` posts an `ack` from `<slug>`
+  2. `--sent` takes a build's slug alone and prints instead one row per message on that build's own
+  mail refs, `refs/gov/mail/<slug>/`, whoever it was addressed to, each state read as in the build's
+  own mailbox; a recipient form prints `mail — not read · --sent reads one build's own mail refs, and
+  '<who>' is no build's slug` (exit 2), and `post`, `ack`, `answer` and `notice` refuse the flag.
+  `--mail ack <slug> <id>` posts an `ack` from `<slug>`
   answering `<id>` to its sender's build, with its subject and an empty body, exit 2 where `<id>` is
   no row addressed to `<slug>`, else the post's exits. `--mail answer <slug> <question id> <body file>
   [--cite <path>@<sha>]...` answers a `question` addressed to `<slug>`, the answering build, the loop
