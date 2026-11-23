@@ -60,6 +60,13 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   to 349, its tab-separated fields intact. Both files are in the write set, and `.memory-tree.conf` sits on the
   kickoff manifest's `watch:` list, so re-stamp `memory/guides/SESSION-KICKOFF.md` in the same commit. If the census
   needs more than one site, hand it back rather than raising the token further.
+- A first builder (run `wf_9a71755a-a4e`) diverged and wrote nothing. The main loop settled its items in
+  `build/2026-11-23-build-TOOL-dBoundRoles-26-1-main-loop-decision.md`: read it WHOLE before your first write. It
+  binds over the spec where they differ: `gov-prompt-writer` moves onto the arm (its `return` drops `refused` and
+  `why`, its body's two refusal lines name the arm, `read_framing` names the `remedy`, and the render self-test's arm
+  24 plants move to the arm's fields), the producer route reads the answered work order's first upstream row and
+  prints it as a trailing `item` field, `route_refusal` takes `repo` and `budget_spent` beside `role` and `build`, and
+  AC4's arm uses the `tRun` fixture's own pair. Record each in the deviation record.
 - TOOL-dBoundRoles-11 landed `resolve_owner_question` and the `owner-question` verb, which S5's owner branch asks, and
   TOOL-dBoundRoles-5 and -23 `check_return`, which S2 extends. TOOL-dBoundRoles-24, -41, -11 and -47 added arms 39 to
   42 to `tools/roles/adopt-roles.test.sh`, with `FLOOR_ASSERTIONS` at 172. Read each at HEAD and build on it; record
