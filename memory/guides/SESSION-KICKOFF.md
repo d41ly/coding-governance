@@ -3,7 +3,7 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-23T00:23:20+02:00 @ 86fa5b770defb0799b9e24457ff591579f7c9de6
+last-audit: 2026-11-23T11:35:05+02:00 @ 5c39a3381b80396288aa69a6078b95fb90e3df73
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 2c621083fd91278f33ba1baba1ea15f4dada31b0
@@ -75,7 +75,7 @@ bash tools/unattended/run-unattended-gates.sh --pooled   # DoD for tools/unatten
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # bug-class checklist + by-design block for THIS diff; the review harness acquires it on the diff kind
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality?
 python tools/govkit/govkit.py epoch --base <base>   # a kit whose shipped bytes moved since <base> and whose version did not: run after a commit that touches a kit. TOOL-aRepatriatedFork-15
-python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3
+python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills ":!memory"   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3
 ```
 
 The repo HAS a codebase map (`memory/map/`), so the kickoff skill's map steps are live. No

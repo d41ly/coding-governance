@@ -22,7 +22,8 @@ in SYMBOL_EXTENSIONS, or a blob-pinned line, `<path>@<oid>:<n>[-<m>]`.
 `check` is the `positional` arm of `gov_tag.py check`, run alone: the tree against the list both ways,
 as `tags.positional` says (`shrink-only`, `refuse` or `report`), every pinned line read against its
 blob and every symbol citation against its file's definitions. An unresolved pin or symbol under
-`<MEMORY_ROOT>/builds/` is printed and never red: those records are frozen. So is an unlisted file:line
+`<MEMORY_ROOT>/builds/` or `<MEMORY_ROOT>/archive/` is printed and never red: those records are
+frozen. So is an unlisted file:line
 citation in a record there when every line holding it was written, as `git blame -M` over the working
 tree reads it, by a commit that does not descend from `L`, the commit that added this module
 (PLAY-dOrderedCharter-47, -53): it was written on a branch that never held the check, and prints
@@ -476,6 +477,12 @@ def read_line_commits(root, path) -> dict:
     return lines
 
 
+def derive_frozen(memory_root) -> tuple:
+    """The frozen record prefixes: `<MEMORY_ROOT>/builds/`, and `<MEMORY_ROOT>/archive/`, whose rotated
+    indexes and legacy material no build claims and none rewrites (TOOL-aFlattenedSeed-4)."""
+    return f"{memory_root}/builds/", f"{memory_root}/archive/"
+
+
 def read_grandfathered(root, kit_rel, frozen, rows) -> dict:
     """{row: [(line, sha), ...]} for each unlisted file:line `row` under `frozen` whose every line holding
     its reference was written by a commit outside the set that holds the check: `L`, the oldest add of
@@ -516,7 +523,7 @@ def read_held_rows(root, kit_rel, memory_root, listed) -> tuple[set, dict]:
     """(the tree's rows of both reference kinds, the unlisted file:line rows `read_grandfathered`
     grandfathers): the measurement the arm holds the list to, which `list` prints less the second."""
     tree = read_file_line_rows(root, memory_root) | read_section_rows(root)
-    old = read_grandfathered(root, kit_rel, f"{memory_root}/builds/",
+    old = read_grandfathered(root, kit_rel, derive_frozen(memory_root),
                              [r for r in sorted(tree - set(listed)) if check_file_line_row(r)])
     return tree, old
 
@@ -535,7 +542,7 @@ def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict
     listed = set(rows)
     tree, old = read_held_rows(root, kit_rel, memory_root, listed)
     aliases = ti.read_aliases(pathlib.Path(root) / kit_rel / "aliases.toml")
-    frozen = f"{memory_root}/builds/"
+    frozen = derive_frozen(memory_root)
 
     def derive_remedy(row):
         path, _, ref = row.partition("\t")
@@ -722,6 +729,7 @@ positional-spec-revbump|1|tags: positional · unlisted · memory/builds/x/spec/s
 positional-bulk-move|1|positional — grandfathered: memory/builds/x/reviews/r1.md:9 {x}:1 (written in
 positional-bulk-move|1|positional — grandfathered: memory/builds/x/reviews/r3.md:9 {x}:1 (written in
 positional-bulk-move|1|tags: positional · unlisted · memory/builds/x/reviews/r2.md · {x}:6
+positional-archived|0|positional — grandfathered: memory/archive/x/record.md:1 {x}:1 (written in
 positional-producer-new|1|tags: positional · producer · {prefix}/roles/agents/gov-x.agent.md:3 · - cite it by file:line · re-point it
 positional-producer-new|1|re-pointed to a stable form: rc=0
 positional-producer-stale|0|tags: positional · producer stale · {prefix}/roles/agents/gov-x.agent.md · - cite it by file:line · no hit
