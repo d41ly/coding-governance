@@ -440,7 +440,7 @@ Cite ids, never line numbers.
 | [TOOL-dBoundRoles-75](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE BREAKER'S BUDGET DRAW HAS NO DRAWER. cl-dClosedLoop-0327 has an act… |
 | [TOOL-dBoundRoles-76](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE. TOOL-dWitnessedBar-84 S9 put… |
 | [TOOL-dBoundRoles-77](../builds/dBoundRoles/BACKLOG.md) | SPECCED | MED | TOOL-dBoundRoles-81 | 2026-11-23 | THE COMPOSE VERB READS NO FRONT-MATTER KIND. TOOL-dBoundRoles-20 §8 F8… |
-| [TOOL-dBoundRoles-78](../builds/dBoundRoles/BACKLOG.md) | SPECCED | MED | TOOL-dBoundRoles-82 | 2026-11-23 | A SCALAR CANNOT WIDEN AS IT RISES. TOOL-dBoundRoles-20 §8 F8 (ii): a… |
+| [TOOL-dBoundRoles-78](../builds/dBoundRoles/BACKLOG.md) | INPROGRESS | MED | TOOL-dBoundRoles-82 | 2026-11-23 | A SCALAR CANNOT WIDEN AS IT RISES. TOOL-dBoundRoles-20 §8 F8 (ii): a… |
 | [TOOL-dBoundRoles-79](../builds/dBoundRoles/BACKLOG.md) | SPECCED | MED | TOOL-dBoundRoles-83 | 2026-11-23 | THE EXCLUSION WALK COMPARES TAGS THE REQUIRERS DO NOT SPELL.… |
 | [TOOL-dBoundRoles-80](../builds/dBoundRoles/BACKLOG.md) | SPECCED | MED | TOOL-dBoundRoles-85 | 2026-11-23 | AN ADOPTER RULE TYPES ONLY A LEVEL-0 UNIT. TOOL-dBoundRoles-19 §8 F4:… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
