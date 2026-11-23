@@ -473,7 +473,6 @@ Cite ids, never line numbers.
 | [TOOL-dDeclaredLoop-114](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-16 | A NUMERIC PATCH DIRECTION FOR THE CLASSIFIER. TOOL-dDeclaredLoop-33's… |
 | [TOOL-dDeclaredLoop-118](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | AN ITEM ROW MAY NAME A PROGRAM OUTSIDE THE FIVE STEPS.… |
 | [TOOL-dDeclaredLoop-119](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | AN ITEM THAT WRITES NO RECORD KIND HAS NO RETURNS VALUE.… |
-| [TOOL-dDeclaredLoop-120](../builds/dDeclaredLoop/BACKLOG.md) | INPROGRESS | MED | TOOL-dBoundRoles-84 | 2026-11-23 | THE ITEM ACTOR TAKES NO REPOSITORY ROLE. TOOL-dBoundRoles-20 §8 F8… |
 | [TOOL-dDerivedDocket-38](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/run-gates/run-selftests.sh SELECTS SUITES ONLY BY A --kit <dir>… |
 | [TOOL-dDerivedDocket-39](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | govkit's requires_if SELECTS NO KIT AT APPLY. Its one reader is… |
 | [TOOL-dDerivedDocket-40](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO LEASE-MATRIX ROW NAMES WHO REACHES IT, AND NOTHING COUNTS ROWS… |

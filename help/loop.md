@@ -1029,9 +1029,13 @@ routes = { done = "item.test.exit" }
 - `seed` and `map` are open along their order of values, a later value widening: `seed` runs `none`,
   `write-set`, `question-paths`, `scope-paths`, and `map` runs `none`, `base`. `unfolds` is open, and
   adding widens it. An absent `seed` or `map` reads `none`, an absent `unfolds` reads empty.
-- `step`, `witness` and `outcomes` are fixed by a principle, and `actor`, `allowance`, `returns` and
-  `owner` are fixed because they declare no direction. Patching one is refused, naming the field and
-  what fixes it.
+- `actor` is open to a repository role and admitted by the actor-patch check alone. The schema opens it
+  on the direction `changes`, any value other than gov's reading as a widening, so the patch composes,
+  and `check` then refuses it, naming the item, your row and the value: a repository role,
+  `role:adopter.<name>`, until the roles kit's actor-patch check answers there, and any other value,
+  a gov role or a command, because an actor patch names a repository role.
+- `step`, `witness` and `outcomes` are fixed by a principle, and `allowance`, `returns` and `owner` stay
+  fixed because they declare no direction. Patching one is refused, naming the field and what fixes it.
 - Each step's exit item and the floor item `item.test.verdict`, whose verdict the runner writes, are
   fixed rows: an `amends`, a `supersedes` or an exclusion of one is refused.
 - An exclusion is refused while another item still needs the excluded one, naming that item, or while
@@ -1049,7 +1053,7 @@ version, so after a bump an input still pinned at the old version is refused unt
   through the playbook kit and prints `loop: items composed · <n> row(s) · <m> repository`, one
   `loop: patch` line per classified patch operation of your overlay, one `loop: record-version` line
   per version row and `loop: record inputs · <n> joined`, and exits 0. It exits 1 on a refusal: the
-  composition's, a needs cycle (each named), a need no item declares, a step exit or the floor item
+  composition's, an actor patch, a needs cycle (each named), a need no item declares, a step exit or the floor item
   with no fixed row, a version row whose hash moved, or a record input no needed item produces. It
   exits 2, `unarmed`, where the playbook kit is not installed, the schema is absent, or your last
   commit holds no definition yet, as right after a first install, before its commit.
@@ -1073,7 +1077,7 @@ version, so after a bump an input still pinned at the old version is refused unt
   `factory` (the register's factory adds an item, `check` reads it, and the same add again exits 2),
   `repo-cycle`, `repo-unresolved-need`, `repo-input-unproduced`, `repo-input-produced`,
   `version-unbumped`, `version-bumped`, `version-stale-input`, `patch-witness`, `patch-outcomes`,
-  `supersede-floor`, `supersede-exit`, `exclude-needed`, `exclude-breakpoint`, `patch-remove-need`,
+  `patch-actor-repo`, `patch-actor-gov`, `patch-allowance`, `supersede-floor`, `supersede-exit`, `exclude-needed`, `exclude-breakpoint`, `patch-remove-need`,
   `patch-add-need`, `patch-routes`, `amended-cycle` (an `amends` whose added need closes a cycle the
   overlay text does not hold), `exit-unfixed`, `schema-absent` and `definition-uncommitted` (a
   first install's state, where the render composes no item and refuses nothing).
