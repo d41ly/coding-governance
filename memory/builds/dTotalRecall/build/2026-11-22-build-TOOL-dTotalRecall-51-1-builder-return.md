@@ -23,7 +23,7 @@ Built TOOL-dTotalRecall-51 in commit 30d1901d6 (base 8138bb587). All paths were 
   - Record keys stay Markdown file stems, and `--measure` is unchanged.
   - The `--check` count line now reads `N Markdown record(s) · M comment-headed · K legacy`.
   - New fixture plants: `script-cause-prefixed`, `script-cause-bare` and `script-causeless`.
-- **S4**: one `ratchet.py widen legacy-records` call admitted 139 records. It wrote memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-51-widen-7.md and added 139 rows to memory/project/legacy-records.txt, removing none. No existing record was rewritten.
+- **S4**: one `ratchet.py widen legacy-records` call admitted 139 records (DERIVED, the widen's own count). It wrote memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-51-widen-7.md and added 139 rows (DERIVED, the same widen) to memory/project/legacy-records.txt, removing none. No existing record was rewritten.
 - **S5**: one sentence added to the Record bindings section of tools/memory-tree/HYGIENE.template.md, rendered into memory/HYGIENE.md with `adopt-memory-tree.sh --render`.
 - **Test arm**: added to tools/memory-tree/check-memory-hygiene.test.sh for AC1 to AC3. I checked its syntax with `bash -n` and ran its reader-probe part on its own (3 checks, all passed). I did not run the suite.
 - **Other files in the commit**: the acceptance ledger (memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-51-1-acceptance-ledger.md), RUN.md, and the files `gen_build_index.py --write` regenerated (memory/LIVE.md, memory/backlog/TOOL.md, the build README, and the spec's records table). `gen_map.py --write` changed nothing.
@@ -32,7 +32,7 @@ Built TOOL-dTotalRecall-51 in commit 30d1901d6 (base 8138bb587). All paths were 
 - **AC1**: a `python -c` probe of `read_header_edges` over a `.py` text with a `#`-prefixed cause line returned the `caused-by` edge to `TOOL-dFix-1`. The `script-cause-prefixed` plant reported `1 comment-headed`, `0 causeless · 0 orphan(s)` and green. Stands in for the memory-hygiene self-test.
 - **AC2**: a bare cause line under a `#` Serves line in a `.sh` record, and a `#` cause line under a bare Serves line in a `.md` record, each raised the `ValueError` naming both lines. The `script-cause-bare` plant reported the record's header as refused. A probe of every tracked record in the tree raised 0 times. Stands in for the memory-hygiene self-test.
 - **AC3**: the `script-causeless` plant reported the `.sh` record under `causes` and never mentioned `atlas.html`. Stands in for the memory-hygiene self-test.
-- **AC4**: a probe of `read_grading` at the base found 139 graded non-Markdown records, none already in the legacy list, matching the spec's 139. A probe of the list then counted 139 rows marked `widened:` with the widen-7 record's name. The commit adds no non-Markdown file under memory/builds. Stands in for the `record causes` and `memory hygiene` legs.
+- **AC4**: a probe of `read_grading` at the base found 139 graded non-Markdown records, none already in the legacy list, matching the spec's 139. A probe of the list then counted 139 rows marked `widened:` with the widen-7 record's name (DERIVED, that probe). The commit adds no non-Markdown file under memory/builds. Stands in for the `record causes` and `memory hygiene` legs.
 
 **Owed to the close (not run here)**
 - `record_causes.py --check` at the tip (AC4's first clause). The hook refused it to this role because it is the `record causes` leg.

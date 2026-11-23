@@ -86,7 +86,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 91 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 91 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14
 ids TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27 TOOL-dTotalRecall-28
 ids TOOL-dTotalRecall-29 TOOL-dTotalRecall-30 TOOL-dTotalRecall-31 TOOL-dTotalRecall-32 TOOL-dTotalRecall-33 TOOL-dTotalRecall-34 TOOL-dTotalRecall-35 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42
@@ -129,7 +129,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-21 — memory-recall's FTS5 tables moved into the one index file, keyed by path and blob](spec/2026-10-26-spec-TOOL-dTotalRecall-21.md) | 17 | 2 | CLOSED | rev-6 | 2026-11-23 |
 | [TOOL-dTotalRecall-36 — every code writer of a record writes its `Caused-by` line, so the causes check stays green on the records written after its seed](spec/2026-10-26-spec-TOOL-dTotalRecall-36.md) | 17 | 2 | CLOSED | rev-5 | 2026-11-23 |
 | [TOOL-dTotalRecall-39 — one record-header edge reader: the edge grammar's header site calls `tree_lib.read_header_edges` and defines none of its own](spec/2026-10-26-spec-TOOL-dTotalRecall-39.md) | 17 | 2 | CLOSED | rev-3 | 2026-11-23 |
-| [TOOL-dTotalRecall-47 — the cause backfill is a verb run at the tip after the step-17 group, so no record written between the seed and the writers' change stays causeless](spec/2026-10-26-spec-TOOL-dTotalRecall-47.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-22 |
+| [TOOL-dTotalRecall-47 — the cause backfill is a verb run at the tip after the step-17 group, so no record written between the seed and the writers' change stays causeless](spec/2026-10-26-spec-TOOL-dTotalRecall-47.md) | 18 | 2 | INPROGRESS | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-48 — the run record's fixed head admits a cause line, and runlog grades its shape while the causes leg grades its absence](spec/2026-10-26-spec-TOOL-dTotalRecall-48.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-49 — the as-built view keeps the pinned instrument's bytes, and its writer is kept off the cause census by a stated reason](spec/2026-10-26-spec-TOOL-dTotalRecall-49.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-50 — the cause census reads the build folders' instruments, and the pinned departures writer is a declared row that drains when its owner repins](spec/2026-10-26-spec-TOOL-dTotalRecall-50.md) | 18 | 2 | DEFERRED | rev-4 | 2026-11-22 |
@@ -192,7 +192,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 596 bound to this build, across 4 record folder(s).
+Records: 597 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -298,7 +298,7 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-23-prompt-TOOL-dTotalRecall-36-fold-spec-writer.md`, `2026-11-23-prompt-TOOL-dTotalRecall-36-fold-brief.md` and 252 more under prompts/ |
+| briefs | `2026-11-23-prompt-TOOL-dTotalRecall-36-fold-spec-writer.md`, `2026-11-23-prompt-TOOL-dTotalRecall-36-fold-brief.md` and 253 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-23-build-TOOL-dTotalRecall-21-deviation-1004.md`, `2026-11-23-build-TOOL-dTotalRecall-21-deviation-1003.md` and 139 more under build/ |
 | red-fix | `2026-11-23-build-TOOL-dTotalRecall-21-red-fix-17.md`, `2026-11-23-build-TOOL-dTotalRecall-19-red-fix-16.md` and 15 more under build/ |
