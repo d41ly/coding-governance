@@ -46,6 +46,12 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   `### framing:job`; this unit's frame sorts that fill into `FRAME_SLOTS` order. TOOL-dBoundRoles-21 landed
   `read_policy_setting`, `resolve_stage_efforts` and `resolve_effort`, and TOOL-dBoundRoles-3 the work-order blocks.
   Read each at HEAD and build on it; record every citation you re-ground.
+- A first builder (run `wf_a398b95f-aed`) diverged and wrote nothing. The main loop settled its items in
+  `build/2026-11-23-build-TOOL-dBoundRoles-23-1-main-loop-decision.md`: read it WHOLE before your first write. It
+  binds over the spec where they differ: the population comes from `### framing:population` alone (no lister),
+  AC1 follows the slot table over a fixture catalogue role reading `upstream:rows?`, S4 reads `--upstream`, and
+  `check_return` gains its read of the work order. Build those items as the decision states, and record each in
+  the one deviation record below.
 - The paths S4 to S6 cite under `tools/loop/`, `tools/policy/`, `tools/workflows/` and `tools/hooks/` are read, not
   written: none is in the write set. If S6's guard needs a change there, hand it back as a divergence.
 - Record every change the spec does not state in ONE deviation record,
