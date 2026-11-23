@@ -722,10 +722,13 @@ a tree whose receipt predates it, printing `default-gained`.
    and `.claude/roles.json`, the role index the hooks kit's write gate and spawn guard arm on. Your
    own definitions under `.claude/agents/` are never touched. `--check` grades all three and runs
    as the `roles render wiring` leg.
-2. **The house overlays are yours.** The ten files under `<prefix>/roles/house/` are seeded once and
-   never rewritten by an update. Put your project's rules for a role there; the base files under
-   `agents/` are the kit's and are overwritten. Re-run `--scaffold` after editing one, or the leg
-   reds.
+2. **A role's project rules are overlay units.** Put your project's rules for a role in your overlay,
+   `.governance/instructions.toml`, as a level-5 unit selecting `role.<role>`, written through the
+   overlay's door (`instructions_edit.py add --manifest overlay`); the base files under `agents/` are
+   the kit's and are overwritten. The render reads the overlay at `HEAD`, so commit the unit, then
+   re-run `--scaffold`, or the leg reds. The house text files the kit once seeded under
+   `<prefix>/roles/house/` are moved into units by the upgrade step
+   `roles/house-overlays-to-instructions`; only `house/policy.toml`, the effort policy, is seeded.
 3. **Restart before spawning.** A Claude Code session reads its agent registry when it starts, so
    a session that ran the install or the update cannot spawn a newly rendered agent type. Start a
    new session first.
@@ -1387,7 +1390,7 @@ it.
 ├── <prefix>/hooks/              # agent-cap.js, scratch-guard.js + their two fragments (hooks kit, default)
 ├── <prefix>/settings-merge.py   # the one writer of .claude/settings.json (default)
 ├── <prefix>/check-wiring.sh     # reports an unwired hook or an UNARMED ROUTED_PATHS (default)
-├── <prefix>/roles/              # the role catalogue + its adopter; house/ overlays are yours (default)
+├── <prefix>/roles/              # the role catalogue + its adopter; house/policy.toml is yours (default)
 ├── <prefix>/loop/               # the loop definition, its readers and its gates (default)
 ├── .claude/agents/<role>.md     # one rendered agent type per agent role (roles kit, §3g)
 ├── .claude/roles.json           # the role index the write gate and spawn guard arm on (roles kit)

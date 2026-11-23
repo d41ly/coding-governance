@@ -2336,13 +2336,22 @@ ARM_ARGS=()
 # TOOL-aSmoothedDispatch-8 S2: the gov-spec-writer overlay quotes the exit-1 row and summary shapes, and a
 # red --spec run must print both. The spans are read from the overlay itself, so a reworded overlay or
 # checker print reds here. A missing overlay or an empty span is a FAIL, never two arms over an empty
-# needle, which every output carries.
-ROLES_DIR=$(resolve_kit_dir "$PY" roles render_agents.py "$HERE") || exit 2
-sp_overlay="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$ROLES_DIR/house/gov-spec-writer.md"
-sp_row=$(tr -d '\r' < "$sp_overlay" 2>/dev/null | grep -o '`spec-tokens: <spec path> \[[^`]*`' | head -1 | tr -d '`')
-sp_sum=$(tr -d '\r' < "$sp_overlay" 2>/dev/null | grep -o '`spec-tokens: <N> unwaived[^`]*`' | head -1 | tr -d '`')
+# needle, which every output carries. TOOL-dBoundRoles-19 moved that overlay out of the roles kit's house
+# text file into the instruction overlay, so the spans are read from the text of its one home there, the
+# level-5 unit the house step tagged for gov-spec-writer; no such unit, or no text, is the same FAIL.
+sp_overlay="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/.governance/instructions.toml"
+sp_tag="repo.""house.""gov-spec-writer"
+sp_text=$("$PY" -c 'import pathlib, sys, tomllib
+try:
+    rows = tomllib.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")).get("unit", [])
+except (OSError, ValueError):
+    rows = []
+print(next((u.get("text", "") for u in rows if u.get("tag") == sys.argv[2] and u.get("level") == 5), ""))' \
+  "$sp_overlay" "$sp_tag" 2>/dev/null | tr -d '\r')
+sp_row=$(printf '%s\n' "$sp_text" | grep -o '`spec-tokens: <spec path> \[[^`]*`' | head -1 | tr -d '`')
+sp_sum=$(printf '%s\n' "$sp_text" | grep -o '`spec-tokens: <N> unwaived[^`]*`' | head -1 | tr -d '`')
 if [ -z "$sp_row" ] || [ -z "$sp_sum" ]; then
-  echo "arm FAIL  SD8 AC2 the overlay $sp_overlay quotes no row span or no summary span"; fail=$((fail+1))
+  echo "arm FAIL  SD8 AC2 the overlay unit $sp_tag of $sp_overlay quotes no row span or no summary span"; fail=$((fail+1))
 else
   d=$base/scope
   write_handoff_spec "$d" "$sc_spec" TOOL-tOne-7 OPEN '## 7. Gates' '' '`imaginary leg`.'

@@ -8,7 +8,8 @@ fence, `<!-- microformats -->` to `<!-- /microformats -->`, whose `agent` and `r
 `handoff.py agents` fills (TOOL-aOrientedCast-20): each marker a whole line and the last definition
 of a head winning, as the hooks kit's format guard reads the fence (TOOL-aOrientedCast-25). Its
 `extract_prompt_marker` reads an `Agent` prompt's marker line as the hooks kit's spawn guard does.
-`render_role` is the one composition of a role with its house overlay, and `render_charter_blocks`
+`render_role` is the one composition of a role with the repository's own rules for it, the overlay's
+level-5 units selecting it, which `read_role_units` reads (TOOL-dBoundRoles-19), and `render_charter_blocks`
 the one composition of the charter text a role carries: every consumer that hands a role to an agent
 calls both, so a role reaches an agent the same way by every route. `render_static_block` composes the
 two into the agent file's body, the block R5 measures against the role's `budget`, and
@@ -2094,22 +2095,75 @@ def resolve_role_model(slot, harness, root, kit_dir=None):
 
 
 def render_role(kit_dir, name, memory_root, gates=()):
-    """The role's base body with `{{MEMORY_ROOT}}` substituted, then its house overlay when non-empty, then
-    its `## Never`, `## Ceiling` and `## Return` sections, `render_role_fields`' of its front matter and
-    the gate legs `gates` granted it (TOOL-dBoundRoles-2 S6), so every route closes the role alike."""
-    kit = pathlib.Path(kit_dir)
+    """The role's base body with `{{MEMORY_ROOT}}` substituted, then the repository's own rules for it, the
+    overlay's level-5 units selecting `role.<name>` at HEAD of the repository holding `kit_dir`
+    (`read_role_units`), between the playbook render's marked pair `<!-- gov:repo -->` and
+    `<!-- /gov:repo -->` (TOOL-dBoundRoles-19 S3), then its `## Never`, `## Ceiling` and `## Return`
+    sections, `render_role_fields`' of its front matter and the gate legs `gates` granted it
+    (TOOL-dBoundRoles-2 S6), so every route closes the role alike. A house text file under the kit is
+    read by no render: the upgrade step `HOUSE_STEP` moves it into the overlay."""
+    kit = pathlib.Path(kit_dir).absolute()
     path = kit / "agents" / (name + ".agent.md")
     keys, body = parse_front_matter(path.as_posix(), load_text(path))
-    overlay_path = kit / "house" / (name + ".md")
-    overlay = load_text(overlay_path).strip("\n") if overlay_path.is_file() else ""
-    for src, rule, text in ((path, "R5", body), (overlay_path, "R10", overlay)):
+    for token in TOKEN_RE.findall(body):
+        if token != MEMORY_ROOT_TOKEN:
+            raise RolesError("%s: R5 — carries the render token %s; only %s renders"
+                             % (path.as_posix(), token, MEMORY_ROOT_TOKEN))
+    root = next((d for d in (kit, *kit.parents) if (d / ".git").exists()), kit)
+    units = read_role_units(root, kit, name)
+    for unit, text in units:
         for token in TOKEN_RE.findall(text):
             if token != MEMORY_ROOT_TOKEN:
-                raise RolesError("%s: %s — carries the render token %s; only %s renders"
-                                 % (src.as_posix(), rule, token, MEMORY_ROOT_TOKEN))
-    out = body + ("\n\n## House rules\n\n" + overlay if overlay.strip() else "")
+                raise RolesError("%s#%s: R10 — carries the render token %s; only %s renders"
+                                 % (OVERLAY_FILE, unit.tag, token, MEMORY_ROOT_TOKEN))
+    out = body
+    if units:
+        import render_playbook  # the playbook kit, on the path `read_role_units` put it on
+        out += "\n\n" + "\n".join([render_playbook.REPO_OPEN, "\n\n".join(t for _u, t in units),
+                                   render_playbook.REPO_CLOSE])
     out += "\n\n" + render_role_fields(keys, gates)
     return out.replace(MEMORY_ROOT_TOKEN, memory_root) + "\n"
+
+
+def read_role_units(root, kit_dir, slot=None):
+    """`((unit, text), ...)`, the overlay's level-5 units that select a `role.` tag, `role.<slot>` alone where
+    `slot` is given, each with its rendered text, CRLF folded and its edge newlines cut: a repository's own
+    rules for a role (TOOL-dBoundRoles-19 S3, S4). They are read at HEAD of the repository at `root` through
+    the playbook kit's `render_playbook.read_repo_units`, which reads `overlay.read_overlay` and keeps the
+    units whose `trigger` holds, and rendered by `instruction_units.render_unit`, in overlay order. The rows
+    at HEAD are looked at first, so a tree whose overlay holds no such row reads no sibling kit and gets ().
+    A refused read or render, or no playbook kit to read the rows a role selects, is a RolesError naming it."""
+    import sys
+    text = read_head_text(root, "HEAD", OVERLAY_FILE)
+    want = (ROLE_TAG + slot) if slot else None
+
+    def test_scope(scope):
+        return isinstance(scope, (list, tuple)) and any(
+            isinstance(s, str) and (s == want if want else s.startswith(ROLE_TAG)) for s in scope)
+
+    try:
+        rows = (tomllib.loads(text).get("unit") if text else None) or []
+    except tomllib.TOMLDecodeError:
+        rows = None   # the overlay reader below names the fault
+    if isinstance(rows, list) and not any(isinstance(r, dict) and r.get("level") == ROLE_UNIT_LEVEL
+                                          and test_scope(r.get("scope")) for r in rows):
+        return ()
+    try:
+        kit = str(resolve_kit_dir("playbook", "render_playbook.py", kit_dir))
+    except LookupError as exc:
+        raise RolesError("%s: holds a level-%d unit selecting a role, and no playbook kit reads it: %s"
+                         % (OVERLAY_FILE, ROLE_UNIT_LEVEL, exc)) from None
+    if kit not in sys.path:
+        sys.path.insert(0, kit)
+    import render_playbook  # the playbook kit's renderer, found above
+    try:
+        units = render_playbook.read_repo_units(pathlib.Path(root))
+        import overlay
+        reader = overlay.derive_policy_reader(root)
+        return tuple((u, overlay.iu.render_unit(u, reader, root).replace("\r\n", "\n").strip("\n"))
+                     for u in units if u.level == ROLE_UNIT_LEVEL and test_scope(u.scope))
+    except (render_playbook.Refusal, ValueError) as exc:   # the read's refusal, a UnitRowError, OverlayRefused
+        raise RolesError("%s: the overlay's role units are refused: %s" % (OVERLAY_FILE, exc)) from None
 
 
 def render_static_block(kit_dir, slot, role, memory_root, charter, notes, gates=(), missing=(), rows=None,
@@ -2390,6 +2444,11 @@ def resolve_cited_paths(text, kit_dir, target_root, workflows):
 #: The repository's overlay, whose `[[role]]` and `[[workflow]]` rows the playbook kit's `compose` verb reads at
 #: HEAD beside gov's; a repository row's `path` names it, since it has no role file.
 OVERLAY_FILE = ".governance/instructions.toml"
+#: A repository's own rules for a role (TOOL-dBoundRoles-19 S2): the overlay's units at the playbook kit's
+#: ladder level `LEVELS[5]`, `role`, whose `scope` holds the role's tag `role.<slot>`.
+ROLE_UNIT_LEVEL, ROLE_TAG = 5, "role."
+#: The upgrade step that moves a house text file into the overlay, named by the checker's leftover-file note.
+HOUSE_STEP = "roles/house-overlays-to-instructions"
 #: The two row schemas beside this file, in the playbook kit's row grammar (S2): the role kind's, which
 #: check_roles.py's R2 joins to `role-schema.toml` both ways, and the workflow kind's, which R6 joins to its keys.
 ROLE_ROW_SCHEMA, WORKFLOW_ROW_SCHEMA = "role-row-schema.toml", "workflow-schema.toml"

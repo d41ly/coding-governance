@@ -31,16 +31,15 @@ version_from = { file = "roles_lib.py", pattern = "^KIT_ROLES_VERSION = " }
 include = "**"
 role = "engine"
 
-# THE HOUSE OVERLAYS ARE SEEDED, and so is the effort policy beside them (TOOL-aOrientedCast-10). An
-# adopter receives each once and owns it afterwards: it is where that project's own rules and levels
-# for a role live, and `update` never rewrites a seed. EACH IS NAMED, because
-# a LIST include claims literal paths only (the runlog descriptor records the measurement).
+# THE EFFORT POLICY IS SEEDED (TOOL-aOrientedCast-10). An adopter receives it once and owns it
+# afterwards, and `update` never rewrites a seed. It is read by workflow and stage only where no
+# `roles.effort.*` key is set (TOOL-dBoundRoles-16, TOOL-dBoundRoles-21). It is NAMED, because a LIST
+# include claims literal paths only (the runlog descriptor records the measurement). A role's own
+# project rules are no seed: they are level-5 units of `.governance/instructions.toml` selecting the
+# role, and the step `roles/house-overlays-to-instructions` below moved the house text files there
+# (TOOL-dBoundRoles-19).
 [[files]]
-include = ["house/gov-architect.md", "house/gov-builder.md", "house/gov-orienter.md",
-           "house/gov-planner.md", "house/gov-prompt-writer.md", "house/gov-researcher.md",
-           "house/gov-reuse-scout.md", "house/gov-reviewer.md", "house/gov-session.md",
-           "house/gov-skeptic.md", "house/gov-spec-writer.md", "house/gov-synthesizer.md",
-           "house/gov-tester.md", "house/policy.toml"]
+include = ["house/policy.toml"]
 role = "seed"
 
 # THE ADOPTER'S SELF-TEST IS WITHHELD, by claiming the destination (TOOL-aQuenchedHarness-3): its
@@ -96,7 +95,7 @@ means = "no-governing-doc"
 ok = true
 
 # THE CATALOGUE LEG SHIPS (section 8 F2). It grades the shipped role files against the adopter's own
-# governing doc and house overlays, so its subject is the adopter's tree, and a broken overlay reds
+# governing doc and its overlay's role units, so its subject is the adopter's tree, and a broken unit reds
 # on the adopter's bar before a handoff refuses at run time.
 [[gate_leg]]
 tag = "leg.roles.roles-catalogue"
@@ -149,7 +148,7 @@ stage = ["step.test"]
 guard = []
 chunk = "selftests"
 
-# THE OUTPUTS ARE A PROGRAM'S. An agent type is a base role, a house overlay and front matter
+# THE OUTPUTS ARE A PROGRAM'S. An agent type is a base role, the overlay units selecting it and front matter
 # composed by `render_agents.py`, not one template with tokens, so it is declared here and not as a
 # `rendered` row. The unattended kit reads these rows into its generated set, so a pass's re-render
 # is a generated write rather than an undeclared one.
@@ -209,8 +208,9 @@ when = "a unit whose spec is READY"
 # gov-reviewer, and this step gives an adopter that merge. Its up re-keys the house file, the policy
 # file and the overlay, carries the old house texts, removes the two old role files an update left, and
 # runs the target's own render_agents.py, so it needs the target's code and runs attended. `surfaces`
-# names every member the step gate reads as vanished with the two role files. It sits after every other
-# [[upgrade]] row of this file. Once landed this row is frozen: a correction is a new step.
+# names every member the step gate reads as vanished with the two role files. It sits before the house
+# step below, so the old house texts it carries reach gov-reviewer's file before that step moves the file.
+# Once landed this row is frozen: a correction is a new step.
 [[upgrade]]
 id = "roles/reviewers-to-gov-reviewer"
 up = ["python", "{gov}/govkit/steps/reviewer_merge.py", "up", "{target}", "{prefix}"]
@@ -220,3 +220,33 @@ surfaces = ["agent:gov-spec-reviewer", "agent:gov-diff-reviewer",
             "installable:{prefix}/roles/agents/gov-spec-reviewer.agent.md",
             "installable:{prefix}/roles/agents/gov-diff-reviewer.agent.md"]
 needs-target = true
+
+# TOOL-dBoundRoles-19: a role's own project rules move from the seeded house text files `house/<slot>.md`
+# into the overlay, `.governance/instructions.toml`, one level-5 `repo.house.<slot>` unit selecting
+# `role.<slot>` per non-empty file, written through the playbook kit's overlay writer; every house text
+# file is removed, `house/policy.toml` kept. Its down restores the files and the overlay from the
+# before-image. It reads and writes files only, through gov's own overlay module, so it needs no target
+# code. `surfaces` names each house text file the kit seeded, as the two classes the step gate reads it in.
+# Once landed this row is frozen: a correction is a new step.
+[[upgrade]]
+id = "roles/house-overlays-to-instructions"
+up = ["python", "{gov}/govkit/steps/house_overlays_to_instructions.py", "up", "{target}", "{prefix}"]
+down = ["python", "{gov}/govkit/steps/house_overlays_to_instructions.py", "down", "{target}", "{prefix}"]
+witness = ["python", "{gov}/govkit/steps/house_overlays_to_instructions.py", "witness", "{target}", "{prefix}"]
+surfaces = ["file:{prefix}/roles/house/gov-architect.md", "file:{prefix}/roles/house/gov-builder.md",
+            "file:{prefix}/roles/house/gov-orienter.md", "file:{prefix}/roles/house/gov-planner.md",
+            "file:{prefix}/roles/house/gov-prompt-writer.md", "file:{prefix}/roles/house/gov-researcher.md",
+            "file:{prefix}/roles/house/gov-reuse-scout.md", "file:{prefix}/roles/house/gov-reviewer.md",
+            "file:{prefix}/roles/house/gov-session.md", "file:{prefix}/roles/house/gov-skeptic.md",
+            "file:{prefix}/roles/house/gov-spec-writer.md", "file:{prefix}/roles/house/gov-synthesizer.md",
+            "file:{prefix}/roles/house/gov-tester.md",
+            "installable:{prefix}/roles/house/gov-architect.md", "installable:{prefix}/roles/house/gov-builder.md",
+            "installable:{prefix}/roles/house/gov-orienter.md", "installable:{prefix}/roles/house/gov-planner.md",
+            "installable:{prefix}/roles/house/gov-prompt-writer.md",
+            "installable:{prefix}/roles/house/gov-researcher.md",
+            "installable:{prefix}/roles/house/gov-reuse-scout.md", "installable:{prefix}/roles/house/gov-reviewer.md",
+            "installable:{prefix}/roles/house/gov-session.md", "installable:{prefix}/roles/house/gov-skeptic.md",
+            "installable:{prefix}/roles/house/gov-spec-writer.md",
+            "installable:{prefix}/roles/house/gov-synthesizer.md",
+            "installable:{prefix}/roles/house/gov-tester.md"]
+needs-target = false

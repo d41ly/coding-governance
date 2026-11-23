@@ -437,8 +437,10 @@ def run_mode(mode, kit_dir, tool_root, target_root):
 
 
 def build_fixture(root, roles, policy=FIXTURE_POLICY):
-    """A catalogue in <root>: kit, overlays, policy, work-order template, workflow table, conf, governing doc,
-    stub harnesses."""
+    """A catalogue in <root>: kit, policy, work-order template, workflow table, conf, governing doc, stub
+    harnesses. A role's non-empty second value is written as a leftover house text file `house/<slot>.md`,
+    which no render reads since TOOL-dBoundRoles-19 moved a role's own rules into the overlay; the fixture
+    is no git repository, so it holds no overlay at HEAD."""
     root = pathlib.Path(root)
     kit = root / FIXTURE_ROOT / KIT_DIR.name
     stubs = (root / FIXTURE_HARNESS.format(prefix=FIXTURE_ROOT)).parent
@@ -450,7 +452,8 @@ def build_fixture(root, roles, policy=FIXTURE_POLICY):
         (kit / "agents" / (slot + ".agent.md")).write_text(
             "---\nname: %s\ndescription: d %s\ntools: Read, Write\nmodel: inherit\n%s---\n\n"
             "Body of %s, under {{MEMORY_ROOT}}.\n" % (slot, slot, extra, slot), encoding="utf-8")
-        (kit / "house" / (slot + ".md")).write_text(overlay, encoding="utf-8")
+        if overlay:
+            (kit / "house" / (slot + ".md")).write_text(overlay, encoding="utf-8")
     (kit / "house" / "policy.toml").write_text(policy, encoding="utf-8")
     for stub in ("a.js", "b.js"):
         (stubs / stub).write_text("// stub\n", encoding="utf-8")
@@ -1105,10 +1108,13 @@ def run_selftest():
         check_arm(state, 2, "r-off" not in texts, "an agent: false role rendered a type")
         check_arm(state, 2, index["roles"].get("r-off", {}).get("agent") is False,
                   "the index does not carry r-off with agent false")
-        check_arm(state, 3, "\n## House rules\n\nOverlay line.\n" in texts.get("r-one", ""),
-                  "a one-line overlay did not reach the type")
-        check_arm(state, 3, "## House rules" not in texts.get("r-two", "x## House rules"),
-                  "an empty overlay added a House rules heading")
+        # TOOL-dBoundRoles-19 S3: a role's own rules are the overlay's level-5 units at HEAD, so r-one's leftover
+        # house text file reaches no type, and a tree with no overlay renders no marked part.
+        check_arm(state, 3, "Overlay line." not in texts.get("r-one", "Overlay line.")
+                  and "## House rules" not in texts.get("r-one", "## House rules"),
+                  "a leftover house text file reached the type")
+        check_arm(state, 3, bool(texts) and not any("<!-- gov:repo -->" in t for t in texts.values()),
+                  "a tree with no overlay rendered a marked part")
         carried = ("### Protocols — read the one whose trigger holds\n\n- A pass: `mem/P.md`.\n\n"
                    "### Facts\n\n- **Fact:** one.\n")
         check_arm(state, 4, texts.get("r-one", "").endswith(

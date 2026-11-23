@@ -57,7 +57,9 @@
 # legacy home (arm 33); and the spec writer's handoff handing its spec as content under a `record:` fact line,
 # and `handoff.py facts` cutting it to the same key (arm 34); and the work order rendered per item, its five blocks,
 # its allowance by class, a wrong role, no allowance, an unrouted one, an undeclared item, no loop kit and a missing
-# block refused (arm 35). Every arm is a self-contained block below the prologue, so a
+# block refused (arm 35); and a house text file moved by the house step into the overlay, rendered between the
+# marked pair, and R10 over a level-5 unit selecting no role file and over one carrying a heading (arm 47).
+# Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 25
 # arm 9's writer and lines.
 #
@@ -74,7 +76,7 @@
 # Arm 11 does not compare a refusal's wording, any marker field beyond the whole line, or any
 # micro-format head but `agent` and `returned`. Arm 13 does not check which rule refused: any
 # non-zero exit of the agent render takes the same branch, so it grades the adopter's handling of a
-# refusal, and R10 only as the trigger. Arm 19 does not check any profile the policy file seeds, nor
+# refusal, and R5 only as the trigger. Arm 19 does not check any profile the policy file seeds, nor
 # the resolver's order inside a profile. Arm 9 does not check an agent whose model a profile
 # matches, since the verb reads no profile.
 #
@@ -143,7 +145,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +3 for arm 44 (TOOL-dBoundRoles-59).
 # +2 for arm 45, the missing slot and the refused front matter (TOOL-dBoundRoles-61).
 # +23 for arm 46, twenty-one over the composed fixture and two over the adopter's harness list (TOOL-dBoundRoles-20).
-FLOOR_ASSERTIONS=212
+# +6 for arm 47, five verdicts over the house fixture and its line count (TOOL-dBoundRoles-19).
+FLOOR_ASSERTIONS=218
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -778,11 +781,12 @@ done
 # ---- arm 13: a --scaffold whose agent render refuses stops before the Skill ----------------------
 # TOOL-dRedressedBar-6 S2: the adopter runs the agent render before it writes the Skill, so a refused
 # render exits 1, names the refusal, and leaves the Skill unwritten. The break is arm 3's token idiom
-# appended to a house overlay, which roles_lib.render_role refuses as R10 whatever the overlay held;
+# appended to a role file's body, which roles_lib.render_role refuses as R5 whatever the body held
+# (TOOL-dBoundRoles-19 moved the house text file it was planted in into the overlay);
 # the Skill is unlinked first, so a scaffold that went on to write it is seen.
 build_fixture; check_arm "arm 13 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
 rm -f "$FX/.claude/skills/build/SKILL.md"
-printf '{{UNKNOWN_TOKEN}}\n' >> "$FX/$KREL/house/gov-builder.md"
+printf '{{UNKNOWN_TOKEN}}\n' >> "$FX/$KREL/agents/gov-builder.agent.md"
 out=$(run_adopter --scaffold); rc=$?
 check_arm "arm 13 a refused agent render stops the scaffold, naming the refusal, and writes no Skill" \
    "$([ "$rc" = 1 ] \
@@ -2805,6 +2809,110 @@ with open(sys.argv[1], "w", encoding="utf-8", newline="\n") as fh:
 out=$(run_adopter --check); rc=$?
 check_arm "arm 46 ac8 an index naming a harness the install lacks reds --check, naming the path" \
    "$([ "$rc" != 0 ] && [[ $out == *"$_h46"* ]] && [[ $out == *'drift .claude/roles.json'* ]] && echo 1 || echo 0)"
+
+# ---- arm 47 (TOOL-dBoundRoles-19 AC3 AC4): a role's own rules as the overlay's level-5 units. Its fixture is
+# ---- arm 46's, a repository holding this tree's roles, loop, playbook, memory-tree, policy and lib kits whole,
+# ---- since the render reads the overlay at HEAD through the playbook kit. The `build` pass writes one line to
+# ---- the roles kit's house text file for gov-builder, runs gov's step `roles/house-overlays-to-instructions`
+# ---- up over it and commits (ac3-up); the scaffold then renders gov-builder's type, which must carry the line
+# ---- between `<!-- gov:repo -->` and `<!-- /gov:repo -->` and no `## House rules` heading (ac3-marked). The
+# ---- `plants` pass runs the catalogue checker over that commit, clean and with no R10 line first (ac4-clean),
+# ---- then over a level-5 unit selecting a role no role file defines (ac4-nobody) and over one whose text
+# ---- carries a `## ` line (ac4-heading), each exit 1 naming the unit's tag under R10, reset between. Every tag
+# ---- is spelled from parts. The failing case, owed at the close and not observed by the pass that wrote this:
+# ---- `render_role` reading the house text file again in place of the overlay, which reds ac3-marked. WHAT IT
+# ---- DOES NOT CHECK: a unit whose trigger reads a policy key, or a unit at another level selecting a role.
+A47_PY=$(cat <<'PY'
+import json, os, pathlib, shutil, subprocess, sys, tomllib
+mode = sys.argv[1]
+repo, kit, fx = (pathlib.Path(a).resolve() for a in sys.argv[2:5])
+mr, ch = sys.argv[5], sys.argv[6]
+env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_") and k != "GOV_DEFAULT_BRANCH"}
+env["PYTHONIOENCODING"] = "utf-8"
+tool_rel = kit.parent.relative_to(repo)
+tool = fx / tool_rel
+RK = tool / kit.name
+OV = ".governance/instructions.toml"
+SLOT = "gov-" + "builder"
+LINE = "Name each leg you ran in the return, beside its exit."
+sys.path.insert(0, str(kit))
+import roles_lib
+def git(*a):
+    return subprocess.run(["git", "-c", "user.name=fx", "-c", "user.email=fx@fx", "-c", "commit.gpgsign=false",
+                           "-C", str(fx), *a], env=env, capture_output=True, text=True, encoding="utf-8")
+def run(*a):
+    p = subprocess.run([sys.executable, *a], cwd=str(fx), env=env, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    return p.returncode, (p.stdout + p.stderr).replace("\r", "")
+def say(name, ok, why=""):
+    print("%s %d%s" % (name, 1 if ok else 0, "" if ok else " " + why.replace("\n", " | ")[:1500]))
+def commit(msg):
+    git("add", "-A")
+    return git("commit", "-q", "--no-verify", "-m", msg).returncode == 0
+def read_units():
+    p = fx / OV
+    return tomllib.loads(p.read_text(encoding="utf-8")).get("unit", []) if p.is_file() else []
+def unit_row(tag, scope, text):
+    return ('\n[[unit]]\ntag = "%s"\nlevel = 5\ntype = "adopter-rule"\nscope = ["%s"]\nbudget = "block"\ntext = %s\n'
+            % (tag, scope, json.dumps(text)))
+if mode == "build":
+    for home in ("roles", "loop", "playbook", "memory-tree", "policy", "lib"):
+        if (kit.parent / home).is_dir():
+            shutil.copytree(kit.parent / home, tool / home, ignore=shutil.ignore_patterns("__pycache__"))
+    shutil.copyfile(kit.parent / roles_lib.GATE_MANIFEST, tool / roles_lib.GATE_MANIFEST)
+    for role in roles_lib.load_roles(kit).values():   # each enforcer a never entry names, as arm 46 copies it
+        for _limit, enforcer in roles_lib.parse_never_entries(role["keys"].get("never", "")):
+            first = (enforcer.split() or [""])[0]
+            path = roles_lib.resolve_enforcer_path(kit.parent, first) if roles_lib.ENFORCER_SCRIPT_RE.match(first) else None
+            dest = tool / path.relative_to(kit.parent) if path is not None else None
+            if dest is not None and not dest.exists():
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(path, dest)
+    (fx / ch).parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(repo / ch, fx / ch)
+    (fx / mr / "project").mkdir(parents=True, exist_ok=True)
+    (fx / ".memory-tree.conf").write_text("MEMORY_ROOT=%s\nCHARTER=%s\n" % (mr, ch), encoding="utf-8")
+    (RK / "house" / (SLOT + ".md")).write_text(LINE + "\n", encoding="utf-8", newline="\n")
+    git("init", "-q"); git("symbolic-ref", "HEAD", "refs/heads/main")
+    base = commit("base, a house text file for %s" % SLOT)
+    step = roles_lib.resolve_kit_dir("govkit", "govkit.py", kit) / "steps" / "house_overlays_to_instructions.py"
+    rc, out = run("-I", str(step), "up", str(fx), tool_rel.as_posix())
+    held = [u for u in read_units() if u.get("tag") == "repo." + "house." + SLOT and u.get("level") == 5
+            and u.get("scope") == ["role." + SLOT] and u.get("text") == LINE]
+    say("ac3-up", base and rc == 0 and len(held) == 1 and not (RK / "house" / (SLOT + ".md")).exists()
+        and commit("the house step's up"), out)
+elif mode == "marked":
+    p = fx / ".claude" / "agents" / (SLOT + ".md")
+    text = p.read_text(encoding="utf-8").replace("\r", "") if p.is_file() else ""
+    o, i, c = text.find("<!-- gov:repo -->"), text.find(LINE), text.find("<!-- /gov:repo -->")
+    say("ac3-marked", sys.argv[7] == "0" and 0 <= o < i < c and "## House rules" not in text,
+        "scaffold exit %s · %s" % (sys.argv[7], text[-1500:]))
+else:
+    up = git("rev-parse", "HEAD").stdout.strip()
+    rc, out = run(str(RK / "check_roles.py"), "--root", str(fx))
+    say("ac4-clean", rc == 0 and " R10 " not in out, out)
+    for name, tag, scope, text in (("ac4-nobody", "repo." + "fx-nobody", "role." + "gov-" + "nobody", "A rule for no role."),
+                                   ("ac4-heading", "repo." + "fx-heading", "role." + SLOT, "## A heading\nKeep it.")):
+        with open(fx / OV, "a", encoding="utf-8", newline="\n") as fh:
+            fh.write(unit_row(tag, scope, text))
+        ok = commit(name)
+        rc, out = run(str(RK / "check_roles.py"), "--root", str(fx))
+        say(name, ok and rc == 1 and any(" R10 " in ln and tag in ln for ln in out.splitlines()), out)
+        git("reset", "-q", "--hard", up)
+PY
+)
+_a47=("$TMP_ROOT/fx47" "$MR" "$CH")
+A47=$("$PY" -B -c "$A47_PY" build "$REPO" "$HERE" "${_a47[@]}")
+_o47=$(cd "$TMP_ROOT/fx47" && bash "$KREL/adopt-roles.sh" --scaffold 2>&1); _rc47=$?
+A47+=$'\n'$("$PY" -B -c "$A47_PY" marked "$REPO" "$HERE" "${_a47[@]}" "$_rc47")
+A47+=$'\n'$("$PY" -B -c "$A47_PY" plants "$REPO" "$HERE" "${_a47[@]}"); A47=${A47//$'\r'/}
+_l47=(); mapfile -t _l47 <<< "$A47"
+check_arm "arm 47 the house fixture printed its five verdict lines" "$([ "${#_l47[@]}" = 5 ] && echo 1 || echo 0)"
+for _ln in "${_l47[@]}"; do
+  _w=${_ln#* }
+  check_arm "arm 47 ${_ln%% *} (TOOL-dBoundRoles-19)" "${_w%% *}"
+  [ "${_w%% *}" = 1 ] || printf '    %s\n' "$_ln"
+done
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

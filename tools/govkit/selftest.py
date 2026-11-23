@@ -3031,8 +3031,9 @@ def check_roles_default() -> None:
     """TOOL-aOrientedCast-8 S10, AC2, over gov's OWN registry and descriptors: `roles` is a default
     and the default closes over it; without its card writer it is an unsatisfied requirement; an aged
     registry lacking it makes `update` gain it and an unmoved one gains nothing; and the descriptor
-    claims every house overlay as `seed`, the Skill as `rendered` with a re-render, and every test
-    file as `project-owned`. A module-level function, so a slice runs it without `main()`."""
+    claims its effort policy and no house text file as `seed` (TOOL-dBoundRoles-19 S5), the Skill as
+    `rendered` with a re-render, and every test file as `project-owned`. A module-level function, so a
+    slice runs it without `main()`."""
     gk = govkit_module()
     rep = gk.Report()
     reg = gk.load_registry(GOV_ROOT)
@@ -3146,9 +3147,15 @@ def check_roles_default() -> None:
         return next((r.get("role") for r in rules if r.get("include") == "**"), None)
 
     kit = KIT_DIRS["roles"]
-    house = sorted("house/" + p.name for p in (kit / "house").glob("*.md"))
-    check("OC8 AC2 every house overlay is a seed row", house and all(
-        derive_listed_role(h) == "seed" for h in house), str({h: derive_listed_role(h) for h in house}))
+    # TOOL-dBoundRoles-19 S5: a role's own rules are the overlay's level-5 units, so the kit seeds its effort
+    # policy and no house text file, and holds none to seed.
+    seeds = [x for r in rules if r.get("role") == "seed"
+             for x in (r["include"] if isinstance(r.get("include"), list) else [r.get("include")])]
+    held = sorted("house/" + p.name for p in (kit / "house").glob("*.md"))
+    check("OC8 AC2 the roles descriptor seeds house/policy.toml and no house text file, and the kit holds none",
+          "house/policy.toml" in seeds and derive_listed_role("house/policy.toml") == "seed"
+          and not [x for x in seeds if str(x).startswith("house/") and str(x).endswith(".md")] and not held,
+          "seeds %s, house text files held %s" % (seeds, held))
     _skill = [r for r in rules if r.get("include") == ["SKILL.template.md"]]
     check("OC8 AC2 the Skill row is rendered, and the descriptor declares a [[regenerate]]",
           len(_skill) == 1 and _skill[0].get("role") == "rendered" and bool(d.get("regenerate")),
@@ -3168,36 +3175,12 @@ def load_kit_roster(kit: pathlib.Path) -> dict:
     return rlib.load_roles(kit)
 
 
-def derive_roles_expected(kit: pathlib.Path, descriptor: dict) -> tuple[set, set]:
-    """TOOL-dBoundRoles-37 S1: the roster a roles install is graded against, DERIVED, never typed.
-    `agents` is the slot of every `agents/*.agent.md` of `kit` whose front matter does not set
-    `agent: false`, an absent key counting true, read through `load_kit_roster`. `overlays` is every
-    `house/*.md` include of `descriptor`'s `seed` rows, `descriptor` a parsed roles `kit.toml`. Runs no
-    case."""
-    agents = {s for s, r in load_kit_roster(kit).items() if r["keys"].get("agent", "true") != "false"}
-    seeds = [x for f in descriptor.get("files", []) if f.get("role") == "seed"
-             for x in (f["include"] if isinstance(f["include"], list) else [f["include"]])]
-    overlays = {x for x in seeds if x.startswith("house/") and x.endswith(".md") and x.count("/") == 1}
-    return agents, overlays
-
-
-def derive_overlay_expected(kit: pathlib.Path) -> set:
-    """TOOL-dBoundRoles-54 S1: the house overlays the roles kit at `kit` owes, DERIVED from its roster
-    and never from the seed rule they are compared with: `house/<slot>.md` for EVERY slot
-    `load_kit_roster` reads, `agent: false` included, since `gov-session` is no agent and has one.
-    Runs no case."""
-    return {"house/%s.md" % s for s in load_kit_roster(kit)}
-
-
-def derive_overlay_drift(expected: set, rows: list[dict]) -> tuple[list, list]:
-    """TOOL-dBoundRoles-54 S2: `expected`, `derive_overlay_expected`'s set, compared both ways with the
-    `house/*.md` sources of the `roles` rows of `rows`, `derive_seed_expected`'s. A row's `src` is gov's
-    repo path `<home>/house/<file>`, so its `house/<file>` tail is what is compared. Returns `(slots,
-    files)`: the slot of each expected overlay no roles seed row sources, and each seeded overlay no
-    slot owns, both sorted. Runs no case."""
-    tails = ("/".join(str(r["src"]).replace("\\", "/").split("/")[-2:]) for r in rows if r["kit"] == "roles")
-    seeded = {x for x in tails if _re.fullmatch(r"house/[^/]+\.md", x)}
-    return (sorted(o[len("house/"):-len(".md")] for o in expected - seeded), sorted(seeded - expected))
+def derive_roles_expected(kit: pathlib.Path) -> set:
+    """TOOL-dBoundRoles-37 S1: the roster a roles install is graded against, DERIVED, never typed: the
+    slot of every `agents/*.agent.md` of `kit` whose front matter does not set `agent: false`, an absent
+    key counting true, read through `load_kit_roster`. The house overlays it also derived left the seed
+    list with TOOL-dBoundRoles-19, which moved a role's own rules into the overlay. Runs no case."""
+    return {s for s, r in load_kit_roster(kit).items() if r["keys"].get("agent", "true") != "false"}
 
 
 def derive_seed_expected(target: pathlib.Path, descs: dict, selection: list[str]) -> list[dict]:
@@ -3291,7 +3274,7 @@ def check_stop_replay(t: pathlib.Path) -> None:
 
 def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = False) -> None:
     """TOOL-aOrientedCast-8 S10, AC4 and AC6: a DEFAULT apply into a scratch target renders the roles
-    kit — the role index, one agent type per agent role, the seeded house overlays and the `/build`
+    kit — the role index, one agent type per agent role, no house text file and the `/build`
     Skill — its `--check` reads fresh, and the target's own wiring checker reads `ok` for roles, then
     `UNWIRED` once the index is gone. Both roster counts are the source kit's, read rather than typed
     (TOOL-dWitnessedBar-23 S6). The target holds a governing doc at the path the memory-tree seed writes
@@ -3363,17 +3346,22 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
     # TOOL-dWitnessedBar-23 S6, TOOL-dBoundRoles-37 S2: the roster is DERIVED from the source kit by
     # `derive_roles_expected`, never typed beside it. Both wants are read from the gov tree and both
     # gots from the target, so the install is graded against what it was handed.
-    import tomllib  # noqa: PLC0415
-    agents_want, overlays_want = derive_roles_expected(KIT_DIRS["roles"], tomllib.loads(
-        (KIT_DIRS["roles"] / "kit.toml").read_text(encoding="utf-8")))
+    agents_want = derive_roles_expected(KIT_DIRS["roles"])
     check("OC8 AC4 ...renders one agent type per agent role (%d)" % len(agents_want), agents_got == agents_want,
           "rendered %s, agent roles %s, differing %s" % (sorted(agents_got), sorted(agents_want),
                                                          sorted(agents_got ^ agents_want)))
-    overlays_got = {"house/" + p.name for p in (kit / "house").glob("*.md")}
-    check("OC8 AC4 ...seeds one house overlay per seed-list entry (%d)" % len(overlays_want),
-          bool(overlays_want) and overlays_got == overlays_want,
-          "seeded %s, seed list %s, differing %s" % (sorted(overlays_got), sorted(overlays_want),
-                                                     sorted(overlays_got ^ overlays_want)))
+    # TOOL-dBoundRoles-19 S5: a role's own rules are the overlay's level-5 units, so a default install seeds
+    # no house text file, renders no `## House rules` into a type, and already reads as the house step's
+    # after-state by that step's own witness.
+    house_got = sorted(p.name for p in (kit / "house").glob("*.md"))
+    headed = sorted(s for s in agents_got
+                    if "\n## House rules\n" in (t / ".claude" / "agents" / (s + ".md")).read_text(encoding="utf-8"))
+    hw = subprocess.run([sys.executable, "-I", str(HERE / "steps" / "house_overlays_to_instructions.py"), "witness",
+                         str(t), PFX], capture_output=True, text=True, encoding="utf-8", errors="replace")
+    check("OC8 AC4 ...seeds no house text file, renders no House rules heading, and the house step's witness "
+          "reads it applied", bool(agents_got) and not house_got and not headed and hw.returncode == 0,
+          "house text files %s, types with the heading %s, witness exit %d: %s"
+          % (house_got, headed, hw.returncode, hw.stdout + hw.stderr))
     check("OC8 AC4 ...and renders the /build Skill", (t / ".claude" / "skills" / "build" / "SKILL.md").is_file(),
           "absent")
     ck = subprocess.run([govkit_module().resolve_bash(), str(kit / "adopt-roles.sh"), "--check"], cwd=str(t),
@@ -4474,6 +4462,92 @@ def check_reviewer_merge(tmp: pathlib.Path) -> None:
           up.returncode == 0 and "Read each changed caller." in (house_dir / (merged + ".md")).read_text(encoding="utf-8")
           and stems[1] in (house_dir / (merged + ".md")).read_text(encoding="utf-8")
           and not (house_dir / (stems[1] + ".md")).exists(), up.stdout + up.stderr)
+
+
+def check_house_step(tmp: pathlib.Path) -> None:
+    """TOOL-dBoundRoles-19 AC1 and AC2, the `house-step-` cases — `steps/house_overlays_to_instructions.py`'s
+    up, down and witness argvs over scratch targets, each run under `-I` as the runner runs it. A target holds
+    a copy of gov's roles kit under the install prefix and no overlay; its house text file for gov-builder
+    holds one line and every other roster slot's is empty, the slots read through `load_kit_roster`. Then
+    the up's two refusals each leave every file byte-identical: a body over the `block` budget, naming the
+    file, and a tag the overlay already holds. The failing case, owed at the close: an up that skips the
+    before-image, which reds the down's restore. WHAT IT DOES NOT CHECK: the render of a moved unit, which
+    the roles adopter's arm 47 reads, or a re-run over a killed up."""
+    import tomllib  # noqa: PLC0415
+    step_py = HERE / "steps" / "house_overlays_to_instructions.py"
+    rk_name = KIT_DIRS["roles"].name  # the kit's home, read from its own location
+    slot = "gov-" + "builder"
+    tag = "repo." + "house." + slot
+    line = "Run the checker before you return."
+    ov_rel = pathlib.PurePosixPath(".governance", "instructions.toml").as_posix()
+
+    def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t), PFX], capture_output=True,
+                              text=True, encoding="utf-8", errors="replace")
+
+    def read_tree(t: pathlib.Path) -> dict:
+        return {p.relative_to(t).as_posix(): p.read_bytes() for p in t.rglob("*") if p.is_file()
+                and not {".git", "__pycache__"} & set(p.relative_to(t).parts)}
+
+    def build_house_target(name: str, bodies: dict | None = None, files: dict | None = None) -> pathlib.Path:
+        t = build_target(tmp / name, None, files={".gitignore": "__pycache__/\n", **(files or {})})
+        shutil.copytree(KIT_DIRS["roles"], t / PFX / rk_name, ignore=shutil.ignore_patterns("__pycache__"))
+        house = t / PFX / rk_name / "house"
+        for s in load_kit_roster(KIT_DIRS["roles"]):
+            body = (bodies or {}).get(s, line + "\n" if s == slot else "")
+            (house / (s + ".md")).write_text(body, encoding="utf-8", newline="\n")
+        settle(t, "a roles install whose house text files hold one line")
+        return t
+
+    # ---- AC1: the up moves the one line into one level-5 unit, removes every house text file, and holds.
+    t = build_house_target("hs-ac1")
+    before = read_tree(t)
+    w0 = run_step("witness", t)
+    up = run_step("up", t)
+    units = tomllib.loads((t / ov_rel).read_text(encoding="utf-8")).get("unit", []) if (t / ov_rel).is_file() else []
+    left = sorted(p.name for p in (t / PFX / rk_name / "house").glob("*.md"))
+    w1 = run_step("witness", t)
+    check("house-step-AC1 LIVENESS the witness exits 1 over the house text files before the up",
+          w0.returncode == 1, w0.stdout + w0.stderr)
+    check("house-step-AC1 the up writes exactly one unit, %s at level 5 selecting role.%s, its text the line"
+          % (tag, slot), up.returncode == 0 and len(units) == 1 and units[0].get("tag") == tag
+          and units[0].get("level") == 5 and units[0].get("scope") == ["role." + slot]
+          and units[0].get("text") == line and units[0].get("budget") == "block", up.stdout + up.stderr + str(units))
+    check("house-step-AC1 ...no house text file remains, house/policy.toml stays, and the witness exits 0",
+          not left and (t / PFX / rk_name / "house" / "policy.toml").is_file() and w1.returncode == 0,
+          "left %s · %s" % (left, w1.stdout + w1.stderr))
+    # The witness reads the unit's tag, never its text (the main loop's decision of round two): a unit the
+    # adopter reworded since the up still holds, one re-tagged does not. The overlay is restored after.
+    ov_bytes = (t / ov_rel).read_bytes()
+    (t / ov_rel).write_bytes(ov_bytes.replace(line.encode("utf-8"), b"Reworded since the up."))
+    w_text = run_step("witness", t)
+    (t / ov_rel).write_bytes(ov_bytes.replace(tag.encode("utf-8"), ("repo." + "renamed." + slot).encode("utf-8")))
+    w_tag = run_step("witness", t)
+    (t / ov_rel).write_bytes(ov_bytes)
+    check("house-step-AC1 ...the witness holds over a unit reworded since the up, and exits 1 over one re-tagged",
+          w_text.returncode == 0 and w_tag.returncode == 1 and tag in w_tag.stdout,
+          w_text.stdout + w_text.stderr + " · " + w_tag.stdout + w_tag.stderr)
+    # ---- AC2: the down restores every house text file and the absent overlay, and the witness no longer holds.
+    down = run_step("down", t)
+    w2 = run_step("witness", t)
+    after = read_tree(t)
+    check("house-step-AC2 the down restores every house text file and the overlay byte-identical to the fixture",
+          down.returncode == 0 and after == before,
+          down.stdout + down.stderr + " differing %s" % sorted(set(after) ^ set(before)
+                                                              | {k for k in after if after.get(k) != before.get(k)}))
+    check("house-step-AC2 ...and the witness exits 1", w2.returncode == 1, w2.stdout + w2.stderr)
+    # ---- The up's refusals write nothing: a body over the block budget, and a tag the overlay holds.
+    t = build_house_target("hs-big", bodies={"gov-" + "tester": "x" * 601 + "\n"})
+    before = read_tree(t)
+    up = run_step("up", t)
+    check("house-step a body over 600 bytes refuses the up, exit 1, naming the file, with no byte written",
+          up.returncode == 1 and "gov-tester.md" in up.stderr and read_tree(t) == before, up.stdout + up.stderr)
+    held = '[[unit]]\ntag = "%s"\nlevel = 5\ntype = "adopter-rule"\nscope = ["role.%s"]\nbudget = "block"\ntext = "held"\n'
+    t = build_house_target("hs-held", files={ov_rel: held % (tag, slot)})
+    before = read_tree(t)
+    up = run_step("up", t)
+    check("house-step a tag the overlay already holds refuses the up, exit 2, both files byte-identical",
+          up.returncode == 2 and tag in up.stderr and read_tree(t) == before, up.stdout + up.stderr)
 
 
 def check_kickoff_facts_step() -> None:
@@ -6925,6 +6999,7 @@ def main() -> int:
         check_succession(tmp / "dsc")
         check_fanout_step(tmp / "dfs")
         check_reviewer_merge(tmp / "drm")
+        check_house_step(tmp / "dhs")
         check_kickoff_facts_step()
         check_review_rounds_step(tmp / "drr")
         check_inherited_red_step(tmp / "dir")
@@ -10826,33 +10901,6 @@ user_skills = "/tmp/gk-fake-skills"
                   _seed_got == len(_seed_rows) and marks.get("ORDER|project-owned") == 34,
                   "previewed %d seed row(s), the plan model derives %d, by kit %s; marks %s"
                   % (_seed_got, len(_seed_rows), _seed_by_kit, marks))
-            # TOOL-dBoundRoles-49 S3, its expected side re-derived by TOOL-dBoundRoles-54 S1 and S2,
-            # its empty refusal and its end set by TOOL-dBoundRoles-55. The population it reads: the
-            # roster of the roles kit at `KIT_DIRS["roles"]`, as `house/<slot>.md` for every slot,
-            # read independently of the seed rule, compared both ways with the `house/*.md` sources
-            # of the derived roles seed rows. It reds the three breaks of unit 54's table: an include
-            # removed while its file stays, and a role added with no overlay seeded, naming the slot;
-            # an overlay seeded for no role, naming the file. It refuses an empty expected set by the
-            # kit path it loaded, before it compares anything: a roster with no slot is a broken
-            # loader or a wrong path, never a passing check. It does not check tracked house files
-            # that no role owns and no include seeds: such a file seeds and previews nothing. When
-            # the roles kit stops seeding `house/*.md`, unit 19 deletes this check and
-            # `derive_overlay_expected` in the pass that moves the house files out of the kit.
-            _kit55 = KIT_DIRS["roles"]
-            _ov54 = derive_overlay_expected(_kit55)
-            check("...and the roles roster the overlay compare reads holds a slot", bool(_ov54),
-                  "no roster slot loaded from %s: a broken loader or a wrong path, so nothing is compared"
-                  % _kit55)
-            if _ov54:
-                _slots54, _files54 = derive_overlay_drift(_ov54, _seed_rows)
-                _roles_src54 = sorted(str(_sr["src"]) for _sr in _seed_rows if _sr["kit"] == "roles")
-                check("...and every roster slot's house overlay is the source of a previewed roles seed row",
-                      not _slots54,
-                      "slots whose overlay is not seeded %s; roster overlays %s, roles seed sources %s"
-                      % (_slots54, sorted(_ov54), _roles_src54))
-                check("...and every seeded roles house overlay belongs to a roster slot", not _files54,
-                      "seeded overlays no slot owns %s; roster overlays %s, roles seed sources %s"
-                      % (_files54, sorted(_ov54), _roles_src54))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
             check("...and NO project-owned row is previewed as a write",

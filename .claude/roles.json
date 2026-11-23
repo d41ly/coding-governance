@@ -267,7 +267,7 @@
         "spec tokens (a spec's own names resolve)"
       ],
       "layer": "layer.roles",
-      "role-sha": "cbcb39d1d690",
+      "role-sha": "5ce6294ca2bd",
       "shapes": [
         "per-unit"
       ],

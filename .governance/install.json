@@ -1379,70 +1379,16 @@
       "source": "tools/roles/workflows.toml"
     },
     {
-      "path": "tools/roles/house/gov-builder.md",
-      "kit": "roles",
-      "role": "seed",
-      "source": "tools/roles/house/gov-builder.md"
-    },
-    {
       "path": "tools/roles/house/gov-diff-reviewer.md",
       "kit": "roles",
       "role": "seed",
       "source": "tools/roles/house/gov-diff-reviewer.md"
     },
     {
-      "path": "tools/roles/house/gov-orienter.md",
-      "kit": "roles",
-      "role": "seed",
-      "source": "tools/roles/house/gov-orienter.md"
-    },
-    {
-      "path": "tools/roles/house/gov-researcher.md",
-      "kit": "roles",
-      "role": "seed",
-      "source": "tools/roles/house/gov-researcher.md"
-    },
-    {
-      "path": "tools/roles/house/gov-reuse-scout.md",
-      "kit": "roles",
-      "role": "seed",
-      "source": "tools/roles/house/gov-reuse-scout.md"
-    },
-    {
-      "path": "tools/roles/house/gov-session.md",
-      "kit": "roles",
-      "role": "seed",
-      "source": "tools/roles/house/gov-session.md"
-    },
-    {
-      "path": "tools/roles/house/gov-skeptic.md",
-      "kit": "roles",
-      "role": "seed",
-      "source": "tools/roles/house/gov-skeptic.md"
-    },
-    {
       "path": "tools/roles/house/gov-spec-reviewer.md",
       "kit": "roles",
       "role": "seed",
       "source": "tools/roles/house/gov-spec-reviewer.md"
-    },
-    {
-      "path": "tools/roles/house/gov-spec-writer.md",
-      "kit": "roles",
-      "role": "seed",
-      "source": "tools/roles/house/gov-spec-writer.md"
-    },
-    {
-      "path": "tools/roles/house/gov-synthesizer.md",
-      "kit": "roles",
-      "role": "seed",
-      "source": "tools/roles/house/gov-synthesizer.md"
-    },
-    {
-      "path": "tools/roles/house/gov-tester.md",
-      "kit": "roles",
-      "role": "seed",
-      "source": "tools/roles/house/gov-tester.md"
     },
     {
       "path": "tools/roles/house/policy.toml",
@@ -2013,6 +1959,11 @@
       "introduced": null,
       "state": "applied",
       "via": "witness"
+    },
+    {
+      "id": "roles/house-overlays-to-instructions",
+      "introduced": null,
+      "state": "applied"
     }
   ]
 }

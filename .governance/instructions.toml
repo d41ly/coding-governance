@@ -420,3 +420,11 @@ trigger = "always"
 budget = "block"
 text = "Every composition is checked to terminate by `tools/loop/termination.py`, its own leg `loop termination`, and the owner gates and review breakpoints of a build are one list read by `tools/loop/breakpoints.py` (`help/loop.md`)."
 enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.house.gov-spec-writer"
+level = 5
+type = "adopter-rule"
+scope = ["role.gov-spec-writer"]
+budget = "block"
+text = "A `check-spec-tokens.py --spec` run that finds a miss exits 1. It prints one\n`spec-tokens: <spec path> [<kind>]` row per miss, naming its token, then one\n`spec-tokens: <N> unwaived hit(s)` summary line.\nA `spec-tokens: REFUSING` line, an exit 2, or an exit 1 with no summary line is the checker\nrefusing, not a hit: name it in your return."

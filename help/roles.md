@@ -216,8 +216,24 @@ refuses the render, naming the key.
   checked. It does not check the agents a harness spawns itself, the `committer` and `probe`
   stages, which workflow a call to a harness serving two runs, a default subagent model or an
   effort ceiling in your settings, or a role index edited by shell.
-- **Change how a role behaves:** edit `<prefix>/roles/house/<role>.md`, never the file under
-  `agents/`. Your overlay is appended under `## House rules`, and updates never overwrite it.
+- **Change how a role behaves:** add a level-5 unit selecting the role to your overlay,
+  `.governance/instructions.toml`, never an edit of the file under `agents/`. Write it through the
+  overlay's door, `instructions_edit.py add --manifest overlay`, as one row typed `adopter-rule` at
+  `level = 5`, with `scope = ["role.<role>"]`, `budget = "block"` (600 bytes of text) and your rules in
+  `text`. Commit it, then re-run `--scaffold`: the render reads the overlay at `HEAD`, and places the
+  unit's text after the role's body between `<!-- gov:repo -->` and `<!-- /gov:repo -->`. Updates
+  never overwrite your overlay. The text takes no `#` or `##` heading, no token but `{{MEMORY_ROOT}}`
+  and no protocol's file name, and a unit selecting a role no role file defines is refused: the
+  catalogue checker names each by its tag under R10.
+- **Your house files moved into the overlay.** The rules a role once took from a seeded house file
+  under the kit's `house/` folder are units of your overlay now. The upgrade step
+  `roles/house-overlays-to-instructions` moves each house file that holds text into one unit tagged
+  `repo.house.<role>` at your next `govkit update`, removes every house file, and keeps
+  `house/policy.toml`. It stops, exit 1 with nothing written, on a file over 600 bytes, naming it:
+  shorten it and run the update again. It stops, exit 2, where your overlay already holds that tag.
+  Its down restores the files and the overlay from the before-image under `.governance/steps/`. Until
+  it runs, a house file is read by no render, and the catalogue checker prints one note per file
+  naming the step.
 - **Change a role's effort or model:** set a key in `.governance/policy.toml` and commit it:
   `roles.effort.<role>`, `roles.effort.<workflow>.<stage>` for one harness stage,
   `roles.effort.default` for every role, or `roles.model.<role>.claude-code`. A set key wins over

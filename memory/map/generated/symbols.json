@@ -7178,6 +7178,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "check_house_step",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_hv_line",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -10325,6 +10330,11 @@
     {
       "id": "cmd_down",
       "kind": "function",
+      "file": "tools/govkit/steps/house_overlays_to_instructions.py"
+    },
+    {
+      "id": "cmd_down",
+      "kind": "function",
       "file": "tools/govkit/steps/inherited_red.py"
     },
     {
@@ -10710,6 +10720,11 @@
     {
       "id": "cmd_up",
       "kind": "function",
+      "file": "tools/govkit/steps/house_overlays_to_instructions.py"
+    },
+    {
+      "id": "cmd_up",
+      "kind": "function",
       "file": "tools/govkit/steps/inherited_red.py"
     },
     {
@@ -10766,6 +10781,11 @@
       "id": "cmd_witness",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
+      "file": "tools/govkit/steps/house_overlays_to_instructions.py"
     },
     {
       "id": "cmd_witness",
@@ -12763,6 +12783,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "derive_house_rows",
+      "kind": "function",
+      "file": "tools/govkit/steps/house_overlays_to_instructions.py"
+    },
+    {
       "id": "derive_house_source",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -13501,16 +13526,6 @@
       "id": "derive_overlaps_line",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "derive_overlay_drift",
-      "kind": "function",
-      "file": "tools/govkit/selftest.py"
-    },
-    {
-      "id": "derive_overlay_expected",
-      "kind": "function",
-      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "derive_overlay_text",
@@ -17345,6 +17360,11 @@
     {
       "id": "load_overlay",
       "kind": "function",
+      "file": "tools/govkit/steps/house_overlays_to_instructions.py"
+    },
+    {
+      "id": "load_overlay",
+      "kind": "function",
       "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
@@ -17501,6 +17521,11 @@
       "id": "load_steps",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "load_steps",
+      "kind": "function",
+      "file": "tools/govkit/steps/house_overlays_to_instructions.py"
     },
     {
       "id": "load_steps",
@@ -17811,6 +17836,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/house_overlays_to_instructions.py"
     },
     {
       "id": "main",
@@ -23803,6 +23833,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_house_files",
+      "kind": "function",
+      "file": "tools/govkit/steps/house_overlays_to_instructions.py"
+    },
+    {
       "id": "read_hv_record",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -26006,6 +26041,16 @@
       "id": "read_role_step",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
+    },
+    {
+      "id": "read_role_units",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "read_roles_kit",
+      "kind": "function",
+      "file": "tools/govkit/steps/house_overlays_to_instructions.py"
     },
     {
       "id": "read_roles_kit",

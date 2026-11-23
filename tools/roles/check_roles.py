@@ -23,7 +23,7 @@ the composition they join and prints each composed tag with its `origin`.
 
 The kit directory is this script's own directory and the tool root its parent; `--root` defaults to
 the git toplevel of the working directory. One line per defect, `roles: <path>: <rule> — <what>`,
-then one summary line naming every count it graded and each overlay's bytes. Exit 0 clean, 1 on any
+then one summary line naming every count it graded and each role unit's bytes by its tag. Exit 0 clean, 1 on any
 defect, 2 when the check is unarmed. `--write` renders the README's catalogue region and writes it,
 touching nothing else, then grades as usual. `--print-tag-rows` prints the tag index's rows of the
 text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says; `--print-rows`
@@ -114,8 +114,12 @@ grades nothing: the seed the memory-tree kit's `legacy_ledger.py seed --home` ru
       `cap` are graded after its kind's defaults, and a cap above the limit at the row only where
       the row sets it, since its kind's row is graded once. The summary counts the entries per kind
       and the unit tags resolved
-  R10 a house overlay naming no role, or carrying a `# `/`## ` line, a token other than
-      {{MEMORY_ROOT}}, or the file name of a protocol the charter's Protocols section names
+  R10 a level-5 unit of the overlay at HEAD selecting a `role.` tag, read by `roles_lib.read_role_units`,
+      that selects a role no role file defines, or whose text carries a `# `/`## ` line, a token other
+      than {{MEMORY_ROOT}}, or the file name of a protocol the charter's Protocols section names, each
+      named by its unit tag; and the read refused, or no playbook kit to read it (TOOL-dBoundRoles-19
+      S4). A house text file `house/<role>.md` the kit still holds is read by no render: one
+      `roles: note:` per file names the upgrade step that moves it into the overlay
   R11 the README's catalogue region absent, or different from a fresh render
   R12 a `house/policy.toml` defect, one line per line of `roles_lib.load_policy`'s refusal: the file
       unreadable or not TOML, an absent file being an empty fallback that no defect names, since each
@@ -167,7 +171,7 @@ write it: the MEANING of a body; the truth of an `enforced-by` entry; a `tools:`
 with the CLI; a command harness, which is graded for presence only; and whether the kit of a harness
 the tree does not hold should be installed, which is a `note` here and the wiring check's to report;
 whether a cited rule suits its role; and whether a bare tag exists in every v4.x seed an adopter may
-hold. An overlay's size is printed and never graded: it is the adopter's own text. R13 reads a
+hold. A role unit's size is printed and never graded here: the unit grammar holds it to its budget. R13 reads a
 first word ending in `.js` as a hook by spelling convention alone, never asking whether that script
 exists, is wired or refuses an inline stand-in. A `never` entry's script is graded for presence
 alone and its leg for a name in the manifest: whether that enforcer refuses what the entry names is a
@@ -884,19 +888,32 @@ def check_roles(root, kit_dir, write=False, scenario=None, composed=None):
     for what in idle:
         add_defect(root / lib.OVERLAY_FILE, "R8", what)
 
+    # R10 (TOOL-dBoundRoles-19 S4): the overlay's level-5 units selecting a role, each named by its tag; a house
+    # text file the kit still holds is read by no render, so it is one note naming the step that moves it.
     overlays = {}
-    for p in sorted((kit_dir / "house").glob("*.md")):
-        text = lib.load_text(p)
-        overlays[p.stem] = len(text.encode("utf-8"))
-        if p.stem not in roles:
-            add_defect(p, "R10", "overlay names no role: there is no agents/%s.agent.md" % p.stem)
+    ov_path = root / lib.OVERLAY_FILE
+    try:
+        role_units = lib.read_role_units(root, kit_dir)
+    except lib.RolesError as e:
+        role_units = ()
+        add_defect(ov_path, "R10", str(e).split(": ", 1)[-1])
+    for unit, text in role_units:
+        overlays[unit.tag] = len(text.encode("utf-8"))
+        for entry in unit.scope:
+            if entry.startswith(lib.ROLE_TAG) and entry[len(lib.ROLE_TAG):] not in files:
+                add_defect(ov_path, "R10", "%s selects %s, which no role file defines: there is no agents/%s.agent.md"
+                           % (unit.tag, entry, entry[len(lib.ROLE_TAG):]))
         if any(ln.startswith(("# ", "## ")) for ln in text.split("\n")):
-            add_defect(p, "R10", "overlay carries a '# ' or '## ' heading line")
+            add_defect(ov_path, "R10", "%s carries a '# ' or '## ' heading line" % unit.tag)
         for token in sorted(set(lib.TOKEN_RE.findall(text)) - {lib.MEMORY_ROOT_TOKEN}):
-            add_defect(p, "R10", "overlay carries the token %s; only %s renders" % (token, lib.MEMORY_ROOT_TOKEN))
+            add_defect(ov_path, "R10", "%s carries the token %s; only %s renders" % (unit.tag, token, lib.MEMORY_ROOT_TOKEN))
         for name in protocol_files:
             if name in text:
-                add_defect(p, "R10", "overlay spells the protocol file %s; name the protocol, never its file" % name)
+                add_defect(ov_path, "R10", "%s spells the protocol file %s; name the protocol, never its file"
+                           % (unit.tag, name))
+    for p in sorted((kit_dir / "house").glob("*.md")):
+        notes.append("roles: note: %s is a house text file no render reads; the upgrade step %s moves it into %s"
+                     % (resolve_display_path(root, p), lib.HOUSE_STEP, lib.OVERLAY_FILE))
 
     granted = {}
     try:
@@ -987,11 +1004,11 @@ def check_roles(root, kit_dir, write=False, scenario=None, composed=None):
     if problem:
         add_defect(readme, "R11", problem)
 
-    summary = ("roles: graded %d roles, %d overlays, %d workflows (by kind %s; %s), %d stage rows against "
+    summary = ("roles: graded %d roles, %d role units, %d workflows (by kind %s; %s), %d stage rows against "
                "runtime.agents-in-flight %s, %d reads keys, %d mandatory roles, "
                "%d writer outputs, %d never entries (%d unenforced), %d rule tags and %d protocol file "
                "names against %s, a %s charter; roles by layer %s, by acts-as %s; "
-               "overlay bytes %s; %d stand-in waiver(s), %d stand-in declaration(s); %s; %d defect(s)" % (
+               "role unit bytes %s; %d stand-in waiver(s), %d stand-in declaration(s); %s; %d defect(s)" % (
                    len(files) + sum(1 for r in roles.values() if r.get("origin") != "gov"), len(overlays),
                    len(workflows),
                    ", ".join("%s=%d" % kv for kv in sorted(by_kind.items())) or "none",

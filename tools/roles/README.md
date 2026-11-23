@@ -9,17 +9,25 @@ file under `agents/`: a CONSTANT block its agent starts from, plus front matter 
 workflow it serves, which inputs it reads, which path class it may write, which sections of the
 governing doc it needs, when it is mandatory and where its output goes. The workflow table, `workflows.toml`, says which roles drive each workflow,
 which harness stage spawns as which role, and what refuses a bypass. The library, `roles_lib.py`, is
-the one reader of all of it and the one composition of a role with its house overlay
+the one reader of all of it and the one composition of a role with the overlay units selecting it
 (`render_role`): every route that hands a role to an agent goes through it, so a role reaches an
 agent the same way by every route.
 
 ## Editing a role
 
-Edit the role's HOUSE OVERLAY, `house/<role>.md`, never the base file under `agents/`. The base
-block is the kit's and is overwritten on update; the overlay is yours and is kept. A non-empty
-overlay is appended to the base block under a `## House rules` heading when the role is rendered;
-an empty or absent one adds nothing. An overlay carries no `#` or `##` heading of its own and no
-render token but `{{MEMORY_ROOT}}`. Its size is printed on every check run and never graded.
+A project's own rules for a role are LEVEL-5 UNITS OF THE OVERLAY, `.governance/instructions.toml`,
+selecting the role, never an edit of the base file under `agents/`. The base block is the kit's and is
+overwritten on update; the overlay is yours and is kept. Write a unit through the overlay's door,
+the playbook kit's `instructions_edit.py add --manifest overlay`: `type = "adopter-rule"`, `level = 5`,
+`scope = ["role.<role>"]`, `budget = "block"`, its rules in `text`. `render_role` reads the overlay at
+HEAD through the playbook kit (`roles_lib.read_role_units`) and places each unit selecting the role
+after the base block, between `<!-- gov:repo -->` and `<!-- /gov:repo -->`; a role no unit selects
+adds nothing. A unit's text carries no `#` or `##` heading and no render token but
+`{{MEMORY_ROOT}}`, and selects a role a role file defines: R10 names each that does not by its tag.
+Its size is printed on every check run. The house text files `house/<role>.md` the kit once seeded
+are read by no render: the upgrade step `roles/house-overlays-to-instructions`, its program under
+govkit's `steps/`, moves each into one `repo.house.<role>` unit, and the checker prints one note per
+file still there (TOOL-dBoundRoles-19).
 The `mandatory` and `output` keys ride the base file, as `writes` does, so an overlay cannot change
 them, and so do `never` and `return` (TOOL-dBoundRoles-2). The keys a role file may carry, and which
 each role must, are the rows of `role-schema.toml`, which `roles_lib.load_role_schema` reads; a
@@ -683,8 +691,10 @@ Protocols section lists.
 
 - The base role files, the workflow table, the library, the checker, the renderers, the adopter and
   this README are the kit's, overwritten on every update.
-- The house overlays under `house/`, one per role, are SEEDED: you receive each once and own it afterwards,
-  and an update never rewrites one. They are where your project's rules for a role go.
+- The effort policy `house/policy.toml` is SEEDED: you receive it once and own it afterwards, and an
+  update never rewrites it. Your project's rules for a role go in your overlay,
+  `.governance/instructions.toml`, as level-5 units selecting the role, written through the overlay's
+  door, never in a file of the kit.
 - The adopter, `bash adopt-roles.sh --scaffold`, runs at install and again at every update unless
   `GOVKIT_RERENDER=0` declines it. It renders the `/build` Skill, one agent type per agent role
   under `.claude/agents/` and the role index `.claude/roles.json`, the file the role-aware write
