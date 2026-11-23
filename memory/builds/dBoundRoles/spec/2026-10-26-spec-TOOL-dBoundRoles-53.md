@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-53 — unit 47's case proves its render arguments are read before it relies on them, so neither half can pass or fail on argument parsing
 
-**Status:** INPROGRESS · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
+**Status:** CLOSED · rev-4 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-26-build-TOOL-dBoundRoles-52-round3-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-52-round3-fix-return.md) | research | TOOL-dBoundRoles-52 TOOL-dBoundRoles-55 TOOL-dBoundRoles-58 |
 | [2026-10-26-build-TOOL-dBoundRoles-53-deviation-531.md](../build/2026-10-26-build-TOOL-dBoundRoles-53-deviation-531.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-53-deviation-532.md](../build/2026-10-26-build-TOOL-dBoundRoles-53-deviation-532.md) | deviation | — |
+| [2026-11-22-build-TOOL-dBoundRoles-53-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dBoundRoles-53-1-acceptance-ledger.md) | journal | — |
+| [2026-11-23-build-TOOL-dBoundRoles-53-deviation-533.md](../build/2026-11-23-build-TOOL-dBoundRoles-53-deviation-533.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-52-round3-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-52-round3-fix-brief.md) | research | TOOL-dBoundRoles-52 TOOL-dBoundRoles-55 TOOL-dBoundRoles-58 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-11-reground-l-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-11-reground-l-brief.md) | journal | TOOL-dBoundRoles-11 TOOL-dBoundRoles-47 TOOL-dBoundRoles-26 TOOL-dBoundRoles-52 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-53-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-53-build-brief.md) | journal | — |
