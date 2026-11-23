@@ -11066,7 +11066,7 @@ def cmd_new_spec(root: str, conf: dict, args: dict) -> int:
 
 
 # >>> gov:shim memory-tree/new-build-to-record
-# tools/memory-tree/gen_build_index.py --new-build moved to tools/memory-tree/gov_record.py new build-readme: this forwarder is held until install.deprecation-window closes it.
+# {prefix}/memory-tree/gen_build_index.py --new-build moved to {prefix}/memory-tree/gov_record.py new build-readme: this forwarder is held until install.deprecation-window closes it.
 # Rendered by shims.py from shims.toml; edit the row, never this block.
 def run_shim_new_build_to_record(argv):
     import json as _shim_json
@@ -11077,6 +11077,18 @@ def run_shim_new_build_to_record(argv):
     import runpy as _shim_runpy
 
     _SHIM_HERE = _shim_os.path.dirname(_shim_os.path.abspath(__file__))
+    _shim_rel = _shim_os.path.basename(_SHIM_HERE)
+    _shim_anc = _SHIM_HERE
+    while True:
+        if _shim_os.path.exists(_shim_os.path.join(_shim_anc, ".git")):
+            _shim_rel = _shim_os.path.relpath(_SHIM_HERE, _shim_anc).replace(_shim_os.sep, "/")
+            break
+        _shim_up = _shim_os.path.dirname(_shim_anc)
+        if _shim_up == _shim_anc:
+            break
+        _shim_anc = _shim_up
+    _shim_src = _shim_rel + "/" + "gen_build_index.py --new-build"
+    _shim_dst = _shim_os.path.normpath(_shim_rel + "/" + "gov_record.py").replace(_shim_os.sep, "/") + " new build-readme"
     # a read that fails reads warn, and the line says so; neither branch blocks the forward
     mode, why = "warn", " (the policy could not be read, so this reads warn)"
     try:
@@ -11087,7 +11099,7 @@ def run_shim_new_build_to_record(argv):
     except OSError:
         pass
     if mode != "journal":
-        print("gov: tools/memory-tree/gen_build_index.py --new-build has moved to tools/memory-tree/gov_record.py new build-readme; this forwarder is held only until its deprecation window closes" + why, file=_shim_sys.stderr)
+        print("gov: " + _shim_src + " has moved to " + _shim_dst + "; this forwarder is held only until its deprecation window closes" + why, file=_shim_sys.stderr)
     try:
         g = _shim_sp.run(["git", "rev-parse", "--is-inside-work-tree", "--git-path", "govkit/shim-calls.jsonl"],
                          stdin=_shim_sp.DEVNULL, capture_output=True, text=True)
@@ -11096,7 +11108,7 @@ def run_shim_new_build_to_record(argv):
         lines = []
     if lines[:1] == ["true"] and len(lines) > 1:
         line = {"utc": _shim_time.strftime("%Y-%m-%dT%H:%M:%SZ", _shim_time.gmtime()), "shim": "memory-tree/new-build-to-record",
-                "from": "tools/memory-tree/gen_build_index.py --new-build", "to": "tools/memory-tree/gov_record.py new build-readme", "mode": mode}
+                "from": _shim_src, "to": _shim_dst, "mode": mode}
         try:
             _shim_os.makedirs(_shim_os.path.dirname(lines[1]) or ".", exist_ok=True)
             with open(lines[1], "a", encoding="utf-8", newline="\n") as f:
@@ -11113,7 +11125,7 @@ def run_shim_new_build_to_record(argv):
 
 
 # >>> gov:shim memory-tree/new-spec-to-record
-# tools/memory-tree/gen_build_index.py --new-spec moved to tools/memory-tree/gov_record.py new spec: this forwarder is held until install.deprecation-window closes it.
+# {prefix}/memory-tree/gen_build_index.py --new-spec moved to {prefix}/memory-tree/gov_record.py new spec: this forwarder is held until install.deprecation-window closes it.
 # Rendered by shims.py from shims.toml; edit the row, never this block.
 def run_shim_new_spec_to_record(argv):
     import json as _shim_json
@@ -11124,6 +11136,18 @@ def run_shim_new_spec_to_record(argv):
     import runpy as _shim_runpy
 
     _SHIM_HERE = _shim_os.path.dirname(_shim_os.path.abspath(__file__))
+    _shim_rel = _shim_os.path.basename(_SHIM_HERE)
+    _shim_anc = _SHIM_HERE
+    while True:
+        if _shim_os.path.exists(_shim_os.path.join(_shim_anc, ".git")):
+            _shim_rel = _shim_os.path.relpath(_SHIM_HERE, _shim_anc).replace(_shim_os.sep, "/")
+            break
+        _shim_up = _shim_os.path.dirname(_shim_anc)
+        if _shim_up == _shim_anc:
+            break
+        _shim_anc = _shim_up
+    _shim_src = _shim_rel + "/" + "gen_build_index.py --new-spec"
+    _shim_dst = _shim_os.path.normpath(_shim_rel + "/" + "gov_record.py").replace(_shim_os.sep, "/") + " new spec"
     # a read that fails reads warn, and the line says so; neither branch blocks the forward
     mode, why = "warn", " (the policy could not be read, so this reads warn)"
     try:
@@ -11134,7 +11158,7 @@ def run_shim_new_spec_to_record(argv):
     except OSError:
         pass
     if mode != "journal":
-        print("gov: tools/memory-tree/gen_build_index.py --new-spec has moved to tools/memory-tree/gov_record.py new spec; this forwarder is held only until its deprecation window closes" + why, file=_shim_sys.stderr)
+        print("gov: " + _shim_src + " has moved to " + _shim_dst + "; this forwarder is held only until its deprecation window closes" + why, file=_shim_sys.stderr)
     try:
         g = _shim_sp.run(["git", "rev-parse", "--is-inside-work-tree", "--git-path", "govkit/shim-calls.jsonl"],
                          stdin=_shim_sp.DEVNULL, capture_output=True, text=True)
@@ -11143,7 +11167,7 @@ def run_shim_new_spec_to_record(argv):
         lines = []
     if lines[:1] == ["true"] and len(lines) > 1:
         line = {"utc": _shim_time.strftime("%Y-%m-%dT%H:%M:%SZ", _shim_time.gmtime()), "shim": "memory-tree/new-spec-to-record",
-                "from": "tools/memory-tree/gen_build_index.py --new-spec", "to": "tools/memory-tree/gov_record.py new spec", "mode": mode}
+                "from": _shim_src, "to": _shim_dst, "mode": mode}
         try:
             _shim_os.makedirs(_shim_os.path.dirname(lines[1]) or ".", exist_ok=True)
             with open(lines[1], "a", encoding="utf-8", newline="\n") as f:

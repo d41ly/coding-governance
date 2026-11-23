@@ -242,6 +242,25 @@ _run_shim_prelude()
 _SHIM_TARGET = _shim_os.path.join(_SHIM_HERE, @TO_REL@)
 """)
 
+# A `verb` row's paths as its block names them in its line and journal: its own directory relative to
+# the enclosing checkout, DERIVED at the call as tree_lib.py#kit_rel derives it, never spelled, because
+# the block sits inside a shipped script and an adopter installs it at its own prefix. A block outside
+# any checkout names its directory's base name. Its header comment spells the row's paths through the
+# drained `{prefix}/` token for the same reason.
+PY_VERB_NAMES = r"""    _shim_rel = _shim_os.path.basename(_SHIM_HERE)
+    _shim_anc = _SHIM_HERE
+    while True:
+        if _shim_os.path.exists(_shim_os.path.join(_shim_anc, ".git")):
+            _shim_rel = _shim_os.path.relpath(_SHIM_HERE, _shim_anc).replace(_shim_os.sep, "/")
+            break
+        _shim_up = _shim_os.path.dirname(_shim_anc)
+        if _shim_up == _shim_anc:
+            break
+        _shim_anc = _shim_up
+    _shim_src = _shim_rel + "/" + @FROM_TAIL@
+    _shim_dst = _shim_os.path.normpath(_shim_rel + "/" + @TO_TAIL@).replace(_shim_os.sep, "/") + @TO_WORDS_TAIL@
+"""
+
 # A `verb` row's block, placed above its script's `def main(` line: one function, so no statement of
 # it runs at import and two blocks in one script share no name. Its forward runs the `to` script as
 # `__main__` under its own path, its words and the caller's arguments, so the call exits as it does.
@@ -250,7 +269,7 @@ PY_VERB_BLOCK = (r"""# >>> @MARKER@
 # Rendered by shims.py from shims.toml; edit the row, never this block.
 def run_shim_@SLUG@(argv):
 """ + textwrap.indent(PY_IMPORTS + "import runpy as _shim_runpy\n", "    ") + "\n"
-    + textwrap.indent(PY_HERE, "    ") + PY_PRELUDE_BODY + r"""    _SHIM_TARGET = _shim_os.path.join(_SHIM_HERE, @TO_REL@)
+    + textwrap.indent(PY_HERE, "    ") + PY_VERB_NAMES + PY_PRELUDE_BODY + r"""    _SHIM_TARGET = _shim_os.path.join(_SHIM_HERE, @TO_REL@)
     _shim_sys.argv = [_SHIM_TARGET, @TO_WORDS@*argv]
     _shim_runpy.run_path(_SHIM_TARGET, run_name="__main__")
     return 0
@@ -306,8 +325,18 @@ def render_shim(row: dict) -> str:
             text = JS_TEMPLATE
         elif row["kind"] == "verb":
             text = PY_VERB_BLOCK
+            moved_q = ('"gov: " + _shim_src + " has moved to " + _shim_dst + '
+                       + q("; this forwarder is held only until its deprecation window closes"))
             subs |= {"@SLUG@": row["id"].split("/")[-1].replace("-", "_"),
-                     "@TO_WORDS@": "".join(q(w) + ", " for w in row["to-words"])}
+                     "@TO_WORDS@": "".join(q(w) + ", " for w in row["to-words"]),
+                     "@FROM_TAIL@": q(" ".join([posixpath.basename(row["from"]), *row["from-words"]])),
+                     "@TO_TAIL@": q(to_rel),
+                     "@TO_WORDS_TAIL@": q("".join(" " + w for w in row["to-words"])),
+                     "@MOVED@": moved_q, "@FROM_Q@": "_shim_src", "@TO_Q@": "_shim_dst"}
+            src = " ".join(["{prefix}/" + posixpath.relpath(row["from"], posixpath.dirname(posixpath.dirname(row["from"]))),
+                            *row["from-words"]])
+            dst = " ".join(["{prefix}/" + posixpath.relpath(row["to"], posixpath.dirname(posixpath.dirname(row["to"]))),
+                            *row["to-words"]])
         else:
             text = PY_PRELUDE + (PY_MODULE_TAIL if row["kind"] == "module" else PY_COMMAND_TAIL)
     subs |= {"@MARKER@": f"{MARKER} {row['id']}", "@FROM@": src, "@TO@": dst}
