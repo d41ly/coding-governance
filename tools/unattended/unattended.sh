@@ -3728,6 +3728,8 @@ check_mail_addressed() { # to · who -> 0 when <to> addresses <who>, 1 otherwise
 # content key, in that order, each absent one written `none`. No session and no time is a field, so a
 # post retried from the same session or a new one carries the id of the post it retries; two answers
 # to two messages carry two ids, and so do one notice to two recipients and one recipient's two keys.
+# An act, once dWellOiledMachine's Runtime mints one, is appended as the ninth field, after the
+# recipient and the content key (KICK-dKeptSession-51).
 derive_message_id() { # build · item · pass · kind · subject · answers · to · content-key -> the first 12 hex digits; rc 1 when git cannot hash
   derive_gov_id "${1:-none}" "${2:-none}" "${3:-none}" "${4:-none}" "${5:-none}" "${6:-none}" "${7:-none}" "${8:-none}"
 }
