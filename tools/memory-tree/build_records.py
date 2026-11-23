@@ -1589,7 +1589,7 @@ def check_door_header_plant():
         tag, now = tag.strip() or "-", datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         msg = (f"gov-claim dTotalRecall/build\n\nslug: dTotalRecall\nnode: {tag}\nhost: h\nsession: s-mine\nkeepalive: k\n"
                f"status: live\nlease-utc: {now}\nbeat-utc: {now}\nepoch: 1\nkind: build\nfleet-tag: {tag}\nrenews: yes")
-        tree = subprocess.run(["git", "mktree"], cwd=str(a), input="", capture_output=True, text=True, check=True).stdout.strip()
+        tree = subprocess.run(["git", "mktree"], cwd=str(a), input="", capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip()
         lease = run_git(a, "commit-tree", tree, "-m", msg).strip()
         run_git(a, "push", "-q", "-f", "origin", f"{lease}:refs/gov/leases/dTotalRecall/build")
         name = "2026-11-23-prompt-TOOL-dTotalRecall-2-lease"
