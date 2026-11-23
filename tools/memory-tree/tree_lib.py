@@ -632,38 +632,42 @@ def resolve_kind(token):
     return KIND_ALIASES.get(token, token)
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally
-# exclude the one file most easily forgotten.
-BIND_RE = re.compile(
-    r"^[ \t]*(?:#+|//|;)?[ \t]*\*\*(?P<key>Serves|Commissions):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$"
-)
+# exclude the one file most easily forgotten. TOOL-dTotalRecall-51 S1: the marker is the named group `prefix`,
+# spelled once here, so the header edge lines' prefix and the Serves line's cannot drift.
+BIND_PREFIX = r"^[ \t]*(?P<prefix>#+|//|;)?[ \t]*"
+BIND_RE = re.compile(BIND_PREFIX + r"\*\*(?P<key>Serves|Commissions):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$")
 UNBOUND_RE = re.compile(r"^none\b[\s—–:-]*(?P<reason>\S.*)$")
 EVIDENCES_RE = re.compile(r"^\*\*Evidences:\*\* `?([^`\s]+)`?")
 # TOOL-dTotalRecall-19 S5: a record's key is its file stem, a dated stem whose kind word is `build`, `review` or
 # `prompt`; the `record-key` native class of the playbook kit's namespace registry matches its targets with it.
 RECORD_KEY_RE = re.compile(r"\d{4}-\d{2}-\d{2}-(?:build|review|prompt)-[A-Za-z0-9_-]+")
-# TOOL-dTotalRecall-19 S1: an untyped record's header edge lines, column 0 in its head
-HEADER_EDGE_RE = re.compile(r"^\*\*(?P<key>Caused-by|Made-by):\*\*[ \t]+(?P<target>\S.*?)[ \t]*$")
+# TOOL-dTotalRecall-19 S1, TOOL-dTotalRecall-51 S1: an untyped record's header edge lines in its head, behind
+# the prefix its Serves line wears
+HEAD_EDGE_RE = re.compile(BIND_PREFIX + r"\*\*(?P<key>Made-by|Caused-by):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$")
 
 
 def read_header_edges(text: str, path: str, binding=None) -> list:
     """A record header's edges, `{path, line, type, targets, site}` each, `site` `header`: the `**Serves:**`
     line as `serves`, its ids `binding`'s (the record's `read_bindings` row, None for a text it did not read,
     its kind carried as `kind`), and one `made-by` and one `caused-by` edge where the record names them,
-    backticks cut (TOOL-dTotalRecall-19 S1). An untyped record names them as the column-0 lines
-    `**Made-by:** <target>` and `**Caused-by:** <target>` in its first `BIND_HEAD_LINES` unfenced lines; a
-    record whose name a typed kind's grammar matches (`build_records.derive_record_name`) as its
-    `- **Made-by:**` and `- **Caused-by:**` fields wherever they sit, read with `build_records.FIELD`.
-    ValueError naming both lines where one key is given twice. The edge grammar's own adapter of the same
-    name stays until TOOL-dTotalRecall-39 binds this one."""
+    backticks cut (TOOL-dTotalRecall-19 S1). An untyped record names them as the lines
+    `**Made-by:** <target>` and `**Caused-by:** <target>` in its first `BIND_HEAD_LINES` unfenced lines, read
+    by `HEAD_EDGE_RE` behind the comment prefix its first Serves line wears, bare where that line is bare or
+    absent (TOOL-dTotalRecall-51 S1); a record whose name a typed kind's grammar matches
+    (`build_records.derive_record_name`) as its `- **Made-by:**` and `- **Caused-by:**` fields wherever they
+    sit, read with `build_records.FIELD`. ValueError naming both lines where one key is given twice, or
+    where an edge line's prefix differs from its Serves line's, whitespace ignored (TOOL-dTotalRecall-51 S2)."""
     import build_records   # noqa: E402  the factory's name grammar and field grammar; at call time, no cycle
     lines = text.replace("\r\n", "\n").split("\n")
     typed = any(build_records.derive_record_name(k).search(path) for k in TYPED_RECORD_KINDS)
-    edges, seen = [], {}
+    edges, seen, serves = [], {}, None
     head = [(n, ln) for n, ln in unfenced_lines("\n".join(lines))][:BIND_HEAD_LINES]
     for n, line in head:
         if line is None:
             break
         mb = BIND_RE.match(line)
+        if mb and mb.group("key") == "Serves" and serves is None:
+            serves = (n, line, mb.group("prefix") or "")
         if binding and binding.get("ids") and mb and mb.group("key") == "Serves":
             edges.append({"path": path, "line": n, "type": "serves", "targets": list(binding["ids"]),
                           "site": "header", "kind": binding.get("kind")})
@@ -678,9 +682,13 @@ def read_header_edges(text: str, path: str, binding=None) -> list:
         for n, line in head:
             if line is None:
                 break
-            m = HEADER_EDGE_RE.match(line)
-            if m:
-                found.append((n, m.group("key"), m.group("target")))
+            m = HEAD_EDGE_RE.match(line)
+            if not m:
+                continue
+            if (m.group("prefix") or "") != (serves[2] if serves else ""):
+                said = f"its Serves line {serves[0]} `{serves[1].strip()}`" if serves else "no Serves line, so the bare form"
+                raise ValueError(f"{path}: {m.group('key')} line {n} `{line.strip()}` wears a prefix other than {said}")
+            found.append((n, m.group("key"), m.group("rest")))
     for n, key, target in found:
         if key in seen:
             raise ValueError(f"{path}: {key} is given twice, at lines {seen[key]} and {n}")

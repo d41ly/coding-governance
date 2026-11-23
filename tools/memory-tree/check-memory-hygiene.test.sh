@@ -3776,6 +3776,35 @@ print(*[r for r in record_kinds.check_row(row, 1, set(), ".", "") if "root" in r
 PY
 )
 hit "row log: the column \`root\` 'yes' is not a boolean"   # AC5
+# --- TOOL-dTotalRecall-51 (AC1 AC2 AC3) — a non-Markdown record's cause line wears its Serves line's comment
+# --- prefix: the reader reads a `#`-prefixed cause in a `.py` record, refuses a bare cause under a `#` Serves
+# --- line and a `#` cause under a Markdown record's bare one, each naming both lines; the causes check grades
+# --- the prefixed `.py` record green, names the bare-cause `.sh` refused and the causeless `.sh` causeless,
+# --- and leaves an `.html` record with a bare head ungraded. Red on the reader taking the column-0 form only
+# --- and on the graded set kept to the Markdown members.
+out=$("$_PY" - "$HERE" 2>&1 <<'PY'
+import sys
+sys.path.insert(0, sys.argv[1])
+import tree_lib
+print(tree_lib.read_header_edges("# **Serves:** log TOOL-dFix-1\n# **Caused-by:** TOOL-dFix-1\nprint(1)\n", "x.py"))
+for path, text in (("x.sh", "# **Serves:** log TOOL-dFix-1\n**Caused-by:** TOOL-dFix-1\n"),
+                   ("x.md", "**Serves:** log TOOL-dFix-1\n# **Caused-by:** TOOL-dFix-1\n")):
+    try:
+        print("read", path, tree_lib.read_header_edges(text, path))
+    except ValueError as exc:
+        print("refused", exc)
+PY
+)
+hit "'type': 'caused-by', 'targets': ['TOOL-dFix-1']"   # AC1
+hit 'refused x.sh: Caused-by line 2 `**Caused-by:** TOOL-dFix-1` wears a prefix other than its Serves line 1 `# **Serves:** log TOOL-dFix-1`'   # AC2
+hit 'refused x.md: Caused-by line 2 `# **Caused-by:** TOOL-dFix-1` wears a prefix other than its Serves line 1 `**Serves:** log TOOL-dFix-1`'
+_scr='memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-probe'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant script-cause-prefixed 2>&1)   # AC1
+hit 'record causes: 2 Markdown record(s) · 1 comment-headed'; hit 'record causes: 0 causeless · 0 orphan(s)'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant script-cause-bare 2>&1)   # AC2
+hit "record causes: causes · $_scr.sh · its header is refused: $_scr.sh: Caused-by line 2"
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant script-causeless 2>&1)   # AC3
+hit "record causes: causes · $_scr.sh · names no Caused-by"; miss 'atlas.html'
 
 # --- TOOL-dTotalRecall-7 (AC4 AC5 AC6 AC7 AC10 AC11 AC12) — the ask door, `gov_record.py new ask`: the plant
 # --- runs the refuse, undeclared-family, file, replay, grade, refused-read and refused-filing-on-a-remote

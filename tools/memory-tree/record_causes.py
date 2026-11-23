@@ -11,7 +11,12 @@ A record's header names what made it and why it exists: `**Made-by:**` and `**Ca
 `**Serves:**` line, or a typed kind's `- **Made-by:**` and `- **Caused-by:**` fields, read by
 `tree_lib.read_header_edges`. The record door writes both (`gov_record.py new <kind> --caused-by <target>`).
 
-THE CAUSES CHECK (`check_causes`). A tracked Markdown record with no `<path> -` row of the `legacy-records`
+THE GRADED SET (`read_grading`, TOOL-dTotalRecall-51 S3). The Markdown members of `tree_lib.record_paths`,
+and each non-Markdown member whose first Serves line wears a comment prefix (`tree_lib.BIND_RE`'s `prefix`),
+whose cause line wears the same prefix. A non-Markdown record whose Serves line is bare, or that has none, is
+not graded, and record keys stay Markdown stems.
+
+THE CAUSES CHECK (`check_causes`). A graded record with no `<path> -` row of the `legacy-records`
 population, whose kind's `record-kinds.toml` row is not `root = true`, is red when it carries no
 `Caused-by` or one that does not resolve: a target resolves when it is a family id the corpus defines
 (`corpus_ids.py`'s defined-id set) or a record key, the stem of a tracked Markdown record. A record of a
@@ -41,7 +46,7 @@ derives none and reads a legacy record as reached; `retag` reads the authored ta
 
 Exit: 0 green or unarmed (no registration, an absent or unarmed home, an empty population), 1 a red, 2 a
 refused read, `memory.legacy-anchors` named. `--print-*` exit 3 where the class has no member here.
-WHAT IT DOES NOT CHECK: a record that is not Markdown, which carries no header; whether a `Made-by`
+WHAT IT DOES NOT CHECK: a non-Markdown record whose head is not a comment; whether a `Made-by`
 names who really wrote it; the edge grammar of a header's targets, which `edge_grammar.py --check` grades;
 whether a census file that spells `Caused-by` writes the line at run time, since the census grades spelling.
 """
@@ -71,7 +76,7 @@ HEADING_RE = re.compile(r"#{2,3} (?P<text>.*\S)")
 #: an authored heading tag, the `[section.<anchor>]` TOOL-dTotalRecall-20's retag step writes
 AUTHORED_TAG_RE = re.compile(r"\[section\.(?P<seg>[a-z0-9][a-z0-9-]*)\](?:[ \t]|$)")
 PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "none", "writer-without-cause",
-          "bulleted-cause", "bulleted-twice")
+          "bulleted-cause", "bulleted-twice", "script-cause-prefixed", "script-cause-bare", "script-causeless")
 #: TOOL-dTotalRecall-39 AC2 AC3: the plants whose typed record's cause is a bulleted field, each the number of
 #: `- **Caused-by:**` fields it writes; both checks read the record, the causes check and the edge walk
 BULLETED_PLANTS = {"bulleted-cause": 1, "bulleted-twice": 2}
@@ -79,6 +84,14 @@ BULLETED_UNIT = "TOOL-tFix-1"
 BULLETED_RECORD = f"memory/builds/tFix/build/2026-01-02-build-{BULLETED_UNIT}-deviation-1.md"
 #: the record's head, its fields following from the line after its last
 BULLETED_HEAD = f"# {BULLETED_UNIT} deviation 1 — a bulleted cause\n\n**Serves:** deviation {BULLETED_UNIT}\n\n"
+#: TOOL-dTotalRecall-51 AC1 to AC3: each script plant's records, `{<name after the record's unit>: <text>}`,
+#: `{unit}` the fixture's unit; a cause line wears its Serves line's prefix, and a bare head is not graded
+SCRIPT_PLANTS = {
+    "script-cause-prefixed": {"probe.py": "# **Serves:** log {unit}\n# **Caused-by:** {unit}\nprint('probe')\n"},
+    "script-cause-bare": {"probe.sh": "# **Serves:** log {unit}\n**Caused-by:** {unit}\necho probe\n"},
+    "script-causeless": {"probe.sh": "# **Serves:** log {unit}\necho probe\n",
+                         "atlas.html": "**Serves:** research {unit}\n<p>an atlas</p>\n"},
+}
 CLAIM_NS = "refs/gov/claims/"
 #: TOOL-dTotalRecall-36 S7: the writer census's kept files, `{<path under the tool root>: <reason>}`, each
 #: whose `**Serves:** ` literals are fixture, instruction or reader-prefix text only, so it writes no
@@ -270,19 +283,32 @@ def read_legacy_paths(root) -> tuple:
 
 
 def read_grading(root) -> dict:
-    """Everything both checks read, once: the records, their texts and bindings, the two target sets, the
-    registry's rows by kind, the legacy paths and `memory.legacy-anchors`. ValueError for a refused read."""
+    """Everything both checks read, once: the graded records (the Markdown ones, then each non-Markdown one
+    whose first Serves line wears a comment prefix, TOOL-dTotalRecall-51 S3), their texts and bindings, the
+    two target sets, the registry's rows by kind, the legacy paths and `memory.legacy-anchors`. ValueError
+    for a refused read."""
     import record_kinds   # noqa: E402  the registry's reader
     root = pathlib.Path(root)
     conf = read_conf(root)
     tracked = read_tracked(root)
     paths = read_record_paths(root, tracked, conf)
+
+    def read_serves_prefix(text):
+        """The comment prefix the first Serves line in `text`'s head wears, `""` bare, None for no Serves line."""
+        for line in list(tree_lib.unfenced(text))[:tree_lib.BIND_HEAD_LINES]:
+            mo = tree_lib.BIND_RE.match(line)
+            if mo and mo.group("key") == "Serves":
+                return mo.group("prefix") or ""
+        return None
+
     texts = {}
-    for p in paths:
+    for p in paths + [p for p in tree_lib.record_paths(tracked, conf["MEMORY_ROOT"]) if not p.endswith(".md")]:
         try:
-            texts[p] = tree_lib.read_text(os.path.join(str(root), p))
+            text = tree_lib.read_text(os.path.join(str(root), p))
         except (OSError, UnicodeDecodeError):
             continue
+        if p.endswith(".md") or read_serves_prefix(text):
+            texts[p] = text
     try:
         rows = {r.get("name"): r for r in record_kinds.read_record_kinds(root) or []}
     except record_kinds.RecordKindsError as exc:
@@ -290,7 +316,7 @@ def read_grading(root) -> dict:
     legacy, note = read_legacy_paths(root)
     return {"root": root, "conf": conf, "tracked": tracked, "texts": texts, "rows": rows, "legacy": legacy,
             "note": note, "bindings": tree_lib.read_bindings(str(root), list(texts), conf),
-            "keys": read_record_keys(root, list(texts)), "ids": read_defined_ids(root) if legacy is not None else set(),
+            "keys": read_record_keys(root, [p for p in texts if p.endswith(".md")]), "ids": read_defined_ids(root) if legacy is not None else set(),
             "value": read_anchor_value(root)}
 
 
@@ -440,8 +466,10 @@ def run_check(root) -> tuple:
         writer_lines, writer_reds = check_cause_writers(root)
     except ValueError as exc:
         return [f"{SAY}: refused · {exc}"], 2
+    script = sum(1 for p in g["texts"] if not p.endswith(".md"))
     lines = [f"{SAY}: {POPULATION} · {g['note']} · memory.legacy-anchors {g['value']}",
-             f"{SAY}: {len(g['texts'])} Markdown record(s) · {len(g['legacy'] & set(g['texts']))} legacy"]
+             f"{SAY}: {len(g['texts']) - script} Markdown record(s) · {script} comment-headed · "
+             f"{len(g['legacy'] & set(g['texts']))} legacy"]
     lines += causes + orphans
     lines += [f"{SAY}: {ln}" for ln in writer_lines] + [f"{SAY}: RED {r}" for r in writer_reds]
     lines.append(f"{SAY}: {len(causes)} causeless · {len(orphans)} orphan(s)")
@@ -532,6 +560,9 @@ def write_fixture(top, plant) -> pathlib.Path:
         write_file(f"memory/builds/tFix/spec/2026-01-01-spec-{BULLETED_UNIT}.md",
                    f"# {BULLETED_UNIT} — the fixture's unit\n\n**Status:** OPEN · rev-1 · 2026-01-01 · node a · Tier-1 · base 00000000\n")
         write_file(BULLETED_RECORD, BULLETED_HEAD + f"- **Caused-by:** {BULLETED_UNIT}\n" * BULLETED_PLANTS[plant])
+    elif plant in SCRIPT_PLANTS:   # TOOL-dTotalRecall-51 AC1 to AC3: non-Markdown records, their heads comments
+        for name, text in SCRIPT_PLANTS[plant].items():
+            write_file(f"{build}/2026-01-02-build-{FIXTURE_UNIT}-{name}", text.format(unit=FIXTURE_UNIT))
     elif plant == "claim-root":
         write_file(f"memory/builds/fClaim/build/2026-01-02-build-{FIXTURE_CLAIM}-claimed.md",
                    f"# Claimed\n\n**Serves:** research {FIXTURE_CLAIM}\n**Made-by:** owner\n**Caused-by:** {FIXTURE_CLAIM}\n")
