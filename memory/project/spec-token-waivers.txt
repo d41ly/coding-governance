@@ -33,3 +33,5 @@ policy fixtures <- tools/workflows/kit.toml	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83
 hook destinations self-test <- tools/workflows/kit.toml	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/hooks/agent-cap.js	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
 tools/hooks/agent-cap.test.sh	2	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+agent-cap self-test	1	ed2b4eb0623013bcbfa692af379f0441c5d3e741	widened:2026-11-23-build-TOOL-dBoundRoles-43-widen-9
+spawn-guard self-test <- tools/roles/spawn-guard.js	1	ed2b4eb0623013bcbfa692af379f0441c5d3e741	widened:2026-11-23-build-TOOL-dBoundRoles-43-widen-9
