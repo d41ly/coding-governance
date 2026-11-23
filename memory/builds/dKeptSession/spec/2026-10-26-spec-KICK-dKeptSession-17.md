@@ -1,6 +1,6 @@
 # KICK-dKeptSession-17 — the attendance rule: `attendance` adds only the owner's interactions, its arm refusing any that swaps an actor
 
-**Status:** DEFERRED · rev-6 · 2026-11-23 · node a · Tier-2 · base 689698a5 · streams kickoff · order 27 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-6 · 2026-11-23 · node a · Tier-2 · base 689698a5 · streams kickoff · order 27 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0155@6d913746 whole
 **Carries:** node:policy-key.attendance
@@ -21,6 +21,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-11-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-11-precheck-brief.md) | research | KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 |
 | [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-26 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-11 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-61 KICK-dKeptSession-18 |
 | [2026-11-21-prompt-KICK-dKeptSession-17-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-17-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-17-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-17-build-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-17-orders-27-29-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-17-orders-27-29-reground-brief.md) | research | KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 |
 | [2026-11-22-prompt-KICK-dKeptSession-17-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-17-reground-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-17-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-17-1-spec-writer.md) | journal | — |
