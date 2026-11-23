@@ -1,6 +1,6 @@
 # KICK-dKeptSession-56 — the round-1 promotions' audit's 45 minor findings, closed after every unit they land on is built
 
-**Status:** INPROGRESS · rev-6 · 2026-11-23 · node a · Tier-2 · base ff2654fc · streams kickoff · order 31 · advances KICK-dKeptSession-29
+**Status:** CLOSED · rev-6 · 2026-11-23 · node a · Tier-2 · base ff2654fc · streams kickoff · order 31 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-26-build-KICK-dKeptSession-56-deviation-561.md](../build/2026-10-26-build-KICK-dKeptSession-56-deviation-561.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-56-deviation-562.md](../build/2026-10-26-build-KICK-dKeptSession-56-deviation-562.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-56-promoted-fix-return.md](../build/2026-10-26-build-KICK-dKeptSession-56-promoted-fix-return.md) | research | — |
+| [2026-11-21-build-KICK-dKeptSession-56-1-acceptance-ledger.md](../build/2026-11-21-build-KICK-dKeptSession-56-1-acceptance-ledger.md) | journal | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 |
 | [2026-10-26-prompt-KICK-dKeptSession-56-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-56-1-spec-writer.md) | journal | KICK-dKeptSession-1 |
