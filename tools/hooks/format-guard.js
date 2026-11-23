@@ -4,7 +4,7 @@
  * final message lacks the charter's BUILD/SPEC pair, breaks rule r1, leaves a new commit unreported, or
  * leaves out the `agent` or `returned` line of an agent its turn dispatched or received.
  *
- * gov:kit agent-cap@1.51 — ships inside the hooks kit entry; the kit version is agent-cap.js's.
+ * gov:kit agent-cap@1.52 — ships inside the hooks kit entry; the kit version is scratch-guard.js's KIT_AGENT_CAP_VERSION.
  *
  * Contract: the spec for TOOL-aHeardState-1 under the build folder of that slug.
  *
@@ -420,14 +420,14 @@ function extractTurnAgents(turn, transcriptText, sessionDir) {
   // The prompt is the call's own input when this turn holds the call, else the result's. The marker
   // path reaches a child process as an argument, so it is denied by default: an absolute or
   // drive-qualified path, one holding a `..` segment on either slash, or one opening `-` gives null.
-  // agent-cap.js is required only when a prompt names the marker, so a turn with none parses nothing new.
+  // The marker reader is scratch-guard.js's, called only when a prompt names the marker (TOOL-dBoundRoles-25).
   const readHandoffVia = (toolUseId, r) => {
     const input = calls.has(toolUseId) ? calls.get(toolUseId).input : null
     const prompt = input && typeof input === 'object' && typeof input.prompt === 'string' ? input.prompt : r.prompt
     if (typeof prompt !== 'string' || !prompt.includes('gov:handoff')) return null
     // A missing module or export reads as no selector, never a throw: a throw here would allow the stop.
     let marks
-    try { marks = require('./agent-cap.js').extractHandoffMarker(prompt) } catch { return null }
+    try { marks = require('./scratch-guard.js').extractHandoffMarker(prompt) } catch { return null }
     if (!Array.isArray(marks) || marks.length !== 1) return null
     const p = marks[0].path
     if (path.win32.isAbsolute(p) || path.posix.isAbsolute(p) || /^[A-Za-z]:/.test(p) || p.startsWith('-') ||
@@ -557,7 +557,7 @@ function readHandoffLines({ script, top, sid, transcriptPath, selector, deadline
  * entry, in `required` order, the first line `handoff.py agents` prints for its selector that opens
  * `- <head> — `, carries the agent id and matches the head's shape. One run per distinct selector, all
  * inside HANDOFF_BOUND_MS. An entry or commit with no such line adds a witness and no line, so its
- * defect keeps the verb's sentence. The roles kit is found by agent-cap.js's resolveKitDir, required
+ * defect keeps the verb's sentence. The roles kit is found by scratch-guard.js's resolveKitDir, called
  * only when some entry has a selector.
  */
 function deriveOwedLines({ agents, commits, branch, shapes, top, sid, transcriptPath }) {
@@ -572,7 +572,7 @@ function deriveOwedLines({ agents, commits, branch, shapes, top, sid, transcript
   let found = { error: '' }
   if (agents.some((q) => q.via)) {
     try {
-      found = { script: path.join(require('./agent-cap.js').resolveKitDir('roles', 'handoff.py', __dirname), 'handoff.py') }
+      found = { script: path.join(require('./scratch-guard.js').resolveKitDir('roles', 'handoff.py', __dirname), 'handoff.py') }
     } catch (e) {
       found = { error: (e && e.message) || String(e) }
     }

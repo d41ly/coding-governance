@@ -830,7 +830,7 @@ def parse_shell_defs(src: str):
        any static extractor, so pretending otherwise would be the green-by-absence claim this parser
        exists to refuse.
     3. A definition inside a HEREDOC BODY is not a definition and is not returned. This is the one
-       refusal with a confirmed live instance: the hooks kit's `agent-cap.test.sh` embeds a JavaScript
+       refusal with a confirmed live instance: the roles kit's `spawn-guard.test.sh` embeds a JavaScript
        `function f() { … }` inside a `<<'EOF'` body, which the naive same-line pattern reports as a
        shell function.
 

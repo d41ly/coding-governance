@@ -6,7 +6,7 @@
 // unattended-unit.js builds one unit per call: the parent holds the roster and the order, and a
 // script that iterated the matrix would need a loop the fan-out hook cannot size.
 //
-// THE RUN COUNT IS A MARKED TWO-ELEMENT LITERAL iterated by the ONE loop shape agent-cap.js admits,
+// THE RUN COUNT IS A MARKED TWO-ELEMENT LITERAL iterated by the ONE loop shape the fan-out gate admits,
 // `for (const i of RUNS)` under `gov:sequential-agents(2)`, with `await agent(` directly inside.
 // The marker is what makes the two kickoffs SEQUENTIAL rather than a fan: two kickoffs sharing the
 // repository's wall clock would each measure the other's disk and index traffic, and a matched pair

@@ -279,7 +279,7 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 _rkd_py=$(resolve_python) || { echo "check-playbook-parity.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
-HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
+HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks scratch-guard.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
 MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree check-memory-hygiene.sh "$HERE") || exit 2
 MT_KIT="${MT_KIT_DIR##*/}"
@@ -310,7 +310,9 @@ fixture() {
   git -C "$d" config user.email t@t; git -C "$d" config user.name t
   cp "$GATE_SRC" "$d/${FX}check-playbook-parity.sh"
   : > "$d/${FX}${MT_KIT}/engine.sh"
-  printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\n' > "$d/${FX}${HOOKS}/agent-cap.js"
+  printf 'const CAP = 5\n' > "$d/${FX}${HOOKS}/scratch-guard.js"
+  # The verify total's owner since TOOL-dBoundRoles-25: the review kit's script-views.js.
+  printf 'const MAX_VERIFIERS = 5\n' > "$d/${FX}${WF}/script-views.js"
   # The lens-array bound's owner (TOOL-dFairHearing-27 S16): a planted workflows kit the registry declares and the
   # waivers excuse (TOOL-dFairHearing-32 S29), so the valid-fixture control stays green with it in the population.
   printf 'const LENS_SLOTS = 5\n' > "$d/${FX}${WF}/check-verifier-fanout.js"
@@ -449,7 +451,7 @@ arm "AC4 the renderer's TEMPLATE_MAJOR drifts from the template marker" red \
   sh -c 'printf "TEMPLATE_MAJOR = 3\n" > '"${PFX}${PB}/render_playbook.py"''
 arm "AC2 MAX_VERIFIERS drifts from the catalogue's stated total" red \
   "a declared value pair disagrees with the source that owns it. Pair verify-agent total" \
-  sh -c 'printf "const MAX_VERIFIERS = 6\n" > '"${PFX}${HOOKS}/agent-cap.js"''
+  sh -c 'printf "const MAX_VERIFIERS = 6\n" > '"${PFX}${WF}/script-views.js"''
 
 # --- AC3 · a placeholder added and the catalogue counts not updated ---------------------------------
 

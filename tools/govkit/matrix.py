@@ -341,22 +341,25 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
                           ("a declaration removed after one", [skill], True)])
 
     # AND OVER settings-merge's CODE-2 STOP (TOOL-dRedressedBar-9): the bare adopter refuses to wire
-    # an agent-cap.js that is not installed, accepted only where the adopter landed and the hook did
-    # not. Both paths are where the ENGINE lands each kit's version-carrying file in this
-    # directory's context, never typed, so a probe naming a path agent-cap does not land at reds a
-    # row here.
+    # a spawn guard the roles kit has not installed (TOOL-dBoundRoles-25 §8 F4), accepted only where the
+    # adopter landed and the hook did not. Both paths are where the ENGINE lands them in this directory's
+    # context, never typed: the adopter's version-carrying file, and the file the code-2 probe names in
+    # the roles kit, so a probe naming a path that kit does not land at reds a row here.
+    _sm_probe = next((b.get("probe") or {} for b in descs["settings-merge"][0].get("outcome", [])
+                      if b.get("code") == 2), {})
+    _hook_name = "/" + posixpath.basename(str(_sm_probe.get("must_not_resolve") or ""))
     engine, writes = {}, {}
-    for _eid in ("agent-cap", "settings-merge"):
+    for _eid in ("roles", "settings-merge"):
         _d, _p = descs[_eid]
-        _f = "/" + str((_d.get("version_from") or {}).get("file") or "")
+        _f = _hook_name if _eid == "roles" else "/" + str((_d.get("version_from") or {}).get("file") or "")
         writes[_eid] = govkit.resolve_entry(
             ROOT, _d, govkit.target_context(g, deploy, _eid, _d))["writes"]
         engine[_eid] = sorted(dest for dest, w in writes[_eid].items()
                               if w["src"] and ("/" + w["src"]).endswith(_f))
-    check("settings-merge exit 2: each kit's version-carrying file lands at exactly one path",
+    check("settings-merge exit 2: the spawn guard and the adopter each land at exactly one path",
           all(len(v) == 1 for v in engine.values()), str(engine))
     if all(len(v) == 1 for v in engine.values()):
-        hook, adopter = engine["agent-cap"][0], engine["settings-merge"][0]
+        hook, adopter = engine["roles"][0], engine["settings-merge"][0]
         # THE RESOLVER'S SECOND STATIC HOME (TOOL-dRedressedBar-10): settings-merge.py probes
         # `<here>/../hooks` after `<here>/hooks`, so a hook there is found and an exit 2 is a
         # failure. Derived from the hook's landed path, re-homed one level above settings-merge's
@@ -368,19 +371,19 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
                                              posixpath.normpath(posixpath.join(_sm, "..")))
         # A HOME ONLY THE RECEIPT RECORDS (TOOL-dRedressedBar-11): the adopter's resolver reads
         # `.governance/install.json` first, so a hook at a renamed home is found and an exit 2 is a
-        # failure, where no static term sees it. The row's `source` is agent-cap's engine source as
+        # failure, where no static term sees it. The row's `source` is the roles kit's engine source as
         # `resolve_entry` gives it, never typed; the home is a fixture value, asserted to be neither
         # static path, so the REFUSED row cannot pass on a static home. The `.git` entry stops the
         # resolver's root walk HERE, so it never reads a receipt of a repository above the scratch.
-        guard = "guard/agent-cap.js"
+        guard = "guard" + _hook_name
         check("settings-merge exit 2: the receipt-only home is neither static home the probe names",
               guard not in (hook, parent), "%s vs %s, %s" % (guard, hook, parent))
         (g / ".git").mkdir(exist_ok=True)
         receipt = {".governance/install.json": json.dumps({"files": [
-            {"path": guard, "kit": "agent-cap", "role": "engine",
-             "source": writes["agent-cap"][hook]["src"]}]}, indent=2) + NL}
+            {"path": guard, "kit": "roles", "role": "engine",
+             "source": writes["roles"][hook]["src"]}]}, indent=2) + NL}
         check_outcome_states(descs, g, "settings-merge", 2,
-                             [("an install with no hooks kit", [adopter], True),
+                             [("an install with no roles kit", [adopter], True),
                               ("an install with the hook beside it", [adopter, hook], False),
                               ("an install that landed neither", [], False),
                               ("an install with the hook at its prefix's parent home only",
@@ -922,7 +925,7 @@ def main() -> int:
         # declines memory-recall's opt-in hook. EXPECTED: every gate, card and check-wiring fragment
         # the install lands is `wired`, the declined hook's fragment is `not wired` naming its hook,
         # nothing lands UNWIRED and nothing is REFUSED; then the target's own check-wiring reads
-        # `ok` for agent-cap, scratch and card. Before the unit the default carried no
+        # `ok` for the spawn guard, scratch and card. Before the unit the default carried no
         # settings-merge, so every fragment landed UNWIRED — the state this shape reds on. Its deploy
         # file names the registry's default as its `kits`, since the renderer refuses a target
         # declaring none, and stubs every placeholder (PLAY-dOrderedCharter-80 S7).
@@ -958,7 +961,7 @@ def main() -> int:
         cw = subprocess.run(govkit.resolve_shell_argv(["bash", f"{PFX}check-wiring.sh", "--check"]),
                             cwd=str(g), capture_output=True, encoding="utf-8", errors="replace",
                             stdin=subprocess.DEVNULL)
-        for arm in ("agent-cap", "scratch", "card"):
+        for arm in ("spawn", "scratch", "card"):
             check(f"default install: check-wiring reads `ok` for {arm}",
                   any(ln.startswith("ok ") and ln.split()[1] == arm for ln in cw.stdout.splitlines()),
                   cw.stdout + cw.stderr)

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # check-verifier-fanout.sh — the COMMITTED workflow harnesses obey the verify-stage TOTAL and the
-# loop markers, rule 2 of the agent-cap hook until TOOL-dFairHearing-16 moved it to this kit's
+# loop markers, rule 2 of the agent limit hook until TOOL-dFairHearing-16 moved it to this kit's
 # check-verifier-fanout.js beside this gate (the owner's NT-27). The ref-keyed-join rule, which this
 # gate also ran through the hook's `scripts` selector since TOOL-dTieredTribunal-14 S3, runs from
 # check-review-join.sh alone now, as the move says.
@@ -11,8 +11,8 @@
 # Exit 0 = clean · 1 = the rule is broken · 2 = misconfigured, or its check refused a harness.
 #
 # THIS GATE DOES NOT IMPLEMENT THE RULE. It runs check-verifier-fanout.js over each script, and that
-# file reads `<prefix>/hooks/agent-cap.js`'s views through the hook's exports, so the rule's scanner is
-# the hook's one scanner. A bash re-implementation of a node predicate is two answers to one
+# file reads this kit's `script-views.js` beside it (TOOL-dBoundRoles-25), so the rule's scanner is the
+# review kit's one scanner. A bash re-implementation of a node predicate is two answers to one
 # question: they would not disagree loudly, they would drift the day either side is tightened, and
 # the gate would then bless scripts the rule denies (or the reverse) with no signal at all.
 #
@@ -41,7 +41,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 # ---- THE PREDICATE, PROBED -------------------------------------------------------------------
 # Three rungs, and the third is not optional. Adopter nc keeps its hooks a directory up from its
 # harnesses, which rung 2 reaches. adopter ic has no such directory AT ALL -- its only copy sits at
-# `.claude/hooks/agent-cap.js` -- so a two-rung chain strands it, and that was found by testing the
+# `.claude/hooks/scratch-guard.js` -- so a two-rung chain strands it, and that was found by testing the
 # derivation against both trees rather than by reasoning about one.
 #
 # F1, ratified: rung 3 stays a literal. `.claude/hooks/` is the HARNESS's own convention, not an
@@ -292,15 +292,15 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 HOOK=""
 _hk_py=$(resolve_python 2>/dev/null) || echo "verifier-fanout: no usable python, so the install receipt and the kit probes were NOT read; only the .claude/hooks/ rung was tried" >&2
-if [ -n "$_hk_py" ] && _hk_dir=$(resolve_kit_dir "$_hk_py" hooks agent-cap.js "$HERE" 2>/dev/null); then
+if [ -n "$_hk_py" ] && _hk_dir=$(resolve_kit_dir "$_hk_py" hooks scratch-guard.js "$HERE" 2>/dev/null); then
   # The resolver answers relative to the checkout holding THIS gate, which is not the caller's
   # `$ROOT` when the gate runs from another repo (closing review round 1 H1). Asked with an inherited
   # `GIT_DIR` unset (round 2 L1): with one exported, git answers `$HERE` itself and the path names nothing.
-  HOOK="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_hk_dir/agent-cap.js"
-elif [ -f "$ROOT/.claude/hooks/agent-cap.js" ]; then
-  HOOK="$ROOT/.claude/hooks/agent-cap.js"
+  HOOK="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_hk_dir/scratch-guard.js"
+elif [ -f "$ROOT/.claude/hooks/scratch-guard.js" ]; then
+  HOOK="$ROOT/.claude/hooks/scratch-guard.js"
 fi
-[ -n "$HOOK" ] || { echo "verifier-fanout: no agent-cap.js through the install receipt, at $HERE/hooks/, $HERE/../hooks/ or $ROOT/.claude/hooks/ — this gate has no predicate to delegate to"; exit 2; }
+[ -n "$HOOK" ] || { echo "verifier-fanout: no scratch-guard.js through the install receipt, at $HERE/hooks/, $HERE/../hooks/ or $ROOT/.claude/hooks/ — this gate has no policy helper locator for a writer split's bound"; exit 2; }
 command -v node >/dev/null 2>&1 || { echo "verifier-fanout: node not found — the predicate is a node hook"; exit 2; }
 
 # The gate and its fixtures are outside their own population: the test's RED fixtures spell the banned
@@ -346,8 +346,9 @@ if [ -z "$SCAN" ]; then
 fi
 
 # THE RULE IS check-verifier-fanout.js BESIDE THIS GATE (TOOL-dFairHearing-16): the hook's rule 2,
-# moved to the review kit by the owner's NT-27, run per harness with the hook resolved above as its
-# `--hook`, whose views and MAX_VERIFIERS it reads. The hook's `scripts` selector, which this gate used
+# moved to the review kit by the owner's NT-27, run per harness with the hooks kit's scratch-guard.js
+# resolved above as its `--hook`, whose policy helper locator a writer split's bound reads (§8 F8 of
+# TOOL-dBoundRoles-25); its views and MAX_VERIFIERS are script-views.js's, beside it. The hook's `scripts` selector, which this gate used
 # to call, now refuses: once rules 2 and 5 left, the mode ran nothing and could never red. Rule 5 runs
 # from check-review-join.sh alone. Its exit 1 is a finding, and its 2 a refusal that ends this gate at
 # exit 2, as the slot count's does below (TOOL-dFairHearing-50 S8).

@@ -130,11 +130,14 @@ the population is then every `*.js` the repo holds.
   whose own ban tables trip the predicate — measured, and it reds the bar. It keeps the derived prefix
   and ADDS `.claude/workflows/` as a literal, the harness's own convention. `.claude/hooks/` stays out.
 
-**The predicate.** Three rungs, tried in order, then a refusal:
+**The hook the fan-out gate names.** Since TOOL-dBoundRoles-25 the predicate's views, `MAX_VERIFIERS` and the
+writer bound are this kit's `script-views.js`, beside both gates, and the one thing the fan-out gate asks a hook for
+is the policy helper a writer split's bound reads (§8 F8 of that unit): the hooks kit's `scratch-guard.js`, found by
+three rungs, tried in order, then a refusal. The join gate reads nothing from a hook and probes none.
 
-1. `agent-cap.js` in `$HERE/hooks/`
-2. `agent-cap.js` in `$HERE/../hooks/` — gov and adopter nc both resolve here
-3. `$ROOT/.claude/hooks/agent-cap.js` — adopter ic has no sibling `hooks/` at all, and this is its only copy
+1. `scratch-guard.js` in `$HERE/hooks/`
+2. `scratch-guard.js` in `$HERE/../hooks/` — gov and adopter nc both resolve here
+3. `$ROOT/.claude/hooks/scratch-guard.js` — adopter ic has no sibling `hooks/` at all, and this is its only copy
 
 The third rung is not a fallback for tidiness; a two-rung chain strands a real adopter, which was
 found by testing the derivation against both trees rather than by reasoning about one. A gate that
@@ -174,15 +177,15 @@ given before now refuses, exit 2, naming the two script homes.
 | the ref-keyed verdict join ban | `check-review-join.js` | `check-review-join.sh` alone, per script |
 | the spec-audit opt-in | `spec-audit-optin.js` | the `PreToolUse` wiring, on `Workflow` calls |
 
-The two script homes are CLIs as well as modules, and take the hook as `--hook`:
+The two script homes are CLIs as well as modules; the fan-out one takes the hooks kit's scratch-guard.js as `--hook`:
 
 ```bash
-node <prefix>/workflows/check-verifier-fanout.js --hook <prefix>/hooks/agent-cap.js <file>…
-node <prefix>/workflows/check-review-join.js --hook <prefix>/hooks/agent-cap.js <file>…
+node <prefix>/workflows/check-verifier-fanout.js --hook <prefix>/hooks/scratch-guard.js <file>…
+node <prefix>/workflows/check-review-join.js <file>…
 ```
 
 Each prints a finding as the hook printed it and exits 1, exits 0 clean, and exits 2 when it cannot
-load the hook's exports or read a file. A writer split's bound is read at the working directory. An
+load `script-views.js` beside it, the fan-out one the hook's `resolvePolicyHelper` too, or read a file. A writer split's bound is read at the working directory. An
 inline `script` on a `Workflow` call is no longer judged at the tool call: the harness's own
 concurrency settings bound it, and the gates judge every harness that lands.
 
@@ -194,9 +197,8 @@ python <prefix>/settings-merge.py --fragment <prefix>/workflows/spec-audit-optin
 
 A default install wires it through govkit, and `<prefix>/check-wiring.sh` grades it with the same
 per-fragment loop that grades the hooks kit's fragments, reporting it UNWIRED in a tree that unwired
-it. It reads `extractWorkflowArgs` and `extractBuildSlug` from the hook and `readFrontMatterKey` and
-`readConfKey` from scratch-guard.js, both in the directory its inline `resolveKitDir`, agent-cap's
-resolver, finds the hooks kit in: the install receipt's row, then the two sibling probes. A copy that
+it. It reads `extractWorkflowArgs`, `extractBuildSlug`, `readFrontMatterKey` and `readConfKey` from
+scratch-guard.js, in the directory its inline `resolveKitDir`, the hooks kit's resolver, finds that kit in: the install receipt's row, then the two sibling probes. A copy that
 finds no hooks kit denies a call whose args may be a spec audit, naming the three places it looked, and
 admits every other; one that cannot load a reader from there denies naming that reader. What the rule
 denies is stated in `<prefix>/hooks/README.md`.

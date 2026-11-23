@@ -8,7 +8,7 @@
 # leg TAB reds TAB last seconds, or -
 # A row carrying `scope_of` holds its own reds plus those of the leg it names.
 # window	210	2026-09-21T03:34:29Z	2026-11-13T03:27:45Z	a	2026-11-13
-agent-cap self-test	2	742.0
+spawn-guard self-test	2	742.0
 brief-recorded	20	104.1
 build README slot contract	1	2.1
 check-wiring self-test	2	588.9

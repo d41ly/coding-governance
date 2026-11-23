@@ -100,11 +100,11 @@
 - `<prefix>/workflows/tier2-review.js` runs a Tier-2 review as one bounded `Workflow`.
 <!-- /kit:review-harness -->
 <!-- kit:agent-cap -->
-- The agent-cap hook refuses an unbounded fan-out at the tool call; consolidate the fan-out rather than routing around it.
 - The write gate refuses a product-code write that no specced unit owns; route the unit through `/session-kickoff` first.
 <!-- /kit:agent-cap -->
 <!-- kit:roles -->
 - An attended code build runs through `/build`.
+- The spawn guard refuses an agent prompt that is not a rendered handoff, and a harness that differs from its landed blob; land the harness, or render the handoff, rather than routing around it.
 <!-- /kit:roles -->
 <!-- kit:unattended -->
 - `/unattended` starts, resumes or closes a run that merges and pushes with no owner turn.

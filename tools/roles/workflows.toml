@@ -179,7 +179,7 @@ roles = ["gov-reviewer", "gov-skeptic", "gov-synthesizer"]
 kind = "panel"
 checklist = "none"
 orientation = "unit.orient.verifier-cold"
-enforced-by = ["agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys"]
+enforced-by = ["spawn-guard.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys"]
 trigger = "after the spec set is written, where the build or its project declares a spec audit"
 
 [[workflow.stages]]
@@ -237,7 +237,7 @@ roles = ["gov-reviewer", "gov-skeptic", "gov-synthesizer"]
 kind = "panel"
 checklist = "unit.checklist.for-diff"
 orientation = "unit.orient.verifier-cold"
-enforced-by = ["agent-cap.js spawn guard"]
+enforced-by = ["spawn-guard.js spawn guard"]
 trigger = "once per build, after the last unit is terminal, over the cumulative diff"
 
 [[workflow.stages]]
@@ -286,7 +286,7 @@ roles = ["gov-researcher"]
 kind = "single"
 checklist = "none"
 orientation = "none"
-enforced-by = ["agent-cap.js spawn guard"]
+enforced-by = ["spawn-guard.js spawn guard"]
 trigger = "any time a design must choose between candidates that no existing seam decides"
 
 [[workflow]]
@@ -316,7 +316,7 @@ roles = ["gov-planner"]
 kind = "single"
 checklist = "unit.checklist.for-paths"
 orientation = "unit.orient.producer"
-enforced-by = ["agent-cap.js spawn guard"]
+enforced-by = ["spawn-guard.js spawn guard"]
 trigger = "any time a build's plan is drafted, judged or recorded, before its specs are written"
 
 [[workflow]]
@@ -327,5 +327,5 @@ roles = ["gov-architect"]
 kind = "single"
 checklist = "unit.checklist.for-paths"
 orientation = "unit.orient.producer"
-enforced-by = ["agent-cap.js spawn guard"]
+enforced-by = ["spawn-guard.js spawn guard"]
 trigger = "any time a build's scope is inventoried or decomposed into units, before its specs are written"

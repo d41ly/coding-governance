@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/agent-cap.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/roles/spawn-guard.js\""
           }
         ]
       },

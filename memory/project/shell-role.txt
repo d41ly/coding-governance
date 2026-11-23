@@ -40,14 +40,13 @@ tools/check-template-size.sh	336	99c65d5e352d061e856a81d01d00f3454294071c	widene
 tools/check-template-size.test.sh	255	99c65d5e352d061e856a81d01d00f3454294071c	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
 tools/check-testsuite-counts.sh	85	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/check-testsuite-counts.test.sh	306	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/check-wiring.sh	1306	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/check-wiring.sh	1291	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/check-wiring.test.sh	1654	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/codebase-map/adopt-codebase-map.sh	277	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/codebase-map/adopt-codebase-map.test.sh	353	2e4634f8cf060cbf11c9d8046da58737629773e5	widened:2026-11-20-build-TOOL-dWitnessedBar-57-widen-2
 tools/drift-audit/adopt-drift-audit.sh	262	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/gate-lint/fork-count.sh	344	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/govkit/census.test.sh	241	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/hooks/agent-cap.test.sh	708	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/hooks/format-guard.test.sh	598	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
 tools/hooks/scratch-guard.test.sh	1353	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
 tools/lexicon/adopt-lexicon.sh	473	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
@@ -94,6 +93,7 @@ tools/push-main.test.sh	1685	ea0c6868d78283c542daa710e6678851292b9c86	widened:20
 tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	203	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/roles/adopt-roles.sh	283	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/roles/adopt-roles.test.sh	845	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/roles/spawn-guard.test.sh	708	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/adopt-run-gates.sh	103	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/adopt-run-gates.test.sh	334	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/fixtures/measure-legs/forks.sh	9	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
@@ -143,8 +143,8 @@ tools/unattended/stop-guard.test.sh	618	85a1c45076fd9093f1b9a08a2d720c8146aa1acf
 tools/unattended/unattended.sh	11453	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
 tools/unattended/unattended.test.sh	16420	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
 tools/workflows/check-protocol-parity.test.sh	698	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/workflows/check-review-join.sh	408	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/workflows/check-review-join.test.sh	533	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/workflows/check-review-join.sh	219	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/workflows/check-review-join.test.sh	530	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/check-verifier-fanout.sh	275	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/check-verifier-fanout.test.sh	1443	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
 tools/workflows/spec-audit-optin.test.sh	474	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded

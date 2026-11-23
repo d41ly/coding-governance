@@ -86,7 +86,7 @@ reads policy through the helper, and the mirror rendered at its commit in the wo
 parity and readers arms. `mirror-worktree-loosened`, `mirror-stale-last-valid`, `mirror-stale-refuse`
 and `mirror-absent-refuse` are outcome cases (TOOL-dGroundRules-5): each copies policy.py,
 policy-mirror.js and policy-shim.sh into the kit copy, pushes a landed revision L to a bare remote,
-and asserts what the helper, the hooks kit's agent-cap.js and `arm_mirror_landed` answer there.
+and asserts what the helper, the roles kit's spawn-guard.js and `arm_mirror_landed` answer there.
 `mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in six ladder states.
 `mirror-commit-rewrite` (TOOL-dGroundRules-65) commits the mirror rendered at its parent, rewrites
 that commit with `git commit-tree` as the lander does, and reds a `mirror --check` that is not fresh
@@ -141,10 +141,10 @@ last `policy.py mirror --print` too, which must refuse at the same line;
 over a malformed file whose last valid revision sets 6, render the mirror and red a `get` or a
 helper reading the fresh mirror that does not answer the lowered value;
 `limit-settings-render` commits two policy values and runs `policy.py settings`; the seven `limit-hook-`
-cases copy the hooks kit's agent-cap.js and scratch-guard.js beside a copy of this kit, so rule 7 reads
+cases copy the roles kit's spawn-guard.js and the hooks kit's scratch-guard.js beside a copy of this kit, so rule 7 reads
 the fixture's own limit, and judge each call by its exit code and the text its criterion names;
 `limit-hook-writer-split` (TOOL-dGroundRules-18) runs the workflows kit's build-harness template,
-rendered at 6, through that kit's `check-verifier-fanout.js` over the hook copy, which holds rule 2
+rendered at 6, through that kit's `check-verifier-fanout.js`, given the scratch-guard.js copy, which holds rule 2
 since TOOL-dFairHearing-16, so rule 2 judges its `gov:fixed-writers` split by that limit, and runs
 that kit's `check-review-join.js`, which holds rule 5, over a case holding a ref-keyed verdict join.
 
@@ -2479,15 +2479,11 @@ def run_mirror_landed(name):
             doc = json.loads(mirror.read_bytes())
             doc["keys"][AGENTS_KEY]["value"] = 8
             mirror.write_bytes((json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii"))
-            # The hooks kit's agent-cap.js beside the kit copy, its settings at 3 (TOOL-dGroundRules-10):
-            # rule 7 must read L's limit of 2, never the working-tree mirror's 8.
-            hooks = resolve_kit_dir("hooks", "agent-cap.js", KIT)
-            hook = repo / (policy.run_git(hooks, "rev-parse", "--show-prefix") or "").strip() / "agent-cap.js"
-            hook.parent.mkdir(parents=True, exist_ok=True)
-            for f in HOOK_FILES:
-                (hook.parent / f).write_bytes((hooks / f).read_bytes().replace(b"\r\n", b"\n"))
+            # The roles kit's spawn-guard.js beside the kit copy, its settings at 3 (TOOL-dGroundRules-10):
+            # rule 7 must read L's limit of 2, never the working-tree mirror's 8 (TOOL-dBoundRoles-25 moved it).
+            hook = write_hook_copies(repo)
             write_settings(repo, render_limit_env(3))
-            checks += [check_hook_call(at_l, "agent-cap.js rule 7 with settings at 3", hook, render_spawn(repo, "u3"),
+            checks += [check_hook_call(at_l, "spawn-guard.js rule 7 with settings at 3", hook, render_spawn(repo, "u3"),
                                        lambda rc, err: rc == 2 and "above runtime.agents-in-flight 2" in err),
                        check_run(at_l, what, helper, lambda rc, o, e: rc == 0 and o == "2\n")]
         elif name == "mirror-stale-last-valid":
@@ -3589,7 +3585,10 @@ def run_reader_declared(name):
 # ---- the agent limit (TOOL-dGroundRules-10) ------------------------------------------------------
 
 LIMIT_POLICY = "[runtime]\nagents-in-flight = {n}\n"
-HOOK_FILES = ("agent-cap.js", "scratch-guard.js")
+# TOOL-dBoundRoles-25: the rules the hook cases judge are the roles kit's spawn guard's, which reads the hooks
+# kit's scratch-guard.js exports; each is copied to its own kit's path, so the pack finds the hooks kit and the
+# hooks kit this kit's copy, as they find each other in gov's tree.
+HOOK_FILES = (("roles", "roles_lib.py", "spawn-guard.js"), ("hooks", "scratch-guard.js", "scratch-guard.js"))
 SETTINGS_FILE = (".claude", "settings.json")
 SETTINGS_LOCAL = (".claude", "settings.local.json")
 # The retired print mode's flag in two halves, so the grep `limit-hook-env-cap` runs over the tool root
@@ -3621,21 +3620,32 @@ def render_limit_env(n):
     return {v: str(n) for v in policy.SETTINGS_VARS}
 
 
+def write_hook_copies(repo):
+    """The spawn guard and scratch-guard.js copied into `repo` at their kits' own paths, CRLF folded;
+    -> the spawn guard's copy."""
+    hook = None
+    for home, anchor, name in HOOK_FILES:
+        src = resolve_kit_dir(home, anchor, KIT)
+        dst = Path(repo) / (policy.run_git(src, "rev-parse", "--show-prefix") or "").strip()
+        dst.mkdir(parents=True, exist_ok=True)
+        (dst / name).write_bytes((Path(src) / name).read_bytes().replace(b"\r\n", b"\n"))
+        hook = hook or dst / name
+    return hook
+
+
 def build_limit_repo(path, policy_text, conf=None, mirror=True):
     """A git repository at `path` on `main`, no remote, so local main is its landed revision: this
-    kit's reader, mirror helper and shim beside its catalogue at the kit's own path, the hooks kit's
-    agent-cap.js and scratch-guard.js at theirs, `policy_text` as the policy file (None: none) and
+    kit's reader, mirror helper and shim beside its catalogue at the kit's own path, the roles kit's
+    spawn-guard.js and the hooks kit's scratch-guard.js at theirs, `policy_text` as the policy file (None: none) and
     `conf` as `.agent-cap.conf`, committed; then, when `mirror`, the mirror rendered at that commit,
     committed over it: a malformed conf refuses the render (TOOL-dGroundRules-15), so its case has none.
     -> (repo, kit copy, hook copy)."""
-    hooks = resolve_kit_dir("hooks", "agent-cap.js", KIT)
     path.mkdir()
     kit = path / (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()
-    hook_dir = path / (policy.run_git(hooks, "rev-parse", "--show-prefix") or "").strip()
-    for src, dst, names in ((KIT, kit, (policy.CATALOGUE, *MIRROR_KIT_FILES)), (hooks, hook_dir, HOOK_FILES)):
-        dst.mkdir(parents=True, exist_ok=True)
-        for f in names:
-            (dst / f).write_bytes((Path(src) / f).read_bytes().replace(b"\r\n", b"\n"))
+    kit.mkdir(parents=True, exist_ok=True)
+    for f in (policy.CATALOGUE, *MIRROR_KIT_FILES):
+        (kit / f).write_bytes((Path(KIT) / f).read_bytes().replace(b"\r\n", b"\n"))
+    hook = write_hook_copies(path)
     if policy_text is not None:
         write_policy(path, policy_text)
     if conf is not None:
@@ -3645,12 +3655,12 @@ def build_limit_repo(path, policy_text, conf=None, mirror=True):
     run_fixture_git(path, "add", "-A")
     run_fixture_git(path, "commit", "-q", "-m", "the agent limit's fixture")
     if not mirror:
-        return path, kit, hook_dir / "agent-cap.js"
+        return path, kit, hook
     Path(path, *MIRROR_FILE).parent.mkdir(exist_ok=True)
     Path(path, *MIRROR_FILE).write_bytes(policy.render_mirror(path, "HEAD"))
     run_fixture_git(path, "add", "-A")
     run_fixture_git(path, "commit", "-q", "-m", "its mirror")
-    return path, kit, hook_dir / "agent-cap.js"
+    return path, kit, hook
 
 
 def check_hook_call(scenario, what, hook, payload, want, env=None, args=(), cwd=None):
@@ -3692,7 +3702,7 @@ def write_handoff_fixture(repo):
 def run_limit_case(name):
     """One planted repository per `limit-` case (TOOL-dGroundRules-10), judged by exit code and the
     text each criterion names. The conf cases read `policy.py get` at the landed revision; the render
-    case commits two policy values; the hook cases run the hooks kit's agent-cap.js beside a copy of
+    case commits two policy values; the hook cases run the roles kit's spawn-guard.js beside a copy of
     this kit, so rule 7 reads the fixture's own landed limit, with each payload's cwd the fixture."""
     t = Path(tempfile.mkdtemp(prefix="pol-"))
     checks = []
@@ -3758,6 +3768,10 @@ def run_limit_case(name):
             repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=8), "FANOUT_CAP=8\n")
             checks.append(check_get("at 8", repo, ["--write"], lambda rc, o, e: rc == 0, kit=kit, verb="settings"))
             spawn = write_handoff_fixture(repo)
+            # TOOL-dBoundRoles-25 S3: a declared harness is admitted only at its landed blob, and local main is
+            # this repository's landed revision, so the harness the fixture wrote is committed before it is called.
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "-m", "the handoff and the registered harness")
             checks += [check_hook_call(name, "a handoff-valid Agent call", hook,
                                        {**render_spawn(repo, "u8"), "tool_input": spawn}, admits),
                        check_hook_call(name, "the registered harness", hook, {
@@ -3857,8 +3871,10 @@ def run_limit_case(name):
             def check_case(repo, hook, script, what, want, checker="check-verifier-fanout.js"):
                 case = Path(repo, "fanout-case.js")
                 case.write_text(script, encoding="utf-8", newline="\n")
-                return check_run(name, what, ["node", str(wf / checker), "--hook", str(hook), str(case)],
-                                 want, cwd=repo)
+                # TOOL-dBoundRoles-25 §8 F8: the fan-out check's --hook is the hooks kit's scratch-guard.js copy,
+                # whose policy helper locator a writer split's bound reads; the join check takes no hook.
+                guard = ["--hook", str(next(Path(repo).rglob("scratch-guard.js")))] if checker == "check-verifier-fanout.js" else []
+                return check_run(name, what, ["node", str(wf / checker), *guard, str(case)], want, cwd=repo)
             for i, (n, script, what, want) in enumerate((
                     (6, render, "the render at 6 under a landed limit of 6", lambda rc, o, e: rc == 0),
                     (4, render, "the render at 6 under a landed limit of 4",

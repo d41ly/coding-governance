@@ -418,6 +418,14 @@ of a return that is no valid refusal, and 2 when a reader it asks refuses.
   writer. Your own files under `.claude/agents/` are not affected. The policy kit's commit guard also
   admits a commit of these files only as `render_agents.py --write` leaves them.
 - A `Workflow` call that runs anything other than a listed harness with its `roles` argument.
+- A `Workflow` call whose listed harness is not at its landed blob: the file differs from the bytes the
+  landed revision holds for it, the default branch's tip the policy kit names, or the landed revision
+  holds no such file. An edit committed and not yet landed is refused like one never committed, since
+  the merge bar has not read it. The refusal names the harness and the landed revision's first eight
+  hex digits; land the edit, or run the harness at its landed bytes. A checkout with CRLF line endings
+  compares through git's own filters, so it is not refused for them. Without the policy kit no landed
+  revision can be read, and every listed harness is refused, naming the kit to install.
+  <!-- usage: hook:spawn-guard 66668593 -->
 - A role agent's direct return that fails its role's `return` template: no `json` block or
   `key: value` fields to read, a required field missing, a field the template does not name, a value
   of the wrong type or outside its set, a `sha` naming no commit, a `path` naming no file, or an

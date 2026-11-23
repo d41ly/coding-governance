@@ -1001,7 +1001,7 @@ adopter who unwires one keeps it unwired, and `check-wiring.sh` reports it. A de
 
 | Kit | Hook | Event | Matcher |
 |---|---|---|---|
-| `agent-cap` | `agent-cap.js` | PreToolUse | `Workflow\|Agent` |
+| `roles` | `spawn-guard.js` | PreToolUse | `Workflow\|Agent` |
 | `agent-cap` | `scratch-guard.js` | PreToolUse | `Bash\|PowerShell\|Edit\|Write\|MultiEdit\|NotebookEdit` |
 | `agent-cap` | `scratch-guard.js` | SubagentStart | `*` |
 | `review-harness` | `spec-audit-optin.js` | PreToolUse | `Workflow` |
@@ -1013,23 +1013,24 @@ An opt-in hook the target declined, as memory-recall's `recall-opened.js`, lands
 is reported `not wired`, never refused. The manual steps below are for a project wiring by hand.
 
 **Concurrency guard (recommended for ANY project that fans out `Workflow` agents — the charter's `[bound]`):**
-- Copy `<prefix>/hooks/agent-cap.js` (+ its `.test.sh` sibling) into the project **under the same kit
-  prefix as your other kits** — `<project>/<prefix>/hooks/`. **NOT `<project>/.claude/hooks/`**, which this runbook prescribed until
-  TOOL-dRetiredFork-14/21 withdrew that destination: the wiring check now expects the hook beside
-  the kit that ships it and reports a `.claude/` copy as a legacy one.
+- The guard is the roles kit's `<prefix>/roles/spawn-guard.js` (TOOL-dBoundRoles-25), which reads the hooks kit's
+  `<prefix>/hooks/scratch-guard.js`: copy both kits into the project **under the same kit prefix as your other
+  kits**. **NOT `<project>/.claude/hooks/`**, which this runbook prescribed until TOOL-dRetiredFork-14/21 withdrew
+  that destination. A tree still wiring the retired hooks kit file moves through the upgrade step
+  `agent-cap/spawn-guard-to-roles-pack`, which wires the pack before it unwires the old command.
 - Wire the `PreToolUse` hook into `.claude/settings.json` idempotently (from the project root):
   ```bash
   python <gov>/<prefix>/settings-merge.py    # merges/creates .claude/settings.json; re-run = no-op; `--check` verifies; backs up to settings.json.bak on change
   ```
-  It inserts the block below (a hand-merge works too):
+  With no `--fragment` it wires the roles kit's `spawn-guard.fragment.json`, inserting the block below (a hand-merge works too):
   ```json
   "PreToolUse": [ { "matcher": "Workflow|Agent", "hooks": [ { "type": "command",
-    "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\"" } ] } ]
+    "command": "node \"${CLAUDE_PROJECT_DIR}/<prefix>/roles/spawn-guard.js\"" } ] } ]
   ```
   The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression,
   and not two blocks. `Workflow` is a harness call and `Agent` the direct-spawn modality; the hook
   judges both calls and reads no script since TOOL-dFairHearing-16. `<prefix>/check-wiring.sh` asserts
-  this matcher VALUE, not merely that the file mentions `agent-cap.js`: a group left at `Workflow`
+  this matcher VALUE, not merely that the file mentions `spawn-guard.js`: a group left at `Workflow`
   alone contains the string and used to report ok.
   The review protocol's TWO rules have two enforcers since TOOL-dGroundRules-10. How
   many agents run AT ONCE is the policy key `runtime.agents-in-flight`: the policy kit renders it into
@@ -1037,7 +1038,7 @@ is reported `not wired`, never refused. The manual steps below are for a project
   settings --write`, which every landing re-runs), the harness enforces them, and the hook refuses
   any call whose checkout's settings are absent or above the landed limit. Run that render once at
   install, after the policy kit, or the hook refuses every spawn. A review's verify stage spawning
-  at most the hook's `MAX_VERIFIERS` agents TOTAL is the review kit's `check-verifier-fanout.js`,
+  at most `MAX_VERIFIERS` agents TOTAL, the constant in the review kit's `script-views.js`, is its `check-verifier-fanout.js`,
   run over every committed harness by the merge bar's `verifier fan-out` gate (TOOL-dFairHearing-16). A `FANOUT_CAP` line in `.agent-cap.conf` lowers the limit through the policy reader and
   never raises it; the hook reads no conf and no environment variable. A wide fan-out trips the
   server rate
@@ -1047,7 +1048,7 @@ is reported `not wired`, never refused. The manual steps below are for a project
 - Copy the kit dir in as `<project>/<prefix>/workflows/` for a ready consolidated review harness
   (`tier2-review.js`): five finder lenses, then at most five BATCHED verifiers, then one synthesis
   pass — 7–11 agents over the whole run, all within the verify-stage bound
-  `<prefix>/hooks/agent-cap.js` resolves and the agent limit the policy kit renders.
+  `<prefix>/workflows/script-views.js` resolves and the agent limit the policy kit renders.
 - Then run `bash <project>/<prefix>/workflows/check-protocol-parity.test.sh --render` once. The kit
   ships the unattended build harness as `unattended-build.template.js`, and this writes
   `unattended-build.js` beside it with your install paths filled in, and the protocol copy with it.
@@ -1056,7 +1057,7 @@ is reported `not wired`, never refused. The manual steps below are for a project
   the harness out loud, by name, and still renders the protocol; export `MEMORY_TREE_DIR=<dir>` if
   yours lives elsewhere, and an override naming nothing tracked is refused.
 - Verify all five workflow legs, not two — the dogfood bar runs every one of these:
-  `bash <project>/.claude/hooks/agent-cap.test.sh` · `bash <project>/<prefix>/workflows/check-protocol-parity.test.sh` ·
+  `bash <project>/<prefix>/roles/spawn-guard.test.sh` · `bash <project>/<prefix>/workflows/check-protocol-parity.test.sh` ·
   `bash <project>/<prefix>/workflows/check-verifier-fanout.sh` · `bash <project>/<prefix>/workflows/check-review-join.sh` ·
   `node <project>/<prefix>/workflows/check-workflow-syntax.js` — each → exit 0.
 
@@ -1387,7 +1388,7 @@ it.
 ├── <prefix>/manifest-check.sh # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
 ├── .claude/settings.json        # the hooks a default install wires (§5's table), by settings-merge
-├── <prefix>/hooks/              # agent-cap.js, scratch-guard.js + their two fragments (hooks kit, default)
+├── <prefix>/hooks/              # scratch-guard.js, format-guard.js + their fragments (hooks kit, default)
 ├── <prefix>/settings-merge.py   # the one writer of .claude/settings.json (default)
 ├── <prefix>/check-wiring.sh     # reports an unwired hook or an UNARMED ROUTED_PATHS (default)
 ├── <prefix>/roles/              # the role catalogue + its adopter; house/policy.toml is yours (default)
@@ -2152,7 +2153,7 @@ exports it cannot hide an encoding dependency.
 
 ### The hooks ship ONE copy each — migrating a tree that has two
 
-Before `TOOL-dRetiredFork-14`, `agent-cap.js` and `scratch-guard.js` installed to both
+Before `TOOL-dRetiredFork-14`, the agent limit hook and `scratch-guard.js` installed to both
 `{prefix}/hooks/` and `.claude/hooks/`, and the wired command named the second. Only the first ships
 now. A tree adopted before that change has two copies and a command pointing at the one that is no
 longer maintained.

@@ -3073,7 +3073,6 @@
       "{prefix}/hooks/format-guard.js",
       "{prefix}/hooks/format-guard.test.sh",
       "{prefix}/hooks/scratch-guard.js",
-      "{prefix}/hooks/agent-cap.js",
       "{prefix}/runlog/prose.py",
       "{prefix}/runlog/extract.py",
       "{prefix}/lib/"
@@ -3089,20 +3088,21 @@
     ]
   },
   {
-    "name": "agent-cap self-test",
-    "tag": "leg.gov.agent-cap-self-test",
+    "name": "spawn-guard self-test",
+    "tag": "leg.gov.spawn-guard-self-test",
     "tests": [
-      "feature.agent-cap"
+      "feature.roles"
     ],
-    "purpose": "tests the agent-cap guard on Workflow and Agent tool calls",
+    "purpose": "tests the spawn guard on Workflow and Agent tool calls",
     "argv": [
       "bash",
-      "{prefix}/hooks/agent-cap.test.sh"
+      "{prefix}/roles/spawn-guard.test.sh"
     ],
     "guard": [
-      "{prefix}/hooks/",
-      "{prefix}/lib/",
-      "{prefix}/workflows/spec-audit-optin.js"
+      "{prefix}/roles/spawn-guard.js",
+      "{prefix}/roles/spawn-guard.fragment.json",
+      "{prefix}/roles/spawn-guard.test.sh",
+      "{prefix}/hooks/scratch-guard.js"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3856,7 +3856,7 @@
       "{prefix}/workflows/check-review-join.js",
       "{prefix}/workflows/check-verifier-fanout.js",
       "{prefix}/lib/",
-      "{prefix}/hooks/agent-cap.js",
+      "{prefix}/roles/spawn-guard.js",
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/check-template-size.sh",
       "{prefix}/check-spec-tokens.py",

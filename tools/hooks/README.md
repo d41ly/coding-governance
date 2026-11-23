@@ -1,12 +1,22 @@
-# agent-cap — the fan-out guard, and the grammar it enforces
+# agent-cap — the hooks kit: the write gate, the turn-end format guard, and the grammar the guards enforce
 
-A `PreToolUse` hook that bounds review fan-out at the tool call, where the rule actually gets broken.
-The charter's `[bound]` practice states the two rules; this file states the GRAMMAR the hook recognises, because a
-grammar is implementation detail of one hook and does not belong in a ruleset every session reads.
+The kit keeps its registry id `agent-cap` though the hook file it was named for retired (TOOL-dBoundRoles-25):
+every rule that file ran moved into the roles kit's spawn guard, `<prefix>/roles/spawn-guard.js`, and its
+version moved to `scratch-guard.js`'s `KIT_AGENT_CAP_VERSION`. Where each moved rule lives now:
+
+| Rule | Its home |
+|---|---|
+| the `--only=` refusal, rule 6 (the rendered handoff, harness admission held to the landed blob), rule 8 (the effort level), rule 7 (the settings in force), the spec-audit pack's presence | the roles kit's `spawn-guard.js`, in that order; its README's "The spawn guard" |
+| the script views, `runBothViews`, `MAX_VERIFIERS`, the writer bound, the harness name | the review kit's `script-views.js`, read by its two merge-bar gates |
+| the marker, args and slug readers, the policy helper's locator, `resolveKitDir` | this kit's `scratch-guard.js` exports, which both kits read |
+
+The charter's `[bound]` practice states the two rules; this file states the GRAMMAR the guards recognise, because a
+grammar is implementation detail and does not belong in a ruleset every session reads. The sections on rules 6,
+7 and 8 below describe the spawn guard's rules as they moved, its deny prefix `BLOCKED by spawn-guard:`.
 
 ## The two rules
 
-- **The verify-stage TOTAL is `agent-cap.js`'s `MAX_VERIFIERS`.** Batching grows the batch, never
+- **The verify-stage TOTAL is the review kit's `script-views.js` `MAX_VERIFIERS`.** Batching grows the batch, never
   the agent count.
 - **Concurrency is a SECOND bound, and since TOOL-dGroundRules-10 it is not this file's.** How many agents
   run at once is the policy key `runtime.agents-in-flight`, which the policy kit renders into the
@@ -16,8 +26,11 @@ grammar is implementation detail of one hook and does not belong in a ruleset ev
 
 ## Wiring
 
-The matcher is the exact pair `Workflow|Agent`. `Workflow` alone leaves direct spawns unguarded,
-which is the configuration this hook was rewritten to stop shipping.
+The spawn guard's matcher is the exact pair `Workflow|Agent`. `Workflow` alone leaves direct spawns
+unguarded. `settings-merge.py` with no `--fragment` wires it from the roles kit's
+`spawn-guard.fragment.json`, and an install whose wired command still names the retired hook moves through the
+upgrade step `agent-cap/spawn-guard-to-roles-pack`, which wires the pack FIRST and unwires the old command
+SECOND, for the reason below, and restores the settings file byte-identical on its down.
 
 **ONE COPY SHIPS, and the wired command names it.** Until `TOOL-dRetiredFork-14` this hook was
 installed to `{prefix}/hooks/` AND `.claude/hooks/`, byte-identical, and the wired command named the
@@ -387,7 +400,7 @@ skipped. Its profile is the one whose `match` holds a word of the id, else the d
 
 A refusal names the role or stage, both levels, the model and where it was read, and the call that
 prints the right value. A level it cannot check is admitted with one stderr line,
-`agent-cap: rule 8 did not check this <tool> call's effort level — <why>`: no `transcript_path`, an
+`spawn-guard: rule 8 did not check this <tool> call's effort level — <why>`: no `transcript_path`, an
 unreadable transcript, no entry naming a model, a model two profiles match, a harness whose
 workflows hold no stage key, and an `Agent` call where `CLAUDE_CODE_EFFORT_LEVEL` is set, since that
 session's tool offers no `effort`.
@@ -539,7 +552,7 @@ the agent writes: approval is recorded, not proven. The gate stops forgetting, n
 **The role arm: WHO writes a spec or a product file** (`TOOL-aOrientedCast-6`), and what a
 `none` or `review` role writes anywhere else (`TOOL-dBoundRoles-9`). The same gate reads
 the payload's `agent_type` against the role index `.claude/roles.json` at the target's toplevel,
-which the roles kit generates; `loadRoleIndex(top)` is the one reader, exported for `agent-cap.js`.
+which the roles kit generates; `loadRoleIndex(top)` is the one reader, exported for the roles kit's `spawn-guard.js`.
 Four write classes are graded:
 
 - **spec** — a target under `<MEMORY_ROOT>/builds/<build>/spec/`, at any depth. Admitted only from
@@ -696,7 +709,7 @@ the subject, a ` · ` inside a value folded to `, `; then each missing `agent` o
 `handoff.py agents` prints it. The hook runs that verb with no shell and never with `--write`, using
 the selector the turn already names: `--run <run-id>` for a harness agent, `--handoff <path>` from
 the `gov:handoff` marker of a direct agent's prompt, an absolute or climbing path refused. The roles
-kit is found by `agent-cap.js`'s `resolveKitDir`, and every spawn of one stop shares a 20 s bound.
+kit is found by `scratch-guard.js`'s `resolveKitDir`, and every spawn of one stop shares a 20 s bound.
 A line off its derived shape is withheld. An agent with no marker, no script, no launcher, a failing
 verb or a spent bound keeps the sentence naming the verb, with one witness line; a derivation never
 turns a block into an allow, and an allowing stop spawns nothing.
@@ -857,7 +870,7 @@ agent's remedy. It stops forgetting, not evasion.
 `TOOL-dBoundRoles-10`. On a `Read`, `Grep` or `Glob` payload, `main` calls `checkDriverRead` after its
 `SubagentStart` branch and before its write-gate branch, then exits, so a read never reaches
 `checkRouted` or the Bash checks. It reads the policy key `driver.reads` through the policy kit's
-`readPolicy`, found through agent-cap's `resolvePolicyHelper` as the red-fix lane reads its key, at the
+`readPolicy`, found through `scratch-guard.js`'s `resolvePolicyHelper` as the red-fix lane reads its key, at the
 toplevel of the payload `cwd` (else `CLAUDE_PROJECT_DIR`), at the landed revision. First match wins:
 
 - a payload carrying an `agent_type` is admitted: a worker keeps its read-only probes;

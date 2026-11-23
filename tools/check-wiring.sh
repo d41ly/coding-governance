@@ -71,7 +71,7 @@ done
 # ABOVE the append, so a ROOT install breaks on iteration one with no segment. It used to append
 # first and test the PARENT, so `$_p` was never tested as the root: a root install walked PAST the
 # repository to the filesystem root and handed every rung a prefix of directories ABOVE the tree —
-# measured as `c/Temp/kw3/repo`, and the agent-cap arm skipped `not adopted` over a hook that was
+# measured as `c/Temp/kw3/repo`, and the agent limit arm skipped `not adopted` over a hook that was
 # there. OUTSIDE a repo the walk still ends at the filesystem root with that same path in KIT_REL;
 # that is not fixed here because `--check` exits at `skip — not a git repo` before any rung reads it.
 KIT_REL=${KIT_REL:-}
@@ -371,7 +371,7 @@ derive_receipt_miss() { # <kit-home> <file> -> a skip reason, or ""
 # tool is copied in per WIRE §3c step 4 / §5, so an arm that REQUIRED it to answer reported
 # `skip … exit 0` on the state the runbook calls the one bad state).
 #
-# THE MATCHER HALF IS NEW, AND IT IS THE WHOLE POINT. A file-wide grep for `agent-cap.js` answers
+# THE MATCHER HALF IS NEW, AND IT IS THE WHOLE POINT. A file-wide grep for a hook's file name answers
 # "is the hook mentioned"; the question is "does it fire on the events it must". A group still
 # matching only `Workflow` — the state where a direct `Agent` spawn meets no rule at all — contains
 # the string and reported `ok`, so the arm could not tell a correctly-widened wiring from a stale one
@@ -731,7 +731,7 @@ resolve_kit_file() { # <kit-home> <file> -> <repo-relative kit dir>/<file>, or n
 }
 # EVERY `<home> <file>` PAIR AN ARM PASSES `resolve_kit_file`, declared, one line: the self-test
 # compares it with the literal pairs this file's call sites spell, so it cannot drift without a red.
-KIT_FILE_PAIRS=(hooks agent-cap.js hooks scratch-guard.fragment.json workflows spec-audit-optin.fragment.json memory-recall recall-opened.fragment.json memory-tree merge-rows.py lib pyrun.sh memory-tree adopt-memory-tree.sh roles workflows.toml)
+KIT_FILE_PAIRS=(roles spawn-guard.fragment.json hooks scratch-guard.fragment.json workflows spec-audit-optin.fragment.json memory-recall recall-opened.fragment.json memory-tree merge-rows.py lib pyrun.sh memory-tree adopt-memory-tree.sh roles workflows.toml)
 _KF_KEYS=(); _KF_DIRS=()
 # ONE python start for every declared pair, run once after the print verb's exit. Its answers reach
 # the arrays by parameter expansion, one line per pair: no loop fed by a substitution, and no IFS
@@ -963,103 +963,42 @@ fi
 rm -f "$_sj_err"
 matchers_of || :
 
-# --- Check A: agent-cap PreToolUse hook in the resolved settings file -----------------------------
-# Advisory: no mode mutates settings.json (the SessionStart hook must not rewrite its own file).
-#
-# THE MATCHER IS A LIST OF EXACT STRINGS separated by `|`, not a regular expression: the hook fires
-# for `Workflow` (where it reads the script) and for `Agent` (where a direct spawn would otherwise
-# meet no rule at all). A group carrying only `Workflow` is the stale state, and it is named by the
-# value found rather than reported as a generic miss — an operator who is told "unwired" about a
-# hook that is plainly in the file will conclude the checker is broken.
-AGENTCAP_MATCHER='Workflow|Agent'
-check_agentcap() {
-  local smerge found shipped; smerge=$SMERGE
-  # THE ADOPTION TEST PROBES FOR THE HOOK, IT DOES NOT NAME ONE COPY. This used to key on
-  # `.claude/hooks/agent-cap.js` and said so on purpose: the hook path "is not declared anywhere this
-  # script can read". That reason stopped being true at TOOL-dRetiredFork-14, which moved `hook_path`
-  # into the fragment exactly as the recall arm below already had it.
-  #
-  # Keying on the withdrawn copy was not merely stale, it was DANGEROUS: the moment the duplicate was
-  # dropped this arm printed `skip — not adopted` about a hook that is adopted and wired, over the
-  # most important guard in the repo. A skip that reads as a pass is the shape this repo keeps
-  # finding, and here it was one commit away from hiding an unwired security hook.
-  # The adopter rung is spelled through KIT_REL rather than as a bare `hooks/...`. Both forms probe
-  # the same place; only the bare one is a root-install spelling the prefix gate bans, and its
-  # waiver registry is shrink-only, so buying a new row here would spend a budget meant for the
-  # probes that already have one.
-  # `${KIT_REL:+...}` LIKE EVERY SIBLING ARM, and this one was the only probe in the file
-  # without it. Unguarded, a ROOT install (KIT_REL empty) built the absolute path
-  # rooted at `/` with the hook's kit-relative path, matched nothing, and printed `skip -- not adopted` over a hook that
-  # was present and correctly wired. A silent skip over the concurrency hook, which is the
-  # one arm in this file where a false skip has a security shape. Found by the closing review
-  # of TOOL-dRetiredFork-17, reproduced on a scratch root-layout tree.
-  #
-  # The guard buys no waiver row: with KIT_REL empty the rung IS the bare spelling, so the
-  # form the prefix gate bans never appears in the source.
-  first_of "$(resolve_receipt_path hooks agent-cap.js)" "$(resolve_kit_file hooks agent-cap.js)" .claude/hooks/agent-cap.js >/dev/null; shipped=$_first_of
-  if [ -z "$shipped" ]; then
-    # THE MESSAGE NAMES WHAT THE PROBE ACTUALLY TRIED. It used to advertise three locations
-    # for a two-rung probe, one of them a hardcoded install-prefix literal in prose that
-    # ships verbatim to an adopter at another prefix -- the class this build exists to drain,
-    # inside the arm whose own comment is about skips that read as passes.
-    local miss; miss=$(derive_receipt_miss hooks agent-cap.js)
-    echo "skip     agent-cap — ${miss:-not adopted (no agent-cap.js at ${KIT_REL:+$KIT_REL/}hooks/ or .claude/hooks/)}"
+# --- Check A: the roles kit's spawn guard, a PreToolUse hook on Workflow and Agent calls ------------
+# TOOL-dBoundRoles-25 S6: the hooks kit's agent limit hook retired, and every rule it ran moved into the
+# roles kit's `spawn-guard.js`, which ships wired through its fragment beside it. Graded by the one
+# per-fragment function the scratch and spec-audit arms call (TOOL-dFairHearing-16 S6), so this arm
+# asserts nothing the shipped fragment does not declare: its marker, its `Workflow|Agent` matcher and
+# its hook path. A present-but-unwired pack is a real UNWIRED naming it, as for scratch-guard, since a
+# guard that is silent when unwired looks identical to a guard that is passing; no fragment found is the
+# roles kit not adopted here.
+check_spawn_guard() {
+  local first
+  first_of "$(resolve_receipt_path roles spawn-guard.fragment.json)" "$(resolve_kit_file roles spawn-guard.fragment.json)" >/dev/null; first=$_first_of
+  if [ -z "$first" ]; then
+    local miss; miss=$(derive_receipt_miss roles spawn-guard.fragment.json)
+    echo "skip     spawn     — ${miss:-roles kit does not ship spawn-guard.fragment.json here (no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}roles/)}"
     return
   fi
-  # S4: a LEGACY second copy is REPORTED, never redded. An adopter mid-migration has both, and their
-  # wired command may still name either; blocking them would make the safe ordering -- move the
-  # command first, withdraw second -- impossible to perform.
-  if [ "$shipped" != ".claude/hooks/agent-cap.js" ] && [ -f .claude/hooks/agent-cap.js ]; then
-    echo "note     agent-cap — a legacy copy remains at .claude/hooks/agent-cap.js while the shipped copy is $shipped; withdraw it once your wired command names the shipped one"
-  fi
-  if wired "agent-cap.js" "$AGENTCAP_MATCHER"; then
-    # TOOL-dTieredTribunal-14 S7 - a WIRED command may never carry --only. The flag narrows the hook
-    # to one rule, so `--only=join` in settings.json turns the three cap rules off with no diff and a
-    # hook that still looks wired. That is the class of the AGENT_CAP environment knob this file
-    # deleted, whose own header records that it survived two releases by appearing to work.
-    # matchers_of() discards the command, so the command text is read here rather than there.
-    # M8 closing review, BLOCKER: the first spelling of this guard could never fire. Every class was
-    # bounded with [^"]*, and the command settings.json actually ships is
-    #   "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\""
-    # so no class could cross the ESCAPED quote and the match was always empty. The only declared
-    # control on a bypass this same build introduced was itself a check that could not fail. Scoped
-    # to the LINE now, which no quoting defeats, and the test file observes the failing case.
-    # TOOL-dFairHearing-16: the hook now REFUSES every `--only=`, exit 2, so a wired command carrying it
-    # blocks every Workflow and Agent call rather than narrowing the rules; still UNWIRED, new reason.
-    if grep 'agent-cap\.js' "$(settings_json)" 2>/dev/null | grep -q -- '--only'; then
-      echo "UNWIRED  agent-cap — the wired command carries --only, which the hook now refuses on every call, so every Workflow and Agent call is blocked. Remove the flag from $(render_settings_path)."
-      unwired=$((unwired+1))
-      return
-    fi
-    # WIRED IS NOT ENOUGH -- it must name the copy that actually ships. A command pointing at a
-    # withdrawn path satisfies the marker test and loads nothing, which is precisely the silent
-    # unwiring this unit's migration ordering exists to prevent.
-    if ! grep -q "$shipped" "$(settings_json)" 2>/dev/null; then
-      echo "UNWIRED  agent-cap — wired, but the command does not name the shipped copy $shipped. Repath with: $PY $smerge"
-      unwired=$((unwired+1))
-      return
-    fi
-    echo "ok       agent-cap — PreToolUse hook wired in $(render_settings_path) at $shipped (matcher '$AGENTCAP_MATCHER')"
+  # TOOL-dTieredTribunal-14 S7, carried with the rules: a WIRED command may never carry --only, which the
+  # pack refuses on every call, so a wired flag blocks every Workflow and Agent call. Read by line, which
+  # no quoting defeats, since matchers_of() discards the command text.
+  if grep 'spawn-guard\.js' "$(settings_json)" 2>/dev/null | grep -q -- '--only'; then
+    echo "UNWIRED  spawn     — the wired command carries --only, which the spawn guard refuses on every call, so every Workflow and Agent call is blocked. Remove the flag from $(render_settings_path)."
+    unwired=$((unwired+1))
     return
   fi
-  found=$(matchers_of "agent-cap.js" | paste -sd, - 2>/dev/null || matchers_of "agent-cap.js" | tr '\n' ',')
-  if [ -n "$found" ]; then
-    echo "UNWIRED  agent-cap — the hook is wired under matcher '$found', not '$AGENTCAP_MATCHER'; it never fires for a direct Agent spawn, which is the modality the arity rule was blind to. Fix: $PY $smerge"
-  else
-    echo "UNWIRED  agent-cap — agent-cap.js present but hook not in settings.json. Fix: $PY $smerge"
-  fi
-  unwired=$((unwired+1))
+  check_fragments "spawn    " "$first" spawn-guard.fragment.json
 }
 
 # --- Check S: scratch-guard PreToolUse hook -------------------------------------------------------
-# Reads marker, matcher and hook path from the SHIPPED fragment, the way the recall arm does and the
-# agent-cap arm above does not. That is deliberate: this arm should assert nothing the kit does not
+# Reads marker, matcher and hook path from the SHIPPED fragment, the way the recall and spawn arms do.
+# That is deliberate: this arm should assert nothing the kit does not
 # itself declare, so widening the matcher is a one-line fragment edit rather than a two-file edit
 # with a drift window between them.
 #
 # Unlike recall, this hook is NOT an opt-in — it ships wired with the hooks kit — so an absent hook
 # file means "kit not adopted here" and a present-but-unwired one is a real UNWIRED, exactly as for
-# agent-cap. A guard that is silent when unwired looks identical to a guard that is passing.
+# the spawn guard. A guard that is silent when unwired looks identical to a guard that is passing.
 # Advisory like every other arm: no mode rewrites settings.json.
 check_scratch_guard() {
   local first
@@ -1078,8 +1017,10 @@ check_scratch_guard() {
 # THE PER-FRAGMENT GRADING, ONE FUNCTION both fragment arms call (TOOL-dFairHearing-16 S6, its F6): the
 # scratch arm's loop, lifted whole, so the review kit's spec-audit opt-in pack is graded exactly as the
 # hooks kit's fragments are, never by a copy that grades one fragment two ways. <label> heads each line.
-check_fragments() { # <label> <a fragment found>: every *.fragment.json in that fragment's directory
-  local label=$1 first=$2 frag smerge marker hookjs smatcher sevent found
+# A third argument names the one fragment of that directory to grade (TOOL-dBoundRoles-25): the roles kit's
+# directory holds the spawn guard's and the return check's, each graded under its own arm's label.
+check_fragments() { # <label> <a fragment found> [<only this fragment's file name>]: every *.fragment.json in that fragment's directory
+  local label=$1 first=$2 only=${3:-} frag smerge marker hookjs smatcher sevent found
   smerge=$SMERGE
   # EVERY FRAGMENT THE HOOKS KIT SHIPS, each against its OWN event (TOOL-aRoutedQuill-5 S8). The
   # kit ships the PreToolUse gate and its SubagentStart context as two fragments, and grading the
@@ -1087,6 +1028,7 @@ check_fragments() { # <label> <a fragment found>: every *.fragment.json in that 
   # gate's fragment was found in, so a fragment added there later is graded without an edit here.
   for frag in "${first%/*}"/*.fragment.json; do
     [ -f "$frag" ] || continue
+    [ -z "$only" ] || [ "${frag##*/}" = "$only" ] || continue
     # ONE read of the fragment, all four keys, before the first test; the subshell below answers from it.
     read_fragment_keys "$frag"; marker=$FRAG_MARKER; sevent=$FRAG_EVENT; smatcher=$FRAG_MATCHER
     # A REFUSED owned-hook join is UNWIRED naming its reason, never a blank path read as a bad fragment.
@@ -1119,7 +1061,7 @@ check_fragments() { # <label> <a fragment found>: every *.fragment.json in that 
       continue
     fi
     # Name the value FOUND rather than reporting a generic miss: an operator told "unwired" about a
-    # hook plainly present in the file concludes the checker is broken. Same reasoning as agent-cap.
+    # hook plainly present in the file concludes the checker is broken.
     found=$(matchers_of "$marker" "" "$sevent" | paste -sd, - 2>/dev/null || matchers_of "$marker" "" "$sevent" | tr '\n' ',')
     if [ -n "$found" ]; then
       echo "UNWIRED  $label — the $sevent entry is wired under matcher '$found', not '$smatcher'; it never fires for the calls the fragment declares. Fix: $PY $smerge --fragment $frag"
@@ -1131,7 +1073,7 @@ check_fragments() { # <label> <a fragment found>: every *.fragment.json in that 
 }
 
 # --- Check P: the review kit's spec-audit opt-in pack, a PreToolUse hook on Workflow calls -------------
-# TOOL-dFairHearing-16. Rule 0 of agent-cap left the hook for the review kit's spec-audit-optin.js, which
+# TOOL-dFairHearing-16. Rule 0 of the agent limit hook left it for the review kit's spec-audit-optin.js, which
 # ships wired with that kit through its fragment, so a present-but-unwired pack is a real UNWIRED, as
 # for scratch-guard, and graded by the same function. No fragment found is the kit not adopted here.
 # TOOL-dFairHearing-50 S14 - no fork with no receipt: each receipt call answers empty without one, so it
@@ -1152,7 +1094,7 @@ check_spec_audit_optin() {
 # --- Check R: recall-opened PostToolUse hook (memory-recall kit — an OPT-IN) ----------------------
 # FIVE states, not two. `adopt-memory-recall.sh` copies the hook only under `--with-hook`, so an
 # absent hook file with nothing in settings.json is a TRUE signal ("opt-in not taken"), never
-# UNWIRED. Mirroring the agent-cap arm literally would print a permanent false alarm in the repo
+# UNWIRED. Mirroring the spawn arm literally would print a permanent false alarm in the repo
 # that runs THIS script as its own SessionStart hook, which is the fastest way to train every node
 # to ignore the wiring verifier. Both halves — the marker and the script path — are read from the
 # fragment, so this arm asserts nothing the shipped kit does not itself declare.
@@ -1933,10 +1875,10 @@ EOF
   fi
   echo "ok       roles     — $n agent types, the role index and the /build Skill are rendered"
   # TOOL-dBoundRoles-5 S5 - the return check's SubagentStop fragment, graded by the one per-fragment
-  # grader the scratch and spec-audit arms call, over every fragment in the kit's directory. A kit that
-  # ships none, one older than the return check, adds no line.
+  # grader the scratch and spec-audit arms call; the spawn guard's fragment beside it is the spawn arm's
+  # (TOOL-dBoundRoles-25). A kit that ships none, one older than the return check, adds no line.
   if [ -f "$kit/return-check.fragment.json" ]; then
-    check_fragments "roles    " "$kit/return-check.fragment.json"
+    check_fragments "roles    " "$kit/return-check.fragment.json" return-check.fragment.json
   fi
 }
 
@@ -2169,7 +2111,7 @@ check_backlog_stragglers() {
 }
 
 check_hooks
-check_agentcap
+check_spawn_guard
 check_scratch_guard
 check_spec_audit_optin
 check_recall_opened

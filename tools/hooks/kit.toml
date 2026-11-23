@@ -4,13 +4,15 @@ id = "agent-cap"
 home = "hooks"
 layer = "layer.runtime"
 scope = "repo"
-version_from = { file = "agent-cap.js", pattern = "KIT_AGENT_CAP_VERSION = " }
+# TOOL-dBoundRoles-25 S8: the hook file this entry was named for retired into the roles kit's spawn guard, and the
+# entry keeps its registry id `agent-cap` (§8 F5); its version is the constant scratch-guard.js carries.
+version_from = { file = "scratch-guard.js", pattern = "KIT_AGENT_CAP_VERSION = " }
 # TOOL-aRoutedQuill-5 S2: kickoff-manifest is the card writer whose `## route` the gate reads, so the
 # gate never installs without it.
 requires = ["settings-merge", "kickoff-manifest"]
-# TOOL-dFairHearing-27 S12: the review kit's spec-audit opt-in pack reads this hook's exports and carries its
-# `gov:kit agent-cap@` marker, so a scoped `govkit update --kits agent-cap` moves a claimed review kit with it
-# through govkit's marker coupling. The hook's pack-presence check stays, for hand copies and hooks-only adopters.
+# TOOL-dFairHearing-27 S12: the review kit's spec-audit opt-in pack reads scratch-guard.js's exports and carries
+# this kit's `gov:kit agent-cap@` marker, so a scoped `govkit update --kits agent-cap` moves a claimed review kit
+# with it through govkit's marker coupling. The spawn guard's pack-presence check stays, for hand copies.
 marker_carriers = ["{prefix}/workflows/spec-audit-optin.js"]
 
 # TWO destinations for ONE source. The kit copy AND the wired copy are both required: the parity arm
@@ -23,20 +25,6 @@ marker_carriers = ["{prefix}/workflows/spec-audit-optin.js"]
 # (F1, ratified). gov simply stops shipping it. Nothing is deleted from an adopter's tree by this
 # change: `govkit update --write-withdrawals` does that, on their timing and after their wired
 # command has moved, because the reverse order unwires a security guard for the window between.
-[[files]]
-include = ["agent-cap.js"]
-role = "engine"
-to = "{prefix}/hooks/agent-cap.js"
-
-# WITHHELD, TOOL-aQuenchedHarness-3: this suite stages a break into a copy of the hook
-# beside it, so its subject is the hook and it has a job only when that source changes.
-# `project-owned` rather than a second carve-out rule, because this home enumerates its
-# files one rule per file and a source claimed twice is the conflict selfcheck reports.
-# `silenced_legs` drops the leg that names it, so both halves close here.
-[[files]]
-include = ["agent-cap.test.sh"]
-role = "project-owned"
-
 # The descriptor travels with the kit, as it does for every entry whose include is `**`. Without
 # this rule it was the ONE file under a non-flat home that no rule claimed — invisible to the
 # surface predicate, which is depth-1 and sees only `<prefix>/hooks`.
@@ -45,8 +33,8 @@ include = ["kit.toml"]
 role = "engine"
 to = "{prefix}/hooks/kit.toml"
 
-# The grammar this hook enforces, moved out of the charter at v3.0. It ships with
-# the hook because it is implementation detail of ONE hook: an adopter installing agent-cap and not
+# The grammar these hooks enforce, moved out of the charter at v3.0. It ships with
+# the hooks because it is implementation detail of them: an adopter installing agent-cap and not
 # receiving the marker spellings gets a guard whose refusals they cannot satisfy. It is also the
 # fourth file under this non-flat home, and selfcheck reds on any tracked file here no rule claims.
 [[files]]
@@ -54,7 +42,8 @@ include = ["README.md"]
 role = "engine"
 to = "{prefix}/hooks/README.md"
 
-# scratch-guard — the second hook in this home. One rule per file, not one rule with a
+# scratch-guard — the write gate in this home, and since TOOL-dBoundRoles-25 the home of the kit's version and of
+# the readers two kits share. One rule per file, not one rule with a
 # many-element include: govkit check 7i quantifies per FILE under a non-flat home, and every rule
 # here is already one-per-file for that reason. `.claude/settings.json` is deliberately NOT a
 # destination of this entry — it is owned by `settings-merge`, and check 4 reds on two entries
@@ -111,14 +100,26 @@ to = "{prefix}/hooks/format-guard.fragment.json"
 # carrying neither, and `govkit check <target>` reds on exactly that for every adopter that
 # selected it. Found by the closing review of the build that deleted them.
 #
-# THE ADOPTER IS SETTINGS-MERGE'S (TOOL-dRedressedBar-15). Wiring the built-in `Workflow|Agent`
-# entry is settings-merge.py's default action, and the file is settings-merge's. A copy of its argv
+# THE ADOPTER IS SETTINGS-MERGE'S (TOOL-dRedressedBar-15). Wiring the default `Workflow|Agent`
+# entry, the roles kit's spawn guard since TOOL-dBoundRoles-25 (its §8 F4), is settings-merge.py's
+# default action, and the file is settings-merge's. A copy of its argv
 # here resolved `{prefix}` through THIS entry's table, so `[kit.agent-cap] prefix = "scripts"` ran
 # `scripts/settings-merge.py`, which nothing installed there. `via` runs settings-merge's own
 # adopter at settings-merge's home, its `mutates_index` and `why_no_regenerate` with it, and this
 # entry's descriptor still classifies the exit. It still runs when settings-merge is claimed and
 # not selected, which is the one step that wires the hook then.
 via = "settings-merge"
+
+# TOOL-dBoundRoles-25: the default fragment settings-merge wires is the roles kit's spawn guard, so an install
+# of this kit without the roles kit has no pack to wire and the adopter exits 2 before writing anything. That
+# exit is the stop settings-merge's own descriptor declares, accepted here on the same probe: this kit's
+# hooks still land, and a target without the roles kit carries no rule the pack would arm (rule 6 is armed
+# only by a role index).
+[[outcome]]
+code = 2
+probe = { must_not_resolve = "{prefix}/roles/spawn-guard.js" }
+means = "no-spawn-guard-to-wire"
+ok = true
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
@@ -147,3 +148,17 @@ down = ["python", "{gov}/govkit/steps/fanout_cap.py", "down", "{target}"]
 witness = ["python", "{gov}/govkit/steps/fanout_cap.py", "witness", "{target}"]
 surfaces = ["conf-key:.agent-cap.conf#FANOUT_CAP"]
 needs-target = false
+
+# TOOL-dBoundRoles-25 S7: the agent limit hook retired, every rule it ran moved into the roles kit's spawn guard,
+# and this step moves a target's wiring with it. Its up wires the pack through the target's settings-merge.py
+# BEFORE it unwires the old command, so a killed up leaves both hooks wired and never neither, the order this
+# file records above for a moved security guard; its down restores `.claude/settings.json` byte-identical from
+# the before-image. It runs the target's own settings-merge.py, so it needs the target. `surfaces` names the
+# retired file as the two classes the step gate reads it in. Once landed this row is frozen.
+[[upgrade]]
+id = "agent-cap/spawn-guard-to-roles-pack"
+up = ["python", "{gov}/govkit/steps/spawn_guard_pack.py", "up", "{target}", "{prefix}"]
+down = ["python", "{gov}/govkit/steps/spawn_guard_pack.py", "down", "{target}", "{prefix}"]
+witness = ["python", "{gov}/govkit/steps/spawn_guard_pack.py", "witness", "{target}", "{prefix}"]
+surfaces = ["installable:{prefix}/hooks/agent-cap.js", "file:{prefix}/hooks/agent-cap.js"]
+needs-target = true

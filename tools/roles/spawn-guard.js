@@ -1,27 +1,29 @@
 #!/usr/bin/env node
 /**
- * agent-cap — project-agnostic PreToolUse guard on the `Workflow` and `Agent` tool calls.
+ * spawn-guard — the roles kit's PreToolUse guard on the `Workflow` and `Agent` tool calls
+ * (TOOL-dBoundRoles-25, the night pass two's NT-27). It holds every rule the hooks kit's retired
+ * agent limit hook still ran when it retired: rule 6, the spawn guard and harness admission, with admission held to the
+ * landed blob (S3); rule 8, the effort level; rule 7, the settings in force (brief D4); and the spec-audit
+ * opt-in pack's presence, in that order, after refusing every `--only=` argument. Each rule moved with its
+ * predicate and its deny text, the prefix `BLOCKED by spawn-guard:` aside.
  *
  * THE AGENT LIMIT IS NOT THIS FILE'S (TOOL-dGroundRules-10). How many agents run at once is the policy
  * key `runtime.agents-in-flight`, which the policy kit renders into the harness's own two concurrency
- * settings in `.claude/settings.json` (`policy.py settings --write`). The harness counts agents in
- * flight and knows when each one ends, which a PreToolUse hook cannot. What a call-time check CAN see
- * is the settings files the harness started from, and RULE 7 holds them to the landed limit.
+ * settings in `.claude/settings.json` (`policy.py settings --write`). What a call-time check CAN see is the
+ * settings files the harness started from, and RULE 7 holds them to the landed limit.
  *
- * THE RULES IT KEEPS, in the order `main()` runs them: rule 6, then rule 8, then rule 7, then the call is admitted.
- * Rules 0, 2 and 5 left for the review kit (TOOL-dFairHearing-16, the owner's NT-27): the verify-stage
- * total and the loop markers are its `check-verifier-fanout.js`, the ref-keyed verdict join ban its
- * `check-review-join.js`, both run by the merge bar's gates beside them over every committed harness,
- * and the spec-audit opt-in its `spec-audit-optin.js`, a PreToolUse hook on `Workflow` calls. They
- * read this file's views, constants and readers through its exports; requiring it runs no rule. Every
- * `--only=` argument is refused, naming the two script homes.
+ * THE HOOKS KIT'S READERS. The role index readers, the card reader, the fence walker, the marker reader, the
+ * args reader, the slug walk and the policy helper's locator are `<prefix>/hooks/scratch-guard.js`'s exports,
+ * found through this file's own `resolveKitDir` port (a receipt row, then `<here>/hooks/` and
+ * `<here>/../hooks/`), the edge the roles kit's `requires_if` row declares (§8 F7). A guard that cannot load
+ * them cannot read, and refuses every `Workflow` and `Agent` call, naming the hooks kit and the owner.
  *
  * RULE 6 (TOOL-aOrientedCast-7) — every agent prompt is a rendered handoff. Armed by
  * `.claude/roles.json` at the checkout root of the payload `cwd`, else of `CLAUDE_PROJECT_DIR`
  * (TOOL-aOrientedCast-14; neither resolving adds no rule, with one stderr line when
- * `CLAUDE_PROJECT_DIR` is set), read through the sibling hook's `resolveRoleRoot` and `loadRoleIndex`:
+ * `CLAUDE_PROJECT_DIR` is set), read through the hooks kit's `resolveRoleRoot` and `loadRoleIndex`:
  * absent adds no rule, except in a governed tree, one whose `.claude/agents/` keeps a rendered role
- * agent (the sibling's `checkRoleGoverned`), where it refuses both tools naming the re-render
+ * agent (the hooks kit's `checkRoleGoverned`), where it refuses both tools naming the re-render
  * (TOOL-dBoundRoles-6 S3); broken refuses both tools; no `agent`-true role refuses every `Agent` call, and
  * an empty `harnesses` list every `Workflow` call, as UNARMED. An `Agent` call is admitted only when
  * its `subagent_type` is an `agent`-true role and its `prompt` is, line endings folded and its ends
@@ -29,7 +31,7 @@
  * section of the file the marker's `path` names under `builds/<build>/prompts/`, that file holding the
  * same single marker and a section whose SHA-256 prefix is the marker's `task-sha` and whose walk ends
  * outside every fence (TOOL-dBoundRoles-38 S5: a marker or fact line inside a fence is handed content,
- * counted and re-cut by no step, every line read through the sibling's `readUnfencedLines`), no typed
+ * counted and re-cut by no step, every line read through the hooks kit's `readUnfencedLines`), no typed
  * input's `### input:<name>` block holding a fact, marker or `Framed by:` line, fenced or not, or leaving a
  * fence open (TOOL-dBoundRoles-46 S2: a typed value is authored text, `TYPED_INPUTS`), every block opening
  * outside a fence and each handed block's content inside its own (TOOL-dBoundRoles-48 S3, `checkBlockFences`: an
@@ -40,11 +42,11 @@
  * rendered from (TOOL-dBoundRoles-6 S6: an index holding none refuses naming the index's re-render, a
  * differing one naming both values and the handoff's re-render), every `gov:fact` line of the section
  * holding a `blob:` or `record:` key whose source, read now, still has the blob it was cut at
- * (TOOL-dBoundRoles-13 S4: `card/<sid>` read through the sibling's `readCard`, any other key from the
+ * (TOOL-dBoundRoles-13 S4: `card/<sid>` read through the hooks kit's `readCard`, any other key from the
  * checkout root; a moved or vanished source refuses naming the key, both blobs and the re-render; a
  * `cmd:` key rides the task-sha and is not re-run; a handoff carrying no fact line re-derives nothing), a
  * marker whose `item=` is a tag binding its work order to this session (TOOL-dBoundRoles-3 S5, the stand-in
- * binding record until dWellOiledMachine's: the payload session's card, read through the sibling's `readCard`,
+ * binding record until dWellOiledMachine's: the payload session's card, read through the hooks kit's `readCard`,
  * must route the marker's `unit=` among its `## route` units, read through `extractRouteUnits`; a refusal
  * names the unit and the card, `readCard`'s `shown` where no card reads; `item=-` or none is not judged), and its
  * `description`, ends trimmed, the name the renderer prints on stderr: `<build> · <unit> · <workflow>`
@@ -100,39 +102,31 @@
  * Its location rests on the working-tree receipt, so a forged row chooses the code this rule runs
  * (TOOL-dFairHearing-48 F1).
  *
- * Wiring (per project): run `python <prefix>/settings-merge.py` (idempotent) — it merges the block
- * below into .claude/settings.json; or merge it by hand:
+ * ADMISSION HELD TO THE LANDED BLOB (TOOL-dBoundRoles-25 S3). A `Workflow` call whose `scriptPath` matched a
+ * declared harness is admitted only where that file's working-tree blob id, `git hash-object` with the
+ * repository's clean filters, equals its blob id at the landed revision the policy kit's `readLandedRevision`
+ * names; absent there it is refused as not landed. No policy kit, or a refusal from it, refuses the call naming
+ * the owner. It runs after the path match and before the `args.roles` checks: two git calls per admitted call.
+ * An uncommitted edit and a committed but unlanded one are refused alike (§8 F2).
+ *
+ * Wiring (per project): run `python <prefix>/settings-merge.py` (idempotent), whose default fragment is this
+ * kit's `spawn-guard.fragment.json`; or merge it by hand:
  *   "hooks": { "PreToolUse": [ { "matcher": "Workflow|Agent",
  *     "hooks": [ { "type": "command",
- *       "command": "node \"${CLAUDE_PROJECT_DIR}/<path>/agent-cap.js\"" } ] } ] }
+ *       "command": "node \"${CLAUDE_PROJECT_DIR}/<path>/spawn-guard.js\"" } ] } ] }
  * The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression.
- * `Workflow` is a harness call rules 6, 8 and 7 judge; `Agent` is a direct spawn they judge too.
- * main() exits 0 on any other tool_name.
- * Blocks via exit 2 + stderr (version-robust; no JSON-schema dependency).
- *
- * WHAT A QUOTE IS, since the views exported to rules 2 and 5 turn on it. A quote opens a string literal
- * only where one may legally BEGIN (`checkLiteralOpen`): glued to the character
- * that ends an expression it is TEXT — the apostrophe in `don't` — and so it is
- * after a bare word that is not a JS keyword. A quote that opens nothing is left
- * as text and its line is still blanked, EXCEPT inside a same-line template span,
- * which is emitted whole: a quoted `'http://x'` written in one therefore survives
- * into the line-comment strip. That channel is not closed by wording, it is
- * bounded by the no-regression property below — every rule is evaluated over the
- * SHIPPED views as well, and a denial from either stands, so nothing this hook
- * denied before the quote rule changed can be admitted after it.
+ * main() exits 0 on any other tool_name. Blocks via exit 2 + stderr (version-robust; no JSON-schema dependency).
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.51' // gov:kit agent-cap@1.51 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
-
-// The review harness a deny message points at, DERIVED (TOOL-aRepatriatedFork-2 S6): found by
-// `resolveKitDir` in the workflows kit (TOOL-dFairHearing-32 S25), and the bare name when it refuses,
-// because a path spelled at gov's prefix sends an adopter's reader to a file that is not there.
-function resolveHarnessName() {
-  const path = require('path')
-  let dir
-  try { dir = resolveKitDir('workflows', 'tier2-review.js', __dirname) } catch { return 'tier2-review.js' }
-  return path.relative(process.env.CLAUDE_PROJECT_DIR || process.cwd(), path.join(dir, 'tier2-review.js')).split(path.sep).join('/')
+// The hooks kit's `scratch-guard.js`, loaded once through `resolveKitDir`; a throw where it does not resolve,
+// which `main()` turns into a refusal of the call (§4 "Disposition": a guard that cannot read does not admit).
+function loadScratchGuard() {
+  if (!loadScratchGuard.at) {
+    const path = require('path')
+    loadScratchGuard.at = require(path.join(resolveKitDir('hooks', 'scratch-guard.js', __dirname), 'scratch-guard.js'))
+  }
+  return loadScratchGuard.at
 }
 
 function readStdin() {
@@ -142,486 +136,6 @@ function readStdin() {
     return ''
   }
 }
-
-// TOOL-dMispairedQuote-1 — the ONE decision this file makes about what OPENS a string literal.
-// All three views below ask it; none of them walks a line looking for a partner itself.
-//
-// A quote opens a literal only where one may legally BEGIN. In valid JavaScript a string's opening
-// quote is never GLUED to the character that ends an expression, and never follows a bare word that
-// is not a keyword — so `don't`, `won't`, `it's`, `y'all` and `run 'em` are TEXT, while `return 'x'`,
-// `case 'y':` and `throw 'z'` are ordinary openers. `LITERAL_OPENERS` is that keyword set, and it
-// omits `in`, `of` and `do`: those are ordinary English connectives, and admitting them let a
-// comment reading "one of 'em" open a span that swallowed a fan-out.
-//
-// WHY THIS AND NOT A REGEX-LITERAL MODEL, since the reported instance was `/won't/` sharing its line
-// with a fan-out and the obvious repair is to model `/…/`. That closes ONE spelling. Measured against
-// the pre-fix hook, four more admit the same raw `parallel(` and none of them is a regex: a
-// double-quoted `"don't"`, a block comment, a backticked `don't`, and loose prose. The APOSTROPHE is
-// the mechanism; the construct around it is not, and a fix keyed on the construct gates the instance.
-// Four of this file's five rules were defeated, rule 5's join ban included.
-//
-// WHAT THE PAIR TEST COULD NOT REACH. `addc6169` already required a matching PAIR before blanking,
-// which fixed an unpaired quote swallowing the rest of its line. A pair exists for
-// `/won't/ … agent('a'` too — the prose apostrophe and the quote opening the call — and blanking
-// between them erased the very call the rules count. Asking what a quote OPENS is the question a
-// partner test cannot ask, and it is why that repair looked like it closed the class and did not.
-//
-// THREE RESIDUALS, stated rather than closed, each with a fixture in the suite and a backlog row:
-//   (a) a BALANCED set of loose prose quotes straddling a fan-out — every quote finds a partner and
-//       none is left over, so nothing is left to notice;
-//   (b) prose whose last word before the apostrophe is one of the keywords below;
-//   (c) prose that puts the apostrophe after an OPERATOR — `/* rock - 'n roll */` — which is a legal
-//       opener position in code and which this predicate cannot tell from prose.
-// None of the three is a regression: all admit at the pre-fix revision too. What bounds them is the
-// dual evaluation in `runBothViews` — a denial from the shipped views still stands.
-const LITERAL_OPENERS = new Set([
-  'return', 'case', 'throw', 'typeof', 'instanceof', 'new', 'delete', 'void', 'yield', 'await', 'else',
-])
-
-function checkLiteralOpen(line, i) {
-  let p = i - 1
-  while (p >= 0 && (line[p] === ' ' || line[p] === '\t')) p--
-  if (p < 0) return true
-  if (!/[A-Za-z0-9_$)\]\\]/.test(line[p])) return true
-  // Walk the IDENTIFIER backwards. This read `/([A-Za-z_$][\w$]*)$/.exec(line.slice(0, p + 1))`,
-  // which copies the whole line prefix and rescans it FOR EVERY QUOTE — quadratic in line length,
-  // and every ordinary `return 'x'` pays it. Measured by the closing review on one long line:
-  // 253 KB took 33.8 s against 62 ms before this build, ~4x per doubling, so about half a megabyte
-  // clears the 60 s hook timeout. **A PreToolUse hook that times out is NON-BLOCKING**, so the cost
-  // was not slowness, it was a fan-out walking straight past the guard. The same measurement after
-  // this rewrite: 87 ms. The walk is bounded by the identifier, never by the line.
-  let s = p
-  while (s >= 0 && /[A-Za-z0-9_$]/.test(line[s])) s--
-  if (s === p) return false
-  return LITERAL_OPENERS.has(line.slice(s + 1, p + 1))
-}
-
-function resolveLiteralEnd(line, i) {
-  if (!checkLiteralOpen(line, i)) return -1
-  const q = line[i]
-  let e = i + 1
-  while (e < line.length && line[e] !== q) e += line[e] === '\\' ? 2 : 1
-  return e < line.length ? e : -1
-}
-
-// Blank the CONTENTS of single/double-quoted string literals so a `parallel(`
-// mentioned in prose (a meta.description, a log message) isn't read as a call.
-// ONE ORDERED PASS, not two `replace()` sweeps: the single-quote sweep used to run first and pair
-// the apostrophe inside a DOUBLE-quoted `"don't"` with the quote opening `agent('a'`, blanking the
-// `parallel(` between them. A single pass consumes `"don't"` whole and never sees its apostrophe.
-// A same-line template span is skipped WHOLE — its prose contributes no opener — but its text is
-// KEPT, so a primitive named inside a lens prompt still denies exactly as it did before
-// (`TOOL-aLexedStripper-3` owns that false positive and this build does not touch it). The cost is
-// that a quoted `'http://x'` inside such a span survives into the line-comment strip below, which
-// the dual evaluation bounds rather than this function.
-// Run BEFORE the line-comment strip so a `//` inside a string can't truncate it.
-function renderStrippedLine(line) {
-  let out = ''
-  let i = 0
-  while (i < line.length) {
-    const ch = line[i]
-    if (ch === '`') {
-      let e = i + 1
-      while (e < line.length && line[e] !== '`') e += line[e] === '\\' ? 2 : 1
-      if (e < line.length) { out += line.slice(i, e + 1); i = e + 1; continue }
-      out += ch; i++; continue
-    }
-    if (ch === "'" || ch === '"') {
-      const e = resolveLiteralEnd(line, i)
-      if (e >= 0) { out += ch + ch; i = e + 1; continue }
-      out += ch; i++; continue
-    }
-    out += ch
-    i++
-  }
-  return out
-}
-
-// ---------------------------------------------------------------------------
-// TOOL-dMispairedQuote-3 — the NO-REGRESSION guarantee.
-//
-// The three views below are the SHIPPED ones, kept VERBATIM. They are not dead code and they are
-// not a second answer to the question the new views answer: every rule is evaluated over BOTH,
-// and a denial from EITHER stands. That makes the change monotone in the DENY direction by
-// construction, so no script this hook denies today can be admitted after it.
-//
-// WHY A PROPERTY AND NOT THREE FIXTURES. Correcting what counts as a string literal does not only
-// un-hide fan-outs; it un-hides every OTHER character the old mispairing was blanking, and this
-// file's rules 2 and 3 walk brackets and balance parens ACROSS lines. Three separate DENY-to-ADMIT
-// moves were reproduced against the improved views alone: a backtick inside a regex literal
-// reaching the template-mode switch, a regex-borne `)` closing a multi-line call site early so a
-// declared cap of 50 fell through to the helper default, and a `//` inside a quoted span inside a
-// template truncating rule 1's line. Each has its own fixture below, and each was ALSO closed by
-// this one property — which is what makes the property worth its bytes: the next repair to these
-// views inherits it without knowing these three shapes.
-// ---------------------------------------------------------------------------
-function renderShippedLine(line) {
-  return line.replace(/'(?:\\.|[^'\\])*'/g, "''").replace(/"(?:\\.|[^"\\])*"/g, '""')
-}
-
-// TOOL-aRepatriatedFork-7 S2 — THIS VIEW KEEPS THE NESTED-INTERPOLATION DEFECT, on purpose. Its one
-// `interpDepth` is zeroed by a nested `${` and never restored, which `renderLexedView` now fixes. The
-// frozen body is the no-regression BASELINE (the S10 byte arm compares it to `d65da7ab`), and a
-// corrupted view can only LOSE code, so its failure is a false negative: `runBothViews` denies when
-// EITHER view denies, and the corrected lexed view decides every case this one misses. Editing it
-// would move the baseline the S9 property measures against for no verdict the union lacks.
-function renderShippedView(script) {
-  const out = []
-  let mode = 'code' // code | tmpl
-  const stack = [] // 'tmpl' | 'interp', innermost last
-  let interpDepth = 0 // brace depth inside the current interpolation
-  for (const raw of script.split(/\r?\n/)) {
-    let res = ''
-    let i = 0
-    while (i < raw.length) {
-      const ch = raw[i]
-      const two = raw.slice(i, i + 2)
-      if (mode === 'code') {
-        if (two === '//') break
-        if (ch === '`') { stack.push('tmpl'); mode = 'tmpl'; res += '`'; i++; continue }
-        if (ch === "'" || ch === '"') {
-          // An UNPAIRED quote is ordinary text, not a string. This used to run to end of line
-          // and then append a closer the source never had, swallowing the rest of that line --
-          // and any fan-out sitting on it went too, ADMITTING a script the shipped hook DENIES.
-          // The measured case is an apostrophe inside a regex literal, /won't/. `stripStrings`
-          // needs a matching PAIR before it blanks anything, and so does this now.
-          const q = ch
-          let e = i + 1
-          while (e < raw.length && raw[e] !== q) e += raw[e] === '\\' ? 2 : 1
-          if (e >= raw.length) { res += ch; i++; continue }
-          res += q + q
-          i = e + 1
-          continue
-        }
-        // Inside an interpolation, the matching `}` returns to the template it came from. Depth is
-        // counted so an object literal or a block inside the expression does not close it early.
-        if (stack.length && stack[stack.length - 1] === 'interp') {
-          if (ch === '{') interpDepth++
-          else if (ch === '}') {
-            if (interpDepth === 0) { stack.pop(); mode = 'tmpl'; res += ' '; i++; continue }
-            interpDepth--
-          }
-        }
-        res += ch
-        i++
-      } else if (mode === 'tmpl') {
-        if (ch === '\\') { i += 2; continue }
-        if (two === '${') { stack.push('interp'); interpDepth = 0; mode = 'code'; res += '  '; i += 2; continue }
-        if (ch === '`') { stack.pop(); mode = 'code'; res += '`'; i++; continue }
-        i++
-      }
-    }
-    out.push(res)
-  }
-  // THIS VIEW DOES NOT BLANK BLOCK COMMENTS, and that is the fix rather than an omission. It cannot
-  // tell a real block-comment opener from one inside a regex literal, so every blanking it did on
-  // hide a fan-out: a regex-borne opener closed by a later ordinary closer ends the scan back in
-  // code mode with an empty stack, no flag fires, and the span between is gone from the view. Two
-  // closing-review rounds measured that, and the second one measured the smaller repair -- widening
-  // the flag -- as insufficient for exactly this shape. The view this replaced blanked no block
-  // comment either, so leaving them alone cannot regress against it, and un-blanked comment text can
-  // only ADD apparent code, never hide it. That is the same fail-closed posture rule 1 already
-  // documents for a primitive named inside a block comment.
-  //
-  // The flag still reports every mode that outlives the scan, which now means an unterminated
-  // TEMPLATE only.
-  return { code: out, unterminated: stack.length > 0 || mode !== 'code' }
-}
-
-function renderShippedBlanks(script) {
-  const out = []
-  let mode = 'code' // code | tmpl | block
-  for (const raw of script.split(/\r?\n/)) {
-    let res = ''
-    let i = 0
-    while (i < raw.length) {
-      const ch = raw[i]
-      const two = raw.slice(i, i + 2)
-      if (mode === 'code') {
-        if (two === '//') break
-        if (two === '/*') { mode = 'block'; i += 2; continue }
-        if (ch === '`') { mode = 'tmpl'; res += '`'; i++; continue }
-        if (ch === "'" || ch === '"') {
-          res += ch
-          const q = ch
-          i++
-          while (i < raw.length && raw[i] !== q) i += raw[i] === '\\' ? 2 : 1
-          res += q
-          i++
-          continue
-        }
-        res += ch
-        i++
-      } else if (mode === 'tmpl') {
-        if (ch === '\\') { i += 2; continue }
-        if (ch === '`') { mode = 'code'; res += '`'; i++; continue }
-        i++
-      } else {
-        if (two === '*/') { mode = 'code'; i += 2; continue }
-        i++
-      }
-    }
-    out.push(res)
-  }
-  return out
-}
-
-// ---------------------------------------------------------------------------
-// TOOL-dMispairedQuote-3 — the NO-REGRESSION guarantee, as a DISPATCHER.
-//
-// Every rule below reads its view through one of these three names and none of them knows there are
-// two implementations. `main()` runs the whole rule set, and if nothing denied, sets the mode to
-// `shipped` and runs it again: a denial from EITHER pass stands, so no script this hook denies today
-// can be admitted after the change.
-//
-// WHY A DISPATCHER AND NOT A PARAMETER. The first cut threaded a `shipped` flag through each rule
-// function, which needs a CENSUS of which rule reads which view — and that census was wrong for two
-// of the four: `fanoutFindings` reads the lexed view AND the per-line one on its fallback branch, and
-// `scanJoinFindings` reads the blanked view AND the per-line one. A census that has to be right is a
-// census that can be wrong, and getting it wrong silently drops half the guarantee. Here every read
-// goes through a dispatcher by construction and no rule function changes at all.
-//
-// A MODULE-LEVEL MODE is safe here and nowhere near a general licence: this file is a one-shot CLI
-// that reads stdin, decides, and exits. There is no concurrency, no second script in flight, and
-// `main()` is the only writer.
-let VIEW_MODE = 'lexed' // 'lexed' | 'shipped'
-
-function renderStrippedView(line) {
-  return VIEW_MODE === 'shipped' ? renderShippedLine(line) : renderStrippedLine(line)
-}
-
-function renderCodeView(script) {
-  return VIEW_MODE === 'shipped' ? renderShippedView(script) : renderLexedView(script)
-}
-
-function renderBlankedLiterals(script) {
-  // TOOL-aWeldedTribunal-3 — both arms return `{ code, unterminated }`, and the SHIPPED arm is
-  // hard-coded `false` rather than reporting. That is not an oversight and not a shortcut.
-  //
-  // The three `renderShipped*` bodies are FROZEN: a self-test arm byte-compares them against BASE,
-  // because they ARE the no-regression baseline that makes `runBothViews`'s union sound. Editing one
-  // to add a report would break exactly the guarantee this whole dispatcher exists to provide — the
-  // suite caught the first attempt at it, which is the arm working as designed.
-  //
-  // Nothing is lost. `runBothViews` UNIONS the two passes, so the corrected view's fallback ADDS the
-  // findings the frozen view cannot see, and the frozen view keeps behaving exactly as it always
-  // has. The improvement belongs to the corrected view; the baseline stays a baseline.
-  return VIEW_MODE === 'shipped'
-    ? { code: renderShippedBlanks(script), unterminated: false }
-    : renderBlankedView(script)
-}
-
-// Run one rule over BOTH views and merge. The mode is restored before returning, so a rule that
-// throws cannot leave the next one reading the wrong view. Findings merge on `n`, the 1-based line
-// number every rule's finding shape carries — and on the `why` beside it where one exists, because
-// a rule can push more than one finding for a single line and keying on `n` alone would drop the
-// second.
-function runBothViews(rule, script) {
-  // BOTH passes are isolated, and neither may turn a crash into an admission. `main()` has no
-  // top-level catch and a PreToolUse hook that exits 1 is NON-BLOCKING, so an unguarded lexed pass
-  // handed a crashing script straight through — reproduced by the closing review with a
-  // 9000-deep nested ternary that the pre-fix hook DENIES at exit 2. A throw in the corrected views
-  // must fall through to the shipped ones, which is what this file did before this build.
-  let lexed = []
-  let lexedThrew = false
-  try {
-    lexed = rule(script)
-  } catch (e) {
-    lexedThrew = true
-  }
-  VIEW_MODE = 'shipped'
-  let shipped = []
-  let shippedThrew = false
-  try {
-    shipped = rule(script)
-  } catch (e) {
-    shippedThrew = true
-  } finally {
-    VIEW_MODE = 'lexed'
-  }
-  // BOTH threw: this file cannot read the script at all, and FAIL CLOSED is its stated posture
-  // everywhere else. The pre-fix hook exited 1 here and admitted; denying is stricter than BASE and
-  // is the one place this build deliberately is.
-  if (lexedThrew && shippedThrew)
-    return [{ n: 1, line: String(script).split(/\r?\n/)[0] || '', why: 'this file could not scan the script under EITHER view — a script it cannot read is not a script it may approve' }]
-  const key = (f) => f.n + '\u0000' + (f.why === undefined ? '' : f.why)
-  const seen = new Set(lexed.map(key))
-  return lexed.concat(shipped.filter((f) => !seen.has(key(f))))
-}
-
-// THE VERIFY TOTAL. Since TOOL-dFairHearing-16 no rule of this file reads it: rule 2, the verify-stage
-// total, is the review kit's `check-verifier-fanout.js`, which reads it through this file's exports,
-// and `check-playbook-parity.sh` reads it by source line. It stays here, with the views, until
-// dBoundRoles retires this hook and moves it. The lens allowance that sat beside it left with its last
-// reader (TOOL-dFairHearing-27 S16): its one home is `LENS_SLOTS` in `check-verifier-fanout.js`.
-const MAX_VERIFIERS = 5
-// TOOL-dGroundRules-10 F2 — a VERIFIER split's comparand is MAX_VERIFIERS, the verify total. TOOL-dGroundRules-18 — a WRITER
-// split's is the agent limit (receiver (a)), read through rule 7's `readPolicy` once, only for a script carrying the marker.
-// TOOL-dFairHearing-43 S6 - found through `resolveKitDir`; a refusal reads as the absent helper, an empty path.
-function resolvePolicyHelper() {
-  try { return require('path').join(resolveKitDir('policy', 'policy-mirror.js', __dirname), 'policy-mirror.js') } catch { return '' }
-}
-const POLICY_HELPER = resolvePolicyHelper()
-function readWriterBound(repo) {
-  if (!require('fs').existsSync(POLICY_HELPER)) return { n: MAX_VERIFIERS, key: 'MAX_VERIFIERS, as no policy kit was found by resolveKitDir' }
-  let v
-  try { v = require(POLICY_HELPER).readPolicy('runtime.agents-in-flight', { repo }).value } catch (e) { return { why: `the agent limit could not be read: ${(e && e.message) || e}` } }
-  return Number.isInteger(v) && v > 0 ? { n: v, key: 'runtime.agents-in-flight' } : { why: `runtime.agents-in-flight reads ${JSON.stringify(v)}, not a positive integer` }
-}
-
-// TOOL-aLexedStripper-2 — the view RULE 2 reads, and the reason it is not `renderBlankedLiterals`.
-//
-// Rule 2 counts a lens array's elements and walks brackets to do it. `renderStrippedView` (line 70) blanks
-// '…' and "…" per line and leaves backticks ALONE, so a lens PROMPT — which is a backticked template
-// literal full of English — reaches those counters as though it were code. Measured against the
-// shipped hook, five prose spellings DENIED a correct five-element fan in the multi-line array shape
-// every harness here is written in: a literal `...` (read as a spread), and an unmatched `[`, `]`,
-// `)` or `}` (read as bracket structure). None of them is code.
-//
-// `renderBlankedLiterals` cannot be that view, and this was measured rather than reasoned. It blanks template
-// CONTENTS including `${…}` bodies, which hold real code — an `agent(` inside a multi-line
-// interpolation is DENIED today and would have been ADMITTED. And its mode is carried across lines,
-// so one unterminated backtick blanks every later line and an unbounded burst below it would have
-// been ADMITTED too. Both are fail-open on the only mechanical control against an agent burst.
-//
-// So: LINE-ALIGNED (one output line per input line, because every walk here indexes by line),
-// interpolation bodies COPIED, `${…}` nesting tracked so `` `a${`b`}c` `` balances, and a report of
-// whether the scan ended inside a template literal.
-//
-// TOOL-aLexedStripper-5 — what that last flag is FOR, and what it is not. It does NOT fail closed.
-// TOOL-dMispairedQuote-1 — and the sentence below is TRUE and is NOT the explanation anyone came
-// looking for. A raw fan-out got past rule 1 whenever an apostrophe shared its line, and the regex
-// literal in the report was one of five spellings: a double-quoted `"don't"`, a block comment, a
-// backticked `don't` and loose prose all did it too. The mechanism was the APOSTROPHE, and the fix
-// is `checkLiteralOpen` above, not a regex model. What modelling regex literals would buy is
-// separate and is not built: a regex's CONTENTS supply the backtick, the `)` and the `//` that made
-// correcting the quote rule un-hide delimiters, which is why the shipped views are still evaluated.
-// This file models no regex literal (neither does `renderBlankedLiterals`), so a backtick inside `/…/`
-// opens template mode and never closes — on a LEGAL script the shipped hook admits. Denying on the
-// flag traded one false-positive class for another. Instead an unterminated scan FALLS BACK to the
-// per-line view rule 2 read before, which returns the shipped hook's own verdict for that script:
-// it cannot regress in either direction, because it IS the shipped behaviour. The fail-open the flag
-// was written to close stays closed, because the shipped hook DENIES that script too (measured).
-//
-// RESIDUAL, named the way `memory/map/features/agent-cap.md` names rule 1's: a script containing a
-// regex literal with an odd backtick count is judged at the shipped hook's precision, not the
-// improved one. That is a smaller and stated loss.
-function renderLexedView(script) {
-  const out = []
-  let mode = 'code' // code | tmpl
-  const stack = [] // 'tmpl' | 'interp', innermost last
-  let interpDepth = 0 // brace depth inside the current interpolation
-  // TOOL-aRepatriatedFork-7 S1 — the depth of every ENCLOSING interpolation, saved when a nested `${`
-  // opens and restored when it closes. One scalar zeroed on every `${` lost the outer depth, so in
-  // `${ f({ k: `b ${ x } c` }) + fan }` the object's own `}` closed the OUTER interpolation and the
-  // fan-out after it left the view: measured admitted at exit 0 by a7c78ad2, through a sanctioned
-  // helper the raw-text rule has no reason to fire on. adopter ic's D1, absorbed.
-  const interpDepths = []
-  for (const raw of script.split(/\r?\n/)) {
-    let res = ''
-    let i = 0
-    while (i < raw.length) {
-      const ch = raw[i]
-      const two = raw.slice(i, i + 2)
-      if (mode === 'code') {
-        if (two === '//') break
-        if (ch === '`') { stack.push('tmpl'); mode = 'tmpl'; res += '`'; i++; continue }
-        if (ch === "'" || ch === '"') {
-          // An UNPAIRED quote is ordinary text, not a string, AND SO IS ONE WHOSE ONLY AVAILABLE
-          // PARTNER IS THE WRONG ONE. This used to run to end of line and append a closer the source
-          // never had, swallowing the rest of that line -- and any fan-out sitting on it went too.
-          // `addc6169` fixed THAT by demanding a matching PAIR, which is where it stopped: for
-          // `/won't/ ... agent('a'` a pair exists, the prose apostrophe and the quote opening the
-          // call, and blanking between them erased the `agent(` this rule counts (TOOL-dMispairedQuote-1).
-          // `resolveLiteralEnd` asks whether a literal opens here AT ALL, which a pair test cannot reach.
-          const e = resolveLiteralEnd(raw, i)
-          if (e < 0) { res += ch; i++; continue }
-          res += ch + ch
-          i = e + 1
-          continue
-        }
-        // Inside an interpolation, the matching `}` returns to the template it came from. Depth is
-        // counted so an object literal or a block inside the expression does not close it early.
-        if (stack.length && stack[stack.length - 1] === 'interp') {
-          if (ch === '{') interpDepth++
-          else if (ch === '}') {
-            if (interpDepth === 0) { stack.pop(); interpDepth = interpDepths.length ? interpDepths.pop() : 0; mode = 'tmpl'; res += ' '; i++; continue }
-            interpDepth--
-          }
-        }
-        res += ch
-        i++
-      } else if (mode === 'tmpl') {
-        if (ch === '\\') { i += 2; continue }
-        if (two === '${') { stack.push('interp'); interpDepths.push(interpDepth); interpDepth = 0; mode = 'code'; res += '  '; i += 2; continue }
-        if (ch === '`') { stack.pop(); mode = 'code'; res += '`'; i++; continue }
-        i++
-      }
-    }
-    out.push(res)
-  }
-  // THIS VIEW DOES NOT BLANK BLOCK COMMENTS, and that is the fix rather than an omission. It cannot
-  // tell a real block-comment opener from one inside a regex literal, so every blanking it did on
-  // hide a fan-out: a regex-borne opener closed by a later ordinary closer ends the scan back in
-  // code mode with an empty stack, no flag fires, and the span between is gone from the view. Two
-  // closing-review rounds measured that, and the second one measured the smaller repair -- widening
-  // the flag -- as insufficient for exactly this shape. The view this replaced blanked no block
-  // comment either, so leaving them alone cannot regress against it, and un-blanked comment text can
-  // only ADD apparent code, never hide it. That is the same fail-closed posture rule 1 already
-  // documents for a primitive named inside a block comment.
-  //
-  // The flag still reports every mode that outlives the scan, which now means an unterminated
-  // TEMPLATE only.
-  return { code: out, unterminated: stack.length > 0 || mode !== 'code' }
-}
-// TOOL-dMispairedQuote-1 — the quote branch below asks `resolveLiteralEnd` whether a literal opens at
-// all, which removes both of this view's old defects: it ran to end of line synthesizing a closer the
-// source never had, and it paired a prose apostrophe with the next quote. The claim below that string
-// AND template contents are gone therefore holds for every span this file can RESOLVE as a literal,
-// and a quote it cannot resolve is left as text on a line that is still blanked.
-//
-// A literal-blanked view: string AND TEMPLATE contents gone, comments gone, delimiters and structure
-// kept. Rule 5 reads it, through `renderBlankedLiterals`, so a banned join named inside a prompt
-// string is prose and not code.
-function renderBlankedView(script) {
-  const out = []
-  let mode = 'code' // code | tmpl | block
-  for (const raw of script.split(/\r?\n/)) {
-    let res = ''
-    let i = 0
-    while (i < raw.length) {
-      const ch = raw[i]
-      const two = raw.slice(i, i + 2)
-      if (mode === 'code') {
-        if (two === '//') break
-        if (two === '/*') { mode = 'block'; i += 2; continue }
-        if (ch === '`') { mode = 'tmpl'; res += '`'; i++; continue }
-        if (ch === "'" || ch === '"') {
-          const e = resolveLiteralEnd(raw, i)
-          if (e < 0) { res += ch; i++; continue }
-          res += ch + ch
-          i = e + 1
-          continue
-        }
-        res += ch
-        i++
-      } else if (mode === 'tmpl') {
-        if (ch === '\\') { i += 2; continue }
-        if (ch === '`') { mode = 'code'; res += '`'; i++; continue }
-        i++
-      } else {
-        if (two === '*/') { mode = 'code'; i += 2; continue }
-        i++
-      }
-    }
-    out.push(res)
-  }
-  // TOOL-aWeldedTribunal-3 — same report as the shipped sibling, so the dispatcher's two arms return
-  // one shape. A dispatcher whose arms differ is a defect every caller has to know about, which is
-  // the thing a dispatcher exists to prevent.
-  return { code: out, unterminated: mode !== 'code' }
-}
-
 
 // The CHECKOUT root: the nearest directory holding `.git`, a directory in a primary tree and a FILE
 // in a linked worktree. Resolved without shelling out to git — this runs on every call.
@@ -642,59 +156,10 @@ function resolveCheckoutRoot(start) {
 }
 
 
-// The `builds/<slug>` a repo-relative path sits under, or null: no `builds` segment, any `..`
-// segment, or a spelling that is not repo-relative at all — absolute (`/…`, `X:…`) or `~`-rooted
-// (round 2, R1). A direct spec-audit subject is repo-relative by the harness's own contract, and a
-// slug walk over an absolute path answers the SLUG axis while a second checkout with the same slug
-// sits on the ROOT axis it never asked about. One walk for every subject so containment cannot be
-// tested one way (closing review F2).
-function extractBuildSlug(p) {
-  const q = String(p).replace(/\\/g, '/')
-  if (q.startsWith('~') || /^([A-Za-z]:|\/)/.test(q)) return null
-  const parts = q.split('/')
-  if (parts.indexOf('..') !== -1) return null
-  const i = parts.indexOf('builds')
-  return i === -1 || !parts[i + 1] ? null : parts[i + 1]
-}
-
-
-// A Workflow call's structured `args`, parsed ONCE for rules 0 and 6: a JSON string is parsed, and
-// anything that is not then a plain object — a string that does not parse included — is null. Rule 0
-// admits on null, as it always has; rule 6 refuses on it.
-function extractWorkflowArgs(data) {
-  let a = data && data.tool_input && data.tool_input.args
-  if (typeof a === 'string') {
-    try { a = JSON.parse(a) } catch { return null }
-  }
-  return a && typeof a === 'object' && !Array.isArray(a) ? a : null
-}
-
-// RULE 6 (TOOL-aOrientedCast-7) — every agent prompt is a rendered handoff. The marker line is the
-// roles kit's interface, read here and never written; the renderer is named by its bare file name in
-// every message, because a kit file names no sibling kit by literal.
+// RULE 6 (TOOL-aOrientedCast-7) — every agent prompt is a rendered handoff. The marker line is this
+// kit's renderer's interface, read here through the hooks kit's `extractHandoffMarker` and never
+// written; the renderer is named by its bare file name in every message.
 const HANDOFF_MARK = 'gov:handoff'
-// The roles kit's `MARKER_RE` spelled again with the same named groups, since a kit imports no sibling
-// kit: `item=` is optional, so a marker written before it still matches (TOOL-dBoundRoles-17 S1).
-const HANDOFF_MARK_RE = /^<!-- gov:handoff role=(?<role>\S+) build=(?<build>\S+) unit=(?<unit>\S+)(?: item=(?<item>\S+))? path=(?<path>\S+) role-sha=(?<roleSha>[0-9a-f]{12}) task-sha=(?<taskSha>[0-9a-f]{12}) -->$/
-
-// Every line of `text` outside a fence, carriage returns stripped, that is a whole marker line with its
-// fields in order: `{ line, role, build, unit, item, path, roleSha, taskSha }` each, read by group name;
-// `item` is the field's string, `-` included, or null for a marker carrying none. The lines are the ones
-// scratch-guard's `readUnfencedLines` yields, so a marker quoted inside handed content, which the renderer
-// fences, is content and is not counted (TOOL-dBoundRoles-38 S4).
-function extractHandoffMarker(text) {
-  const out = []
-  const sg = require(require('path').join(__dirname, 'scratch-guard.js'))
-  for (const [, raw] of sg.readUnfencedLines(text)) {
-    if (raw === null) continue
-    const line = raw.replace(/\r/g, '')
-    const m = HANDOFF_MARK_RE.exec(line)
-    if (!m) continue
-    const g = m.groups
-    out.push({ line, role: g.role, build: g.build, unit: g.unit, item: g.item === undefined ? null : g.item, path: g.path, roleSha: g.roleSha, taskSha: g.taskSha })
-  }
-  return out
-}
 
 // The `## Task` section: from the first line that is exactly `## Task` to the end of the text, CRLF
 // folded to LF, or null. The renderer's span (`handoff.py`'s `check` hashes the same bytes). Walked
@@ -733,7 +198,7 @@ const TYPED_INPUTS = ['question', 'diff']
 // the count of the file's lines before the section, so each refusal names the line of the file. null to
 // admit, else the refusal naming the block and the line.
 function checkTypedBlocks(section, lead) {
-  const sg = require(require('path').join(__dirname, 'scratch-guard.js'))
+  const sg = loadScratchGuard()
   const lines = String(section).split('\n')
   const remedy = 'a typed input\'s block is authored text, so it may hold no fact, marker or `Framed by:` line and must close every fence it opens; correct the value and re-render with handoff.py render.'
   for (let i = 0; i < lines.length; i++) {
@@ -746,7 +211,7 @@ function checkTypedBlocks(section, lead) {
     while (k < body.length && body[k].trim() === '') k++
     k = k < body.length && FACT_RE.test(body[k]) ? k + 1 : 0
     for (let j = k; j < body.length; j++) {
-      if (FACT_RE.test(body[j]) || HANDOFF_MARK_RE.test(body[j]) || /^Framed by:/.test(body[j])) {
+      if (FACT_RE.test(body[j]) || loadScratchGuard().HANDOFF_MARK_RE.test(body[j]) || /^Framed by:/.test(body[j])) {
         return `input:${h[1]}: line ${lead + i + 2 + j} of the file reads ${JSON.stringify(body[j].slice(0, 120))}, an executor line inside a typed block; ${remedy}`
       }
     }
@@ -768,7 +233,7 @@ function checkTypedBlocks(section, lead) {
 // `lead` is the count of the file's lines before the section, so each refusal names the line of the file. null to
 // admit, else the refusal naming the block and the line.
 function checkBlockFences(section, lead, docPath) {
-  const sg = require(require('path').join(__dirname, 'scratch-guard.js'))
+  const sg = loadScratchGuard()
   const lines = String(section).split('\n').map((l) => l.replace(/\r/g, ''))
   const read = new Map()
   for (const [n, line] of sg.readUnfencedLines(lines.join('\n'))) if (line !== null) read.set(n, line)
@@ -826,7 +291,7 @@ function deriveBlobId(buf) {
 function checkFactKeys(section, root) {
   const fs = require('fs')
   const path = require('path')
-  for (const [, line] of require(path.join(__dirname, 'scratch-guard.js')).readUnfencedLines(section)) {
+  for (const [, line] of loadScratchGuard().readUnfencedLines(section)) {
     const f = line === null ? null : FACT_RE.exec(line)
     const m = f ? FACT_SOURCE_RE.exec(f.groups.key) : null
     if (!m) continue
@@ -834,7 +299,7 @@ function checkFactKeys(section, root) {
     let now = null
     const card = g.form === 'record' && g.ref.startsWith('card/') ? g.ref.slice(5) : null
     if (card !== null) {
-      const sg = require(path.join(__dirname, 'scratch-guard.js'))
+      const sg = loadScratchGuard()
       const top = sg.resolveToplevel(root)
       const read = top ? sg.readCard(sg.resolveCommonDir(top), card) : { text: null, shown: '(no card: no checkout)' }
       now = read.text === null ? `nothing, ${read.shown}` : deriveBlobId(Buffer.from(read.text, 'utf8'))
@@ -858,7 +323,7 @@ function checkFactKeys(section, root) {
 function checkItemBinding(m, sessionId, root) {
   if (m.item === null || m.item === '-') return null
   const path = require('path')
-  const sg = require(path.join(__dirname, 'scratch-guard.js'))
+  const sg = loadScratchGuard()
   const top = sg.resolveToplevel(root)
   const common = top ? sg.resolveCommonDir(top) : null
   const card = typeof sessionId !== 'string' || sessionId === ''
@@ -880,7 +345,7 @@ function renderHandoffDeny(tool, why, index) {
       `\`prompt\` with \`subagent_type\` that role and \`description\` the name it prints on stderr.`
     : `The declared harnesses are: ${(index && index.harnesses ? index.harnesses : []).join(', ') || '(none)'}. ` +
       `Run one by \`scriptPath\` and pass, in \`args\`, the \`roles\` object \`handoff.py harness-args <harness>\` prints.`
-  return `BLOCKED by agent-cap: rule 6 (TOOL-aOrientedCast-7) refused this ${tool} call — ${why}\n${route}\n`
+  return `BLOCKED by spawn-guard: rule 6 (TOOL-aOrientedCast-7) refused this ${tool} call — ${why}\n${route}\n`
 }
 
 // TOOL-dBoundRoles-10 S3 - the policy key `prompts.author`, who writes a worker's task: `prompt-writer`, its
@@ -892,7 +357,7 @@ function renderHandoffDeny(tool, why, index) {
 // `renderAuthorNote` kept.
 const PROMPTS_AUTHOR_KEY = 'prompts.author'
 function resolvePromptsAuthor(root) {
-  const helper = resolvePolicyHelper()
+  const helper = loadScratchGuard().resolvePolicyHelper()
   if (!helper || !require('fs').existsSync(helper)) return null
   return require(helper).readPolicy(PROMPTS_AUTHOR_KEY, { repo: root }).value
 }
@@ -938,7 +403,7 @@ function checkHandoffSpawn(data, index, root) {
       `a built-in agent type is never admitted${research.length ? `, and research or mapping runs as the ${research.join(' or ')} role` : ''}.`, index)
   }
   if (typeof ti.prompt !== 'string') return renderHandoffDeny('Agent', 'the call carries no `prompt` string.', index)
-  const marks = extractHandoffMarker(ti.prompt)
+  const marks = loadScratchGuard().extractHandoffMarker(ti.prompt)
   if (marks.length !== 1) return renderHandoffDeny('Agent', `the prompt carries ${marks.length} ${HANDOFF_MARK} marker lines; exactly one is required.`, index)
   const m = marks[0]
   if (m.role !== type) return renderHandoffDeny('Agent', `the marker's role ${m.role} is not the subagent_type ${type}.`, index)
@@ -951,7 +416,7 @@ function checkHandoffSpawn(data, index, root) {
   try { st = fs.statSync(file) } catch { st = null }
   if (!st || !st.isFile()) return renderHandoffDeny('Agent', `the marker's path ${m.path} names no file under ${root.split(path.sep).join('/')}.`, index)
   const text = fs.readFileSync(file, 'utf8')
-  const fileMarks = extractHandoffMarker(text)
+  const fileMarks = loadScratchGuard().extractHandoffMarker(text)
   if (fileMarks.length !== 1 || fileMarks[0].line !== m.line) {
     return renderHandoffDeny('Agent', `${m.path} does not hold exactly one marker line byte-equal to the prompt's (it holds ${fileMarks.length}).`, index)
   }
@@ -975,7 +440,7 @@ function checkHandoffSpawn(data, index, root) {
   // TOOL-dBoundRoles-38 S5 - a section whose walk ends inside a fence would hide every later fact line from
   // the re-cut below, so it is denied, naming the line of the file the fence opened at.
   let open = null
-  for (const [n, line] of require(path.join(__dirname, 'scratch-guard.js')).readUnfencedLines(section)) if (line === null) open = n
+  for (const [n, line] of loadScratchGuard().readUnfencedLines(section)) if (line === null) open = n
   if (open !== null) {
     const at = text.replace(/\r\n/g, '\n').length - section.length
     const fileLine = text.replace(/\r\n/g, '\n').slice(0, at).split('\n').length + open - 1
@@ -1029,7 +494,7 @@ function checkHandoffSpawn(data, index, root) {
 function checkPromptPath(p, build) {
   const parts = String(p).replace(/\\/g, '/').split('/')
   const at = parts.indexOf('builds')
-  if (extractBuildSlug(p) !== build || parts[at + 2] !== 'prompts' || parts.length < at + 4 || parts.slice(at + 3).some((s) => s === '' || s === '.')) return null
+  if (loadScratchGuard().extractBuildSlug(p) !== build || parts[at + 2] !== 'prompts' || parts.length < at + 4 || parts.slice(at + 3).some((s) => s === '' || s === '.')) return null
   return parts
 }
 
@@ -1053,7 +518,7 @@ function checkFraming(type, m, section, root) {
   if (author !== 'prompt-writer' || type === PROMPT_WRITER) return null
   const route = `${PROMPTS_AUTHOR_KEY} is prompt-writer, so a ${type} task carries the prompt writer's framing: render the prompt writer with \`handoff.py render --role ${PROMPT_WRITER} --for ${type} --build ${m.build}${m.unit === '-' ? '' : ` --unit ${m.unit}`} --input question=<your details> ...\`, spawn it, then render this task with \`handoff.py render --role ${type} ... --framed-by <the prompt writer's agent id>\` and spawn that.`
   const lines = []
-  for (const [n, raw] of require(path.join(__dirname, 'scratch-guard.js')).readUnfencedLines(section)) if (raw !== null) lines.push([n, raw.replace(/\r/g, '')])
+  for (const [n, raw] of loadScratchGuard().readUnfencedLines(section)) if (raw !== null) lines.push([n, raw.replace(/\r/g, '')])
   const heads = lines.filter(([, l]) => /^### framing:job[ \t]*$/.test(l))
   if (heads.length !== 1) return `the task carries ${heads.length} \`### framing:job\` blocks; exactly one is required. ${route}`
   const framed = lines.filter(([, l]) => l.startsWith('Framed by:'))
@@ -1067,7 +532,7 @@ function checkFraming(type, m, section, root) {
   let text = null
   try { text = fs.readFileSync(path.join(root, ...parts), 'utf8') } catch { text = null }
   if (text === null) return `the \`Framed by:\` path ${f.groups.path} names no file under ${root.split(path.sep).join('/')}. ${route}`
-  const marks = extractHandoffMarker(text)
+  const marks = loadScratchGuard().extractHandoffMarker(text)
   if (marks.length !== 1) return `${f.groups.path} holds ${marks.length} ${HANDOFF_MARK} marker lines; the prompt writer's work order holds exactly one. ${route}`
   if (marks[0].role !== PROMPT_WRITER) return `${f.groups.path}'s marker names role=${marks[0].role}, not ${PROMPT_WRITER}: only the prompt writer's work order frames a task. ${route}`
   if (marks[0].taskSha !== f.groups.taskSha) return `${f.groups.path}'s marker says task-sha=${marks[0].taskSha}, and the \`Framed by:\` line names ${f.groups.taskSha}: the framing was cut from another render of it. ${route}`
@@ -1087,10 +552,15 @@ function checkHarnessCall(data, index, root) {
   if (ti.script) return renderHandoffDeny('Workflow', 'an inline `script` is never a declared harness.', index)
   const sp = ti.scriptPath
   if (typeof sp !== 'string' || sp === '') return renderHandoffDeny('Workflow', 'the call names no `scriptPath` (a `name:` run is not a declared harness).', index)
-  if (resolveHarnessEntry(data, index, root) === null) {
+  const entry = resolveHarnessEntry(data, index, root)
+  if (entry === null) {
     return renderHandoffDeny('Workflow', `scriptPath ${sp} (${resolveHarnessEntry.rel} from the checkout root) is not a declared harness.`, index)
   }
-  const a = extractWorkflowArgs(data)
+  // TOOL-dBoundRoles-25 S3 - the declared harness runs only at its landed bytes: after the path match, so a call
+  // refused for its path pays no git call, and before the args, so an edited harness is named first.
+  const unlanded = checkHarnessLanded(entry, root)
+  if (unlanded) return renderHandoffDeny('Workflow', unlanded, index)
+  const a = loadScratchGuard().extractWorkflowArgs(data)
   if (!a) return renderHandoffDeny('Workflow', '`args` is not a plain object, or a JSON string of one.', index)
   const r = a.roles
   if (!r || typeof r !== 'object' || Array.isArray(r) || !Object.keys(r).length) {
@@ -1110,7 +580,7 @@ function checkHarnessCall(data, index, root) {
 function resolveHarnessEntry(data, index, root) {
   const fs = require('fs')
   const path = require('path')
-  const { buildComparablePath } = require(path.join(__dirname, 'scratch-guard.js'))
+  const { buildComparablePath } = loadScratchGuard()
   const sp = String((data.tool_input || {}).scriptPath)
   const folded = process.platform === 'win32' ? sp.replace(/\\/g, '/').replace(/^\/([A-Za-z])\//, '$1:/') : sp
   const abs = path.resolve(data.cwd || process.cwd(), folded)
@@ -1122,6 +592,50 @@ function resolveHarnessEntry(data, index, root) {
   resolveHarnessEntry.rel = rel
   const hit = index.harnesses.find((h) => buildComparablePath(h).replace(/^\.\//, '') === rel)
   return hit === undefined ? null : hit
+}
+
+// TOOL-dBoundRoles-25 S3 - THE TWO BLOBS ADMISSION COMPARES, for the declared harness `rel` (repo-relative, as the
+// index spells it) under the checkout `root`: `{ L, landed, worktree }`, `landed` the blob id of `rel` at the landed
+// revision L or '' where L holds no such path, `worktree` the id `git hash-object` gives the working-tree file, which
+// applies the repository's clean filters, so a CRLF checkout of an LF blob reads equal. L is the policy kit's
+// `readLandedRevision`, the one JS reader of the landed revision (TOOL-dGroundRules-5 S5), found through the hooks
+// kit's `resolvePolicyHelper` as rule 7 finds it. `{ why }` where it cannot be read: no policy kit, a refusal from
+// it, an answer that is no commit, or a working-tree file git cannot hash. Two git calls; never throws.
+function readHarnessBlobs(rel, root) {
+  const fs = require('fs')
+  const { spawnSync } = require('child_process')
+  const helper = loadScratchGuard().resolvePolicyHelper()
+  if (!helper || !fs.existsSync(helper)) {
+    return { why: `no policy kit resolves beside the hooks kit, so the landed revision ${rel} is held to cannot be read, and a rule that cannot read does not admit; the owner installs the policy kit (govkit apply --kits policy)` }
+  }
+  let L
+  try { L = String(require(helper).readLandedRevision(root)).trim() } catch (e) {
+    return { why: `the landed revision ${rel} is held to cannot be read (${String((e && e.message) || e).split(/\r?\n/)[0]}), and a rule that cannot read does not admit; the owner clears the policy reader's refusal it names` }
+  }
+  if (!/^[0-9a-f]{40,64}$/.test(L)) return { why: `the landed revision reads ${JSON.stringify(L.slice(0, 80))}, which is no commit, so ${rel} cannot be held to it; the owner names the default branch the policy reader's ladder resolves` }
+  const env = Object.assign({}, process.env)
+  for (const k of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_COMMON_DIR']) delete env[k]
+  const runGit = (args) => spawnSync('git', ['-C', root, ...args], { encoding: 'utf8', env, timeout: 20000, windowsHide: true })
+  const at = runGit(['rev-parse', '--verify', '--quiet', `${L}:${rel}`])
+  const landed = at.status === 0 ? String(at.stdout || '').trim() : ''
+  const now = runGit(['hash-object', '--', rel])
+  const worktree = now.status === 0 ? String(now.stdout || '').trim() : ''
+  if (!worktree) return { why: `git could not hash the working-tree file ${rel} (${String(now.stderr || (now.error && now.error.message) || 'no answer').trim().split(/\r?\n/)[0]}), and a rule that cannot read does not admit; the driver restores the file` }
+  return { L, landed, worktree }
+}
+
+// TOOL-dBoundRoles-25 S3 - ADMISSION HELD TO THE LANDED BLOB (gap-roles-30): a declared harness runs only when its
+// working-tree blob is its blob at the landed revision, so an edited harness never runs before the bar has read it.
+// An uncommitted edit and a committed but unlanded one are refused alike (§8 F2). null to admit, else the reason,
+// naming the harness, L's first eight hex digits and the remedy's actor: the driver, who lands the harness or runs
+// it at its landed bytes, or the owner where the landed revision cannot be read at all.
+function checkHarnessLanded(rel, root) {
+  const b = readHarnessBlobs(rel, root)
+  if (b.why) return b.why
+  const L8 = b.L.slice(0, 8)
+  if (!b.landed) return `harness ${rel} is not landed at ${L8}; land it before running it (the driver lands it, or runs a harness that is).`
+  if (b.landed !== b.worktree) return `harness ${rel} differs from its blob at the landed revision ${L8}; an edited harness runs only after it lands, so the bar has read it (the driver lands the edit, or restores the landed bytes with git show ${L8}:${rel} for the call).`
+  return null
 }
 
 // RULE 8 (TOOL-aGuardedEffort-1) — the level a call runs at is the one the effort policy gives its
@@ -1158,7 +672,7 @@ function resolveModelProfile(profiles, model) {
 
 // The refusal: the rule, the tool, the reason, and the call that prints the right value.
 function renderEffortDeny(tool, why, remedy) {
-  return `BLOCKED by agent-cap: rule 8 (TOOL-aGuardedEffort-1) refused this ${tool} call — ${why}\n${remedy}\n`
+  return `BLOCKED by spawn-guard: rule 8 (TOOL-aGuardedEffort-1) refused this ${tool} call — ${why}\n${remedy}\n`
 }
 
 // Rule 8 on a call rule 6 admitted: null when it was graded and admitted, or when the index carries
@@ -1173,7 +687,7 @@ function checkEffortLevel(data, index, root) {
   const checkOwn = (o, k) => !!o && typeof o === 'object' && Object.prototype.hasOwnProperty.call(o, k)
   const renderShown = (v) => JSON.stringify(typeof v === 'string' ? v.slice(0, 80) : v === undefined ? null : v)
   const renderLevel = (v) => (typeof v === 'string' ? v.slice(0, 80) : renderShown(v))
-  const renderNote = (why) => ({ note: `agent-cap: rule 8 did not check this ${tool} call's effort level — ${why}` })
+  const renderNote = (why) => ({ note: `spawn-guard: rule 8 did not check this ${tool} call's effort level — ${why}` })
   // F2: a session whose environment fixes the level offers no `effort` on its Agent tool, so no call
   // could pass. An Agent call's step alone, before the model is read; a Workflow call is graded.
   if (tool === 'Agent' && process.env.CLAUDE_CODE_EFFORT_LEVEL) {
@@ -1207,7 +721,7 @@ function checkEffortLevel(data, index, root) {
   const entry = resolveHarnessEntry(data, index, root)
   const workflows = entry === null ? null : e.harnesses[entry]
   if (!Array.isArray(workflows) || !workflows.length) throw new Error(`the effort tables of ${index.shown} name no workflow for the harness ${entry}`)
-  const a = extractWorkflowArgs(data) || {}
+  const a = loadScratchGuard().extractWorkflowArgs(data) || {}
   const efforts = a.efforts === undefined ? {} : a.efforts
   if (!efforts || typeof efforts !== 'object' || Array.isArray(efforts)) {
     return { deny: renderEffortDeny('Workflow', '`args.efforts` is present and not a plain object, so no stage level can be read from it.',
@@ -1276,19 +790,19 @@ const SETTINGS_VARS = ['CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS', 'CLAUDE_CODE_WORK
 function checkSettingsInForce(data) {
   const fs = require('fs')
   const path = require('path')
-  const helper = POLICY_HELPER
+  const helper = loadScratchGuard().resolvePolicyHelper()
   if (!fs.existsSync(helper)) return null
   const root = resolveCheckoutRoot(data.cwd || process.cwd())
-  if (!root) return `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the payload cwd ${String(data.cwd || process.cwd()).split(path.sep).join('/')} is in no git checkout, so the settings in force and the landed agent limit cannot be read, and a rule that cannot read does not admit.\n`
+  if (!root) return `BLOCKED by spawn-guard: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the payload cwd ${String(data.cwd || process.cwd()).split(path.sep).join('/')} is in no git checkout, so the settings in force and the landed agent limit cannot be read, and a rule that cannot read does not admit.\n`
   const rel = path.relative(root, path.dirname(helper)).split(path.sep).join('/')  // the render's kit path: a hook names no prefix
   const remedy = `python ${rel ? rel + '/' : ''}policy.py settings --write`
   const renderSettingsDeny = (why) =>
-    `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the ` +
+    `BLOCKED by spawn-guard: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the ` +
     `settings this checkout's harness starts from do not hold the landed agent limit.\n${why}\n` +
     `Render them from the policy: ${remedy}, run at ${root.split(path.sep).join('/')}. A session started ` +
     `before the render keeps the settings it started with until it restarts (UNVERIFIED).\n`
   const renderReadDeny = (why) =>
-    `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the ` +
+    `BLOCKED by spawn-guard: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the ` +
     `landed agent limit cannot be read, so the settings in force were not compared, and a rule that ` +
     `cannot read does not admit. Clear the policy reader's refusal, which names its cause:\n${why}\n`
   checkSettingsInForce.step = `reading the landed limit through ${helper.split(path.sep).join('/')}` // main names the step a throw left
@@ -1337,9 +851,9 @@ function main() {
   const onlyArg = process.argv.slice(2).find((a) => a.startsWith('--only='))
   if (onlyArg !== undefined) {
     process.stderr.write(
-      `agent-cap: ${onlyArg} is refused — this hook runs no script rule since TOOL-dFairHearing-16. ` +
+      `spawn-guard: ${onlyArg} is refused — this hook runs no script rule since TOOL-dFairHearing-16. ` +
         `The verifier total and the loop markers run from the review kit's check-verifier-fanout.js, ` +
-        `and the ref-keyed join ban from its check-review-join.js, each given this hook as --hook. ` +
+        `and the ref-keyed join ban from its check-review-join.js, each reading the review kit's script-views.js. ` +
         `Omit the flag to run this hook's rules 6, 8 and 7.\n`,
     )
     process.exit(2)
@@ -1353,6 +867,13 @@ function main() {
   }
   if (!data || (data.tool_name !== 'Workflow' && data.tool_name !== 'Agent')) process.exit(0)
 
+  // TOOL-dBoundRoles-25 - the hooks kit's readers, before any rule reads them: a pack that cannot load
+  // scratch-guard.js cannot read the index, and refuses the call rather than admit it unread.
+  try { loadScratchGuard() } catch (e) {
+    process.stderr.write(`BLOCKED by spawn-guard: the hooks kit's scratch-guard.js could not be loaded (${String((e && e.message) || e).split(/\r?\n/)[0]}), so no rule of this guard can read the call, and a guard that cannot read does not admit. The owner installs the hooks kit beside the roles kit: govkit apply --kits agent-cap.\n`)
+    process.exit(2)
+  }
+
   // RULE 6 (TOOL-aOrientedCast-7) — first, so a call outside a declared harness is refused whatever its
   // args. An absent `.claude/roles.json` at the role root adds no rule, except in a governed tree, whose
   // `.claude/agents/` keeps a rendered role agent, where it refuses (TOOL-dBoundRoles-6 S3); a broken
@@ -1364,7 +885,7 @@ function main() {
     try {
       // TOOL-aOrientedCast-14: the root of the payload cwd, else of CLAUDE_PROJECT_DIR. No candidates
       // are passed, so the third start, a launched script's directory, never applies (TOOL-dBoundRoles-8 S2).
-      const { loadRoleIndex, resolveRoleRoot, checkRoleGoverned } = require(require('path').join(__dirname, 'scratch-guard.js'))
+      const { loadRoleIndex, resolveRoleRoot, checkRoleGoverned } = loadScratchGuard()
       const cwd = data.cwd || process.cwd()
       root = resolveRoleRoot(cwd, process.env)
       if (root) {
@@ -1374,7 +895,7 @@ function main() {
         } else if (index.state === 'broken') deny = renderHandoffDeny(data.tool_name, `the role index ${index.shown} ${index.why}; fix or regenerate it.`, null)
         else if (index.state === 'ok') deny = data.tool_name === 'Agent' ? checkHandoffSpawn(data, index, root) : checkHarnessCall(data, index, root)
       } else if (process.env.CLAUDE_PROJECT_DIR) {
-        process.stderr.write(`agent-cap: rule 6 unarmed — neither the payload cwd ${cwd} nor CLAUDE_PROJECT_DIR ${process.env.CLAUDE_PROJECT_DIR} lies in a checkout, so no role index was read\n`)
+        process.stderr.write(`spawn-guard: rule 6 unarmed — neither the payload cwd ${cwd} nor CLAUDE_PROJECT_DIR ${process.env.CLAUDE_PROJECT_DIR} lies in a checkout, so no role index was read\n`)
       }
     } catch (e) {
       deny = renderHandoffDeny(data.tool_name, `the rule threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.`, index)
@@ -1412,7 +933,7 @@ function main() {
     try {
       deny = checkSettingsInForce(data)
     } catch (e) {
-      deny = `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) threw (while ${checkSettingsInForce.step || 'resolving the payload cwd'}: ${(e && e.message) || e}), and a rule that cannot finish does not admit.\n`
+      deny = `BLOCKED by spawn-guard: rule 7 (TOOL-dGroundRules-10) threw (while ${checkSettingsInForce.step || 'resolving the payload cwd'}: ${(e && e.message) || e}), and a rule that cannot finish does not admit.\n`
     }
     if (deny) {
       process.stderr.write(deny)
@@ -1424,27 +945,10 @@ function main() {
   { const deny = checkOptinPackPresent(data); if (deny) { process.stderr.write(deny); process.exit(2) } }
   process.exit(0)
 }
-
-// TOOL-dFairHearing-16 S1 — THE SHARED READERS, exported to the homes that left with this file's
-// rules: rule 2's `check-verifier-fanout.js` and rule 5's `check-review-join.js` read the views,
-// `runBothViews`, the harness name and the verify total, rule 2 the writer bound too, and the review
-// kit's spec-audit opt-in pack the args reader and the slug walk, which rule 6 here also calls. ONE
-// copy each: a view reads the mode `runBothViews` switches, so the views and it stay one module.
-// `main()` runs only when this file is the entry point, the idiom scratch-guard.js uses, so requiring
-// it judges nothing. dBoundRoles retires this hook and moves these to their last home.
-module.exports = {
-  MAX_VERIFIERS, readWriterBound, runBothViews, renderCodeView, renderStrippedView,
-  renderBlankedLiterals, resolveHarnessName, extractWorkflowArgs, extractBuildSlug,
-  resolveModelProfile, checkEffortLevel, // rule 8's, for the roles kit's parity arm and a probe of the rule alone
-  // TOOL-dPavedRoad-2 S5: format-guard.js finds the roles kit and reads the handoff marker through these.
-  resolveKitDir, extractHandoffMarker,
-  // TOOL-aNimbleMend-8 S4: scratch-guard.js finds the policy kit's mirror reader for the red-fix lane's key.
-  resolvePolicyHelper,
-  // TOOL-dBoundRoles-46 S1: the typed inputs, read by the agent-cap suite against handoff.py's split.
-  TYPED_INPUTS,
-  // TOOL-dBoundRoles-10 S3: the prompts.author reader, which TOOL-dBoundRoles-4's framing branch reads.
-  resolvePromptsAuthor,
-}
+// TOOL-dBoundRoles-25 S4 - THE PACK'S EXPORTS, each read by the roles kit alone: rule 8's resolver and check, for
+// that kit's adopter suite (arm 20) and a probe of the rule alone, and rule 6's typed inputs and prompts.author
+// reader, for this kit's suite. `main()` runs only when this file is the entry point, so requiring it judges nothing.
+module.exports = { resolveModelProfile, checkEffortLevel, TYPED_INPUTS, resolvePromptsAuthor, checkHarnessLanded, readHarnessBlobs }
 if (require.main === module) main()
 
 // TOOL-dGroundRules-61 S1 — the settings layers rule 7 reads, highest precedence first: the local file
@@ -1497,7 +1001,7 @@ function checkOptinPackPresent(data) {
   const path = require('path')
   const fs = require('fs')
   try {
-    const a = data.tool_name === 'Workflow' ? extractWorkflowArgs(data) : null
+    const a = data.tool_name === 'Workflow' ? loadScratchGuard().extractWorkflowArgs(data) : null
     if (!a || (String(a.kind) !== 'spec-audit' && a.specAudit === undefined)) return null
     let refusal
     try { resolveKitDir('workflows', 'spec-audit-optin.js', __dirname); return null } catch (e) { refusal = e }
@@ -1506,13 +1010,13 @@ function checkOptinPackPresent(data) {
     const claimed = !!receipt && Array.isArray(receipt.kits) && receipt.kits.includes('review-harness')
     const kits = path.dirname(__dirname)
     const renderRel = (f) => path.relative(process.env.CLAUDE_PROJECT_DIR || process.cwd(), f).split(path.sep).join('/')
-    return `BLOCKED by agent-cap: this Workflow call is a spec audit, and the spec-audit opt-in pack was not found: ` +
+    return `BLOCKED by spawn-guard: this Workflow call is a spec audit, and the spec-audit opt-in pack was not found: ` +
       `${refusal.message}. The opt-in moved to the review kit (TOOL-dFairHearing-16), ` +
       `and a hook landed without its pack does not admit an audit nobody judged.\n` +
       `Install the pack: govkit ${claimed ? 'update' : 'apply'} --kits review-harness, or wire a hand copy with ` +
       `python ${renderRel(path.join(kits, 'settings-merge.py'))} --fragment ${renderRel(path.join(kits, 'workflows', 'spec-audit-optin.fragment.json'))}.\n`
   } catch (e) {
-    return `BLOCKED by agent-cap: the spec-audit pack check (TOOL-dFairHearing-22) threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.\n`
+    return `BLOCKED by spawn-guard: the spec-audit pack check (TOOL-dFairHearing-22) threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.\n`
   }
 }
 

@@ -13,7 +13,6 @@ tools/check-template-size.sh	tab-ifs-read	2	85a1c45076fd9093f1b9a08a2d720c8146aa
 tools/check-wiring.test.sh	heredoc-source	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/codebase-map/adopt-codebase-map.test.sh	heredoc-source	2	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/gate-lint/fork-count.sh	tab-ifs-read	2	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/hooks/agent-cap.test.sh	heredoc-source	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/gov-feed.sh	tab-ifs-read	1	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-35
 tools/lib/gov-ref.sh	tab-ifs-read	1	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-35
 tools/lib/render-doc.sh	tab-ifs-read	3	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded

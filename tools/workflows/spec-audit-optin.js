@@ -4,8 +4,8 @@
  * calls holding RULE 0 of the agent-cap hook whole, moved here by TOOL-dFairHearing-16 (the owner's
  * NT-27), since the opt-in is the review kit's rule and not a fan-out guard's.
  *
- * gov:kit agent-cap@1.51 — the hooks kit's marker, declared in its `marker_carriers`: this pack reads
- * agent-cap.js's exports, so a scoped update of either kit moves both (TOOL-dFairHearing-27 S12).
+ * gov:kit agent-cap@1.52 — the hooks kit's marker, declared in its `marker_carriers`: this pack reads
+ * scratch-guard.js's exports, so a scoped update of either kit moves both (TOOL-dFairHearing-27 S12).
  *
  * Wiring (per project), through its fragment beside it, which declares the event, the `Workflow`
  * matcher, the marker and the hook path:
@@ -13,10 +13,10 @@
  * A default install lands and wires it through govkit; <prefix>/check-wiring.sh reports it UNWIRED in
  * a tree that unwired it. Blocks via exit 2 + stderr; exits 0 on any other tool and any admitted call.
  *
- * ITS READERS ARE THE HOOKS KIT'S, one copy each: `extractWorkflowArgs` and `extractBuildSlug` from
- * agent-cap.js's exports, `readFrontMatterKey` and `readConfKey` from scratch-guard.js, both read from
- * the directory `resolveKitDir` finds the hooks kit in, as agent-cap finds this pack: the install
- * receipt's row, then the two sibling probes. That location
+ * ITS READERS ARE THE HOOKS KIT'S, one copy each: `extractWorkflowArgs`, `extractBuildSlug`,
+ * `readFrontMatterKey` and `readConfKey`, all from scratch-guard.js's exports (TOOL-dBoundRoles-25 S4),
+ * read from the directory `resolveKitDir` finds the hooks kit in, as the roles kit's spawn guard finds
+ * this pack: the install receipt's row, then the two sibling probes. That location
  * rests on the working-tree receipt, so a forged row chooses the code this pack loads
  * (TOOL-dFairHearing-48 F1). A call it cannot load them for is judged without them: one
  * whose `args` may be a spec audit is DENIED by name, naming the reader, and every other call is
@@ -27,9 +27,9 @@
 // Bound by `loadReaders` before the rule runs; the rule reads them by these names.
 let extractWorkflowArgs, extractBuildSlug, readFrontMatterKey, readConfKey
 
-// TOOL-dFairHearing-43 S4 - agent-cap.js's resolver, carried inline because the pack needs it to find
-// agent-cap.js. `resolve_kit_dir.py` in gov's lib dir is its canonical, and the resolve-python suite
-// holds this block byte-identical to the hook's.
+// TOOL-dFairHearing-43 S4 - the hooks kit's resolver, carried inline because the pack needs it to find
+// scratch-guard.js. `resolve_kit_dir.py` in gov's lib dir is its canonical, and the resolve-python suite
+// holds this block byte-identical to scratch-guard.js's and the spawn guard's (TOOL-dBoundRoles-25 §8 F7).
 // >>> resolveKitDir
 function resolveKitDir(home, anchor, here) {
   const path = require('path')
@@ -69,16 +69,14 @@ function resolveKitDir(home, anchor, here) {
 
 function loadReaders() {
   const path = require('path')
-  const hooksDir = resolveKitDir('hooks', 'agent-cap.js', __dirname)
-  for (const [file, names] of [['agent-cap.js', ['extractWorkflowArgs', 'extractBuildSlug']], ['scratch-guard.js', ['readFrontMatterKey', 'readConfKey']]]) {
-    const at = path.join(hooksDir, file).split(path.sep).join('/')
-    let m
-    try { m = require(at) } catch (e) { throw new Error(`${file}'s ${names.join(' and ')} could not be loaded from ${at} (${(e && e.code) || (e && e.message) || e})`) }
-    const miss = names.filter((n) => typeof m[n] !== 'function')
-    if (miss.length) throw new Error(`${at} exports no ${miss.join(' and ')}`)
-    if (file === 'agent-cap.js') ({ extractWorkflowArgs, extractBuildSlug } = m)
-    else ({ readFrontMatterKey, readConfKey } = m)
-  }
+  const file = 'scratch-guard.js'
+  const names = ['extractWorkflowArgs', 'extractBuildSlug', 'readFrontMatterKey', 'readConfKey']
+  const at = path.join(resolveKitDir('hooks', file, __dirname), file).split(path.sep).join('/')
+  let m
+  try { m = require(at) } catch (e) { throw new Error(`${file}'s ${names.join(', ')} could not be loaded from ${at} (${(e && e.code) || (e && e.message) || e})`) }
+  const miss = names.filter((n) => typeof m[n] !== 'function')
+  if (miss.length) throw new Error(`${at} exports no ${miss.join(' and ')}`)
+  ;({ extractWorkflowArgs, extractBuildSlug, readFrontMatterKey, readConfKey } = m)
 }
 
 // RULE 0 — a pre-code SPEC AUDIT is OPT-IN, and the opt-in is a key in the build README's front
@@ -291,7 +289,7 @@ function main() {
   try {
     loadReaders()
   } catch (e) {
-    // NO READER, NO PLACEMENT. Without agent-cap's `extractWorkflowArgs` this file cannot tell a spec
+    // NO READER, NO PLACEMENT. Without the hooks kit's `extractWorkflowArgs` this file cannot tell a spec
     // audit from any other call, so it asks the raw `args` text whether one may be: a mention of the
     // kind or of `specAudit` is denied naming the reader, and every other call is admitted.
     // ponytail: a text test over-reads in a broken install only, a diff review whose args mention the kind; the readers' probe is TOOL-dFairHearing-32's resolver port.

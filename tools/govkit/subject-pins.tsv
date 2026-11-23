@@ -12,7 +12,6 @@
 # <prefix>/run-gates/run-gates.sh: ask what a FAILURE of the leg MEANS.
 agent-cap restatement	repo	product
 agent-cap restatement self-test	kit	selftests
-agent-cap self-test	kit	selftests
 agent-instructions wiring	repo	wiring
 backlog migration selftest	kit	selftests
 branch-guard self-test	repo	selftests
@@ -206,6 +205,7 @@ shell hygiene (a quoting hazard)	repo	product
 shell hygiene (a stage committed with no staged-diff test)	repo	product
 shell-hygiene selftest	kit	selftests
 spawn budget (forks per hot entrypoint)	repo	product
+spawn-guard self-test	kit	selftests
 spec tokens (a spec's own names resolve)	repo	declarations
 spec tokens (the pass's own spec)	repo	declarations
 spec-audit opt-in pack self-test	kit	selftests

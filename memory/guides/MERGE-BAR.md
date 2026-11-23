@@ -78,7 +78,7 @@ and no job is a required check.
 **Two protocols are BINDING, and they are rules rather than leg descriptions.**
 
 - `memory/guides/REVIEW-PROTOCOL.md` — a review's verify stage spawns **at most the total
-  `tools/hooks/agent-cap.js` resolves** (the batch grows, the agent count never does), and how many
+  `tools/workflows/script-views.js` resolves** (the batch grows, the agent count never does), and how many
   run at once is a **second bound held as its own constant in that same file**. Both are file
   constants there and are written nowhere else, so this line points instead of restating. Enforced
   at the tool call by that hook, which sees the inline script where the rule actually gets

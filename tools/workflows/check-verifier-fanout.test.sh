@@ -2,7 +2,7 @@
 # Self-test for check-verifier-fanout.sh and its rule, check-verifier-fanout.js. The first half tests
 # what the gate adds: the population, the self-exclusion, the empty-population failure, and that the
 # delegation actually reaches the rule rather than reporting clean because nothing ran. The second
-# half is the rule's OWN arms, moved here from <prefix>/hooks/agent-cap.test.sh with the rule
+# half is the rule's OWN arms, moved here from the agent limit hook's suite with the rule
 # (TOOL-dFairHearing-16), the base-versus-now property arm among them.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -266,7 +266,7 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 _rkd_py=$(resolve_python) || { echo "check-verifier-fanout.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
-HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
+HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks scratch-guard.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
 ROOT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" || exit 2
 GATE="$HERE/check-verifier-fanout.sh"
@@ -334,7 +334,7 @@ else fails=$((fails+1)); printf 'arm FAIL  the population collapsed (got %s scri
 E="$TMP/empty"; mkdir -p "$E"
 ( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify ) >/dev/null 2>&1
-mkdir -p "$E/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$E/${PFX}${HOOKS}/agent-cap.js"
+mkdir -p "$E/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/scratch-guard.js" "$E/${PFX}${HOOKS}/scratch-guard.js"
 # TOOL-dRetiredFork-10: the gate now resolves its predicate RELATIVE TO ITSELF, so the fixture
 # has to put it where an install actually puts it. It previously sat at the bare repository
 # root and worked only because the gate hard-coded `$ROOT/<prefix>/hooks/` -- the literal this
@@ -342,7 +342,7 @@ mkdir -p "$E/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$E/${PFX}$
 # layout that never existed, and it would have kept passing while real adopters stayed broken.
 mkdir -p "$E/${KIT_REL}" && cp "$GATE" "$E/${KIT_REL}/gate.sh"
 # TOOL-dFairHearing-23 S27: the gate exits 2 with no rule or marker predicate beside it, so every copy carries both.
-cp "$HERE/check-verifier-fanout.js" "$HERE/render_lenses.py" "$E/${KIT_REL}/"
+cp "$HERE/check-verifier-fanout.js" "$HERE/script-views.js" "$HERE/render_lenses.py" "$E/${KIT_REL}/"
 arm 'an empty population is not a pass' 'the population is empty, which is not a pass' \
   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$E"
 
@@ -386,8 +386,8 @@ D="$TMP/nohook"; mkdir -p "$D"
 ( cd "$D" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm base --no-verify ) >/dev/null 2>&1
 mkdir -p "$D/${KIT_REL}" && cp "$GATE" "$D/${KIT_REL}/gate.sh"
-cp "$HERE/check-verifier-fanout.js" "$HERE/render_lenses.py" "$D/${KIT_REL}/"
-arm 'a missing predicate is a named failure' 'has no predicate to delegate to' \
+cp "$HERE/check-verifier-fanout.js" "$HERE/script-views.js" "$HERE/render_lenses.py" "$D/${KIT_REL}/"
+arm 'a missing hooks kit is a named failure' 'has no policy helper locator' \
   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$D"
 
 # ---- TOOL-dFairHearing-23: the rule beside the gate, one counter and one marker predicate ----------------------
@@ -396,7 +396,7 @@ arm 'a missing predicate is a named failure' 'has no predicate to delegate to' \
 # WFK names these fixtures' own kit directory; the layouts further down derive it from the install.
 WFK=workflows
 NJ="$TMP/nojs/k"; mkdir -p "$NJ/workflows" "$NJ/hooks" && cp "$GATE" "$HERE/render_lenses.py" "$NJ/workflows/" \
-  && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$NJ/hooks/" && git -C "$NJ" init -q
+  && cp "$ROOT/${HOOKS_DIR}/scratch-guard.js" "$NJ/hooks/" && git -C "$NJ" init -q
 out=$(cd "$NJ" && bash "$WFK/check-verifier-fanout.sh" "$TMP/bounded.js" 2>&1); rc=$?
 case "$rc:$out" in 2:*"no check-verifier-fanout.js beside this gate"*) printf 'arm ok    AC18: a gate copy with no .js beside it exits 2 naming the file\n' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  AC18: a gate copy with no .js did not refuse by name (rc=%s)\n%s\n' "$rc" "$out" ;; esac
@@ -423,15 +423,15 @@ case "$rc:$out" in 0:*"slots — 1 lens-slot literal(s), each holding 5"*) print
   *) fails=$((fails+1)); printf 'arm FAIL  FH27 AC1: the opt-in literal moved the slot count (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 # AC18: a gate copy with no render_lenses.py beside it, and one whose python candidates all fail to run, each exit 2
 # naming the predicate. RED against the gate at TOOL-dFairHearing-23's commit, whose refusals named neither.
-NR="$TMP/norl/k"; mkdir -p "$NR/workflows" "$NR/hooks" && cp "$GATE" "$HERE/check-verifier-fanout.js" "$NR/workflows/" \
-  && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$NR/hooks/" && git -C "$NR" init -q
+NR="$TMP/norl/k"; mkdir -p "$NR/workflows" "$NR/hooks" && cp "$GATE" "$HERE/check-verifier-fanout.js" "$HERE/script-views.js" "$NR/workflows/" \
+  && cp "$ROOT/${HOOKS_DIR}/scratch-guard.js" "$NR/hooks/" && git -C "$NR" init -q
 out=$(cd "$NR" && bash "$WFK/check-verifier-fanout.sh" "$TMP/optin.js" 2>&1); rc=$?
 case "$rc:$out" in 2:*"the marker predicate did not run (no render_lenses.py"*) printf 'arm ok    FH27 AC18: a gate copy with no renderer exits 2 naming the predicate\n' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  FH27 AC18: a gate copy with no renderer did not refuse by name (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 # No python: stubs named for every launcher candidate, each exiting 9, ahead of PATH, so the probe RUNS each and
 # none answers. The hook is then found on the .claude/hooks/ rung alone, which the fixture carries.
-NP="$TMP/nopy"; mkdir -p "$NP/k/workflows" "$NP/.claude/hooks" "$NP/stub" && cp "$GATE" "$HERE/check-verifier-fanout.js" "$HERE/render_lenses.py" "$NP/k/workflows/" \
-  && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$NP/.claude/hooks/" && git -C "$NP" init -q
+NP="$TMP/nopy"; mkdir -p "$NP/k/workflows" "$NP/.claude/hooks" "$NP/stub" && cp "$GATE" "$HERE/check-verifier-fanout.js" "$HERE/script-views.js" "$HERE/render_lenses.py" "$NP/k/workflows/" \
+  && cp "$ROOT/${HOOKS_DIR}/scratch-guard.js" "$NP/.claude/hooks/" && git -C "$NP" init -q
 for _n in python3 python py; do printf '#!/bin/sh\nexit 9\n' > "$NP/stub/$_n"; chmod +x "$NP/stub/$_n"; done
 out=$(cd "$NP" && PATH="$NP/stub:$PATH" GOV_PYTHON= bash "k/$WFK/check-verifier-fanout.sh" "$TMP/optin.js" 2>&1); rc=$?
 case "$rc:$out" in 2:*"the marker predicate did not run (no usable python)"*) printf 'arm ok    FH27 AC18: an unresolvable python exits 2 naming the predicate\n' ;;
@@ -453,8 +453,9 @@ out=$(bash "$GATE" "$TMP/calls.js" 2>&1); rc=$?
 case "$rc:$out" in 0:*"slots — 1 lens-slot literal(s), each holding 5"*) printf 'arm ok    AC25: five slot calls count 5\n' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  AC25: five slot calls did not count 5 (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 SC="$TMP/split/k"; mkdir -p "$SC/workflows" "$SC/hooks" && cp "$GATE" "$HERE/render_lenses.py" "$SC/workflows/" \
-  && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$SC/hooks/" && git -C "$SC" init -q
+  && cp "$ROOT/${HOOKS_DIR}/scratch-guard.js" "$SC/hooks/" && git -C "$SC" init -q
 sed "s/else if (ch === ',' \&\& d === 0)/else if (ch === ',')/" "$HERE/check-verifier-fanout.js" > "$SC/$WFK/check-verifier-fanout.js"
+cp "$HERE/script-views.js" "$SC/$WFK/"
 if ! grep -q "else if (ch === ',') {" "$SC/$WFK/check-verifier-fanout.js"; then
   fails=$((fails+1)); printf 'arm FAIL  AC25: the staged topLevelArgs edit matched nothing, so the copy measures the shipped counter\n'
 else
@@ -498,7 +499,7 @@ mkfix() { # $1 = fixture root · $2 = where the hook goes, relative to the root 
   local fix=$1 hookrel=$2
   mkdir -p "$fix/scripts/$WFK"
   cp "$HERE/check-verifier-fanout.sh" "$fix/scripts/$WFK/"
-  cp "$HERE/check-verifier-fanout.js" "$HERE/render_lenses.py" "$fix/scripts/$WFK/"
+  cp "$HERE/check-verifier-fanout.js" "$HERE/script-views.js" "$HERE/render_lenses.py" "$fix/scripts/$WFK/"
   # a bounded harness carrying one five-slot marked literal, so the population is non-empty, the slot
   # count grades something whole-tree, and the verdict is legitimately clean (TOOL-dFairHearing-23 S23)
   cat >"$fix/scripts/$WFK/harness.js" <<'JS'
@@ -515,14 +516,14 @@ const SLOTS = [ // gov:lens-slots fixture
 JS
   if [ -n "$hookrel" ]; then
     mkdir -p "$fix/$(dirname "$hookrel")"
-    cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$fix/$hookrel"
+    cp "$ROOT/${HOOKS_DIR}/scratch-guard.js" "$fix/$hookrel"
   fi
   ( cd "$fix" && git init -q . && git config user.email t@t && git config user.name t \
       && git add -A && git commit -q -m fixture --no-verify ) >/dev/null 2>&1
 }
 
 # AC2 — the adopter nc shape: kit at `scripts/`, hook a directory up from the harnesses. Rung 2.
-FIX_A=$(mktemp -d); mkfix "$FIX_A" "scripts/$HKK/agent-cap.js"
+FIX_A=$(mktemp -d); mkfix "$FIX_A" "scripts/$HKK/scratch-guard.js"
 out=$(cd "$FIX_A" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1); rc=$?
 if [ "$rc" = 0 ]; then printf 'arm ok    AC2: resolves at a scripts/ install and exits 0\n'
 else fails=$((fails+1)); printf 'arm FAIL  AC2: a scripts/ install did not pass (rc=%s)\n%s\n' "$rc" "$out"; fi
@@ -531,7 +532,7 @@ case "$out" in *"1 workflow script"*) printf 'arm ok    AC2: and the population 
 
 # AC3 — the adopter ic shape: NO scripts/hooks/ at all, the only copy at .claude/hooks/. Rung 3, which a
 # two-rung chain strands. This arm is the one that would have caught that.
-FIX_B=$(mktemp -d); mkfix "$FIX_B" ".claude/hooks/agent-cap.js"
+FIX_B=$(mktemp -d); mkfix "$FIX_B" ".claude/hooks/scratch-guard.js"
 out=$(cd "$FIX_B" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1); rc=$?
 if [ "$rc" = 0 ]; then printf 'arm ok    AC3: resolves the .claude/hooks/ copy when no sibling exists\n'
 else fails=$((fails+1)); printf 'arm FAIL  AC3: the third rung did not resolve (rc=%s)\n%s\n' "$rc" "$out"; fi
@@ -554,7 +555,7 @@ if [ "$outA" != "$outC" ]; then printf 'arm ok    the hook is what the fixtures 
 else fails=$((fails+1)); printf 'arm FAIL  identical verdicts with and without the predicate\n'; fi
 # TOOL-dFairHearing-23 AC14: the mkfix literal is what the whole-tree slot count grades, so cut it and the fixture reds
 # naming the missing marker. RED against the parent suite, whose mkfix harness carries no marked literal at all.
-FIX_D=$(mktemp -d); mkfix "$FIX_D" "scripts/$HKK/agent-cap.js"
+FIX_D=$(mktemp -d); mkfix "$FIX_D" "scripts/$HKK/scratch-guard.js"
 sed -i '/gov:lens-slots fixture/,/^]$/d' "$FIX_D/scripts/$WFK/harness.js"
 out=$(cd "$FIX_D" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1); rc=$?
 case "$rc:$out" in 1:*"no lens-slot literal (a line marked gov:lens-slots) in any workflow script"*) printf 'arm ok    AC14: the mkfix fixture with its literal cut reds naming the missing marker\n' ;;
@@ -564,7 +565,7 @@ case "$rc:$out" in 1:*"no lens-slot literal (a line marked gov:lens-slots) in an
 # Both adopters keep their harnesses there, outside the kit prefix. The a7c78ad2 bytes read this
 # fixture as EMPTY (observed: `the population is empty`); the marker is now the whole selector.
 rm -rf "$FIX_D"   # the AC14 fixture above: only the FIX_D assigned here is removed at the end
-FIX_D=$(mktemp -d); mkfix "$FIX_D" "scripts/$HKK/agent-cap.js"
+FIX_D=$(mktemp -d); mkfix "$FIX_D" "scripts/$HKK/scratch-guard.js"
 rm -f "$FIX_D/scripts/$WFK/harness.js"; mkdir -p "$FIX_D/.claude/workflows"
 cp "$TMP/the-incident.js" "$FIX_D/.claude/workflows/incident.js"
 cp "$TMP/not-a-workflow.js" "$FIX_D/.claude/workflows/helper.js"
@@ -576,7 +577,7 @@ case "$out" in *helper.js*) fails=$((fails+1)); printf 'arm FAIL  an unmarked .j
   *) printf 'arm ok    an unmarked .js under .claude/workflows/ is not judged\n' ;; esac
 
 # ==== RULE 2'S OWN ARMS, moved from the hook's suite (TOOL-dFairHearing-16) ========================
-# Rule 2 left agent-cap.js for check-verifier-fanout.js beside this gate, and its arms came with it,
+# Rule 2 left the agent limit hook for check-verifier-fanout.js beside this gate, and its arms came with it,
 # each keeping its label, its payload and the hook's verdict: 2 for a deny, 0 for an admit. Only the
 # helpers below are new. `run_fan` is the hook's interface over the rule's new home: the payload on
 # stdin, and the script it carries, or the file its `scriptPath` names, judged by
@@ -587,8 +588,8 @@ case "$out" in *helper.js*) fails=$((fails+1)); printf 'arm FAIL  an unmarked .j
 unset CLAUDE_PROJECT_DIR
 TESTPY=$_rkd_py
 FANJS="$HERE/check-verifier-fanout.js"
-ARMS_HOOKS="$TMP/arms-hooks/hooks"; mkdir -p "$ARMS_HOOKS"; cp "$ROOT/$HOOKS_DIR/agent-cap.js" "$ROOT/$HOOKS_DIR/scratch-guard.js" "$ARMS_HOOKS/"
-HOOK="$ARMS_HOOKS/agent-cap.js"
+ARMS_HOOKS="$TMP/arms-hooks/hooks"; mkdir -p "$ARMS_HOOKS"; cp "$ROOT/$HOOKS_DIR/scratch-guard.js" "$ARMS_HOOKS/"
+HOOK="$ARMS_HOOKS/scratch-guard.js"
 pass=0; fail=0
 # ponytail: run_home is check-review-join.test.sh's twin; one suite library is the step if a third suite needs it.
 run_home() { # <home.js> [arg...]; payload on stdin -> the hook's exit code for it; the home's stderr on stderr
@@ -634,7 +635,41 @@ run_limit_call() { # name expected_exit payload-json hook [text stderr must carr
 # The property arm's BASE, the hook blob the S9 arm below compares against; an adopter tree where it
 # does not resolve gets that arm's announced skip.
 GOV_BASE_SHA=${GOV_BASE_SHA:-d65da7ab}
-git -C "$HERE" show "$GOV_BASE_SHA:$HOOKS_DIR/agent-cap.js" > "$TMP/base-hook.js" 2>/dev/null || : > "$TMP/base-hook.js"
+# TOOL-dBoundRoles-25: the hook file retired, so the BASE is pinned by the blob id it had at GOV_BASE_SHA, which
+# names its bytes with no path; an adopter tree holding no such blob gets the arms' announced skips.
+GOV_BASE_BLOB=${GOV_BASE_BLOB:-a326d5a6a892ec4ba6aa3cc1fb4b65b6afc685bf}
+git -C "$HERE" cat-file blob "$GOV_BASE_BLOB" > "$TMP/base-hook.js" 2>/dev/null || : > "$TMP/base-hook.js"
+# ---- S10, moved with the views (TOOL-dBoundRoles-25): `verbatim` is CHECKED, not asserted ------------------
+# The three renderShipped* bodies in script-views.js must equal their counterparts in the BASE blob; only the
+# name line differs. A tree where that blob does not resolve -- every adopter -- gets an announced SKIP.
+if [ -s "$TMP/base-hook.js" ]; then
+  "$TESTPY" -c 'import sys, pathlib
+base = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n")
+cur = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").replace("\r\n", "\n")
+PAIRS = [("function stripStrings(line) {", "function renderShippedLine(line) {"),
+         ("function renderCodeView(script) {", "function renderShippedView(script) {"),
+         ("function blankLiterals(script) {", "function renderShippedBlanks(script) {")]
+def block(text, header):
+    ls = text.split("\n")
+    s = ls.index(header)
+    e = s
+    while ls[e] != "}":
+        e += 1
+    return "\n".join(ls[s + 1:e + 1])
+bad = 0
+for b, c in PAIRS:
+    try:
+        if block(base, b) != block(cur, c):
+            print("DRIFT %s is not the BASE bytes of %s" % (c, b)); bad += 1
+    except ValueError as e:
+        print("MISSING %s or %s (%s)" % (b, c, e)); bad += 1
+print("bodies-compared 3 drifted %d" % bad)
+sys.exit(1 if bad else 0)' "$TMP/base-hook.js" "$HERE/script-views.js" > "$TMP/byte.out" 2>&1
+  if [ $? = 0 ]; then echo "ok   no-regress: the three renderShipped* bodies in script-views.js are the BASE bytes"; pass=$((pass+1))
+  else echo "FAIL no-regress: a renderShipped* body has drifted from BASE"; sed 's/^/     /' "$TMP/byte.out"; fail=$((fail+1)); fi
+else
+  echo "skip no-regress byte arm — the BASE blob $GOV_BASE_BLOB does not resolve in this tree, so there is nothing to compare the frozen bodies against"
+fi
 
 # ---- the first arms ------------------------------------------------------------------------------
 # Rule 1, the ban on raw `parallel`/`pipeline`, retired in TOOL-dGroundRules-10 with its corpus:
@@ -647,7 +682,7 @@ check "a raw parallel fanning an agent over an unbounded map → deny (rule 2)" 
 check "boundedParallel + marker → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"async function boundedParallel(t,cap=5){const o=[];for(let i=0;i<t.length;i+=cap)o.push(...await parallel(t.slice(i,i+cap))); // gov:bounded-fanout\nreturn o}\nconst LENSES = [1,2,3]\nconst r = await boundedParallel(LENSES.map(d=>()=>agent(d)),5)"}}'
 
 # ---- the LOOP KEYWORD SET (TOOL-aWeldedTribunal-1) ----------------------------------------------
-# Every loop-recognition path must see the SAME keyword set. Six sites in agent-cap.js used to hold
+# Every loop-recognition path must see the SAME keyword set. Six sites in the agent limit hook used to hold
 # their own `for|while` regex, and two ordinary spellings matched none of them: `for await (` puts an
 # identifier between the keyword and the paren, and a `do { … } while (…)` block's opening line
 # carries no keyword at all. Both were MEASURED at exit 0 against the shipped hook before this unit.
@@ -1230,7 +1265,7 @@ else echo "FAIL rule-2 deny text does not name the cap"; fail=$((fail+1)); fi
 # rule from that scratch checkout, the payload's `cwd`. Its settings, at 4, are what rule 7 read when
 # the hook ran these arms (TOOL-dGroundRules-68); the review kit's check runs no rule 7. With no stub,
 # the bound is MAX_VERIFIERS.
-WS="$TMP/writer-split"; WS_HOOKS="$WS/hooks" WS_POLICY="$WS/policy"; mkdir -p "$WS_HOOKS" "$WS_POLICY" "$WS/.claude"; cp "$ROOT/$HOOKS_DIR/agent-cap.js" "$ROOT/$HOOKS_DIR/scratch-guard.js" "$WS_HOOKS/"
+WS="$TMP/writer-split"; WS_HOOKS="$WS/hooks" WS_POLICY="$WS/policy"; mkdir -p "$WS_HOOKS" "$WS_POLICY" "$WS/.claude"; cp "$ROOT/$HOOKS_DIR/scratch-guard.js" "$WS_HOOKS/"
 printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"4","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"4"}}\n' > "$WS/.claude/settings.json"
 ( unset GIT_DIR GIT_WORK_TREE; cd "$WS" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
     && git config user.name t && git add -A && git commit -qm writer-split --no-verify )
@@ -1240,13 +1275,13 @@ write_limit_stub() { # limit
 WS_WRITER='{"tool_name":"Workflow","cwd":"'"$NODEDIR/writer-split"'","tool_input":{"script":"const SPEC_WRITERS = 6\nconst g = chunk(s, Math.ceil(s.length / SPEC_WRITERS)) // gov:fixed-writers\nconst r = await boundedParallel(g.map((x) => () => agent(x)), SPEC_WRITERS)"}}'
 WS_VERIFIER='{"tool_name":"Workflow","cwd":"'"$NODEDIR/writer-split"'","tool_input":{"script":"const K = 6\nconst g = chunk(all, Math.ceil(all.length / K)) // gov:fixed-verifiers\nconst r = await boundedParallel(g.map((x) => () => agent(x)), 5)"}}'
 write_limit_stub 4
-run_limit_call "writer split: K 6 above a stub limit of 4 -> deny, naming the marker" 2 "$WS_WRITER" "$WS_HOOKS/agent-cap.js" 'gov:fixed-writers but its bounded split'
-run_limit_call "writer split: ...and the K it read against that limit" 2 "$WS_WRITER" "$WS_HOOKS/agent-cap.js" 'resolves to 6, above the bound 4: runtime.agents-in-flight'
+run_limit_call "writer split: K 6 above a stub limit of 4 -> deny, naming the marker" 2 "$WS_WRITER" "$WS_HOOKS/scratch-guard.js" 'gov:fixed-writers but its bounded split'
+run_limit_call "writer split: ...and the K it read against that limit" 2 "$WS_WRITER" "$WS_HOOKS/scratch-guard.js" 'resolves to 6, above the bound 4: runtime.agents-in-flight'
 write_limit_stub 6
-run_limit_call "writer split: K 6 at a stub limit of 6 -> allow (control)" 0 "$WS_WRITER" "$WS_HOOKS/agent-cap.js"
-run_limit_call "verifier split: K 6 under a stub limit of 6 -> deny, against MAX_VERIFIERS" 2 "$WS_VERIFIER" "$WS_HOOKS/agent-cap.js" 'above the bound 5: MAX_VERIFIERS'
+run_limit_call "writer split: K 6 at a stub limit of 6 -> allow (control)" 0 "$WS_WRITER" "$WS_HOOKS/scratch-guard.js"
+run_limit_call "verifier split: K 6 under a stub limit of 6 -> deny, against MAX_VERIFIERS" 2 "$WS_VERIFIER" "$WS_HOOKS/scratch-guard.js" 'above the bound 5: MAX_VERIFIERS'
 rm -f "$WS_POLICY/policy-mirror.js"
-run_limit_call "FH48 AC7 writer split: no policy kit found -> deny, against MAX_VERIFIERS" 2 "$WS_WRITER" "$WS_HOOKS/agent-cap.js" 'above the bound 5: MAX_VERIFIERS, as no policy kit was found by resolveKitDir'
+run_limit_call "FH48 AC7 writer split: no policy kit found -> deny, against MAX_VERIFIERS" 2 "$WS_WRITER" "$WS_HOOKS/scratch-guard.js" 'above the bound 5: MAX_VERIFIERS, as no policy kit was found by resolveKitDir'
 
 # ---- rule 2: LENS PROSE IS NOT CODE (TOOL-aLexedStripper-2) --------------------------------------
 # Every arm below is the SAME correct five-element lens array, fanned through the sanctioned helper.
@@ -1780,7 +1815,6 @@ const base = loadHook(baseHook)
 const fan = require(path.resolve(fanJs))
 const join = require(path.resolve(joinJs))
 fan.loadHook(curHook)
-join.loadHook(curHook)
 // "Now": 2 when either home finds in the body, as the hook exited 2 on either rule; else 0.
 function runHomes(body) {
   return fan.scanFanout(body).length || join.scanJoin(body).length ? 2 : 0
@@ -1790,7 +1824,7 @@ function runHomeClis(body) {
   const f = path.join(fixdir, '.parity-body.txt')
   fs.writeFileSync(f, body)
   const codes = [fanJs, joinJs].map((js) => {
-    const r = cp.spawnSync(process.execPath, [js, '--hook', curHook, f], { timeout: BOUND_MS, stdio: ['ignore', 'ignore', 'ignore'] })
+    const r = cp.spawnSync(process.execPath, js === fanJs ? [js, '--hook', curHook, f] : [js, f], { timeout: BOUND_MS, stdio: ['ignore', 'ignore', 'ignore'] })
     return r.status === null ? 'killed' : r.status
   })
   if (codes.includes(1)) return 2

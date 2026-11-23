@@ -268,7 +268,7 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 _rkd_py=$(resolve_python) || { echo "check-agent-cap-restatement.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
-HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
+HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks scratch-guard.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
 GATE="$HERE/check-agent-cap-restatement.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
@@ -307,7 +307,7 @@ ck "a bound with no fan-out noun stays silent"      '[ "$rc" = 0 ]'
 
 # ---- POINTER: the fixed form — no digit, names the resolver — is silent.
 mk pointed
-printf '# rules\n\nA review spawns at most the total `'"${PFX}${HOOKS}/agent-cap.js"'` resolves.\n' > "$R/GUIDE.md"
+printf '# rules\n\nA review spawns at most the total `'"${PFX}${HOOKS}/scratch-guard.js"'` resolves.\n' > "$R/GUIDE.md"
 run
 ck "a pointer with no digit is silent"              '[ "$rc" = 0 ]'
 

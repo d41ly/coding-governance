@@ -26,7 +26,7 @@ paths:
   stdlib+git, seconds, no agents; every signal carries a liveness assertion so a probe
   that cannot move prints DEAD PROBE instead of a reassuring 0), `branch-reconcile/` (which
   worktrees, branches and stash entries landed and which still hold work — one read-only,
-  byte-stable verdict report), `hooks/agent-cap.js` (the fan-out guard: raw-primitive ban + the verifier-arity rule it resolves),
+  byte-stable verdict report), `roles/spawn-guard.js` (the spawn guard: rendered handoffs, harnesses at their landed blob, the effort level and the settings in force; the verifier-arity total is `workflows/script-views.js`'s),
   `workflows/tier2-review.js`, `workflows/drift-audit-{code,state}.js`,
   `unattended/` (the unattended-run kit: the binding protocol, the four-verb driver, and the leg that
   reads the project's `.unattended.conf` declarations rather than restating them — a run that will

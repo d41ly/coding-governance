@@ -295,7 +295,7 @@ WF_DIR="<no workflows kit>"
 PB_DIR="<no playbook-render kit>"
 REGISTRY=""
 if _pp_py=$(resolve_python 2>/dev/null); then
-  HK_DIR=$(resolve_kit_dir "$_pp_py" hooks agent-cap.js "$_self_dir" 2>/dev/null) || HK_DIR="<no hooks kit>"
+  HK_DIR=$(resolve_kit_dir "$_pp_py" hooks scratch-guard.js "$_self_dir" 2>/dev/null) || HK_DIR="<no hooks kit>"
   # TOOL-dFairHearing-27 S16: the lens-array bound's owner is LENS_SLOTS, the review kit's fan-out rule's one home.
   WF_DIR=$(resolve_kit_dir "$_pp_py" workflows check-verifier-fanout.js "$_self_dir" 2>/dev/null) || WF_DIR="<no workflows kit>"
   # TOOL-aDistilledCharter-8: the renderer's TEMPLATE_MAJOR is a pair whose owner is the template.
@@ -449,8 +449,8 @@ done
 # are manifest-check.sh's checks 3 and 5, not this gate's.
 PAIRS="
 lens-array bound~${HK_DIR}/README.md~sed -n 's/.*array LITERAL of ≤\([0-9]\+\) elements.*/\1/p'~${WF_DIR}/check-verifier-fanout.js~sed -n 's/^const LENS_SLOTS = \([0-9]\+\).*/\1/p'
-verify-agent total~${PB_DIR}/practices.toml~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
-resolved-K ceiling~${HK_DIR}/README.md~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+verify-agent total~${PB_DIR}/practices.toml~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~${WF_DIR}/script-views.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+resolved-K ceiling~${HK_DIR}/README.md~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~${WF_DIR}/script-views.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 template major~${PB_DIR}/render_playbook.py~sed -n 's/^TEMPLATE_MAJOR = \([0-9]\+\).*/\1/p'~$TEMPLATE~sed -n 's/.*governance-template: v\([0-9]\+\)\..*/\1/p'
 stamp rule sha expression~skills/session-kickoff/MANIFEST-TEMPLATE.md~sed -n 's/.*Stamp rule: sha = \`\([A-Z]*\)\` on any branch.*/\1/p'~skills/session-kickoff/manifest-check.sh~sed -n 's/^STAMP_SHA_RULE=\"sha = \([A-Z]*\) on any branch\".*/\1/p'
 "

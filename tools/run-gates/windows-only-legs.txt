@@ -13,7 +13,7 @@
 # reds in WSL for the host and not the tree is found by a paired run and earns a row here then.
 #
 # GOV'S DECLARATION over gov's legs, withheld from adopters by `kit.toml` as `selftest-budgets.txt` is.
-agent-cap self-test	its arms resolve MSYS /c/ spellings through node's win32 path.resolve, a translation only a Windows node performs
+spawn-guard self-test	its arms resolve MSYS /c/ spellings through node's win32 path.resolve, a translation only a Windows node performs
 scratch-guard self-test	it runs the hook inside node with a payload cwd spelled C:\..., which is the shape the hook receives only on Windows
 process-monitor census selftest	its arms join MSYS ps -W rows to Windows process ids, a census that exists only under MSYS
 measure-legs selftest	its arms profile each fixture leg in a Windows Job Object, an API no other platform has, and the tool refuses anywhere else

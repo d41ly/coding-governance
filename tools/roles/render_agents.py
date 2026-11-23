@@ -38,7 +38,7 @@ left out so the guard never admits a path that does not exist (TOOL-dBoundRoles-
 (TOOL-dBoundRoles-9 S2), and `gates.manifest`, the repo-relative path of
 the tool root's gate manifest or null when no file is there (TOOL-aOrientedCast-11; scratch-guard.js reads
 both to refuse a role agent a gate), and `effort`, the resolved role and stage levels of the default
-tables and of every profile (TOOL-aGuardedEffort-1; agent-cap.js grades a spawn's level against
+tables and of every profile (TOOL-aGuardedEffort-1; spawn-guard.js grades a spawn's level against
 them). Everything is rendered in memory first, so a role, overlay or
 rule tag that fails to resolve writes nothing.
 

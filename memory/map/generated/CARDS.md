@@ -10,14 +10,14 @@ PreToolUse guards — fan-out bounded across Workflow+Agent, scratch bounded acr
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/agent-cap.md`
 - decisions 1: `TOOL-aOrientedCast-21`
-- gate-legs 10: `agent-cap self-test`, `scratch-guard self-test`, `format-guard self-test`, `verifier fan-out`, `verifier fan-out self-test`, `review-protocol parity (kit vs dogfood)`, `agent-cap restatement`, `agent-cap restatement self-test`, `hook destinations (every declared hook path ships)`, `hook destinations self-test`
+- gate-legs 9: `scratch-guard self-test`, `format-guard self-test`, `verifier fan-out`, `verifier fan-out self-test`, `review-protocol parity (kit vs dogfood)`, `agent-cap restatement`, `agent-cap restatement self-test`, `hook destinations (every declared hook path ships)`, `hook destinations self-test`
 - kits 1: `hooks`
-- harness-hooks 4: `PreToolUse tools/hooks/agent-cap.js`, `PreToolUse tools/hooks/scratch-guard.js`, `SubagentStart tools/hooks/scratch-guard.js`, `Stop tools/hooks/format-guard.js`
+- harness-hooks 3: `PreToolUse tools/hooks/scratch-guard.js`, `SubagentStart tools/hooks/scratch-guard.js`, `Stop tools/hooks/format-guard.js`
 - workflow-scripts 1: `check-verifier-fanout.js`
-- gotcha-classes 10: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`
+- gotcha-classes 10: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`, `git-rm-cached-refuses-a-diverged-index-blob.md`
 - guides 1
-- globs 12
-- cut 21 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 11
+- cut 19 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## annotation-style
 
@@ -257,10 +257,10 @@ Workflow review harnesses — one pipeline, three implementations, one hardened
 - decisions 0
 - gate-legs 7: `workflow script syntax`, `review-join ban (no ref-keyed join)`, `review-join self-test`, `spec-audit opt-in pack self-test`, `review-replay selftest`, `tier2-review self-test`, `unattended-build self-test`
 - harness-hooks 1: `PreToolUse tools/workflows/spec-audit-optin.js`
-- workflow-scripts 11: `check-review-join.js`, `check-workflow-syntax.js`, `drift-audit-code.js`, `drift-audit-code.template.js`, `drift-audit-state.js`, `drift-audit-state.template.js`, `orient-counterfactual.js`, `spec-audit-optin.js`, `tier2-review.js`, `tier2-review.template.js`, `unattended-build.template.js`
+- workflow-scripts 12: `check-review-join.js`, `check-workflow-syntax.js`, `drift-audit-code.js`, `drift-audit-code.template.js`, `drift-audit-state.js`, `drift-audit-state.template.js`, `orient-counterfactual.js`, `script-views.js`, `spec-audit-optin.js`, `tier2-review.js`, `tier2-review.template.js`, `unattended-build.template.js`
 - gotcha-classes 7: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`
-- globs 1: `tools/workflows/*`
-- cut 5 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 1
+- cut 6 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## roles
 
@@ -268,9 +268,9 @@ The role catalogue: one owner-editable agent definition per role with an empty h
 
 - status `building` · streams `tooling` · dossier `memory/map/features/roles.md`
 - decisions 13: `TOOL-aOrientedCast-1`, `TOOL-aOrientedCast-2`, `TOOL-aOrientedCast-3`, `KICK-aOrientedCast-2`, `TOOL-aOrientedCast-8`, `TOOL-aOrientedCast-10`, `TOOL-aOrientedCast-11`, `TOOL-aOrientedCast-16`, `TOOL-aOrientedCast-17`, `TOOL-aOrientedCast-20`, `TOOL-aOrientedCast-27`, `TOOL-dRenderedAnchor-1`, `TOOL-dRenderedAnchor-2`
-- gate-legs 4: `roles adopter self-test`, `roles catalogue`, `roles render selftest`, `roles render wiring`
+- gate-legs 5: `roles adopter self-test`, `roles catalogue`, `roles render selftest`, `roles render wiring`, `spawn-guard self-test`
 - kits 1: `roles`
-- harness-hooks 1: `SubagentStop tools/roles/return-check.sh`
+- harness-hooks 2: `PreToolUse tools/roles/spawn-guard.js`, `SubagentStop tools/roles/return-check.sh`
 - rendered-skills 1: `build`
 - globs 1: `tools/roles/**`
 

@@ -6,30 +6,23 @@
  * script in its population, so nothing else carries the ban.
  *
  * ONE SCANNER. The literal-blanked view, the stripped view and `runBothViews`, which unions the lexed
- * and the shipped views so no denial is lost, are agent-cap's, loaded from the hook `--hook` names:
- * each view reads the mode `runBothViews` switches, so a copy here would be a second scanner of one
- * script. Everything below `loadHook` is the hook's rule 5, moved verbatim, its per-line fallback with it.
+ * and the shipped views so no denial is lost, are this kit's `script-views.js`, required from beside this
+ * file (TOOL-dBoundRoles-25 S4): each view reads the mode `runBothViews` switches, so a copy here would be a
+ * second scanner of one script. It reads nothing from a hook, so it takes no `--hook` (§8 F8). Everything
+ * below the views is the retired hook's rule 5, moved verbatim, its per-line fallback with it.
  *
- *   node <prefix>/workflows/check-review-join.js --hook <prefix>/hooks/agent-cap.js <file>...
+ *   node <prefix>/workflows/check-review-join.js <file>...
  *
  * Exit 0 = clean · 1 = a join, each file's printed on stderr as the hook printed it, one `  L<n>:` line
- * per hit · 2 = refused: no `--hook` or no file, an argument it does not take, agent-cap's exports not
- * loadable, or a file it cannot read. This file holds the ban table as regex literals, which survive
+ * per hit · 2 = refused: no file, an argument it does not take, or a file it cannot read. This file holds the ban table as regex literals, which survive
  * the blanking, so the gate keeps it out of its own population.
  */
 'use strict'
 
-// The hook's exports, bound by `loadHook` before the rule runs; the rule reads them by these names.
-let renderBlankedLiterals, renderStrippedView, runBothViews, resolveHarnessName
-
-function loadHook(hook) {
-  const m = require(require('path').resolve(hook))
-  const need = ['renderBlankedLiterals', 'renderStrippedView', 'runBothViews', 'resolveHarnessName']
-  const miss = need.filter((k) => m[k] === undefined)
-  if (miss.length) throw new Error(`it exports no ${miss.join(', ')}`)
-  ;({ renderBlankedLiterals, renderStrippedView, runBothViews, resolveHarnessName } = m)
-  return m
-}
+// The review kit's one scanner, beside this file (TOOL-dBoundRoles-25 S4); the rule reads its exports by these names.
+// A module that does not load is kept as its error, which `main` refuses naming it, never node's own exit 1.
+const VIEWS = (() => { try { return require(require('path').join(__dirname, 'script-views.js')) } catch (e) { return e } })()
+const { renderBlankedLiterals, renderStrippedView, runBothViews, resolveHarnessName } = VIEWS instanceof Error ? {} : VIEWS
 
 // TOOL-aWeldedTribunal-3 — THE FALLBACK VIEW for the blanked readers, and it is NOT
 // `renderStrippedView`. Rule 2's fallback uses that one, which leaves backticks ALONE; the two rules
@@ -128,19 +121,15 @@ function renderJoinDeny(joins) {
 
 // THE CLI, the verifier check's contract: every refusal is exit 2 with its reason, never a pass, and a
 // throw anywhere is a refusal too, since node's own exit 1 on an uncaught throw would read as a join.
-// ponytail: this argv loop is check-verifier-fanout.js's twin; dBoundRoles' move of the shared readers is where one runner would live.
 function main(argv) {
   const printRefusal = (why) => { process.stderr.write(`check-review-join: ${why}\n`); return 2 }
-  let hook = null
   const files = []
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === '--hook') hook = argv[++i] || null
-    else if (argv[i].startsWith('-')) return printRefusal(`${argv[i]} is no argument this check takes: it takes --hook <agent-cap.js> and the files to judge`)
+    if (argv[i].startsWith('-')) return printRefusal(`${argv[i]} is no argument this check takes: it takes the files to judge`)
     else files.push(argv[i])
   }
-  if (!hook) return printRefusal('names no --hook, so agent-cap\'s views, which this rule reads, cannot be loaded')
   if (!files.length) return printRefusal('names no file, and a check over nothing is not a pass')
-  try { loadHook(hook) } catch (e) { return printRefusal(`cannot load agent-cap's exports from ${hook}: ${(e && e.message) || e}`) }
+  if (VIEWS instanceof Error) return printRefusal(`cannot load the review kit's script-views.js beside this file: ${VIEWS.message.split(/\r?\n/)[0]}`)
   let status = 0
   for (const f of files) {
     let script
@@ -153,7 +142,7 @@ function main(argv) {
   return status
 }
 
-module.exports = { loadHook, scanJoinFindings, scanJoin, renderJoinDeny }
+module.exports = { scanJoinFindings, scanJoin, renderJoinDeny }
 if (require.main === module) {
   let code
   try { code = main(process.argv.slice(2)) } catch (e) {

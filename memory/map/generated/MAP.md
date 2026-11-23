@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 224 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 177 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 224 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · workflow-scripts: 15 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 177 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -12,7 +12,6 @@ Inventories: gate-legs: 224 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · 
 |---|---|
 | `agent-cap restatement` | agent-cap |
 | `agent-cap restatement self-test` | agent-cap |
-| `agent-cap self-test` | agent-cap |
 | `agent-instructions wiring` | playbook |
 | `backlog migration selftest` | memory-tree-hygiene |
 | `branch-guard self-test` | baseline |
@@ -206,6 +205,7 @@ Inventories: gate-legs: 224 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · 
 | `shell hygiene (a stage committed with no staged-diff test)` | gate-lint |
 | `shell-hygiene selftest` | gate-lint |
 | `spawn budget (forks per hot entrypoint)` | gate-lint |
+| `spawn-guard self-test` | roles |
 | `spec tokens (a spec's own names resolve)` | spec-tokens |
 | `spec tokens (the pass's own spec)` | spec-tokens |
 | `spec-audit opt-in pack self-test` | review-harnesses |
@@ -276,8 +276,8 @@ Inventories: gate-legs: 224 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · 
 | `PostToolUse memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js` | closed-loop-atlas |
 | `PostToolUse tools/memory-recall/recall-opened.js` | memory-recall |
 | `PostToolUse tools/process-monitor/procmon-hook.js` | process-monitor |
-| `PreToolUse tools/hooks/agent-cap.js` | agent-cap |
 | `PreToolUse tools/hooks/scratch-guard.js` | agent-cap |
+| `PreToolUse tools/roles/spawn-guard.js` | roles |
 | `PreToolUse tools/unattended/gate-guard.js` | unattended |
 | `PreToolUse tools/workflows/spec-audit-optin.js` | review-harnesses |
 | `SessionStart skills/session-kickoff/manifest-check.sh` | session-kickoff |
@@ -301,6 +301,7 @@ Inventories: gate-legs: 224 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · 
 | `drift-audit-state.js` | review-harnesses |
 | `drift-audit-state.template.js` | review-harnesses |
 | `orient-counterfactual.js` | review-harnesses |
+| `script-views.js` | review-harnesses |
 | `spec-audit-optin.js` | review-harnesses |
 | `tier2-review.js` | review-harnesses |
 | `tier2-review.template.js` | review-harnesses |

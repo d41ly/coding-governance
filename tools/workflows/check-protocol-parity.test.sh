@@ -891,15 +891,18 @@ LIVE="$M/guides/REVIEW-PROTOCOL.md"
 #
 # A PROTOCOL PAIR --tracked-only SKIPPED has no live copy to read, and this arm says so rather than
 # redding an install that never took the document or passing by reading nothing.
-_p_bad=0; _secs='The hard cap
-Concurrency'
+_p_bad=0; _secs='The hard cap~script-views.js
+Concurrency~spawn-guard.js'
 case "$skipped_live" in
   *" $LIVE "*) echo "protocol-parity: the pointer arm over $LIVE did NOT run — that pair was skipped above"; _secs="" ;;
 esac
 while IFS= read -r _sec; do
   [ -n "$_sec" ] || continue
+  # TOOL-dBoundRoles-25: each section names the file that RESOLVES its bound, the verify total the review kit's
+  # script-views.js and the settings in force the roles kit's spawn-guard.js, read off the pair's second half.
+  _want=${_sec#*~}; _sec=${_sec%%~*}
   # `next` DROPS the heading from the body. Without it this arm graded the heading line, and both
-  # headings already contain the literal `agent-cap.js` -- so `grep -qF` passed on the heading no
+  # headings already contained the file's literal -- so `grep -qF` passed on the heading no
   # matter what the body said, and the arm could not detect the body losing its pointer. A predicate
   # that reads its own subject line is this repo's vacuity class wearing the shape of a section scan.
   _body=$(awk -v want="$_sec" '
@@ -909,8 +912,8 @@ while IFS= read -r _sec; do
     echo "protocol-parity: $LIVE has no '## $_sec ...' section, so this pointer arm would pass by finding nothing"
     _p_bad=1; continue
   fi
-  printf '%s\n' "$_body" | grep -qF 'agent-cap.js' \
-    || { echo "protocol-parity: $LIVE's '$_sec' section states a bound without naming the file that RESOLVES it (expected 'agent-cap.js' inside that section) — a bound an agent cannot look up"; _p_bad=1; }
+  printf '%s\n' "$_body" | grep -qF "$_want" \
+    || { echo "protocol-parity: $LIVE's '$_sec' section states a bound without naming the file that RESOLVES it (expected '$_want' inside that section) — a bound an agent cannot look up"; _p_bad=1; }
 done <<EOF
 $_secs
 EOF

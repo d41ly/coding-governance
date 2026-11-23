@@ -286,20 +286,21 @@ check_arm "arm 5 an unknown argument is the usage refusal, exit 2" \
    "$([ "$rc" = 2 ] && [[ $'\n'$out == *$'\n''usage: '* ]] && echo 1 || echo 0)"
 
 # ---- arm 6: the renderer's task part, sent as an Agent prompt, is admitted by the spawn guard ----
-# TOOL-aOrientedCast-15 S4: the renderer and the hooks kit's rule 6 hash the same `## Task` bytes, and
-# nothing but this arm runs the one against the other. The hooks kit is found the derived way the
-# renderer finds the kickoff kit; with no hooks kit or no node the arm SKIPs, naming what is absent.
+# TOOL-aOrientedCast-15 S4: the renderer and the spawn guard's rule 6 hash the same `## Task` bytes, and
+# nothing but this arm runs the one against the other. The spawn guard is this kit's `spawn-guard.js`
+# since TOOL-dBoundRoles-25, run beside the hooks kit's scratch-guard.js, which is found the derived way
+# the renderer finds the kickoff kit; with no hooks kit or no node the arm SKIPs, naming what is absent.
 HK=$("$PY" -B -c 'import sys
 sys.path.insert(0, sys.argv[1])
 import roles_lib
 try:
-    print(roles_lib.resolve_kit_dir("hooks", "agent-cap.js", sys.argv[1]).as_posix())
+    print(roles_lib.resolve_kit_dir("hooks", "scratch-guard.js", sys.argv[1]).as_posix())
 except LookupError:
     pass' "$HERE"); HK=${HK%$'\r'}
 if [ -z "$HK" ]; then
-  echo "SKIP arm 6 — no hooks kit holding agent-cap.js was found from $KREL"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-1))
+  echo "SKIP arm 6 — no hooks kit holding scratch-guard.js was found from $KREL"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-1))
 elif ! command -v node >/dev/null 2>&1; then
-  echo "SKIP arm 6 — no node on PATH to run $HK/agent-cap.js"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-1))
+  echo "SKIP arm 6 — no node on PATH to run $HERE/spawn-guard.js"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-1))
 else
   build_fixture
   # TOOL-aGuardedEffort-1: the rendered index carries `effort`, so the hook's rule 8 grades this
@@ -325,15 +326,16 @@ for out, desc in ((sys.argv[5], name), (sys.argv[6], "bx · TOOL-bx-1 · researc
                    "prompt": open(sys.argv[2], newline="", encoding="utf-8").read()}}, fh)
 sys.stdout.buffer.write(json.dumps(name, ensure_ascii=False).encode("utf-8"))' \
     "$FXN" "$TMP_ROOT/a6.task" "$$" "$TMP_ROOT/a6.err" "$TMP_ROOT/a6.json" "$TMP_ROOT/a6s.json" > "$TMP_ROOT/a6.name"
-  # TOOL-dGroundRules-10: the hook's rule 7 refuses a spawn in a checkout whose settings do not hold
+  # TOOL-dGroundRules-10: the pack's rule 7 refuses a spawn in a checkout whose settings do not hold
   # the landed agent limit, and this fixture carries no policy. The agreement this arm holds is rule
-  # 6's, so it runs a copy of the hook with no policy kit beside it, where rule 7 adds no rule.
-  HKC="$TMP_ROOT/hooks-copy/hooks"; mkdir -p "$HKC" && cp "$HK/agent-cap.js" "$HK/scratch-guard.js" "$HKC/"
-  HK=$HKC
+  # 6's, so it runs a copy of the pack beside scratch-guard.js and no policy kit, where rule 7 adds no rule.
+  HKC="$TMP_ROOT/hooks-copy/hooks"; mkdir -p "$HKC" "$TMP_ROOT/hooks-copy/roles" && cp "$HK/scratch-guard.js" "$HKC/" \
+    && cp "$HERE/spawn-guard.js" "$TMP_ROOT/hooks-copy/roles/"
+  HK=$HKC; PK="$TMP_ROOT/hooks-copy/roles/spawn-guard.js"
   # TOOL-aGuardedEffort-1: the payload names no transcript, so rule 8 reads no model and the admitted
   # spawn's stderr is exactly its not-checked line. Against a main() with rule 8 cut out, it is empty.
-  A6_NOTE="agent-cap: rule 8 did not check this Agent call's effort level — the payload carries no transcript_path"
-  (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR -u CLAUDE_CODE_EFFORT_LEVEL node "$HK/agent-cap.js" < "$TMP_ROOT/a6.json" >/dev/null 2>"$TMP_ROOT/a6.hook"); hrc=$?
+  A6_NOTE="spawn-guard: rule 8 did not check this Agent call's effort level — the payload carries no transcript_path"
+  (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR -u CLAUDE_CODE_EFFORT_LEVEL node "$PK" < "$TMP_ROOT/a6.json" >/dev/null 2>"$TMP_ROOT/a6.hook"); hrc=$?
   _a6ok=0; [ "$rc" = 0 ] && [ "$hrc" = 0 ] && [ "$(tr -d '\r' < "$TMP_ROOT/a6.hook")" = "$A6_NOTE" ] && _a6ok=1
   check_arm "arm 6 the renderer's task part, named as it printed, is admitted by the spawn guard, saying only that rule 8 read no model" "$_a6ok"
   [ "$_a6ok" = 1 ] || sed 's/^/    /' "$TMP_ROOT/a6.err" "$TMP_ROOT/a6.hook"
@@ -347,12 +349,12 @@ with open(sys.argv[1], encoding="utf-8") as fh:
 d["transcript_path"] = sys.argv[2]
 with open(sys.argv[3], "w", encoding="utf-8") as fh:
     json.dump(d, fh)' "$TMP_ROOT/a6.json" "$TRN/a6.tfam.jsonl" "$TMP_ROOT/a6e.json"
-  (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR -u CLAUDE_CODE_EFFORT_LEVEL node "$HK/agent-cap.js" < "$TMP_ROOT/a6e.json" >/dev/null 2>"$TMP_ROOT/a6e.hook"); hrc=$?
-  _a6e=0; [ "$hrc" = 2 ] && grep -qF 'BLOCKED by agent-cap: rule 8' "$TMP_ROOT/a6e.hook" \
+  (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR -u CLAUDE_CODE_EFFORT_LEVEL node "$PK" < "$TMP_ROOT/a6e.json" >/dev/null 2>"$TMP_ROOT/a6e.hook"); hrc=$?
+  _a6e=0; [ "$hrc" = 2 ] && grep -qF 'BLOCKED by spawn-guard: rule 8' "$TMP_ROOT/a6e.hook" \
      && grep -qF 'the tfam profile gives it max on the model "vendor-tfam-9"' "$TMP_ROOT/a6e.hook" && _a6e=1
   check_arm "arm 6 ...and on a profiled model's transcript with no effort it is refused over the rendered index, naming the profile's level" "$_a6e"
   [ "$_a6e" = 1 ] || sed 's/^/    /' "$TMP_ROOT/a6e.hook"
-  (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HK/agent-cap.js" < "$TMP_ROOT/a6s.json" >/dev/null 2>"$TMP_ROOT/a6s.hook"); hrc=$?
+  (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$PK" < "$TMP_ROOT/a6s.json" >/dev/null 2>"$TMP_ROOT/a6s.hook"); hrc=$?
   check_arm "arm 6 ...and named by the role's slot it is refused, naming the rendered name" \
      "$([ "$hrc" = 2 ] && [ "$(<"$TMP_ROOT/a6.name")" != null ] && grep -qF -- "$(<"$TMP_ROOT/a6.name")" "$TMP_ROOT/a6s.hook" && echo 1 || echo 0)"
   # TOOL-aGuardedEffort-2 S6: the `Workflow` half of rule 8 over the RENDERED index. The harness is
@@ -378,11 +380,26 @@ for name, tp, efforts in (("w1", tfam, verb("stage-efforts", "build", "--model",
     with open("%s.%s.json" % (out, name), "w", encoding="utf-8") as fh:
         json.dump({"tool_name": "Workflow", "cwd": fx.as_posix(), "transcript_path": tp,
                    "tool_input": {"scriptPath": (fx / harness).as_posix(), "args": args}}, fh)
-sys.stdout.buffer.write(("build: stage %s would run at " % sorted(roles)[0]).encode("utf-8"))' \
+sys.stdout.buffer.write(("build: stage %s would run at " % sorted(roles)[0]).encode("utf-8"))
+(pathlib.Path(out).parent / "a6.harness").write_text(harness, encoding="utf-8")' \
     "$FXN" "$KREL" "$TMP_ROOT/a6" "$TRN/a6.tfam.jsonl" "$TRN/a6.other.jsonl" > "$TMP_ROOT/a6.stage" 2>"$TMP_ROOT/a6w.err"; _a6w=$?
+  # TOOL-dBoundRoles-25 S3: a declared harness is admitted only at its blob at the landed revision, which the
+  # policy kit names, so the Workflow half runs a second copy of the pack beside a copy of the policy kit; the
+  # fixture's harness is committed on its branch, which GOV_DEFAULT_BRANCH names as landed since it has no
+  # remote, and its local settings hold the agent limit at one, so rule 7 admits.
+  PKL="$TMP_ROOT/pack-landed/roles/spawn-guard.js"; mkdir -p "$TMP_ROOT/pack-landed/roles" "$TMP_ROOT/pack-landed/hooks" "$TMP_ROOT/pack-landed/policy"
+  cp "$HERE/spawn-guard.js" "$TMP_ROOT/pack-landed/roles/"; cp "$HKC/scratch-guard.js" "$TMP_ROOT/pack-landed/hooks/"
+  A6PK=$("$PY" -B -c 'import sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+print(roles_lib.resolve_kit_dir("policy", "policy.py", sys.argv[1]).as_posix())' "$HERE" 2>/dev/null); A6PK=${A6PK%$'\r'}
+  for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do [ -n "$A6PK" ] && cp "$A6PK/$f" "$TMP_ROOT/pack-landed/policy/"; done
+  printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"1","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"1"}}\n' > "$FX/.claude/settings.local.json"
+  ( cd "$FX" && git add -- "$(<"$TMP_ROOT/a6.harness")" && git -c user.email=t@t.test -c user.name=t commit -qm "the build harness, landed" --no-verify ) >/dev/null 2>&1
+  A6BR=$(git -C "$FX" symbolic-ref --short HEAD 2>/dev/null)
   _a6h=""
   for _w in w1 w2 w3; do
-    (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR -u CLAUDE_CODE_EFFORT_LEVEL node "$HK/agent-cap.js" < "$TMP_ROOT/a6.$_w.json" >/dev/null 2>"$TMP_ROOT/a6.$_w.hook"); _a6h="$_a6h$?"
+    (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR -u CLAUDE_CODE_EFFORT_LEVEL GOV_DEFAULT_BRANCH="$A6BR" node "$PKL" < "$TMP_ROOT/a6.$_w.json" >/dev/null 2>"$TMP_ROOT/a6.$_w.hook"); _a6h="$_a6h$?"
   done
   _a6ok=0; [ "$_a6w" = 0 ] && [ "$_a6h" = 020 ] && [ -s "$TMP_ROOT/a6.stage" ] && grep -qF -- "$(<"$TMP_ROOT/a6.stage")" "$TMP_ROOT/a6.w2.hook" && _a6ok=1
   check_arm "arm 6 a harness call over the rendered index is admitted at the profile's levels, refused with none naming the stage, and admitted at the default levels on an unmatched model" "$_a6ok"
@@ -673,7 +690,7 @@ HK11=$("$PY" -B -c 'import sys
 sys.path.insert(0, sys.argv[1])
 import roles_lib
 found = []
-for anchor in ("agent-cap.js", "format-guard.js"):
+for anchor in ("scratch-guard.js", "format-guard.js"):
     try:
         found.append(roles_lib.resolve_kit_dir("hooks", anchor, sys.argv[1]).as_posix())
     except LookupError:
@@ -681,9 +698,9 @@ for anchor in ("agent-cap.js", "format-guard.js"):
 sys.stdout.write("|".join(found))' "$HERE")
 HKA=${HK11%%|*}; HKF=${HK11#*|}
 if [ -z "$HKA" ] || [ -z "$HKF" ]; then
-  echo "SKIP arm 11 — no hooks kit holding agent-cap.js and format-guard.js was found from $KREL"
+  echo "SKIP arm 11 — no hooks kit holding scratch-guard.js and format-guard.js was found from $KREL"
 elif ! command -v node >/dev/null 2>&1; then
-  echo "SKIP arm 11 — no node on PATH to run $HKA/agent-cap.js and $HKF/format-guard.js"
+  echo "SKIP arm 11 — no node on PATH to run $HERE/spawn-guard.js and $HKF/format-guard.js"
 else
   build_fixture
   printf -v _d '%(%Y-%m-%d)T' -1
@@ -713,12 +730,13 @@ for name, text in variants.items():
     hit = roles_lib.extract_prompt_marker(text)
     with open(out / (name + ".py"), "w", encoding="utf-8", newline="") as fh:
         fh.write("admit" if hit and hit.group(0) == m else "refuse")' "$HERE" "$TMP_ROOT/a11" "$FXN" "$$"
-  # A copy of the hook with no policy kit beside it, as arm 6 runs, so rule 7 adds no rule here.
-  HKAC="$TMP_ROOT/a11/hooks-copy/hooks"; mkdir -p "$HKAC" && cp "$HKA/agent-cap.js" "$HKA/scratch-guard.js" "$HKAC/"
-  HKA=$HKAC
+  # A copy of the pack with no policy kit beside it, as arm 6 runs, so rule 7 adds no rule here.
+  HKAC="$TMP_ROOT/a11/hooks-copy/hooks"; mkdir -p "$HKAC" "$TMP_ROOT/a11/hooks-copy/roles" && cp "$HKA/scratch-guard.js" "$HKAC/" \
+    && cp "$HERE/spawn-guard.js" "$TMP_ROOT/a11/hooks-copy/roles/"
+  HKA="$TMP_ROOT/a11/hooks-copy/roles"
   _seen=""
   for _v in v1 v2 v3 v4 v5; do
-    (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HKA/agent-cap.js" < "$TMP_ROOT/a11/$_v.json" >/dev/null 2>"$TMP_ROOT/a11/$_v.hook"); hrc=$?
+    (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HKA/spawn-guard.js" < "$TMP_ROOT/a11/$_v.json" >/dev/null 2>"$TMP_ROOT/a11/$_v.hook"); hrc=$?
     # The exit code alone: an admitted spawn's stderr holds rule 8's not-checked line, since the
     # rendered index carries `effort` and the payload names no transcript (TOOL-aGuardedEffort-1).
     _js=refuse; [ "$hrc" = 0 ] && _js=admit
@@ -1055,9 +1073,9 @@ check_arm "arm 19 a model two profiles match exits 1 through both verbs, naming 
 # ---- `tfam` for `atfam-1`. WHAT IT DOES NOT CHECK: an id holding a letter outside ASCII.
 A20_IDS=("" "affable-1" "atfam-1" "tfam9" "maker-tfam-9" "Maker-TFAM-9" "vendor-other-9" "vendor-tfam-9" "us.maker/x-tfam-9:0" "---")
 if [ -z "$HK" ]; then
-  echo "SKIP arm 20 — no hooks kit holding agent-cap.js was found from $KREL"
+  echo "SKIP arm 20 — no hooks kit holding scratch-guard.js was found from $KREL"
 elif ! command -v node >/dev/null 2>&1; then
-  echo "SKIP arm 20 — no node on PATH to run $HK/agent-cap.js"
+  echo "SKIP arm 20 — no node on PATH to run $HERE/spawn-guard.js"
 else
   (cd "$FX" && "$PY" -B "$KREL/render_agents.py" --write >/dev/null 2>&1); _rc20=$?
   FXN=$(cd "$FX" && { pwd -W 2>/dev/null || pwd; })
@@ -1072,7 +1090,7 @@ for m in sys.argv[2:]:
     except l.RolesError:
         out.append("!")
 sys.stdout.buffer.write("".join(a + "\n" for a in out).encode("utf-8"))' "$FX/$KREL" "${A20_IDS[@]}" > "$TMP_ROOT/a20.py" 2>/dev/null
-  node -e 'const cap = require(process.argv[1] + "/agent-cap.js")
+  node -e 'const cap = require(process.argv[1] + "/../roles/spawn-guard.js")
 const e = require(process.argv[1] + "/scratch-guard.js").loadRoleIndex(process.argv[2]).effort
 for (const m of process.argv.slice(3)) { const n = cap.resolveModelProfile(e.profiles, m); process.stdout.write((n.length > 1 ? "!" : n[0] || "-") + "\n") }' \
     "$HK" "$FXN" "${A20_IDS[@]}" > "$TMP_ROOT/a20.js" 2>/dev/null
@@ -1524,7 +1542,7 @@ roles = ["gov-reuse-scout", "gov-skeptic"]
 kind = "single"
 checklist = "none"
 orientation = "none"
-enforced-by = ["agent-cap.js spawn guard"]
+enforced-by = ["spawn-guard.js spawn guard"]
 trigger = "any time this arm plants it"
 """
 ROW = """
@@ -1696,8 +1714,8 @@ for path in (kit / "agents").glob("*.agent.md"):
     declared[path.name[:-len(".agent.md")]] = [s.strip() for s in m.group(1).split(",")] if m else []
 print("ac4b %d" % int(rc == 0 and len(declared) > 1 and any(declared.values())
                       and {s: r.get("shapes") for s, r in index.items()} == declared))
-table.write_text(held.replace("orientation = \"unit.orient.verifier-cold\"\nenforced-by = [\"agent-cap.js spawn guard\"]",
-                              "orientation = \"unit.orient.nothing\"\nenforced-by = [\"agent-cap.js spawn guard\"]", 1),
+table.write_text(held.replace("orientation = \"unit.orient.verifier-cold\"\nenforced-by = [\"spawn-guard.js spawn guard\"]",
+                              "orientation = \"unit.orient.nothing\"\nenforced-by = [\"spawn-guard.js spawn guard\"]", 1),
                  encoding="utf-8")
 rc, out, r9 = check()
 print("ac6a %d" % int(rc == 1 and len(r9) == 1 and "unit.orient.nothing" in r9[0] and "no declared unit" in r9[0]))
@@ -1981,7 +1999,7 @@ check_arm "arm 34 handoff.py facts cuts the same spec to the same key, beside it
 # ---- cases, owed at the close and not observed by the pass that wrote this: `render_handoff` with its item
 # ---- step cut out, which renders the work order with no block and passes every refusal, and `derive_allowance`
 # ---- admitting every granted path. WHAT IT DOES NOT CHECK: a work order spawned, which the hooks kit's
-# ---- agent-cap.test.sh binds to the session's card.
+# ---- spawn-guard.test.sh binds to the session's card.
 build_fixture; _rc35=$?
 printf '\n[[item]]\ntag = "item.build.unit"\nstep = "step.build"\nactor = "role:gov-builder"\nneeds = []\noutcomes = ["committed", "diverged"]\nwitness = { class = "history", by = "the unit'"'"'s commit, its Pass: trailer naming the unit" }\nowner = "tFix"\nroutes = { committed = "transition", diverged = "transition" }\n' >> "$FX/$FXL/loop.toml"
 for _t in tspec tnone; do
@@ -2642,7 +2660,7 @@ def role_row(name, ret=RET, shapes="single", workflow="triage"):
 def flow_row(name, roles, driver="agent", harness="none", kind="single"):
     return ('\n[[workflow]]\ntag = "workflow.adopter.%s"\nname = "%s"\ndriver = "%s"\nharness = "%s"\n'
             'roles = %s\nkind = "%s"\nchecklist = "none"\norientation = "none"\n'
-            'enforced-by = ["agent-cap.js spawn guard"]\ntrigger = "when a request asks for it"\n'
+            'enforced-by = ["spawn-guard.js spawn guard"]\ntrigger = "when a request asks for it"\n'
             % (name, name, driver, harness, json.dumps(roles), kind))
 STAGE = ('\n[[workflow.stages]]\nkey = "triage"\nrole = "triager"\nfan = 1\ncap = 1\neffort = "medium"\n'
          'receives = []\nreturns = []\n')
@@ -2792,7 +2810,8 @@ _h46=$("$PY" -B -c 'import sys, tomllib
 with open(sys.argv[1], "rb") as fh:
     rows = tomllib.load(fh).get("workflow") or []
 print(next(w["harness"] for w in rows if w.get("name") == "closing-review").split("}/", 1)[-1])' "$FX/$FXK/workflows.toml")
-_h46="${_t46}${_h46//$''/}"
+_h46="${_t46}${_h46//$'
+'/}"
 out=$(run_adopter --scaffold); rc=$?
 _i46=$("$PY" -B -c 'import json, sys
 with open(sys.argv[1], encoding="utf-8") as fh:

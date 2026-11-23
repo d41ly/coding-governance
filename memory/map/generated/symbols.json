@@ -683,6 +683,16 @@
       "file": "tools/playbook/check_layers.py"
     },
     {
+      "id": "VIEWS",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.js"
+    },
+    {
+      "id": "VIEWS",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
       "id": "ViewShardRefused",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
@@ -2670,7 +2680,7 @@
     {
       "id": "buildTaskDigest",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "buildWalkFields",
@@ -3101,6 +3111,11 @@
       "id": "build_entry_rows",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "build_env",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
     },
     {
       "id": "build_ev_spec",
@@ -4840,11 +4855,6 @@
     {
       "id": "check",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
-    },
-    {
-      "id": "check",
-      "kind": "function",
       "file": "tools/lexicon/selftest.py"
     },
     {
@@ -4861,6 +4871,11 @@
       "id": "check",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "check",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "check",
@@ -4920,7 +4935,7 @@
     {
       "id": "checkBlockFences",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkBuildable",
@@ -4995,7 +5010,7 @@
     {
       "id": "checkEffortLevel",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkEmptyTempVar",
@@ -5005,12 +5020,12 @@
     {
       "id": "checkFactKeys",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkFile",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "checkFile",
@@ -5025,6 +5040,11 @@
     {
       "id": "checkFile",
       "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
+    },
+    {
+      "id": "checkFile",
+      "kind": "function",
       "file": "tools/unattended/stop-guard.js"
     },
     {
@@ -5035,7 +5055,7 @@
     {
       "id": "checkFraming",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkGateLeg",
@@ -5055,17 +5075,22 @@
     {
       "id": "checkHandoffSpawn",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkHarnessCall",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
+    },
+    {
+      "id": "checkHarnessLanded",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkItemBinding",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkLane",
@@ -5075,7 +5100,7 @@
     {
       "id": "checkLiteralOpen",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "checkNamed",
@@ -5085,7 +5110,7 @@
     {
       "id": "checkOptinPackPresent",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkOriented",
@@ -5095,7 +5120,7 @@
     {
       "id": "checkOwn",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkPair",
@@ -5135,7 +5160,7 @@
     {
       "id": "checkPromptPath",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkRedLane",
@@ -5210,7 +5235,7 @@
     {
       "id": "checkSettingsInForce",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkSettles",
@@ -5275,7 +5300,7 @@
     {
       "id": "checkTypedBlocks",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "checkUnarmed",
@@ -5521,11 +5546,6 @@
       "id": "check_adv_reaches",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
-    },
-    {
-      "id": "check_agentcap",
-      "kind": "function",
-      "file": "tools/check-wiring.sh"
     },
     {
       "id": "check_alias_copies",
@@ -9288,6 +9308,16 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "check_spawn_guard",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_spawn_guard_step",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_spawn_substitution",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -10363,6 +10393,11 @@
       "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
+      "id": "cmd_down",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
+    },
+    {
       "id": "cmd_emit_floors",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -10753,6 +10788,11 @@
       "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
+      "id": "cmd_up",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
+    },
+    {
       "id": "cmd_update",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -10816,6 +10856,11 @@
       "id": "cmd_witness",
       "kind": "function",
       "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
     },
     {
       "id": "cmd_write",
@@ -11240,7 +11285,7 @@
     {
       "id": "deriveBlobId",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "deriveCellSample",
@@ -14450,11 +14495,6 @@
     {
       "id": "derive_self_rel",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
-    },
-    {
-      "id": "derive_self_rel",
-      "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
@@ -14496,6 +14536,11 @@
       "id": "derive_self_rel",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "derive_self_rel",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "derive_self_rel",
@@ -15595,7 +15640,7 @@
     {
       "id": "extractBuildSlug",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "extractByDesign",
@@ -15640,7 +15685,7 @@
     {
       "id": "extractHandoffMarker",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "extractItemSlug",
@@ -15665,7 +15710,7 @@
     {
       "id": "extractTaskSection",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "extractTurnAgents",
@@ -15675,7 +15720,7 @@
     {
       "id": "extractWorkflowArgs",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "extract_acceptance",
@@ -16825,12 +16870,12 @@
     {
       "id": "key",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "key",
       "kind": "function",
-      "file": "tools/memory-tree/merge-rows.py"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "keys",
@@ -16965,11 +17010,6 @@
     {
       "id": "loadHook",
       "kind": "function",
-      "file": "tools/workflows/check-review-join.js"
-    },
-    {
-      "id": "loadHook",
-      "kind": "function",
       "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
@@ -16981,6 +17021,11 @@
       "id": "loadRoleIndex",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "loadScratchGuard",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "load_affordance_exempt",
@@ -17538,6 +17583,11 @@
       "file": "tools/govkit/steps/registry_to_ledger.py"
     },
     {
+      "id": "load_steps",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
+    },
+    {
       "id": "load_target_module",
       "kind": "function",
       "file": "tools/govkit/steps/reviewer_merge.py"
@@ -17880,17 +17930,17 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
-    },
-    {
-      "id": "main",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "main",
@@ -18366,6 +18416,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "main",
@@ -19371,6 +19426,11 @@
       "id": "mkfixture",
       "kind": "function",
       "file": "tools/unattended/check-pass-order.test.sh"
+    },
+    {
+      "id": "mkpack",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "mkrepo",
@@ -21233,6 +21293,11 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "readHarnessBlobs",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
+    },
+    {
       "id": "readHeadBranch",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
@@ -21350,12 +21415,12 @@
     {
       "id": "readSessionModel",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "readSettingsLayers",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "readSidecarLines",
@@ -21385,17 +21450,17 @@
     {
       "id": "readStdin",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
-    },
-    {
-      "id": "readStdin",
-      "kind": "function",
       "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "readStdin",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readStdin",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "readStdin",
@@ -21440,7 +21505,7 @@
     {
       "id": "readWriterBound",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "read_aborted_verdicts",
@@ -23368,6 +23433,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_fragment",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
+    },
+    {
       "id": "read_fragment_keys",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -23601,6 +23671,11 @@
       "id": "read_grant_key_at",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "read_groups",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
     },
     {
       "id": "read_guard_misses",
@@ -24703,6 +24778,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "read_merger",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
+    },
+    {
       "id": "read_message_ids",
       "kind": "function",
       "file": "tools/lib/commit_trailers.py"
@@ -25568,6 +25648,11 @@
       "file": "tools/run-gates/check-receipt.py"
     },
     {
+      "id": "read_receipt_path",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
+    },
+    {
       "id": "read_receipt_rows",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -26421,6 +26506,11 @@
       "id": "read_set",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "read_settings",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
     },
     {
       "id": "read_settle_command",
@@ -27975,11 +28065,6 @@
     {
       "id": "refuse_wrong_shell",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
-    },
-    {
-      "id": "refuse_wrong_shell",
-      "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"
     },
     {
@@ -28096,6 +28181,11 @@
       "id": "refuse_wrong_shell",
       "kind": "function",
       "file": "tools/roles/return-check.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "refuse_wrong_shell",
@@ -28750,17 +28840,17 @@
     {
       "id": "renderAuthorNote",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "renderBlankedLiterals",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "renderBlankedView",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "renderBlock",
@@ -28885,7 +28975,7 @@
     {
       "id": "renderCodeView",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "renderDeny",
@@ -28915,7 +29005,7 @@
     {
       "id": "renderEffortDeny",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "renderFanoutDeny",
@@ -28940,7 +29030,7 @@
     {
       "id": "renderHandoffDeny",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "renderIntent",
@@ -28990,12 +29080,12 @@
     {
       "id": "renderLevel",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "renderLexedView",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "renderLiteral",
@@ -29025,7 +29115,7 @@
     {
       "id": "renderNote",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "renderOrientationDeny",
@@ -29045,7 +29135,12 @@
     {
       "id": "renderPosix",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "renderPosix",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "renderPosix",
@@ -29070,7 +29165,7 @@
     {
       "id": "renderReadDeny",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "renderReadRev",
@@ -29085,7 +29180,7 @@
     {
       "id": "renderRel",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "renderRerunTail",
@@ -29150,7 +29245,7 @@
     {
       "id": "renderSettingsDeny",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "renderShapeLine",
@@ -29175,27 +29270,27 @@
     {
       "id": "renderShippedBlanks",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "renderShippedLine",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "renderShippedView",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "renderShown",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "renderSpawnName",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "renderStageOpts",
@@ -29230,12 +29325,12 @@
     {
       "id": "renderStrippedLine",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "renderStrippedView",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "renderTwinRange",
@@ -30905,7 +31000,7 @@
     {
       "id": "resolveCheckoutRoot",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "resolveCommonDir",
@@ -30930,12 +31025,12 @@
     {
       "id": "resolveHarnessEntry",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "resolveHarnessName",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "resolveHomeRoots",
@@ -30950,7 +31045,12 @@
     {
       "id": "resolveKitDir",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolveKitDir",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "resolveKitDir",
@@ -30965,22 +31065,22 @@
     {
       "id": "resolveLiteralEnd",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "resolveModelProfile",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "resolvePolicyHelper",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "resolvePromptsAuthor",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "resolveRealPath",
@@ -31376,6 +31476,11 @@
       "id": "resolve_default",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "resolve_default_fragment",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
     },
     {
       "id": "resolve_default_ref",
@@ -31840,11 +31945,6 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"
     },
     {
@@ -31970,6 +32070,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/roles/spawn-guard.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/run-gates/leg_factory.py"
     },
     {
@@ -32091,11 +32196,6 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/workflows/check-protocol-parity.test.sh"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
-      "file": "tools/workflows/check-review-join.sh"
     },
     {
       "id": "resolve_kit_dir",
@@ -32595,11 +32695,6 @@
     {
       "id": "resolve_python",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
-    },
-    {
-      "id": "resolve_python",
-      "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"
     },
     {
@@ -32716,6 +32811,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/roles/return-check.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "resolve_python",
@@ -32856,11 +32956,6 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/workflows/check-protocol-parity.test.sh"
-    },
-    {
-      "id": "resolve_python",
-      "kind": "function",
-      "file": "tools/workflows/check-review-join.sh"
     },
     {
       "id": "resolve_python",
@@ -33700,7 +33795,7 @@
     {
       "id": "runBothViews",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
+      "file": "tools/workflows/script-views.js"
     },
     {
       "id": "runGit",
@@ -33711,6 +33806,11 @@
       "id": "runGit",
       "kind": "function",
       "file": "tools/policy/policy-mirror.js"
+    },
+    {
+      "id": "runGit",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "runLiveness",
@@ -33801,6 +33901,11 @@
       "id": "run_adopter",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "run_adopter_call",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "run_adopter_suite",
@@ -34515,7 +34620,7 @@
     {
       "id": "run_effort",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "run_engine",
@@ -35290,12 +35395,12 @@
     {
       "id": "run_harness",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/lib/lib-selftest.test.sh"
     },
     {
       "id": "run_harness",
       "kind": "function",
-      "file": "tools/lib/lib-selftest.test.sh"
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "run_hold",
@@ -35483,6 +35588,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "run_landed",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.test.sh"
+    },
+    {
       "id": "run_landed_replay",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -35580,7 +35690,7 @@
     {
       "id": "run_limit_call",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "run_limit_call",
@@ -35738,6 +35848,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "run_merges",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
+    },
+    {
       "id": "run_meta_check",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -35885,7 +36000,7 @@
     {
       "id": "run_pack",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "run_page_commands",
@@ -37075,7 +37190,7 @@
     {
       "id": "run_spawn",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "run_spawn_scan",
@@ -39016,6 +39131,11 @@
       "id": "seed_source",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "seed_spawn_guard",
+      "kind": "function",
+      "file": "tools/check-wiring.test.sh"
     },
     {
       "id": "seed_spc",
@@ -43230,7 +43350,7 @@
     {
       "id": "write_handoff",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "write_handoff_fixture",
@@ -43261,6 +43381,11 @@
       "id": "write_hook",
       "kind": "function",
       "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "write_hook_copies",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "write_hook_plant",
@@ -44185,12 +44310,12 @@
     {
       "id": "write_roles",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_roles",
       "kind": "function",
-      "file": "tools/hooks/scratch-guard.test.sh"
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "write_rollback_record",
@@ -44890,11 +45015,6 @@
     {
       "id": "wrong_shell_at",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
-    },
-    {
-      "id": "wrong_shell_at",
-      "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"
     },
     {
@@ -45061,6 +45181,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/roles/return-check.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.test.sh"
     },
     {
       "id": "wrong_shell_at",

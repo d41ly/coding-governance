@@ -273,7 +273,7 @@ resolve_carrier_kit() { # <home> <anchor> -> the kit's repo-relative directory, 
 }
 MT_DIR=$(resolve_carrier_kit memory-tree check-memory-hygiene.sh)
 CM_DIR=$(resolve_carrier_kit codebase-map map_lib.py)
-HK_DIR=$(resolve_carrier_kit hooks agent-cap.js)
+HK_DIR=$(resolve_carrier_kit hooks scratch-guard.js)
 WF_DIR=$(resolve_carrier_kit workflows tier2-review.js)
 RG_DIR=$(resolve_carrier_kit run-gates run-gates.sh)
 UN_DIR=$(resolve_carrier_kit unattended unattended.sh)
@@ -294,7 +294,7 @@ need() { # label · file · extended-regex
 
 need "KIT_MEMORY_TREE_VERSION"    ${MT_DIR}/check-memory-hygiene.sh "^KIT_MEMORY_TREE_VERSION=$V([[:space:]]|\$)"
 need "KIT_CODEBASE_MAP_VERSION"   ${CM_DIR}/map_lib.py             "^KIT_CODEBASE_MAP_VERSION = \"$V\""
-need "KIT_AGENT_CAP_VERSION"      ${HK_DIR}/agent-cap.js                  "KIT_AGENT_CAP_VERSION = '$V'"
+need "KIT_AGENT_CAP_VERSION"      ${HK_DIR}/scratch-guard.js              "KIT_AGENT_CAP_VERSION = '$V'"
 # The harness path, bound ONCE. It was spelled at three sites after TOOL-dRetiredFork-7 and the
 # install-prefix ratchet is shrink-only, so a literal per use is a regression an adopter pays
 # for: apply ships these bytes verbatim and a carried `tools/` path resolves to nothing at
@@ -347,14 +347,14 @@ fi
 # agent-cap: constant and marker sit on ONE line, which is why this pair was presence-checked only —
 # and a half-bumped pair therefore passed. Assert they agree like every other pair; "same line" is
 # not "same value", and the marker is what a deployer greps in an adopting tree.
-ac=$(grep -oE "KIT_AGENT_CAP_VERSION = '$V'" ${HK_DIR}/agent-cap.js | head -1 | grep -oE "$V")
+ac=$(grep -oE "KIT_AGENT_CAP_VERSION = '$V'" ${HK_DIR}/scratch-guard.js | head -1 | grep -oE "$V")
 if [ -z "$ac" ]; then
-  echo "kit-versions: KIT_AGENT_CAP_VERSION is unreadable in ${HK_DIR}/agent-cap.js"
+  echo "kit-versions: KIT_AGENT_CAP_VERSION is unreadable in ${HK_DIR}/scratch-guard.js"
   fails=$((fails+1))
 else
   # The population is DERIVED, and naming one file is exactly how a half-bumped pair passed here for
   # the THIRD time. `TOOL-dTieredTribunal-14` took the kit to 1.8 in both agent-cap copies and left
-  # both scratch-guard copies at 1.7; this block greped agent-cap.js alone and exited 0 over one kit
+  # both scratch-guard copies at 1.7; this block greped one hook file alone and exited 0 over one kit
   # advertising two versions. The population is every tracked `*.js` and NOT every tracked file:
   # that pathspec is load-bearing rather than decorative, because this checker's own source carries
   # the marker string in the grep below and a tree-wide sweep would grade the checker by its own

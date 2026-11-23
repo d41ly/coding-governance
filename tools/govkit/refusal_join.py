@@ -38,7 +38,13 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 335    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 340    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 335 -> 340 at TOOL-dBoundRoles-25, BY THE MEASURED DELTA: the matcher reads 525 over the deployer's
+# directory at that unit's base `43808717` and 530 on the tree it left, all five in the new step program
+# `steps/spawn_guard_pack.py`: `read_settings`' two (a settings file that does not parse, or is no
+# object), `read_merger`'s (no settings-merge.py in the target), `run_merges`' (a merge that exits non-zero)
+# and `cmd_up`'s (merges that wrote other bytes than the before-image records); the step's govkit selftest
+# cases reach the parse refusal, `read_merger`'s and `run_merges`', and no case reaches the other refusals.
 # 334 -> 335 at TOOL-dSafePassage-87, BY THE MEASURED DELTA: the matcher reads 473 over the
 # deployer's directory at that unit's base `cba885c5` and 474 on the tree it left, the one in
 # `upgrade_steps.py`: `check_contained`'s refusal of a key holding a `..` segment that normalises

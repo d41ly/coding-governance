@@ -43,8 +43,8 @@ SELF_EXCLUDE='(^|/)check-review-join\.(sh|js|test\.sh)$'
 # The ban table is check-review-join.js's since TOOL-dFairHearing-16, and that file is excluded by
 # name: the retired-identifier ban is a bare regex literal, and a regex literal survives the literal
 # blanking, so the predicate run over its own table returns one hit on exactly the table's line.
-# agent-cap.js held the table from TOOL-dTieredTribunal-14 S6 until then, and left the exclusion
-# with it: it holds no ban now, so it is judged like any other script.
+# The agent limit hook held the table from TOOL-dTieredTribunal-14 S6 until then, and left the exclusion
+# with it; that hook retired in TOOL-dBoundRoles-25.
 
 # ---- WHERE THIS KIT LIVES, DERIVED -- TOOL-dRetiredFork-10 ------------------------------------
 # This script spells no install prefix. It is `tools/` here, `scripts/` at both measured adopters,
@@ -73,184 +73,10 @@ else
   POP_RE='\.js$'; POP_SAYS="the repository root"
 fi
 
-# ---- THE PREDICATE, PROBED -------------------------------------------------------------------
-# Three rungs, and the third is not optional. Adopter nc keeps its hooks a directory up from its
-# harnesses, which rung 2 reaches. adopter ic has no such directory AT ALL -- its only copy sits at
-# `.claude/hooks/agent-cap.js` -- so a two-rung chain strands it, and that was found by testing the
-# derivation against both trees rather than by reasoning about one.
-#
-# F1, ratified: rung 3 stays a literal. `.claude/hooks/` is the HARNESS's own convention, not an
-# install prefix an adopter chooses, and this is the one place the unit does not practise what it
-# enforces. Said here rather than left for a reader to notice.
-#
-# TOOL-aRepatriatedFork-46: rungs 1 and 2 are the sibling-kit resolver's. It reads the install
-# receipt BEFORE it probes this kit's own directory and its parent, so a hooks kit an adopter homed
-# under another name is found, and it names the kit by its home rather than as a literal segment.
-# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
-resolve_python() {
-  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
-  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
-  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
-  # THE FLOOR is declared once, in python-floor.txt in gov's lib dir. The literal below is its
-  # generated copy, held equal to it by the floor module's `check` and by these blocks' parity rows,
-  # because a copy-installed kit has no lib dir to read. A candidate that runs below it is passed
-  # over and named, exactly as a candidate that does not run.
-  _rp_floor="3.15"
-  _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
-  # THE BAR'S OWN RESOLUTION, taken with no spawn (TOOL-aMeasuredDrag-11). The run-gates runner
-  # exports GATE_RESOLVED_PY as four lines: the version, the launcher it resolved, and GOV_PYTHON and
-  # PATH as it saw them. With no caller override the loop below is decided by GOV_PYTHON, PATH and the
-  # floor, so a memo matching both byte for byte, at or above THIS floor, is what the loop would print.
-  # Anything else, malformed or partial included, is ignored and the loop runs. Only an absolute
-  # launcher is admitted (TOOL-aMeasuredDrag-12): a relative one names another file once a leg
-  # changes directory, and a bare name does too under a PATH holding `.`.
-  _rp_re=$'^([0-9]+)\\.([0-9]+)\n(/[^\n]*|[A-Za-z]:/[^\n]*|[A-Za-z]:\\\\[^\n]*)\n([^\n]*)\n(.*)$'
-  if [ -z "${1:-}" ] && [[ ${GATE_RESOLVED_PY:-} =~ $_rp_re ]] \
-    && [ "${BASH_REMATCH[4]}" = "${GOV_PYTHON:-}" ] && [ "${BASH_REMATCH[5]}" = "$PATH" ] \
-    && [ $(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} )) -ge "$_rp_fv" ]; then
-    printf '%s\n' "${BASH_REMATCH[3]}"
-    return 0
-  fi
-  _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
-  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
-    _rp_i=$((_rp_i + 1))
-    [ -n "$_rp_c" ] || continue
-    _rp_tried="$_rp_tried $_rp_c"
-    # ONE spawn per candidate, isolated: its major.minor and its own executable, forward-slashed,
-    # because a backslashed C:\ path handed to MSYS bash loses its separators.
-    _rp_out=$("$_rp_c" -I -c 'import sys; print("%d.%d" % sys.version_info[:2], sys.executable.replace("\\", "/"))' 2>/dev/null) || _rp_out=""
-    _rp_out=${_rp_out%$'\r'}
-    if [[ ${_rp_out%% *} =~ ^([0-9]+)\.([0-9]+)$ ]]; then
-      _rp_cv=$(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} ))
-      if [ "$_rp_cv" -ge "$_rp_fv" ]; then
-        # An override, the caller's or GOV_PYTHON, names the command a consumer spawns, a wrapper
-        # or a venv launcher included, and is echoed as given. Only the three launcher names give
-        # way to the direct executable where the probe named a file; the launcher's own name
-        # otherwise. The `[ -f ]` HOLDS on a Windows App Execution Alias, so a Store Python whose
-        # own sys.executable is an alias is echoed as printed: a gap the run-gates kit's
-        # check_app_alias closes for the legs it measures, and this block does not.
-        _rp_exe=${_rp_out#* }
-        if [ "$_rp_i" -gt 2 ] && [ "$_rp_exe" != "$_rp_out" ] && [ -f "$_rp_exe" ]; then printf '%s\n' "$_rp_exe"; else printf '%s\n' "$_rp_c"; fi
-        return 0
-      fi
-      _rp_why="ran ${_rp_out%% *}, below the floor $_rp_floor"
-      if [ "$_rp_cv" -gt "$_rp_bv" ]; then _rp_best=$_rp_c; _rp_bv=$_rp_cv; _rp_bver=${_rp_out%% *}; fi
-    else
-      _rp_why="did not run"
-    fi
-    _rp_seen="${_rp_seen}resolve_python:   $_rp_c: $_rp_why"$'\n'
-    [ "$_rp_i" != 1 ] || _rp_o1=$_rp_why
-    [ "$_rp_i" != 2 ] || _rp_og=$_rp_why
-  done
-  {
-    echo "resolve_python: no usable python launcher at the floor $_rp_floor (python-floor.txt in gov's lib dir)."
-    echo "resolve_python: Each candidate was RUN with -I -c — being on PATH is not evidence (the Microsoft Store"
-    echo "resolve_python: python3 stub answers \`command -v\` and exits 9009 without running anything)."
-    printf '%s' "$_rp_seen"
-    if [ -n "${1:-}" ]; then
-      echo "resolve_python: the caller's override '$1' was tried FIRST and $_rp_o1."
-    fi
-    if [ -n "${GOV_PYTHON:-}" ]; then
-      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and $_rp_og. An override that is"
-      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
-      echo "resolve_python: operator believes they chose, and would not have."
-    fi
-    # THE INSTALL COMMAND, as platforms.provision says. The policy kit's own reader answers it at the
-    # landed revision, run by the newest candidate that ran, since its tomllib needs 3.11, and never
-    # through the policy shim, which resolves a launcher itself and would re-enter this refusal.
-    _rp_prov=name; _rp_pwhy=""
-    if [ -z "$_rp_best" ]; then
-      _rp_pwhy="no reader ran, because no candidate ran"
-    elif [ "$_rp_bv" -lt 3011 ]; then
-      _rp_pwhy="no reader ran, because the newest candidate that ran, $_rp_best, is $_rp_bver, below the 3.11 the reader needs"
-    else
-      IFS= read -r -d '' _rp_rkd <<'RKD' || :
-# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
-def resolve_kit_dir(home, anchor, here):
-    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
-
-    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
-       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
-       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
-       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
-    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
-    3. refuse — LookupError naming the three places looked; never a guessed prefix.
-    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
-    """
-    import json
-    import pathlib
-    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
-    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
-    receipt = root / ".governance" / "install.json"
-    try:
-        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
-    except (OSError, ValueError, AttributeError):
-        rows = []
-    for row in rows:
-        if not isinstance(row, dict) or not row.get("path"):
-            continue
-        src = str(row.get("source") or "").split("/")
-        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
-        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
-            continue
-        hit = (root / str(row["path"])).absolute()
-        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
-            return hit.parent
-    probes = (here / home, here.parent / home)
-    for cand in probes:
-        if (cand / anchor).is_file():
-            return cand
-    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
-        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
-# <<< resolve_kit_dir
-RKD
-      case "${BASH_SOURCE[0]:-}" in */*) _rp_here=${BASH_SOURCE[0]%/*} ;; *) _rp_here=. ;; esac
-      _rp_kit=$("$_rp_best" -I -c "${_rp_rkd%$'\n'}"'
-import sys
-try:
-    print(resolve_kit_dir("policy", "policy.py", sys.argv[1]).as_posix())
-except LookupError as e:
-    sys.exit(str(e))' "$_rp_here" 2>&1) || _rp_pwhy="no reader ran, because ${_rp_kit%$'\r'}"
-      if [ -z "$_rp_pwhy" ]; then
-        _rp_kit=${_rp_kit%$'\r'}
-        _rp_val=$("$_rp_best" "$_rp_kit/policy.py" get platforms.provision 2>/dev/null) || _rp_pwhy="the reader, policy.py get, exited $?"
-        _rp_val=${_rp_val%$'\r'}
-        case "$_rp_pwhy:$_rp_val" in
-          :name|:uv|:off) _rp_prov=$_rp_val ;;
-          :*) _rp_pwhy="the reader, policy.py get, printed '$_rp_val', which is no value of the key" ;;
-        esac
-      fi
-    fi
-    [ -z "$_rp_pwhy" ] || echo "resolve_python: platforms.provision reads its catalogue default, name: $_rp_pwhy."
-    if [ "$_rp_prov" = uv ]; then
-      if [ ! -t 2 ]; then _rp_no="not offered, because stderr is not a terminal"
-      elif ! uv --version >/dev/null 2>&1; then _rp_no="not offered, because uv does not run"
-      else
-        printf 'resolve_python: platforms.provision is uv. Run `uv python install %s` now? [y/N] ' "$_rp_floor"
-        _rp_a=""; read -r _rp_a </dev/tty || :
-        if [ "$_rp_a" = y ]; then
-          uv python install "$_rp_floor" || :
-          echo "resolve_python: re-run once the floor is on PATH, or name it in GOV_PYTHON."
-          _rp_prov=offered
-        else
-          _rp_no="declined at the prompt"
-        fi
-      fi
-      [ "$_rp_prov" = offered ] || echo "resolve_python: platforms.provision is uv, and the install was $_rp_no."
-    fi
-    case "$_rp_prov" in
-      off) echo "resolve_python: platforms.provision is off, so this refusal names no install command." ;;
-      name|uv)
-        echo "resolve_python: install the floor with: uv python install $_rp_floor"
-        case "${OSTYPE:-}" in msys*|cygwin*|win*) echo "resolve_python: or, on Windows: py install $_rp_floor" ;; esac ;;
-    esac
-    # LAST, verbatim: the first line names the refusal and this one the candidates, and the lines
-    # between them carry the outcomes, the overrides and the install (TOOL-dSafePassage-26 S20).
-    echo "resolve_python: tried:$_rp_tried"
-  } >&2
-  return 1
-}
-# <<< resolve_python
+# ---- NO HOOK -- TOOL-dBoundRoles-25 -----------------------------------------------------------
+# The predicate reads its views from this kit's `script-views.js`, beside check-review-join.js, and nothing
+# from a hook (§8 F8), so this gate probes no hooks kit: the retired agent limit hook it once resolved
+# through the install receipt and the `.claude/hooks/` rung is gone, and the views went with the rule.
 # >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
 wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
   [ "$2" = 1 ] || return 1
@@ -269,73 +95,6 @@ refuse_wrong_shell() {
 }
 # <<< refuse_wrong_shell
 refuse_wrong_shell || exit 2
-# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
-# canonical copy named on its marker line and gated by the resolve-python self-test's parity
-# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
-# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
-# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
-resolve_kit_dir() {
-  local _rkd
-  IFS= read -r -d '' _rkd <<'RKD' || :
-# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
-def resolve_kit_dir(home, anchor, here):
-    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
-
-    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
-       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
-       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
-       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
-    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
-    3. refuse — LookupError naming the three places looked; never a guessed prefix.
-    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
-    """
-    import json
-    import pathlib
-    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
-    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
-    receipt = root / ".governance" / "install.json"
-    try:
-        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
-    except (OSError, ValueError, AttributeError):
-        rows = []
-    for row in rows:
-        if not isinstance(row, dict) or not row.get("path"):
-            continue
-        src = str(row.get("source") or "").split("/")
-        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
-        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
-            continue
-        hit = (root / str(row["path"])).absolute()
-        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
-            return hit.parent
-    probes = (here / home, here.parent / home)
-    for cand in probes:
-        if (cand / anchor).is_file():
-            return cand
-    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
-        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
-# <<< resolve_kit_dir
-RKD
-  "$1" -c "${_rkd%$'\n'}"'
-import sys
-try:
-    d = resolve_kit_dir(*sys.argv[1:4])
-except LookupError as e:
-    sys.exit(str(e))
-r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
-print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
-}
-HOOK=""
-_hk_py=$(resolve_python 2>/dev/null) || echo "review-join: no usable python, so the install receipt and the kit probes were NOT read; only the .claude/hooks/ rung was tried" >&2
-if [ -n "$_hk_py" ] && _hk_dir=$(resolve_kit_dir "$_hk_py" hooks agent-cap.js "$HERE" 2>/dev/null); then
-  # The resolver answers relative to the checkout holding THIS gate, which is not the caller's
-  # `$ROOT` when the gate runs from another repo (closing review round 1 H1). Asked with an inherited
-  # `GIT_DIR` unset (round 2 L1): with one exported, git answers `$HERE` itself and the path names nothing.
-  HOOK="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_hk_dir/agent-cap.js"
-elif [ -f "$ROOT/.claude/hooks/agent-cap.js" ]; then
-  HOOK="$ROOT/.claude/hooks/agent-cap.js"
-fi
-[ -n "$HOOK" ] || { echo "review-join: no agent-cap.js through the install receipt, at $HERE/hooks/, $HERE/../hooks/ or $ROOT/.claude/hooks/ — a gate whose predicate is absent must say so, not pass"; exit 2; }
 
 EXPLAIN=0
 ARGS=()
@@ -367,11 +126,11 @@ if [ "$EXPLICIT" = 0 ] && [ -z "$FILES" ]; then
   exit 1
 fi
 
-# TOOL-dFairHearing-16 - THE PREDICATE MOVED AGAIN. It was <prefix>/hooks/agent-cap.js's rule 5 from
+# TOOL-dFairHearing-16 - THE PREDICATE MOVED AGAIN. It was the agent limit hook's rule 5 from
 # TOOL-dTieredTribunal-14 S5, run here through the hook's `join` selector, and the owner's NT-27 made it
 # this gate's alone: check-review-join.js beside this gate holds the three bans, their `why` text,
 # which this gate's own self-test asserts, and the deny message, and nothing else carries the ban.
-# Its views are the hook's, read through the hook's exports from the hook resolved above, so the
+# Its views are this kit's script-views.js since TOOL-dBoundRoles-25 retired that hook, so the
 # stripper still BLANKS string contents where the retired in-file scanner kept them. The retired
 # tool's NAME is deliberately not written under this path: a reader grepping for it finds nothing.
 SCAN=()
@@ -387,7 +146,7 @@ JOINJS="$HERE/check-review-join.js"
 
 hits=""
 for f in "${SCAN[@]}"; do
-  out=$(node "$JOINJS" --hook "$HOOK" "$f" 2>&1) && rc=0 || rc=$?
+  out=$(node "$JOINJS" "$f" 2>&1) && rc=0 || rc=$?
   # This loop used to read "the predicate exited non-zero" as "rule 5 fired". Two symptoms, one root.
   # The hook exited 2 on its OWN environment refusal before any rule ran, and that message carries
   # no line starting with two spaces and L, so the sed emptied it and the gate printed a ref-keyed
@@ -573,7 +332,7 @@ if [ "$EXPLAIN" = 1 ]; then
   # Section 5 observability, behind --explain and NOT in the default run: AC1 requires this gate's
   # ordinary output to stay byte-identical to its pre-change run, so an unconditional new line would
   # fail the very criterion it was added to serve. The resolution is fully visible here instead.
-  echo "review-join: --explain — predicate at $JOINJS over the views of $HOOK, population under $POP_SAYS"
+  echo "review-join: --explain — predicate at $JOINJS over the views of $HERE/script-views.js, population under $POP_SAYS"
   echo "review-join: --explain — the population, and why each file is or is not judged:"
   printf '%s\n' "$arm2" | sed -n 's/^EXPLAIN /    /p'
 fi

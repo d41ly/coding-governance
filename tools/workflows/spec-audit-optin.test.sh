@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # spec-audit-optin.test.sh — the review kit's spec-audit opt-in pack, spec-audit-optin.js, which holds
-# rule 0 of the agent-cap hook whole since TOOL-dFairHearing-16. Every arm from the rule-0 section on
-# came from <prefix>/hooks/agent-cap.test.sh with the rule, keeping its label, its payload and its
+# rule 0 of the agent limit hook whole since TOOL-dFairHearing-16. Every arm from the rule-0 section on
+# came from that hook's suite with the rule, keeping its label, its payload and its
 # verdict: the pack is a PreToolUse hook of its own, so it is judged exactly as the hook was, by its
 # stdin and its exit code, and `HOOK` below names it. The arms after them are the pack's own: a copy
 # with no hooks kit beside it, whose readers it cannot load.
@@ -580,7 +580,7 @@ rm -rf "$SAOTH"
 printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
 
 # ---- the pack's own: a reader it cannot load (TOOL-dFairHearing-16 AC6) ----------------------------
-# The pack reads agent-cap.js's `extractWorkflowArgs` and scratch-guard.js's `readFrontMatterKey`, from
+# The pack reads scratch-guard.js's `extractWorkflowArgs` and `readFrontMatterKey` (TOOL-dBoundRoles-25), from
 # the directory its inline `resolveKitDir` finds the hooks kit in. A copy finding no hooks kit cannot place
 # a call, so one whose args may be a spec audit is DENIED naming the three places looked, and any other
 # call is admitted: a missing reader must not turn the one call the rule refuses into an admission.
@@ -595,30 +595,30 @@ check_copy() { # name expected_exit needle(empty for an allow) json
   else echo "FAIL $1 (exit $got, want $2${3:+, stderr carrying '$3'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 }
 SAQ="{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
-check_copy "no hooks kit beside the pack: a spec-audit call is denied, naming agent-cap.js" 2 'agent-cap.js' "$SAQ"
+check_copy "no hooks kit beside the pack: a spec-audit call is denied, naming scratch-guard.js" 2 'scratch-guard.js' "$SAQ"
 check_copy "no hooks kit beside the pack: a harness call carrying specAudit is denied too" 2 'looked in' \
   "{\"tool_name\":\"Workflow\",\"tool_input\":{\"scriptPath\":\"$GOOD\",\"args\":\"{\\\"repo\\\":\\\"$SAJ\\\",\\\"slug\\\":\\\"tSA\\\",\\\"specAudit\\\":\\\"2026-10-05\\\"}\"}}"
 check_copy "no hooks kit beside the pack: a diff review is admitted" 0 "" \
   "{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"diff-review\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
-# ...and with agent-cap.js beside it but no scratch-guard.js, the reader it names is the missing one.
-HK_DIR=$(resolve_kit_dir "$TESTPY" hooks agent-cap.js "$HERE") || { echo "FAIL no hooks kit resolves beside this kit, so the last arm has no agent-cap.js to copy"; fail=$((fail+1)); }
-mkdir -p "$Q/${HK_DIR##*/}"; cp "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$HK_DIR/agent-cap.js" "$Q/${HK_DIR##*/}/"
-check_copy "agent-cap.js beside the pack and no scratch-guard.js: denied, naming scratch-guard.js" 2 'scratch-guard.js' "$SAQ"
+# ...and with a scratch-guard.js beside it that exports no args reader, the reader it names is the missing one.
+HK_DIR=$(resolve_kit_dir "$TESTPY" hooks scratch-guard.js "$HERE") || { echo "FAIL no hooks kit resolves beside this kit, so the last arm has no scratch-guard.js to copy"; fail=$((fail+1)); }
+mkdir -p "$Q/${HK_DIR##*/}"
+printf 'module.exports = { readFrontMatterKey: () => null, readConfKey: () => null }\n' > "$Q/${HK_DIR##*/}/scratch-guard.js"
+check_copy "a scratch-guard.js beside the pack exporting no args reader: denied, naming extractWorkflowArgs" 2 'extractWorkflowArgs' "$SAQ"
 # TOOL-dFairHearing-43 AC4: a receipt homes the hooks kit in a directory not named after it, so the pack
-# finds it by agent-cap's rule and admits the dated opt-in; with the rows naming no file and no hooks kit
+# finds it by the hooks kit's rule and admits the dated opt-in; with the rows naming no file and no hooks kit
 # beside the copy, it denies naming the receipt it read. RED against the pack at unit 40, whose hard-coded
 # sibling path denies the first call with `could not be loaded`.
 RH="$TMP/rh"; RHJ="$NODEDIR/rh"
 mkdir -p "$RH/.git" "$RH/.governance" "$RH/$WFK" "$RH/x/hk" "$RH/memory/builds/tSA/reviews"
 cp "$HOOK" "$RH/$WFK/"
 QPACK="$RH/$WFK/spec-audit-optin.js"
-cp "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$HK_DIR/agent-cap.js" \
-   "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$HK_DIR/scratch-guard.js" "$RH/x/hk/"
+cp "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$HK_DIR/scratch-guard.js" "$RH/x/hk/"
 printf -- '---\nslug: tSA\nspec-audit: 2026-09-20\n---\n' > "$RH/memory/builds/tSA/README.md"
 RHQ="{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$RHJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
-printf '{"files": [{"source": "t/%s/agent-cap.js", "path": "x/hk/agent-cap.js"}]}\n' "${HK_DIR##*/}" > "$RH/.governance/install.json"
+printf '{"files": [{"source": "t/%s/scratch-guard.js", "path": "x/hk/scratch-guard.js"}]}\n' "${HK_DIR##*/}" > "$RH/.governance/install.json"
 check_copy "FH43 AC4 a receipt homes the hooks kit outside a sibling directory: the dated opt-in is admitted" 0 "" "$RHQ"
-printf '{"files": [{"source": "t/%s/agent-cap.js", "path": "y/agent-cap.js"}]}\n' "${HK_DIR##*/}" > "$RH/.governance/install.json"
+printf '{"files": [{"source": "t/%s/scratch-guard.js", "path": "y/scratch-guard.js"}]}\n' "${HK_DIR##*/}" > "$RH/.governance/install.json"
 rm -rf "$RH/x"
 check_copy "FH43 AC4 the receipt's row names no file and no hooks kit is beside the copy: denied, naming the receipt" 2 '.governance/install.json' "$RHQ"
 

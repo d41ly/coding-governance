@@ -269,7 +269,7 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 _rkd_py=$(resolve_python) || { echo "check-hook-destinations.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
-HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
+HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks scratch-guard.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
 MEMORY_RECALL_DIR=$(resolve_kit_dir "$_rkd_py" memory-recall extract.py "$HERE") || exit 2
 MEMORY_RECALL="${MEMORY_RECALL_DIR##*/}"
@@ -365,7 +365,7 @@ b=$(cd "$d" && bash "${KP}check-hook-destinations.sh" >/dev/null 2>&1; echo $?)
 # and an unshipped one reds — the memory-recall fragment is that shape in the shipped tree.
 scratch
 mkdir -p "$d/${KP}nohome"
-printf '{"name": "orphan", "event": "E", "matcher": "M", "marker": "agent-cap.js", "hook_path": "{here}/agent-cap.js"}\n' \
+printf '{"name": "orphan", "event": "E", "matcher": "M", "marker": "scratch-guard.js", "hook_path": "{here}/scratch-guard.js"}\n' \
   > "$d/${KP}nohome/orphan.fragment.json"
 ( cd "$d" && git add -A && git commit -q -m orphan --no-verify ) >/dev/null 2>&1
 out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
@@ -375,7 +375,7 @@ case "$out" in *"orphan.fragment.json"*"'${KP}nohome' is the home of NO descript
   ok "and the refusal names the directory" ;;
   *) bad "the refusal does not name the directory: $(printf '%s' "$out" | grep orphan | head -2)" ;; esac
 scratch
-printf '{"name": "dirkit", "event": "E", "matcher": "M", "marker": "agent-cap.js", "hook_path": "{here}/agent-cap.js"}\n' \
+printf '{"name": "dirkit", "event": "E", "matcher": "M", "marker": "scratch-guard.js", "hook_path": "{here}/scratch-guard.js"}\n' \
   > "$d/$HOOKS_DIR/dirkit.fragment.json"
 ( cd "$d" && git add -A && git commit -q -m dirkit --no-verify ) >/dev/null 2>&1
 out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?

@@ -11,7 +11,6 @@ stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
 
 [claims]
 gate-legs = [
-  "agent-cap self-test",
   "scratch-guard self-test",
   "format-guard self-test",
   "verifier fan-out",
@@ -24,7 +23,7 @@ gate-legs = [
 ]
 kits = ["hooks"]
 git-hooks = []
-harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js", "SubagentStart tools/hooks/scratch-guard.js", "Stop tools/hooks/format-guard.js"]
+harness-hooks = ["PreToolUse tools/hooks/scratch-guard.js", "SubagentStart tools/hooks/scratch-guard.js", "Stop tools/hooks/format-guard.js"]
 workflow-scripts = ["check-verifier-fanout.js"]
 skill-engines = []
 rendered-skills = []
@@ -43,7 +42,6 @@ lexicon-verbs = []
 [paths]
 globs = [
   "tools/hooks/*",
-  ".claude/hooks/agent-cap.js",
   ".claude/hooks/scratch-guard.js",
   "tools/check-agent-cap-restatement.sh",
   "tools/check-agent-cap-restatement.test.sh",
@@ -61,7 +59,7 @@ globs = [
 
 **The rule is the charter's, not this kit's.** `memory/guides/REVIEW-PROTOCOL.md` is BINDING and states
 two bounds: a review's verify stage spawns at most a stated TOTAL, and all fan-out runs at most a
-stated number at once. Both are resolved by `tools/hooks/agent-cap.js` rather than written in the
+stated number at once. Both are resolved by `tools/workflows/script-views.js` and the policy kit rather than written in the
 document, so neither goes stale when a repo declares its own.
 The document and the predicate are one feature for that reason — a rule enforced by a predicate that
 disagrees with it is worse than no predicate.
@@ -100,7 +98,7 @@ denies — the burden is the fan-out's. A spawn whose token cannot be CREATED de
 whose token directory cannot be RESOLVED at all fails OPEN and silently, because a hook that denies
 every spawn on a filesystem hiccup is worse than the burst it prevents.
 
-**The home holds TWO guards, sharing only their shape.** `agent-cap.js` bounds review fan-out and
+**The home held TWO guards, sharing only their shape, until TOOL-dBoundRoles-25 moved the first into the roles kit's `spawn-guard.js`.** The agent limit hook bounded review fan-out and
 reads a Workflow script statically; `scratch-guard.js` bounds where agent scratch may be written
 and reads a shell command string. Both deny by stderr plus exit 2, both fail OPEN on stdin
 they cannot parse, and both are matched on a `|`-joined pair of exact tool names because a guard
@@ -145,7 +143,7 @@ one is not, because the merger re-matches a marker only within one event's group
 what the gate refuses, capped at `ROUTE_CONTEXT_CAP` characters. It states facts and never
 directs, prints nothing where the gate admits everything, and never blocks.
 
-**One rule in `agent-cap.js` is not a fan-out bound and reads the payload's ARGS, not the script**
+**One rule in the spawn guard is not a fan-out bound and reads the payload's ARGS, not the script**
 (`TOOL-aBlindedTrial-4`, for the ruling `TOOL-aBlindedTrial-6`). A `Workflow` call whose
 structured `args` carry `kind: "spec-audit"` is denied unless the build README at
 `<args.repo>/<parent of args.reviewDir>/README.md` declares `spec-audit: <YYYY-MM-DD>` in its front
@@ -168,7 +166,7 @@ hooks.** It returns the single-token value of a key between the opening `---` an
 It takes bytes, not a path: the staged-blob caller has no file to name. One reader keeps F10 one answer for both keys.
 
 **`readConfKey` in the same file is the ONE shell-grammar conf reader.** The write gate reads
-`MEMORY_ROOT`, `ROUTED_PATHS` and `SPEC_TIER1_CUTOFF` through it, and `agent-cap.js`'s
+`MEMORY_ROOT`, `ROUTED_PATHS` and `SPEC_TIER1_CUTOFF` through it, and the agent limit hook's
 `readSpecAuditDefault` delegates to it (`TOOL-aRoutedQuill-2` S9): last assignment wins, the key is
 compared as a string.
 
@@ -179,7 +177,7 @@ and the settings file looks correct either way. `check-hook-destinations.sh` qua
 both populations, fragments AND the adopter scripts that write hook commands, because a kit
 that installs its hook from a script rather than a fragment is otherwise ungraded.
 
-`topLevelArgs` in `tools/hooks/agent-cap.js` is the ONE splitter: it splits on top-level commas and
+`topLevelArgs` in `tools/workflows/check-verifier-fanout.js` is the ONE splitter: it splits on top-level commas and
 drops a trailing empty segment. Both the call-site argument walk and the array-literal element counter
 call it, which keeps "what is an element" a single answer against the
 `trailing-comma-counted-as-an-element` class.
@@ -189,14 +187,14 @@ argument and the default parameter. Adding a consumer means adding a call site, 
 resolver.
 
 `tools/workflows/check-verifier-fanout.sh` DELEGATES to the hook rather than re-implementing it: it
-builds a payload and feeds each committed harness through `tools/hooks/agent-cap.js`. One predicate,
+builds a payload and feeds each committed harness through `tools/workflows/check-verifier-fanout.js`. One predicate,
 two entry points. Its one native rule, which the hook lacks: each literal marked `gov:lens-slots`
 holds exactly five slots (`measureSlots`).
 
 `tools/settings-merge.py` owns the wiring fragment (event, matcher, marker, hook path, plus the
 optional interpreter and args from `TOOL-aReplayedCard-2`) and
 `tools/check-wiring.sh` joins on it, asserting the matcher VALUE rather than merely that the file
-mentions `agent-cap.js`. The merger re-matches an entry it finds under the wrong matcher, and both
+mentions `spawn-guard.js`. The merger re-matches an entry it finds under the wrong matcher, and both
 readers expand a fragment's `{kit}` or `{here}` token identically — `check-hook-destinations.sh`
 asks each through `--resolve-fragment` and refuses when they disagree.
 

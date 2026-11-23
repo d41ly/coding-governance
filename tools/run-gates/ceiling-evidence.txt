@@ -32,7 +32,7 @@
 # <leg>	<max seconds>	<readings>	<node>	<date>	<source>
 agent-cap restatement	27.0	1	a	2026-09-06	runner
 agent-cap restatement self-test	115.4	2	a	2026-09-24	runner
-agent-cap self-test	700.8	2	a	2026-09-24	runner
+spawn-guard self-test	700.8	2	a	2026-09-24	runner
 branch-guard self-test	28.6	2	a	2026-09-24	runner
 brief-recorded	403.5	2	a	2026-09-24	runner
 build README slot contract	1.6	1	a	2026-11-13	runner

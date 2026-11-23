@@ -639,7 +639,7 @@ def write_hand_plant(clone, kit_rel, case):
         text = render_row_after(read_text_exact(p), "key", '[[key]]\nname = "fixture.hand"\nallowed = ["a", "b"]\n'
                                 'default = "a"\nsummary = "A hand knob."\nusage = \'fixture.hand = "b"\'\n')
     elif case == "hook-hand":
-        home = resolve_kit_dir("hooks", "agent-cap.js", here)
+        home = resolve_kit_dir("hooks", "scratch-guard.js", here)
         p = home / "fixture-hand.fragment.json"
         text = json.dumps({"name": "fixture-hand", "event": "Stop", "matcher": "*", "marker": "fixture-hand.js",
                            "hook_path": "{kit}/%s/fixture-hand.js" % home.relative_to(here.parent).as_posix()},
@@ -685,7 +685,7 @@ def run_fixture(case, base, kit_rel):
     if case == "factory-restores-create":  # TOOL-dDeclaredLoop-56 S37: a gate red before the factory writes
         write_hand_plant(clone, kit_rel, "hook-hand")
         run_fixture_git(clone, "commit", "-q", "--no-verify", "-m", "a hand fragment the hook gate refuses")
-        home = resolve_kit_dir("hooks", "agent-cap.js", clone / kit_rel)
+        home = resolve_kit_dir("hooks", "scratch-guard.js", clone / kit_rel)
         created = [home / "fixture-hook.js", home / "fixture-hook.fragment.json"]
     rc, lines = run_core_new(clone, kit_rel, NEW_ARGV[case])
     for line in lines:

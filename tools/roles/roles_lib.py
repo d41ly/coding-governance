@@ -168,7 +168,7 @@ WORK_ORDER_TASK_RE = re.compile(r"^## Task$", re.M)
 #: grammar, `handoff.py#derive_prompt_name`'s, its door, its required parts in order (the marker with `item=`, the
 #: two sections and the five blocks of an item's task) and its readers, on the one line a grep of its name prints.
 #: dTotalRecall's registry reads it when it lands.
-WORK_ORDER_KIND = {"kind": "work-order", "tag": "record-kind.work-order", "folder": "<MEMORY_ROOT>/builds/<slug>/prompts/", "name": "<date>-prompt-<unit id>-<n>-<role without gov-><tail>.md", "door": "handoff.py render --item", "parts": ("<!-- gov:handoff ... item=<tag> ... -->", "## Role", "## Task", "### item", "### inputs", "### allowance", "### return", "### witness"), "readers": ("handoff.py#check_handoff", "agent-cap.js rule 6", "check_roles.py R16")}
+WORK_ORDER_KIND = {"kind": "work-order", "tag": "record-kind.work-order", "folder": "<MEMORY_ROOT>/builds/<slug>/prompts/", "name": "<date>-prompt-<unit id>-<n>-<role without gov-><tail>.md", "door": "handoff.py render --item", "parts": ("<!-- gov:handoff ... item=<tag> ... -->", "## Role", "## Task", "### item", "### inputs", "### allowance", "### return", "### witness"), "readers": ("handoff.py#check_handoff", "spawn-guard.js rule 6", "check_roles.py R16")}
 #: The five blocks an item's work order carries at the end of `## Task`, in order: the kind's parts after the
 #: marker and the two sections, so `render_handoff` writes and `check_handoff` reads one list.
 WORK_ORDER_BLOCKS = WORK_ORDER_KIND["parts"][3:]

@@ -69,16 +69,18 @@ machines/sessions on the same repo.
   identifier collisions, and BOM-less scripts containing non-ASCII that PowerShell 5.1 decodes as
   CP1252. Two lines to adopt, on no gate leg of the kit's own, `--selftest` included. See
   `tools/gate-lint/README.md`.
-- **`tools/hooks/agent-cap.js`** — a `PreToolUse` guard on `Workflow|Agent`. How many agents run at
+- **`tools/roles/spawn-guard.js`** — the roles kit's `PreToolUse` guard on `Workflow|Agent` (TOOL-dBoundRoles-25,
+  which retired the hooks kit's agent limit hook into it): every agent prompt a rendered handoff, every declared
+  harness run at its blob at the landed revision, the effort level, and the settings in force. How many agents run at
   once is the policy key `runtime.agents-in-flight`, which `tools/policy/policy.py settings --write`
   renders into the harness's own two concurrency settings in `.claude/settings.json`; the harness
   enforces them, and the guard refuses any call whose checkout's settings are absent or above the
   landed limit. It enforces the second rule itself: a review's verify stage spawns at most
-  `MAX_VERIFIERS` agents TOTAL, a FILE CONSTANT inside `tools/hooks/agent-cap.js`, which ships
-  deployed verbatim, read from a `Workflow` call's script, so a wide verify fan can't trip the
-  server rate limiter. Since TOOL-dGroundRules-10 it counts no direct spawns and bans no raw `parallel(`, and an
+  `MAX_VERIFIERS` agents TOTAL, a FILE CONSTANT inside the review kit's `tools/workflows/script-views.js`,
+  which ships deployed verbatim and which the merge bar's fan-out gate reads over every committed harness,
+  so a wide verify fan can't trip the server rate limiter. Since TOOL-dGroundRules-10 it counts no direct spawns and bans no raw `parallel(`, and an
   environment variable sets neither number (`help/agent-limit.md`).
-  Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/hooks/agent-cap.test.sh`.
+  Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/roles/spawn-guard.test.sh`.
   Operationalizes the charter's `[bound]` practice; the binding text is
   `memory/guides/REVIEW-PROTOCOL.md`.
 - **`tools/codebase-map/`** — an opt-in kit for a **self-verifying codebase map**: per-feature dossiers

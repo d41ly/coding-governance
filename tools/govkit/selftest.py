@@ -113,7 +113,7 @@ def resolve_kit_dir(home, anchor, here):
     raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
-KIT_DIRS = {home: resolve_kit_dir(home, anchor, HERE) for home, anchor in (("codebase-map", "map_lib.py"), ("drift-audit", "drift_report.py"), ("hooks", "agent-cap.js"), ("lexicon", "lexicon.py"), ("memory-recall", "extract.py"), ("memory-tree", "gotchas.py"), ("playbook", "render_playbook.py"), ("policy", "policy.py"), ("process-monitor", "procmon-hook.js"), ("pytest-parallel-guardrails", "crashprobe.py"), ("roles", "roles_lib.py"), ("run-gates", "run-gates.sh"), ("runlog", "runlog.py"), ("unattended", "unattended.sh"), ("workflows", "tier2-review.js"))}
+KIT_DIRS = {home: resolve_kit_dir(home, anchor, HERE) for home, anchor in (("codebase-map", "map_lib.py"), ("drift-audit", "drift_report.py"), ("hooks", "scratch-guard.js"), ("lexicon", "lexicon.py"), ("memory-recall", "extract.py"), ("memory-tree", "gotchas.py"), ("playbook", "render_playbook.py"), ("policy", "policy.py"), ("process-monitor", "procmon-hook.js"), ("pytest-parallel-guardrails", "crashprobe.py"), ("roles", "roles_lib.py"), ("run-gates", "run-gates.sh"), ("runlog", "runlog.py"), ("unattended", "unattended.sh"), ("workflows", "tier2-review.js"))}
 KIT_DIRS["govkit"] = HERE
 KIT_NAMES = {home: d.name for home, d in KIT_DIRS.items()}
 
@@ -4550,6 +4550,125 @@ def check_house_step(tmp: pathlib.Path) -> None:
           up.returncode == 2 and tag in up.stderr and read_tree(t) == before, up.stdout + up.stderr)
 
 
+def check_spawn_guard_step(tmp: pathlib.Path) -> None:
+    """TOOL-dBoundRoles-25 AC11 AC12 AC13, the `spawn-step-` cases — `steps/spawn_guard_pack.py`'s up, down and
+    witness argvs over scratch targets, each run under `-I` as the runner runs it, and the target's own
+    `settings-merge.py` run with no `--fragment`. A target holds a copy of gov's settings-merge.py at the install
+    prefix, the roles kit's pack and fragment at that kit's home under it, a stub of the retired hook at the hooks
+    kit's home, and settings wiring the stub beside a foreign command. A killed up is the target's merger made to
+    exit on its first `--unwire` of the real settings file, after its wire call ran: both commands stay wired, and
+    a re-run with the merger restored converges on the before-image's after-state. An edit after the up refuses
+    the down naming the file. Then the up's refusals each write nothing: settings that do not parse, and a target
+    holding no settings-merge.py. The failing case, owed at the close: an up that unwires before it wires, whose
+    killed up leaves no command wired and reds the killed-up row. WHAT IT DOES NOT CHECK: the hook path a receipt
+    records, which a target without a receipt reads as the bare file name `check_ours` joins on."""
+    step_py = HERE / "steps" / "spawn_guard_pack.py"
+    merger_src = HERE.parent / "settings-merge.py"
+    rk, hk = KIT_NAMES["roles"], KIT_NAMES["hooks"]
+    old = "agent-cap" + ".js"   # the retired hook's file name, spelled from parts as a fixture key is
+    pack = "spawn-guard.js"
+    frag = "spawn-guard.fragment.json"
+    sj = pathlib.PurePosixPath(".claude", "settings.json").as_posix()
+
+    def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t), PFX.rstrip("/")],
+                              capture_output=True, text=True, encoding="utf-8", errors="replace")
+
+    def read_wired(t: pathlib.Path) -> list[str]:
+        doc = json.loads((t / sj).read_text(encoding="utf-8"))
+        return [h.get("command", "") for gs in doc.get("hooks", {}).values() for g in gs for h in g.get("hooks", [])]
+
+    def build_wired(name: str, roles: bool = True, merger: bool = True, settings: str | None = None) -> pathlib.Path:
+        cmd = 'node "${CLAUDE_PROJECT_DIR}/%s%s/%s"' % (PFX, hk, old)
+        body = settings if settings is not None else json.dumps({"model": "x", "hooks": {"PreToolUse": [
+            {"matcher": "Workflow|Agent", "hooks": [{"type": "command", "command": cmd},
+                                                     {"type": "command", "command": "node other.js"}]}]}}, indent=2) + "\n"
+        files = {sj: body, f"{PFX}{hk}/{old}": "// the retired hook\n"}
+        if merger:
+            files[f"{PFX}settings-merge.py"] = merger_src.read_bytes()
+        if roles:
+            files[f"{PFX}{rk}/{pack}"] = (KIT_DIRS["roles"] / pack).read_bytes()
+            files[f"{PFX}{rk}/{frag}"] = (KIT_DIRS["roles"] / frag).read_bytes()
+        return build_target(tmp / name, None, files=files)
+
+    # ---- AC12: the up wires the pack and unwires the old command; the witness moves from 1 to 0.
+    t = build_wired("sg-ac12")
+    before = (t / sj).read_bytes()
+    w0, up = run_step("witness", t), run_step("up", t)
+    w1 = run_step("witness", t)
+    wired = read_wired(t)
+    check("spawn-step-AC12 LIVENESS the witness exits 1 over settings wiring the retired hook",
+          w0.returncode == 1, w0.stdout + w0.stderr)
+    check("spawn-step-AC12 the up wires %s, keeps the foreign command and wires no %s, and the witness exits 0"
+          % (pack, old), up.returncode == 0 and w1.returncode == 0 and any(pack in c for c in wired)
+          and "node other.js" in wired and not any(old in c for c in wired), up.stdout + up.stderr + str(wired))
+    # ---- AC13: the down restores the file byte-identical; an edit after the up refuses it, naming the file.
+    down = run_step("down", t)
+    check("spawn-step-AC13 the down after the up leaves %s byte-identical to the before state" % sj,
+          down.returncode == 0 and (t / sj).read_bytes() == before, down.stdout + down.stderr)
+    up = run_step("up", t)
+    (t / sj).write_bytes((t / sj).read_bytes() + b" ")
+    edited = (t / sj).read_bytes()
+    down = run_step("down", t)
+    check("spawn-step-AC13 an edit after the up refuses the down, exit 1 naming %s, and the edit stays" % sj,
+          up.returncode == 0 and down.returncode == 1 and sj in down.stderr and (t / sj).read_bytes() == edited,
+          up.stdout + down.stdout + down.stderr)
+
+    # ---- AC12: an up killed after its wire call leaves both commands wired, and a re-run converges.
+    t = build_wired("sg-kill")
+    real = t / PFX / "settings-merge.py"
+    (t / PFX / "real-settings-merge.py").write_bytes(real.read_bytes())
+    real.write_text("import pathlib, runpy, sys\n"
+                    "if '--unwire' in sys.argv and sys.argv[1].replace('\\\\', '/').endswith('.claude/settings.json'):\n"
+                    "    sys.exit(9)  # killed after the wire call, before the unwire\n"
+                    "sys.argv[0] = str(pathlib.Path(__file__).with_name('real-settings-merge.py'))\n"
+                    "runpy.run_path(sys.argv[0], run_name='__main__')\n", encoding="utf-8", newline="\n")
+    up = run_step("up", t)
+    wired = read_wired(t)
+    check("spawn-step-AC12 an up killed after its wire call leaves both %s and %s wired, never neither" % (pack, old),
+          up.returncode == 1 and any(pack in c for c in wired) and any(old in c for c in wired),
+          up.stdout + up.stderr + str(wired))
+    real.write_bytes((t / PFX / "real-settings-merge.py").read_bytes())
+    up = run_step("up", t)
+    w1 = run_step("witness", t)
+    check("spawn-step-AC12 ...and a re-run with the merger restored converges: the witness exits 0",
+          up.returncode == 0 and w1.returncode == 0, up.stdout + up.stderr + w1.stdout)
+
+    # ---- a target without the roles kit's pack only unwires; the witness then holds.
+    t = build_wired("sg-noroles", roles=False)
+    up, w1 = run_step("up", t), run_step("witness", t)
+    check("spawn-step- a target with no roles kit loses the old command and wires nothing in its place",
+          up.returncode == 0 and w1.returncode == 0 and not any(old in c or pack in c for c in read_wired(t)),
+          up.stdout + up.stderr)
+
+    # ---- the up's refusals write nothing: settings that do not parse, and no settings-merge.py in the target.
+    t = build_wired("sg-broken", settings='{"hooks": "%s"' % old)
+    pre = (t / sj).read_bytes()
+    up = run_step("up", t)
+    check("spawn-step- settings that do not parse refuse the up, exit 1 naming %s, nothing written" % sj,
+          up.returncode == 1 and sj in up.stderr and (t / sj).read_bytes() == pre
+          and not (t / ".governance" / "steps").exists(), up.stdout + up.stderr)
+    t = build_wired("sg-nomerger", merger=False)
+    pre = (t / sj).read_bytes()
+    up = run_step("up", t)
+    check("spawn-step- a target holding no settings-merge.py refuses the up, exit 1, nothing written",
+          up.returncode == 1 and "settings-merge.py" in up.stderr and (t / sj).read_bytes() == pre
+          and not (t / ".governance" / "steps").exists(), up.stdout + up.stderr)
+
+    # ---- AC11: settings-merge with no --fragment wires the pack's fragment where the roles kit is, exits 2 where not.
+    for name, roles, want in (("sg-sm-roles", True, 0), ("sg-sm-none", False, 2)):
+        t = build_target(tmp / name, None, files={f"{PFX}settings-merge.py": merger_src.read_bytes(), **(
+            {f"{PFX}{rk}/{pack}": (KIT_DIRS["roles"] / pack).read_bytes(),
+             f"{PFX}{rk}/{frag}": (KIT_DIRS["roles"] / frag).read_bytes()} if roles else {})})
+        p = subprocess.run([sys.executable, "-I", str(t / PFX / "settings-merge.py")], cwd=str(t),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+        got = read_wired(t) if (t / sj).is_file() else []
+        check("spawn-step-AC11 settings-merge with no --fragment %s" % (
+            "wires the command %s declares" % frag if roles else "exits 2 with no roles kit, wiring nothing"),
+            p.returncode == want and (got == ['node "${CLAUDE_PROJECT_DIR}/%s%s/%s"' % (PFX, rk, pack)] if roles
+                                      else not got), p.stdout + p.stderr + str(got))
+
+
 def check_kickoff_facts_step() -> None:
     """TOOL-dPlacedRequest-9 AC1 AC3 AC4 AC5 AC6 AC7 AC9, and the step's and the verb's refusals — the step's `--fixture --plant <case>` for every
     case it declares, each under `-I` as the runner runs a step, each in its own throwaway repository: an
@@ -7000,6 +7119,7 @@ def main() -> int:
         check_fanout_step(tmp / "dfs")
         check_reviewer_merge(tmp / "drm")
         check_house_step(tmp / "dhs")
+        check_spawn_guard_step(tmp / "dsg")
         check_kickoff_facts_step()
         check_review_rounds_step(tmp / "drr")
         check_inherited_red_step(tmp / "dir")
@@ -7321,8 +7441,8 @@ def main() -> int:
               "current" in p.stdout and "stale" not in p.stdout, p.stdout)
 
         # --- TOOL-dRedressedBar-9. A NARROW RECEIPT'S UPDATE GAINS settings-merge AND COMPLETES.
-        # --- The default set gained settings-merge since OLD and agent-cap is left out for its
-        # --- unmet `kickoff-manifest`, so the gained adopter exits 2 with no hook to wire. The
+        # --- The default set gained settings-merge since OLD and the roles kit is left out, so the
+        # --- gained adopter exits 2 with no spawn guard to wire (TOOL-dBoundRoles-25 §8 F4). The
         # --- descriptor declares that exit an accepted stop: the run exits 0, re-stamps and claims
         # --- the entry. A fixture of its own, sharing nothing with the arms above it witnesses. The
         # --- `means` is read from the descriptor's code-2 block rather than typed here, so the line
@@ -7368,42 +7488,44 @@ def main() -> int:
               " | ".join(ln for ln in p9pout if "can't open file" in ln))
 
         # --- TOOL-dRedressedBar-11. A HOOK ONLY THE RECEIPT LOCATES IS FOUND, SO ITS EXIT 2 FAILS.
-        # --- settings-merge.py finds agent-cap through the receipt before its two static homes, so
-        # --- with the hook at a renamed home and a malformed settings file it exits 2 on the PARSE,
-        # --- and a code-2 block reading the static homes alone accepted that as "no hook to wire"
-        # --- and swallowed the reason. Fixture A drives `apply`, fixture B the `update` that gains
-        # --- settings-merge with agent-cap at its per-kit prefix, and each must refuse on ONE
-        # --- problem line that carries the adopter's own `cannot read` (the line, never the whole
-        # --- output: four fragment lines in B carry it too). A-absent is the stop still accepted.
+        # --- settings-merge.py finds its default fragment, the roles kit's spawn guard since
+        # --- TOOL-dBoundRoles-25, through the receipt before its two static homes, so with the pack at a
+        # --- renamed home and a malformed settings file it exits 2 on the PARSE, and a code-2 block
+        # --- reading the static homes alone accepted that as "no hook to wire" and swallowed the
+        # --- reason. Fixture A drives `apply` and must refuse on ONE problem line that carries the
+        # --- adopter's own `cannot read`. A-absent is the stop still accepted. The `update` fixture
+        # --- that planted the hook at its OLD vintage retired with the hook: the pack has no OLD vintage.
         _rb11gk = govkit_module()
-        _rb11src = f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js"
+        _rb11rows = []
         _rb11a = build_target(tmp / "rq11a", DEPLOY_FULL)
         run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
         settle(_rb11a, "the first apply")
-        _rb11hk = idx_of(_rb11src)
         (_rb11a / "guard").mkdir()
-        (_rb11a / "guard" / "agent-cap.js").write_bytes(_rb11hk)
+        for _rb11f in ("spawn-guard.js", "spawn-guard.fragment.json"):
+            _rb11src = f"{PFX}{KIT_NAMES['roles']}/{_rb11f}"
+            _rb11hk = idx_of(_rb11src)
+            (_rb11a / "guard" / _rb11f).write_bytes(_rb11hk)
+            _rb11rows.append({"path": f"guard/{_rb11f}", "kit": "roles", "role": "engine", "source": _rb11src,
+                              "sha256": _rb11gk._sha(_rb11hk), "gov_oid": _rb11gk.blob_oid(_rb11hk)})
         _rb11rp = _rb11a / ".governance" / "install.json"
         _rb11rec = json.loads(_rb11rp.read_text(encoding="utf-8"))
-        _rb11rec["files"].append({"path": "guard/agent-cap.js", "kit": "agent-cap", "role": "engine",
-                                  "source": _rb11src, "sha256": _rb11gk._sha(_rb11hk),
-                                  "gov_oid": _rb11gk.blob_oid(_rb11hk)})
-        _rb11rec["kits"] = [*(_rb11rec.get("kits") or []), "agent-cap"]
+        _rb11rec["files"].extend(_rb11rows)
+        _rb11rec["kits"] = [*(_rb11rec.get("kits") or []), "roles"]
         _rb11rp.write_text(json.dumps(_rb11rec, indent=2) + "\n", encoding="utf-8", newline="\n")
         (_rb11a / ".claude").mkdir(exist_ok=True)
         (_rb11a / ".claude" / "settings.json").write_text("{", encoding="utf-8", newline="\n")
-        settle(_rb11a, "agent-cap at a home only the receipt records, and a malformed settings file")
+        settle(_rb11a, "the spawn guard at a home only the receipt records, and a malformed settings file")
         _rb11pa = run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
         # TOOL-dRedressedBar-12 AC2. THE REFUSAL HOLDS ON THE NEXT RUN. The refused apply still writes
         # its receipt, and a receipt written from the selection alone dropped the planted row, so a
         # third identical apply found the hook nowhere and accepted the stop. The row is compared
         # whole, as planted; the third run's problem line is graded by the loop below.
         settle(_rb11a, "the refused second apply")
-        _rb11plant = [f for f in _rb11rec["files"] if f.get("path") == "guard/agent-cap.js"]
+        _rb11plant = [f for f in _rb11rec["files"] if f.get("path", "").startswith("guard/")]
         _rb11kept = [f for f in json.loads(_rb11rp.read_text(encoding="utf-8"))["files"]
-                     if f.get("path") == "guard/agent-cap.js"]
-        check("[dRB-12] AC2 fixture A's refused apply leaves the planted agent-cap row in its receipt",
-              len(_rb11plant) == 1 and _rb11kept == _rb11plant,
+                     if f.get("path", "").startswith("guard/")]
+        check("[dRB-12] AC2 fixture A's refused apply leaves the planted spawn guard rows in its receipt",
+              len(_rb11plant) == 2 and _rb11kept == _rb11plant,
               f"planted {json.dumps(_rb11plant)} · kept {json.dumps(_rb11kept)}")
         _rb11pa3 = run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
         check("[dRB-12] AC2 a third identical apply over fixture A exits 1",
@@ -7414,66 +7536,16 @@ def main() -> int:
         settle(_rb11n, "the first apply")
         (_rb11n / ".claude").mkdir(exist_ok=True)
         (_rb11n / ".claude" / "settings.json").write_text("{", encoding="utf-8", newline="\n")
-        settle(_rb11n, "a malformed settings file, and no agent-cap anywhere")
+        settle(_rb11n, "a malformed settings file, and no spawn guard anywhere")
         _rb11pn = run("apply", "--target", str(_rb11n), "--kits", "settings-merge")
-        check("[dRB-11] with agent-cap absent everywhere, the apply exits 0 on the declared stop",
+        check("[dRB-11] with the spawn guard absent everywhere, the apply exits 0 on the declared stop",
               _rb11pn.returncode == 0 and len(means9) == 1
               and f"CONFIGURE settings-merge: adopter exit 2 — {means9[0]} [accepted stop]"
               in _rb11pn.stdout,
               f"rc {_rb11pn.returncode} · code-2 means {means9} · {_rb11pn.stdout[-900:]}")
 
-        # [dRB-11] fixture B: begin
-        # B's hook row is an OLDER INSTALL: its bytes and both identities at OLD, as the receipt's.
-        # The row carries the source `resolve_entry` gives agent-cap's hook in B's own context, and
-        # `write_vintage_receipt` writes that source's bytes at OLD and sets its `commit`, `sha256`
-        # and `gov_oid`, so this block never derives an identity itself (TOOL-dRedressedBar-13). The
-        # helper re-sets the rows `stale_target` already rewound to the same values. The two
-        # identity checks either side of that call are TOOL-dRedressedBar-17's S3: the row is
-        # appended bare, and the helper is what gives it all three keys. The claim carries
-        # kickoff-manifest because agent-cap requires it, and `update` now refuses a claim that
-        # leaves it unmet (TOOL-dDeclaredLoop-57) before the settings-merge adopter runs.
-        _rb11b = stale_target("rq11b", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n',
-                              kits="check-wiring,kickoff-manifest")
-        _rb11dest = f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"
-        _rb11d = _rb11gk.read_descriptors(govroot, _rb11gk.load_toml(
-            govroot / PFX / KIT_NAMES["govkit"] / "registry.toml"), _rb11gk.Report())["agent-cap"][0]
-        _rb11w = _rb11gk.resolve_entry(govroot, _rb11d, _rb11gk.target_context(
-            _rb11b, _rb11gk.load_toml(_rb11b / ".governance" / "deploy.toml"), "agent-cap",
-            _rb11d))["writes"]
-        (_rb11b / _rb11dest).parent.mkdir(parents=True, exist_ok=True)
-        _rb11rp = _rb11b / ".governance" / "install.json"
-        _rb11rec = json.loads(_rb11rp.read_text(encoding="utf-8"))
-        _rb11rec["files"].append({"path": _rb11dest, "kit": "agent-cap", "role": "engine",
-                                  "source": (_rb11w.get(_rb11dest) or {}).get("src")})
-        _rb11rec["kits"] = [*(_rb11rec.get("kits") or []), "agent-cap"]
-        _rb11rp.write_text(json.dumps(_rb11rec, indent=2) + "\n", encoding="utf-8", newline="\n")
-        _rb11ids = ("commit", "sha256", "gov_oid")
-        _rb11pre = [f for f in json.loads(_rb11rp.read_text(encoding="utf-8"))["files"]
-                    if f.get("path") == _rb11dest]
-        check("[dRB-11] fixture B's appended agent-cap row carries none of commit, sha256 and "
-              "gov_oid before the vintage helper runs",
-              len(_rb11pre) == 1 and not any(k in _rb11pre[0] for k in _rb11ids),
-              json.dumps(_rb11pre))
-        write_vintage_receipt(govroot, _rb11b, OLD)
-        _rb11row = [f for f in json.loads(_rb11rp.read_text(encoding="utf-8"))["files"]
-                    if f.get("path") == _rb11dest]
-        check("[dRB-11] ...and all three after it, so the helper is what gave the row its identity",
-              len(_rb11row) == 1 and all(_rb11row[0].get(k) for k in _rb11ids),
-              json.dumps(_rb11row))
-        check("[dRB-11] LIVENESS gov shipped the hook at OLD, so fixture B's row is an older install",
-              len(_rb11row) == 1 and _rb11row[0].get("commit") == OLD and (_rb11b / _rb11dest).is_file(),
-              f"{_rb11dest} at {OLD[:8]}: {json.dumps(_rb11row)}")
-        (_rb11b / ".claude").mkdir(exist_ok=True)
-        (_rb11b / ".claude" / "settings.json").write_text("{", encoding="utf-8", newline="\n")
-        settle(_rb11b, "agent-cap at its per-kit prefix at OLD, and a malformed settings file")
-        _rb11pb = run("update", "--target", str(_rb11b), "--write")
-        check("[dRB-11] update over fixture B leaves the receipt's gov_commit where it was",
-              json.loads(_rb11rp.read_text(encoding="utf-8"))["gov_commit"] == _rb11rec["gov_commit"],
-              _rb11rp.read_text(encoding="utf-8")[:300])
-        # [dRB-11] fixture B: end
         for _rb11tag, _rb11p in (("apply over fixture A", _rb11pa),
-                                 ("a third identical apply over fixture A", _rb11pa3),
-                                 ("update over fixture B", _rb11pb)):
+                                 ("a third identical apply over fixture A", _rb11pa3)):
             _rb11out = _rb11p.stdout.splitlines() + _rb11p.stderr.splitlines()
             _rb11sm = [ln for ln in _rb11out if ln.startswith("govkit: kit 'settings-merge'")]
             check(f"[dRB-11] {_rb11tag} exits non-zero", _rb11p.returncode != 0,
@@ -7632,19 +7704,21 @@ def main() -> int:
               _rb23gl[:900] or "no .governance/outbox/gate-legs.md")
 
         # --- TOOL-dRedressedBar-14. A FIRST APPLY AT A PER-KIT PREFIX CONFIGURES AGAINST THE HOMES IT
-        # --- JUST WROTE. settings-merge.py finds agent-cap's hook through the receipt, and `apply`
-        # --- wrote the receipt only at its last step, so on a first apply with `[kit.agent-cap]
-        # --- prefix = "scripts"` the adopter probed the two static homes alone, exited 2 for want of
-        # --- the hook, and the stop was accepted with the hook unwired. The receipt is now written
-        # --- ahead of CONFIGURE. Each fact is read on the line it names, and no exit code is
-        # --- asserted: the run's exit belongs to agent-cap's own argv (spec 14 §8 F1, unit 15).
-        _rb14 = build_target(tmp / "rq14", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n')
+        # --- JUST WROTE. settings-merge.py finds its default fragment's kit through the receipt, and
+        # --- `apply` wrote the receipt only at its last step, so on a first apply at a per-kit prefix
+        # --- the adopter probed the two static homes alone, exited 2 for want of the hook, and the stop
+        # --- was accepted with the hook unwired. The receipt is now written ahead of CONFIGURE. Since
+        # --- TOOL-dBoundRoles-25 the hook is the roles kit's spawn guard, so the per-kit prefix is the
+        # --- roles kit's, `[kit.roles] prefix = "scripts"`, and the apply carries that kit's requires.
+        # --- Each fact is read on the line it names, and no exit code is asserted: the run's exit
+        # --- belongs to agent-cap's own argv (spec 14 §8 F1, unit 15).
+        _rb14 = build_target(tmp / "rq14", DEPLOY_FULL + '\n[kit.roles]\nprefix = "scripts"\n')
         _rb14p = run("apply", "--target", str(_rb14), "--kits",
-                     "agent-cap,settings-merge,kickoff-manifest")
+                     "roles,agent-cap,settings-merge,kickoff-manifest,memory-tree,loop,run-gates,policy")
         _rb14so = _rb14p.stdout.splitlines()
         _rb14out = _rb14so + _rb14p.stderr.splitlines()
-        _rb14dest = f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"
-        _rb14src = f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js"
+        _rb14dest = f"scripts/{KIT_NAMES['roles']}/spawn-guard.js"
+        _rb14src = f"{PFX}{KIT_NAMES['roles']}/spawn-guard.js"
         _rb14sm = [ln for ln in _rb14out if ln.startswith("govkit apply — CONFIGURE settings-merge:")]
         check("[dRB-14] AC1 exactly one CONFIGURE settings-merge line, and it ends `adopter exit 0`",
               len(_rb14sm) == 1 and _rb14sm[0].endswith("adopter exit 0"),
@@ -7659,7 +7733,7 @@ def main() -> int:
         _rb14rp = _rb14 / ".governance" / "install.json"
         _rb14rows = [f for f in (json.loads(_rb14rp.read_text(encoding="utf-8"))["files"]
                                  if _rb14rp.is_file() else []) if f.get("path") == _rb14dest]
-        check("[dRB-14] AC1 the receipt rows the hook at its per-kit prefix, sourced from gov's hook",
+        check("[dRB-14] AC1 the receipt rows the spawn guard at its per-kit prefix, sourced from gov's",
               any(f.get("source") == _rb14src for f in _rb14rows),
               f"{_rb14dest}: {json.dumps(_rb14rows)}")
         _rb14sp = _rb14 / ".claude" / "settings.json"
@@ -7685,7 +7759,7 @@ def main() -> int:
               f"differ {sorted(p for _h, p in _rb14sums ^ _rb14want)[:4]}")
 
         # --- TOOL-dRedressedBar-15. THE SAME APPLY, READ FOR AGENT-CAP'S OWN ADOPTER. Its argv was a
-        # --- copy of settings-merge's, resolved through `[kit.agent-cap]`, so it ran
+        # --- copy of settings-merge's, resolved through the entry's own prefix, so it ran
         # --- `scripts/settings-merge.py`, a file nothing installed there, and python exited 2.
         # --- `[adopt] via = "settings-merge"` runs settings-merge's argv at settings-merge's home.
         _rb15cfg = {k: [ln for ln in _rb14out if ln.startswith(f"govkit apply — CONFIGURE {k}:")]
@@ -10871,7 +10945,7 @@ user_skills = "/tmp/gk-fake-skills"
             # 28 -> 29, TOOL-dDerivedDocket-9 (27 -> 28 on its own side; the two added rows summed at
             # the reconcile): memory-tree withholds `transition-audit.test.sh` by the same `project-owned` include (its spec's S12: the suite grades gov's hooks).
             # 29 -> 31, TOOL-aRoutedQuill-5 S1: `agent-cap` joined the default selection, and it
-            # withholds `agent-cap.test.sh` and `scratch-guard.test.sh` by the same mechanism.
+            # withheld its suites by the same mechanism.
             # Measured by a default `plan` into a scratch target on 2026-10-10.
             # 31 -> 32 and seed 3 -> 13, TOOL-aOrientedCast-8 S1: `roles` joined the default
             # selection; it withholds `adopt-roles.test.sh` and seeds its ten house overlays.
@@ -12746,18 +12820,18 @@ user_skills = "/tmp/gk-fake-skills"
         #
         # The three arms below are one fixture read three ways, so the difference between them is the
         # only thing that can move: same base, same content, different needle source.
-        _f1 = [(f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js", f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"),
+        _f1 = [(f"{PFX}{KIT_NAMES['hooks']}/format-guard.js", f"scripts/{KIT_NAMES['hooks']}/format-guard.js"),
                (f"{PFX}{KIT_NAMES['hooks']}/scratch-guard.js", ".claude/hooks/scratch-guard.js")]
         _nf, _pf, _df = GK9.derive_carry_map(_f1)
         check("[-1] S1 a fanned gov directory is still DROPPED from the global map",
               [d[0] for d in _df] == [f"{PFX}hooks"] and not _nf,
               f"dropped={_df} needles={_nf}")
-        _rowf = {"source": f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js",
-                 "path": f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"}
+        _rowf = {"source": f"{PFX}{KIT_NAMES['hooks']}/format-guard.js",
+                 "path": f"scripts/{KIT_NAMES['hooks']}/format-guard.js"}
         _pf2 = GK9.resolve_row_needles(_nf, _rowf)
         check("[-1] S1 ...but the row's own overlay supplies the needle the map could not hold",
               _pf2.get(f"{PFX}hooks") == "scripts/hooks", repr(_pf2))
-        _base1 = f"# see {PFX}{KIT_NAMES['hooks']}/agent-cap.js for the rule".encode() + bytes([10])
+        _base1 = f"# see {PFX}{KIT_NAMES['hooks']}/format-guard.js for the rule".encode() + bytes([10])
         _ours1 = GK9.derive_carried(_base1, _pf2)
         check("[-1] S1 the rung is RELOCATE with the row's needles, where the map gave nothing",
               GK9.derive_carry_rung(_base1, _pf2, lambda: _ours1, known_equal=False) == "relocate"
@@ -17468,8 +17542,8 @@ user_skills = "/tmp/gk-fake-skills"
         # of 31 real NicoCares candidates as layout carriage.
         _k6GKC = govkit_module()
         # Class 4: the same line with a path rewritten, and nothing else.
-        _k6g4 = f"load('{PFX}{KIT_NAMES['hooks']}/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
-        _k6a4 = f"load('scripts/{KIT_NAMES['hooks']}/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
+        _k6g4 = f"load('{PFX}{KIT_NAMES['hooks']}/format-guard.js')" + chr(10) + "x = 1" + chr(10)
+        _k6a4 = f"load('scripts/{KIT_NAMES['hooks']}/format-guard.js')" + chr(10) + "x = 1" + chr(10)
         _k6c4, _k6w4 = _k6GKC.contrib_propose_class({"path": "a.js", "gov_path": "a.js"}, _k6g4, _k6a4, "nc")
         check("[-6] a change that is only a repath proposes class 4", _k6c4 == 4, f"{_k6c4}: {_k6w4}")
         # ...and the DESTINATION differing does NOT, on its own, make it class 4. This is the arm
@@ -18694,8 +18768,8 @@ user_skills = "/tmp/gk-fake-skills"
         _pvRENDERED = (_pvT_B.replace("{{TOOL_ROOT}}", "scripts/").replace("{{MEMORY_TREE_DIR}}", "scripts")
                        .replace("{{KIT_DIR}}", "scripts/workflows"))
         _pvPROTO_T = ("# Review protocol, installed under {{TOOL_ROOT}}\n\n## The hard cap\n\n"
-                      "The bound is what {{TOOL_ROOT}}hooks/agent-cap.js resolves.\n\n"
-                      "## Concurrency\n\nSo is this one: {{TOOL_ROOT}}hooks/agent-cap.js.\n")
+                      "The bound is what {{TOOL_ROOT}}hooks/format-guard.js resolves.\n\n"
+                      "## Concurrency\n\nSo is this one: {{TOOL_ROOT}}hooks/format-guard.js.\n")
         _pvPROTO = _pvPROTO_T.replace("{{TOOL_ROOT}}", "scripts/")
         # ROUND 4: gov's protocol template moves at B, and one consumer's copy is a FORK that spelled
         # the same addition by hand, as core's `SKILL.template.md` was. `update` writes no fork, so
@@ -18812,13 +18886,13 @@ user_skills = "/tmp/gk-fake-skills"
                 shutil.copy2(KIT_DIRS["policy"] / _pf, t / "scripts" / KIT_NAMES["policy"] / _pf)
 
         def seed_pv_hook(t):
-            """The agent-cap hook where inCMS core keeps its only copy, `.claude/hooks/`, which the
-            fan-out gate's resolver probes third. The review harness requires the hook kit, so every
+            """The hooks kit's scratch-guard.js where inCMS core keeps its only copy, `.claude/hooks/`, which
+            the fan-out gate's resolver probes third, for the policy helper's locator (TOOL-dBoundRoles-25). The review harness requires the hook kit, so every
             real install holds one, and since TOOL-dGroundRules-30 the renderer asks it, through
             `check-verifier-fanout.sh`, whether it admits the writer split. A fixture without it
             renders nothing (TOOL-dGroundRules-83)."""
             (t / ".claude" / "hooks").mkdir(parents=True, exist_ok=True)
-            shutil.copy2(KIT_DIRS["hooks"] / "agent-cap.js", t / ".claude" / "hooks" / "agent-cap.js")
+            shutil.copy2(KIT_DIRS["hooks"] / "scratch-guard.js", t / ".claude" / "hooks" / "scratch-guard.js")
 
         def build_pv_target(g, name, harness_edit=None):
             """An install `apply` wrote at vintage A, with one local delta, which both measured
@@ -19973,13 +20047,13 @@ user_skills = "/tmp/gk-fake-skills"
         # LIVENESS FIRST, because every assertion below is about ABSENCE and absence is what a
         # broken apply also produces. If the kit's engine did not land either, the withholding
         # arms are grading a target that received nothing at all.
-        _qeng = _qg / PFX / KIT_NAMES["hooks"] / "agent-cap.js"
+        _qeng = _qg / PFX / KIT_NAMES["hooks"] / "scratch-guard.js"
         check("aQuenchedHarness-3 LIVENESS: the kit's ENGINE landed, so the absence arms below "
               "are about withholding and not about an apply that did nothing",
               _qeng.is_file(), str(sorted(p.name for p in (_qg / PFX).rglob("*"))))
 
         # AC1 — the self-test FILES are withheld.
-        for _qf in ("agent-cap.test.sh", "scratch-guard.test.sh"):
+        for _qf in ("format-guard.test.sh", "scratch-guard.test.sh"):
             check(f"aQuenchedHarness-3 AC1: {_qf} is NOT in the adopter's tree",
                   not (_qg / PFX / KIT_NAMES["hooks"] / _qf).is_file(),
                   str(sorted(p.name for p in (_qg / PFX / KIT_NAMES["hooks"]).glob("*"))))

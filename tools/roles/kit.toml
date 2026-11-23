@@ -11,15 +11,17 @@ scope = "repo"
 # and the checker, the library and the adopter read the memory root and the governing doc's path from
 # `.memory-tree.conf`. Each workflow's build order and step are the loop kit's (TOOL-dDeclaredLoop-1):
 # the catalogue checker joins the workflow table with the loop definition, and the adopter binds the
-# Skill's stage headings to its orders, so with no loop kit both refuse.
-requires = ["kickoff-manifest", "memory-tree", "loop"]
+# Skill's stage headings to its orders, so with no loop kit both refuse. TOOL-dBoundRoles-25 S6: the spawn
+# guard `spawn-guard.js` reads the hooks kit's `scratch-guard.js` exports (entry `agent-cap`) and holds a
+# harness to its blob at the landed revision the policy kit's `readLandedRevision` names, so both are required.
+requires = ["kickoff-manifest", "memory-tree", "loop", "agent-cap", "policy"]
 
 # `/build` and `handoff.py harness-args` drive the three harnesses `workflows.toml` names, and all
 # three ship in `review-harness`, which is not a default. TOOL-aOrientedCast-8 section 8 F1: a plain
 # requirement would make `apply` refuse every default install, so this is a DECLARATION selfcheck
 # grades and nothing else. Where the harness is absent the catalogue checker, the agent render and
 # check-wiring each print a `note`; the role agents, the handoffs and the gates work everywhere.
-requires_if = [{ kit = "review-harness", why = "TOOL-aOrientedCast-8 section 8 F1: /build and the harness-arguments verb drive the three harnesses workflows.toml names, which review-harness ships. A plain requirement would refuse every default install, since review-harness is not a default; its absence is a note on the catalogue checker, the agent render and check-wiring. No condition key: the edge holds wherever /build is used" }]
+requires_if = [{ kit = "review-harness", why = "TOOL-aOrientedCast-8 section 8 F1: /build and the harness-arguments verb drive the three harnesses workflows.toml names, which review-harness ships. A plain requirement would refuse every default install, since review-harness is not a default; its absence is a note on the catalogue checker, the agent render and check-wiring. No condition key: the edge holds wherever /build is used" }, { kit = "agent-cap", why = "TOOL-dBoundRoles-25 S4, PLAY-dOrderedCharter-7: spawn-guard.js requires the hooks kit's scratch-guard.js in process for the role index readers, the card and fence readers, the handoff marker reader, the Workflow args reader, the slug walk and the policy helper's locator, found through its own resolveKitDir port (a receipt row, then <here>/hooks/ and <here>/../hooks/). This is the pack's one in-process edge to a sibling kit, declared here; where scratch-guard.js does not resolve the pack refuses every Workflow and Agent call, naming the hooks kit and the owner, since a guard that cannot read does not admit. No condition key: the edge holds wherever the pack is wired" }]
 
 # Pinned at the library module, which lands in the SAME unit as this descriptor.
 version_from = { file = "roles_lib.py", pattern = "^KIT_ROLES_VERSION = " }
@@ -49,6 +51,18 @@ role = "seed"
 [[files]]
 include = ["adopt-roles.test.sh"]
 role = "project-owned"
+
+# THE SPAWN GUARD'S SUITE IS WITHHELD the same way (TOOL-dBoundRoles-25 S5): it stages its fixtures around a copy
+# of `spawn-guard.js` beside it, so its subject is the pack, and its leg `spawn-guard self-test` is an
+# [[exempt_leg]] row in the deployer's registry.
+[[files]]
+include = ["spawn-guard.test.sh"]
+role = "project-owned"
+
+# The fragment `settings-merge.py` wires by default, read with sed by check-wiring.sh as the hooks kit's are.
+[[lf_pin]]
+pattern = "spawn-guard.fragment.json"
+why = "check-wiring.sh reads the fragment with sed; a trailing CR lands inside the captured matcher and the arm reports UNWIRED against a correctly wired repo"
 
 # THE SKILL IS RENDERED. It names the kit, the tool root and the memory root, three values that
 # differ per repository, so the adopter renders it and its `--check` re-renders and compares. All

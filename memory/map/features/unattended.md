@@ -59,7 +59,7 @@ verdict — control flow, not a rule an agent remembers. AUDIT runs only when th
 `specAudit` (`TOOL-aBlindedTrial-3`); absent, it logs OFF and hands out the roster after SPEC with
 `verdict: NOT-OWED`. It verifies nothing: a Workflow script has no
 filesystem, so every observation is a claim its own agent returned. TWO
-SHAPES ARE FORCED BY `agent-cap.js` (`TOOL-dFoldedVerdict-4`): DISPOSAL is ONE agent over the whole
+SHAPES ARE FORCED BY the fan-out gate `check-verifier-fanout.js` (`TOOL-dFoldedVerdict-4`): DISPOSAL is ONE agent over the whole
 set, and the convergence LOOP sits in the caller while the harness holds the GATE.
 
 **PASS ORDER IS ENFORCED TWICE: ONE PLACE IS BYPASSABLE.** The method's hard floor — never build

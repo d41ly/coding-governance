@@ -305,8 +305,16 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 _rkd_py=$(resolve_python) || { echo "check-wiring.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
-HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
+HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks scratch-guard.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
+# TOOL-dBoundRoles-25: the spawn guard is the roles kit's, graded from its shipped fragment, which each arm
+# seeds beside a stub pack exactly as the kit ships it, so no arm spells a second copy of the contract.
+ROLES_DIR=$(resolve_kit_dir "$_rkd_py" roles spawn-guard.fragment.json "$HERE") || exit 2
+ROLES="${ROLES_DIR##*/}"
+SPAWN_FRAG="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$ROLES_DIR/spawn-guard.fragment.json"
+seed_spawn_guard() { # <kit dir> -> the roles kit's shipped fragment there, beside a stub pack
+  mkdir -p "$1" && cp "$SPAWN_FRAG" "$1/" && printf '// stub\n' > "$1/spawn-guard.js"
+}
 MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree merge-rows.py "$HERE") || exit 2
 MT_KIT="${MT_KIT_DIR##*/}"
 # PLAY-dOrderedCharter-17 S10: the recall kit is a declared slot. Where it does not resolve, the recall
@@ -427,22 +435,20 @@ ck "U8 AC4 ...and a second --session over the wired tree prints ok and appends n
    "$(printf '%s\n' "$out" | grep -q '^ok       hooks' && [ "$(grep -c . "$hl" 2>/dev/null)" = "$nb" ] && echo 1 || echo 0)"
 cleanup
 
-# AC7 — agent-cap adopted but unwired -> --check UNWIRED (exit 1); --session still exits 0
+# AC7 — the spawn guard adopted but unwired -> --check UNWIRED (exit 1); --session still exits 0
+# (TOOL-dBoundRoles-25 AC10: the pack's fragment is graded, and an unwired pack is UNWIRED naming it).
 if [ -f "$SMERGE" ]; then
-  newrepo; mkdir -p $KIT_REL/${HOOKS} .claude/hooks; cp "$SMERGE" ${KP}settings-merge.py
-  # The stub goes where the FRAGMENT declares the hook, not at `.claude/hooks/`.
-  # TOOL-dRetiredFork-14 moved the shipped copy under the kit directory, so a fixture that
-  # keeps installing into `.claude/hooks/` is testing a layout the kit no longer produces --
-  # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
-  printf '// stub\n' > $KIT_REL/${HOOKS}/agent-cap.js
-  git config core.hooksPath .githooks     # isolate: hooks wired, so only agent-cap can be unwired
+  newrepo; mkdir -p .claude/hooks; cp "$SMERGE" ${KP}settings-merge.py
+  # The stub goes where the FRAGMENT declares the hook, beside it in the roles kit.
+  seed_spawn_guard "${KP}${ROLES}"
+  git config core.hooksPath .githooks     # isolate: hooks wired, so only the pack can be unwired
   out=$(chk --check); rc=$?
-  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  agent-cap'* ]]; } && ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 1 || ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 0
-  chk --session >/dev/null; [ "$?" = 0 ] && ck "AC6 --session exit 0 despite agent-cap unwired" 1 || ck "AC6 --session exit 0 despite agent-cap unwired" 0
+  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  spawn'* ]] && [[ $out == *'spawn-guard.js'* ]]; } && ck "AC7 the spawn guard unwired -> UNWIRED naming the pack, exit 1" 1 || ck "AC7 the spawn guard unwired -> UNWIRED naming the pack, exit 1" 0
+  chk --session >/dev/null; [ "$?" = 0 ] && ck "AC6 --session exit 0 despite the spawn guard unwired" 1 || ck "AC6 --session exit 0 despite the spawn guard unwired" 0
 
   # AC7b — THE STALE MATCHER. `.claude/settings.json` carries the hook under `Workflow` alone: the
   # state where a direct `Agent` spawn meets no rule at all, and the state every repo was in before
-  # the widening. The retired predicate grepped the whole file for `agent-cap.js`, so it reported
+  # the widening. The retired predicate grepped the whole file for the hook's file name, so it reported
   # `ok` here — it could not tell a correctly-widened wiring from a stale one and never could have.
   # This arm fails against that predicate, which is what makes it a test rather than a restatement.
   cat > .claude/settings.json <<'JSON'
@@ -454,7 +460,7 @@ if [ -f "$SMERGE" ]; then
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/{KP}{HOOKS}/agent-cap.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/{KP}{ROLES}/spawn-guard.js\""
           }
         ]
       }
@@ -462,9 +468,9 @@ if [ -f "$SMERGE" ]; then
   }
 }
 JSON
-  sed -i "s#{KP}#${KP}#; s#{HOOKS}#${HOOKS}#" .claude/settings.json   # the quoted heredoc cannot expand either
+  sed -i "s#{KP}#${KP}#; s#{ROLES}#${ROLES}#" .claude/settings.json   # the quoted heredoc cannot expand either
   out=$(chk --check); rc=$?
-  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  agent-cap'* ]] \
+  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  spawn'* ]] \
       && printf '%s' "$out" | grep -q "wired under matcher 'Workflow'"; } \
     && ck "AC7b a stale Workflow-only matcher -> UNWIRED naming the value found" 1 \
     || ck "AC7b a stale Workflow-only matcher -> UNWIRED naming the value found" 0
@@ -474,17 +480,17 @@ JSON
   # the two-group state, which is a different fact.
   sed -i 's/"matcher": "Workflow"/"matcher": "Workflow|Agent"/' .claude/settings.json
   out=$(chk --check); rc=$?
-  { [ "$rc" = 0 ] && [[ $out == *'ok       agent-cap'* ]]; } \
+  { [ "$rc" = 0 ] && [[ $out == *'ok       spawn'* ]]; } \
     && ck "AC7b the widened matcher -> ok, exit 0" 1 || ck "AC7b the widened matcher -> ok, exit 0" 0
   # AC7d — THE --only BYPASS, and the arm that should have landed with the guard. `--only=<rule>`
-  # narrows agent-cap to one rule, so a wired command carrying `--only=join` turns the three cap
+  # narrowed the retired hook to one rule, and the pack refuses every call carrying it, so a wired `--only=join` turns the
   # rules off with no diff and a hook that still looks wired. The guard's FIRST spelling bounded
   # every character class with [^"]*, which cannot cross the escaped quote this settings.json
   # actually ships, so it matched nothing and printed `ok` over a live bypass — a check that could
   # not fail, guarding a bypass the same build introduced. This arm fails against that spelling.
-  sed -i 's|agent-cap\.js\\"|agent-cap.js\\" --only=join|' .claude/settings.json
+  sed -i 's|spawn-guard\.js\\"|spawn-guard.js\\" --only=join|' .claude/settings.json
   out=$(chk --check); rc=$?
-  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  agent-cap'* ]] \
+  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  spawn'* ]] \
       && printf '%s' "$out" | grep -q -- '--only'; } \
     && ck "AC7d a wired command carrying --only -> UNWIRED" 1 \
     || ck "AC7d a wired command carrying --only -> UNWIRED" 0
@@ -492,7 +498,7 @@ JSON
   # checker that denies every wired command there is.
   sed -i 's| --only=join||' .claude/settings.json
   out=$(chk --check); rc=$?
-  { [ "$rc" = 0 ] && [[ $out == *'ok       agent-cap'* ]]; } \
+  { [ "$rc" = 0 ] && [[ $out == *'ok       spawn'* ]]; } \
     && ck "AC7d the flag removed -> ok, exit 0" 1 || ck "AC7d the flag removed -> ok, exit 0" 0
   # BP12 AC7 — AN INHERITED VIEW IS NOT A SETTINGS READ (TOOL-aBriskPreflight-12 S5). The view is
   # captured from matchers_of's OWN flatten over this correctly wired file, lifted alone as
@@ -505,23 +511,23 @@ JSON
   # so a missing one reds there whether or not the view was inherited, and grades nothing.
   sed -i 's/"matcher": "Workflow|Agent"/"matcher": "Workflow"/' .claude/settings.json
   out=$(_SJ_RC=0 _SJ_VIEW=$_bpv chk --check); rc=$?
-  { [ "$rc" = 1 ] && ! [[ $out == *'ok       agent-cap'* ]] \
+  { [ "$rc" = 1 ] && ! [[ $out == *'ok       spawn'* ]] \
       && printf '%s' "$out" | grep -q "wired under matcher 'Workflow'"; } \
-    && ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED agent-cap, exit 1" 1 \
-    || ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED agent-cap, exit 1 [rc=$rc]" 0
+    && ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED spawn, exit 1" 1 \
+    || ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED spawn, exit 1 [rc=$rc]" 0
   # (b) an inherited EMPTY view over the correct file: the file's own wiring must still read ok.
   sed -i 's/"matcher": "Workflow"/"matcher": "Workflow|Agent"/' .claude/settings.json
   out=$(_SJ_RC=0 _SJ_VIEW= chk --check); rc=$?
-  [[ $out == *'ok       agent-cap'* ]] \
-    && ck "BP12 AC7 an inherited empty view over a correct settings file -> ok agent-cap" 1 \
-    || ck "BP12 AC7 an inherited empty view over a correct settings file -> ok agent-cap [rc=$rc]" 0
+  [[ $out == *'ok       spawn'* ]] \
+    && ck "BP12 AC7 an inherited empty view over a correct settings file -> ok spawn" 1 \
+    || ck "BP12 AC7 an inherited empty view over a correct settings file -> ok spawn [rc=$rc]" 0
   cleanup
 else
-  echo "skip agent-cap cases — settings-merge.py not found next to script"
+  echo "skip spawn guard cases — settings-merge.py not found next to script"
 fi
 
 # AC13 — the scratch-guard arm, FOUR states in one repo. Written like the recall arm rather than the
-# agent-cap one because this arm reads marker/matcher/hook_path from the shipped fragment, so a
+# retired hook's one because this arm reads marker/matcher/hook_path from the shipped fragment, so a
 # fixture that hardcodes them would be testing a second spelling of the contract instead of the one
 # the kit declares. Unlike recall the guard is NOT an opt-in, so a present-but-unwired hook is a real
 # UNWIRED and an absent hook file is "kit not adopted here".
@@ -714,7 +720,7 @@ fi
 
 # AC8 — the memory-recall recall-opened arm, all SIX states in one repo. The hook is copied only
 # under `adopt-memory-recall.sh --with-hook`, so an ABSENT hook file is a TRUE signal and must print
-# a skip: mirroring the agent-cap arm literally would print a permanent false UNWIRED in the repo
+# a skip: mirroring the spawn arm literally would print a permanent false UNWIRED in the repo
 # that runs check-wiring.sh as its own SessionStart hook. The fragment is resolved the way the arm
 # itself resolves it, so this test works in both layouts (adopter: <root>/memory-recall/).
 FRAG=""; for c in "$ROOT_ABS/$MEMORY_RECALL_DIR/recall-opened.fragment.json"; do
@@ -1519,7 +1525,7 @@ out=$(GOV_SETTINGS_JSON="$OOTS/settings.json" chke --check)
 ck "S4 an out-of-tree settings file is REPORTED, not failed" \
   "$(printf '%s' "$out" | grep -qF 'OUTSIDE the repo root' && echo 1 || echo 0)"
 ck "S4 ...and the wiring is still graded" \
-  "$(printf '%s' "$out" | grep -qE '^(ok|UNWIRED|note) +(hooks|agent-cap|scratch|recall|merge)' && echo 1 || echo 0)"
+  "$(printf '%s' "$out" | grep -qE '^(ok|UNWIRED|note) +(hooks|spawn|scratch|recall|merge)' && echo 1 || echo 0)"
 
 # UNRESOLVABLE: a REFUSAL, not a non-match. An empty string here is what let every arm pass by
 # absence, so this is the arm the whole unit exists for.
@@ -1536,10 +1542,10 @@ ck "S4 ...and the run names the failed resolution" \
 # THE ARM NEEDS AN ADOPTED KIT. With no kit installed every settings arm reports `skip — not
 # adopted`, which is correct and says nothing about this unit; the false-green case is a kit
 # that IS installed while the settings file cannot be found.
-mkdir -p $KIT_REL/${HOOKS} && printf '// agent-cap\n' > $KIT_REL/${HOOKS}/agent-cap.js
+seed_spawn_guard "${KP}${ROLES}"
 out=$(chke --check)
 ck "S4 an ADOPTED kit with no settings file says UNWIRED, not ok" \
-  "$(printf '%s' "$out" | grep -qE '^UNWIRED +agent-cap' && echo 1 || echo 0)"
+  "$(printf '%s' "$out" | grep -qE '^UNWIRED +spawn' && echo 1 || echo 0)"
 
 # A DECLARED path that is not there is also a refusal, never a silent fallthrough to the preference
 # rung — resolving a DIFFERENT file than the operator named would make every arm confidently wrong.
@@ -1627,19 +1633,19 @@ cp "$SCRIPT" ./check-wiring.sh
 mkdir -p scripts/gov; cp "$SCRIPT" scripts/gov/check-wiring.sh
 git add -A; git commit -q -m "installs at the root and at a two-segment prefix"
 out=$(bash ./check-wiring.sh --check 2>&1)
-ck "prefix: a ROOT install probes agent-cap at 'hooks/', carrying no prefix segment" \
-   "$(printf '%s' "$out" | grep -q 'no agent-cap.js at hooks/ or' && echo 1 || echo 0)"
+ck "prefix: a ROOT install probes the spawn guard at 'roles/', carrying no prefix segment" \
+   "$(printf '%s' "$out" | grep -q 'and none at roles/)' && echo 1 || echo 0)"
 out=$(bash ./scripts/gov/check-wiring.sh --check 2>&1)
 ck "prefix: a two-segment install still carries both segments" \
-   "$(printf '%s' "$out" | grep -q 'no agent-cap.js at scripts/gov/hooks/ or' && echo 1 || echo 0)"
+   "$(printf '%s' "$out" | grep -q 'and none at scripts/gov/roles/)' && echo 1 || echo 0)"
 # THE SECURITY SHAPE, which the path string on its own does not show: with the hook actually THERE, a
 # root install reported the fan-out guard as not adopted. A skip that reads as a pass, over the one
 # arm in this file where a false skip has a security shape.
-mkdir -p "./${ROOTPFX}${HOOKS}"; printf '// stub\n' > "${ROOTPFX}${HOOKS}/agent-cap.js"
-git add -A; git commit -q -m "ship agent-cap.js at the root install"
+seed_spawn_guard "./${ROOTPFX}${ROLES}"
+git add -A; git commit -q -m "ship the spawn guard at the root install"
 out=$(bash ./check-wiring.sh --check 2>&1)
-ck "prefix: a ROOT install FINDS a shipped agent-cap.js instead of skipping it" \
-   "$(printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' && echo 1 || echo 0)"
+ck "prefix: a ROOT install FINDS a shipped spawn guard instead of skipping it" \
+   "$(printf '%s' "$out" | grep -q 'UNWIRED  spawn' && echo 1 || echo 0)"
 # TOOL-cMendedVintage-4 — AND THE REMEDY IT PRINTS HAS TO BE RUNNABLE WHERE IT IS PRINTED. `SMERGE`
 # used to fall back to a hardcoded `<prefix>/` prefix, so an install at any other prefix with no merger
 # beside it handed the operator a command naming a file their tree does not contain. The two-segment
@@ -1649,10 +1655,10 @@ ck "prefix: a ROOT install FINDS a shipped agent-cap.js instead of skipping it" 
 # That second pattern deliberately stops before the extension: spelled whole it would be a carried
 # `<prefix>/` literal in this file's own bytes, which the install-prefix ban reds on with no waiver to
 # take. Truncated it still matches the dead spelling and nothing else. Do not "complete" it.
-mkdir -p "scripts/gov/$HOOKS"; printf '// stub\n' > "scripts/gov/$HOOKS/agent-cap.js"
-git add -A; git commit -q -m "ship agent-cap.js at the two-segment install"
+seed_spawn_guard "scripts/gov/$ROLES"
+git add -A; git commit -q -m "ship the spawn guard at the two-segment install"
 out=$(bash ./scripts/gov/check-wiring.sh --check 2>&1)
-ck "prefix: the agent-cap remedy names the INSTALL PREFIX's merger" \
+ck "prefix: the spawn guard's remedy names the INSTALL PREFIX's merger" \
    "$(printf '%s' "$out" | grep -q 'scripts/gov/settings-merge.py' && echo 1 || echo 0)"
 ck "prefix: no remedy in that install still names the dead ${KP} merger" \
    "$(printf '%s' "$out" | grep -q ''"${KP}settings-merge"'' && echo 0 || echo 1)"
@@ -1660,17 +1666,17 @@ cleanup
 
 # ---- closing review round 1 M6 (TOOL-aRepatriatedFork-46): NO PYTHON, AND THE HOOK IS THERE ------
 # This runs as a SessionStart hook on a host that may have no python. The probe rung went through the
-# python resolver and was simply lost without one, so the agent-cap arm printed `not adopted` over a
+# python resolver and was simply lost without one, so the hook's arm printed `not adopted` over a
 # hook that sat beside the checker, naming a place nothing had probed. Every launcher name is
 # shadowed by a stub that exits non-zero, the way the Microsoft Store stub does.
 newrepo
 OOT=$(mktemp -d)
 for _n in python3 python py; do printf '#!/bin/sh\nexit 9\n' > "$OOT/$_n"; chmod +x "$OOT/$_n"; done
-mkdir -p "./${KP}$HOOKS"; cp "$SCRIPT" "./${KP}check-wiring.sh"; printf '// stub\n' > "${KP}$HOOKS/agent-cap.js"
-git add -A; git commit -q -m "a shipped agent-cap.js, and no usable python"
+mkdir -p "./${KP}$HOOKS"; cp "$SCRIPT" "./${KP}check-wiring.sh"; seed_spawn_guard "./${KP}$ROLES"
+git add -A; git commit -q -m "a shipped spawn guard, and no usable python"
 out=$(PATH="$OOT:$PATH" GOV_PYTHON= bash "./${KP}check-wiring.sh" --check 2>&1)
-ck "M6 with no usable python the probe rung still finds a shipped agent-cap.js" \
-   "$(printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' && ! printf '%s' "$out" | grep -q 'skip     agent-cap' && echo 1 || echo 0)"
+ck "M6 with no usable python the probe rung still finds a shipped spawn guard" \
+   "$(printf '%s' "$out" | grep -q 'UNWIRED  spawn' && ! printf '%s' "$out" | grep -q 'skip     spawn' && echo 1 || echo 0)"
 cleanup
 
 # ---- Check T: local branches that still owe a backlog relocation (TOOL-dDerivedDocket-13) -------
@@ -1768,12 +1774,12 @@ cleanup
 # Every arm that needs python reads `PY_OK`, set beside `PY`, instead of RUNNING the candidates again.
 # Every launcher name is shadowed by a stub that exits 9 and GOV_PYTHON names a fourth, so a memo that
 # read a launcher as resolved hands a stub to the kit resolver and to the straggler inventory: the
-# agent-cap arm then skips a hook that is there, and the straggler line names an exit status. The
+# spawn arm then skips a hook that is there, and the straggler line names an exit status. The
 # engine is a stub too, because a run with no python stops before it starts it.
 newrepo
 OOT=$(mktemp -d)
 for _n in python3 python py gov-py; do printf '#!/bin/sh\nexit 9\n' > "$OOT/$_n"; chmod +x "$OOT/$_n"; done
-mkdir -p "./${KP}$HOOKS" "./${KP}${MT_KIT}"; cp "$SCRIPT" "./${KP}check-wiring.sh"; printf '// stub\n' > "${KP}$HOOKS/agent-cap.js"
+mkdir -p "./${KP}$HOOKS" "./${KP}${MT_KIT}"; cp "$SCRIPT" "./${KP}check-wiring.sh"; seed_spawn_guard "./${KP}$ROLES"
 printf '# a stub engine\n' > "${KP}${MT_KIT}/migrate_backlog.py"
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTATION_MODE="cut"\nBACKLOG_MODE="builds"\n' > .memory-tree.conf
 git add -A; git commit -q -m "no usable python, and a builds-mode memory tree"
@@ -1782,8 +1788,8 @@ ck "BP2 AC9 no launcher runs -> stderr carries the resolver's bash-probe note" \
    "$(grep -q '^note     resolver  — no usable python' "$OOT/err" && echo 1 || echo 0)"
 ck "BP2 AC9 ...stdout says the straggler inventory did not run" \
    "$(printf '%s' "$out" | grep -q '^note     straggler — no usable python launcher resolved' && echo 1 || echo 0)"
-ck "BP2 AC9 ...and the bash probe rung still finds the shipped agent-cap.js" \
-   "$(printf '%s' "$out" | grep -q '^UNWIRED  agent-cap' && ! printf '%s' "$out" | grep -q '^skip     agent-cap' && echo 1 || echo 0)"
+ck "BP2 AC9 ...and the bash probe rung still finds the shipped spawn guard" \
+   "$(printf '%s' "$out" | grep -q '^UNWIRED  spawn' && ! printf '%s' "$out" | grep -q '^skip     spawn' && echo 1 || echo 0)"
 cleanup
 
 # ---- TOOL-aBriskPreflight-2 AC12: KIT_FILE_PAIRS lists every pair a call site passes -----------------
@@ -1803,7 +1809,7 @@ ck "BP2 AC12 LIVENESS ...and with one pair taken out of the list, the comparison
 rm -rf "$_kfd"
 
 # ---- TOOL-dFairHearing-16 AC9: the review kit's spec-audit opt-in pack, graded by the shared loop ----
-# Rule 0 left agent-cap for the review kit's spec-audit-optin.js, wired through its fragment, and the
+# Rule 0 left the agent limit hook for the review kit's spec-audit-optin.js, wired through its fragment, and the
 # scratch arm's per-fragment grading is the one function both arms call. Over THIS tree, through the
 # GOV_SETTINGS_JSON override: a copy of its settings with the pack's group removed must read UNWIRED
 # naming the pack, and the tree's own settings must read the pack ok, so the arm cannot pass on a

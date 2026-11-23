@@ -83,7 +83,7 @@ export const meta = {
 //
 // ---------------------------------------------------------------------------------------------
 // TWO SHAPES HERE ARE FORCED RATHER THAN CHOSEN, and both come from one denial.
-// The `agent-cap.js` hook refused an `agent()` inside ANY loop body when this file was written,
+// The agent limit hook (retired into the review kit's fan-out gate) refused an `agent()` inside ANY loop body when this file was written,
 // with a closed whitelist naming no marker for the case. `TOOL-dFoldedVerdict-4` has since added
 // `gov:sequential-agents(<K>)`, so a bounded sequential loop over a proven-bounded identifier is now
 // admissible and these are no longer the only shapes. Both are KEPT because both remain correct:
@@ -144,7 +144,7 @@ export const meta = {
 // value and names that file so the two are one figure with a stated source rather than two
 // declarations drifting apart.
 //
-// The marker on the slice line below is what `agent-cap.js` reads to admit the raw primitive. Do not
+// The marker on the slice line below is what the fan-out gate `check-verifier-fanout.js` reads to admit the raw primitive. Do not
 // spell that token anywhere else in this file, including in prose: the hook scans line by line and
 // treats any line carrying it as a marked one, so a comment ABOUT the marker is read as a marker
 // claiming a bound over nothing, and denies the whole file. Learned here. Grammar:
@@ -1114,7 +1114,7 @@ const GROUND =
 // filesystem and cannot derive a grouping. The caller's slice count bounds NOTHING, so the slices
 // are re-split into at most `SPEC_WRITERS` groups: that bounds the agent TOTAL, which is the
 // second of the two rules the charter insists are not one rule, and it is the receiver shape
-// `agent-cap.js` can prove bounded.
+// `check-verifier-fanout.js` can prove bounded.
 //
 // SO A WRITER HOLDS A GROUP, WHICH ABOVE THE CAP IS MORE THAN ONE SLICE. `chunk` splits by SIZE
 // `ceil(N/K)`, so the group COUNT is at most K and is often less: at seven slices and a cap of five

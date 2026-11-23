@@ -1062,7 +1062,7 @@ PY
   if [ -n "$missing" ]; then
     echo "run-selftests: these HELD legs carry no budget row, so their cost is unbounded by declaration:" >&2
     # QUOTED, and printed line-wise: a leg name has spaces in it, so an unquoted $missing
-    # word-splits and reports `agent-cap self-test` as two missing legs.
+    # word-splits and reports `spawn-guard self-test` as two missing legs.
     printf '%s\n' "$missing" | sed 's/^/  /' >&2
     fails=1
   fi

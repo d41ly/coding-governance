@@ -1,0 +1,7 @@
+{
+  "name": "spawn-guard",
+  "event": "PreToolUse",
+  "matcher": "Workflow|Agent",
+  "marker": "spawn-guard.js",
+  "hook_path": "{here}/spawn-guard.js"
+}

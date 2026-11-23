@@ -442,7 +442,7 @@ def scan_js_definitions(
     tracked ``tools/**/*.js`` carry **30** top-level definitions and the recall index carried **3**
     rows for that layer — the three workflow ``meta`` blocks, which are objects and are DISJOINT from
     the 30. So the index carried none of the definitions, and ``reuse_lookup.py`` could not see
-    ``boundedK`` (the hooks kit's ``agent-cap.js``), the binder every fan-out consumer routes through.
+    ``boundedK`` (the review kit's ``check-verifier-fanout.js``), the binder every fan-out consumer routes through.
     The comment that kept it that way read "accurate coverage of a layer with few exports, not a
     hole"; it was true about exports and false about the layer.
 

@@ -41,7 +41,7 @@
 #     and this gate reads markdown only, so nothing would be watching. The example is kept because it
 #     is the clearest statement of what this gate cannot do, and its `<=6` half is dead. Widening to source is what took the false-positive rate to
 #     64% when it was measured, which is why the scope stops at markdown. The one carrier this cost
-#     the build was a REMEDY STRING inside `<prefix>/hooks/agent-cap.js`; it was fixed by reading, and
+#     the build was a REMEDY STRING inside the hooks kit's agent limit hook; it was fixed by reading, and
 #     it is the standing argument for widening the population when someone has the budget.
 #
 # A BOUND WORD must be adjacent to the number. That is what separates an ASSERTION from a

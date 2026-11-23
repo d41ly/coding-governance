@@ -10,10 +10,10 @@ decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast
 stage = ["step.test"]
 
 [claims]
-gate-legs = ["roles adopter self-test", "roles catalogue", "roles render selftest", "roles render wiring"]
+gate-legs = ["roles adopter self-test", "roles catalogue", "roles render selftest", "roles render wiring", "spawn-guard self-test"]
 kits = ["roles"]
 git-hooks = []
-harness-hooks = ["SubagentStop tools/roles/return-check.sh"]
+harness-hooks = ["PreToolUse tools/roles/spawn-guard.js", "SubagentStop tools/roles/return-check.sh"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = ["build"]
@@ -39,7 +39,10 @@ checks such a file's hashes, and prints the stage-to-role map a harness takes (T
 The agent-type renderer, `render_agents.py`, is its second: it renders each `agent`-true role into a
 Claude Code agent type under `.claude/agents/`, trimmed of the charter by `omitClaudeMd: true` and
 carrying the rule lines the role cites and the charter's Protocols and Facts sections instead, beside the generated index `.claude/roles.json`
-the hooks read; its `--check` is the `roles render wiring` leg (TOOL-aOrientedCast-3). The kit's
+the hooks read; its `--check` is the `roles render wiring` leg (TOOL-aOrientedCast-3). The spawn guard that
+reads that index at every `Workflow` and `Agent` call is this kit's own `spawn-guard.js` since TOOL-dBoundRoles-25:
+rule 6, every prompt a rendered handoff and every declared harness run at its blob at the landed revision, rule 8,
+rule 7 and the opt-in pack's presence, wired from `spawn-guard.fragment.json` and held by `spawn-guard self-test`. The kit's
 adopter, `adopt-roles.sh`, renders the `/build` Skill from `SKILL.template.md`: the router an
 attended session follows after kickoff's go, whose `## Stage` headings the render binds to the
 orders of the loop definition, the loop kit's `loop.toml`, where each workflow's build order and

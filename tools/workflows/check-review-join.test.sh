@@ -273,7 +273,7 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 _rkd_py=$(resolve_python) || { echo "check-review-join.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
-HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
+HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks scratch-guard.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
@@ -352,20 +352,21 @@ arm 'the shipped tree is clean' 'clean — no ref-keyed verdict join' \
 
 # ---- D7: a status this gate cannot interpret is a REFUSAL, never a verdict -----------------------
 # Both halves of one root: the loop read "the pipeline exited non-zero" as "rule 5 fired".
-# The false RED. agent-cap exited 2 on its own environment refusal BEFORE any rule ran, and that
+# The false RED. The agent limit hook exited 2 on its own environment refusal BEFORE any rule ran, and that
 # message has no line starting with two spaces and L, so the sed emptied it and the gate reported a
 # ref-keyed verdict join with a blank body - sending an operator off to rewrite a join that is not
 # there. Reproduced exactly this way against the shipped tree, through a set `AGENT_CAP`. That
 # refusal retired in TOOL-dGroundRules-10, so a stub predicate stands in for any
-# exit 2 that names no line, beside the stub for an unclassifiable status below.
-ER="$TMP/envrefusal"; mkdir -p "$ER/${KIT_REL}" "$ER/${PFX}${HOOKS}"
+# exit 2 that names no line, beside the stub for an unclassifiable status below. Since TOOL-dBoundRoles-25
+# the predicate reads its views from script-views.js beside it, so the stub is that module.
+ER="$TMP/envrefusal"; mkdir -p "$ER/${KIT_REL}"
 ( cd "$ER" && git init -q . && git config user.email t@t.test && git config user.name t
   printf "export const meta = { name: 'x' }
 await log('hi')
 " > $KIT_REL/w.js
-  printf 'process.stderr.write("BLOCKED by agent-cap: a refusal of its own environment\\n")
+  printf 'process.stderr.write("BLOCKED by script-views: a refusal of its own environment\\n")
 process.exit(2)
-' > ${PFX}${HOOKS}/agent-cap.js
+' > $KIT_REL/script-views.js
   git add -A && git commit -qm envrefusal --no-verify )
 cp "$GATE" "$ER/${KIT_REL}/gate.sh"; cp "$KIT_REL/check-review-join.js" "$ER/${KIT_REL}/"
 arm 'a predicate refusing its ENVIRONMENT is not a join report' 'is its own refusal and not a join'   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$ER"
@@ -374,13 +375,13 @@ arm 'a predicate refusing its ENVIRONMENT is not a join report' 'is its own refu
 # status was read, so a builder that threw fed empty stdin to a JSON.parse whose catch exits 0 and
 # the file was recorded clean. A stub predicate returning an unclassifiable status stands in for
 # every such shape. The gate's own header preaches that a probe which cannot move must say so.
-BS="$TMP/badstatus"; mkdir -p "$BS/${KIT_REL}" "$BS/${PFX}${HOOKS}"
+BS="$TMP/badstatus"; mkdir -p "$BS/${KIT_REL}"
 ( cd "$BS" && git init -q . && git config user.email t@t.test && git config user.name t
   printf "export const meta = { name: 'x' }
 await log('hi')
 " > $KIT_REL/w.js
   printf 'process.exit(3)
-' > ${PFX}${HOOKS}/agent-cap.js
+' > $KIT_REL/script-views.js
   git add -A && git commit -qm badstatus --no-verify )
 # TOOL-dRetiredFork-10: the gate resolves its predicate RELATIVE TO ITSELF now, so these
 # fixtures place it where an install actually puts it. They previously dropped it at the
@@ -435,10 +436,8 @@ mkdir -p "$D/${KIT_REL}"
   printf "export const meta = { name: 'seed', description: 'a tracked workflow' }\nawait log('hi')\n" \
     > $KIT_REL/seed-workflow.js
   git add -A && git commit -qm seed --no-verify )
-mkdir -p "$D/${KIT_REL}" && cp "$GATE" "$D/${KIT_REL}/gate.sh"; cp "$SYNTAX" "$D/syntax.js"; cp "$KIT_REL/check-review-join.js" "$D/${KIT_REL}/"
-# TOOL-dTieredTribunal-14 S8 - the gate DELEGATES its predicate to the hook now, so a scratch repo
-# without one meets the missing-predicate refusal instead of the verdict this arm asserts.
-mkdir -p "$D/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$D/${PFX}${HOOKS}/agent-cap.js"
+mkdir -p "$D/${KIT_REL}" && cp "$GATE" "$D/${KIT_REL}/gate.sh"; cp "$SYNTAX" "$D/syntax.js"; cp "$KIT_REL/check-review-join.js" "$KIT_REL/script-views.js" "$D/${KIT_REL}/"
+# TOOL-dBoundRoles-25 §8 F8: the predicate reads nothing from a hook, so the scratch repo carries none.
 
 # never staged, never committed — visible to `git ls-files --others`, invisible to `git ls-files`
 cat >"$D/${KIT_REL}/scratch-join.js" <<'EOF'
@@ -468,29 +467,27 @@ arm 'discovery: a git-ignored file is not judged (syntax)' 'parsed clean' \
 E="$TMP/emptyrepo"; mkdir -p "$E"
 ( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify )
-mkdir -p "$E/${KIT_REL}" && cp "$GATE" "$E/${KIT_REL}/gate.sh"; cp "$KIT_REL/check-review-join.js" "$E/${KIT_REL}/"
+mkdir -p "$E/${KIT_REL}" && cp "$GATE" "$E/${KIT_REL}/gate.sh"; cp "$KIT_REL/check-review-join.js" "$KIT_REL/script-views.js" "$E/${KIT_REL}/"
 # S8 - same reason as the $D site. `$E` and not `$D`: the scratch variable is per SITE, and `E` is
 # not bound until this block, so a `$D` spelling here would judge the wrong repo.
-# TOOL-dFairHearing-50 S4 - the copy sits at the `.claude/hooks/` rung, outside the population, because a
-# hook under the kit prefix is a script the gate reads, and this repo's population must stay empty.
-mkdir -p "$E/.claude/hooks" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$E/.claude/hooks/agent-cap.js"
 arm 'discovery: an empty population is still not a pass' 'the population is empty, which is not a pass' \
   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$E"
 
 # TOOL-dTieredTribunal-14 S8 - the missing-predicate refusal's own failing case, OBSERVED. A gate whose
 # predicate is absent must SAY SO rather than pass, and a refusal nobody has watched fire is an
-# assertion about nothing. Named `N` and not `D`, which is already bound to the discovery repo.
+# assertion about nothing. Named `N` and not `D`, which is already bound to the discovery repo. Since
+# TOOL-dBoundRoles-25 the predicate's views are script-views.js beside it, so that module is what is absent.
 N="$TMP/nohook"; mkdir -p "$N/${KIT_REL}"
 ( cd "$N" && git init -q . && git config user.email t@t.test && git config user.name t
   printf "export const meta = { name: 'x' }\nawait log('hi')\n" > $KIT_REL/w.js
   git add -A && git commit -qm nohook --no-verify )
 cp "$GATE" "$N/${KIT_REL}/gate.sh"; cp "$KIT_REL/check-review-join.js" "$N/${KIT_REL}/"
-arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicate is absent must say so' \
+arm 'the predicate being absent is a refusal, not a pass' "cannot load the review kit's script-views.js" \
   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$N"
 # TOOL-dFairHearing-16 - the ban table is check-review-join.js's, so a gate copied WITHOUT it, its hook
 # beside it, refuses by name rather than scanning nothing. The same tree with the file restored is the
 # control: it reads clean, so the refusal is the missing file's and not the tree's.
-mkdir -p "$N/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$N/${PFX}${HOOKS}/agent-cap.js"
+cp "$KIT_REL/script-views.js" "$N/${KIT_REL}/"
 rm -f "$N/${KIT_REL}/check-review-join.js"
 arm 'the ban table being absent is a refusal, not a pass' 'no check-review-join.js beside this gate' \
   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$N"
@@ -507,8 +504,8 @@ arm '...and restored beside it, the same tree reads clean' 'clean — no ref-key
 # gate resolves sits at the `.claude/hooks/` rung, outside the population (TOOL-dFairHearing-50 S4).
 WFK=${KIT_REL##*/}
 H4="$TMP/harnessdir"; mkdir -p "$H4/scripts/$WFK" "$H4/.claude/workflows" "$H4/.claude/hooks"
-cp "$GATE" "$H4/scripts/$WFK/check-review-join.sh"; cp "$KIT_REL/check-review-join.js" "$H4/scripts/$WFK/"
-cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$H4/.claude/hooks/agent-cap.js"
+cp "$GATE" "$H4/scripts/$WFK/check-review-join.sh"; cp "$KIT_REL/check-review-join.js" "$KIT_REL/script-views.js" "$H4/scripts/$WFK/"
+cp "$ROOT/${HOOKS_DIR}/scratch-guard.js" "$H4/.claude/hooks/scratch-guard.js"
 ( cd "$H4" && git init -q . && git config user.email t@t.test && git config user.name t \
   && git add -A && git commit -qm h4 --no-verify ) >/dev/null 2>&1
 out=$(cd "$H4" && bash "scripts/$WFK/check-review-join.sh" 2>&1); rc=$?
@@ -529,8 +526,7 @@ case "$out" in *ban-table.js*) fails=$((fails+1)); printf 'arm FAIL  a file unde
 # Each fixture is a whole scratch TREE, not a lone file, because arm 2's population and its liveness
 # refusal are both properties of the scan, and an explicit file list bypasses the refusal by design.
 a2tree() {  # $1 = dir · $2 = harness body
-  mkdir -p "$1/${KIT_REL}" "$1/${PFX}${HOOKS}"
-  cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$1/${PFX}${HOOKS}/agent-cap.js"
+  mkdir -p "$1/${KIT_REL}"
   printf '%s\n' "$2" > "$1/${KIT_REL}/h.js"
   ( cd "$1" && git init -q . && git config user.email t@t.test && git config user.name t \
     && git add -A && git commit -q -m f --no-verify ) >/dev/null 2>&1
@@ -583,24 +579,24 @@ arm 'arm 2: agents dispatched but nothing judged REFUSES' 'judged NONE of them' 
 rm -rf "$A2"
 
 # ---- closing review round 1 H1 (TOOL-aRepatriatedFork-46): run from ANOTHER checkout ------------
-# Every `a2tree` fixture above copies agent-cap.js into its scratch tree, and that is what hid the
+# Every `a2tree` fixture above copied the hook into its scratch tree, and that is what hid the
 # defect: the resolver answers relative to the checkout holding THIS gate, and the gate joined that
 # to the caller's root. This checkout carries no hooks kit, so only the gate's own one can answer.
 H1R=$(mktemp -d)
 mkdir -p "$H1R/.claude/workflows"
 printf "export const meta = { name: 'x', description: 'y' }\nconst verdictById = new Map()\n" > "$H1R/.claude/workflows/x.js"
 ( cd "$H1R" && git init -q . && git add -A ) >/dev/null 2>&1
-arm 'H1: run from a checkout holding no hooks kit, the gate finds agent-cap.js beside itself' 'review-join: clean' \
+arm 'H1: run from a checkout holding no hooks kit, the gate runs its predicate beside itself' 'review-join: clean' \
   bash -c 'cd "$1" && bash "$2"' _ "$H1R" "$ROOT/$GATE"
 # Closing review round 2 L1 (TOOL-aRepatriatedFork-46 S8): with `GIT_DIR` exported, as `git rebase
 # --exec` and a merge driver export it, the second question to git answered the gate's own directory
 # and node threw MODULE_NOT_FOUND on a hook path under this kit.
-arm 'L1: with GIT_DIR exported, the gate still finds agent-cap.js beside itself' 'review-join: clean' \
+arm 'L1: with GIT_DIR exported, the gate still runs its predicate beside itself' 'review-join: clean' \
   bash -c 'cd "$1" && GIT_DIR="$1/.git" bash "$2"' _ "$H1R" "$ROOT/$GATE"
 rm -rf "$H1R"
 
 # ==== RULE 5'S OWN ARMS, moved from the hook's suite (TOOL-dFairHearing-16) ========================
-# Rule 5 left agent-cap.js for check-review-join.js beside the gate, and its arms came with it, each
+# Rule 5 left the agent limit hook for check-review-join.js beside the gate, and its arms came with it, each
 # keeping its label, its payload and the hook's verdict: 2 for a deny, 0 for an admit. Only the
 # helpers below are new. `run_join` is the hook's interface over the rule's new home: the payload's
 # script judged by check-review-join.js over a COPY of the hook beside scratch-guard.js, as the hook's
@@ -610,8 +606,8 @@ rm -rf "$H1R"
 # The arm that ran the hook UNFILTERED runs every script rule the hook ran, now both homes (`check_all`).
 TESTPY=$_rkd_py
 FANJS="$KIT_REL/check-verifier-fanout.js"; JOINJS="$KIT_REL/check-review-join.js"
-ARMS_HOOKS="$TMP/arms-hooks/hooks"; mkdir -p "$ARMS_HOOKS"; cp "$ROOT/$HOOKS_DIR/agent-cap.js" "$ROOT/$HOOKS_DIR/scratch-guard.js" "$ARMS_HOOKS/"
-HOOK="$ARMS_HOOKS/agent-cap.js"
+ARMS_HOOKS="$TMP/arms-hooks/hooks"; mkdir -p "$ARMS_HOOKS"; cp "$ROOT/$HOOKS_DIR/scratch-guard.js" "$ARMS_HOOKS/"
+HOOK="$ARMS_HOOKS/scratch-guard.js"
 pass=0; fail=0
 # ponytail: run_home is check-verifier-fanout.test.sh's twin; one suite library is the step if a third suite needs it.
 run_home() { # <home.js> [arg...]; payload on stdin -> the hook's exit code for it; the home's stderr on stderr
@@ -625,7 +621,7 @@ run_home() { # <home.js> [arg...]; payload on stdin -> the hook's exit code for 
     if (ti.script) { fs.writeFileSync(process.argv[1], ti.script); f = process.argv[1] } else if (ti.scriptPath) f = ti.scriptPath
     if (!f) process.exit(4)
     process.stdout.write((typeof d.cwd === "string" ? d.cwd : "") + "\n" + f)' "$TMP/join-arm.js") || return 0
-  ( c=${src%%$'\n'*}; if [ -n "$c" ]; then cd "$c" || exit 3; fi; node "$ROOT/$home" --hook "${ARM_HOOK:-$HOOK}" "$@" "${src#*$'\n'}" 2>"$TMP/home.err" ); rc=$?
+  ( c=${src%%$'\n'*}; if [ -n "$c" ]; then cd "$c" || exit 3; fi; if [ "$home" = "$FANJS" ]; then set -- --hook "${ARM_HOOK:-$HOOK}" "$@"; fi; node "$ROOT/$home" "$@" "${src#*$'\n'}" 2>"$TMP/home.err" ); rc=$?
   cat "$TMP/home.err" >&2
   # A 1 or 2 is the hook's deny only when the home SAID so: node's own exit 1 on a crash, a home that
   # never loaded, is the hook's crash, which admits, so a deny arm cannot pass on it.

@@ -1486,11 +1486,11 @@ run_edit "BR6-AC1 a Write to an adopter's own agent file, named by no index row 
 # payloads keep today's exits. Against an absent index read as no arm, the two exit-2 rows exit 0.
 write_roles absent
 run_edit "BR6-AC3 governed, no index: the main loop writes a spec -> deny naming the absent index" 2 "any;;$SG_ROLES_SHOWN;;is absent while this tree carries rendered role agents;;render_agents.py --write" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
-run_role_bash "BR6-AC3 governed, no index: gov-builder runs a .test.sh suite -> deny naming the absent index" 2 "any;;is absent while this tree carries rendered role agents;;render_agents.py --write" gov-builder Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "BR6-AC3 governed, no index: gov-builder runs a .test.sh suite -> deny naming the absent index" 2 "any;;is absent while this tree carries rendered role agents;;render_agents.py --write" gov-builder Bash "bash kit/$SG_K_HOOKS/format-guard.test.sh"
 rm -f "$SG_AGENTS/gov-builder.md"
 printf -- '---\nname: adopter-own\ndescription: d\n---\nbody\n' > "$SG_AGENTS/adopter-own.md"
 run_edit "BR6-AC3 not governed, no index: the main loop writes a spec -> allow, stderr EMPTY" 0 empty Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
-run_role_bash "BR6-AC3 not governed, no index: gov-builder runs a .test.sh suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "BR6-AC3 not governed, no index: gov-builder runs a .test.sh suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$SG_K_HOOKS/format-guard.test.sh"
 rm -rf "$SG_AGENTS"
 write_gate_manifest kit/gate-legs.json
 # ---- AC1: the REFUSED payloads for gov-builder, each naming its row; the main loop's controls -----
@@ -1498,14 +1498,14 @@ run_role_bash "G-AC1 the bar runner -> deny naming G2" 2 "any;;G2 runner;;gov-bu
 run_role_bash "G-AC1 the bar under a GATE_ prefix -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "GATE_SELFTESTS=1 bash kit/$RUN_GATES/run-gates.sh"
 run_role_bash "G-AC1 the self-test runner -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash kit/$RUN_GATES/run-selftests.sh --pooled"
 run_role_bash "G-AC1 the unattended gates runner -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash kit/$SG_K_UNATTENDED/run-unattended-gates.sh --checks"
-run_role_bash "G-AC1 a *.test.sh suite -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "G-AC1 a *.test.sh suite -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash kit/$SG_K_HOOKS/format-guard.test.sh"
 run_role_bash "G-AC1 a selftest.py script -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "python kit/$SG_K_GOVKIT/selftest.py"
 run_role_bash "G-AC1 a script carrying --selftest -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "python3 kit/$SG_K_MEMORY_TREE/gotchas.py --selftest"
 run_role_bash "G-AC1 a leg the allowlist does not name -> deny naming G1 and the leg" 2 "any;;G1 leg;;roles catalogue" gov-builder Bash "python kit/$SG_K_ROLES/check_roles.py"
-run_role_bash "G-AC1 a suite inside bash -c -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash -c 'bash kit/$SG_K_HOOKS/agent-cap.test.sh'"
+run_role_bash "G-AC1 a suite inside bash -c -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash -c 'bash kit/$SG_K_HOOKS/format-guard.test.sh'"
 run_role_bash "G-AC1 PowerShell: the bar after an env assignment -> deny naming G2" 2 "any;;G2 runner" gov-builder PowerShell "\$env:GATE_FULL=1; bash kit/$RUN_GATES/run-gates.sh"
 run_role_bash "G-AC1 the main loop runs the bar -> allow, stderr EMPTY" 0 empty - Bash "bash kit/$RUN_GATES/run-gates.sh"
-run_role_bash "G-AC1 the main loop runs a suite -> allow, stderr EMPTY" 0 empty - Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "G-AC1 the main loop runs a suite -> allow, stderr EMPTY" 0 empty - Bash "bash kit/$SG_K_HOOKS/format-guard.test.sh"
 run_role_bash "G-AC1 the main loop runs a leg -> allow, stderr EMPTY" 0 empty - Bash "python kit/$SG_K_ROLES/check_roles.py"
 # ---- TOOL-aNimbleMend-6: the pass-leg runner is row G2 for a role agent and the main loop's -------
 # ---- Against a GATE_RUNNERS without the name, each exit-2 row below exits 0. ----------------------
@@ -1531,8 +1531,8 @@ run_role_bash "G-AC2 gotchas.py --for-diff -> allow, stderr EMPTY" 0 empty gov-b
 run_role_bash "G-AC2 lexicon.py --suggest -> allow, stderr EMPTY" 0 empty gov-builder Bash "python3 kit/$SG_K_LEXICON/lexicon.py --suggest checkRoleGate --as js.function"
 run_role_bash "G-AC2 gov-spec-writer runs the spec-token checker with --spec -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash "python kit/check-spec-tokens.py --spec memory/builds/x/spec/y.md"
 run_role_bash "G-AC2 a *.test.sh carrying --render -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$SG_K_WORKFLOWS/check-protocol-parity.test.sh --render"
-run_role_bash "G-AC2 bash -n on a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -n kit/$SG_K_HOOKS/agent-cap.test.sh"
-run_role_bash "G-AC2 git log naming a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "git log --oneline -- kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "G-AC2 bash -n on a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -n kit/$SG_K_HOOKS/format-guard.test.sh"
+run_role_bash "G-AC2 git log naming a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "git log --oneline -- kit/$SG_K_HOOKS/format-guard.test.sh"
 run_role_bash "G-AC2 grep for the runner's name -> allow, stderr EMPTY" 0 empty gov-builder Bash 'grep -n run-gates.sh AGENTS.md'
 run_role_bash "G-AC2 a commit message naming the bar -> allow, stderr EMPTY" 0 empty gov-builder Bash "git commit -m \"names bash kit/$RUN_GATES/run-gates.sh\""
 run_role_bash "G-AC2 gov-orienter's manifest-check --card (a leg's script, more words) -> allow, stderr EMPTY" 0 empty gov-orienter Bash 'bash skills/session-kickoff/manifest-check.sh --card --path'
@@ -1541,7 +1541,7 @@ run_role_bash "G-AC2 gov-orienter's manifest-check --card (a leg's script, more 
 # ---- exit-2 row below exits 0 except the node row: its `--selftest` refuses whichever word heads --
 run_role_bash "O-AC1 bash -o pipefail <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -o pipefail kit/$RUN_GATES/run-gates.sh"
 run_role_bash "O-AC1 bash -O extglob <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -O extglob kit/$RUN_GATES/run-gates.sh"
-run_role_bash "O-AC1 bash -e -x <suite> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash -e -x kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "O-AC1 bash -e -x <suite> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash -e -x kit/$SG_K_HOOKS/format-guard.test.sh"
 run_role_bash "O-AC1 bash -e -c '<runner>' -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -e -c 'bash kit/$RUN_GATES/run-gates.sh'"
 run_role_bash "O-AC1 python -X utf8 <selftest.py> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "python -X utf8 kit/$SG_K_GOVKIT/selftest.py"
 run_role_bash "O-AC1 env -u FOO bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "env -u FOO bash kit/$RUN_GATES/run-gates.sh"
@@ -1550,7 +1550,7 @@ run_role_bash "O-AC1 nice -n 10 bash <runner> -> deny naming G2" 2 "any;;G2 runn
 run_role_bash "O-AC1 node -r <preload> <script> --selftest -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'node -r kit/p.js kit/x.js --selftest'
 # ---- AC2: the near-misses — a syntax check, a lookup and an inline program run no script ----------
 run_role_bash "O-AC2 bash -n <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -n kit/$SG_K_HOOKS/scratch-guard.test.sh"
-run_role_bash "O-AC2 bash -e -n <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -e -n kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "O-AC2 bash -e -n <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -e -n kit/$SG_K_HOOKS/format-guard.test.sh"
 run_role_bash "O-AC2 command -v <runner> -> allow, stderr EMPTY" 0 empty gov-builder Bash "command -v kit/$RUN_GATES/run-gates.sh"
 run_role_bash "O-AC2 python -c <program> <selftest.py> -> allow, stderr EMPTY" 0 empty gov-builder Bash "python -c \"print(1)\" kit/$SG_K_GOVKIT/selftest.py"
 run_role_bash "O-AC2 node -e <program> <script> --selftest -> allow, stderr EMPTY" 0 empty gov-builder Bash 'node -e "1" kit/x.js --selftest'
@@ -1558,7 +1558,7 @@ run_role_bash "O-AC2 node -e <program> <script> --selftest -> allow, stderr EMPT
 # ---- polling wait is refused by its P row. Against the base hook R1, R2 and R5 exited 0 ----------
 # ---- (2026-11-14, node a, the spec's pass probe); every R row exits 0 with the polling step -------
 # ---- removed, and R1 with the bare -o back in takes and no clusterTakes --------------------------
-run_role_bash "W-AC2 R1 bash -eo pipefail <suite> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash -eo pipefail kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "W-AC2 R1 bash -eo pipefail <suite> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash -eo pipefail kit/$SG_K_HOOKS/format-guard.test.sh"
 run_role_bash "W-AC2 R2 timeout 590 tail -f -> deny naming P1" 2 "any;;P1 tail follow;;run_in_background" gov-builder Bash 'timeout 590 tail -f /c/x.log'
 run_role_bash "W-AC2 R3 tail --pid -f | grep -> deny naming P1" 2 "any;;P1 tail follow" gov-builder Bash 'tail --pid=4242 -f /c/x.log | grep -m1 exit='
 run_role_bash "W-AC2 R4 until ...; do sleep 1; done -> deny naming P2" 2 "any;;P2 sleep in a loop" gov-builder Bash 'until [ -s /c/x.out ]; do sleep 1; done'
@@ -1570,7 +1570,7 @@ run_role_bash "W-AC3 N2 tail -n 5 -> allow, stderr EMPTY" 0 empty gov-builder Ba
 run_role_bash "W-AC3 N3 tail -5; grep -f -> allow, stderr EMPTY" 0 empty gov-builder Bash 'tail -5 /c/x.log; grep -f /c/p.txt /c/x.log'
 run_role_bash "W-AC3 N4 the main loop's tail -f -> allow, stderr EMPTY" 0 empty - Bash 'timeout 590 tail -f /c/x.log'
 run_role_bash "W-AC3 N5 for ...; do sleep 1; done -> allow, stderr EMPTY" 0 empty gov-builder Bash 'for i in 1 2 3; do sleep 1; done'
-run_role_bash "W-AC3 N6 bash -no pipefail <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -no pipefail kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "W-AC3 N6 bash -no pipefail <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -no pipefail kit/$SG_K_HOOKS/format-guard.test.sh"
 run_role_bash "W-AC3 N7 bash -o pipefail <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -o pipefail kit/$RUN_GATES/run-gates.sh"
 # ---- TOOL-aTrimmedWait-9, review items M2 and L2: a shell comment is read by no row, and P3 is ----
 # ---- tested at its floor. With the comment cut removed from scanCommandHeads, C1 and C3 exit 2 ----
@@ -1581,7 +1581,7 @@ run_role_bash "W9-AC1 C2 sleep 9 # x -> deny naming P3" 2 "any;;P3 sleep at or o
 run_role_bash "W9-AC1 C3 a comment's ; starts no command -> allow, stderr EMPTY" 0 empty gov-builder Bash 'sleep 3 # a; sleep 9'
 run_role_bash "W9-AC1 C4 a quoted ' #' opens no comment -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash "echo ' #'; sleep 9"
 run_role_bash "W9-AC1 C5 a # inside a word opens no comment -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 3#x'
-run_role_bash "W9-AC2 C6 <suite> # --render -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh # --render"
+run_role_bash "W9-AC2 C6 <suite> # --render -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash kit/$SG_K_HOOKS/format-guard.test.sh # --render"
 run_role_bash "W9-AC4 F1 sleep 5, at the floor -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 5'
 run_role_bash "W9-AC4 F2 sleep 1m -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 1m'
 run_role_bash "W9-AC4 F3 sleep 1h -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep 1h'
@@ -1614,7 +1614,7 @@ else echo "FAIL BR8-AC3 resolveRoleRoot with no candidates from a cwd in no chec
 # AC4: three field shapes that only NAME a gate script, read inside the checkout; each is admitted.
 run_role_bash "BR8-AC4 a suite path assigned to a variable and read with sed -> allow, stderr EMPTY" 0 empty gov-builder Bash "f=kit/$SG_K_ROLES/adopt-roles.test.sh && sed -n 1,5p \"\$f\""
 run_role_bash "BR8-AC4 a grep -E whose quoted alternation names the bar runner -> allow, stderr EMPTY" 0 empty gov-builder Bash "grep -E 'serve.sh|run-gates.sh|await.sh' AGENTS.md"
-run_role_bash "BR8-AC4 a sed read of a suite file -> allow, stderr EMPTY" 0 empty gov-builder Bash "sed -n 5p kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "BR8-AC4 a sed read of a suite file -> allow, stderr EMPTY" 0 empty gov-builder Bash "sed -n 5p kit/$SG_K_HOOKS/format-guard.test.sh"
 # ---- AC3: arming — no index, a broken index, a manifest that does not read ------------------------
 write_roles absent
 run_role_bash "G-AC3 no index: gov-builder runs the bar -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh"

@@ -9,11 +9,12 @@
  * concurrency settings bound it, and the rule judges what is committed.
  *
  * ONE SCANNER. The views this rule reads, and `runBothViews`, which unions the lexed and the shipped
- * views so no denial is lost, are agent-cap's, loaded from the hook `--hook` names: each view reads the
- * mode `runBothViews` switches, so a copy here would be a second scanner of one script, the drift
- * TOOL-aBatchedTribunal-1d ruled out. MAX_VERIFIERS and the writer bound are the hook's too. Everything
- * below `loadHook` is the hook's rule 2, moved verbatim, but for its array-literal bound, which reads
- * LENS_SLOTS (TOOL-dFairHearing-23 S42).
+ * views so no denial is lost, are this kit's `script-views.js`, required from beside this file
+ * (TOOL-dBoundRoles-25 S4): each view reads the mode `runBothViews` switches, so a copy here would be a
+ * second scanner of one script, the drift TOOL-aBatchedTribunal-1d ruled out. MAX_VERIFIERS and the writer
+ * bound are that module's too; the writer bound reads the policy helper the hooks kit's `scratch-guard.js`,
+ * which `--hook` names, resolves (§8 F8). Everything below `loadHook` is the retired hook's rule 2, moved
+ * verbatim, but for its array-literal bound, which reads LENS_SLOTS (TOOL-dFairHearing-23 S42).
  *
  * THE SLOT COUNT (TOOL-dFairHearing-13, here since TOOL-dFairHearing-23). `--slots` takes `<file>:<line>`
  * locations, each a marker line `render_lenses.py --markers` printed, so the renderer's own anchored
@@ -21,25 +22,30 @@
  * `]` in the hook's literal-blanked view, holds exactly LENS_SLOTS top-level elements, counted by
  * `topLevelArgs`, the counter rule 2 uses, so a comma inside parentheses, braces or a string is no slot.
  *
- *   node <prefix>/workflows/check-verifier-fanout.js --hook <prefix>/hooks/agent-cap.js <file>...
- *   node <prefix>/workflows/check-verifier-fanout.js --hook <prefix>/hooks/agent-cap.js --slots <file>:<line>...
+ *   node <prefix>/workflows/check-verifier-fanout.js --hook <prefix>/hooks/scratch-guard.js <file>...
+ *   node <prefix>/workflows/check-verifier-fanout.js --hook <prefix>/hooks/scratch-guard.js --slots <file>:<line>...
  *
  * Exit 0 = clean · 1 = a finding, each file's printed on stderr as the hook printed it · 2 = refused:
- * no `--hook` or no file, an argument it does not take, agent-cap's exports not loadable, or a file it
- * cannot read. A writer split's bound is the hook's `readWriterBound` read at this process's working
- * directory, where the hook's `--only=scripts` read it.
+ * no `--hook` or no file, an argument it does not take, the hooks kit's `resolvePolicyHelper` not loadable,
+ * or a file it cannot read. A writer split's bound is `readWriterBound` read at this process's working
+ * directory, where the retired hook's `--only=scripts` read it.
  */
 'use strict'
 
-// The hook's exports, bound by `loadHook` before any rule runs; the rule reads them by these names.
-let MAX_VERIFIERS, renderCodeView, renderStrippedView, renderBlankedLiterals, runBothViews, readWriterBound, resolveHarnessName
+// The review kit's one scanner, beside this file (TOOL-dBoundRoles-25 S4); the rule reads its exports by these names.
+// A module that does not load is kept as its error, which `main` refuses naming it, never node's own exit 1.
+const VIEWS = (() => { try { return require(require('path').join(__dirname, 'script-views.js')) } catch (e) { return e } })()
+const { MAX_VERIFIERS, renderCodeView, renderStrippedView, renderBlankedLiterals, runBothViews, readWriterBound, resolveHarnessName } =
+  VIEWS instanceof Error ? {} : VIEWS
+
+// The policy helper a writer split's bound reads (§8 F8): the hooks kit's `resolvePolicyHelper`, from the
+// `scratch-guard.js` `--hook` names, bound by `loadHook` before any rule runs; '' reads as no policy kit.
+let POLICY_HELPER = ''
 
 function loadHook(hook) {
   const m = require(require('path').resolve(hook))
-  const need = ['MAX_VERIFIERS', 'renderCodeView', 'renderStrippedView', 'renderBlankedLiterals', 'runBothViews', 'readWriterBound', 'resolveHarnessName']
-  const miss = need.filter((k) => m[k] === undefined)
-  if (miss.length) throw new Error(`it exports no ${miss.join(', ')}`)
-  ;({ MAX_VERIFIERS, renderCodeView, renderStrippedView, renderBlankedLiterals, runBothViews, readWriterBound, resolveHarnessName } = m)
+  if (typeof m.resolvePolicyHelper !== 'function') throw new Error('it exports no resolvePolicyHelper')
+  POLICY_HELPER = m.resolvePolicyHelper()
   return m
 }
 
@@ -791,7 +797,7 @@ function measureLensSlots(script, n) {
 // Rule 2 over one script under both views, the writer bound read once and only for a marked script,
 // at this process's working directory.
 function scanFanout(script) {
-  const writer = script.includes(WRITER_MARK) ? readWriterBound(process.cwd()) : null
+  const writer = script.includes(WRITER_MARK) ? readWriterBound(process.cwd(), POLICY_HELPER) : null
   return runBothViews((s) => fanoutFindings(s, writer), script)
 }
 
@@ -822,12 +828,13 @@ function main(argv) {
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--hook') hook = argv[++i] || null
     else if (argv[i] === '--slots') slots = true
-    else if (argv[i].startsWith('-')) return printRefusal(`${argv[i]} is no argument this check takes: it takes --hook <agent-cap.js>, then the files to judge or --slots and their <file>:<line> marker locations`)
+    else if (argv[i].startsWith('-')) return printRefusal(`${argv[i]} is no argument this check takes: it takes --hook <scratch-guard.js>, then the files to judge or --slots and their <file>:<line> marker locations`)
     else files.push(argv[i])
   }
-  if (!hook) return printRefusal('names no --hook, so agent-cap\'s views, which this rule reads, cannot be loaded')
+  if (!hook) return printRefusal('names no --hook, so the hooks kit\'s policy helper, which a writer split\'s bound reads, cannot be found')
   if (!files.length) return printRefusal('names no file, and a check over nothing is not a pass')
-  try { loadHook(hook) } catch (e) { return printRefusal(`cannot load agent-cap's exports from ${hook}: ${(e && e.message) || e}`) }
+  try { loadHook(hook) } catch (e) { return printRefusal(`cannot load the hooks kit's resolvePolicyHelper from ${hook}: ${(e && e.message) || e}`) }
+  if (VIEWS instanceof Error) return printRefusal(`cannot load the review kit's script-views.js beside this file: ${VIEWS.message.split(/\r?\n/)[0]}`)
   if (slots) {
     // Each location is a marker line render_lenses.py --markers printed; the literal's name is the line's last word.
     let bad = 0

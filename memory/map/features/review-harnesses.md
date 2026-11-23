@@ -30,6 +30,7 @@ workflow-scripts = [
   "drift-audit-state.js",
   "drift-audit-state.template.js",
   "orient-counterfactual.js",
+  "script-views.js",
   "spec-audit-optin.js",
   "tier2-review.js",
   "tier2-review.template.js",
@@ -63,7 +64,7 @@ does not apply to these files.
 `check-verifier-fanout.js`, run by the merge bar over every harness, denies an `agent(` fanned over a
 receiver it cannot prove bounded, or a bound it cannot resolve to an integer at or below the hook's
 constant; `check-review-join.js` holds the ref-keyed join ban, and the `spec-audit-optin.js` pack, a
-PreToolUse hook on `Workflow` calls, the spec-audit opt-in. All three read `tools/hooks/agent-cap.js`'s
+PreToolUse hook on `Workflow` calls, the spec-audit opt-in. All three read the review kit's `tools/workflows/script-views.js` or the hooks kit's `tools/hooks/scratch-guard.js`'s
 exports. Two authoring traps live here: the batching assignment must be ONE line ending in its
 marker comment, and a trailing semicolon on a bound constant declaration defeats the binder.
 
@@ -106,7 +107,7 @@ and `check-workflow-syntax.js` both select their population by the literal `expo
 regex, so a harness spelling that export any other way silently drops out of both. That is a real
 selection seam and not a formality.
 
-`check-verifier-fanout.sh` delegates its predicate to `tools/hooks/agent-cap.js` rather than
+`check-verifier-fanout.sh` delegates its predicate to `check-verifier-fanout.js` over `tools/workflows/script-views.js` rather than
 re-implementing it, which is the shape any second entry point on a hook predicate should copy: one
 predicate, two callers.
 
@@ -196,7 +197,7 @@ build harness refuses a declared `specAudit` beside no pinned `base` (`TOOL-aGra
   other. What stays a prompt property is that the item list matches the table the same agent wrote
   into the report: nothing re-reads the record.
 - **The two enforcement points AGREE now, and the modality gap is closed for one rule.**
-  `TOOL-dTieredTribunal-14` lifted the ref-keyed-join ban into `tools/hooks/agent-cap.js` as its fifth
+  `TOOL-dTieredTribunal-14` lifted the ref-keyed-join ban into the agent limit hook (retired by TOOL-dBoundRoles-25) as its fifth
   rule and made `check-review-join.sh` delegate through `--only=join`, so both entry points share one
   predicate and an inline `script` string on a `Workflow` call is judged by it. What remains true is
   the general shape: every OTHER file-scoped scanner in this directory still covers the committed
@@ -225,11 +226,11 @@ seam: tier2-review.js — reuse as the reference implementation of the pipeline 
 counter; extend by copying a guard together with the comment naming the unit that earned it, because
 the provenance is the only thing that stops the guard being deleted as noise later.
 seam: check-review-join.sh — reuse for a source-level absence assertion over the harness population.
-It no longer HOLDS a predicate: it selects the population and delegates to `agent-cap.js --only=join`,
+It no longer HOLDS a predicate: it selects the population and delegates to `check-review-join.js`,
 so extend it by adding a rule to the hook and a member to that closed set, never by re-implementing
 one here. Literal blanking is load-bearing and lives in the hook, because the reference harness
 necessarily spells the banned expression while documenting it.
-seam: agent-cap.js — reuse as the single predicate for any fan-out rule that must reach an inline
+seam: script-views.js — reuse as the single scanner for any fan-out rule that must reach an inline
 script; extend by delegating from a file gate rather than re-implementing, the way
 check-verifier-fanout.sh already does.
 seam: check-protocol-parity.test.sh — reuse as this kit's ONLY renderer, and as the leg that grades

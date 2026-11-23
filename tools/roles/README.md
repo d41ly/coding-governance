@@ -83,10 +83,27 @@ that parses the return, because the harness owns its return contract.
 
 Each workflow's `enforced-by` names, by description, what refuses a bypass once the catalogue is
 wired: the kickoff kit's card writer for `orient`; the hooks kit's write gate, keyed on a role's
-`writes`, for `spec-write` and `build`, beside the routed-commits leg for `build`; the hooks kit's
+`writes`, for `spec-write` and `build`, beside the routed-commits leg for `build`; this kit's
 spawn guard for `research`, `spec-review` and `closing-review`; the pre-push hook for `gate-bar`;
 the memory-tree hygiene leg for `bookkeeping`. `handoff` and `reuse` read `none` with the reason.
 The checker grades that each entry names something, not that the thing exists.
+
+### The spawn guard
+
+`spawn-guard.js` is this kit's `PreToolUse` hook on `Workflow|Agent`, wired by `settings-merge.py`, whose
+default fragment is `spawn-guard.fragment.json` beside it (TOOL-dBoundRoles-25). It holds every rule the
+hooks kit's agent limit hook ran until that hook retired, in this order: every `--only=` argument refused;
+rule 6, the rendered handoff on an `Agent` call and harness admission on a `Workflow` call; rule 8, the
+effort level; rule 7, the settings in force against the landed agent limit; then the spec-audit opt-in
+pack's presence. Each refusal opens `BLOCKED by spawn-guard:`. A declared harness is admitted only where its
+working-tree blob, through the repository's clean filters, is its blob at the landed revision the policy
+kit's `readLandedRevision` names: an edited harness, committed or not, waits until it lands, so the merge
+bar has read it before it runs. The pack reads the role index, card, fence, marker and args readers from the
+hooks kit's `scratch-guard.js` exports, found through its own `resolveKitDir` port; where that file does not
+resolve it refuses every call, as it does where the policy kit cannot name the landed revision. Its suite,
+`spawn-guard.test.sh`, is withheld from adopters and runs as the leg `spawn-guard self-test`. An adopter's
+wiring moves from the retired hook to the pack through the hooks kit's upgrade step
+`agent-cap/spawn-guard-to-roles-pack`, which wires the pack before it unwires the old command.
 
 ## The handoff renderer
 
@@ -174,7 +191,7 @@ fact line or a `gov:handoff` marker line inside a fence is content, never a fact
 of either walks `roles_lib.read_unfenced_lines`, the one fence walker (a fence opens on at most three
 spaces of indent and three or more backticks or tildes, and closes only on a run of the same character at
 least as long with nothing after it but whitespace), as `extract_prompt_marker` and the playbook kit's
-`read_handoff_edges` do, and the hooks kit's spawn guard walks its copy, `readUnfencedLines`. So a spec
+`read_handoff_edges` do, and this kit's spawn guard walks its copy, `readUnfencedLines`. So a spec
 that quotes a fact line, a heading-then-fact pair or a marker is handed whole and read as text. The
 practices block, the `## Card` block and the work-order blocks other than `### inputs`' sub-blocks are no
 handed value and are not fenced. The section is checked block by block (TOOL-dBoundRoles-48): every block
@@ -244,7 +261,7 @@ the memory root, and `product` each path a repeated `--allowance <path>` grants,
 file). A `product` item granted none, a granted path under no entry, absolute or climbing through `..`,
 a path granted to any other class and `--allowance` without `--item` each refuse. Pass the unit's
 `--dispatch --writes` set: a caller granting a whole `ROUTED_PATHS` entry is admitted, and nothing here
-can tell. THE BINDING: the hooks kit's spawn guard admits a work order whose marker's `item=` is a tag only
+can tell. THE BINDING: this kit's spawn guard admits a work order whose marker's `item=` is a tag only
 in a session whose orientation card routes the marker's `unit=`, the stand-in binding record until
 dWellOiledMachine's. `python handoff.py check <file>` refuses a work order with `item=` set that lacks
 any of the five blocks, naming it. The record kind is `roles_lib.WORK_ORDER_KIND`: its folder, its name
@@ -269,7 +286,7 @@ fill then closes with `handoff.render_framing_blocks`: `### framing:job`, `### f
 and `nostop`, each verbatim, authored text checked by the fence walk, and `### framing:job` closing with
 `Framed by: <prompt path> task-sha=<12hex>`, all inside the bytes the task-sha covers. `--framed-by` on the
 prompt writer, and `--for` naming it, refuse: its own task is the driver's details, unframed. While the policy
-key `prompts.author` is `prompt-writer`, the hooks kit's spawn guard admits a spawn of any other role only
+key `prompts.author` is `prompt-writer`, this kit's spawn guard admits a spawn of any other role only
 with that framing (its `checkFraming`). WHAT THIS DOES NOT CHECK: that the framing says anything the work
 order supports, of which TOOL-dBoundRoles-24's anchor check grades only that each anchor resolves to a handed fact,
 nor a forged line inside a framing field.
@@ -304,7 +321,7 @@ file holding no envelope, a prompt record rendered before them, reads `unranked`
 carries. Outside `--stand-in`, `render` also prints one stderr line, `handoff: description — <name>`,
 after its notes: the spawn's name, `<build> · <unit> · <workflow>` with the role's catalogue
 `workflow`, or `<build> · <workflow>` with no `--unit`. The `Agent` call passes it as `description`,
-and the hooks kit's spawn guard derives the same name from the marker and the role index and refuses
+and this kit's spawn guard derives the same name from the marker and the role index and refuses
 a call carrying any other (TOOL-aOrientedCast-27). stdout does not change in any mode.
 That `Agent` call also carries `effort` (TOOL-aProfiledEffort-3): its role's value in the JSON
 `python handoff.py role-efforts --model <id>` prints, one line mapping every role whose `agent` is
@@ -866,15 +883,15 @@ key holds.
 | orient | main-loop | /session-kickoff | gov-orienter | — | manifest-check.sh --card --append | once per session, at kickoff, before the first work-unit is opened | single | none | none | — | — | — | — |
 | reuse | agent | none | gov-reuse-scout | — | none — the scout's trigger is the kickoff opt-in that aScoutedSeam owns | before a new behaviour is designed, when kickoff asks for a scout | single | none | none | — | — | — | — |
 | spec-write | workflow | {prefix}/workflows/unattended-build.js | gov-spec-writer, gov-builder, gov-reviewer, gov-skeptic, gov-synthesizer | specWriter → gov-spec-writer, disposal → gov-spec-writer, builder → gov-builder, specFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | scratch-guard.js role arm | once per build, after orientation, for every unit whose spec is missing or thin | per-unit | unit.checklist.for-paths | unit.orient.producer | — | — | — | — |
-| spec-review | workflow | {prefix}/workflows/tier2-review.js | gov-reviewer, gov-skeptic, gov-synthesizer | specFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys | after the spec set is written, where the build or its project declares a spec audit | panel | none | unit.orient.verifier-cold | — | — | — | — |
+| spec-review | workflow | {prefix}/workflows/tier2-review.js | gov-reviewer, gov-skeptic, gov-synthesizer | specFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | spawn-guard.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys | after the spec set is written, where the build or its project declares a spec audit | panel | none | unit.orient.verifier-cold | — | — | — | — |
 | build | workflow | {prefix}/workflows/unattended-unit.js | gov-builder | builder → gov-builder | scratch-guard.js role arm, routed commits name a specced unit | once per unit, in stage order, after its spec is READY | per-unit | unit.checklist.for-paths | unit.orient.producer | — | — | — | — |
-| closing-review | workflow | {prefix}/workflows/tier2-review.js | gov-reviewer, gov-skeptic, gov-synthesizer | diffFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard | once per build, after the last unit is terminal, over the cumulative diff | panel | unit.checklist.for-diff | unit.orient.verifier-cold | — | — | — | — |
+| closing-review | workflow | {prefix}/workflows/tier2-review.js | gov-reviewer, gov-skeptic, gov-synthesizer | diffFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | spawn-guard.js spawn guard | once per build, after the last unit is terminal, over the cumulative diff | panel | unit.checklist.for-diff | unit.orient.verifier-cold | — | — | — | — |
 | gate-bar | program | bash {prefix}/run-gates/run-gates.sh | gov-tester | — | the pre-push hook | once, after the closing review, at the close or the push boundary | single | unit.checklist.for-diff | unit.orient.verifier-cold | — | — | — | — |
-| research | agent | none | gov-researcher | — | agent-cap.js spawn guard | any time a design must choose between candidates that no existing seam decides | single | none | none | — | — | — | — |
+| research | agent | none | gov-researcher | — | spawn-guard.js spawn guard | any time a design must choose between candidates that no existing seam decides | single | none | none | — | — | — | — |
 | handoff | program | python {prefix}/roles/handoff.py render | gov-prompt-writer, gov-session | — | none — a session-to-session message is no tool call the spawn guard sees | any time work passes to another session of this repository | single | none | none | — | — | — | — |
 | bookkeeping | main-loop | none | — | — | memory hygiene | any time a record, an index or the run state is updated | — | — | — | — | — | — | — |
-| plan | agent | none | gov-planner | — | agent-cap.js spawn guard | any time a build's plan is drafted, judged or recorded, before its specs are written | single | unit.checklist.for-paths | unit.orient.producer | — | — | — | — |
-| design | agent | none | gov-architect | — | agent-cap.js spawn guard | any time a build's scope is inventoried or decomposed into units, before its specs are written | single | unit.checklist.for-paths | unit.orient.producer | — | — | — | — |
+| plan | agent | none | gov-planner | — | spawn-guard.js spawn guard | any time a build's plan is drafted, judged or recorded, before its specs are written | single | unit.checklist.for-paths | unit.orient.producer | — | — | — | — |
+| design | agent | none | gov-architect | — | spawn-guard.js spawn guard | any time a build's scope is inventoried or decomposed into units, before its specs are written | single | unit.checklist.for-paths | unit.orient.producer | — | — | — | — |
 
 **Roles**, from `agents/*.agent.md`:
 

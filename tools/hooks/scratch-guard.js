@@ -29,7 +29,7 @@
  * located in a STRING-BLANKED view, so a `>` inside a quoted argument is invisible; the target is then
  * read from the ORIGINAL text at that offset, so a legitimately quoted redirect target still resolves.
  * Without the first half, `git commit -m "fixes the > ~/.merge-bar.log litter"` is denied. Without the
- * second, `> "$HOME/.x"` is missed. The sibling hook draws the same distinction (agent-cap.js
+ * second, `> "$HOME/.x"` is missed. The review kit's script views draw the same distinction (script-views.js
  * `stripStrings`), for the same reason.
  *
  * ponytail: the predicate is TEXTUAL. It resolves no variable beyond `~`, `$HOME` and the three temp
@@ -44,7 +44,7 @@
  * check below, the write gate, is one exception: it fails closed. The role-gate arm and the
  * shell-write arm are the others, for a payload carrying an `agent_type` only.
  *
- * Protocol: deny = stderr text + exit 2. Allow = print nothing, exit 0. Matches agent-cap.js, which
+ * Protocol: deny = stderr text + exit 2. Allow = print nothing, exit 0. Matches the roles kit's spawn-guard.js, which
  * records the choice as version-robust and free of any JSON-schema dependency — with ONE departure,
  * stated next: the orientation check below writes a WITNESS line on some exit-0 paths.
  *
@@ -96,7 +96,7 @@
  *
  * THE ROLE ARM (TOOL-aOrientedCast-6). The same gate reads WHO writes, from the payload's
  * `agent_type`, against the role index `.claude/roles.json` at the target toplevel (`loadRoleIndex`,
- * exported so agent-cap.js reads the index through this one reader). A write under
+ * exported so the roles kit's spawn-guard.js reads the index through this one reader). A write under
  * `<MEMORY_ROOT>/builds/<build>/spec/` is admitted only from a role declaring `writes = spec`; a
  * product write admitted by the route arm above is then admitted only from a role declaring
  * `writes = product`. The main loop, which carries no `agent_type`, and an untyped harness agent
@@ -220,7 +220,10 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.51 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.52 — ships inside the hooks kit entry
+// TOOL-dBoundRoles-25 S8: the hooks kit's version, which the retired hook file carried until TOOL-dBoundRoles-25; the kit keeps its
+// registry id `agent-cap` (§8 F5), and its `version_from` reads this constant.
+const KIT_AGENT_CAP_VERSION = '1.52' // gov:kit agent-cap@1.52 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -871,7 +874,7 @@ function resolveToplevel(start) {
 /**
  * The common dir: the `.git` directory itself, or — in a linked worktree, where `.git` is a FILE —
  * its `gitdir:` target's `commondir`, relative paths resolved against each. The same walk as
- * agent-cap.js makes for its slot ledger, and the branch every real session in this repo takes.
+ * the retired agent limit hook made for its slot ledger, and the branch every real session in this repo takes.
  */
 function resolveCommonDir(hit) {
   const fs = require('fs')
@@ -903,7 +906,7 @@ function resolveKickoffChecker() {
   const path = require('path')
   const { spawnSync } = require('child_process')
   try {
-    return path.join(require('./agent-cap.js').resolveKitDir('session-kickoff', 'manifest-check.sh', __dirname), 'manifest-check.sh')
+    return path.join(resolveKitDir('session-kickoff', 'manifest-check.sh', __dirname), 'manifest-check.sh')
   } catch { /* the next rung */ }
   const hit = resolveToplevel(__dirname)
   if (!hit) return null
@@ -1008,7 +1011,7 @@ function readCard(commonDir, sessionId, checker) {
  * its own line inside a build README's front matter, or null. FRONT MATTER ONLY — the slice between
  * the opening `---` on line 1 and the next `---` line, the scope the unattended driver reads its
  * keys in. Matching the whole file exempted a README whose BODY carried `authorized-by:` in a fenced
- * example while the driver authorized nothing (F10); agent-cap.js's spec-audit rule reads
+ * example while the driver authorized nothing (F10); the review kit's spec-audit-optin.js reads
  * `spec-audit:` through the same slice for the same reason (TOOL-aBlindedTrial-4). Takes BYTES, not
  * a path, because the staged-blob caller below has no file on disk to name. The key is compared as
  * a string, never interpolated into a regex (the `conf-value-interpolated-into-a-regex` class).
@@ -1122,7 +1125,7 @@ function checkOriented(cmd, data) {
 const WRITE_TOOLS = ['Edit', 'Write', 'MultiEdit', 'NotebookEdit']
 /** The statuses that admit a write, per tier. A Tier-1 SPECCED admits only when graded (F4). */
 const BUILDABLE_STATUS = { 'Tier-1': ['INPROGRESS', 'SPECCED'], 'Tier-2': ['INPROGRESS'] }
-/** The memory-tree conf at the target's toplevel; precedent for a root-level conf literal: agent-cap.js. */
+/** The memory-tree conf at the target's toplevel; precedent for a root-level conf literal: the retired agent limit hook's conf. */
 const ROUTE_CONF = '.memory-tree.conf'
 
 /**
@@ -1130,7 +1133,7 @@ const ROUTE_CONF = '.memory-tree.conf'
  * single-quoted or bare, an optional `export`, a trailing `# comment` only behind whitespace — a `#`
  * glued to a bare word is part of the word. null when no assignment exists; the value is RAW. The
  * key is compared as a string and never put into a regex (`conf-value-interpolated-into-a-regex`).
- * Lifted from agent-cap.js's `readSpecAuditDefault`, which now delegates here: one conf grammar
+ * Lifted from the agent limit hook's `readSpecAuditDefault`, which delegated here: one conf grammar
  * in this home. Ceiling: a multi-line quoted value elsewhere in the conf can hold a line that
  * reads as an assignment; the shell would not read it so.
  */
@@ -1354,7 +1357,7 @@ const ROLE_INDEX = '.claude/roles.json'
  * TOOL-aGuardedEffort-1 adds a third: the top-level `effort`, a plain object whose `default`,
  * `profiles`, `harnesses` and `unset` are plain objects; `effort` is null when absent.
  * TOOL-dBoundRoles-6 S5 adds a fourth: a role's `role-sha`, 12 lowercase hex digits, the hash of the
- * `## Role` section a handoff of it carries, which agent-cap.js's rule 6 compares at spawn.
+ * `## Role` section a handoff of it carries, which the spawn guard's rule 6 (spawn-guard.js) compares at spawn.
  * TOOL-dBoundRoles-9 S3 adds a fifth: the top-level `classes`, a plain object whose every value is a
  * string, each write class's folder as the roles kit's `WRITE_FOLDERS` spells it; null when absent.
  */
@@ -1399,7 +1402,7 @@ function loadRoleIndex(top) {
     return { state: 'broken', shown, why: `${shape}: gates is not { manifest: <string|null> }` }
   }
   // TOOL-aGuardedEffort-1 S2: the top-level `effort`, when present, is a plain object whose four keys
-  // are plain objects; agent-cap.js's rule 8 reads it. Absent reads as null, which adds no rule there.
+  // are plain objects; spawn-guard.js's rule 8 reads it. Absent reads as null, which adds no rule there.
   const effort = d.effort
   const checkPlain = (v) => !!v && typeof v === 'object' && !Array.isArray(v)
   if (effort !== undefined && !(checkPlain(effort) && ['default', 'profiles', 'harnesses', 'unset'].every((k) => checkPlain(effort[k])))) {
@@ -1420,7 +1423,7 @@ const ROLE_AGENTS_DIR = ROLE_INDEX.replace(/[^/]+$/, 'agents/')
  * TOOL-dBoundRoles-6 §4 "A governed tree": true when `.claude/agents/` at `top` holds a `.md` file whose
  * front matter, read by readFrontMatterKey, carries both `workflow` and `writes`, the two gov keys the
  * roles kit's renderer writes and Claude Code's own agent files never carry. Exported beside
- * loadRoleIndex, so agent-cap.js reads it through this one reader. Asked only where the index is absent,
+ * loadRoleIndex, so spawn-guard.js reads it through this one reader. Asked only where the index is absent,
  * so a tree whose index was deleted while its renders remain is governed and refused, and a tree that
  * never adopted the roles kit keeps its no-arm verdict. A folder or file that does not read is not
  * governed. WHAT IT DOES NOT SEE: a tree whose index and every rendered agent file were both deleted.
@@ -1676,7 +1679,7 @@ function readOpenReds(gitDir, top) {
       // A BLANK KEY (TOOL-aNimbleMend-15 S7), read as the commit grader's `resolve_leg_manifest` reads
       // it: `gate-legs.json` beside the run-gates kit this install holds, and only inside `top`. The
       // resolver throws where no such kit resolves, which the catch below answers.
-      file = path.join(path.dirname(require('./agent-cap.js').resolveKitDir('run-gates', 'run-gates.sh', __dirname)), 'gate-legs.json')
+      file = path.join(path.dirname(resolveKitDir('run-gates', 'run-gates.sh', __dirname)), 'gate-legs.json')
       const real = buildComparablePath(resolveRealPath(file))
       const root = buildComparablePath(resolveRealPath(top))
       if (!real || !root || real === root || !checkUnderRoot(real, root)) return []
@@ -1697,7 +1700,7 @@ function readOpenReds(gitDir, top) {
   const unlanded = new Set()
   if (rows.some((r) => r.head !== head)) {
     try {
-      const helper = require('./agent-cap.js').resolvePolicyHelper()
+      const helper = resolvePolicyHelper()
       const landed = helper && fs.existsSync(helper) ? require(helper).readLandedRevision(top) : ''
       if (/^[0-9a-f]{40,64}$/.test(landed)) {
         const r = runGit(['rev-list', 'HEAD', '--not', landed])
@@ -1736,7 +1739,7 @@ function checkRedLane(w) {
 /**
  * The policy file's arm (TOOL-dDeclaredLoop-2 S10): a deny when `target` is the policy file of the
  * repository at `top`, the path the policy kit's policy-mirror.js exports as POLICY_REL, found through
- * agent-cap.js's resolvePolicyHelper; null otherwise, and null with no policy kit beside the hook. A
+ * this file's resolvePolicyHelper; null otherwise, and null with no policy kit beside the hook. A
  * target that is no `.toml` file reads nothing. The policy file has one door, the loop kit's
  * policy_edit.py, which checks the value, writes the change record and stages both; the pre-commit
  * guard judges the commit.
@@ -1745,7 +1748,7 @@ function checkPolicyFile(tool, target, top) {
   const fs = require('fs')
   const path = require('path')
   if (path.extname(target).toLowerCase() !== '.toml') return null
-  const helper = require('./agent-cap.js').resolvePolicyHelper()
+  const helper = resolvePolicyHelper()
   if (!helper || !fs.existsSync(helper)) return null
   const rel = require(helper).POLICY_REL
   if (typeof rel !== 'string' || buildComparablePath(target) !== buildComparablePath(path.join(top, buildNativePath(rel)))) return null
@@ -1927,7 +1930,7 @@ function checkRouted(data, env) {
     if (!checkRedLane({ agentType, index, governed, lane: { on: true, why: '' }, reds })) return verdict
     let lane
     try {
-      const helper = require('./agent-cap.js').resolvePolicyHelper()
+      const helper = resolvePolicyHelper()
       if (!helper || !fs.existsSync(helper)) {
         lane = { on: true, why: 'NOTE — no policy kit resolves beside this hook, so bar.inline-red-fixes reads on' }
       } else {
@@ -1982,7 +1985,7 @@ const TRANSCRIPT_READ_BOUND = 256 * 1024
 
 /**
  * S4: the allowance of the work order a role agent was spawned with, read from its transcript, where
- * agent-cap.js's rule 6 verified the prompt against its prompt file byte for byte. The transcript is
+ * spawn-guard.js's rule 6 verified the prompt against its prompt file byte for byte. The transcript is
  * `<session dir>/subagents/agent-<agent_id>.jsonl`, else `<session dir>/subagents/workflows/<run id>/
  * agent-<agent_id>.jsonl` for the first run id in name order holding one, the session dir being the
  * payload's `transcript_path` without `.jsonl`; `agent_id` and each run id reach a path only in
@@ -2613,7 +2616,7 @@ const READ_TOOLS = ['Read', 'Grep', 'Glob']
  * `{ deny }` refuses.
  *  1. the payload carries an `agent_type` -> null: a worker keeps its read-only probes (RL-5).
  *  2. the payload `cwd`, else `env.CLAUDE_PROJECT_DIR`, lies in no repository -> null, not this arm's.
- *  3. no policy kit resolves beside this hook (agent-cap.js's resolvePolicyHelper) -> witness,
+ *  3. no policy kit resolves beside this hook (this file's resolvePolicyHelper) -> witness,
  *     `driver.reads unarmed`.
  *  4. `readPolicy('driver.reads')` at the toplevel, the landed revision's value, never the working
  *     tree's: a refused read denies, naming the reader's line, since an arm that cannot read its key
@@ -2632,7 +2635,7 @@ function checkDriverRead(data, env) {
   const start = (typeof data.cwd === 'string' && data.cwd !== '') ? data.cwd : ((env && env.CLAUDE_PROJECT_DIR) || '')
   const hit = start ? resolveToplevel(start) : null
   if (!hit) return null
-  const helper = require('./agent-cap.js').resolvePolicyHelper()
+  const helper = resolvePolicyHelper()
   if (!helper || !fs.existsSync(helper)) {
     return { witness: `driver.reads unarmed — no policy kit resolves beside this hook, so the main loop's ${tool} is admitted (TOOL-dBoundRoles-10)` }
   }
@@ -2690,7 +2693,7 @@ function main() {
   }
   if (data && WRITE_TOOLS.includes(data.tool_name)) {
     // FAILS CLOSED, unlike the two Bash checks below: a write gate that throws and admits is the
-    // silent off D7 gives no bypass. agent-cap.js keeps the same rule for its spec-audit kind (S8).
+    // silent off D7 gives no bypass. spawn-guard.js keeps the same rule for its spec-audit kind (S8).
     let gate
     try {
       gate = checkRouted(data, process.env)
@@ -2767,5 +2770,110 @@ function main() {
   process.exit(0)
 }
 
+
+// TOOL-dBoundRoles-25 S4 — THE HELPERS TWO KITS READ, moved here from the retired agent limit hook (§8 F7). The
+// roles kit's spawn guard (`<prefix>/roles/spawn-guard.js`) and this kit's own hooks read the marker reader,
+// the args reader, the slug walk, the policy helper's locator and the sibling-kit resolver, and so does the
+// review kit's spec-audit opt-in pack; a helper two kits read lives in this file's exports, over the roles
+// kit's declared `requires_if` edge. ONE copy each, beside `readUnfencedLines`, which the marker reader walks.
+// The `builds/<slug>` a repo-relative path sits under, or null: no `builds` segment, any `..`
+// segment, or a spelling that is not repo-relative at all — absolute (`/…`, `X:…`) or `~`-rooted
+// (round 2, R1). A direct spec-audit subject is repo-relative by the harness's own contract, and a
+// slug walk over an absolute path answers the SLUG axis while a second checkout with the same slug
+// sits on the ROOT axis it never asked about. One walk for every subject so containment cannot be
+// tested one way (closing review F2).
+function extractBuildSlug(p) {
+  const q = String(p).replace(/\\/g, '/')
+  if (q.startsWith('~') || /^([A-Za-z]:|\/)/.test(q)) return null
+  const parts = q.split('/')
+  if (parts.indexOf('..') !== -1) return null
+  const i = parts.indexOf('builds')
+  return i === -1 || !parts[i + 1] ? null : parts[i + 1]
+}
+
+
+// A Workflow call's structured `args`, parsed ONCE for rules 0 and 6: a JSON string is parsed, and
+// anything that is not then a plain object — a string that does not parse included — is null. Rule 0
+// admits on null, as it always has; rule 6 refuses on it.
+function extractWorkflowArgs(data) {
+  let a = data && data.tool_input && data.tool_input.args
+  if (typeof a === 'string') {
+    try { a = JSON.parse(a) } catch { return null }
+  }
+  return a && typeof a === 'object' && !Array.isArray(a) ? a : null
+}
+
+// The roles kit's `MARKER_RE` spelled again with the same named groups (brief I5), since a kit imports no
+// sibling kit: `item=` is optional, so a marker written before it still matches (TOOL-dBoundRoles-17 S1).
+const HANDOFF_MARK_RE = /^<!-- gov:handoff role=(?<role>\S+) build=(?<build>\S+) unit=(?<unit>\S+)(?: item=(?<item>\S+))? path=(?<path>\S+) role-sha=(?<roleSha>[0-9a-f]{12}) task-sha=(?<taskSha>[0-9a-f]{12}) -->$/
+
+// Every line of `text` outside a fence, carriage returns stripped, that is a whole marker line with its
+// fields in order: `{ line, role, build, unit, item, path, roleSha, taskSha }` each, read by group name;
+// `item` is the field's string, `-` included, or null for a marker carrying none. The lines are the ones
+// scratch-guard's `readUnfencedLines` yields, so a marker quoted inside handed content, which the renderer
+// fences, is content and is not counted (TOOL-dBoundRoles-38 S4).
+function extractHandoffMarker(text) {
+  const out = []
+  for (const [, raw] of readUnfencedLines(text)) {
+    if (raw === null) continue
+    const line = raw.replace(/\r/g, '')
+    const m = HANDOFF_MARK_RE.exec(line)
+    if (!m) continue
+    const g = m.groups
+    out.push({ line, role: g.role, build: g.build, unit: g.unit, item: g.item === undefined ? null : g.item, path: g.path, roleSha: g.roleSha, taskSha: g.taskSha })
+  }
+  return out
+}
+
+// TOOL-dFairHearing-43 S6 - found through `resolveKitDir`; a refusal reads as the absent helper, an empty path.
+function resolvePolicyHelper() {
+  try { return require('path').join(resolveKitDir('policy', 'policy-mirror.js', __dirname), 'policy-mirror.js') } catch { return '' }
+}
+
+// TOOL-dFairHearing-32 S25 — THE SIBLING-KIT RESOLVER, ported from `resolve_kit_dir.py` in gov's lib dir
+// rung for rung, and held to it row for row by that dir's resolve-python.test.sh (§2k), so it cannot
+// drift silently the way a hand port did (TOOL-aMendedFleet-102). The directory holding <anchor> of the
+// kit gov homes at <home>: 1. a `.governance/install.json` row, at the root the nearest `.git` names,
+// whose `path` is a file inside the tree and whose `source` ends <home>/<anchor>, or a `rendered` row
+// whose template sits under <home>/ and whose `path` names <anchor>; a row whose path escapes the tree,
+// holds `..` or names no file is skipped; 2. <here>/<home>/<anchor>, then <here>/../<home>/<anchor>;
+// 3. a thrown Error naming the three places looked, its `receipt` the receipt's path.
+// >>> resolveKitDir
+function resolveKitDir(home, anchor, here) {
+  const path = require('path')
+  const fs = require('fs')
+  const checkFile = (f) => { try { return fs.statSync(f).isFile() } catch { return false } }
+  here = path.resolve(here)
+  let root = here
+  for (let d = here; ; d = path.dirname(d)) {
+    if (fs.existsSync(path.join(d, '.git'))) { root = d; break }
+    if (path.dirname(d) === d) break
+  }
+  const receipt = path.join(root, '.governance', 'install.json')
+  let rows = []
+  try {
+    const data = JSON.parse(fs.readFileSync(receipt, 'utf8'))
+    rows = data && typeof data === 'object' && Array.isArray(data.files) ? data.files : []
+  } catch { rows = [] }
+  for (const row of rows) {
+    if (!row || typeof row !== 'object' || Array.isArray(row) || !row.path) continue
+    const src = String(row.source || '').split('/')
+    const n = src.length
+    const made = row.role === 'rendered' && String(row.path).split('/').pop() === anchor
+    if (!(n >= 2 && src[n - 2] === home && (src[n - 1] === anchor || made))) continue
+    const hit = path.resolve(root, String(row.path))
+    const rel = path.relative(root, hit)
+    const inside = rel !== '' && !path.isAbsolute(rel) && rel.split(path.sep)[0] !== '..'
+    if (checkFile(hit) && inside && !String(row.path).split(/[\\/]/).includes('..')) return path.dirname(hit)
+  }
+  const probes = [path.join(here, home), path.join(path.dirname(here), home)]
+  for (const cand of probes) if (checkFile(path.join(cand, anchor))) return cand
+  const renderPosix = (f) => f.split(path.sep).join('/')
+  const e = new Error(`no ${home} kit holding ${anchor} in this install: looked in ${renderPosix(receipt)}, ${renderPosix(probes[0])} and ${renderPosix(probes[1])}`)
+  e.receipt = receipt
+  throw e
+}
+// <<< resolveKitDir
+
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines, scanWriteTargets, checkShellWrites, readWorkOrderAllowance, checkRoutedEntry, checkDriverRead }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines, scanWriteTargets, checkShellWrites, readWorkOrderAllowance, checkRoutedEntry, checkDriverRead, KIT_AGENT_CAP_VERSION, extractBuildSlug, extractWorkflowArgs, HANDOFF_MARK_RE, extractHandoffMarker, resolvePolicyHelper, resolveKitDir }

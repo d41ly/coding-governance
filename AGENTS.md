@@ -166,9 +166,9 @@
 - `/drift-audit` measures whether this repository's records still match its tree; run it when the state feels unclear.
 - `/lexicon` answers what to call a new function, type or command from `.lexicon.conf`, before the name is written.
 - `<prefix>/workflows/tier2-review.js` runs a Tier-2 review as one bounded `Workflow`.
-- The agent-cap hook refuses an unbounded fan-out at the tool call; consolidate the fan-out rather than routing around it.
 - The write gate refuses a product-code write that no specced unit owns; route the unit through `/session-kickoff` first.
 - An attended code build runs through `/build`.
+- The spawn guard refuses an agent prompt that is not a rendered handoff, and a harness that differs from its landed blob; land the harness, or render the handoff, rather than routing around it.
 - `/unattended` starts, resumes or closes a run that merges and pushes with no owner turn.
 - `/runlog` answers what an unattended run did, decided or cost, and why it stopped.
 - `<prefix>/push-main.sh` lands and pushes the default branch, and nothing bypasses it.

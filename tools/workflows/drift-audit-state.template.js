@@ -17,7 +17,7 @@ export const meta = {
 // BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS IN THE RENDER, and neither is
 // caller-settable. The retired form bound each of them from an `<expr> || 5` fallback, which read as a
 // constant to the guard and as a knob to the runtime — so a caller raised this harness's own agent
-// count past the cap with every gate green. agent-cap.js RESOLVES the verify total and refuses that
+// count past the cap with every gate green. check-verifier-fanout.js RESOLVES the verify total and refuses that
 // binder form outright; `CAP` is the agent limit, `runtime.agents-in-flight`, which the harness's own
 // settings enforce (TOOL-dGroundRules-10).
 // (The spelling itself is paraphrased here on purpose: the acceptance grep for it is repo-wide and

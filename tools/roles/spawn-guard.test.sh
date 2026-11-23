@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# Runnable check for the portable agent-cap.js guard on the Workflow and Agent tool calls, the rules it
-# keeps since TOOL-dFairHearing-16: rule 6, the rendered handoff, rule 8, the effort level a call runs
-# at against its model's (TOOL-aGuardedEffort-1), and rule 7, the settings in force
-# against the landed agent limit, plus the readers it exports, its refusal of every `--only=`, and
-# its refusal of a spec-audit call with no opt-in pack beside it (TOOL-dFairHearing-22).
-# Rules 2, 5 and 0 moved to the review kit and their arms to its suites; the retired rules' arms went
-# with them.
-# Run from the kit directory: bash ./agent-cap.test.sh   (exit 0 = all pass)
+# Runnable check for the roles kit's spawn guard, `spawn-guard.js`, on the Workflow and Agent tool calls
+# (TOOL-dBoundRoles-25): every rule the hooks kit's retired agent limit hook ran, moved with its arms,
+# each retargeted at the pack and its deny prefix `BLOCKED by spawn-guard:` — rule 6, the rendered
+# handoff, with harness admission held to the landed blob (S3), rule 8, the effort level a call runs at
+# against its model's (TOOL-aGuardedEffort-1), and rule 7, the settings in force against the landed agent
+# limit, plus the readers the pack exports, its refusal of every `--only=`, and its refusal of a
+# spec-audit call with no opt-in pack beside it (TOOL-dFairHearing-22). Every arm runs a COPY of the
+# pack beside a copy of the hooks kit's scratch-guard.js, the layout `mkpack` builds, since the pack
+# reads that file's exports. The arms over the retired hook's own copies and its frozen script views
+# did not move: the views are the review kit's script-views.js now, and their arm is its suite's.
+# Run from the kit directory: bash ./spawn-guard.test.sh   (exit 0 = all pass)
 set -u
 # A suite run from inside a session inherits the session's directory, which would arm rule 6 over a
 # fixture whose cwd lies in no checkout (TOOL-aOrientedCast-14 S7); an arm that needs one names it.
@@ -24,7 +27,7 @@ derive_self_rel() {
   printf '%s\n' "$_dsr_rel"
 }
 # <<< derive_self_rel
-KIT_REL=$(derive_self_rel "$HERE") || { echo "agent-cap.test: not inside a git repository"; exit 2; }
+KIT_REL=$(derive_self_rel "$HERE") || { echo "spawn-guard.test: not inside a git repository"; exit 2; }
 # PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
@@ -32,14 +35,8 @@ case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 # ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
 # or a key relative to the tool root, is spelled through it rather than bare (TOOL-aRepatriatedFork-28 S2).
 ROOTPFX=""
-KIT_HOOK="$HERE/agent-cap.js"
+KIT_HOOK="$HERE/spawn-guard.js"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
-# THE ARMS RUN A COPY (TOOL-dGroundRules-21 S38): rule 7 refuses a payload cwd that lies in no checkout
-# wherever a policy kit sits beside the hook, and every arm below runs from "$TMP", which no checkout
-# holds. The copy sits beside scratch-guard.js and no policy kit, where rule 7 adds no rule, so each arm
-# judges the rule it names; the sections that arm rule 7 build their own copies beside a policy kit.
-ARMS_HOOKS="$TMP/arms-hooks/hooks"; mkdir -p "$ARMS_HOOKS"; cp "$KIT_HOOK" "$HERE/scratch-guard.js" "$ARMS_HOOKS/"
-HOOK="$ARMS_HOOKS/agent-cap.js"
 pass=0; fail=0
 # The one resolver, not the retired `command -v python3 || python` idiom this repo banned — which the
 # ban could not see here, because it matches only `command -v`.
@@ -284,7 +281,20 @@ except LookupError as e:
 r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
-TESTPY=$(resolve_python) || { echo "agent-cap.test: no usable python"; exit 2; }
+TESTPY=$(resolve_python) || { echo "spawn-guard.test: no usable python"; exit 2; }
+# THE PACK'S LAYOUT: the hooks kit's scratch-guard.js, found the way the pack finds it, read from its kit.
+ROOTDIR=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null)
+SG_DIR=$(resolve_kit_dir "$TESTPY" hooks scratch-guard.js "$HERE") || { echo "spawn-guard.test: no hooks kit holding scratch-guard.js beside this kit"; exit 2; }
+SG_SRC="$ROOTDIR/$SG_DIR/scratch-guard.js"
+mkpack() { # <kits dir> -> prints <kits dir>/roles/spawn-guard.js, a copy of the pack beside <kits dir>/hooks/scratch-guard.js
+  mkdir -p "$1/roles" "$1/hooks" && cp "$KIT_HOOK" "$1/roles/" && cp "$SG_SRC" "$1/hooks/" && printf '%s\n' "$1/roles/spawn-guard.js"
+}
+# THE ARMS RUN A COPY (TOOL-dGroundRules-21 S38): rule 7 refuses a payload cwd that lies in no checkout
+# wherever a policy kit sits beside the pack, and every arm below runs from "$TMP", which no checkout
+# holds. The copy sits beside scratch-guard.js and no policy kit, where rule 7 adds no rule, so each arm
+# judges the rule it names; the sections that arm rule 7 or admit a harness build their own copies beside
+# a policy kit, since a declared harness is admitted only at its landed blob, which the policy kit reads.
+HOOK=$(mkpack "$TMP/arms-kits")
 check() { # name expected_exit json
   # FROM "$TMP", not from wherever the suite was launched: a payload with no `cwd` judges the
   # caller's checkout, whose roles index arms rule 6 and whose settings rule 7 reads. The scratch dir
@@ -302,11 +312,11 @@ check() { # name expected_exit json
 # it EXPORTS to those homes. This arm requires the hook as a module: were `main()` to run on require it
 # would read the empty stdin and exit before the line printed, and a reader missing from the exports
 # prints `undefined` in its place.
-exported=$(cd "$TMP" && node -e "const m=require(process.argv[1]); console.log(typeof m.runBothViews, typeof m.extractWorkflowArgs, typeof m.extractBuildSlug, typeof m.readWriterBound, m.MAX_VERIFIERS)" "$HOOK" < /dev/null 2>"$TMP/err")
-if [ "$exported" = "function function function function 5" ]; then
-  echo "ok   requiring the hook runs no rule, and it exports the readers its review-kit homes read"; pass=$((pass+1))
+exported=$(cd "$TMP" && node -e "const m=require(process.argv[1]); console.log(typeof m.resolveModelProfile, typeof m.checkEffortLevel, typeof m.resolvePromptsAuthor, typeof m.checkHarnessLanded, Array.isArray(m.TYPED_INPUTS))" "$HOOK" < /dev/null 2>"$TMP/err")
+if [ "$exported" = "function function function function true" ]; then
+  echo "ok   requiring the pack runs no rule, and it exports the readers the roles kit's suites read"; pass=$((pass+1))
 else
-  echo "FAIL the hook's exports read '$exported', want 'function function function function 5'"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  echo "FAIL the pack's exports read '$exported', want 'function function function function true'"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
 fi
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
@@ -330,9 +340,8 @@ SA0="$TMP/sa0"; mkdir -p "$SA0/memory/builds/tSA/reviews"; printf -- '---\nslug:
 # $TMP/pack-hooks/hooks, with the tree's own pack copied beside it. Against a hook with no presence
 # check, the dated call and the `specAudit` call are admitted, and the first and third arms red.
 PKWF=$(resolve_kit_dir "$TESTPY" workflows spec-audit-optin.js "$HERE") || PKWF=""
-[ -n "$PKWF" ] && [ -z "${ROOTDIR:-}" ] && ROOTDIR=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null)
-PACK_HOOKS="$TMP/pack-hooks/hooks"; mkdir -p "$PACK_HOOKS" "$TMP/pack-hooks/workflows"; cp "$KIT_HOOK" "$HERE/scratch-guard.js" "$PACK_HOOKS/"
-[ -n "$PKWF" ] && cp "$ROOTDIR/$PKWF/spec-audit-optin.js" "$TMP/pack-hooks/workflows/"
+PACK_HOOK=$(mkpack "$TMP/pack-kits"); mkdir -p "$TMP/pack-kits/workflows"
+[ -n "$PKWF" ] && cp "$ROOTDIR/$PKWF/spec-audit-optin.js" "$TMP/pack-kits/workflows/"
 run_pack() { # name expected_exit hook payload-json [text stderr must carry ...]
   local name=$1 want=$2 hk=$3 body=$4 got miss=""; shift 4
   printf '%s' "$body" | (cd "$TMP" && node "$hk") >/dev/null 2>"$TMP/err"; got=$?
@@ -350,37 +359,37 @@ run_pack "pack AC1: a dated spec-audit call with no pack beside the hook is refu
 # beside the hook never reaches. RED against the hook at TOOL-dFairHearing-22's commit, which read no receipt:
 # it named `update` for an unclaimed kit and denied the pack the receipt names.
 RWK=workflows
-RCP="$TMP/rcpt/p"; mkdir -p "$RCP/.git" "$RCP/.claude/hooks" "$RCP/.governance" "$RCP/tools/$RWK"
-cp "$KIT_HOOK" "$HERE/scratch-guard.js" "$RCP/.claude/hooks/"
+RCP="$TMP/rcpt/p"; mkdir -p "$RCP/.git" "$RCP/.governance" "$RCP/tools/$RWK"
+RCP_HOOK=$(mkpack "$RCP/.claude")
 RCP_ROW="{\"path\":\"tools/$RWK/spec-audit-optin.js\",\"kit\":\"review-harness\",\"role\":\"engine\",\"source\":\"tools/$RWK/spec-audit-optin.js\"}"
 printf '{"kits":["agent-cap"],"files":[]}' > "$RCP/.governance/install.json"
-run_pack "FH27 AC8: a receipt claiming agent-cap alone names the apply remedy" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" 'govkit apply --kits review-harness'
+run_pack "FH27 AC8: a receipt claiming agent-cap alone names the apply remedy" 2 "$RCP_HOOK" "$SA_DATED" 'govkit apply --kits review-harness'
 grep -qF 'update --kits review-harness' "$TMP/err" && { echo "FAIL FH27 AC8: the unclaimed receipt's deny still names the update remedy"; fail=$((fail+1)); }
 printf '{"kits":["agent-cap","review-harness"],"files":[]}' > "$RCP/.governance/install.json"
-run_pack "FH27 AC8: a receipt claiming both names the update remedy" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" 'govkit update --kits review-harness'
+run_pack "FH27 AC8: a receipt claiming both names the update remedy" 2 "$RCP_HOOK" "$SA_DATED" 'govkit update --kits review-harness'
 : > "$RCP/tools/$RWK/spec-audit-optin.js"
 printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "$RCP_ROW" > "$RCP/.governance/install.json"
-run_pack "FH27 AC15: the pack under a per-kit prefix the receipt names is admitted" 0 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED"
+run_pack "FH27 AC15: the pack under a per-kit prefix the receipt names is admitted" 0 "$RCP_HOOK" "$SA_DATED"
 # TOOL-dFairHearing-32 AC15: `resolveKitDir`'s rungs. A row naming a missing path is SKIPPED, so the pack beside the
 # hook admits; only the resolver's refusal denies, naming the receipt and both probes, and a `..` row is skipped
 # even where it names a file. RED against the hook at TOOL-dFairHearing-27's commit, which denied the stale row
 # whatever sat beside the hook. The paths are matched by their tails: node spells the scratch root its own way.
 printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "${RCP_ROW//tools\/$RWK\/spec-audit-optin.js\",\"kit/tools/gone/spec-audit-optin.js\",\"kit}" > "$RCP/.governance/install.json"
 mkdir -p "$RCP/.claude/workflows"; : > "$RCP/.claude/workflows/spec-audit-optin.js"
-run_pack "FH32 AC15: a stale receipt row with the pack beside the hook is admitted" 0 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED"
+run_pack "FH32 AC15: a stale receipt row with the pack beside the hook is admitted" 0 "$RCP_HOOK" "$SA_DATED"
 rm -f "$RCP/.claude/workflows/spec-audit-optin.js"
-run_pack "FH32 AC15: ...and with the pack removed too, refused naming the receipt and both probes" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" \
-  'rcpt/p/.governance/install.json' 'rcpt/p/.claude/hooks/workflows and ' 'rcpt/p/.claude/workflows. '
+run_pack "FH32 AC15: ...and with the pack removed too, refused naming the receipt and both probes" 2 "$RCP_HOOK" "$SA_DATED" \
+  'rcpt/p/.governance/install.json' 'rcpt/p/.claude/roles/workflows and ' 'rcpt/p/.claude/workflows. '
 printf '{"kits":["agent-cap","review-harness"],"files":[%s]}' "${RCP_ROW//\"path\":\"tools\/$RWK/\"path\":\"tools/x/../$RWK}" > "$RCP/.governance/install.json"
-run_pack "FH32 AC15: a receipt row whose path holds .. is skipped though it names the pack, refused the same way" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" \
-  'rcpt/p/.governance/install.json' 'rcpt/p/.claude/hooks/workflows and ' 'rcpt/p/.claude/workflows. '
+run_pack "FH32 AC15: a receipt row whose path holds .. is skipped though it names the pack, refused the same way" 2 "$RCP_HOOK" "$SA_DATED" \
+  'rcpt/p/.governance/install.json' 'rcpt/p/.claude/roles/workflows and ' 'rcpt/p/.claude/workflows. '
 printf '{"kits":["agent-cap","review-harness"],"files":[]}' > "$RCP/.governance/install.json"
-run_pack "FH27 AC15: with the row left out, the probe beside the hook misses and the call is refused" 2 "$RCP/.claude/hooks/agent-cap.js" "$SA_DATED" 'spec-audit-optin.js'
+run_pack "FH27 AC15: with the row left out, the probe beside the hook misses and the call is refused" 2 "$RCP_HOOK" "$SA_DATED" 'spec-audit-optin.js'
 if [ -z "$PKWF" ]; then
   echo "FAIL pack AC2: no workflows kit holding spec-audit-optin.js beside this hooks kit, so the pack-present arm has no pack to copy"; fail=$((fail+1))
 else
-  run_pack "pack AC2: the same call with the pack beside the hook is admitted" 0 "$PACK_HOOKS/agent-cap.js" "$SA_DATED"
-  run_pack "an undated spec-audit call is admitted: rule 0 is the review kit's spec-audit-optin.js" 0 "$PACK_HOOKS/agent-cap.js" "{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$NODEDIR/sa0\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
+  run_pack "pack AC2: the same call with the pack beside the hook is admitted" 0 "$PACK_HOOK" "$SA_DATED"
+  run_pack "an undated spec-audit call is admitted: rule 0 is the review kit's spec-audit-optin.js" 0 "$PACK_HOOK" "{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$NODEDIR/sa0\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
 fi
 run_pack "pack AC2: a diff-review call with no pack beside the hook is admitted" 0 "$HOOK" "{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"diff-review\",\"repo\":\"$NODEDIR/sad\"}}}"
 run_pack "pack AC3: a specAudit call with no kind and no pack is refused, naming the pack" 2 "$HOOK" '{"tool_name":"Workflow","tool_input":{"name":"unattended-build","args":"{\"specAudit\":\"2026-10-23\",\"slug\":\"tSA\",\"repo\":\".\"}"}}' 'spec-audit-optin.js'
@@ -414,12 +423,12 @@ fi
 # run a COPY of the hook beside a copy of scratch-guard.js and nothing else, so rule 7 finds no policy
 # kit and adds no rule, in a checkout that is a bare `.git` directory, which is all the root walk
 # looks for. The last arm puts a policy kit beside the copy, in a real repository, and rule 7 arms.
-LIMHK="$TMP/limit-hooks/hooks"; mkdir -p "$LIMHK"; cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$LIMHK/"
+LIMHOOK=$(mkpack "$TMP/limit-kits")
 LIMREPO="$TMP/limitrepo"; mkdir -p "$LIMREPO/.git" "$LIMREPO/sub"
 LIMJ="$NODEDIR/limitrepo/sub"
 run_limit_call() { # name expected_exit payload-json [hook] [text stderr must carry]
   local got
-  printf '%s' "$3" | (cd "$TMP" && node "${4:-$LIMHK/agent-cap.js}") >/dev/null 2>"$TMP/err"; got=$?
+  printf '%s' "$3" | (cd "$TMP" && node "${4:-$LIMHOOK}") >/dev/null 2>"$TMP/err"; got=$?
   if [ "$got" = "$2" ] && { [ -z "${5:-}" ] || grep -qF -- "$5" "$TMP/err"; }; then
     echo "ok   $1 (exit $got)"; pass=$((pass+1))
   else
@@ -447,33 +456,37 @@ check "limit: boundedParallel(thunks, 50) -> allow" 0 '{"tool_name":"Workflow","
 # RULE 7, armed: a real repository whose policy lands a limit of 2, the hook copy with a copy of the
 # policy kit beside it, and the settings the harness would start from first above the limit, then at it.
 LIMPK=$(resolve_kit_dir "$TESTPY" policy policy.py "$HERE") || LIMPK=""
-ROOTDIR=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null)
 if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
   echo "FAIL limit: no policy kit beside this hooks kit, so rule 7 has nothing to arm with"; fail=$((fail+1))
 else
-  R7="$TMP/r7"; R7_HOOKS="$R7/kits/hooks"; mkdir -p "$R7/.governance" "$R7_HOOKS" "$R7/kits/policy" "$R7/.claude"
-  cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$R7_HOOKS/"
+  R7="$TMP/r7"; mkdir -p "$R7/.governance" "$R7/kits/policy" "$R7/.claude" "$R7/tools/workflows"
+  R7_HOOK=$(mkpack "$R7/kits")
+  # The harness rule 8's order arm names below, committed so its blob is the landed one (S3).
+  printf 'const s = await agent("one")\n' > "$R7/tools/workflows/h.js"
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$R7/kits/policy/"; done
   printf '[runtime]\nagents-in-flight = 2\n' > "$R7/.governance/policy.toml"
   ( cd "$R7" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
       && git config user.name t && git add -A && git commit -qm limit --no-verify )
   R7_WF='{"tool_name":"Workflow","cwd":"'"$NODEDIR/r7"'","tool_input":{"script":"const r = await agent(1)"}}'
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"3","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"3"}}\n' > "$R7/.claude/settings.json"
-  run_limit_call "rule7: settings at 3 over a landed limit of 2 -> deny, naming the variable" 2 "$R7_WF" "$R7_HOOKS/agent-cap.js" 'CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS'
-  run_limit_call "rule7: ...and naming the render" 2 "$R7_WF" "$R7_HOOKS/agent-cap.js" 'policy.py settings --write'
+  run_limit_call "rule7: settings at 3 over a landed limit of 2 -> deny, naming the variable" 2 "$R7_WF" "$R7_HOOK" 'CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS'
+  # TOOL-dBoundRoles-25 AC7: the moved rule names the file and both numbers.
+  run_limit_call "rule7 BR25 AC7: ...naming the file, the value and the landed limit" 2 "$R7_WF" "$R7_HOOK" '.claude/settings.json: env.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS is 3, above runtime.agents-in-flight 2'
+  run_limit_call "rule7 BR25 AC7: ...and its stderr opens with the pack's prefix" 2 "$R7_WF" "$R7_HOOK" 'BLOCKED by spawn-guard: rule 7'
+  run_limit_call "rule7: ...and naming the render" 2 "$R7_WF" "$R7_HOOK" 'policy.py settings --write'
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$R7/.claude/settings.json"
-  run_limit_call "rule7: settings at the limit -> allow (control)" 0 "$R7_WF" "$R7_HOOKS/agent-cap.js"
+  run_limit_call "rule7: settings at the limit -> allow (control)" 0 "$R7_WF" "$R7_HOOK"
   # TOOL-dGroundRules-61: a settings file GOV_SETTINGS_JSON declares outside the checkout is one more
   # layer, never the project file's replacement, and every layer that sets a variable holds the limit.
   R7D="$TMP/r7-declared.json"; R7DN="$NODEDIR/r7-declared.json"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$R7D"
   printf '{"env":{"CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"3"}}\n' > "$R7/.claude/settings.json"
-  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared at 2, the project file at 3 -> deny, naming the project file" 2 "$R7_WF" "$R7_HOOKS/agent-cap.js" '.claude/settings.json: env.CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS is 3'
+  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared at 2, the project file at 3 -> deny, naming the project file" 2 "$R7_WF" "$R7_HOOK" '.claude/settings.json: env.CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS is 3'
   rm -f "$R7/.claude/settings.json"
-  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared only, at 2 -> allow" 0 "$R7_WF" "$R7_HOOKS/agent-cap.js"
+  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared only, at 2 -> allow" 0 "$R7_WF" "$R7_HOOK"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$R7/.claude/settings.json"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"3","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"3"}}\n' > "$R7D"
-  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared at 3, the project file at 2 -> deny, naming the declared file" 2 "$R7_WF" "$R7_HOOKS/agent-cap.js" 'r7-declared.json: env.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS is 3'
+  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared at 3, the project file at 2 -> deny, naming the declared file" 2 "$R7_WF" "$R7_HOOK" 'r7-declared.json: env.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS is 3'
 fi
 # ---- TOOL-dBoundRoles-10 AC4 (S3): rule 6 reads prompts.author, and its refusal names the value --------
 # A real repository, the hook copy beside a copy of the policy kit, as rule 7's armed section builds it,
@@ -486,9 +499,9 @@ fi
 if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
   echo "FAIL prompts.author: no policy kit beside this hooks kit, so rule 6 has no key to read"; fail=$((fail+1))
 else
-  PA="$TMP/pa"; PA_HOOKS="$PA/kits/hooks"; mkdir -p "$PA/.governance" "$PA_HOOKS" "$PA/kits/policy" "$PA/.claude"
-  cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$PA_HOOKS/"
-  PA_NODE_HOOK="$(cd "$PA_HOOKS" && pwd -W 2>/dev/null || printf '%s' "$PA_HOOKS")/agent-cap.js"
+  PA="$TMP/pa"; mkdir -p "$PA/.governance" "$PA/kits/policy" "$PA/.claude"
+  PA_HOOK=$(mkpack "$PA/kits")
+  PA_NODE_HOOK="$(cd "$PA/kits/roles" && pwd -W 2>/dev/null || printf '%s' "$PA/kits/roles")/spawn-guard.js"
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$PA/kits/policy/"; done
   printf '[prompts]\nauthor = "requesting-worker-rendered"\n' > "$PA/.governance/policy.toml"
   printf '%s\n' '{"roles":{"gov-researcher":{"agent":true,"workflow":"research","writes":"none"}},"harnesses":[]}' > "$PA/.claude/roles.json"
@@ -502,9 +515,9 @@ else
   if [ "$pa_got" = requesting-worker-rendered ]; then echo "ok   AC4 resolvePromptsAuthor reads the landed requesting-worker-rendered"; pass=$((pass+1))
   else echo "FAIL AC4 resolvePromptsAuthor with prompts.author set read: $pa_got"; fail=$((fail+1)); fi
   PA_FREE='{"tool_name":"Agent","cwd":"'"$NODEDIR/pa"'","session_id":"pa","tool_input":{"subagent_type":"gov-researcher","prompt":"Research this freely.","description":"x"}}'
-  run_limit_call "AC4 author-requesting: a freeform prompt under requesting-worker-rendered -> deny by rule 6" 2 "$PA_FREE" "$PA_HOOKS/agent-cap.js" 'rule 6 (TOOL-aOrientedCast-7) refused'
-  run_limit_call "AC4 author-requesting: ...naming prompts.author and the value in force" 2 "$PA_FREE" "$PA_HOOKS/agent-cap.js" 'prompts.author is requesting-worker-rendered'
-  GOV_DEFAULT_BRANCH=pa-unset run_limit_call "AC4 a freeform prompt with prompts.author unset -> deny naming the default prompt-writer" 2 "$PA_FREE" "$PA_HOOKS/agent-cap.js" 'prompts.author is prompt-writer'
+  run_limit_call "AC4 author-requesting: a freeform prompt under requesting-worker-rendered -> deny by rule 6" 2 "$PA_FREE" "$PA_HOOK" 'rule 6 (TOOL-aOrientedCast-7) refused'
+  run_limit_call "AC4 author-requesting: ...naming prompts.author and the value in force" 2 "$PA_FREE" "$PA_HOOK" 'prompts.author is requesting-worker-rendered'
+  GOV_DEFAULT_BRANCH=pa-unset run_limit_call "AC4 a freeform prompt with prompts.author unset -> deny naming the default prompt-writer" 2 "$PA_FREE" "$PA_HOOK" 'prompts.author is prompt-writer'
 fi
 # ---- TOOL-dBoundRoles-4 AC3 (S4): under prompts.author = prompt-writer a spawn carries the prompt writer's framing
 # A real repository, the hook copy beside a copy of the policy kit, as the section above builds it; its main branch
@@ -522,8 +535,8 @@ fi
 if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
   echo "FAIL prompt framing: no policy kit beside this hooks kit, so rule 6 has no prompts.author to read"; fail=$((fail+1))
 else
-  PF="$TMP/pf"; PF_HOOKS="$PF/kits/hooks"; mkdir -p "$PF/.governance" "$PF_HOOKS" "$PF/kits/policy" "$PF/.claude" "$PF/memory/builds/bx/prompts"
-  cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$PF_HOOKS/"
+  PF="$TMP/pf"; mkdir -p "$PF/.governance" "$PF/kits/policy" "$PF/.claude" "$PF/memory/builds/bx/prompts"
+  PF_HOOK=$(mkpack "$PF/kits")
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$PF/kits/policy/"; done
   printf '[prompts]\nauthor = "requesting-worker-rendered"\n' > "$PF/.governance/policy.toml"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$PF/.claude/settings.json"
@@ -566,127 +579,13 @@ for name, (r, prompt, wf) in calls.items():
   ( cd "$PF" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
       && git config user.name t && git add -A && git commit -qm framing --no-verify \
       && git update-ref refs/heads/pf-unset "$(git commit-tree "$(git mktree </dev/null)" -m 'no policy file')" )
-  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-unframed: a builder task with no framing:job under the default prompt-writer -> deny naming prompts.author" 2 "$(cat "$TMP/spawn-unframed.json")" "$PF_HOOKS/agent-cap.js" 'prompts.author is prompt-writer, so a gov-builder task carries the prompt writer'"'"'s framing'
-  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-unframed: ...naming the three-call route, --for then --framed-by" 2 "$(cat "$TMP/spawn-unframed.json")" "$PF_HOOKS/agent-cap.js" '--for gov-builder --build bx --unit T-1'
-  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-framed: its Framed by: line names the prompt writer's work order and task-sha -> allow" 0 "$(cat "$TMP/spawn-framed.json")" "$PF_HOOKS/agent-cap.js"
-  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-framed-by-researcher: its Framed by: line names a role=gov-researcher work order -> deny" 2 "$(cat "$TMP/spawn-framed-by-researcher.json")" "$PF_HOOKS/agent-cap.js" 'marker names role=gov-researcher, not gov-prompt-writer'
-  run_limit_call "rule6 BR4 AC3 spawn-unframed: under requesting-worker-rendered the unframed builder task -> allow" 0 "$(cat "$TMP/spawn-unframed.json")" "$PF_HOOKS/agent-cap.js"
-  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-prompt-writer: the prompt writer's own task, unframed, under the default -> allow" 0 "$(cat "$TMP/spawn-prompt-writer.json")" "$PF_HOOKS/agent-cap.js"
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-unframed: a builder task with no framing:job under the default prompt-writer -> deny naming prompts.author" 2 "$(cat "$TMP/spawn-unframed.json")" "$PF_HOOK" 'prompts.author is prompt-writer, so a gov-builder task carries the prompt writer'"'"'s framing'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-unframed: ...naming the three-call route, --for then --framed-by" 2 "$(cat "$TMP/spawn-unframed.json")" "$PF_HOOK" '--for gov-builder --build bx --unit T-1'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-framed: its Framed by: line names the prompt writer's work order and task-sha -> allow" 0 "$(cat "$TMP/spawn-framed.json")" "$PF_HOOK"
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-framed-by-researcher: its Framed by: line names a role=gov-researcher work order -> deny" 2 "$(cat "$TMP/spawn-framed-by-researcher.json")" "$PF_HOOK" 'marker names role=gov-researcher, not gov-prompt-writer'
+  run_limit_call "rule6 BR4 AC3 spawn-unframed: under requesting-worker-rendered the unframed builder task -> allow" 0 "$(cat "$TMP/spawn-unframed.json")" "$PF_HOOK"
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-prompt-writer: the prompt writer's own task, unframed, under the default -> allow" 0 "$(cat "$TMP/spawn-prompt-writer.json")" "$PF_HOOK"
 fi
-# ---- the two copies ------------------------------------------------------------------------------
-# `.claude/hooks/agent-cap.js` is the WIRED copy and `<prefix>/hooks/agent-cap.js` is the kit's. Nothing
-# gated them: check-wiring.sh asserts the hook is wired, never that the wired one is this one. A
-# stale wired copy enforces yesterday's rules while the kit documents today's.
-# The arm used to sit inside `if BOTH files exist`, so a DELETED wired copy satisfied it by absence —
-# the parity assertion's own failure mode. Inside the governance repo the pair is REQUIRED; in an
-# adopting tree with no <prefix>/hooks/ the arm skips loudly instead of vanishing.
-# The kit copy is LOCATED, never assumed at one prefix. Gating on the literal `<prefix>/hooks/` made
-# this arm disarm itself in every tree that installs the kit anywhere else: measured in a scratch
-# repo with the kit at `<root>/hooks/` and NO wired copy at all, this file reported "39 passed, 0
-# failed", exit 0. A stale wired hook enforcing yesterday's fan-out rules was undetectable there.
-# Finding nothing is still a legitimate skip — an adopting tree need not carry the kit — but finding
-# the kit and then not checking it is not.
-ROOT=$(git rev-parse --show-toplevel 2>/dev/null || true)
-KITJS=""
-if [ -n "$ROOT" ]; then
-  for c in "$ROOT/$KIT_REL/agent-cap.js" "$ROOT/${KIT_REL##*/}/agent-cap.js"; do
-    [ -f "$c" ] && { KITJS="$c"; break; }
-  done
-  # Last resort: ask git where it is, so a prefix nobody listed still arms the arm.
-  if [ -z "$KITJS" ]; then
-    # The two globs sit in variables so the marked line carries no line continuation: a trailing
-    # backslash would escape the space before a comment rather than the newline, and the resulting
-    # break is valid shell that silently drops the rest of the command.
-    _g_prefixed="*/${KIT_REL##*/}/agent-cap.js"
-    _g_root="${ROOTPFX}${KIT_REL##*/}/agent-cap.js"   # a root install is half of what this searches
-    rel=$(git -C "$ROOT" ls-files -- "$_g_prefixed" "$_g_root" 2>/dev/null \
-          | grep -v '^\.claude/' | head -1)
-    [ -n "$rel" ] && KITJS="$ROOT/$rel"
-  fi
-fi
-# SELF-ARMING ON THE RESOLVED COPY COUNT — TOOL-dRetiredFork-14.
-# This arm asserted TWO copies and hard-FAILED when the second was absent. That became the CORRECT
-# state the moment the kit stopped shipping a second destination, so the arm failed on the shipped
-# layout: not a parity check any more, just a stale assumption with a test around it.
-#
-# It now grades the population it actually finds:
-#   0 copies  -> REFUSE. A parity arm with no subject proves nothing, and saying "skip" there is the
-#                green-by-absence shape this repo has a catalogue entry for.
-#   1 copy    -> the single-copy layout. There is nothing to drift FROM, and that is a pass.
-#   2 or more -> the historical dual-ship. Every extra copy must match the kit copy byte for byte.
-if [ -n "$KITJS" ]; then
-  ac_extra=""
-  for ac_c in "$ROOT/.claude/hooks/agent-cap.js"; do
-    [ -f "$ac_c" ] && ac_extra="$ac_extra $ac_c"
-  done
-  ac_n=$(printf '%s' "$ac_extra" | wc -w | tr -d ' ')
-  if [ "$ac_n" = 0 ]; then
-    echo "ok   single-copy layout: ${KITJS#"$ROOT/"} is the only tracked copy, so there is nothing to drift from"
-    pass=$((pass+1))
-  else
-    ac_drift=0
-    for ac_c in $ac_extra; do
-      if ! diff -q <(sed 's/\r$//' "$ac_c") <(sed 's/\r$//' "$KITJS") >/dev/null; then
-        echo "FAIL ${ac_c#"$ROOT/"} has drifted from ${KITJS#"$ROOT/"}"
-        echo "     fix: cp ${KITJS#"$ROOT/"} ${ac_c#"$ROOT/"}"
-        ac_drift=1
-      fi
-    done
-    if [ "$ac_drift" = 0 ]; then
-      echo "ok   all $((ac_n+1)) tracked copies of agent-cap.js agree"; pass=$((pass+1))
-    else
-      fail=$((fail+1))
-    fi
-  fi
-else
-  echo "FAIL the parity arm found NO copy of agent-cap.js anywhere (looked for ${PFX}hooks/, hooks/, then any */hooks/ outside .claude/) — an arm with no subject cannot pass"
-  fail=$((fail+1))
-fi
-
-
-# ---- S10: `verbatim` is CHECKED, not asserted ----------------------------------------------------
-# The three renderShipped* bodies must equal their counterparts in the BASE blob. Only the name line
-# differs. A tree where that blob does not resolve -- every adopter -- gets an announced SKIP.
-GOV_BASE_SHA=${GOV_BASE_SHA:-d65da7ab}
-# DERIVED, never spelled: a `<prefix>/hooks/` literal is gov's own install prefix and resolves to
-# nothing in a target that installed this kit elsewhere, which is what the shipped-surface ratchet
-# refuses. `git ls-files --full-name` answers where THIS hook actually lives in THIS tree.
-HOOKREL=$(git -C "$HERE" ls-files --full-name -- "$KIT_HOOK" 2>/dev/null | head -1)
-if [ -n "$HOOKREL" ] && git -C "$HERE" show "$GOV_BASE_SHA:$HOOKREL" > "$TMP/base-hook.js" 2>/dev/null; then
-  cat > "$TMP/byte.py" <<'PYEOF'
-import sys, pathlib
-base = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n")
-cur = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").replace("\r\n", "\n")
-PAIRS = [("function stripStrings(line) {", "function renderShippedLine(line) {"),
-         ("function renderCodeView(script) {", "function renderShippedView(script) {"),
-         ("function blankLiterals(script) {", "function renderShippedBlanks(script) {")]
-def block(text, header):
-    ls = text.split("\n")
-    s = ls.index(header)
-    e = s
-    while ls[e] != "}":
-        e += 1
-    return "\n".join(ls[s + 1:e + 1])
-bad = 0
-for b, c in PAIRS:
-    try:
-        if block(base, b) != block(cur, c):
-            print("DRIFT %s is not the BASE bytes of %s" % (c, b)); bad += 1
-    except ValueError as e:
-        print("MISSING %s or %s (%s)" % (b, c, e)); bad += 1
-print("bodies-compared 3 drifted %d" % bad)
-sys.exit(1 if bad else 0)
-PYEOF
-  "$TESTPY" "$TMP/byte.py" "$TMP/base-hook.js" "$HOOK" > "$TMP/byte.out" 2>&1
-  if [ $? = 0 ]; then
-    echo "ok   no-regress: the three renderShipped* bodies are the BASE bytes"; pass=$((pass+1))
-  else
-    echo "FAIL no-regress: a renderShipped* body has drifted from BASE"; sed 's/^/     /' "$TMP/byte.out"; fail=$((fail+1))
-  fi
-else
-  echo "skip no-regress byte arm — $GOV_BASE_SHA:${HOOKREL:-<this hook is not tracked here>} does not resolve in this tree, so there is nothing to compare the frozen bodies against"
-fi
-
 # ---- rule 6: every agent prompt is a rendered handoff (TOOL-aOrientedCast-7) ----------------------
 # Armed by `.claude/roles.json` at the checkout root of the payload `cwd`. Every arm above runs with
 # no index, which is the absent case; the arms below build their own checkout, whose index the
@@ -696,15 +595,27 @@ fi
 # THE SECTION RUNS A COPY OF THE HOOK (TOOL-dGroundRules-10): its checkout is a bare `.git` directory
 # with no settings, which rule 7 would refuse, so the copy sits beside scratch-guard.js and no policy
 # kit, where rule 7 adds no rule. Its refusal arms are rule 6's, which decides before rule 7.
-HO6="$TMP/rule6-hooks/hooks"; mkdir -p "$HO6"; cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$HO6/"
-HOOK="$HO6/agent-cap.js"
+HOOK=$(mkpack "$TMP/rule6-hooks")
 HOREPO="$TMP/horepo"
 HO_WF=workflows
-mkdir -p "$HOREPO/.git" "$HOREPO/.claude" "$HOREPO/sub" "$HOREPO/tools/$HO_WF" \
+mkdir -p "$HOREPO/.claude" "$HOREPO/.governance" "$HOREPO/sub" "$HOREPO/tools/$HO_WF" \
   "$HOREPO/memory/builds/bx/prompts" "$HOREPO/memory/builds/bx/spec"
 HOJ="$NODEDIR/horepo"
 printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/h.js"
 printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/other.js"
+# TOOL-dBoundRoles-25 S3 - A HARNESS IS ADMITTED ONLY AT ITS LANDED BLOB. The checkout is a real repository whose
+# `main`, the landed revision where it has no remote, commits every harness the index below declares, a policy
+# file holding the agent limit, and settings at it; `HOOKL` is a copy of the pack beside the policy kit, inside
+# the checkout as rule 7's own fixtures place it, and every Workflow call that reaches the harness match runs
+# through it, so each arm judges the rule it names after the harness is admitted. The Agent arms keep the copy
+# with no policy kit beside it.
+for _h in h2 h3 h4; do printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/$_h.js"; done
+printf '[runtime]\nagents-in-flight = 2\n' > "$HOREPO/.governance/policy.toml"
+printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$HOREPO/.claude/settings.json"
+HOOKL=$(mkpack "$HOREPO/kits"); mkdir -p "$HOREPO/kits/policy"
+for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do [ -n "$LIMPK" ] && cp "$ROOTDIR/$LIMPK/$f" "$HOREPO/kits/policy/"; done
+( cd "$HOREPO" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
+    && git config user.name t && git add -A && git commit -qm landed --no-verify )
 # TOOL-dBoundRoles-6 S6: the researcher's `role-sha` is the hash of the role section write_handoff gives
 # every handoff below; HO_RSHA2 is that section with one more line, the role text after a body change.
 HO_RSHA=$("$TESTPY" -c 'import hashlib; print(hashlib.sha256(b"## Role\n\nYou research.\n\n").hexdigest()[:12])' | tr -d '\r')
@@ -892,7 +803,7 @@ run_harness() { # name expected_exit tool_input-json needle(empty for an allow)
   local payload got
   payload=$("$TESTPY" -c 'import json,sys
 print(json.dumps({"tool_name":"Workflow","cwd":sys.argv[1],"tool_input":json.loads(sys.argv[2])}))' "$HOJ/sub" "$3")
-  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
+  printf '%s' "$payload" | (cd "$TMP" && node "$HOOKL") >/dev/null 2>"$TMP/err"; got=$?
   if [ "$got" = "$2" ] && { if [ -z "$4" ]; then [ ! -s "$TMP/err" ]; else grep -qF -- "$4" "$TMP/err"; fi; }; then
     echo "ok   $1 (exit $got)"; pass=$((pass+1))
   else
@@ -1016,11 +927,10 @@ run_spawn "rule6 BR46 AC2: a fence the typed block leaves open, closed in the ne
 run_spawn "rule6 BR48 AC3: a section flipped around its handed block refused, naming the surfaced fact line" 2 gov-researcher fflip "opening: line 26 of the file reads a fact line no unfenced"
 run_spawn "rule6 BR48 AC3: the handoff wrapped in the task envelope, closed naming its own path, admitted" 0 gov-researcher fwrap ""
 run_spawn "rule6 BR48 AC3: ...and closed naming another path refused, naming that line" 2 gov-researcher fwrapx "input:spec: line 28 of the file sits between the handed block's fence and the next block"
-# AC3 - the hook's TYPED_INPUTS equals handoff.py's INPUT_NAMES less its PATH_INPUTS, both read at run time from
+# AC3 - the pack's TYPED_INPUTS equals handoff.py's INPUT_NAMES less its PATH_INPUTS, both read at run time from
 # the roles kit beside this one. Against a TYPED_INPUTS missing a name, or a typed input added to handoff.py
 # alone, the row reds; with no roles kit beside this one, it reds, as nothing could be compared.
 HO_RK=$(resolve_kit_dir "$TESTPY" roles handoff.py "$HERE") || HO_RK=""
-[ -z "${ROOTDIR:-}" ] && ROOTDIR=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null)
 HO_JS=$(cd "$TMP" && node -e 'console.log(require(process.argv[1]).TYPED_INPUTS.slice().sort().join(" "))' "$HOOK" < /dev/null 2>&1 | tr -d '\r')
 HO_PY=$([ -n "$HO_RK" ] && "$TESTPY" -c 'import sys; sys.path.insert(0, sys.argv[1]); import handoff
 print(" ".join(sorted(n for n in handoff.INPUT_NAMES if n not in handoff.PATH_INPUTS)))' "$ROOTDIR/$HO_RK" 2>&1 | tr -d '\r')
@@ -1127,7 +1037,8 @@ else:
 d={"tool_name":tool,"cwd":cwd,"tool_input":ti}
 if tp!="-": d["transcript_path"]=tp
 print(json.dumps(d))' "${E8_CWD:-$HOJ/sub}" "$3" "$4" "$5" "$TMP/ho.ok" "${E8_H:-$HO_H}" "$roles" "${E8_TYPE:-gov-researcher}")
-  printf '%s' "$payload" | (cd "$TMP" && unset CLAUDE_CODE_EFFORT_LEVEL && { [ -z "$E8_LEVEL" ] || export CLAUDE_CODE_EFFORT_LEVEL="$E8_LEVEL"; } && node "${E8_HOOK:-$HOOK}") >/dev/null 2>"$TMP/err"; got=$?
+  local hk=$HOOK; [ "$3" = Workflow ] && hk=$HOOKL   # a harness call is admitted only at its landed blob (S3)
+  printf '%s' "$payload" | (cd "$TMP" && unset CLAUDE_CODE_EFFORT_LEVEL && { [ -z "$E8_LEVEL" ] || export CLAUDE_CODE_EFFORT_LEVEL="$E8_LEVEL"; } && node "${E8_HOOK:-$hk}") >/dev/null 2>"$TMP/err"; got=$?
   shift 5
   if [ -z "$1" ]; then [ ! -s "$TMP/err" ] || miss=" an empty stderr"
   else for n in "$@"; do grep -qF -- "$n" "$TMP/err" || miss="$miss '$n'"; done; fi
@@ -1141,7 +1052,7 @@ print(json.dumps(d))' "${E8_CWD:-$HOJ/sub}" "$3" "$4" "$5" "$TMP/ho.ok" "${E8_H:
 E8_T="$NODEDIR/e8.tfam.jsonl"; E8_O="$NODEDIR/e8.other.jsonl"
 # AC1 — a matched model: no `effort` and the default level are refused, the profile's level admitted.
 run_effort "rule8 AC1: no effort on a profiled model refused, naming the profile's level" 2 Agent "$E8_T" '{}' 'and the tfam profile gives it medium on the model "maker-tfam-9" (read from the transcript)'
-run_effort "rule8 AC1: ...opening as rule 8 and naming the agent type's level" 2 Agent "$E8_T" '{}' "BLOCKED by agent-cap: rule 8 (TOOL-aGuardedEffort-1) refused this Agent call — gov-researcher would run at high (its agent type's level"
+run_effort "rule8 AC1: ...opening as rule 8 and naming the agent type's level" 2 Agent "$E8_T" '{}' "BLOCKED by spawn-guard: rule 8 (TOOL-aGuardedEffort-1) refused this Agent call — gov-researcher would run at high (its agent type's level"
 run_effort "rule8 AC1: ...and the verb that prints the right value" 2 Agent "$E8_T" '{}' 'handoff.py role-efforts --model "maker-tfam-9"'
 run_effort "rule8 AC1: the default level passed as effort refused" 2 Agent "$E8_T" '{"effort":"high"}' "would run at high (the call's own"
 run_effort "rule8 AC1: the profile's level passed as effort admitted" 0 Agent "$E8_T" '{"effort":"medium"}' ""
@@ -1207,8 +1118,8 @@ E8_H=""
 # by rule 6. Against a main() running rule 8's block first, the refusal is rule 8's throw.
 E8_TYPE=general-purpose E8_NOT='rule 8'
 run_effort "rule8 GE2 item 7: a general-purpose spawn over the effort index is refused by rule 6, with no rule 8 text" 2 Agent "$E8_T" '{}' 'is not an agent-true role'
-if [ "$(head -c 28 "$TMP/err")" = 'BLOCKED by agent-cap: rule 6' ]; then echo "ok   rule8 GE2 item 7: ...and its stderr opens as rule 6's"; pass=$((pass+1))
-else echo "FAIL rule8 GE2 item 7: the refusal does not open 'BLOCKED by agent-cap: rule 6'"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+if [ "$(head -c 30 "$TMP/err")" = 'BLOCKED by spawn-guard: rule 6' ]; then echo "ok   rule8 GE2 item 7: ...and its stderr opens as rule 6's, under the pack's prefix (BR25 AC1)"; pass=$((pass+1))
+else echo "FAIL rule8 GE2 item 7: the refusal does not open 'BLOCKED by spawn-guard: rule 6'"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 E8_TYPE="" E8_NOT=""
 # ...and a harness call whose level differs, in the armed rule 7 section's checkout, whose settings
 # are put above the landed limit: rule 8 answers, before rule 7. The index is written there after
@@ -1218,7 +1129,7 @@ if [ -z "${R7:-}" ]; then
 else
   printf '%s' "$E8_ROLES" > "$R7/.claude/roles.json"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"3","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"3"}}\n' > "$R7/.claude/settings.json"
-  E8_CWD="$NODEDIR/r7" E8_HOOK="$R7_HOOKS/agent-cap.js" E8_H="$NODEDIR/r7/tools/$HO_WF/h.js" E8_NOT='rule 7'
+  E8_CWD="$NODEDIR/r7" E8_HOOK="$R7_HOOK" E8_H="$NODEDIR/r7/tools/$HO_WF/h.js" E8_NOT='rule 7'
   run_effort "rule8 GE2 item 7: settings above the limit and a level that differs are refused by rule 8, with no rule 7 text" 2 Workflow "$E8_T" null 'rule 8 (TOOL-aGuardedEffort-1) refused'
   E8_CWD="" E8_HOOK="" E8_H="" E8_NOT=""
   rm -f "$R7/.claude/roles.json"
@@ -1248,6 +1159,81 @@ run_effort "rule8 GE2 item 9: an effort holding three of its four keys refuses a
 write_roles "${HO_ROLES%\}},\"effort\":{\"default\":[],\"profiles\":{},\"harnesses\":{},\"unset\":{}}}"
 run_effort "rule8 GE2 item 9: an effort whose default is a list refuses as a broken index" 2 Agent "$E8_T" '{"effort":"medium"}' 'effort is not'
 write_roles none
+
+
+# ---- TOOL-dBoundRoles-25 AC4 AC5 AC6: a declared harness is admitted only at its landed blob ------------
+# A repository with a bare remote whose `main` holds the declared harness, the pack and its kits committed
+# inside it as rule 7's fixtures place them, its policy file holding the agent limit and its settings at it.
+# The landed revision is `origin/main`, which `readLandedRevision` reads through the policy kit's shim. The
+# harness edited in the working tree is refused naming the path and the landed sha's first eight digits;
+# the edit committed and not pushed is refused the same way; the landed bytes restored are admitted. A
+# second declared harness present in the working tree and absent at the landed revision is refused as not
+# landed. Against an admission that compares with HEAD, the committed edit is admitted; against one that
+# matches the path alone, every edited row is admitted; against one reading a missing blob as equal, the
+# not-landed row is admitted. WHAT THESE DO NOT CHECK: a harness whose landed bytes differ only by a filter
+# the repository does not declare, which `git hash-object` reads as the repository does.
+if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
+  echo "FAIL BR25 AC4: no policy kit beside this kit, so no landed revision can be read"; fail=$((fail+1))
+else
+  LB="$TMP/lb"; LBR="$TMP/lb-remote.git"; LBJ="$NODEDIR/lb"
+  mkdir -p "$LB/.claude" "$LB/.governance" "$LB/tools/workflows"
+  LB_HOOK=$(mkpack "$LB/kits"); mkdir -p "$LB/kits/policy"
+  for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$LB/kits/policy/"; done
+  printf '[runtime]\nagents-in-flight = 2\n' > "$LB/.governance/policy.toml"
+  printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$LB/.claude/settings.json"
+  printf '%s\n' '{"roles":{"gov-builder":{"agent":true,"workflow":"build","writes":"product"}},"harnesses":["tools/workflows/h.js","tools/workflows/h5.js"]}' > "$LB/.claude/roles.json"
+  printf 'const s = await agent("one")\n' > "$LB/tools/workflows/h.js"
+  git init -q --bare "$LBR"
+  ( cd "$LB" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
+      && git config user.name t && git config core.autocrlf false && git add -A && git commit -qm landed --no-verify \
+      && git remote add origin "$LBR" && git push -q origin main 2>/dev/null )
+  LB_L8=$(git -C "$LB" rev-parse origin/main | cut -c1-8)
+  run_landed() { # name expected_exit harness-file [text stderr must carry ...]
+    local name=$1 want=$2 h=$3 got miss="" n; shift 3
+    printf '%s' '{"tool_name":"Workflow","cwd":"'"$LBJ"'","tool_input":{"scriptPath":"'"$LBJ/tools/workflows/$h"'","args":{"roles":{"builder":"gov-builder"}}}}' \
+      | (cd "$TMP" && node "$LB_HOOK") >/dev/null 2>"$TMP/err"; got=$?
+    for n in "$@"; do grep -qF -- "$n" "$TMP/err" || miss="$miss '$n'"; done
+    if [ "$got" = "$want" ] && [ -z "$miss" ]; then echo "ok   $name (exit $got)"; pass=$((pass+1))
+    else echo "FAIL $name (exit $got, want $want${miss:+, stderr missing$miss})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+  }
+  run_landed "BR25 AC4 LIVENESS the landed harness is admitted" 0 h.js
+  printf 'const s = await agent("two")\n' > "$LB/tools/workflows/h.js"
+  run_landed "BR25 AC4 the harness edited in the working tree is refused, naming the path and the landed sha" 2 h.js \
+    'BLOCKED by spawn-guard: rule 6' "harness tools/workflows/h.js differs from its blob at the landed revision $LB_L8"
+  ( cd "$LB" && git commit -qam edit --no-verify )
+  run_landed "BR25 AC4 ...and the edit committed and not pushed is refused all the same" 2 h.js "differs from its blob at the landed revision $LB_L8"
+  ( cd "$LB" && git reset -q --hard origin/main )
+  run_landed "BR25 AC4 ...and the landed bytes restored are admitted" 0 h.js
+  printf 'const s = await agent("five")\n' > "$LB/tools/workflows/h5.js"
+  run_landed "BR25 AC5 a declared harness in the working tree and absent at the landed revision is refused as not landed" 2 h5.js \
+    "harness tools/workflows/h5.js is not landed at $LB_L8"
+
+  # AC6 (gap-roles-25): an adopter layout at prefix `scripts`, its index naming gov's review harness there,
+  # landed, is admitted; so is a CRLF checkout of the same LF blob, read through the repository's clean filter.
+  AD="$TMP/ad"; ADR="$TMP/ad-remote.git"; ADJ="$NODEDIR/ad"
+  mkdir -p "$AD/.claude" "$AD/.governance" "$AD/scripts/workflows"
+  AD_HOOK=$(mkpack "$AD/scripts"); mkdir -p "$AD/scripts/policy"
+  for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$AD/scripts/policy/"; done
+  printf '[runtime]\nagents-in-flight = 2\n' > "$AD/.governance/policy.toml"
+  printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$AD/.claude/settings.json"
+  printf '%s\n' '{"roles":{"gov-reviewer":{"agent":true,"workflow":"review","writes":"none"}},"harnesses":["scripts/workflows/tier2-review.js"]}' > "$AD/.claude/roles.json"
+  printf 'const a = 1\nconst b = await agent("x")\n' > "$AD/scripts/workflows/tier2-review.js"
+  git init -q --bare "$ADR"
+  ( cd "$AD" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
+      && git config user.name t && git config core.autocrlf false && git add -A && git commit -qm landed --no-verify \
+      && git remote add origin "$ADR" && git push -q origin main 2>/dev/null )
+  run_adopter_call() { # name expected_exit
+    local got
+    printf '%s' '{"tool_name":"Workflow","cwd":"'"$ADJ"'","tool_input":{"scriptPath":"'"$ADJ/scripts/workflows/tier2-review.js"'","args":{"roles":{"finder":"gov-reviewer"}}}}' \
+      | (cd "$TMP" && node "$AD_HOOK") >/dev/null 2>"$TMP/err"; got=$?
+    if [ "$got" = "$2" ]; then echo "ok   $1 (exit $got)"; pass=$((pass+1))
+    else echo "FAIL $1 (exit $got, want $2)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+  }
+  run_adopter_call "BR25 AC6 an adopter at prefix scripts calling its landed tier2-review.js is admitted" 0
+  git -C "$AD" config core.autocrlf true
+  printf 'const a = 1\r\nconst b = await agent("x")\r\n' > "$AD/scripts/workflows/tier2-review.js"
+  run_adopter_call "BR25 AC6 ...and a CRLF checkout of the same LF blob is admitted, through the clean filter" 0
+fi
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

@@ -5,16 +5,16 @@ Read this before ANY multi-agent review or `Workflow` run. Ported from adopter i
 (`ARCH-bWhittledTome-1`, 2026-07-15; hard cap added by the owner 2026-07-29) and re-measured here —
 every number below is either measured on THIS tree or marked as inherited with the reason it travels.
 
-## The hard cap — the verify-stage total `agent-cap.js` resolves
+## The hard cap — the verify-stage total `script-views.js` resolves
 
-**A review's verify stage spawns at most the total `{{TOOL_ROOT}}hooks/agent-cap.js` holds as
+**A review's verify stage spawns at most the total `{{TOOL_ROOT}}workflows/script-views.js` holds as
 `MAX_VERIFIERS`, whatever the finding count.** The batch size grows
 with the finding count; the agent count never does.
 
-The NUMBER is a FILE CONSTANT in `{{TOOL_ROOT}}hooks/agent-cap.js`, and that file is what a run actually
+The NUMBER is a FILE CONSTANT in `{{TOOL_ROOT}}workflows/script-views.js`, and that file is what a run actually
 obeys — it ships deployed verbatim, with no conf channel and no environment override. This document
 restates it only where a reader has to act on it, and every restatement is a copy that can go stale:
-when the two disagree, the hook is right and the sentence you are reading is the bug. An earlier
+when the two disagree, the module is right and the sentence you are reading is the bug. An earlier
 revision of this line claimed the number was "declared per repository"; that was written for a
 mechanism that was specced and then parked, and it described a channel this tree does not have.
 
@@ -37,19 +37,19 @@ no verdict as **unverified**, never as refuted. `{{TOOL_ROOT}}workflows/tier2-re
 ## Enforcement — and where it does NOT reach
 
 The rule is mechanical, and each review rule has ONE home in the review kit since TOOL-dFairHearing-16,
-while `{{TOOL_ROOT}}hooks/agent-cap.js` keeps the two rules that judge the call itself:
+while the roles kit's `{{TOOL_ROOT}}roles/spawn-guard.js` keeps the rules that judge the call itself:
 
 - `{{TOOL_ROOT}}workflows/check-verifier-fanout.js` — the verify-stage total and the loop markers
   (`gov:fixed-verifiers`, `gov:fixed-writers`, `gov:sequential-agents`), the predicate below. The
   merge-bar leg `{{TOOL_ROOT}}workflows/check-verifier-fanout.sh` runs it over every committed harness,
-  reading `MAX_VERIFIERS` and the writer bound through the hook's exports and `LENS_SLOTS` from its
-  own file.
+  reading `MAX_VERIFIERS` and the writer bound from `{{TOOL_ROOT}}workflows/script-views.js` beside it
+  and `LENS_SLOTS` from its own file.
 - `{{TOOL_ROOT}}workflows/check-review-join.js` — the ref-keyed verdict join ban, the integer key
   above. `{{TOOL_ROOT}}workflows/check-review-join.sh` alone runs it, per script.
 - `{{TOOL_ROOT}}workflows/spec-audit-optin.js` — the spec-audit opt-in, the review kit's pack: a
   `PreToolUse` hook on `Workflow` calls that judges each call's `args`.
-- The hook on the **`Agent`** and **`Workflow`** calls — rule 6, every agent prompt a rendered
-  handoff, and the SETTINGS half, its rule 7
+- The spawn guard on the **`Agent`** and **`Workflow`** calls — rule 6, every agent prompt a rendered
+  handoff and every declared harness run at its blob at the landed revision, and the SETTINGS half, its rule 7
   (TOOL-dGroundRules-10). How many agents run at once is the agent limit, `runtime.agents-in-flight`,
   and the harness enforces it through the two concurrency settings the policy kit renders from it,
   because the harness counts agents in flight and knows when each one ends, which a `PreToolUse` hook
@@ -63,7 +63,7 @@ while `{{TOOL_ROOT}}hooks/agent-cap.js` keeps the two rules that judge the call 
 
 The hook's wiring is `"matcher": "Workflow|Agent"` — a list of exact strings in ONE group, not a
 regular expression. `check-wiring.sh` asserts that VALUE, because a group left at `Workflow`
-alone still contains the string `agent-cap.js` and used to report the tree correctly wired.
+alone still contains the string `spawn-guard.js` and used to report the tree correctly wired.
 
 **Where enforcement does NOT reach**, stated rather than implied away:
 
@@ -137,7 +137,7 @@ policy kit renders it into the harness's own two settings in `.claude/settings.j
 `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` and `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`, with
 `policy.py settings --write`, and every landing regenerates that render. The harness counts agents in
 flight and enforces them: a direct spawn over the first is refused, and a Workflow agent over the
-second queues. `{{TOOL_ROOT}}hooks/agent-cap.js` holds the settings a session starts from to the landed
+second queues. `{{TOOL_ROOT}}roles/spawn-guard.js` holds the settings a session starts from to the landed
 limit, its rule 7, and resolves no width itself. Read the limit with `policy.py get
 runtime.agents-in-flight --explain`, which names a `FANOUT_CAP` lowering in `.agent-cap.conf` too.
 

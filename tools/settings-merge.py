@@ -4,13 +4,16 @@ Stdlib only (json, argparse, pathlib), at the interpreter floor python-floor.txt
 
 # gov:kit settings-merge@1.20
 
-The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
-<prefix>/hooks/agent-cap.js verbatim):
+The default fragment, with no --fragment, is the roles kit's `spawn-guard.fragment.json`, READ FROM ITS
+FILE and never typed here (TOOL-dBoundRoles-25 §8 F4), found through the sibling-kit resolver: the
+`Workflow|Agent` spawn guard, whose rendered entry is
 
     {"hooks": {"PreToolUse": [
       {"matcher": "Workflow|Agent",
        "hooks": [{"type": "command",
-                  "command": "node \\"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\\""}]}]}}
+                  "command": "node \\"${CLAUDE_PROJECT_DIR}/<prefix>/roles/spawn-guard.js\\""}]}]}}
+
+A target holding no roles kit has no default, and a run with no --fragment exits 2 naming it.
 
 Idempotent by structure: a re-run finds the existing matcher group already carrying the fragment's
 marker in a command and makes NO change (apply-twice-changed = 0). Existing keys and any other
@@ -25,8 +28,8 @@ Usage:
     python <prefix>/settings-merge.py --selftest      (or: --resolve-fragment F)
       SETTINGS_FILE  default .claude/settings.json (resolved from cwd = target repo root)
       --fragment     a JSON file declaring {name, event, matcher, marker, hook_path} plus the
-                     optional {interpreter, args}; omitted = the built-in agent-cap PreToolUse
-                     fragment (matcher "Workflow|Agent")
+                     optional {interpreter, args}; omitted = the roles kit's
+                     spawn-guard.fragment.json (matcher "Workflow|Agent"), read from its file
       --hook-path    override the fragment's hook_path (the copied hook, repo-relative)
       --check        report drift without writing: exit 1 if a merge WOULD change the file
       --unwire       with --fragment: remove that fragment's entry instead of merging it, from
@@ -38,9 +41,8 @@ Usage:
       --resolve-hook P  print P, a repo-relative hook path already expanded, or the target's
                      `adopter-owned` copy of it from `.governance/install.json`; exit 2 on a row
                      it refuses. check-wiring.sh CALLS this rather than reading the receipt itself
-    With neither, agent-cap's copy is located by `[kit.agent-cap] prefix` in the target's
-    `.governance/deploy.toml` when one is declared, and by this file's own install prefix
-    otherwise — an entry may be installed somewhere other than where settings-merge.py sits.
+    With neither, the default fragment's `{here}` hook_path resolves against that fragment's own
+    location, so the pack is wired wherever the roles kit landed.
       --selftest     run the in-file assert suite in a tempdir; exit 0 on pass
 Exit: 0 wired (already present OR merged this run) · 1 --check found drift · 2 error.
 
@@ -210,12 +212,6 @@ def scan_bash(script="", host=""):
 # <<< resolve_bash_py
 
 KIT_SETTINGS_MERGE_VERSION = "1.20"  # gov:kit settings-merge@1.20 — engine identity
-HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
-# The kit NAME a hook path carries when no hooks kit resolves in this install. It names the miss and
-# exists nowhere, so `main`'s existence refusal fires on it. Spelled once: the selftest reads it too.
-NO_HOOKS_KIT = "no-agent-cap-kit-resolved"
-
-
 def _kit_rel() -> str:
     """Where this kit sits, relative to the target repo root — DERIVED, never spelled.
 
@@ -235,107 +231,23 @@ def _kit_rel() -> str:
         return "tools"  # a name-only default when run from outside the tree it writes into; whether it should refuse instead is the settings-merge owner's call (TOOL-aRepatriatedFork-2 section 8 F4)
 
 
-# A path fragment and nothing else — the character class govkit's own `demand_safe_token` grades
-# `prefix` with, plus containment. This value is target-supplied and lands inside a command string
-# Claude Code executes, which is the class govkit reproduced twice; a `prefix` carrying a shell
-# metacharacter or climbing out of the tree is refused here rather than resolved.
-_SAFE_PREFIX = re.compile(r"^[A-Za-z0-9_.~@+-]+(?:/[A-Za-z0-9_.~@+-]+)*$")
+# THE DEFAULT FRAGMENT (TOOL-dBoundRoles-25 S6, §8 F4): the roles kit's spawn guard, read from the file that
+# kit ships beside the hook and never typed here, so the fragment is stated once. Found through the
+# sibling-kit resolver, the receipt first, then this file's directory and its parent.
+DEFAULT_FRAGMENT = "spawn-guard.fragment.json"
 
 
-def _load_declared_prefix(kit_id: str, root: Path = Path(".")) -> str | None:
-    """The install home the TARGET declared for `kit_id`, out of `.governance/deploy.toml`.
-
-    `_kit_rel()` answers "where does THIS FILE live", and that is the right answer for agent-cap
-    only while both entries share one install home. A target may give an entry its own:
-    `[kit.agent-cap] prefix = ".claude"` puts the hook there while settings-merge.py stays at the
-    top-level prefix. Deriving agent-cap's home from this file's then names a path that is not
-    there — the merge REFUSES to wire, and `--check` reports DRIFT against a settings.json that was
-    correct all along. REPRODUCED on a fixture before this was written, and pinned by selftest 12.
-
-    None whenever the declaration is absent, unreadable or unsafe. Absent is the common case and it
-    is not a failure: an adopter who copy-installed the kits by hand per WIRE-INTO-PROJECT.md has no
-    deploy.toml, and the derivation above is exactly right for them. `tomllib` is 3.11+, so a 3.10
-    interpreter also lands here and keeps the pre-existing behaviour rather than crashing.
-    """
+def resolve_default_fragment() -> Path:
+    """The roles kit's `spawn-guard.fragment.json` in THIS install; ValueError naming the three places looked
+    where no roles kit resolves, which `main` turns into exit 2: with no fragment there is nothing to wire."""
     try:
-        import tomllib
-    except ImportError:
-        return None
-    try:
-        with (root / ".governance" / "deploy.toml").open("rb") as fh:
-            deploy = tomllib.load(fh)
-    except (OSError, ValueError):
-        return None
-    if not isinstance(deploy, dict):
-        return None
-    per = (deploy.get("kit") or {}).get(kit_id) or {}
-    pfx = (per.get("prefix") if isinstance(per, dict) else None) or deploy.get("prefix")
-    if not isinstance(pfx, str) or not pfx.strip("/"):
-        return None
-    pfx = pfx.strip("/")
-    if not _SAFE_PREFIX.match(pfx) or ".." in pfx.split("/"):
-        print(f"settings-merge: ignoring an unsafe prefix for {kit_id} in .governance/deploy.toml: "
-              f"{pfx!r} — a prefix becomes a path inside a command Claude Code runs", file=sys.stderr)
-        return None
-    return pfx
+        return resolve_kit_dir("roles", DEFAULT_FRAGMENT, Path(__file__).resolve().parent) / DEFAULT_FRAGMENT
+    except LookupError as e:
+        raise ValueError(f"no --fragment, and the default fragment is the roles kit's {DEFAULT_FRAGMENT}, "
+                         f"which this install does not hold ({e}); install the roles kit, or pass --fragment") from None
 
 
-def _resolve_agent_cap_dir() -> Path | None:
-    """agent-cap's kit directory in THIS install, through the sibling-kit resolver, or None.
-
-    TOOL-aRepatriatedFork-46: the receipt is read first, so a hooks kit homed under another name is
-    found; the probes are this file's own directory and its parent, which is where the kit's NAME
-    used to be typed after this file's prefix.
-    """
-    try:
-        return resolve_kit_dir("hooks", "agent-cap.js", Path(__file__).resolve().parent)
-    except LookupError:
-        return None
-
-
-def _resolve_agent_cap_hook_path(root: Path = Path(".")) -> str:
-    """agent-cap's shipped copy: the resolved kit where it sits in the target, else the declaration.
-
-    ONE composition, in one place, so the arm that stages the break has something to red on. It is
-    also the only reader of `_load_declared_prefix`: the `{kit}` fragments need no lookup at all,
-    because a fragment ships beside its hook, so resolving `{kit}` against the FRAGMENT's own
-    location already follows whatever prefix that kit was installed at.
-
-    TOOL-aRepatriatedFork-46: the sibling-kit resolver answers first, because it reads the install
-    receipt, which records where the kit LANDED. A top-level `prefix` answers where kits go by
-    default, and a hooks kit homed under another name contradicted it: the declaration named a path
-    the receipt had moved. The declaration still answers where the resolver finds no kit inside the
-    target, joined to the kit directory's NAME in this install. A kit found nowhere yields a path that
-    names the miss and exists nowhere, so the existence refusal in `main` fires on it: the wiring is
-    REFUSED, never pointed at a guessed prefix.
-    """
-    kit = _resolve_agent_cap_dir()
-    if kit is not None:
-        try:
-            return kit.relative_to(Path(root).resolve()).as_posix() + "/agent-cap.js"
-        except ValueError:
-            pass  # a kit outside the target this merge writes into
-    name = kit.name if kit is not None else NO_HOOKS_KIT
-    declared = _load_declared_prefix("agent-cap", root)
-    if declared:
-        return f"{declared}/{name}/agent-cap.js"
-    return f"{_kit_rel()}/{name}/agent-cap.js"
-
-
-# The built-in fragment. Identical to the three values this script hardcoded before --fragment
-# existed, so a no-argument run is unchanged in behaviour AND in what it prints.
-AGENT_CAP = {
-    "name": "agent-cap",
-    "event": "PreToolUse",
-    # A LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression, and not two
-    # fragments. The hook fires for `Workflow`, where it reads the script, and for `Agent`, where a
-    # direct spawn used to meet no rule at all. One group means one marker and no dedup question:
-    # the merge below finds the existing group by this exact matcher value.
-    "matcher": "Workflow|Agent",
-    "marker": HOOK_MARKER,
-    "hook_path": _resolve_agent_cap_hook_path(),
-}
-_FRAGMENT_KEYS = tuple(AGENT_CAP)
+_FRAGMENT_KEYS = ("name", "event", "matcher", "marker", "hook_path")
 # The two OPTIONAL keys and their defaults. `interpreter` is a CLOSED pair, refused by name outside
 # it: the value is the first word of a command Claude Code runs, so an open set would be a way to
 # put an arbitrary program there through a data file. `args` render UNQUOTED, so each token is held
@@ -521,7 +433,7 @@ def set_group(pre: list, matcher: str, marker: str, hook_path: str) -> None:
     pre[:] = kept
 
 
-def merge(obj: dict, hook_path: str, frag: dict = AGENT_CAP, frag_file: str | None = None) -> dict:
+def merge(obj: dict, hook_path: str, frag: dict, frag_file: str | None = None) -> dict:
     """Ensure the fragment's hook is present in obj (mutates + returns obj)."""
     hook_path = resolve_hook_path(hook_path, frag_file)
     event, matcher, marker = frag["event"], frag["matcher"], frag["marker"]
@@ -548,7 +460,7 @@ def merge(obj: dict, hook_path: str, frag: dict = AGENT_CAP, frag_file: str | No
     # tree keeps a command pointing at a withdrawn file and loses the hook silently.
     #
     # The compare is FRAGMENT-LEVEL, per TOOL-dRetiredFork-14 F0: the fragment supplies hook_path, so
-    # a fragment gov owns repaths on the same run as the built-in default, and an adopter who cannot
+    # a fragment gov owns repaths on the same run as the default one, and an adopter who cannot
     # edit that fragment without forking gets the fix for free. The rejected alternative was a
     # `--rewrite-stale-path` flag, which puts the decision on whoever remembers to pass it.
     # It compares the WHOLE rendered command, not the path inside it: a changed argument list is
@@ -603,7 +515,7 @@ def _dump(obj: dict) -> str:
     return json.dumps(obj, indent=2, ensure_ascii=False) + "\n"
 
 
-def run(settings_file: str, hook_path: str, check: bool, frag: dict = AGENT_CAP,
+def run(settings_file: str, hook_path: str, check: bool, frag: dict,
         frag_file: str | None = None, unwire: bool = False) -> int:
     path = Path(settings_file)
     existed = path.exists()
@@ -651,63 +563,67 @@ def _selftest() -> int:
         except LookupError:
             return None
 
-    hp = ".claude/hooks/agent-cap.js"
+    hp = ".claude/hooks/spawn-guard.js"
     cmd = render_command(hp)
+    # The default fragment's SCHEMA, pinned as a literal: these arms judge the merge, never the file, which
+    # arm 12 reads. PINNED, never read back from the file, so a shipped fragment that drifts reds there.
+    cap = {"name": "spawn-guard", "event": "PreToolUse", "matcher": "Workflow|Agent",
+           "marker": "spawn-guard.js", "hook_path": hp}
     with tempfile.TemporaryDirectory() as d:
         root = Path(d)
 
-        # 1) absent file -> creates the Workflow|Agent group + agent-cap command, exit 0
+        # 1) absent file -> creates the Workflow|Agent group + spawn-guard command, exit 0
         sf = root / ".claude" / "settings.json"
-        assert run(str(sf), hp, check=False) == 0
+        assert run(str(sf), hp, check=False, frag=cap) == 0
         wf = [g for g in json.loads(sf.read_text(encoding="utf-8"))["hooks"]["PreToolUse"]
-              if g.get("matcher") == AGENT_CAP["matcher"]]
+              if g.get("matcher") == cap["matcher"]]
         assert len(wf) == 1 and any(h["command"] == cmd for h in wf[0]["hooks"])
         assert "\r" not in sf.read_text(encoding="utf-8")  # LF-only on every OS
 
         # 2) re-run -> byte-identical (no change); --check on a wired file -> 0
         first = sf.read_text(encoding="utf-8")
-        assert run(str(sf), hp, check=False) == 0 and sf.read_text(encoding="utf-8") == first
-        assert run(str(sf), hp, check=True) == 0
+        assert run(str(sf), hp, check=False, frag=cap) == 0 and sf.read_text(encoding="utf-8") == first
+        assert run(str(sf), hp, check=True, frag=cap) == 0
 
         # 3) pre-existing unrelated key is preserved through the merge
         sf2 = root / "s2.json"
         sf2.write_text('{"model": "x"}\n', encoding="utf-8")
-        assert run(str(sf2), hp, check=False) == 0
+        assert run(str(sf2), hp, check=False, frag=cap) == 0
         o2 = json.loads(sf2.read_text(encoding="utf-8"))
         assert o2["model"] == "x" and o2["hooks"]["PreToolUse"][0]["matcher"] == "Workflow|Agent"
 
-        # 4) pre-existing group w/ a FOREIGN command -> agent-cap appended, foreign kept, ONE group
+        # 4) pre-existing group w/ a FOREIGN command -> spawn-guard appended, foreign kept, ONE group
         sf3 = root / "s3.json"
         sf3.write_text(json.dumps({"hooks": {"PreToolUse": [
-            {"matcher": AGENT_CAP["matcher"],
+            {"matcher": cap["matcher"],
              "hooks": [{"type": "command", "command": "node other.js"}]}]}}) + "\n", encoding="utf-8")
-        assert run(str(sf3), hp, check=False) == 0
+        assert run(str(sf3), hp, check=False, frag=cap) == 0
         wf3 = [g for g in json.loads(sf3.read_text(encoding="utf-8"))["hooks"]["PreToolUse"]
-               if g.get("matcher") == AGENT_CAP["matcher"]]
+               if g.get("matcher") == cap["matcher"]]
         cmds = [h["command"] for h in wf3[0]["hooks"]]
         assert len(wf3) == 1 and "node other.js" in cmds and cmd in cmds
 
         # 5) malformed JSON -> exit 2
         sf4 = root / "s4.json"
         sf4.write_text("{ not json", encoding="utf-8")
-        assert run(str(sf4), hp, check=False) == 2
+        assert run(str(sf4), hp, check=False, frag=cap) == 2
 
         # 6) --check on an absent file -> drift (1), and nothing written
         sf5 = root / "sub" / "s5.json"
-        assert run(str(sf5), hp, check=True) == 1 and not sf5.exists()
+        assert run(str(sf5), hp, check=True, frag=cap) == 1 and not sf5.exists()
 
         # 6b) --unwire (TOOL-aRepatriatedFork-11 S4): wired by merge beside a FOREIGN command, then
         # removed -> the foreign command stays, the entry is gone, --check reports drift again; a
         # second --unwire is a no-op exit 0; unwiring the only entry drops the group it emptied.
         sfu = root / "su.json"
         sfu.write_text(sf3.read_text(encoding="utf-8"), encoding="utf-8")
-        assert run(str(sfu), hp, check=False, unwire=True) == 0
+        assert run(str(sfu), hp, check=False, frag=cap, unwire=True) == 0
         gu = json.loads(sfu.read_text(encoding="utf-8"))["hooks"]["PreToolUse"]
         assert [h["command"] for h in gu[0]["hooks"]] == ["node other.js"], gu
-        assert run(str(sfu), hp, check=True) == 1
-        assert run(str(sfu), hp, check=False, unwire=True) == 0
+        assert run(str(sfu), hp, check=True, frag=cap) == 1
+        assert run(str(sfu), hp, check=False, frag=cap, unwire=True) == 0
         sfu2 = root / "su2.json"
-        assert run(str(sfu2), hp, check=False) == 0 and run(str(sfu2), hp, check=False, unwire=True) == 0
+        assert run(str(sfu2), hp, check=False, frag=cap) == 0 and run(str(sfu2), hp, check=False, frag=cap, unwire=True) == 0
         assert json.loads(sfu2.read_text(encoding="utf-8"))["hooks"]["PreToolUse"] == []
 
         # --- --fragment: a SECOND hook, on a different event and matcher -----------------------
@@ -718,13 +634,13 @@ def _selftest() -> int:
         # used below is the RESOLVED one, because a fixture needs a real directory.
         rhp = resolve_hook_path(recall["hook_path"])
 
-        # 7) a fragment adds ITS block and leaves the agent-cap one alone; re-run is byte-identical
+        # 7) a fragment adds ITS block and leaves the spawn-guard one alone; re-run is byte-identical
         sf6 = root / "s6.json"
-        assert run(str(sf6), hp, check=False) == 0                 # agent-cap first
+        assert run(str(sf6), hp, check=False, frag=cap) == 0                 # spawn-guard first
         cap_only = sf6.read_text(encoding="utf-8")
         assert run(str(sf6), rhp, check=False, frag=recall) == 0
         both = json.loads(sf6.read_text(encoding="utf-8"))["hooks"]
-        # PINNED AS A LITERAL, never as AGENT_CAP["matcher"]. This is the arm that has to fail when
+        # PINNED AS A LITERAL, never as cap["matcher"]. This is the arm that has to fail when
         # the shipped matcher narrows back to `Workflow`; asserting it against the constant it is
         # checking would make it agree with any value the constant happens to hold.
         assert [g["matcher"] for g in both["PreToolUse"]] == ["Workflow|Agent"]
@@ -735,11 +651,11 @@ def _selftest() -> int:
         assert run(str(sf6), rhp, check=False, frag=recall) == 0
         assert sf6.read_text(encoding="utf-8") == wired             # AC10: re-run changes nothing
         assert run(str(sf6), rhp, check=True, frag=recall) == 0
-        assert run(str(sf6), hp, check=True) == 0                   # ...and agent-cap still reads wired
+        assert run(str(sf6), hp, check=True, frag=cap) == 0                   # ...and spawn-guard still reads wired
 
-        # 8) the fragment's OWN drift is detected independently of agent-cap's
+        # 8) the fragment's OWN drift is detected independently of spawn-guard's
         sf7 = root / "s7.json"
-        assert run(str(sf7), hp, check=False) == 0
+        assert run(str(sf7), hp, check=False, frag=cap) == 0
         assert run(str(sf7), rhp, check=True, frag=recall) == 1
 
         # 9) a fragment with no marker is REFUSED, not defaulted — a marker-less fragment
@@ -767,40 +683,29 @@ def _selftest() -> int:
         #     wired-but-script-missing state is reachable from two separate WIRE commands run out of
         #     order, and it makes Claude Code run `node` against nothing on every matching call.
         sf9, gone, there = root / "s9.json", root / "gone.js", root / "here.js"
-        assert main([str(sf9), "--hook-path", str(gone)]) == 2 and not sf9.exists()
-        assert main([str(sf9), "--hook-path", str(gone), "--check"]) == 1, "--check is a report, not a merge"
+        cfrag = root / "cap.fragment.json"
+        cfrag.write_text(json.dumps(cap) + "\n", encoding="utf-8")
+        assert main([str(sf9), "--fragment", str(cfrag), "--hook-path", str(gone)]) == 2 and not sf9.exists()
+        assert main([str(sf9), "--fragment", str(cfrag), "--hook-path", str(gone), "--check"]) == 1, "--check is a report, not a merge"
         there.write_text("// stub\n", encoding="utf-8")
-        assert main([str(sf9), "--hook-path", str(there)]) == 0 and sf9.exists()
+        assert main([str(sf9), "--fragment", str(cfrag), "--hook-path", str(there)]) == 0 and sf9.exists()
 
-        # 12) a PER-ENTRY `prefix` in the target's deploy.toml decides agent-cap's home, and this
-        #     file's own location does not. Staged as the reported break: settings-merge at the
-        #     top-level prefix, the hook at its own. Before the fix the composition below read
-        #     the top-level prefix joined to the hook's own path, and the merge refused a settings.json that was correct.
-        gov = root / "dep" / ".governance"
-        gov.mkdir(parents=True)
-        dep = gov / "deploy.toml"
-        dep.write_text('prefix = "scripts"\n\n[kit.agent-cap]\nprefix = ".claude"\n',
-                       encoding="utf-8", newline="\n")
-        # THE COMPOSITION, not just the reader: reverting the lookup has to red something. This
-        # assertion is what fails on the pre-fix engine, which answered "<this file's prefix>/hooks/
-        # agent-cap.js" and then refused to wire a tree whose settings.json was already right.
-        # The hooks kit's directory NAME in this install, or the miss name where no hooks kit sits
-        # beside this file: the entry declares `requires = []`, so a settings-merge-only install is
-        # legal, and `.name` on the None the resolver returns there crashed this arm (closing
-        # review round 1 M4). The composition asserted below is the same either way.
-        _hk_dir = _resolve_agent_cap_dir()
-        _hk = _hk_dir.name if _hk_dir is not None else NO_HOOKS_KIT
-        assert _resolve_agent_cap_hook_path(gov.parent) == f".claude/{_hk}/agent-cap.js"
-        assert _resolve_agent_cap_hook_path(root).endswith(f"/{_hk}/agent-cap.js")     # no deploy.toml -> derived
-        assert _load_declared_prefix("agent-cap", gov.parent) == ".claude"
-        assert _load_declared_prefix("settings-merge", gov.parent) == "scripts"   # falls back to top-level
-        assert _load_declared_prefix("agent-cap", root) is None                   # no deploy.toml at all
-        # An unsafe value is REFUSED, not resolved into a command Claude Code runs. Every one of
-        # these is VALID TOML on purpose: a value that merely breaks the parse would be rejected by
-        # tomllib and the character class would go unexercised.
-        for evil in ('../../PWNED', 'x; touch PWNED', 'x$(id)', 'C:/abs'):
-            dep.write_text(f'[kit.agent-cap]\nprefix = "{evil}"\n', encoding="utf-8", newline="\n")
-            assert _load_declared_prefix("agent-cap", gov.parent) is None, evil
+        # 12) TOOL-dBoundRoles-25 S6: with no --fragment the merge wires the roles kit's spawn-guard.fragment.json,
+        #     read from its file. Beside a roles kit the default resolves and declares the pinned schema; in a
+        #     settings-merge-only install (arm 18's copy) no roles kit resolves, so a no-fragment run exits 2 and
+        #     writes nothing: there is no built-in fragment left to wire a deleted hook.
+        sf12 = root / "s12.json"
+        try:
+            shipped12 = resolve_default_fragment()
+        except ValueError:
+            shipped12 = None
+        if shipped12 is not None:
+            got12 = load_fragment(shipped12)
+            assert {k: got12[k] for k in _FRAGMENT_KEYS} == dict(cap, hook_path="{here}/spawn-guard.js"), got12
+            assert (got12["interpreter"], got12["args"]) == ("node", [])
+        else:
+            assert main([str(sf12)]) == 2 and not sf12.exists(), "a no-fragment run with no roles kit wired something"
+            assert main([str(sf12), "--check"]) == 2 and not sf12.exists()
 
         # 10) the SHIPPED fragment beside this script parses and declares the schema check-wiring
         #     joins on. Skipped, not failed, in a project that did not adopt memory-recall.
@@ -1067,9 +972,9 @@ def _selftest() -> int:
                      else "no bash on PATH shares this filesystem"))
 
         # 18) THIS FILE ALONE (closing review round 1 M4). The entry declares `requires = []`, so a
-        #     target may install settings-merge with no hooks kit beside it, and arm 12 read `.name`
-        #     off the None the resolver returns there. The whole selftest re-runs from a copy in a
-        #     scratch root holding nothing else; the copy's own run does not recurse.
+        #     target may install settings-merge with no roles kit beside it, which arm 12 reads as no
+        #     default fragment. The whole selftest re-runs from a copy in a scratch root holding nothing
+        #     else; the copy's own run does not recurse.
         if not os.environ.get("SETTINGS_MERGE_SELFTEST_ALONE"):
             alone = root / "alone"
             (alone / ".git").mkdir(parents=True)
@@ -1102,9 +1007,8 @@ def main(argv: list[str] | None = None) -> int:
         return _selftest()
     if a.unwire and (a.check or not a.fragment):
         print("settings-merge: --unwire takes --fragment and not --check; it removes one fragment's "
-              "entry, and the built-in default is never removed by name", file=sys.stderr)
+              "entry, and the default fragment is never removed by name", file=sys.stderr)
         return 2
-    frag = AGENT_CAP
     try:
         if a.resolve_hook:
             # The owned-hook join's ONE reader, printed for check-wiring.sh (the round-1 fold, S3).
@@ -1116,8 +1020,10 @@ def main(argv: list[str] | None = None) -> int:
             frag = load_fragment(Path(a.resolve_fragment))
             print(resolve_hook_path(frag["hook_path"], a.resolve_fragment))
             return 0
-        if a.fragment:
-            frag = load_fragment(Path(a.fragment))
+        if not a.fragment:
+            # TOOL-dBoundRoles-25 S6: no --fragment wires the roles kit's spawn guard, read from its file.
+            a.fragment = str(resolve_default_fragment())
+        frag = load_fragment(Path(a.fragment))
         # RESOLVED ONCE, HERE, before anything reads it. The existence refusal below and the merge
         # itself must agree on which file they are talking about, and a `{kit}` token reaching the
         # refusal makes it reject a path nobody ever meant to write.

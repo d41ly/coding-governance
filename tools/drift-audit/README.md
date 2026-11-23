@@ -37,8 +37,8 @@ over an empty finding set. That path previously produced a confident report abou
 caller-supplied concurrency cap or verifier total; both are bare literals matching the review
 protocol's ≤5. Delete those two keys from any `args` object you pass — they are ignored, not
 honoured. Nothing else in the contract moved. The knobs never worked as documented on any adopter
-whose `agent-cap.js` enforced the rule: the guard read the literal on the fallback's right-hand side
-and the runtime used the caller's value, so the two disagreed silently. `agent-cap.js` 1.2 now
+whose agent limit hook enforced the rule: the guard read the literal on the fallback's right-hand side
+and the runtime used the caller's value, so the two disagreed silently. That hook, at 1.2,
 resolves the bound and denies that binder form, which is what makes the removal load-bearing rather
 than cosmetic.
 

@@ -1205,7 +1205,6 @@ guard = [
   "{prefix}/hooks/format-guard.js",
   "{prefix}/hooks/format-guard.test.sh",
   "{prefix}/hooks/scratch-guard.js",
-  "{prefix}/hooks/agent-cap.js",
   "{prefix}/runlog/prose.py",
   "{prefix}/runlog/extract.py",
   "{prefix}/lib/",
@@ -1217,13 +1216,13 @@ stage = ["step.test"]
 enforces = ["practice.gate"]
 
 [[exempt_leg]]
-name = "agent-cap self-test"
-why = "it runs `agent-cap.test.sh`, which `<prefix>/hooks/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
-tag = "leg.gov.agent-cap-self-test"
-tests = ["feature.agent-cap"]
-purpose = "tests the agent-cap guard on Workflow and Agent tool calls"
-argv = ["bash", "{prefix}/hooks/agent-cap.test.sh"]
-guard = ["{prefix}/hooks/", "{prefix}/lib/", "{prefix}/workflows/spec-audit-optin.js"]
+name = "spawn-guard self-test"
+why = "it runs `spawn-guard.test.sh`, which `<prefix>/roles/kit.toml` withholds with `role = \"project-owned\"`: the suite stages its fixtures around a copy of the spawn guard beside it, so its subject is the pack and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dBoundRoles-25 S5 renamed it from the retired hook's leg, whose `enforces` it keeps; TOOL-aQuenchedHarness-3."
+tag = "leg.gov.spawn-guard-self-test"
+tests = ["feature.roles"]
+purpose = "tests the spawn guard on Workflow and Agent tool calls"
+argv = ["bash", "{prefix}/roles/spawn-guard.test.sh"]
+guard = ["{prefix}/roles/spawn-guard.js", "{prefix}/roles/spawn-guard.fragment.json", "{prefix}/roles/spawn-guard.test.sh", "{prefix}/hooks/scratch-guard.js"]
 chunk = "selftests"
 subject = "kit"
 ceiling = 1800
@@ -1697,7 +1696,7 @@ guard = [
   "{prefix}/workflows/check-review-join.js",
   "{prefix}/workflows/check-verifier-fanout.js",
   "{prefix}/lib/",
-  "{prefix}/hooks/agent-cap.js",
+  "{prefix}/roles/spawn-guard.js",
   "{prefix}/memory-tree/tree_lib.py",
   "{prefix}/check-template-size.sh",
   "{prefix}/check-spec-tokens.py",

@@ -270,7 +270,7 @@ RUNLOG_DIR=$(resolve_kit_dir "$TESTPY" runlog prose.py "$HERE") || exit 2
 HOOKS_HOME=$(resolve_kit_dir "$TESTPY" hooks format-guard.js "$HERE") || exit 2
 ROLES_HOME=$(resolve_kit_dir "$TESTPY" roles handoff.py "$HERE") || exit 2
 mkdir -p "$TMP/kit/$HOOKS_HOME" "$TMP/kit/$ROLES_HOME"
-cp "$HERE/format-guard.js" "$HERE/scratch-guard.js" "$HERE/agent-cap.js" "$TMP/kit/$HOOKS_HOME/"
+cp "$HERE/format-guard.js" "$HERE/scratch-guard.js" "$TMP/kit/$HOOKS_HOME/"
 HOOK="$TMP/kit/$HOOKS_HOME/format-guard.js"
 # The hook's card reader asks the kickoff checker where a session's card lives, resolved from the hook's
 # OWN install (TOOL-dPlacedRequest-2 S10), so the copy carries a stub checker where that probe looks: it

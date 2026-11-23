@@ -8,8 +8,8 @@
 # — and the STRUCTURAL claims are asserted over the file's own text.
 #
 # Asserting over text is weaker than executing and is used only where executing cannot reach: whether
-# an `agent(` sits inside a loop is a property of the source, and it is the property `agent-cap.js`
-# itself judges from the source.
+# an `agent(` sits inside a loop is a property of the source, and it is the property the review kit's
+# fan-out gate itself judges from the source.
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
 derive_self_rel() {
@@ -274,8 +274,9 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 _rkd_py=$(resolve_python) || { echo "unattended-build.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
 UNATTENDED_DIR=$(resolve_kit_dir "$_rkd_py" unattended unattended.sh "$HERE") || exit 2
 UNATTENDED="${UNATTENDED_DIR##*/}"
-HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
+HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks scratch-guard.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
+ROLES_DIR=$(resolve_kit_dir "$_rkd_py" roles spawn-guard.js "$HERE") || exit 2
 POLICY_KIT_DIR=$(resolve_kit_dir "$_rkd_py" policy policy.py "$HERE") || exit 2
 POLICY_KIT="${POLICY_KIT_DIR##*/}"
 MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gotchas.py "$HERE") || exit 2
@@ -677,7 +678,7 @@ has "a degraded run reports DEGRADED, not complete" "$o" "DEGRADED"
 has "the refused units are NAMED, not merely counted" "$o" "A-tB-2"
 
 # ---- AC4: NO agent() IN A LOOP AND NO FAN-OUT PRIMITIVE, asserted over the file's own text. This is
-# ---- the property `agent-cap.js` judges, and the shape TOOL-cBriefedPilot-21's ratified
+# ---- the property the fan-out gate judges, and the shape TOOL-cBriefedPilot-21's ratified
 # ---- `parallelism route: none` requires. The hook's own verdict is the second arm.
 # NO no-op arm here. A counted `n=$((n+1))` with an empty body was written first and removed: it
 # incremented the total and asserted nothing, which is `memory/gotchas/fixture-passes-by-finding-
@@ -702,14 +703,21 @@ n=$((n+1)); if grep -q "DISPATCH IS STRICTLY SEQUENTIAL" "$F"; then
 else
   echo "FAIL the file no longer declares per-unit dispatch sequential"; st=1
 fi
-if [ -f "$ROOT/${HOOKS_DIR}/agent-cap.js" ]; then
-  # `roles` in `args` (TOOL-aOrientedCast-7 S11): where a role index exists, the hook admits a harness
-  # call only when it hands the harness a known role.
+if [ -f "$ROOT/${ROLES_DIR}/spawn-guard.js" ]; then
+  # `roles` in `args` (TOOL-aOrientedCast-7 S11): where a role index exists, the roles kit's spawn guard admits
+  # a harness call only when it hands the harness a known role. TOOL-dBoundRoles-25 S3 answers first where the
+  # harness differs from its blob at the landed revision, as it does on every branch that edits it before it
+  # lands: that run is SAID, never counted, since the role check then never ran.
   o=$(printf '{"tool_name":"Workflow","tool_input":{"scriptPath":"'"${PFX}${KIT}/unattended-build.js"'","args":{"roles":{"specWriter":"gov-spec-writer"}}}}' \
-      | (cd "$ROOT" && node ${HOOKS_DIR}/agent-cap.js 2>&1); echo "rc=$?")
-  n=$((n+1)); case "$o" in *"rc=0"*) echo "ok   agent-cap ADMITS the harness" ;; *) echo "FAIL agent-cap denied the harness -- $o"; st=1 ;; esac
+      | (cd "$ROOT" && node ${ROLES_DIR}/spawn-guard.js 2>&1); echo "rc=$?")
+  case "$o" in
+    *"differs from its blob at the landed revision"*|*"is not landed at"*)
+      echo "SKIP spawn guard admission — the harness is not at its landed blob here, so S3 answered first and the role check was NOT exercised" ;;
+    *"rc=0"*) n=$((n+1)); echo "ok   the spawn guard ADMITS the harness" ;;
+    *) n=$((n+1)); echo "FAIL the spawn guard denied the harness -- $o"; st=1 ;;
+  esac
 else
-  echo "SKIP agent-cap admission — no hook at $ROOT/${HOOKS_DIR}/agent-cap.js, so this arm was NOT exercised"
+  echo "SKIP spawn guard admission — no pack at $ROOT/${ROLES_DIR}/spawn-guard.js, so this arm was NOT exercised"
 fi
 
 # ---- AC5: the AUDIT stage must name the spec-audit kind. `tier2-review.js` DEFAULTS an absent kind
@@ -2434,13 +2442,13 @@ build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklis
   # directory up where the inlined resolver's second probe finds it, and it refuses to render when
   # nothing answers. `requires = ["agent-cap", "policy"]`, so a real install has the reader, the hook
   # and the fan-out gate beside the parity script; the layout is committed so HEAD names a commit.
-  cp "$HERE/check-verifier-fanout.sh" "$HERE/check-verifier-fanout.js" "$d/$kd/"
+  cp "$HERE/check-verifier-fanout.sh" "$HERE/check-verifier-fanout.js" "$HERE/script-views.js" "$d/$kd/"
   mkdir -p "$d/$kd/../${POLICY_KIT}"; cp "$ROOT/${POLICY_KIT_DIR}/policy.py" "$ROOT/${POLICY_KIT_DIR}/catalogue.toml" "$d/$kd/../${POLICY_KIT}/"
   # The three pairs S7 made rendered: the renderer refuses a set with a template missing, and
   # `--tracked-only` would SKIP an absent live copy, so an install carries both halves of each.
   cp "$HERE/tier2-review.template.js" "$HERE/drift-audit-code.template.js" "$HERE/drift-audit-code.js" \
      "$HERE/drift-audit-state.template.js" "$HERE/drift-audit-state.js" "$d/$kd/"
-  mkdir -p "$d/$kd/../${HOOKS}"; cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$d/$kd/../${HOOKS}/"
+  mkdir -p "$d/$kd/../${HOOKS}"; cp "$ROOT/${HOOKS_DIR}/scratch-guard.js" "$d/$kd/../${HOOKS}/"
   # `-` IS A REVIEW-HARNESS-ONLY INSTALL, which `requires` permits: this kit requires agent-cap and
   # policy and nothing else, so neither the unattended kit nor the memory-tree kit has to be there.
   if [ "$ud" != - ]; then mkdir -p "$d/$ud"; printf '#!/usr/bin/env bash\n' > "$d/$ud/unattended.sh"; fi
@@ -2550,12 +2558,13 @@ has "FH23 AC15 ...at exit 2" "$o" "rc=2"
 # ---- stderr notice; a hook that denies the fallback too exits 2 and writes nothing. Gov's own tree
 # ---- always takes the split, so only a layout reaches this path. No layout carries the policy mirror,
 # ---- so its hook bounds the split at MAX_VERIFIERS and every layout above takes the fallback too, with
-# ---- nothing asserted. The hook is staged at its bound here, never left to that accident
-# ---- (TOOL-dFairHearing-50 S8): the fan-out rule asks a hook through its exports, `readWriterBound` and
-# ---- MAX_VERIFIERS, so a stub hook exports nothing it can ask, and is refused before any rule runs.
+# ---- nothing asserted. The bound is staged here, never left to that accident (TOOL-dFairHearing-50 S8):
+# ---- the fan-out rule reads `readWriterBound` and MAX_VERIFIERS from the review kit's script-views.js since
+# ---- TOOL-dBoundRoles-25, and asks the hook it names, the hooks kit's scratch-guard.js, for the policy helper
+# ---- alone, so a stub hook exports nothing it can ask, and is refused before any rule runs.
 WS="$LAY/old-hook"; build_layout "$WS" scripts/$WFK scripts/$UNK scripts/gotchas.py
-sed -i "s/^function readWriterBound(repo) {\$/function readWriterBound(repo) { return { why: 'a staged hook that bounds no writer split' }/" "$WS/scripts/$HOOKS/agent-cap.js"
-same "DGR74 LIVENESS the layout's hook refuses the writer bound" "$(grep -c "a staged hook that bounds no writer split" "$WS/scripts/$HOOKS/agent-cap.js")" "1"
+sed -i "s/^function readWriterBound(repo, helper) {\$/function readWriterBound(repo, helper) { return { why: 'a staged hook that bounds no writer split' }/" "$WS/scripts/$WFK/script-views.js"
+same "DGR74 LIVENESS the layout's hook refuses the writer bound" "$(grep -c "a staged hook that bounds no writer split" "$WS/scripts/$WFK/script-views.js")" "1"
 o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
 has "DGR74 a hook that refuses the writer bound: --render still renders" "$o" "rc=0"
 has "DGR74 ...and stderr carries the hook's own reason" "$e" "does not admit the writer split: BLOCKED by agent-cap:"
@@ -2565,8 +2574,8 @@ has "DGR74 ...and the harness bounds its pool at the verify total" "$h" "async f
 has "DGR74 ...and its spec writers too" "$h" "const SPEC_WRITERS = 5"
 has "DGR74 ...and judges the split under the verifiers marker" "$h" "Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-verifiers"
 cp "$WS/scripts/$WFK/unattended-build.js" "$LAY/old-hook.js" 2>/dev/null
-sed -i 's/^const MAX_VERIFIERS = 5$/const MAX_VERIFIERS = 4/' "$WS/scripts/$HOOKS/agent-cap.js"
-same "DGR74 LIVENESS the layout's hook holds a total below the fallback's" "$(grep -c '^const MAX_VERIFIERS = 4$' "$WS/scripts/$HOOKS/agent-cap.js")" "1"
+sed -i 's/^const MAX_VERIFIERS = 5$/const MAX_VERIFIERS = 4/' "$WS/scripts/$WFK/script-views.js"
+same "DGR74 LIVENESS the layout's hook holds a total below the fallback's" "$(grep -c '^const MAX_VERIFIERS = 4$' "$WS/scripts/$WFK/script-views.js")" "1"
 o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
 has "DGR74 a hook that denies the fallback too: --render refuses" "$o" "rc=2"
 has "DGR74 ...naming the fallback" "$o" "denies unattended-build.js's verifier-bounded fallback too, so nothing was rendered or graded"
@@ -2575,22 +2584,22 @@ same "DGR74 ...and leaves the harness it rendered before unchanged" "$(cmp -s "$
 # ---- TOOL-dGroundRules-83: A GATE THAT COULD NOT ASK THE HOOK IS NO VERDICT. A hook that denies
 # ---- printing nothing is said as one. With no hook at all the fan-out gate exits 2 naming why, and
 # ---- --render refuses at once with that answer on stderr, never as the hook's denial.
-printf '%s\n' "process.exit(1)" > "$WS/scripts/$HOOKS/agent-cap.js"
+printf '%s\n' "process.exit(1)" > "$WS/scripts/$HOOKS/scratch-guard.js"
 ( cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render >/dev/null 2>"$LAY/old-hook.err" ); e=$(<"$LAY/old-hook.err")
 has "DGR83 a hook that denies printing nothing: the notice says so" "$e" "does not admit the writer split: the agent-cap hook denied it and printed no reason"
 # TOOL-dFairHearing-50 S8 - a hook the rule cannot load is no verdict: the fan-out gate exits 2 with the rule's
 # own reason, and --render refuses at once, never as the hook's denial.
-printf '%s\n' "module.exports = {}" > "$WS/scripts/$HOOKS/agent-cap.js"
+printf '%s\n' "module.exports = {}" > "$WS/scripts/$HOOKS/scratch-guard.js"
 o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
 has "FH50 AC8 a hook the rule cannot load: --render refuses" "$o" "rc=2"
 has "FH50 AC8 ...naming the gate that could not ask the hook" "$e" "the fan-out gate exited 2 and could not ask the agent-cap hook"
-has "FH50 AC8 ...and the rule's own reason" "$e" "it exports no MAX_VERIFIERS"
+has "FH50 AC8 ...and the rule's own reason" "$e" "it exports no resolvePolicyHelper"
 hasnt_ "FH50 AC8 ...never as the hook's denial" "$e" "does not admit the writer split"
-rm -f "$WS/scripts/$HOOKS/agent-cap.js"
+rm -f "$WS/scripts/$HOOKS/scratch-guard.js"
 o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
 has "DGR83 no hook at all: --render refuses" "$o" "rc=2"
 has "DGR83 ...naming the gate that could not ask the hook" "$e" "the fan-out gate exited 2 and could not ask the agent-cap hook"
-has "DGR83 ...and the gate's own reason" "$e" "has no predicate to delegate to"
+has "DGR83 ...and the gate's own reason" "$e" "has no policy helper locator"
 hasnt_ "DGR83 ...never as the hook's denial" "$e" "does not admit the writer split"
 
 # ---- AC3: the NESTED layout, and two ROOT installs, one of each memory-tree shape.
