@@ -1,6 +1,6 @@
 # KICK-dKeptSession-79 — the closing diff review's eight minors: a fetched mail record validated once, a refused move posting no ack, a failed fetch spacing the next, and the gaps the review found
 
-**Status:** SPECCED · rev-2 · 2026-11-23 · node d · Tier-2 · base c3ba5199 · streams kickoff · order 37 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-2 · 2026-11-23 · node d · Tier-2 · base c3ba5199 · streams kickoff · order 37 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-23-build-KICK-dKeptSession-79-widen-3.md](../build/2026-11-23-build-KICK-dKeptSession-79-widen-3.md) | widen | — |
+| [2026-11-21-prompt-KICK-dKeptSession-79-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-79-build-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-79-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-79-1-spec-writer.md) | journal | — |
 | [2026-11-23-prompt-KICK-dKeptSession-79-spec-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-79-spec-brief.md) | research | — |
 
