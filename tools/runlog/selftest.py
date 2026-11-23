@@ -2118,6 +2118,16 @@ def test_extract_context_window():
     check("extract context-window KICK-dKeptSession-48 AC1: a 200k session beside a 1M sibling reads its "
           "own window, 75%, under CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000",
           (r.returncode, r.stdout.strip(), r.stderr.strip()), (0, "75%", "context: window 200000 · env"))
+    # KICK-dKeptSession-56 AC12: the same turn on a first-party `claude-` model, whose window the harness
+    # never takes from the variable, reads the owner's figure with its source marked advisory; the
+    # fixture-model read above is the other model's, plain `env`
+    first = both / FIXTURE_PROJECT / f"{uuid.uuid4()}.jsonl"
+    write_transcript_lines(first, json.loads(json.dumps(TRANSCRIPTS["scenarios"]["context-window"]["main"])
+                                             .replace('"fixture-model"', '"claude-fixture-model"')))
+    r = run_runlog(["context", str(first)], base, env)
+    check("extract context-window KICK-dKeptSession-56 AC12: a claude- model's turn under "
+          "CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000 reads 75% with source env, advisory",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()), (0, "75%", "context: window 200000 · env, advisory"))
     env["CLAUDE_CODE_MAX_CONTEXT_TOKENS"] = "x"
     r = run_runlog(["context", str(main)], base, env)
     check("extract context-window AC4: a malformed CLAUDE_CODE_MAX_CONTEXT_TOKENS is ignored, so AC2's 15%",

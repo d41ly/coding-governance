@@ -462,7 +462,11 @@ that does not read `mail — interfaces <parent> unread · <why>`. A `question`,
 never acknowledged, nor a `confirmed` or `changed` the check neither names nor finds superseded. A row
 still reading `open`, a message addressed to the
 build or one of its units neither answered, acknowledged nor past its deadline, raises `MailHeld`, a
-`TransitionRefused` printed `refused — <slug> · mail open <id> …`, exit 1, writing nothing; a row
+`TransitionRefused` printed `refused — <slug> · mail open <id> …`, exit 1, writing nothing; where every
+row it holds is one whose owed ack was refused, for no `CLAUDE_CODE_SESSION_ID` or an origin out of
+reach, `write_consumed_acks` has recorded each ack's own cause and the refusal names it instead,
+`refused — <slug> · mail ack not posted: <id> · <the ack's first line>`, one per row joined by `; `
+(KICK-dKeptSession-56 S32); a row
 acknowledged here is disposed by the build's next move; `claim.py`
 catches it before a row miss and prints `claim held`. A message this node first saw more than its
 `deadline` hours ago reads `expired` (KICK-dKeptSession-24) and holds nothing. `mail — off`, no unattended kit, or a repository with no
@@ -486,9 +490,17 @@ a later exit is a new message rather than a duplicate the mailbox refuses; `chan
 `read_mail_rows` over the dependent already holds a `confirmed` of that subject from the build. A
 dependent whose mailbox does not read gets nothing and one `loop: notice · unread · <dependent> · <why>`
 line; a failed post prints its line and, where it exits non-zero, `notice — not posted <kind> to
-build:<dependent> · rc <n> · <its first line>`; neither fails the move. The unattended kit's
+build:<dependent> · rc <n> · <its first line>`; neither fails the move. A refused or lost notice is
+posted again (KICK-dKeptSession-56 S33): every other move after a Design exit calls
+`write_dependency_notices` with `repost=True` over the latest exit's commit and ordinal, and per
+dependent runs the unattended kit's `check_interface_notice <dependent> "interfaces <slug>" <listing>`
+through `run_sourced` first, posting that exit's notice again only on its exit 1, `unconfirmed`; exit 2
+or a raise prints the `unread` line, and a dependent holding the current interface is never posted to
+again. The unattended kit's
 `--landed` posts `landed` to the same list with `--pass <sha8>`, the landed sha's first eight hex, and
-the same `notice — not posted` line for a refused post. The position engine's dependency gate
+the same `notice — not posted` line for a refused post; a refused `landed` is posted again by running
+`--landed <slug>` again, whose recorded exit posts once more, a notice already on the ref refusing as a
+duplicate by its content-derived id. The position engine's dependency gate
 reads the notices back through `check_parent_interfaces`, the confirmation that lets a dependent's Build
 run under `deps.early-build`'s default.
 
@@ -539,13 +551,17 @@ two dependents and three exits from Design, back through B21 between them, each 
 to the first dependent rebound to exit 1, the move still recording and printing its `notice — not
 posted` line; `notices-repeat-key`, one dependent and three exits from Design, the spec edited after
 the first exit alone, so the third repeats the second's listing, kind and key, its pass `3` alone
-telling it apart, and every notice still posted; and the nine over `write_consumed_acks`, each rebinding the launcher to record every ack
+telling it apart, and every notice still posted; `notices-reposted`, the Design exit's post to the
+first dependent rebound to exit 2, then B7, no exit, posting that notice again to it alone, each
+dependent then holding one `confirmed` of pass 1 (KICK-dKeptSession-56 S33); and the ten over `write_consumed_acks`, each rebinding the launcher to record every ack
 and restoring it: `acks-landed`, a parent's `landed` acknowledged by the move that records past it;
 `acks-confirmed`, a `confirmed` keyed over the parent's listing at its lease's witness, acknowledged
 over the real chain; `acks-superseded`, `check_parent_interfaces` stood in, a `confirmed` and the later
 `changed` it names current both acknowledged, then another parent's pair under an unconfirmed check
 refusing B5; `acks-failed`, one ack across B4 and B5, then an ack exiting 1 and one raising
-`LookupError`, each on stderr, refusing B7; `acks-takeover`, a take-over's `changed` naming its
+`LookupError`, each on stderr, refusing B7 naming each ack's cause; `acks-no-session`, `acks-landed`'s
+move with `CLAUDE_CODE_SESSION_ID` unset, the real ack refused and B4 refused naming its `no session id`,
+the row still `open` (KICK-dKeptSession-56 S32); `acks-takeover`, a take-over's `changed` naming its
 predecessor in `after`, keyed over the parent's listing and sighted before that predecessor's
 `confirmed`, both acknowledged over the real chain and the chain read the same with their `first-seen`
 swapped; `acks-later-key`, the check stood in naming the take-over's `changed` current and a later

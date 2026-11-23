@@ -245,7 +245,9 @@ node's observed usage: `CLAUDE_CODE_MAX_CONTEXT_TOKENS` where the harness sets i
 context this node's recent transcripts show on that model, rounded up to the 200k or the 1M window.
 No transcript names the window a session runs, so on a node that runs one model at both windows a
 200k session reads its fill against the 1M window unless the owner starts it with
-`CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000` set.
+`CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000` set. The harness honours that variable only where its own gate
+passes, never for a first-party `claude-` model, so for such a model the card still takes the figure
+as your declaration of the window and names its source `env, advisory`.
 A subagent's requests never count. The `context.on-full` policy key decides what a filling window leads to, and
 `context.threshold` where it starts: <!-- usage: policy:context.on-full 50e931f0 --> <!-- usage: policy:context.threshold ba7d79dc -->
 
@@ -272,7 +274,9 @@ minutes, then writes and prints one line such as `card-fixture — pass · fixtu
 binary the fixture launches. A pass counts only while the fixture file is still the one it names and
 the tested version is both PATH's `claude` now and the version of the session reading it, so editing
 the fixture, upgrading the CLI on PATH, or starting a session whose harness runs another version
-makes it stale, and the override returns until you run the fixture again. The reason names the two
+makes it stale, and the override returns until you run the fixture again. Versions compare field by
+field as numbers, a missing field read as 0, so a recorded `cli 2.1` and a `2.1.0` are one version,
+and `2.1.10` is newer than `2.1.9`. The reason names the two
 versions that differ: `recorded under cli <old>, PATH now <new>` or `fixture ran cli <x>, this
 session runs <y>`. A version that cannot be read on any side, the recorded one, PATH's or the
 session's, is red too, as `cli version unknown` with the side named. A machine whose IDE harness and

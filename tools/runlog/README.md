@@ -250,7 +250,10 @@ neither attribution names; and an agent file's own context, since `context` is a
 with `context: window <tokens> · <source>` on stderr; or `none` when the transcript holds no main
 usage, and nothing on stderr. It parses the main file alone, so no subagent's request can decide the
 share, keeps no text, writes nothing and exits 0, or 2 when the path names no file. The window is the
-harness's `CLAUDE_CODE_MAX_CONTEXT_TOKENS` where it is set to a positive integer, source `env`; else
+harness's `CLAUDE_CODE_MAX_CONTEXT_TOKENS` where it is set to a positive integer, source `env`, or
+`env, advisory` for a model id starting `claude-`, since the harness honours the variable only where its
+own gate passes and never for a first-party model, so the figure is the owner's declaration and not a
+window the harness enforces (KICK-dKeptSession-56 S14); else
 the smallest `CONTEXT_WINDOW_RUNGS` rung at or above the largest context the node has observed for
 that model, source `observed <n> on <model>`: the largest main `usage` sum on the model and the
 largest `preTokens` of a compaction whose newest earlier main usage in the same transcript is on that

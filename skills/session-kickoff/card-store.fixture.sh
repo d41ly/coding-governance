@@ -46,7 +46,7 @@ follow-fixed snapshot-terminal snapshot-every lookup lookup-offline lookup-upstr
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
 partial-ask terminal-route close-follow-twice follow-offline-publish follow-offline-publish-online
 follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-run fixture-run-cli worktree-named replay-order
-fixture-cli-path-differs fixture-cli-unknown pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay
+fixture-cli-path-differs fixture-cli-unknown fixture-cli-short pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay
 budget-open budget-spent budget-unfrozen budget-omitted budget-no-kit
 position-act position-awaiting position-disagrees position-skips lead-compact lead-resume
 fill-fresh-past fill-under fill-compact fill-replay fill-slow
@@ -500,7 +500,7 @@ case "$PLANT" in
     print_card_held "AC3 the card's cli — cell keeps its reason" \
       "$(grep -m1 '^cli — ' "$R/.git/orientation/t1.md" | tr -d '\r' | grep -qx 'cli — skipped: claude --version printed no version'; echo $?)" ;;
   context-*|partial-*|terminal-route|fixture-stale|fixture-cli-*|worktree-named|replay-order)
-    case "$PLANT" in context-*|fixture-stale|fixture-cli-path-differs|worktree-named|replay-order) export AI_AGENT=claude-code_9-9-2_agent ;; fixture-cli-unknown) unset AI_AGENT ;; esac
+    case "$PLANT" in context-*|fixture-stale|fixture-cli-path-differs|worktree-named|replay-order) export AI_AGENT=claude-code_9-9-2_agent ;; fixture-cli-unknown) unset AI_AGENT ;; fixture-cli-short) export AI_AGENT=claude-code_9-9-0_agent ;; esac
     # The verdict's reader compares a recorded pass with PATH's `claude` too (KICK-dKeptSession-38 S1),
     # so every case replaying one past its blob test answers from a stub, never the node's own binary.
     case "$PLANT" in context-always-resume|fixture-stale|fixture-cli-*) write_claude_stub 'echo "9.9.2 (Claude Code)"' ;; esac
@@ -529,6 +529,7 @@ case "$PLANT" in
       fixture-stale) set_card_verdict pass 00000000 9.9.2 ;;
       fixture-cli-path-differs) set_card_verdict pass "${FX_BLOB:0:8}" 9.9.2; write_claude_stub 'echo "9.9.1 (Claude Code)"' ;;
       fixture-cli-unknown) set_card_verdict pass "${FX_BLOB:0:8}" unknown ;;
+      fixture-cli-short) set_card_verdict pass "${FX_BLOB:0:8}" 9.9; write_claude_stub 'echo "9.9.0 (Claude Code)"' ;;
       context-transcript-absent) printf -v payload '{"session_id":"t1","cwd":"%s"}' "$R" ;;
       partial-*) : > "$R/one.txt"; : > "$R/two.txt" ;;
     esac
@@ -572,6 +573,11 @@ case "$PLANT" in
         write_claude_stub 'echo "9.9.2 (Claude Code)"'; unset AI_AGENT
         (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
         print_card_held "S2 AI_AGENT naming no version: fresh, unknown named for the session" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: cli version unknown · session)"; echo $?)" ;;
+      fixture-cli-short)
+        # KICK-dKeptSession-56 AC19, S37: a pass recorded under cli 9.9 replayed with PATH and the session at
+        # 9.9.0, one version field by field, so no override; a string compare would red it as recorded under
+        # cli 9.9, PATH now 9.9.0.
+        print_card_held "AC19 a pass recorded under cli 9.9, PATH and the session at 9.9.0: resume, no override" "$(grep -qx 'resume — resume recommended (resume.context: always-resume)' "$OUT"; echo $?)" ;;
       worktree-named)
         print_card_held "AC5 a fresh recommendation names the worktree the stored tree cell names" "$([[ $(grep '^resume — ' "$OUT" | tr -d '\r') == "resume — fresh recommended: idle 1"*"s past 300s · in $WT (resume.context: fresh-when-idle)" ]] && [ "$WT" != "$RT" ]; echo $?)"
         git -C "$R" worktree remove --force "$S/wt" 2>/dev/null

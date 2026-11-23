@@ -623,7 +623,11 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   wrote, with `--mail read <parent> --local --sent`, from the copy its first read fetched. A failed ack prints
   `mail — ack not posted <id> · rc <n>` (`rc -` where the driver could not be launched or did not answer
   in time) on stderr and
-  leaves the notice open, so the move is refused on it:
+  leaves the notice open, so the move is refused on it. Where every message holding the move is one
+  whose acknowledgement was refused, the refusal names that cause instead of `mail open`:
+  `refused — <slug> · mail ack not posted: <id> · <the ack's first line>`, one per message joined by
+  `; `, such as `mail — not written: no session id` when your harness exports no
+  `CLAUDE_CODE_SESSION_ID`, or an origin out of reach; fix that and record the move again:
 
   | Kind addressed to your build | Acknowledged by | When |
   |---|---|---|
@@ -711,13 +715,16 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   dependent refused: the move still records and prints the refusal's line), `notices-repeat-key` (one
   dependent and three exits from Design, the spec unchanged between the last two: the third repeats
   the second's spec listing, and every notice is still posted, its pass `3` telling it apart),
-  `acks-landed` (a parent's
+  `notices-reposted` (the Design exit's post to one dependent refused: the next move posts it again to
+  that dependent alone, each then holding one `confirmed` of pass `1`), `acks-landed` (a parent's
   `landed` the move acknowledges, then records), `acks-confirmed` (a `confirmed` whose key recomputes at
   the parent lease's witness, acknowledged over the real interfaces check), `acks-superseded` (a
   `confirmed` and the later `changed` the check names current, both acknowledged; then another parent's
   pair the check does not confirm, refusing the next move), `acks-failed` (one ack across two moves,
   then a refused ack and one whose launch fails, each printing `mail — ack not posted`, refusing the third
-  move), `acks-takeover` (a take-over's `changed` seen before the `confirmed` of the session it took
+  move naming each cause), `acks-no-session` (the `landed` of `acks-landed` with no
+  `CLAUDE_CODE_SESSION_ID`: the ack is refused and the move refused naming `no session id`, the notice
+  still open), `acks-takeover` (a take-over's `changed` seen before the `confirmed` of the session it took
   over: both acknowledged over the real interfaces check, and the chain reads the same with their
   first sightings swapped), `acks-later-key` (a later `changed` on the take-over's own ref stays
   open, so the move acknowledges nothing and is refused naming every open notice), `acks-withdrawn` (a
@@ -1200,6 +1207,13 @@ Design exit posts `--pass <n>`, `<n>` the parent's count of exits from Design, `
 landing posts `--pass <sha8>`, the landed sha's first eight hex, so a re-landing after a revert reaches
 each dependent too.
 A post the mailbox refuses anyway, whatever its `--pass`, prints `notice — not posted <kind> to build:<dependent> · rc <n> · <the post's first line>` and fails neither the move nor the landing.
+A refused interface notice is not lost: every later move of the parent that is not itself an exit
+from Design checks each dependent's mailbox for the latest exit's notice, with the driver's
+`check_interface_notice`, and posts that notice again, same pass, only to a dependent that does not
+hold it; a dependent holding the current interface is never posted to again, and a check that cannot
+read prints `loop: notice · unread · <dependent> · <why>`. A refused `landed` is posted again by
+running `--landed <parent>` again: its recorded exit posts once more, and a dependent that already
+holds the notice refuses it as a duplicate.
 
 Under `confirmed-interfaces` the dependent reads the parent's lease witness with the driver's
 `--lease show build <parent>`, recomputes the key over the parent's `spec/` listing at that commit,

@@ -20,8 +20,10 @@ THE CHECK, `check_presets(rows, presets)`: every presettable row matched by a ke
 preset and every preset key matching a presettable row, both through `policy.read_catalogue_row`;
 each value admitted by `policy.check_value`, and none equal to, or holding as a member, its row's
 derived default text; the default preset, the `preset` row's default, equal to each presettable row's
-default, a derived one on a set-typed row read as its text split on `, ` and compared as a set, on any
-other derived row judged by `check_value` alone (§8 F3); under a presettable placeholder row such as
+default, a derived one on a set-typed row read as its text split on `, ` and compared as a set, under
+`review.<stage>` the member `derive_stage_default` reads off the text for the key's stage, `owed` for
+`build` and `opt-in` otherwise (KICK-dKeptSession-56 S7), and on any other derived row judged by
+`check_value` alone (§8 F3); under a presettable placeholder row such as
 `review.<stage>`, each key one preset assigns held by every other; the `preset` row's `of` and the
 table names one set; each `never` entry a row; `literal` an array of strings, each naming a derived
 row `never` lacks; each pair held in each preset. Each finding names the preset and the key. `check`
@@ -86,6 +88,8 @@ STORE = "presets.toml"
 SAY = "presets"
 PRESET_KEY = ("preset",)
 REPO_TABLE = policy.PRESETS_TABLE  # the policy file's table of repository presets
+#: the placeholder row whose derived default names a member per stage (KICK-dKeptSession-56 S7)
+STAGE_ROW = "review.<stage>"
 #: one refusal line of the loop kit's `guard.py --expansion`, its stdin line number and why
 REFUSED_LINE = re.compile(r"^loop-guard: refused · stdin:(\d+) · (.*)$")
 Load = namedtuple("Load", "assignment refusals lines")   # refusals: [(dotted key, value, why)]
@@ -163,6 +167,15 @@ def derive_presettable(rows, never, literal):
     which the store's `literal` list names."""
     return [r for r in rows if r.get("name") not in never
             and (not policy.check_derived(r.get("default")) or r.get("name") in literal)]
+
+
+def derive_stage_default(text, stage):
+    """The member a derived default's `text` names for `stage` (KICK-dKeptSession-56 S7): the `; ` clause
+    reading `<Stage> <member>`, the stage capitalised, else the first clause, so `opt-in; Build owed`
+    answers `owed` for `build` and `opt-in` for every other stage."""
+    clauses = [c.strip() for c in str(text).split(";")]
+    head = stage[:1].upper() + stage[1:] + " "
+    return next((c[len(head):] for c in clauses[1:] if c.startswith(head)), clauses[0])
 
 
 def derive_default_preset(rows):
@@ -280,12 +293,19 @@ def check_presets(rows, presets):
             at = f"preset.{name} · {policy.render_dotted(segs)}"
             why = check_preset_key(row, value, never, presettable)
             if why is None and name == default:
-                # A derived default is judged on a set-typed row by its text split on `, `, as a set,
-                # and on any other row by `check_value` alone (§8 F3).
+                # A derived default is judged on a set-typed row by its text split on `, `, as a set;
+                # under `review.<stage>` by the member `derive_stage_default` reads for the key's stage
+                # (KICK-dKeptSession-56 S7); and on any other row by `check_value` alone (§8 F3).
                 want = row.get("default")
                 if policy.check_derived(want):
                     allowed = row.get("allowed") if isinstance(row.get("allowed"), dict) else {}
-                    want = str(want["derived"]).split(", ") if allowed.get("type") == "set" else None
+                    at_stage = STAGE_ROW.split(".").index("<stage>")
+                    if allowed.get("type") == "set":
+                        want = str(want["derived"]).split(", ")
+                    elif row.get("name") == STAGE_ROW and len(segs) > at_stage:
+                        want = derive_stage_default(want["derived"], str(segs[at_stage]))
+                    else:
+                        want = None
                 if want is not None and not check_same_value(value, want):
                     why = f"{policy.render_json(value)} is not the row's default {policy.render_json(want)}"
             if why:
