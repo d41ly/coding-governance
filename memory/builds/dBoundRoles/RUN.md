@@ -375,3 +375,41 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T08:11:32Z rescope · item defer TOOL-dBoundRoles-43 · reason its spec consumes from TOOL-dBoundRoles-20, which waits on asks TOOL-dBoundRoles-77 to -79 and TOOL-dDeclaredLoop-120
 
 2026-11-23T08:14:43Z dispatch · item c918856c TOOL-dBoundRoles-61 · reason tools/roles/adopt-roles.test.sh memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-59-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-61-deviation-613.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-61-1-acceptance-ledger.md memory/map/generated/symbols.json
+
+2026-11-23T08:33:33Z rescope · item defer TOOL-dBoundRoles-19 · reason its section 8 F4 waits on ask TOOL-dBoundRoles-80, the level-5 adopter-rule unit the grammar refuses at HEAD
+
+2026-11-23T08:33:35Z rescope · item defer TOOL-dBoundRoles-42 · reason its spec consumes from TOOL-dBoundRoles-25, deferred behind TOOL-dBoundRoles-20's asks
+
+2026-11-23T08:33:35Z rescope · item defer TOOL-dBoundRoles-44 · reason its spec consumes from TOOL-dBoundRoles-25 and -42, each deferred behind TOOL-dBoundRoles-20's asks
+
+2026-11-23T08:33:37Z rescope · item defer TOOL-dBoundRoles-50 · reason its spec consumes from TOOL-dBoundRoles-25, -42 and -43, each deferred behind TOOL-dBoundRoles-20's asks
+
+2026-11-23T08:33:38Z rescope · item defer TOOL-dBoundRoles-51 · reason its spec consumes from TOOL-dBoundRoles-42 and -44, each deferred behind TOOL-dBoundRoles-20's asks
+
+2026-11-23T08:33:39Z rescope · item defer TOOL-dBoundRoles-56 · reason its spec consumes from TOOL-dBoundRoles-50, deferred behind TOOL-dBoundRoles-20's asks
+
+2026-11-23T08:33:39Z rescope · item defer TOOL-dBoundRoles-57 · reason its spec consumes from TOOL-dBoundRoles-51, deferred behind TOOL-dBoundRoles-20's asks
+
+2026-11-23T08:33:41Z rescope · item defer TOOL-dBoundRoles-58 · reason its spec consumes from TOOL-dBoundRoles-25, -43 and their deferred consumers, behind TOOL-dBoundRoles-20's asks
+
+2026-11-23T08:33:42Z rescope · item defer TOOL-dBoundRoles-60 · reason its spec consumes from TOOL-dBoundRoles-19, deferred on ask TOOL-dBoundRoles-80, and from -56 to -58
+
+2026-11-23T08:33:42Z rescope · item defer TOOL-dBoundRoles-62 · reason its spec consumes from TOOL-dBoundRoles-60, deferred behind TOOL-dBoundRoles-19's ask
+
+2026-11-23T08:33:43Z rescope · item defer TOOL-dBoundRoles-63 · reason its spec consumes from TOOL-dBoundRoles-60 and -62, each deferred behind TOOL-dBoundRoles-19's ask
+
+2026-11-23T08:33:44Z rescope · item defer TOOL-dBoundRoles-64 · reason its spec consumes from TOOL-dBoundRoles-19 and -43, deferred on asks TOOL-dBoundRoles-77 to -80
+
+2026-11-23T08:33:45Z rescope · item defer TOOL-dBoundRoles-65 · reason its spec consumes from TOOL-dBoundRoles-63 and -64, each deferred behind the filed asks
+
+2026-11-23T08:33:46Z rescope · item defer TOOL-dBoundRoles-66 · reason its spec consumes from TOOL-dBoundRoles-50, -60 and -62 to -64, each deferred behind the filed asks
+
+2026-11-23T08:33:47Z rescope · item defer TOOL-dBoundRoles-67 · reason its spec consumes from TOOL-dBoundRoles-63 and -65, each deferred behind the filed asks
+
+2026-11-23T08:33:48Z rescope · item defer TOOL-dBoundRoles-68 · reason its spec consumes from TOOL-dBoundRoles-63 and -65, each deferred behind the filed asks
+
+2026-11-23T08:33:49Z rescope · item defer TOOL-dBoundRoles-69 · reason its spec consumes from TOOL-dBoundRoles-60 and -63 to -67, each deferred behind the filed asks
+
+2026-11-23T08:38:33Z dispatch · item d329db71 TOOL-dBoundRoles-18 · reason tools/govkit/steps/reviewer_merge.py tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/roles/kit.toml help/roles.md memory/project/docs-undocumented.txt memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-18-deviation-183.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-18-1-acceptance-ledger.md memory/map/generated/symbols.json
+
+2026-11-23T08:38:35Z brief · item TOOL-dBoundRoles-18 · reason 09d70f672cba memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-18-build-brief.md
