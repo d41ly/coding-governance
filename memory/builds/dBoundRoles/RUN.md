@@ -349,3 +349,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T06:35:29Z dispatch · item 4a7ae9c6 TOOL-dBoundRoles-26 · reason tools/roles/role-schema.toml tools/roles/roles_lib.py tools/roles/handoff.py tools/roles/check_roles.py tools/roles/adopt-roles.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/loop/position.py help/roles.md help/loop.md .memory-tree.conf memory/project/positional-refs.txt memory/project/docs-undocumented.txt memory/guides/SESSION-KICKOFF.md memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-26-deviation-262.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-26-1-acceptance-ledger.md memory/map/generated/symbols.json tools/roles/agents/gov-prompt-writer.agent.md tools/roles/render_agents.py tools/roles/README.md
 
 2026-11-23T06:35:32Z brief · item TOOL-dBoundRoles-26 · reason 7193c63fe00b memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-26-build-brief.md
+
+2026-11-23T06:59:55Z brief · item TOOL-dBoundRoles-26 · reason fa51a1fd1218 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-26-build-brief.md
