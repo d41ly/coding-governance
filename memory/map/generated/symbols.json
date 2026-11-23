@@ -13493,6 +13493,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_map_verdict",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "derive_marker_basis",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -16131,6 +16136,11 @@
       "id": "extract_item",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "extract_item_findings",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "extract_jsx_defs",
@@ -19008,6 +19018,16 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "measure_bytes_before_act",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "measure_call_searches",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "measure_card_records",
       "kind": "function",
       "file": "skills/session-kickoff/card-store.fixture.sh"
@@ -19106,6 +19126,11 @@
       "id": "measure_execs",
       "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
+    },
+    {
+      "id": "measure_existence_searches",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_fixture",
@@ -19241,6 +19266,11 @@
       "id": "measure_lone_cr",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "measure_map_experiment",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "measure_mode_carry",
@@ -25133,6 +25163,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "read_map_known",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "read_map_purpose",
       "kind": "function",
       "file": "tools/memory-tree/record_kinds.py"
@@ -26818,6 +26853,11 @@
       "file": "tools/loop/adapt.py"
     },
     {
+      "id": "read_run_reports",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "read_run_rows",
       "kind": "function",
       "file": "tools/unattended/fix_keeps.py"
@@ -27891,6 +27931,11 @@
       "id": "read_trailer_rows",
       "kind": "function",
       "file": "tools/loop/budget.py"
+    },
+    {
+      "id": "read_transcript_calls",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "read_transition",
@@ -32880,6 +32925,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/workflows/spec-audit-optin.test.sh"
     },
     {
@@ -33956,6 +34006,11 @@
       "id": "resolve_runlog_dirs",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_runlog_extract",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "resolve_seed_head",

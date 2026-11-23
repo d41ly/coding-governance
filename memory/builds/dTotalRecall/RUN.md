@@ -390,3 +390,16 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T10:39:10Z brief · item TOOL-dTotalRecall-82 · reason b12a305eba2b memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-82-build-brief.md
 
 2026-11-23T10:42:31Z dispatch · item 45bbeaf6 TOOL-dTotalRecall-82 · reason memory/builds/dTotalRecall/build tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-82.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-82-1-acceptance-ledger.md
+
+2026-11-23T10:46:31Z brief · item TOOL-dTotalRecall-17 · reason cb46737d8150 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-17-build-brief.md
+
+2026-11-23T10:49:47Z dispatch · item 479d7256 TOOL-dTotalRecall-17 · reason tools/workflows/replay_scorer.py tools/workflows/kit.toml tools/workflows/README.md memory/builds/dTotalRecall/build/<date>-build-TOOL-dTotalRecall-17-map-replay-verdict.md memory/builds/dTotalRecall/build/<date>-build-TOOL-dTotalRecall-17-map-replay-manifest.json memory/codebase-map memory/map/generated tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-17.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-17-1-acceptance-ledger.md
+2026-11-23T11:01:47Z draw · re-dispatch · TOOL-dTotalRecall-17 · 52/186 · 20261123T110147Z-dea304
+
+2026-11-23T11:01:47Z dispatch · item 479d7256 TOOL-dTotalRecall-17 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-17-deviation-<n>.md
+2026-11-23T11:04:49Z draw · re-dispatch · TOOL-dTotalRecall-17 · 53/186 · 20261123T110449Z-283605
+
+2026-11-23T11:04:49Z dispatch · item 479d7256 TOOL-dTotalRecall-17 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+2026-11-23T11:07:26Z draw · re-dispatch · TOOL-dTotalRecall-17 · 54/186 · 20261123T110726Z-68666a
+
+2026-11-23T11:07:26Z dispatch · item 479d7256 TOOL-dTotalRecall-17 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-17-deviation-1009.md

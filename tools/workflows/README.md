@@ -939,8 +939,13 @@ does a lens set or a prompt change find MORE of what a previous review proved re
 lives there as its `review-replay` instance, and this file is that instance's adapter: its CLI, its
 printer, its corpus listing and its arms. The second instance, `scouted-seam`, is aScoutedSeam's
 reuse grader (`check_hit`, `check_case` and the `grade`, `compare` and `judged` readings), ported from
-its grader blob at `b0fe68f30`. Both sit in one `INSTANCES` table, and `check_instances` reds when it
-lacks either. Every population arrives as a `<src>`: a working-tree path, a 40-hex blob or
+its grader blob at `b0fe68f30`. The third, `map-replay` (`TOOL-dTotalRecall-17`), is a project map's
+losing test: past audits replayed with the map handed and without, run only as `--experiment`. Its
+known set is each audit's `### <item>.` headings, read by `extract_item_findings` into the confirmed
+appendix findings each names, and its lens transcripts are read through the runlog kit, reached in
+process by the inline `resolve_kit_dir` under a `requires_if` row; where no runlog kit resolves it
+exits 2 `unarmed`. All three sit in one `INSTANCES` table, and `check_instances` reds when it
+lacks one. Every population arrives as a `<src>`: a working-tree path, a 40-hex blob or
 `<rev>:<path>`, read by one `git cat-file blob`, and an object git cannot read is refused, never an
 empty arm. `derive_paired_cases` is the one place variants are paired with cases: it refuses an
 answer outside the population, a variant that answered nothing and an empty pairing, and each figure
@@ -970,7 +975,14 @@ of how they were measured, and `check_experiment` makes that method a rule where
 show it and a recorded line where they cannot. The manifest, read through `read_raw_output`, names
 `instance`, `cases`, `results` and `arms`, each arm `{name, base, settings, dispatched}`, and may name
 `heldOut`, `judge {verdicts, key}` and `union {tuning, heldOut}`; the `review-replay` instance takes
-`known` and `candidates` in place of `cases` and `results`. An unknown key is refused,
+`known` and `candidates` in place of `cases` and `results`. The `map-replay` instance takes `known`,
+`candidates`, `arms` and `map`: `known` one `{case, record, items}` per audit, refused on an item no
+heading names or a heading naming a finding id no confirmed appendix row holds; each candidate a
+`{case, arm, report, matched, transcripts}`, `transcripts` naming every scored lens's transcript; two
+arms varying `map`; and `map` the map file, whose bytes are the allowance. It prints each audit's
+`known` line, each run's recall, the three terms' figures and `verdict win` or `verdict lose <terms>`,
+read by `derive_map_verdict`: the recall rise below the twin runs' difference plus 5, the median
+existence-search fall below 1, or the median bytes before the first act rising past the map's bytes. An unknown key is refused,
 so a misspelt rule is never skipped. Every rule runs before the first figure line, and a broken one
 exits 2 naming the rule, the arm or case, and the value:
 
