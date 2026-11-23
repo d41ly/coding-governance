@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-9 — the memory extractors, `record find` and `record show` over the one index, and the per-item read budget
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 18 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-7 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 18 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0220@d0de1caf whole
 
@@ -227,6 +227,8 @@ leg's one declaration, from which `tools/run-gates/leg_factory.py --write` rende
 - **hands-off** `TOOL-dTotalRecall-12` — `record find` and `record show`, two of the shell commands the
   re-measure counts
 - **hands-off** `TOOL-dTotalRecall-43` — `record_extract.py`, the `sections` column and `record_find.py`, which that unit changes for the round-1 audit's ids 7, 11, 12, 31, 34, 45 and 62
+- **hands-off** `TOOL-dTotalRecall-14` — the `record`, `feature` and `marker` namespace rows, which that unit gives a `map` field, and the `record.<kind>` rows its map reads a record kind's purpose for
+- **hands-off** `TOOL-dTotalRecall-15` — the `class` and `record` namespaces, which its disk census joins
 
 ## 4. Design
 
@@ -527,6 +529,10 @@ New arm: tools/memory-recall/test_recall_floor.py · covers AC6 · the floor arm
   `cmd_new_spec`; `id#tag` arms `resolve_edge`; the usage is the integer `128`; the cap row brings its
   case; both recall legs guard the finder; the arms move to suites legs run; the help pages and the
   kickoff manifest join Files touched; the leg line gains `tier2-review self-test`.
+- rev-6 · 2026-11-23 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dTotalRecall-14's
+  consumes-from edge, per `2026-11-22-prompt-TOOL-dTotalRecall-14-reground-brief`; nothing else moved.
+- rev-7 · 2026-11-23 · §3 · a hands-off bullet mirrors TOOL-dTotalRecall-15's edge, per
+  `2026-11-22-prompt-TOOL-dTotalRecall-15-reground-brief`.
 
 ## 10. Reuse audit
 
