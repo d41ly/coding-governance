@@ -648,7 +648,8 @@ def check_return_arm(state):
 
         marker = ("<!-- gov:handoff role=gov-builder build=x unit=U-1 item=- path=%s role-sha=%s task-sha=%s -->"
                   % (order[0], "c" * 12, order[1]))
-        subagents = root / "session" / "subagents"
+        sdir = root / "session"
+        subagents = sdir / "subagents"
 
         def write_transcript(path, prompt):
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -661,8 +662,10 @@ def check_return_arm(state):
         # `unmarked-stop`, under the direct layout with no marker, so the marker test alone stops it. Each,
         # its return plain text, would block if graded; each must pass silent and leave no record.
         record_dir = root / ".git" / read_return_dir()
+        run_id = "wf_fx-1"
+        harness_transcript = sdir / "subagents" / "workflows" / run_id / "agent-h1.jsonl"
         for plant, aid, transcript in (
-                ("harness-typed-stop", "h1", write_transcript(subagents / "workflows" / "wf_fx-1" / "agent-h1.jsonl",
+                ("harness-typed-stop", "h1", write_transcript(harness_transcript,
                                                               marker + "\n\n[Workflow harness — computed task] Build "
                                                               "ONE unit.")),
                 ("unmarked-stop", "u1", write_transcript(subagents / "agent-u1.jsonl", "Build it."))):
