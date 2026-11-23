@@ -286,8 +286,10 @@ TESTPY=$(resolve_python) || { echo "spawn-guard.test: no usable python"; exit 2;
 ROOTDIR=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null)
 SG_DIR=$(resolve_kit_dir "$TESTPY" hooks scratch-guard.js "$HERE") || { echo "spawn-guard.test: no hooks kit holding scratch-guard.js beside this kit"; exit 2; }
 SG_SRC="$ROOTDIR/$SG_DIR/scratch-guard.js"
-mkpack() { # <kits dir> -> prints <kits dir>/roles/spawn-guard.js, a copy of the pack beside <kits dir>/hooks/scratch-guard.js
-  mkdir -p "$1/roles" "$1/hooks" && cp "$KIT_HOOK" "$1/roles/" && cp "$SG_SRC" "$1/hooks/" && printf '%s\n' "$1/roles/spawn-guard.js"
+# Kit directory names, read from where each kit sits and never typed (the install-prefix ban).
+RKN=${KIT_REL##*/}; HKN=${SG_DIR##*/}; WKN=workflows; LBW="${PFX}$WKN"
+mkpack() { # <kits dir> -> prints the pack copied into <kits dir>, beside a copy of the hooks kit's scratch-guard.js
+  mkdir -p "$1/$RKN" "$1/$HKN" && cp "$KIT_HOOK" "$1/$RKN/" && cp "$SG_SRC" "$1/$HKN/" && printf '%s\n' "$1/$RKN/spawn-guard.js"
 }
 # THE ARMS RUN A COPY (TOOL-dGroundRules-21 S38): rule 7 refuses a payload cwd that lies in no checkout
 # wherever a policy kit sits beside the pack, and every arm below runs from "$TMP", which no checkout
@@ -459,10 +461,10 @@ LIMPK=$(resolve_kit_dir "$TESTPY" policy policy.py "$HERE") || LIMPK=""
 if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
   echo "FAIL limit: no policy kit beside this hooks kit, so rule 7 has nothing to arm with"; fail=$((fail+1))
 else
-  R7="$TMP/r7"; mkdir -p "$R7/.governance" "$R7/kits/policy" "$R7/.claude" "$R7/tools/workflows"
+  R7="$TMP/r7"; mkdir -p "$R7/.governance" "$R7/kits/policy" "$R7/.claude" "$R7/$LBW"
   R7_HOOK=$(mkpack "$R7/kits")
   # The harness rule 8's order arm names below, committed so its blob is the landed one (S3).
-  printf 'const s = await agent("one")\n' > "$R7/tools/workflows/h.js"
+  printf 'const s = await agent("one")\n' > "$R7/$LBW/h.js"
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$R7/kits/policy/"; done
   printf '[runtime]\nagents-in-flight = 2\n' > "$R7/.governance/policy.toml"
   ( cd "$R7" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
@@ -1176,13 +1178,13 @@ if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
   echo "FAIL BR25 AC4: no policy kit beside this kit, so no landed revision can be read"; fail=$((fail+1))
 else
   LB="$TMP/lb"; LBR="$TMP/lb-remote.git"; LBJ="$NODEDIR/lb"
-  mkdir -p "$LB/.claude" "$LB/.governance" "$LB/tools/workflows"
+  mkdir -p "$LB/.claude" "$LB/.governance" "$LB/$LBW"
   LB_HOOK=$(mkpack "$LB/kits"); mkdir -p "$LB/kits/policy"
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$LB/kits/policy/"; done
   printf '[runtime]\nagents-in-flight = 2\n' > "$LB/.governance/policy.toml"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$LB/.claude/settings.json"
-  printf '%s\n' '{"roles":{"gov-builder":{"agent":true,"workflow":"build","writes":"product"}},"harnesses":["tools/workflows/h.js","tools/workflows/h5.js"]}' > "$LB/.claude/roles.json"
-  printf 'const s = await agent("one")\n' > "$LB/tools/workflows/h.js"
+  printf '%s\n' '{"roles":{"gov-builder":{"agent":true,"workflow":"build","writes":"product"}},"harnesses":["'"$LBW"'/h.js","'"$LBW"'/h5.js"]}' > "$LB/.claude/roles.json"
+  printf 'const s = await agent("one")\n' > "$LB/$LBW/h.js"
   git init -q --bare "$LBR"
   ( cd "$LB" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
       && git config user.name t && git config core.autocrlf false && git add -A && git commit -qm landed --no-verify \
@@ -1190,48 +1192,48 @@ else
   LB_L8=$(git -C "$LB" rev-parse origin/main | cut -c1-8)
   run_landed() { # name expected_exit harness-file [text stderr must carry ...]
     local name=$1 want=$2 h=$3 got miss="" n; shift 3
-    printf '%s' '{"tool_name":"Workflow","cwd":"'"$LBJ"'","tool_input":{"scriptPath":"'"$LBJ/tools/workflows/$h"'","args":{"roles":{"builder":"gov-builder"}}}}' \
+    printf '%s' '{"tool_name":"Workflow","cwd":"'"$LBJ"'","tool_input":{"scriptPath":"'"$LBJ/$LBW/$h"'","args":{"roles":{"builder":"gov-builder"}}}}' \
       | (cd "$TMP" && node "$LB_HOOK") >/dev/null 2>"$TMP/err"; got=$?
     for n in "$@"; do grep -qF -- "$n" "$TMP/err" || miss="$miss '$n'"; done
     if [ "$got" = "$want" ] && [ -z "$miss" ]; then echo "ok   $name (exit $got)"; pass=$((pass+1))
     else echo "FAIL $name (exit $got, want $want${miss:+, stderr missing$miss})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
   }
   run_landed "BR25 AC4 LIVENESS the landed harness is admitted" 0 h.js
-  printf 'const s = await agent("two")\n' > "$LB/tools/workflows/h.js"
+  printf 'const s = await agent("two")\n' > "$LB/$LBW/h.js"
   run_landed "BR25 AC4 the harness edited in the working tree is refused, naming the path and the landed sha" 2 h.js \
-    'BLOCKED by spawn-guard: rule 6' "harness tools/workflows/h.js differs from its blob at the landed revision $LB_L8"
+    'BLOCKED by spawn-guard: rule 6' "harness $LBW/h.js differs from its blob at the landed revision $LB_L8"
   ( cd "$LB" && git commit -qam edit --no-verify )
   run_landed "BR25 AC4 ...and the edit committed and not pushed is refused all the same" 2 h.js "differs from its blob at the landed revision $LB_L8"
   ( cd "$LB" && git reset -q --hard origin/main )
   run_landed "BR25 AC4 ...and the landed bytes restored are admitted" 0 h.js
-  printf 'const s = await agent("five")\n' > "$LB/tools/workflows/h5.js"
+  printf 'const s = await agent("five")\n' > "$LB/$LBW/h5.js"
   run_landed "BR25 AC5 a declared harness in the working tree and absent at the landed revision is refused as not landed" 2 h5.js \
-    "harness tools/workflows/h5.js is not landed at $LB_L8"
+    "harness $LBW/h5.js is not landed at $LB_L8"
 
   # AC6 (gap-roles-25): an adopter layout at prefix `scripts`, its index naming gov's review harness there,
   # landed, is admitted; so is a CRLF checkout of the same LF blob, read through the repository's clean filter.
   AD="$TMP/ad"; ADR="$TMP/ad-remote.git"; ADJ="$NODEDIR/ad"
-  mkdir -p "$AD/.claude" "$AD/.governance" "$AD/scripts/workflows"
+  mkdir -p "$AD/.claude" "$AD/.governance" "$AD/scripts/$WKN"
   AD_HOOK=$(mkpack "$AD/scripts"); mkdir -p "$AD/scripts/policy"
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$AD/scripts/policy/"; done
   printf '[runtime]\nagents-in-flight = 2\n' > "$AD/.governance/policy.toml"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$AD/.claude/settings.json"
-  printf '%s\n' '{"roles":{"gov-reviewer":{"agent":true,"workflow":"review","writes":"none"}},"harnesses":["scripts/workflows/tier2-review.js"]}' > "$AD/.claude/roles.json"
-  printf 'const a = 1\nconst b = await agent("x")\n' > "$AD/scripts/workflows/tier2-review.js"
+  printf '%s\n' '{"roles":{"gov-reviewer":{"agent":true,"workflow":"review","writes":"none"}},"harnesses":["scripts/'"$WKN"'/tier2-review.js"]}' > "$AD/.claude/roles.json"
+  printf 'const a = 1\nconst b = await agent("x")\n' > "$AD/scripts/$WKN/tier2-review.js"
   git init -q --bare "$ADR"
   ( cd "$AD" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
       && git config user.name t && git config core.autocrlf false && git add -A && git commit -qm landed --no-verify \
       && git remote add origin "$ADR" && git push -q origin main 2>/dev/null )
   run_adopter_call() { # name expected_exit
     local got
-    printf '%s' '{"tool_name":"Workflow","cwd":"'"$ADJ"'","tool_input":{"scriptPath":"'"$ADJ/scripts/workflows/tier2-review.js"'","args":{"roles":{"finder":"gov-reviewer"}}}}' \
+    printf '%s' '{"tool_name":"Workflow","cwd":"'"$ADJ"'","tool_input":{"scriptPath":"'"$ADJ/scripts/$WKN/tier2-review.js"'","args":{"roles":{"finder":"gov-reviewer"}}}}' \
       | (cd "$TMP" && node "$AD_HOOK") >/dev/null 2>"$TMP/err"; got=$?
     if [ "$got" = "$2" ]; then echo "ok   $1 (exit $got)"; pass=$((pass+1))
     else echo "FAIL $1 (exit $got, want $2)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
   }
   run_adopter_call "BR25 AC6 an adopter at prefix scripts calling its landed tier2-review.js is admitted" 0
   git -C "$AD" config core.autocrlf true
-  printf 'const a = 1\r\nconst b = await agent("x")\r\n' > "$AD/scripts/workflows/tier2-review.js"
+  printf 'const a = 1\r\nconst b = await agent("x")\r\n' > "$AD/scripts/$WKN/tier2-review.js"
   run_adopter_call "BR25 AC6 ...and a CRLF checkout of the same LF blob is admitted, through the clean filter" 0
 fi
 

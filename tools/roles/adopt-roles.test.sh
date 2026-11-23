@@ -329,9 +329,9 @@ sys.stdout.buffer.write(json.dumps(name, ensure_ascii=False).encode("utf-8"))' \
   # TOOL-dGroundRules-10: the pack's rule 7 refuses a spawn in a checkout whose settings do not hold
   # the landed agent limit, and this fixture carries no policy. The agreement this arm holds is rule
   # 6's, so it runs a copy of the pack beside scratch-guard.js and no policy kit, where rule 7 adds no rule.
-  HKC="$TMP_ROOT/hooks-copy/hooks"; mkdir -p "$HKC" "$TMP_ROOT/hooks-copy/roles" && cp "$HK/scratch-guard.js" "$HKC/" \
-    && cp "$HERE/spawn-guard.js" "$TMP_ROOT/hooks-copy/roles/"
-  HK=$HKC; PK="$TMP_ROOT/hooks-copy/roles/spawn-guard.js"
+  RKN=${HERE##*/}; HKC="$TMP_ROOT/hooks-copy/hooks"; mkdir -p "$HKC" "$TMP_ROOT/hooks-copy/$RKN" && cp "$HK/scratch-guard.js" "$HKC/" \
+    && cp "$HERE/spawn-guard.js" "$TMP_ROOT/hooks-copy/$RKN/"
+  HK=$HKC; PK="$TMP_ROOT/hooks-copy/$RKN/spawn-guard.js"
   # TOOL-aGuardedEffort-1: the payload names no transcript, so rule 8 reads no model and the admitted
   # spawn's stderr is exactly its not-checked line. Against a main() with rule 8 cut out, it is empty.
   A6_NOTE="spawn-guard: rule 8 did not check this Agent call's effort level — the payload carries no transcript_path"
@@ -387,8 +387,8 @@ sys.stdout.buffer.write(("build: stage %s would run at " % sorted(roles)[0]).enc
   # policy kit names, so the Workflow half runs a second copy of the pack beside a copy of the policy kit; the
   # fixture's harness is committed on its branch, which GOV_DEFAULT_BRANCH names as landed since it has no
   # remote, and its local settings hold the agent limit at one, so rule 7 admits.
-  PKL="$TMP_ROOT/pack-landed/roles/spawn-guard.js"; mkdir -p "$TMP_ROOT/pack-landed/roles" "$TMP_ROOT/pack-landed/hooks" "$TMP_ROOT/pack-landed/policy"
-  cp "$HERE/spawn-guard.js" "$TMP_ROOT/pack-landed/roles/"; cp "$HKC/scratch-guard.js" "$TMP_ROOT/pack-landed/hooks/"
+  PKL="$TMP_ROOT/pack-landed/$RKN/spawn-guard.js"; mkdir -p "$TMP_ROOT/pack-landed/$RKN" "$TMP_ROOT/pack-landed/hooks" "$TMP_ROOT/pack-landed/policy"
+  cp "$HERE/spawn-guard.js" "$TMP_ROOT/pack-landed/$RKN/"; cp "$HKC/scratch-guard.js" "$TMP_ROOT/pack-landed/hooks/"
   A6PK=$("$PY" -B -c 'import sys
 sys.path.insert(0, sys.argv[1])
 import roles_lib
@@ -1090,7 +1090,7 @@ for m in sys.argv[2:]:
     except l.RolesError:
         out.append("!")
 sys.stdout.buffer.write("".join(a + "\n" for a in out).encode("utf-8"))' "$FX/$KREL" "${A20_IDS[@]}" > "$TMP_ROOT/a20.py" 2>/dev/null
-  node -e 'const cap = require(process.argv[1] + "/../roles/spawn-guard.js")
+  RKN=${HERE##*/} node -e 'const cap = require(process.argv[1] + "/../" + process.env.RKN + "/spawn-guard.js")
 const e = require(process.argv[1] + "/scratch-guard.js").loadRoleIndex(process.argv[2]).effort
 for (const m of process.argv.slice(3)) { const n = cap.resolveModelProfile(e.profiles, m); process.stdout.write((n.length > 1 ? "!" : n[0] || "-") + "\n") }' \
     "$HK" "$FXN" "${A20_IDS[@]}" > "$TMP_ROOT/a20.js" 2>/dev/null
