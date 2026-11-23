@@ -57,3 +57,4 @@ Cite ids, never line numbers.
 | [PLAY-dConvergedCharter-44](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE, FOR… |
 | [PLAY-dConvergedCharter-45](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE, FOR… |
 | [PLAY-dOrderedCharter-66](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-11-04 | BUILD-METHOD HOLDS NO ENVELOPE. PLAY-dOrderedCharter-3's interim keeps… |
+| [PLAY-dOrderedCharter-89](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | THE OVERLAY HAS NO WRITE VERB FOR STEP PROGRAMS.… |

@@ -128,6 +128,13 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   decision record holds sequence number one, so your acceptance ledger is
   `build/2026-11-22-build-TOOL-dBoundRoles-43-2-acceptance-ledger.md`. The widen door names its own records: it
   wrote widen record 9 for the decision, so yours start at 10; name every stem it mints in your return.
+- This is round two. Round one (`wf_8b782681-749`) wrote nothing and handed back S10 and S23's missing overlay
+  write verb and four stale claims; the main loop decided each in
+  `build/2026-11-23-build-TOOL-dBoundRoles-43-3-main-loop-decision.md`, which binds over the spec as the owner's
+  ruling does: read it whole before you write. S10, S23, AC10 and AC23 wait on `PLAY-dOrderedCharter-89`, filed in
+  dOrderedCharter's backlog as §8 F17 rules: build every other item, write no overlay verb and no second overlay
+  writer, and answer AC10 and AC23 DEFERRED in your ledger naming that ask. The stale claims of S19, S22, S9 and
+  S32 are deviation lines. Every claim round one confirmed at this base still holds; do not re-derive them.
 - The policy guard admits a commit touching a guarded path (`tools/policy/guarded-paths.txt`, among them
   `.claude/roles.json`, the rendered agent files and `.governance/` files) only on the live run's branch. If the
   pre-commit hook refuses your pass commit for that reason alone, never route around it: save the whole staged pass
