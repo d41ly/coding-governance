@@ -312,3 +312,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T04:40:03Z draw · re-dispatch · TOOL-dTotalRecall-48 · 41/186 · 20261123T044003Z-e59edd
 
 2026-11-23T04:40:03Z dispatch · item 4d1d9899 TOOL-dTotalRecall-48 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-48-deviation-1005.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-48-1-acceptance-ledger.md tools/runlog/record.py tools/runlog/selftest.py
+
+2026-11-23T04:54:04Z brief · item TOOL-dTotalRecall-49 · reason 14649c036642 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-49-build-brief.md
+
+2026-11-23T04:58:01Z dispatch · item 22c3f2cc TOOL-dTotalRecall-49 · reason tools/memory-tree/asbuilt_view.py tools/memory-tree/record_causes.py tools/memory-tree/check-memory-hygiene.test.sh tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-49.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-49-1-acceptance-ledger.md

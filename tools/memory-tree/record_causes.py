@@ -35,7 +35,10 @@ THE WRITER CENSUS (`check_cause_writers`, TOOL-dTotalRecall-36 S7). Every tracke
 file under the tool root, the alias census's walk (`record_kinds.read_code_paths`), test-named files
 excepted, that spells a `**Serves:** ` literal and no `Caused-by` is red unless `CAUSE_WRITER_KEPT` keys it
 with a reason, so the next writer that omits the cause line is red at its own pass, before the record it
-writes is.
+writes is. A file kept as rendering a pinned instrument's bytes (`KEPT_INSTRUMENT`, TOOL-dTotalRecall-49
+S3) is red where that stops being true: where `design_lib.read_design_keys` reads the design keys off or
+refuses them, or where the record `DESIGN_VIEW` names has no `<path> -` row of the `legacy-records`
+population.
 
 THE LEGACY POPULATION. `--measure` prints one TAB row `<path> - 1` per tracked Markdown record and, under
 `memory.legacy-anchors` `derived`, one `<path> <anchor> 1` row per untagged `##` or `###` heading, its
@@ -88,7 +91,7 @@ HEADING_RE = re.compile(r"#{2,3} (?P<text>.*\S)")
 AUTHORED_TAG_RE = re.compile(r"\[section\.(?P<seg>[a-z0-9][a-z0-9-]*)\](?:[ \t]|$)")
 PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "none", "writer-without-cause",
           "bulleted-cause", "bulleted-twice", "script-cause-prefixed", "script-cause-bare", "script-causeless",
-          "backfill-selection", "backfill-refusals")
+          "backfill-selection", "backfill-refusals", "kept-instrument-not-legacy")
 #: TOOL-dTotalRecall-47 S1: the causes check's absent-cause rule, the one finding `--backfill` selects
 ABSENT_CAUSE = "names no Caused-by, and its kind is no root"
 #: TOOL-dTotalRecall-47 AC1 AC3: each backfill plant's new records, `{<path>: <text>}`, `{build}` the fixture's
@@ -134,10 +137,16 @@ SCRIPT_PLANTS = {
                          "atlas.html": "**Serves:** research {unit}\n<p>an atlas</p>\n"},
 }
 CLAIM_NS = "refs/gov/claims/"
+#: TOOL-dTotalRecall-49 S2 S3: the kept reason of a file whose one output is a pinned instrument's bytes, and
+#: the as-built view's renderer, kept for it; the census reds the reason where DESIGN_VIEW is no legacy record
+KEPT_INSTRUMENT = "renders a pinned instrument's bytes; its one output is a legacy record"
+KEPT_INSTRUMENT_KEY = "/".join(("memory-tree", "asbuilt_view.py"))
 #: TOOL-dTotalRecall-36 S7: the writer census's kept files, `{<path under the tool root>: <reason>}`, each
 #: whose `**Serves:** ` literals are fixture, instruction or reader-prefix text only, so it writes no
-#: record. Each key is spelled in parts: the install-prefix ban reads a kit path.
+#: record, or, TOOL-dTotalRecall-49 S2, whose one output is a pinned instrument's legacy record. Each key
+#: is spelled in parts: the install-prefix ban reads a kit path.
 CAUSE_WRITER_KEPT = {
+    KEPT_INSTRUMENT_KEY: KEPT_INSTRUMENT,
     "/".join(("loop", "placement.py")): "fixture: the disposition record its fixture reads back",
     "/".join(("memory-tree", "seen_red.py")): "fixture: the acceptance ledger its fixture plants",
     "/".join(("playbook", "instruction_units.py")): "fixture: the handoff head its fixture plants",
@@ -468,7 +477,9 @@ def check_cause_writers(root) -> tuple:
     and `*.js` file under the tool root (`record_kinds.read_code_paths`), test-named files excepted. A census
     file spells a `**Serves:** ` literal and no `Caused-by`, and is red unless `CAUSE_WRITER_KEPT` keys it by
     its path under the tool root, then printed `kept <reason>`; one line per census file at its first Serves
-    literal, then a count line. It grades spelling, never whether the file writes the line at run time."""
+    literal, then a count line. It grades spelling, never whether the file writes the line at run time.
+    A file kept for `KEPT_INSTRUMENT` (TOOL-dTotalRecall-49 S3) is red, named with why, where the design keys
+    read off or refuse, or where the record `DESIGN_VIEW` names has no `-` row of the legacy population."""
     import record_kinds   # noqa: E402  the tool root and the code census's one walk
     tool_rel = record_kinds.derive_tool_rel(record_kinds.derive_kit_rel())
     try:
@@ -483,8 +494,26 @@ def check_cause_writers(root) -> tuple:
         n = next(i for i, ln in enumerate(text.splitlines(), 1) if SERVES_LITERAL in ln)
         key = path[len(tool_rel) + 1:] if tool_rel else path
         if key in CAUSE_WRITER_KEPT:
-            kept += 1
-            lines.append(f"cause-writer · {path}:{n} · kept {CAUSE_WRITER_KEPT[key]}")
+            reason, why = CAUSE_WRITER_KEPT[key], None
+            if reason == KEPT_INSTRUMENT:   # TOOL-dTotalRecall-49 S3: the reason holds over a legacy view only
+                from design_lib import DesignRefusal, read_design_conf, read_design_keys   # noqa: E402  the keys' one reader
+                try:
+                    design = read_design_keys(root, read_design_conf(root))
+                    why = None if design else "the design keys are off, so DESIGN_VIEW names no record"
+                except DesignRefusal as exc:
+                    design, why = None, f"the design keys refuse: {exc}"
+                if design:
+                    legacy, note = read_legacy_paths(root)
+                    if design["DESIGN_VIEW"] not in (legacy or ()):
+                        why = (f"DESIGN_VIEW {design['DESIGN_VIEW']} has no `<path> -` row of {POPULATION}"
+                               + ("" if legacy else f" ({note})"))
+            if why is None:
+                kept += 1
+                lines.append(f"cause-writer · {path}:{n} · kept {reason}")
+                continue
+            lines.append(f"cause-writer · {path}:{n} · red · kept {reason}, but {why}")
+            reds.append(f"cause-writer {path}:{n}: kept because it {reason}, but {why}; restore the record's "
+                        f"legacy row or write the cause line under its Serves line")
             continue
         lines.append(f"cause-writer · {path}:{n} · red")
         reds.append(f"cause-writer {path}:{n}: spells a Serves line and no Caused-by; write the cause line under "
@@ -612,7 +641,8 @@ def write_fixture(top, plant) -> pathlib.Path:
     if plant == "backfill-selection":   # TOOL-dTotalRecall-47 AC1: a kind the registry marks root
         rows["spec-audit"] = ("memory/builds/*/reviews/*.md", '["Serves"]')
         roots.add("spec-audit")
-    write_file(".memory-tree.conf", 'MEMORY_ROOT="memory"\nFAMILIES="tooling:TOOL"\n')
+    conf = 'MEMORY_ROOT="memory"\nFAMILIES="tooling:TOOL"\n'
+    write_file(".memory-tree.conf", conf)
     write_file(f"{kit_rel}/{record_kinds.REGISTRY}", "".join(
         f'[[record-kind]]\nname = "{n}"\nhome = "{h}"\nschema = {{ form = "fields", fields = {f} }}\n'
         + ("root = true\n" if n in roots else "") + "\n" for n, (h, f) in rows.items()))
@@ -632,6 +662,10 @@ def write_fixture(top, plant) -> pathlib.Path:
                f"**Serves:** journal {FIXTURE_UNIT}\n\n# A brief shaped like today's\n\nthe brief\n")
     write_file(f"memory/builds/fRoot/build/2026-01-01-build-{FIXTURE_UNIT}-notes.md",
                f"**Serves:** research {FIXTURE_UNIT}\n\n# Notes\n\n## Findings\n\none\n\n## Findings\n\ntwo\n")
+    build = "memory/builds/fRoot/build"
+    view = f"{build}/2026-01-01-build-{FIXTURE_UNIT}-as-built.md"
+    if plant == "kept-instrument-not-legacy":   # TOOL-dTotalRecall-49 S3: the view, in the legacy tree and caused
+        write_file(view, f"# As built\n\n**Serves:** research {FIXTURE_UNIT}\n**Caused-by:** {FIXTURE_UNIT}\n")
     if plant == "none":
         write_file(".governance/policy.toml", 'memory.legacy-anchors = "none"\n')
     for args in (("init", "-q", "--template="), ("symbolic-ref", "HEAD", "refs/heads/main"),   # main: the landed branch
@@ -643,7 +677,6 @@ def write_fixture(top, plant) -> pathlib.Path:
     reg = next(r for r in ll.read_registrations(root) if r.population == POPULATION)
     line, _ok = ll.seed_population(root, reg, run_git(root, "rev-parse", "HEAD").stdout.strip())
     print(f"{SAY}: fixture {plant} · seed · {line}")
-    build = "memory/builds/fRoot/build"
     if plant == "causeless":
         write_file(f"{build}/2026-01-02-build-{FIXTURE_UNIT}-new.md", f"# New\n\n**Serves:** research {FIXTURE_UNIT}\n")
     elif plant == "typed-causeless":
@@ -675,6 +708,15 @@ def write_fixture(top, plant) -> pathlib.Path:
     if plant == "writer-without-cause":   # TOOL-dTotalRecall-36 S7: a code file spelling a Serves literal, no cause
         write_file(f"{tool_rel}/{CAUSE_WRITER_PLANT}" if tool_rel else CAUSE_WRITER_PLANT,
                    f'"""A record writer."""\nHEAD = "{SERVES_LITERAL}log {FIXTURE_UNIT}\\n"\n')
+    if plant == "kept-instrument-not-legacy":   # the four design keys set over the view, its `-` row cut
+        pin = run_git(root, "rev-parse", "HEAD").stdout.strip()
+        home = root / reg.home
+        home.write_bytes("".join(ln for ln in home.read_bytes().decode("utf-8").splitlines(True)
+                                 if not ln.startswith(f"{view}\t{LEGACY_SECTION}\t")).encode("utf-8"))
+        write_file(".memory-tree.conf", conf + f'DESIGN_RECORD="{build}/2026-01-01-build-{FIXTURE_UNIT}-notes.md"\n'
+                   f'DESIGN_BASELINE="{pin}"\nDESIGN_VIEW="{view}"\nDESIGN_NODES="{build}/map.py"\n')
+        write_file(f"{tool_rel}/{KEPT_INSTRUMENT_KEY}" if tool_rel else KEPT_INSTRUMENT_KEY,
+                   f'"""A view renderer."""\nHEAD = "{SERVES_LITERAL}research {FIXTURE_UNIT}\\n"\n')
     run_commit(f"record-causes fixture: {plant}")
     if plant == "claim-root":
         p = run_git(root, "update-ref", f"{CLAIM_NS}fClaim", run_git(root, "rev-parse", "HEAD").stdout.strip())

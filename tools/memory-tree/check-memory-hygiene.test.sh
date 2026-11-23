@@ -3754,6 +3754,12 @@ hit 'record causes: legacy-records · 2 record row(s) (-), 0 section row(s) · m
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant writer-without-cause 2>&1)
 hit 'planted/writer.py:2 · red'; hit '1 census file(s) · 0 kept · 1 red'; hit 'record causes: RED'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant legacy 2>&1); hit '0 census file(s) · 0 kept · 0 red'
+# --- TOOL-dTotalRecall-49 AC3 — the as-built view's renderer is kept because its one output is a pinned
+# --- instrument's legacy record, and the census reds that reason where DESIGN_VIEW's `-` row is cut. Red on
+# --- S3's legacy-row test skipped for the reason.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-instrument-not-legacy 2>&1); _brc=$?
+n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL record_causes.py --fixture --plant kept-instrument-not-legacy exited $_brc, expected 1"; st=1; }
+hit '/asbuilt_view.py:2 · red · kept renders a pinned instrument'; hit '1 census file(s) · 0 kept · 1 red'
 # --- TOOL-dTotalRecall-39 AC2 AC3 — one header reader: a typed record's bulleted `- **Caused-by:**` is read
 # --- by the causes check and by the playbook kit's edge walk alike, and two such fields are one refusal of
 # --- the walk naming both lines, no edge read. Red on the edge grammar's header site reading the column-0
