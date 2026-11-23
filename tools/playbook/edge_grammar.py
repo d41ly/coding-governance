@@ -23,10 +23,12 @@ line per type, outside code fences. A target holds no space, comma or bracket an
 `tag` (`TAG_RE`), `pinned-tag` (`<tag>@<hash8>`), `section` (`<tag>#<seg>`), `id` (a native id),
 `id#tag` (`<id>#<seg>(.<seg>)*`) or `pinned-id` (`<id>@<hash8>`). A pinned tag is legal only on a row
 whose `pin` is `tag` (`amends`, `supersedes`), a pinned id only on one whose `pin` is `clause`
-(`carries-clause`); a final eight-hex run behind `:`, `/` or `=` is red, since a pin is written `@<hash8>`.
+(`carries-clause`, `caused-by`); a final eight-hex run behind `:`, `/` or `=` is red, since a pin is written `@<hash8>`.
 
-THE SITES, one adapter each: a record's header (`**Serves:**` through `tree_lib.read_bindings`,
-`**Caused-by:**`, `**Made-by:**`), a record's section (`**Edges:**`), an instruction unit's row (`edges`,
+THE SITES, one adapter each: a record's header (`check_header_edges` over memory-tree's one header
+reader, `tree_lib.read_header_edges`: `**Serves:**` through `tree_lib.read_bindings`, and `Caused-by` and
+`Made-by`, an untyped record's column-0 `**Caused-by:**` line, a typed record's `- **Caused-by:**` field,
+a key given twice refused), a record's section (`**Edges:**`), an instruction unit's row (`edges`,
 `scope`, `required-by`, `enforced-by`, read through the registry's `parse_unit_rows`), a leg row of the leg manifest
 (`gate-legs.json`: its `tests` and `enforces` lists, sourced at its `tag`, TOOL-dWitnessedBar-22), code (a `gov:note` line's `refs=` segment), a commit's trailers
 (the `[[trailer]]` table; a `serves` value is edges only when every target passes the grammar, and a
@@ -94,7 +96,6 @@ FORMS = (
 )
 #: the pin word each pinned form needs on its row
 PIN_OF = {"pinned-tag": "tag", "pinned-id": "clause"}
-HEADER_RE = re.compile(r"^\*\*(Caused-by|Made-by):\*\*[ \t]+(\S.*?)[ \t]*$")
 NOTE_RE = re.compile(r"^[ \t]*(?:#+|//|--|;|/?\*+|<!--)[ \t]*gov:note[ \t].*?[ \t]refs=(.*?)[ \t]*(?:-->|\*/)?[ \t]*$")
 UNIT_FIELDS = (("scope", "instructs", False), ("required-by", "instructs", True), ("enforced-by", "enforces", True))
 #: the leg manifest's file name, and the row keys its site reads as edges of the type each names
@@ -313,24 +314,17 @@ def read_section_edges(text, path) -> list[dict]:
     return parse_edge_lines(text, path)
 
 
-def read_header_edges(text, path, binding=None) -> list[dict]:
-    """A record header's edges: `**Serves:**` as `serves`, its ids `tree_lib.read_bindings`' (`binding`, that
-    reader's row for `path`, None for a text it did not read), and the column-0 `**Caused-by:**` and
-    `**Made-by:**` lines of the same head as `caused-by` and `made-by`, one target each, backticks cut."""
+def check_header_edges(text, path, binding=None) -> list[dict]:
+    """A record header's edges, read by memory-tree's one reader and graded by the one target grammar
+    (TOOL-dTotalRecall-39 S1): `tree_lib.read_header_edges`, looked up on the module `load_memory_tree`
+    returns at each call, so a wrap of that reader is the one this site reaches. `binding` is
+    `tree_lib.read_bindings`' row for `path`, None for a text it did not read. The reader's ValueError on a
+    key given twice is one EdgeRefusal, its message on the second line, the line the walk collects."""
     tree_lib, _ = ti.load_memory_tree()
-    edges = []
-    for n, line in list(tree_lib.unfenced_lines(text))[:tree_lib.BIND_HEAD_LINES]:
-        if line is None:
-            break
-        mb = tree_lib.BIND_RE.match(line)
-        if binding and binding.get("ids") and mb and mb.group("key") == "Serves":
-            edges.append({"path": path, "line": n, "type": "serves", "targets": list(binding["ids"]), "site": "header"})
-            binding = None
-            continue
-        m = HEADER_RE.match(line)
-        if m:
-            edges.append({"path": path, "line": n, "type": m.group(1).lower(), "targets": [m.group(2).strip("`")],
-                          "site": "header"})
+    try:
+        edges = tree_lib.read_header_edges(text, path, binding)
+    except ValueError as exc:
+        raise EdgeRefusal(f"edges: {path}: 1 header line(s) refused:\n  {exc}") from None
     return check_site_targets(edges, path)
 
 
@@ -706,7 +700,7 @@ def read_tree_edges(root, base) -> tuple[list, list]:
             continue
         try:
             if md:
-                edges += read_header_edges(text, rel, bindings.get(rel))
+                edges += check_header_edges(text, rel, bindings.get(rel))
                 if EDGE_HEAD in text:   # a text holding no edge head hides no edge line, fenced or not
                     edges += read_section_edges(text, rel)
                 if spec_re.fullmatch(rel):
@@ -937,7 +931,7 @@ def read_site_edges(path, text) -> list[dict]:
         return read_leg_edges(text, path)
     if not str(path).endswith(".md"):
         return read_note_refs(text, path)
-    return read_header_edges(text, path) + read_section_edges(text, path) + read_carries_edges(text, path)
+    return check_header_edges(text, path) + read_section_edges(text, path) + read_carries_edges(text, path)
 
 
 def run_parse(path, text, ns_path=None, rc=None) -> int:

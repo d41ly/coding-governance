@@ -3754,6 +3754,19 @@ hit 'record causes: legacy-records · 2 record row(s) (-), 0 section row(s) · m
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant writer-without-cause 2>&1)
 hit 'planted/writer.py:2 · red'; hit '1 census file(s) · 0 kept · 1 red'; hit 'record causes: RED'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant legacy 2>&1); hit '0 census file(s) · 0 kept · 0 red'
+# --- TOOL-dTotalRecall-39 AC2 AC3 — one header reader: a typed record's bulleted `- **Caused-by:**` is read
+# --- by the causes check and by the playbook kit's edge walk alike, and two such fields are one refusal of
+# --- the walk naming both lines, no edge read. Red on the edge grammar's header site reading the column-0
+# --- form only, its own reader instead of `tree_lib.read_header_edges`.
+_bcr='memory/builds/tFix/build/2026-01-02-build-TOOL-tFix-1-deviation-1.md'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant bulleted-cause 2>&1); _brc=$?
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant bulleted-cause exited $_brc, expected 0"; st=1; }
+hit 'record causes: 0 causeless · 0 orphan(s)'; hit "walk · caused-by $_bcr -> TOOL-tFix-1"
+hit 'record causes: fixture bulleted-cause · PASS'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant bulleted-twice 2>&1); _brc=$?
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant bulleted-twice exited $_brc, expected 0"; st=1; }
+hit "walk · refused · $_bcr: Caused-by is given twice, at lines 5 and 6"; miss "walk · caused-by $_bcr"
+hit 'record causes: fixture bulleted-twice · PASS'
 out=$("$_PY" - "$HERE" 2>&1 <<'PY'
 import sys
 sys.path.insert(0, sys.argv[1])

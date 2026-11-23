@@ -70,7 +70,15 @@ STAND_IN_RE = re.compile(r"owner|lease-[A-Za-z0-9][A-Za-z0-9_-]*")
 HEADING_RE = re.compile(r"#{2,3} (?P<text>.*\S)")
 #: an authored heading tag, the `[section.<anchor>]` TOOL-dTotalRecall-20's retag step writes
 AUTHORED_TAG_RE = re.compile(r"\[section\.(?P<seg>[a-z0-9][a-z0-9-]*)\](?:[ \t]|$)")
-PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "none", "writer-without-cause")
+PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "none", "writer-without-cause",
+          "bulleted-cause", "bulleted-twice")
+#: TOOL-dTotalRecall-39 AC2 AC3: the plants whose typed record's cause is a bulleted field, each the number of
+#: `- **Caused-by:**` fields it writes; both checks read the record, the causes check and the edge walk
+BULLETED_PLANTS = {"bulleted-cause": 1, "bulleted-twice": 2}
+BULLETED_UNIT = "TOOL-tFix-1"
+BULLETED_RECORD = f"memory/builds/tFix/build/2026-01-02-build-{BULLETED_UNIT}-deviation-1.md"
+#: the record's head, its fields following from the line after its last
+BULLETED_HEAD = f"# {BULLETED_UNIT} deviation 1 — a bulleted cause\n\n**Serves:** deviation {BULLETED_UNIT}\n\n"
 CLAIM_NS = "refs/gov/claims/"
 #: TOOL-dTotalRecall-36 S7: the writer census's kept files, `{<path under the tool root>: <reason>}`, each
 #: whose `**Serves:** ` literals are fixture, instruction or reader-prefix text only, so it writes no
@@ -474,6 +482,8 @@ def write_fixture(top, plant) -> pathlib.Path:
 
     rows = {"log": ("memory/builds/*/prompts/*.md", '["Serves"]'), "research": ("memory/builds/*/build/*.md", '["Serves"]'),
             "card": ("memory/builds/*/build/*-build-*-card-*.md", '["Build", "Step", "Ref"]')}
+    if plant in BULLETED_PLANTS:   # a typed kind whose fields hold `Caused-by`, so its bulleted cause is read
+        rows["deviation"] = ("memory/builds/*/build/*-build-*-deviation-*.md", '["Serves", "Caused-by"]')
     write_file(".memory-tree.conf", 'MEMORY_ROOT="memory"\nFAMILIES="tooling:TOOL"\n')
     write_file(f"{kit_rel}/{record_kinds.REGISTRY}", "".join(
         f'[[record-kind]]\nname = "{n}"\nhome = "{h}"\nschema = {{ form = "fields", fields = {f} }}\n\n'
@@ -517,6 +527,11 @@ def write_fixture(top, plant) -> pathlib.Path:
         for me, other in ((a, b), (b, a)):
             write_file(f"{build}/{me}.md", f"# Cycle\n\n**Serves:** research {FIXTURE_UNIT}\n**Made-by:** owner\n"
                                            f"**Caused-by:** {other}\n")
+    elif plant in BULLETED_PLANTS:   # TOOL-dTotalRecall-39: a rooted build's typed record, its cause bulleted
+        write_file("memory/builds/tFix/README.md", f"---\nslug: tFix\nopened: 2026-01-01\nids: {BULLETED_UNIT}\n---\n\n# tFix\n")
+        write_file(f"memory/builds/tFix/spec/2026-01-01-spec-{BULLETED_UNIT}.md",
+                   f"# {BULLETED_UNIT} — the fixture's unit\n\n**Status:** OPEN · rev-1 · 2026-01-01 · node a · Tier-1 · base 00000000\n")
+        write_file(BULLETED_RECORD, BULLETED_HEAD + f"- **Caused-by:** {BULLETED_UNIT}\n" * BULLETED_PLANTS[plant])
     elif plant == "claim-root":
         write_file(f"memory/builds/fClaim/build/2026-01-02-build-{FIXTURE_CLAIM}-claimed.md",
                    f"# Claimed\n\n**Serves:** research {FIXTURE_CLAIM}\n**Made-by:** owner\n**Caused-by:** {FIXTURE_CLAIM}\n")
@@ -534,6 +549,34 @@ def write_fixture(top, plant) -> pathlib.Path:
     return root
 
 
+def check_plant_walk(root, plant, lines, rc) -> tuple:
+    """TOOL-dTotalRecall-39 AC2 AC3: the playbook kit's edge walk, `read_tree_edges`, over a bulleted plant's
+    `root`, beside the causes check's `lines` and exit `rc`. -> `(walk lines, ok)`: the walk's `caused-by`
+    edges and refusals of BULLETED_RECORD, then one PASS or FAIL line. One field passes when the causes check
+    is green and the walk reads the one edge to BULLETED_UNIT and refuses nothing; two pass when the walk
+    reads no edge of the record and refuses it once naming both lines, and the causes check names it refused."""
+    import gen_build_index   # noqa: E402  the route to the playbook kit's edge grammar
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    try:
+        eg = gen_build_index.load_edge_grammar(resolve_kit_dir("playbook", "edge_grammar.py", KIT))
+    except LookupError as exc:
+        raise ValueError(f"the edge grammar does not resolve: {exc}") from None
+    edges, bad = eg.read_tree_edges(pathlib.Path(root), None)
+    mine = [t for e in edges if e["path"] == BULLETED_RECORD and e["type"] == "caused-by" for t in e["targets"]]
+    refused = [r for r in bad if BULLETED_RECORD in r]
+    out = [f"{SAY}: fixture {plant} · walk · caused-by {BULLETED_RECORD} -> {t}" for t in mine]
+    out += [f"{SAY}: fixture {plant} · walk · refused · {r}" for r in bad]
+    first = BULLETED_HEAD.count("\n") + 1
+    if BULLETED_PLANTS[plant] == 1:
+        ok = rc == 0 and mine == [BULLETED_UNIT] and not bad
+    else:
+        named = [ln for ln in lines if BULLETED_RECORD in ln and "its header is refused" in ln]
+        ok = not mine and len(bad) == 1 and len(refused) == 1 and f"lines {first} and {first + 1}" in refused[0] \
+            and len(named) == 1
+    out.append(f"{SAY}: fixture {plant} · {'PASS' if ok else 'FAIL'} · both checks read {BULLETED_RECORD}")
+    return out, ok
+
+
 def run_fixture(plant) -> tuple:
     """`--fixture --plant <case>`: the plant's repository under the system temp directory, its population's
     rows printed, then `--check` run there. -> `(lines, exit)`."""
@@ -548,6 +591,9 @@ def run_fixture(plant) -> tuple:
             rows = [ln for ln in home.read_bytes().decode("utf-8").split("\n")[1:] if ln]
             head = [f"{SAY}: fixture {plant} · row · " + " ".join(ln.split("\t")[:3]).replace(str(root), "") for ln in rows]
             lines, rc = run_check(root)
+            if plant in BULLETED_PLANTS:
+                walk, ok = check_plant_walk(root, plant, lines, rc)
+                return head + lines + walk, 0 if ok else 1
         return head + lines, rc
     except (ValueError, OSError, StopIteration) as exc:
         return [f"{SAY}: fixture {plant} could not be built: {exc}"], 2

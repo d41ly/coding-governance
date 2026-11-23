@@ -215,7 +215,7 @@ id pinned to a hash (`kit.y@1a2b3c4d`). The set, as `--list` prints it:
 | `cites` | `cited-by` | any | any | none, and derived from the text |
 | `serves` | `served-by` | `record`, `work-order`, `commit` | `family-id`, `item`, `build` | none |
 | `made-by` | `made` | `commit`, `record` | `act`, `owner` | none |
-| `caused-by` | `causes` | `record` | any | none |
+| `caused-by` | `causes` | `record` | any | clause |
 | `follows` | `followed-by` | `act` | `work-order` | none |
 | `answers` | `answered-by` | `return`, `answer` | `work-order`, `fork` | none |
 | `runs-in` | `hosts` | `act`, `claim`, `commit` | `session` | none |
@@ -246,12 +246,13 @@ resolver, the same way the `purpose` arm prints such an owner unarmed, so its me
 **Pinned forms.** A pin is written `@` and eight hex digits. A pinned tag (`kit.y@1a2b3c4d`) is
 legal only on `amends` and `supersedes`, and resolves when some committed revision of the tag's unit
 text hashes to it. A pinned clause id (`cl-dTrueNorth-0001@1a2b3c4d`) is legal only on
-`carries-clause`, and resolves when the clause's text at the design baseline or in some committed
+`carries-clause` and `caused-by`, and resolves when the clause's text at the design baseline or in some committed
 revision of the design view hashes to it, so a pin written before a deviation moved the clause still
 resolves.
 
 **Where edges are read.** Beyond the `**Edges:**` line: a record's `**Serves:**` line as `serves` and
-its `**Caused-by:**` and `**Made-by:**` lines; a spec's `**Carries:**` line as `carries-clause`; a
+its `**Caused-by:**` and `**Made-by:**` lines, or a typed record's `- **Caused-by:**` and
+`- **Made-by:**` fields, each key once, read by memory-tree's one header reader; a spec's `**Carries:**` line as `carries-clause`; a
 work order's `gov:handoff` marker's `unit=` and `build=` as `serves`; an instruction unit's `edges`,
 `scope`, `required-by` and `enforced-by`; a code note's `refs=` segment; and a commit's trailers,
 `Pass:`, `Gov-Unit:` and `Gov-Item:` as `serves`, `Gov-Act:` as `made-by`, `Gov-Session:` as

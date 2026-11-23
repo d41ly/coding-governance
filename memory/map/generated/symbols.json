@@ -6993,6 +6993,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "check_header_edges",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
       "id": "check_held_out_frozen",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
@@ -8146,6 +8151,11 @@
       "id": "check_plant_tokens",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "check_plant_walk",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "check_playbook_hole_modes",
@@ -23786,11 +23796,6 @@
       "id": "read_header_edges",
       "kind": "function",
       "file": "tools/memory-tree/tree_lib.py"
-    },
-    {
-      "id": "read_header_edges",
-      "kind": "function",
-      "file": "tools/playbook/edge_grammar.py"
     },
     {
       "id": "read_header_key",

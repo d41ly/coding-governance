@@ -408,9 +408,12 @@ register the native-id classes, `family-id` (pattern `id_grammar:grammar_for`, r
 `read_native_classes`; `gov_tag.py check` prints each with its owner and population
 (`check_native_classes`). A pinned tag is legal only where a row's `pin` is `tag` and resolves when some
 committed revision of its unit's text hashes to it (`read_text_history` over `tree_lib.read_blobs_at`);
-a pinned clause id only where `pin` is `clause`, resolving against every committed revision of the
-design view, the baseline's included. One adapter per site reads edges: `read_header_edges`
-(`**Serves:**` through `tree_lib.read_bindings`, `**Caused-by:**`, `**Made-by:**`), `read_section_edges`,
+a pinned clause id only where `pin` is `clause` (`carries-clause`, `caused-by`), resolving against every committed revision of the
+design view, the baseline's included. One adapter per site reads edges: `check_header_edges`
+(memory-tree's one header reader, `tree_lib.read_header_edges`: `**Serves:**` through
+`tree_lib.read_bindings`, an untyped record's column-0 `**Caused-by:**` and `**Made-by:**`, a typed
+record's `- **Caused-by:**` and `- **Made-by:**` fields; its targets graded by `check_site_targets`, a key
+given twice one refusal), `read_section_edges`,
 `read_unit_edges`, `read_note_refs`, `read_trailer_edges`, `read_handoff_edges` (the roles kit's
 `MARKER_RE`) and `read_carries_edges` (`design_lib.parse_binding_lines`, the carries line's one parser).
 `resolve_edge` resolves one target; `--check [--base <rev>]` runs every adapter over the tree and the

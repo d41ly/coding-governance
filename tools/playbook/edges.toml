@@ -184,7 +184,7 @@ type = "caused-by"
 inverse = "causes"
 from = ["record"]
 to = ["any"]
-pin = "none"
+pin = "clause"
 status = "declared"
 declared-at = "the record header's **Caused-by:**"
 cardinality = { per-source = "1", per-target = "many" }
