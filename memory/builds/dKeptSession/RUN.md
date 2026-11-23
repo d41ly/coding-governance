@@ -267,3 +267,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T23:51:15Z brief · item KICK-dKeptSession-51 · reason 686d20cf6133 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-51-build-brief.md
 
 2026-11-22T23:53:49Z dispatch · item 614fda11 KICK-dKeptSession-51 · reason tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dWellOiledMachine/BACKLOG.md memory/builds/dWellOiledMachine/README.md memory/backlog/TOOL.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-51-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T00:30:27Z brief · item KICK-dKeptSession-27 · reason cd23931c3543 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-27-build-brief.md
+
+2026-11-23T00:33:05Z dispatch · item dba19c7a KICK-dKeptSession-27 · reason tools/unattended/unattended.sh memory/map/generated/symbols.json tools/unattended/unattended.test.sh tools/run-gates/selftest-budgets.txt tools/loop/loop_transition.py tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-27-1-acceptance-ledger.md
