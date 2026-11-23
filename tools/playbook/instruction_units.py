@@ -2096,7 +2096,7 @@ ORDER_ROLE = ("---\nname: gov-fixture\ndescription: A fixture role.\nworkflow: f
               "You are the fixture role of {{{{MEMORY_ROOT}}}}.\n")
 ORDER_CHARTER = ("## 1. Governing practices\n\n- [alpha] The first rule.\n- [beta] The second rule.\n\n"
                  "## Protocols\n\n- A protocol line.\n\n## Facts\n\n- A fact line.\n")
-ORDER_HEAD = ("**Serves:** journal PLAY-fixture-1\n\n# gov-fixture handoff — PLAY-fixture-1\n\n"
+ORDER_HEAD = ("**Serves:** journal PLAY-fixture-1\n\n# gov-fixture handoff — PLAY-fixture-1\n\n"  # census: kept cause-writer fixture: the handoff head its fixture plants
               "<!-- gov:handoff role=gov-fixture build=fixture unit=PLAY-fixture-1 path=memory/builds/fixture/prompts/"
               "{date}-prompt-PLAY-fixture-1-1-fixture.md role-sha=e883c92f6c96 task-sha=TASK -->\n\n"
               "## Role\n\nYou are the fixture role of memory.\n\n## Task\n\n"

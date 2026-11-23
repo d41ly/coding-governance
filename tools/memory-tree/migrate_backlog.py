@@ -932,13 +932,16 @@ def build_status_sheet(chosen: dict, fold, specs: dict, units: set, signed_triag
 
 # ----------------------------------------------------------------------------------- the records
 def render_worksheet(kind: str, columns: tuple, rows: list, unit_id: str, head: str) -> str:
-    """One TAB-separated worksheet: a Serves line, the provenance line, the header, rows, a total.
+    """One TAB-separated worksheet: a Serves line, its cause line in the same comment form
+    (TOOL-dTotalRecall-53 S10, the form `tree_lib.read_header_edges` reads), the provenance line, the
+    header, rows, a total.
 
     NO DATA ROW LEADS WITH AN ID IN A LIST OR TABLE SHAPE. A TSV row does not, which is why these
     are TSV: a markdown table whose first cell is an id ANCHORS that id, and a worksheet listing
     every ask in the corpus would then claim every one of them in this build's folder.
     """
     out = [f"# **Serves:** log {unit_id}",
+           f"# **Caused-by:** {unit_id}",
            f"# {kind} worksheet · computed at {head}",
            "\t".join(columns)]
     for row in rows:
@@ -3397,7 +3400,7 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
                                            r"(census\.md|same-id\.tsv|triage\.tsv|status\.tsv)",
                                            os.path.basename(p)) for p in first))
         arm("each carrying its Serves line",
-            True, lambda: all("**Serves:** log EXMP-aFoo-1" in read_text(p) for p in first))
+            True, lambda: all("**Serves:** log EXMP-aFoo-1" in read_text(p) for p in first))  # census: kept cause-writer fixture: an arm reading the records it wrote
         arm("and two runs over one tree are byte-identical",
             True, lambda: all(read_text(a) == read_text(b) for a, b in zip(first, second)))
         arm("git status shows nothing outside the record directory",

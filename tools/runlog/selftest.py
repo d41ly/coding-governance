@@ -9016,6 +9016,17 @@ def test_memory_dtr43_paths():
         check(f"memory dTR-43 liveness: ...over the {case} plant's one agent", read_memory_cell(rows, "agents"), 1)
 
 
+def test_memory_dtr53_paths():
+    # TOOL-dTotalRecall-53 S24 AC24: a clone on another drive read through its MSYS root, `./memory/x` and
+    # `../../memory/x` resolved against the call's recorded working directory each count; the staged break,
+    # the drive-only case fold with no working directory read, counts the relative ones zero.
+    for case, column, want in (("msys-d-drive", "read B", 450), ("dot-relative", "shell B", 300),
+                               ("parent-relative", "shell B", 250)):
+        _rc, rows, _lines, _out = run_memory_plant(case, "runlog-mem-dtr53-")
+        check(f"memory dTR-53: the {case} plant counts {want} on {column}", read_memory_cell(rows, column), want)
+        check(f"memory dTR-53 liveness: ...over the {case} plant's one agent", read_memory_cell(rows, "agents"), 1)
+
+
 def test_memory_ac9_privacy():
     _rc, rows, _lines, out = run_memory_plant("privacy", "runlog-mem-ac9-")
     check("memory AC9: no planted command, path or result text reaches the output",

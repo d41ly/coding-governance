@@ -2520,7 +2520,8 @@ def derive_parallel_step(units: list) -> str:
 
 def render_order(build: dict) -> str:
     """The BUILD ORDER region. Units sharing an `order` value are a step, and `derive_parallel_step`
-    says whether its units may run concurrently."""
+    says whether its units may run concurrently; one line under the table says what that cell means
+    (TOOL-dTotalRecall-53 S27)."""
     mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-order")
     out = [mo, ""]
     steps = {}
@@ -2536,6 +2537,9 @@ def render_order(build: dict) -> str:
             us = sorted(steps[n], key=lambda x: x["id"])
             ids = ", ".join(f"`{u['id']}`" for u in us)
             out.append(f"| {n} | {ids} | {derive_parallel_step(us)} |")
+        # TOOL-dTotalRecall-53 S27: what the Parallel cell means, stated under the table it qualifies
+        out += ["", "A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences "
+                    "two of them whose write sets intersect at dispatch."]
         # RESIDUAL, stated rather than silently dropped: a unit with no verb is not ordered, and a
         # region that omitted it would read as a complete order while hiding a unit.
         rest = sorted((u["id"] for u in build["units"] if u.get("order") is None))
@@ -5734,13 +5738,13 @@ def test_leg_rows(arm) -> None:
             seen["ac1"] = (f"equal={b1 == b2} index={c1['index']} parsed={c1['parsed']} "
                            f"fenced={b1[fx['fenced']]['ids']} crlf={b1[fx['crlf']]['state']}")
             late = "memory/builds/tOne/build/2026-08-03-build-ARCH-tOne-1-late.md"
-            write_leg_commit(t, late, b"# late\n\n**Serves:** research ARCH-tOne-1\n")
+            write_leg_commit(t, late, b"# late\n\n**Serves:** research ARCH-tOne-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
             _rows, got = tl.read_rows_at(t, list(fx.values()) + [late], "unfenced-head")
             seen["ac2"] = f"index={got['index']} parsed={got['parsed']} absent={got['absent']}"
             with open(os.path.join(t, fx["edited"]), "rb") as fh:
                 edited = fh.read()
             with open(os.path.join(t, fx["edited"]), "wb") as fh:
-                fh.write(b"# edited\n\n**Serves:** research ARCH-tOne-1\n" + edited.split(b"\n", 2)[2])
+                fh.write(b"# edited\n\n**Serves:** research ARCH-tOne-1\n" + edited.split(b"\n", 2)[2])  # census: kept cause-writer fixture: a record head its fixture plants
             b3 = read_bindings(t, read_tracked(t), conf)[fx["edited"]]
             seen["ac3"] = f"{b3['state']} {b3['ids']}"
             blob = run("git", "rev-parse", "HEAD:" + fx["fenced"], cwd=t).strip()
@@ -5748,11 +5752,11 @@ def test_leg_rows(arm) -> None:
             with con:
                 con.execute("DELETE FROM leg_row WHERE blob = ? AND reader = 'unfenced-head'", (blob,))
                 con.execute("INSERT INTO leg_row VALUES (?,?,?,?)",
-                            (blob, "unfenced-head", "0" * 12, '{"head": ["**Serves:** research ARCH-tOne-7"]}'))
+                            (blob, "unfenced-head", "0" * 12, '{"head": ["**Serves:** research ARCH-tOne-7"]}'))  # census: kept cause-writer fixture: a record head its fixture plants
             con.close()
             rows, got = tl.read_rows_at(t, [fx["fenced"]], "unfenced-head")
             old = run("git", "rev-parse", "HEAD:" + fx["crlf"], cwd=t).strip()
-            write_leg_commit(t, fx["crlf"], b"# crlf\r\n\r\n**Serves:** research ARCH-tOne-1\r\n\r\nbody two\r\n")
+            write_leg_commit(t, fx["crlf"], b"# crlf\r\n\r\n**Serves:** research ARCH-tOne-1\r\n\r\nbody two\r\n")  # census: kept cause-writer fixture: a record head its fixture plants
             new = run("git", "rev-parse", "HEAD:" + fx["crlf"], cwd=t).strip()
             held = dict(tl.LEG_READERS)
             tl.LEG_READERS["spec-head"] = ("no_such_leg_module:nothing", None)
@@ -6128,7 +6132,7 @@ def test_staged_render(arm) -> None:
         near = "memory/builds/tTwo/build/2026-08-01-build-ARCH-tTwo-1-notes.md"
         # The body sits past the BIND_HEAD_LINES head, as a long record's tail does.
         for rel in (rec, dev, near):
-            write_text(os.path.join(t2, rel), "# a record\n\n**Serves:** research ARCH-tOne-1\n\n"
+            write_text(os.path.join(t2, rel), "# a record\n\n**Serves:** research ARCH-tOne-1\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                        + "a filler line\n" * BIND_HEAD_LINES + "body\n")
         run("git", "add", "-A", cwd=t2)
         run("git", "commit", "-q", "-m", "records", "--no-verify", cwd=t2)
@@ -6591,7 +6595,7 @@ def test_coverage_region(arm) -> None:
         # Baseline: line names the pin, because with the design keys declared --write renders DESIGN_VIEW
         # from the record at DESIGN_BASELINE and --check compares the file with that render.
         record = os.path.join(t, "memory", "design", "record.md")
-        record_text = ("# a design record\n\n**Serves:** research ARCH-dAlpha-1\n\n## [chain]\n\n"
+        record_text = ("# a design record\n\n**Serves:** research ARCH-dAlpha-1\n\n## [chain]\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                        "| Build | Node | Owner | Clauses | Note |\n|---|---|---|---|---|\n"
                        + "".join(f"| {b} | a | b | " + "; ".join(f"{text} `{cid}`" for cid, text in cl.items())
                                  + " | c |\n" for b, cl in (("dAlpha", alpha), ("dBeta", beta)))
@@ -6744,7 +6748,7 @@ def test_coverage_region(arm) -> None:
         amend_rel = f"memory/builds/dAlpha/build/{cut}-build-ARCH-dAlpha-1-deviation-1.md"
         write_text(os.path.join(t, amend_rel), "\n".join([
             "# ARCH-dAlpha-1 deviation 1 — an amendment of a carried clause", "",
-            "**Serves:** deviation ARCH-dAlpha-1", "",
+            "**Serves:** deviation ARCH-dAlpha-1", "",  # census: kept cause-writer fixture: a record head its fixture plants
             f"- **Departs from:** `cl-dAlpha-0002@{pins['cl-dAlpha-0002']}` [chain]",
             "- **Hand-off:** design-revised", f"- **Before:** {alpha['cl-dAlpha-0002']}",
             "- **After:** The run writes `alpha-two` twice.", "- **Cause:** builder discovery",
@@ -7008,7 +7012,7 @@ def test_front_matter_schema(arm) -> None:
         write_text(os.path.join(tmp, "memory", "builds", "tDesign", "README.md"),
                    "---\nslug: tDesign\nopened: 2026-08-01\nids: ARCH-tDesign-1\nstatus: OPEN\n---\n\n# tDesign\n")
         write_text(os.path.join(tmp, "memory", "builds", "tDesign", "build", "2026-08-01-build-ARCH-tDesign-1-n.md"),
-                   "**Serves:** research ARCH-tDesign-1 ARCH-tDesign-2\n\n# n\n")
+                   "**Serves:** research ARCH-tDesign-1 ARCH-tDesign-2\n\n# n\n")  # census: kept cause-writer fixture: a record head its fixture plants
         run("git", "add", "-A", "--", "memory/builds/tDesign", cwd=tmp)
         out = io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
@@ -7059,7 +7063,7 @@ def _build_design_fixture(tmp: str) -> tuple:
     texts = {"cl-dAlpha-0001": "The reader takes `alpha-one` first.", "cl-dAlpha-0002": "The run writes `alpha-two`."}
     record_rel = "memory/design/record.md"
     view_rel = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-as-built.md"
-    record = ("# a design record\n\n**Serves:** research ARCH-tOne-1\n\n## [chain]\n\n"
+    record = ("# a design record\n\n**Serves:** research ARCH-tOne-1\n\n## [chain]\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
               "| Build | Node | Owner | Clauses | Note |\n|---|---|---|---|---|\n| dAlpha | a | b | "
               + "; ".join(f"{text} `{cid}`" for cid, text in texts.items()) + " | c |\n\n## [clause-ids]\n\n")
     _fixture(tmp)
@@ -7131,11 +7135,11 @@ def test_asbuilt_view(arm) -> None:
         # dated record name carries, the unit and the instrument beside it, and an edit to the record's own
         # Serves line moves no byte of the view.
         arm("TOOL-dTrueNorth-27 AC12 — the view's head names the unit and the instrument its record name carries",
-            "True", lambda: str((lambda head: "\n**Serves:** research ARCH-tOne-1\n" in head
+            "True", lambda: str((lambda head: "\n**Serves:** research ARCH-tOne-1\n" in head  # census: kept cause-writer fixture: a record head its fixture plants
                                  and "Generated by `build/2026-08-01-build-ARCH-tOne-1-asbuilt.py` from" in head)(
                 read_text(view).split("| Build |", 1)[0])))
         write_text(os.path.join(tmp, record_rel), read_text(os.path.join(tmp, record_rel)).replace(
-            "**Serves:** research ARCH-tOne-1", "**Serves:** research ARCH-tOne-1, edited"))
+            "**Serves:** research ARCH-tOne-1", "**Serves:** research ARCH-tOne-1, edited"))  # census: kept cause-writer fixture: a record head its fixture plants
         arm("TOOL-dTrueNorth-16 AC27 — an edit to the record's Serves line leaves --check clean", "rc=0",
             lambda: f"rc={_read_mode(cmd_check, tmp, conf)[0]}")
         run("git", "checkout", "-q", "--", record_rel, cwd=tmp)
@@ -7159,7 +7163,7 @@ def test_asbuilt_view(arm) -> None:
         pin2, after2 = asbuilt_view.derive_clause_hash(texts["cl-dAlpha-0002"]), "The run writes `alpha-two` twice."
         amend_text = "\n".join([
             "# ARCH-tOne-1 deviation 2 — an amendment of a clause", "",
-            "**Serves:** deviation ARCH-tOne-1", "",
+            "**Serves:** deviation ARCH-tOne-1", "",  # census: kept cause-writer fixture: a record head its fixture plants
             f"- **Departs from:** `cl-dAlpha-0002@{pin2}` [chain]",
             "- **Hand-off:** design-to-spec", f"- **Before:** {texts['cl-dAlpha-0002']}",
             f"- **After:** {after2}", "- **Cause:** builder discovery",
@@ -7248,7 +7252,7 @@ def test_asbuilt_view(arm) -> None:
         run("git", "reset", "-q", "--hard", "HEAD~2", cwd=tmp)
         write_text(os.path.join(tmp, dev_rel), "\n".join([
             "# ARCH-tOne-1 deviation 1 — a departure from a clause with no row", "",
-            "**Serves:** deviation ARCH-tOne-1", "",
+            "**Serves:** deviation ARCH-tOne-1", "",  # census: kept cause-writer fixture: a record head its fixture plants
             f"- **Departs from:** `cl-dAlpha-0001@{asbuilt_view.derive_clause_hash(texts['cl-dAlpha-0001'])}` [chain]",
             "- **Hand-off:** design-to-spec", f"- **Before:** {texts['cl-dAlpha-0001']}",
             f"- **After:** {texts['cl-dAlpha-0001']}", "- **Cause:** builder discovery",
@@ -8071,48 +8075,48 @@ def cmd_selftest() -> int:
             return read_bindings(tb, [rel], bconf)[rel]
 
         r1 = _rec("memory/builds/tOne/reviews/r.md",
-                  "# t\n\n**Serves:** spec-audit TOOL-tOne-1 TOOL-tOne-2\n")
+                  "# t\n\n**Serves:** spec-audit TOOL-tOne-1 TOOL-tOne-2\n")  # census: kept cause-writer fixture: a record head its fixture plants
         arm("binding parses kind + ids", "bound", lambda: _bind(r1)["state"])
         arm("binding keeps both ids", "['TOOL-tOne-1', 'TOOL-tOne-2']", lambda: str(_bind(r1)["ids"]))
 
         r2 = _rec("memory/builds/tOne/reviews/r2.md",
-                  "# t\n\n**Serves:** none — the build shipped before any spec existed\n")
+                  "# t\n\n**Serves:** none — the build shipped before any spec existed\n")  # census: kept cause-writer fixture: a record head its fixture plants
         arm("none form with a reason is unbound", "unbound", lambda: _bind(r2)["state"])
 
-        r3 = _rec("memory/builds/tOne/reviews/r3.md", "# t\n\n**Serves:** none\n")
+        r3 = _rec("memory/builds/tOne/reviews/r3.md", "# t\n\n**Serves:** none\n")  # census: kept cause-writer fixture: a record head its fixture plants
         arm("bare none with no reason is malformed", "malformed", lambda: _bind(r3)["state"])
 
-        r4 = _rec("memory/builds/tOne/reviews/r4.md", "# t\n\n**Serves:** postmortem TOOL-tOne-1\n")
+        r4 = _rec("memory/builds/tOne/reviews/r4.md", "# t\n\n**Serves:** postmortem TOOL-tOne-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
         arm("an unknown kind token is malformed", "is not one of", lambda: _bind(r4)["why"])
 
-        r5 = _rec("memory/builds/tOne/build/r5.md", "# t\n\n**Serves:** journal TOOL-tOne-2..4\n")
+        r5 = _rec("memory/builds/tOne/build/r5.md", "# t\n\n**Serves:** journal TOOL-tOne-2..4\n")  # census: kept cause-writer fixture: a record head its fixture plants
         arm("a range EXPANDS at authoring time", "['TOOL-tOne-2', 'TOOL-tOne-3', 'TOOL-tOne-4']",
             lambda: str(_bind(r5)["ids"]))
 
         r6 = _rec("memory/builds/tOne/reviews/r6.md",
-                  "\n" * 13 + "**Serves:** spec-audit TOOL-tOne-1\n")
+                  "\n" * 13 + "**Serves:** spec-audit TOOL-tOne-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
         arm("a Serves line past the head window is not read", "absent", lambda: _bind(r6)["state"])
 
         r7 = _rec("memory/builds/tOne/reviews/r7.md",
-                  "# t\n\n```\n**Serves:** spec-audit TOOL-tOne-1\n```\n")
+                  "# t\n\n```\n**Serves:** spec-audit TOOL-tOne-1\n```\n")  # census: kept cause-writer fixture: a record head its fixture plants
         arm("a FENCED example never parses as a binding", "absent", lambda: _bind(r7)["state"])
 
         r8 = _rec("memory/builds/tOne/build/r8.sh",
-                  "#!/bin/sh\n# **Serves:** journal TOOL-tOne-1\n")
+                  "#!/bin/sh\n# **Serves:** journal TOOL-tOne-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
         arm("a non-markdown record binds through a comment marker", "bound", lambda: _bind(r8)["state"])
 
         r9 = _rec("memory/builds/tOne/reviews/r9.md",
-                  "# t\n\n**Serves:** diff-review TOOL-tOne-1@rev-3 PLAY-tTwo-9\n")
+                  "# t\n\n**Serves:** diff-review TOOL-tOne-1@rev-3 PLAY-tTwo-9\n")  # census: kept cause-writer fixture: a record head its fixture plants
         arm("a rev qualifier is accepted and normalised away",
             "['TOOL-tOne-1', 'PLAY-tTwo-9']", lambda: str(_bind(r9)["ids"]))
         arm("an id may reach into another build", "PLAY-tTwo-9", lambda: str(_bind(r9)["ids"]))
 
-        r10 = _rec("memory/builds/tOne/reviews/r10.md", "# t\n\n**Serves:** journal TOOL-tOne-x\n")
+        r10 = _rec("memory/builds/tOne/reviews/r10.md", "# t\n\n**Serves:** journal TOOL-tOne-x\n")  # census: kept cause-writer fixture: a record head its fixture plants
         arm("a malformed id token is reported, not silently dropped", "TOOL-tOne-x",
             lambda: str(_bind(r10)["bad"]))
 
         r11 = _rec("memory/builds/tOne/reviews/r11.md",
-                   "# t\n\n**Serves:** journal TOOL-tOne-1  <!-- inferred: single-spec build -->\n")
+                   "# t\n\n**Serves:** journal TOOL-tOne-1  <!-- inferred: single-spec build -->\n")  # census: kept cause-writer fixture: a record head its fixture plants
         arm("a trailing comment is a note, not a token", "['TOOL-tOne-1']", lambda: str(_bind(r11)["ids"]))
         arm("a trailing comment contributes no malformed token", "[]", lambda: str(_bind(r11)["bad"]))
 
@@ -8148,7 +8152,7 @@ def cmd_selftest() -> int:
         conf13 = _fixture(t13)
         p13 = os.path.join(t13, "memory/builds/tOne/reviews/2026-08-01-review-tOne-1.md")
         os.makedirs(os.path.dirname(p13), exist_ok=True)
-        write_text(p13, "# r\n\n**Serves:** spec-audit ARCH-tOne-1\n")
+        write_text(p13, "# r\n\n**Serves:** spec-audit ARCH-tOne-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
         run("git", "add", "-A", cwd=t13)
         arm("a bound record emits an S row carrying kind and the resolved ids",
             "S\tmemory/builds/tOne/reviews/2026-08-01-review-tOne-1.md\tspec-audit\tARCH-tOne-1",
@@ -8168,7 +8172,7 @@ def cmd_selftest() -> int:
                            ("2026-08-01-build-ARCH-tOne-1-deviation-3.md", "deviation")):
             _rec4 = os.path.join(t4d, bd4 + name)
             os.makedirs(os.path.dirname(_rec4), exist_ok=True)
-            write_text(_rec4, f"# d\n\n**Serves:** {kind} ARCH-tOne-1\n")
+            write_text(_rec4, f"# d\n\n**Serves:** {kind} ARCH-tOne-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
         run("git", "add", "-A", cwd=t4d)
         arm("TOOL-dTrueNorth-4 AC8 — a record named as a deviation under another kind is an A row naming it",
             "A\t" + bd4 + "2026-08-01-build-ARCH-tOne-1-deviation-1.md\tnamed as a deviation record",
@@ -8206,7 +8210,7 @@ def cmd_selftest() -> int:
                            ("2025-12-31-review-ARCH-tOne-1-old.md", "spec-audit ARCH-tOne-1")):
             _rec5 = os.path.join(t5p, rv5 + name)
             os.makedirs(os.path.dirname(_rec5), exist_ok=True)
-            write_text(_rec5, f"**Serves:** {line}\n\n# r\n")
+            write_text(_rec5, f"**Serves:** {line}\n\n# r\n")  # census: kept cause-writer fixture: a record head its fixture plants
         run("git", "add", "-A", cwd=t5p)
         conf5 = _set_pin_cutoff(t5p, "2026-01-01")
         arm("TOOL-dTrueNorth-5 AC4 — an unpinned spec-audit record dated AT the cutoff prints a P row",
@@ -8237,7 +8241,7 @@ def cmd_selftest() -> int:
         write_text(_spec5, read_text(_spec5).replace(" · rev-1 · ", " · rev-3 · "))
         _rec5 = os.path.join(t5r, rv5 + "2026-08-02-review-ARCH-tOne-1-spec-audit.md")
         os.makedirs(os.path.dirname(_rec5), exist_ok=True)
-        write_text(_rec5, "**Serves:** spec-audit ARCH-tOne-1@rev-2\n\n# r\n")
+        write_text(_rec5, "**Serves:** spec-audit ARCH-tOne-1@rev-2\n\n# r\n")  # census: kept cause-writer fixture: a record head its fixture plants
         run("git", "add", "-A", cwd=t5r)
         arm("TOOL-dTrueNorth-5 AC6 — a spec whose header moved past its highest pin is named at the pin",
             "Ids whose spec moved past its audited revision: ARCH-tOne-1@rev-2.",
@@ -8253,7 +8257,7 @@ def cmd_selftest() -> int:
         body6f = read_text(spec6f).replace(" · rev-1 · ", " · rev-3 · ")
         rec6f = os.path.join(t6f, rv5 + stem6f + ".md")
         os.makedirs(os.path.dirname(rec6f), exist_ok=True)
-        write_text(rec6f, "**Serves:** spec-audit ARCH-tOne-1@rev-1\n\n# r\n")
+        write_text(rec6f, "**Serves:** spec-audit ARCH-tOne-1@rev-1\n\n# r\n")  # census: kept cause-writer fixture: a record head its fixture plants
 
         def _set_fold_log(rev3):
             write_text(spec6f, body6f + f"\n## 9. Revision log\n\n- rev-2 · 2026-08-02 · §6 · folded from {stem6f}\n"
@@ -8275,7 +8279,7 @@ def cmd_selftest() -> int:
             _set_fold_log(f"folded from {stem6f}")
             rel = f"memory/builds/tOne/{folder}/{stem6f}.md"
             os.makedirs(os.path.join(t6f, os.path.dirname(rel)), exist_ok=True)
-            write_text(os.path.join(t6f, rel), "**Serves:** spec-audit ARCH-tOne-1@rev-1\n\n# r\n")
+            write_text(os.path.join(t6f, rel), "**Serves:** spec-audit ARCH-tOne-1@rev-1\n\n# r\n")  # census: kept cause-writer fixture: a record head its fixture plants
             return str(derive_past_pin_ids([{"id": "ARCH-tOne-1", "rev": "3", "path": spec6f}],
                                            [{"kind": "spec-audit", "path": rel, "pins": {"ARCH-tOne-1": 1}}], t6f))
 
@@ -8332,7 +8336,7 @@ def cmd_selftest() -> int:
         r9p = rv5 + "2026-08-02-review-ARCH-tOne-1-spec-audit.md"
         os.makedirs(os.path.join(t9p, rv5), exist_ok=True)
         write_text(os.path.join(t9p, r9p),
-                   "**Serves:** spec-audit ARCH-tOne-1@rev-2 ARCH-tOne-1@rev-3 ARCH-tOne-2..3\n\n# r\n")
+                   "**Serves:** spec-audit ARCH-tOne-1@rev-2 ARCH-tOne-1@rev-3 ARCH-tOne-2..3\n\n# r\n")  # census: kept cause-writer fixture: a record head its fixture plants
         run("git", "add", "-A", cwd=t9p)
         arm("TOOL-dTrueNorth-9 AC3 — a record pinning one id twice keeps the higher pin, and its range pins "
             "nothing", "{'ARCH-tOne-1': 3}", lambda: str(read_bindings(t9p, [r9p], conf9p)[r9p]["pins"]))
@@ -8362,7 +8366,7 @@ def cmd_selftest() -> int:
                 ("bare", "ARCH-tOne-1", ""),
                 ("missing", "ARCH-tOne-1 ARCH-tOne-2", f"{b13}a.md@abc1234, {b13}gone.md@abc1234")):
             write_text(os.path.join(t13p, rv5 + f"2026-02-01-review-ARCH-tOne-1-{name}.md"),
-                       f"**Serves:** spec-audit {serves}\n\n# r\n\n" + (f"Reviewed: {reviewed}\n" if reviewed else ""))
+                       f"**Serves:** spec-audit {serves}\n\n# r\n\n" + (f"Reviewed: {reviewed}\n" if reviewed else ""))  # census: kept cause-writer fixture: a record head its fixture plants
         run("git", "add", "-A", cwd=t13p)
         run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=t13p)
         conf13p = _set_pin_cutoff(t13p, "2026-01-01")
@@ -8376,17 +8380,17 @@ def cmd_selftest() -> int:
         # TOOL-dTrueNorth-20 S17, superseding S4's window: the head is every unfenced line before the first
         # `## ` heading, so a line behind a ten-line provenance paragraph is read and one under a heading
         # is not. Against the twelve-line window the second value reads None.
-        _prov20 = "**Serves:** x\n\n# a design audit\n\n" + "".join(f"provenance line {k}.\n" for k in range(10)) + "\n"
+        _prov20 = "**Serves:** x\n\n# a design audit\n\n" + "".join(f"provenance line {k}.\n" for k in range(10)) + "\n"  # census: kept cause-writer fixture: a record head its fixture plants
         arm("TOOL-dTrueNorth-13 S4 — read_reviewed_paths cuts each entry at its last @, keeps an empty one, "
             "reads the line behind a ten-line provenance paragraph, and none under a ## heading",
             "['memory/x/a.md', 'b.md', ''] ['a.md'] None",
-            lambda: "%s %s %s" % (read_reviewed_paths("**Serves:** x\nReviewed: memory/x/a.md@abc1234, b.md@d, \n"),
+            lambda: "%s %s %s" % (read_reviewed_paths("**Serves:** x\nReviewed: memory/x/a.md@abc1234, b.md@d, \n"),  # census: kept cause-writer fixture: a record head its fixture plants
                                   read_reviewed_paths(_prov20 + "Reviewed: a.md@abc1234\n"),
                                   read_reviewed_paths(_prov20 + "## Verdict: CLEAN\n\nReviewed: a.md@abc1234\n")))
         # TOOL-dTrueNorth-20 AC16 — the same record graded: a design audit whose Reviewed: line sits behind
         # that paragraph, naming the two committed build/ files, prints no P row for its design id.
         write_text(os.path.join(t13p, rv5 + "2026-02-01-review-ARCH-tOne-1-late.md"),
-                   _prov20.replace("**Serves:** x", "**Serves:** spec-audit ARCH-tOne-1")
+                   _prov20.replace("**Serves:** x", "**Serves:** spec-audit ARCH-tOne-1")  # census: kept cause-writer fixture: a record head its fixture plants
                    + f"Reviewed: {b13}a.md@abc1234, {b13}b.md@def5678\n")
         run("git", "add", "-A", cwd=t13p)
         run("git", "commit", "-q", "-m", "late", "--no-verify", cwd=t13p)
@@ -8420,7 +8424,7 @@ def cmd_selftest() -> int:
             rel = rv5 + f"2026-02-0{day}-review-ARCH-tOne-1-spec-audit.md" if day else None
             if rel:
                 os.makedirs(os.path.join(t14w, rv5), exist_ok=True)
-                write_text(os.path.join(t14w, rel), "**Serves:** spec-audit ARCH-tOne-1\n\n# r\n")
+                write_text(os.path.join(t14w, rel), "**Serves:** spec-audit ARCH-tOne-1\n\n# r\n")  # census: kept cause-writer fixture: a record head its fixture plants
             run("git", "add", "-A", cwd=t14w)
             if msg:
                 run("git", "commit", "-q", "-m", msg, "--no-verify", cwd=t14w)
@@ -8499,7 +8503,7 @@ def cmd_selftest() -> int:
             return pathlib.Path(hd19)
 
         def _write_record19(rel):
-            write_text(os.path.join(t19, rel), "**Serves:** spec-audit ARCH-tOne-1\n\n# r\n")
+            write_text(os.path.join(t19, rel), "**Serves:** spec-audit ARCH-tOne-1\n\n# r\n")  # census: kept cause-writer fixture: a record head its fixture plants
             return rel
 
         def _run_commit19(msg):
@@ -8846,7 +8850,7 @@ def cmd_selftest() -> int:
         conf14 = _fixture(t14)
         p14 = os.path.join(t14, "memory/builds/tOne/build/2026-08-01-build-tOne-1.md")
         os.makedirs(os.path.dirname(p14), exist_ok=True)
-        write_text(p14, "# j\n\n**Serves:** journal ARCH-tOne-1\n")
+        write_text(p14, "# j\n\n**Serves:** journal ARCH-tOne-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
         run("git", "add", "-A", cwd=t14)
         arm("a build whose only record is a journal names its id as never spec-audited",
             "Ids no `spec-audit` record has ever named: ARCH-tOne-1",
@@ -11114,11 +11118,11 @@ def run_shim_new_build_to_record(argv):
     try:
         p = _shim_sp.run([_shim_sys.executable, _shim_os.path.join(_SHIM_HERE, "../policy", "policy.py"), "get", "install.on-shim-call"],
                          stdin=_shim_sp.DEVNULL, capture_output=True, text=True)
-        if p.returncode == 0 and p.stdout.strip() in ("warn", "journal"):
+        if p.returncode == 0 and p.stdout.strip() in ("warn", "journal"):  # census: kept alias-compare homonym: the shim install.on-shim-call mode
             mode, why = p.stdout.strip(), ""
     except OSError:
         pass
-    if mode != "journal":
+    if mode != "journal":  # census: kept alias-compare homonym: the shim install.on-shim-call mode
         print("gov: " + _shim_src + " has moved to " + _shim_dst + "; this forwarder is held only until its deprecation window closes" + why, file=_shim_sys.stderr)
     try:
         g = _shim_sp.run(["git", "rev-parse", "--is-inside-work-tree", "--git-path", "govkit/shim-calls.jsonl"],
@@ -11173,11 +11177,11 @@ def run_shim_new_spec_to_record(argv):
     try:
         p = _shim_sp.run([_shim_sys.executable, _shim_os.path.join(_SHIM_HERE, "../policy", "policy.py"), "get", "install.on-shim-call"],
                          stdin=_shim_sp.DEVNULL, capture_output=True, text=True)
-        if p.returncode == 0 and p.stdout.strip() in ("warn", "journal"):
+        if p.returncode == 0 and p.stdout.strip() in ("warn", "journal"):  # census: kept alias-compare homonym: the shim install.on-shim-call mode
             mode, why = p.stdout.strip(), ""
     except OSError:
         pass
-    if mode != "journal":
+    if mode != "journal":  # census: kept alias-compare homonym: the shim install.on-shim-call mode
         print("gov: " + _shim_src + " has moved to " + _shim_dst + "; this forwarder is held only until its deprecation window closes" + why, file=_shim_sys.stderr)
     try:
         g = _shim_sp.run(["git", "rev-parse", "--is-inside-work-tree", "--git-path", "govkit/shim-calls.jsonl"],

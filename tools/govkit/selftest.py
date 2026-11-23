@@ -411,7 +411,7 @@ def check_retired_flags(module_path: pathlib.Path = GOVKIT) -> None:
           "one every assertion below is vacuously true and this arm is a DEAD PROBE reporting a "
           "clean pass over nothing", bool(RETIRED_FLAGS), "RETIRED_FLAGS is empty")
     for name, date, unit in RETIRED_FLAGS:
-        parts = name.replace("_", "-").split("-")
+        parts = name.replace("_", "-").split("-")  # census: kept slug-grammar not a unit id: a retired flag name
         # A name this engine does not spell the way it spells the others reds NAMING THE ROW, rather
         # than being quietly narrowed to whatever survives the derivation.
         spellable = all(p.isalnum() for p in parts)
@@ -20756,7 +20756,7 @@ user_skills = "/tmp/gk-fake-skills"
     import concurrent.futures as _cf
     _shim_cases = [(f"[dSafePassage-6] AC3-AC5 plant {_l} --mode {_m} forwards intact and {_m} reports as it should",
                     ["--plant", _l, "--mode", _m], 0, "observation(s) matched")
-                   for _l in ("sh", "js", "py", "module") for _m in ("warn", "journal", "unset", "bogus")]
+                   for _l in ("sh", "js", "py", "module") for _m in ("warn", "journal", "unset", "bogus")]  # census: kept alias-compare homonym: the shim install.on-shim-call mode
     # TOOL-dSafePassage-26 S9: the window plant takes the expected verdict and exits by the one plant
     # contract, 0 on a match; each pair is asserted with its case and against the other verdict.
     _shim_cases += [(f"[dSafePassage-6] AC6 window {_w} with {_n} release(s) {_v} a closed row, "

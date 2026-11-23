@@ -176,6 +176,8 @@ Coverage of dConvergedCharter's 23 clause(s) and 1 owned node(s), over 27 spec(s
 | 21 | `PLAY-dConvergedCharter-4` | no |
 | 22 | `PLAY-dConvergedCharter-14` | no |
 | 23 | `PLAY-dConvergedCharter-18` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -14,7 +14,7 @@ deviation kind's `**After:**` pipe, `DEPARTS`, `FOLLOW` and `**Supersedes:**` st
 THE EXCEPTION KIND and its stand-in door (S8): `build_records.py new exception --build <slug> --unit <id>
 --principle <tag> --excuses <part> --reason <text> [--expires <YYYY-MM-DD>]` writes the next
 `<date>-build-<unit id>-exception-<n>.md` in that build's `build/` folder of the session's own tree, its
-`**Serves:** exception <unit id>`, for the session's own commit. It is the door the memory plan lists until
+`Serves: exception <unit id>`, for the session's own commit. It is the door the memory plan lists until
 dTotalRecall's record door adopts it. The core gates read the register (`core.py exceptions`).
 
 THE CHANGE KIND and its stand-in door (PLAY-dOrderedCharter-15 S7, S14): `write_change` is the one writer of a
@@ -899,7 +899,7 @@ def write_recommendation(root, build, unit, stage, score, source, binds, reason,
 
 def write_record(root, build, unit, kind, title, fields, today=None, lines=(), check=None, place=None):
     """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
-    headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>`, each `(key, value)` of
+    headed `# <unit> <kind> <n> — <title>`, then `Serves: <kind> <unit>` bolded, each `(key, value)` of
     `fields` as a bold-key bullet and, after one blank line, each of `lines` as written (TOOL-dDeclaredLoop-17
     S1), each refused as a value is. `place(text)`, where given, returns the text with the record door's
     edge lines placed under their headings (TOOL-dTotalRecall-19 S6). `check(rel, text)`, where given, reads
@@ -935,7 +935,7 @@ def write_record(root, build, unit, kind, title, fields, today=None, lines=(), c
     day = today or datetime.date.today().isoformat()
     for _attempt in range(MINT_RETRIES):
         path = out / f"{day}-build-{unit}-{kind}-{n}.md"
-        body = [f"# {unit} {kind} {n} — {title}", "", f"**Serves:** {kind} {unit}", ""]
+        body = [f"# {unit} {kind} {n} — {title}", "", f"**Serves:** {kind} {unit}", ""]  # census: kept cause-writer door: its Caused-by is a field the door passes in fields
         body += [f"- **{key}:** {value}" for key, value in fields]
         body += [""] + list(lines) if lines else []
         text = "\n".join(body) + "\n"
@@ -1838,7 +1838,7 @@ def run_fixture(plant):
                 folder.mkdir(parents=True)
                 (root / ".memory-tree.conf").write_text("MEMORY_ROOT=memory\n", encoding="utf-8")
                 rec = folder / f"2026-01-01-build-{unit}-exception-1.md"
-                rec.write_text(f"# {unit} exception 1 — t\n\n**Serves:** exception {unit}\n", encoding="utf-8")
+                rec.write_text(f"# {unit} exception 1 — t\n\n**Serves:** exception {unit}\n", encoding="utf-8")  # census: kept cause-writer fixture: a record head its fixture plants
                 buf = io.StringIO()
                 with contextlib.redirect_stdout(buf):
                     rc = mod.main(["read", str(rec)])
@@ -2027,7 +2027,7 @@ def run_fixture(plant):
             # PLAY-dOrderedCharter-70 S4: a research record whose name holds `-change-` is no change record
             research = "memory/builds/tKinds/build/2026-01-01-build-ARCH-tKinds-1-change-plan-2.md"
             with open(root / research, "w", encoding="utf-8", newline="\n") as fh:
-                fh.write(f"# {unit} — a change plan\n\n**Serves:** research {unit}\n")
+                fh.write(f"# {unit} — a change plan\n\n**Serves:** research {unit}\n")  # census: kept cause-writer fixture: a record head its fixture plants
             run_git("add", "-A")
             changes = [r["path"] for r in read_changes(root)]
             if research in changes or changes != [written.get("change")]:

@@ -285,6 +285,8 @@ Coverage of dLinkedLibrary's 25 clause(s) and 25 owned node(s), over 91 spec(s) 
 | 37 | `TOOL-dLinkedLibrary-96` | no |
 | 38 | `TOOL-dLinkedLibrary-100`, `TOOL-dLinkedLibrary-101`, `TOOL-dLinkedLibrary-97`, `TOOL-dLinkedLibrary-98` | no |
 | 39 | `TOOL-dLinkedLibrary-102` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

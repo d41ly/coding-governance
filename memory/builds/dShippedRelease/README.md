@@ -338,6 +338,8 @@ Coverage of dShippedRelease's 31 clause(s) and 60 owned node(s), over 126 spec(s
 | 36 | `DEPL-dShippedRelease-138` | no |
 | 37 | `DEPL-dShippedRelease-141` | no |
 | 38 | `DEPL-dShippedRelease-144` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

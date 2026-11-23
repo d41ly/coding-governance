@@ -208,6 +208,8 @@ Ids whose spec moved past its audited revision: none — 0 of 44 unit id(s) carr
 | 26 | `TOOL-aGraftedHelix-45` | no |
 | 27 | `TOOL-aGraftedHelix-46` | no |
 | 28 | `TOOL-aGraftedHelix-47` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

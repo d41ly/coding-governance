@@ -121,6 +121,8 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 | 1 | `TOOL-aTunedCompass-1`, `TOOL-aTunedCompass-4`, `TOOL-aTunedCompass-5`, `TOOL-aTunedCompass-6`, `TOOL-aTunedCompass-7`, `TOOL-aTunedCompass-9` | no |
 | 2 | `TOOL-aTunedCompass-10`, `TOOL-aTunedCompass-11`, `TOOL-aTunedCompass-2` | unknown |
 | 3 | `TOOL-aTunedCompass-3`, `TOOL-aTunedCompass-8` | yes |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

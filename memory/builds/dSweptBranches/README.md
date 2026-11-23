@@ -153,6 +153,8 @@ Ids whose spec moved past its audited revision: none — 0 of 21 unit id(s) carr
 | 19 | `TOOL-dSweptBranches-21` | no |
 | 20 | `TOOL-dSweptBranches-23` | no |
 | 21 | `TOOL-dSweptBranches-24` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

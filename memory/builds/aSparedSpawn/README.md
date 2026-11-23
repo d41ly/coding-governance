@@ -118,6 +118,8 @@ Ids whose spec moved past its audited revision: none — 0 of 22 unit id(s) carr
 | 5 | `TOOL-aSparedSpawn-32` | no |
 | 6 | `TOOL-aSparedSpawn-33` | no |
 | 7 | `TOOL-aSparedSpawn-34` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

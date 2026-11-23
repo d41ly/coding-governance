@@ -90,6 +90,8 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 | 3 | `TOOL-dHomedResolver-3` | no |
 | 5 | `TOOL-dHomedResolver-5` | no |
 | 6 | `TOOL-dHomedResolver-8` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

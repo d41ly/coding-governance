@@ -83,7 +83,7 @@ SERVES_KIND = "log"
 # The kind's read-only alias (TOOL-dTotalRecall-18 S8): a committed run record headed `journal`, the
 # kind's name before it became `log`, still binds. Inline, since this kit requires none; the memory-tree
 # kit's `record_kinds.py --check` holds it to `tree_lib.KIND_ALIASES` by `ast`, never by import.
-SERVES_ALIASES = ("journal",)
+SERVES_ALIASES = ("journal",)  # census: kept alias-compare the alias table itself
 INTRO = ("Rendered from the run model by the runlog kit's `record` command. Every value below is drawn "
          "from a closed schema, so no line carries free text. Re-render it rather than edit it.")
 DATA_OPEN = "```json"
@@ -1163,7 +1163,7 @@ def render_twin(doc) -> str:
 
 
 def render_markdown(doc, serves) -> str:
-    out = [TITLE, "", f"**Serves:** {SERVES_KIND} {render_serves(serves)}", render_cause_line(serves), "",
+    out = [TITLE, "", f"**Serves:** {SERVES_KIND} {render_serves(serves)}", render_cause_line(serves), "",  # census: kept cause-writer its cause line is render_cause_line, the next element of the head
            INTRO, ""]
     for name in RECORD_SCHEMA["headings"]:
         out += [f"## {name}", ""]
@@ -1511,11 +1511,11 @@ def check_cause_line(ln, line, served) -> list:
 
 
 def check_serves_line(ln, line, slug, own_ids) -> list:
-    """The head's binding line: `**Serves:** log <ids>`, or its read-only alias `journal`, every id one a
+    """The head's binding line: `Serves: log <ids>`, bolded, or its read-only alias `journal`, every id one a
     spec of THIS build defines."""
     m = re.fullmatch(r"\*\*Serves:\*\* (\S+) (.+)", line or "")
     if m is None:
-        return [(ln, "serves", "the head's third line is not `**Serves:** <kind> <ids>`")]
+        return [(ln, "serves", "the head's third line is not `**Serves:** <kind> <ids>`")]  # census: kept cause-writer reader: a refusal naming the binding shape
     out = []
     if m.group(1) != SERVES_KIND and m.group(1) not in SERVES_ALIASES:
         out.append((ln, "serves", f"the binding kind is not `{SERVES_KIND}`"))

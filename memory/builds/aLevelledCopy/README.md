@@ -92,6 +92,8 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 | 2 | `TOOL-aLevelledCopy-3` | no |
 | 3 | `TOOL-aLevelledCopy-7`, `TOOL-aLevelledCopy-9` | yes |
 | 4 | `TOOL-aLevelledCopy-8` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

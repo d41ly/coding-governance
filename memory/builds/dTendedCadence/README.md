@@ -215,6 +215,8 @@ Coverage of dTendedCadence's 18 clause(s) and 24 owned node(s), over 58 spec(s) 
 | 22 | `TOOL-dTendedCadence-59`, `TOOL-dTendedCadence-64`, `TOOL-dTendedCadence-65`, `TOOL-dTendedCadence-66`, `TOOL-dTendedCadence-69`, `TOOL-dTendedCadence-70`, `TOOL-dTendedCadence-71` | no |
 | 23 | `TOOL-dTendedCadence-72`, `TOOL-dTendedCadence-73` | no |
 | 24 | `TOOL-dTendedCadence-74` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

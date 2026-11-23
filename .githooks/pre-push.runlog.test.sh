@@ -472,7 +472,7 @@ check_journal() { # label -> the whole journal parses, pairs, and carries no pas
 check_shape_run() { # value -> "shaped" when it is push-<digits>-<digits>, else the value in brackets
   case "$1" in push-*-*) ;; *) echo "[$1]"; return 0 ;; esac
   local mid=${1#push-} tail=${1##*-}
-  mid=${mid%-*}
+  mid=${mid%-*}  # census: kept slug-grammar not a unit id: the push-shape mid
   case "$mid:$tail" in *[!0-9:]*|:*|*:) echo "[$1]" ;; *) echo shaped ;; esac
 }
 

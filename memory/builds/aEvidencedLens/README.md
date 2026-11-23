@@ -135,6 +135,8 @@ Ids whose spec moved past its audited revision: none — 0 of 19 unit id(s) carr
 | 10 | `TOOL-aEvidencedLens-18` | no |
 | 11 | `TOOL-aEvidencedLens-19`, `TOOL-aEvidencedLens-20` | no |
 | 12 | `TOOL-aEvidencedLens-21` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

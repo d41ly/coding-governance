@@ -131,6 +131,8 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 | 3 | `TOOL-dTieredTribunal-14` | no |
 | 4 | `TOOL-dTieredTribunal-11` | no |
 | 5 | `TOOL-dTieredTribunal-12` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

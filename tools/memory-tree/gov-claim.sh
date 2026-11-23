@@ -1002,7 +1002,7 @@ derive_ask_floor() { # family · slug · revs… -> prints the highest <n> of <f
     git grep -ohE "(^|[^A-Za-z0-9])$fam-$slug-[0-9]+" "$r" -- >>"$f" 2>/dev/null
   done
   while IFS= read -r m || [ -n "$m" ]; do
-    m=${m%$'\r'}; m=${m##*-}
+    m=${m%$'\r'}; m=${m##*-}  # census: kept slug-grammar the sequence after the last hyphen
     [ "${#m}" -le 9 ] || continue
     m=$((10#$m))
     [ "$m" -le "$n" ] || n=$m

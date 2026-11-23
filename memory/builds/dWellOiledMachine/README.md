@@ -407,6 +407,8 @@ Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 126 spec
 | 75 | `TOOL-dWellOiledMachine-122`, `TOOL-dWellOiledMachine-123`, `TOOL-dWellOiledMachine-124`, `TOOL-dWellOiledMachine-125` | no |
 | 76 | `TOOL-dWellOiledMachine-126` | no |
 
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+
 Unordered: `TOOL-dWellOiledMachine-127`.
 <!-- /gen:build-order -->
 

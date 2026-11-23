@@ -861,7 +861,8 @@ def check_edge_cardinality(root, registry=False) -> tuple[int, list[str]]:
     too. 1 with one line per violation, 0 with the counts read; EdgeError on an absent registry under
     `registry` or a failed `--print-relations`.
     What it does not check: two sources inside one file (unit rows, leg rows) count as one source, which
-    no bounded type reaches; a line `read_tree_edges` refuses is counted, not graded, the edges leg's red."""
+    no bounded type reaches; a line `read_tree_edges` refuses counts no edge and is not graded, the edges
+    leg's red, but is printed with its record, `cardinality: refused · <refusal>` (TOOL-dTotalRecall-53 S12)."""
     tree_lib, _ = ti.load_memory_tree()
     import design_lib
     root = pathlib.Path(root)
@@ -888,6 +889,7 @@ def check_edge_cardinality(root, registry=False) -> tuple[int, list[str]]:
         differ = {ln.split(" · ")[1] for ln in mirror}
         lines += mirror + [f"cardinality: registry · {len(cells)} kind(s) mirror a bounded type; {len(differ)} differ"]
     reds = len(violations) + len(mirror)
+    lines += [f"cardinality: refused · {r}" for r in refused]   # S12: each refusal named with its record
     lines.append(f"cardinality: read {len(counted)} edges of {len({c[0] for c in counted})} types, {len(refused)} "
                  f"line(s) refused and not counted; {reds} violations")
     return (1 if reds else 0), lines
@@ -1103,8 +1105,13 @@ def run_trailer_plant(top) -> int:
 
 #: TOOL-dTotalRecall-22 §7: the cardinality plants, and the record each branch of the merge plant adds, its
 #: section's edge line on line 5
-CARDINALITY_PLANTS = ("cardinality-missing", "cardinality-mirror", "cardinality-branch", "cardinality-merge")
+CARDINALITY_PLANTS = ("cardinality-missing", "cardinality-mirror", "cardinality-branch", "cardinality-merge",
+                      "cardinality-refused")
 CARDINALITY_RECORD = "# A record\n\n## [x] A section\n\n**Edges:** supersedes=PLAY-xDec-1\n"
+#: TOOL-dTotalRecall-53 AC12: the refused plant's typed record, two bulleted `- **Caused-by:**` fields
+CARDINALITY_REFUSED = "memory/builds/xAlpha/build/2026-11-22-build-PLAY-xAlpha-1-deviation-1.md"
+CARDINALITY_REFUSED_TEXT = ("# PLAY-xAlpha-1 deviation 1 — a cause given twice\n\n**Serves:** deviation PLAY-xAlpha-1\n\n"
+                            + "- **Caused-by:** PLAY-xAlpha-1\n" * 2)
 #: the README each branch's build carries, since the README relations' reader refuses a build folder without one
 CARDINALITY_README = ("---\nslug: {slug}\nopened: 2026-11-22\nids: PLAY-{slug}-1\nstatus: OPEN\n---\n\n# {slug}\n\n"
                       "<!-- gen:build-index -->\n<!-- /gen:build-index -->\n")
@@ -1116,7 +1123,10 @@ def run_cardinality_plant(top, plant) -> int:
     memory-tree's kind registry with the `deviation` row's `caused-by` per-source set to `many` in memory,
     which `check_cardinality_mirror` must red (1). `cardinality-branch` and `cardinality-merge`: gov_tag's
     fixture repository, one branch adding a record whose section supersedes PLAY-xDec-1, and for the merge a
-    second branch adding another, merged clean; `check_edge_cardinality` at the tip (0 alone, 1 merged)."""
+    second branch adding another, merged clean; `check_edge_cardinality` at the tip (0 alone, 1 merged).
+    `cardinality-refused` (TOOL-dTotalRecall-53 AC12): the branch plant beside a typed record carrying two
+    bulleted `- **Caused-by:**` fields, which must print one refused line naming it, read no edge of it and
+    finish: 0 with a PASS line, else 1."""
     top = pathlib.Path(top)
     if plant == "cardinality-missing":
         src = (KIT_DIR / "edges.toml").read_text(encoding="utf-8")
@@ -1156,15 +1166,24 @@ def run_cardinality_plant(top, plant) -> int:
                                     "memory/project/stale-header-waiver.txt": "# empty\n"}, "cardinality base")
         for slug in ("xAlpha", "xBeta") if plant == "cardinality-merge" else ("xAlpha",):
             gov_tag.run_git(root, "checkout", "-q", "-b", slug.lower(), "main")
-            gov_tag.write_commit(root, {
-                f"memory/builds/{slug}/README.md": CARDINALITY_README.format(slug=slug),
-                f"memory/builds/{slug}/build/2026-11-22-build-PLAY-{slug}-1-note.md": CARDINALITY_RECORD,
-            }, f"record {slug}")
+            files = {f"memory/builds/{slug}/README.md": CARDINALITY_README.format(slug=slug),
+                     f"memory/builds/{slug}/build/2026-11-22-build-PLAY-{slug}-1-note.md": CARDINALITY_RECORD}
+            if plant == "cardinality-refused":
+                files[CARDINALITY_REFUSED] = CARDINALITY_REFUSED_TEXT
+            gov_tag.write_commit(root, files, f"record {slug}")
         if plant == "cardinality-merge":
             gov_tag.run_git(root, "merge", "-q", "--no-edit", "xalpha")   # TagError on a conflict
             parents = gov_tag.run_git(root, "rev-list", "--parents", "-n", "1", "HEAD").split()
             print(f"edges: plant cardinality-merge · git merge was clean, HEAD a merge of {len(parents) - 1} parents")
         rc, lines = check_edge_cardinality(root)
+        if plant == "cardinality-refused":   # S12: the refusal printed against its record, no edge of it counted
+            edges, _refused = read_tree_edges(pathlib.Path(root), None)
+            named = [ln for ln in lines if ln.startswith("cardinality: refused · ") and CARDINALITY_REFUSED in ln]
+            mine = [e for e in edges if e["path"] == CARDINALITY_REFUSED]
+            ok = rc == 0 and len(named) == 1 and not mine and lines[-1].startswith("cardinality: read ")
+            lines.append(f"edges: plant cardinality-refused · {'PASS' if ok else 'FAIL'} · {len(named)} refused "
+                         f"line(s) name {CARDINALITY_REFUSED}, {len(mine)} edge(s) of it read")
+            rc = 0 if ok else 1
     for ln in lines:
         print(ln)
     return rc

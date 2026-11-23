@@ -5333,6 +5333,11 @@
       "file": "tools/hooks/format-guard.test.sh"
     },
     {
+      "id": "check_absolute_path",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
       "id": "check_absorb_subject",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -6026,6 +6031,11 @@
       "id": "check_census_floor",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "check_census_plant",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "check_census_root",
@@ -7406,6 +7416,11 @@
       "id": "check_keepalive_reaped",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_kept_instrument",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "check_key_read",
@@ -11728,6 +11743,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "derive_alias_hit",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "derive_all_on",
       "kind": "function",
       "file": "tools/loop/floor.py"
@@ -12031,6 +12051,11 @@
       "id": "derive_census_tokens",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_census_tool_rel",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "derive_census_tree",
@@ -12731,11 +12756,6 @@
       "id": "derive_fold_files",
       "kind": "function",
       "file": "tools/playbook/tag_bundle.py"
-    },
-    {
-      "id": "derive_folded_path",
-      "kind": "function",
-      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "derive_folded_text",
@@ -24688,6 +24708,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_kept_reason",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
       "id": "read_key",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
@@ -25558,6 +25583,11 @@
       "file": "tools/run-gates/verdict_backends.py"
     },
     {
+      "id": "read_not_record_globs",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "read_note_refs",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
@@ -25596,6 +25626,11 @@
       "id": "read_open_asks",
       "kind": "function",
       "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
+      "id": "read_open_literals",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "read_open_passes",
@@ -28193,6 +28228,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_tree_written_kinds",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
+    },
+    {
       "id": "read_trigger_causes",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
@@ -28356,6 +28396,11 @@
       "id": "read_typed_derived_paths",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_unarmed_reason",
+      "kind": "function",
+      "file": "tools/memory-tree/shape_run.py"
     },
     {
       "id": "read_unbound_names",
@@ -28706,6 +28751,11 @@
       "id": "read_writer_fns",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "read_written_kinds",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "readme",
@@ -41773,6 +41823,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_memory_dtr53_paths",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_miss_predictor_verdict_needs_enough_misses",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -43631,6 +43686,11 @@
       "id": "write_case_file",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "write_census_case",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "write_cf_backlog",

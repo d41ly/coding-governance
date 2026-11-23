@@ -238,6 +238,8 @@ Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 59 spec(s) at 
 | 37 | `TOOL-dBoundRoles-65`, `TOOL-dBoundRoles-66` | yes |
 | 38 | `TOOL-dBoundRoles-67`, `TOOL-dBoundRoles-68` | yes |
 | 39 | `TOOL-dBoundRoles-69` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -119,6 +119,8 @@ Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carr
 | 7 | `TOOL-dUnstuckLanding-19` | no |
 | 8 | `TOOL-dUnstuckLanding-20` | no |
 
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+
 Unordered: `TOOL-dUnstuckLanding-25`, `TOOL-dUnstuckLanding-27`.
 <!-- /gen:build-order -->
 

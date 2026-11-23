@@ -114,6 +114,8 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 | 9 | `TOOL-aSightedSkeptic-9` | no |
 | 10 | `TOOL-aSightedSkeptic-10` | no |
 | 13 | `TOOL-aSightedSkeptic-13` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

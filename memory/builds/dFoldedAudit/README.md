@@ -138,6 +138,8 @@ Ids whose spec moved past its audited revision: none — 0 of 18 unit id(s) carr
 | 160 | `TOOL-dFoldedAudit-16` | no |
 | 170 | `TOOL-dFoldedAudit-17` | no |
 | 180 | `TOOL-dFoldedAudit-18` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

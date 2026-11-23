@@ -886,9 +886,67 @@ _READER_SPLIT_SHAPE = re.compile(
     r"|\$\{[A-Za-z_]+(?:%%?-\*|##?\*-)\}")
 
 
-#: The marker a census hit kept on purpose carries on its own line, `# slug-grammar: kept <reason>` (`//` in
-#: JavaScript), which `--readers` never prints (TOOL-dTotalRecall-43 S14).
-READER_KEPT = re.compile(r"(?:#|//) slug-grammar: kept\b")
+#: The one keep marker of the three code censuses (TOOL-dTotalRecall-53 S34, widening TOOL-dTotalRecall-43
+#: S14's): `<lead> census: kept <census> <reason>` on the kept line itself, its lead `#` or `//` (a
+#: JavaScript comment), `<census>` one of `CENSUS_NAMES`, the heads the censuses print. A line may carry one
+#: marker per census.
+KEPT_MARKER_RE = re.compile(r"(?:#|//) census: kept (?P<census>[a-z-]+) (?P<reason>.*?)"
+                            r"(?=\s+(?:#|//) census: kept |\s*$)")
+CENSUS_NAMES = ("slug-grammar", "alias-compare", "cause-writer")
+
+
+def read_kept_reason(line: str, census: str) -> str | None:
+    """The reason `line`'s keep marker gives for `census` (`KEPT_MARKER_RE`), or None where it carries none for
+    that census: the one reader of the marker, called by `scan_readers` here, `record_kinds.py`'s
+    `check_alias_compares` and `record_causes.py`'s `check_cause_writers`. It reads line text, so it does
+    not check that the lead opens a comment in that line's language. An empty reason reads as none."""
+    for m in KEPT_MARKER_RE.finditer(line):
+        if m.group("census") == census and m.group("reason").strip():
+            return m.group("reason").strip()
+    return None
+
+
+def derive_census_tool_rel() -> str:
+    """The tool root as this tree places it, `/`-joined, so an adopter's install prefix is the one scanned;
+    its directory name where this file sits in no conforming tree."""
+    tool_root = pathlib.Path(__file__).resolve().parent.parent
+    try:
+        return tool_root.relative_to(repo_root().resolve()).as_posix()
+    except (ValueError, ConfError):
+        return tool_root.name
+
+
+def write_census_case(clone, case, run) -> str | None:
+    """Plant one `_CENSUS_CASES` case in the scratch clone's working copy (TOOL-dTotalRecall-53 S1 S16):
+    the repository path it rewrote, or None where the clone holds no line to plant it on. `run` is the
+    flip probe's git runner over the clone."""
+    clone = pathlib.Path(clone)
+    if case == "i-named-reader":
+        tool_rel = derive_census_tool_rel()
+        rel = _NAMED_READER[0] if tool_rel in ("", ".") else f"{tool_rel}/{_NAMED_READER[0]}"
+        try:
+            text = (clone / rel).read_bytes().decode("utf-8")
+        except (OSError, UnicodeDecodeError):
+            return None
+        if _NAMED_READER[1] not in text:
+            return None
+        (clone / rel).write_bytes(text.replace(_NAMED_READER[1], _NAMED_READER[2], 1).encode("utf-8"))
+        return rel
+    try:
+        found = run("grep", "-n", "-e", "census: kept slug-grammar").splitlines()
+    except subprocess.CalledProcessError:   # git grep exits 1 on no match
+        return None
+    for hit in found:
+        rel, n, text = hit.split(":", 2)
+        if not _READER_SPLIT_SHAPE.search(text):
+            continue
+        lines = (clone / rel).read_bytes().decode("utf-8").split("\n")
+        line = lines[int(n) - 1]
+        end = "\r" if line.endswith("\r") else ""
+        lines[int(n) - 1] = KEPT_MARKER_RE.sub("", line.rstrip("\r")).rstrip() + end
+        (clone / rel).write_bytes("\n".join(lines).encode("utf-8"))
+        return rel
+    return None
 
 
 def scan_readers(root) -> list[str]:
@@ -896,13 +954,9 @@ def scan_readers(root) -> list[str]:
     `skills/`, and of every tracked file under `.githooks/`, that spells a slug or id shape or splits
     a value on a hyphen in a shape that reads past the family (`_READER_SPLIT_SHAPE`), outside the
     grammar's own entry points: this module and every `slug_legacy_*` block, and never a line carrying
-    the kept marker `READER_KEPT` (TOOL-dTotalRecall-43 S14)."""
+    the keep marker for `slug-grammar` (`read_kept_reason`, TOOL-dTotalRecall-53 S34)."""
     root = pathlib.Path(root)
-    tool_root = pathlib.Path(__file__).resolve().parent.parent
-    try:  # the tool root as this tree places it, so an adopter's install prefix is the one scanned
-        tool_rel = tool_root.relative_to(repo_root().resolve()).as_posix()
-    except (ValueError, ConfError):
-        tool_rel = tool_root.name
+    tool_rel = derive_census_tool_rel()
     out = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", tool_rel, "skills", ".githooks"],
                          capture_output=True, check=True).stdout.decode("utf-8", "replace")
     own = pathlib.Path(__file__).resolve()
@@ -927,7 +981,7 @@ def scan_readers(root) -> list[str]:
             if mark:
                 inside = mark.group(1) == ">>>"
                 continue
-            if inside or READER_KEPT.search(line):   # S14: a hit kept on purpose says so on its line
+            if inside or read_kept_reason(line, "slug-grammar"):   # a hit kept on purpose says so on its line
                 continue
             if (_READER_ID_SHAPE.search(line) or _READER_SLUG_SHAPE.search(line)
                     or _READER_SPLIT_SHAPE.search(line)):
@@ -944,6 +998,13 @@ _FLIPS = (
     ("slug-date in-slug digit", "builds.slug-date", "in-slug", "d20261026ClosedLoop"),
     ("slug-date in-slug hyphenated", "builds.slug-date", "in-slug", "d2026-10-26ClosedLoop"),
 )
+#: The census cases the hyphenated flip runs (TOOL-dTotalRecall-53 S1 S16), each of which the clone's census
+#: must fail: `i-named-reader` reverts the recall floor's `derive_probe_labels` to a split of a value named `i`
+#: (its file under the tool root, spelled in parts: the install-prefix ban reads a kit path, and the text it
+#: replaces); `unmarked-split` strips the keep marker off the first marked split line the clone holds.
+_NAMED_READER = ("/".join(("memory-recall", "check-recall.py")), "extract.id_grammar.parse_id_parts(i, None)[1]",
+                 'i.split("-")[1]')
+_CENSUS_CASES = ("i-named-reader", "unmarked-split")
 
 
 def run_flip_probe(clone) -> int:
@@ -953,7 +1014,11 @@ def run_flip_probe(clone) -> int:
     unchanged; every tracked folder passes `BUILD_SLUG_RE`; `ID_RE` matches `TOOL-<slug>-3` whole;
     `parse_id_parts` returns the new slug and 3 for it; and the clone's census lists no split hit, by
     path and line text, that the census over this probe's own tree does not (TOOL-dTotalRecall-38 S4).
-    One `flip <name>: ok` line or the failed checks each; 1 on any failure, 2 on an unusable clone."""
+    Under the hyphenated flip each `_CENSUS_CASES` case is planted (`write_census_case`) and must make the
+    clone's census list a split hit in the file it rewrote, then is restored (TOOL-dTotalRecall-53 S1 S16);
+    a case the clone holds no line for prints `unarmed` and fails nothing. One `flip <name>: ok` line or the
+    failed checks each, and one `flip <name> · <case>:` line per census case; 1 on any failure, 2 on an
+    unusable clone."""
     global _default, _cached
     clone = pathlib.Path(clone).resolve()
     # The copy `tree_lib` imports, whose slug cache the parser's token regex reads: a second module
@@ -1043,6 +1108,22 @@ def run_flip_probe(clone) -> int:
             else:
                 print(f"flip {name}: ok" + (f" (the shape does not change under {value})" if same else ""))
             failed += bool(why)
+            if name == _FLIPS[-1][0]:   # TOOL-dTotalRecall-53 S1 S16: the census cases, each a failure it must see
+                for case in _CENSUS_CASES:
+                    planted = write_census_case(clone, case, run)
+                    listed = [h for h in scan_readers(clone) if planted and h.startswith(planted + ":")
+                              and _READER_SPLIT_SHAPE.search(h.split(":", 2)[2])
+                              and tuple(h.split(":", 2)[::2]) not in own_splits]
+                    if planted:
+                        run("checkout", "-q", "--", planted)
+                    if listed:
+                        print(f"flip {name} · {case}: ok, the census fails as it must: the clone's census lists "
+                              f"split hit(s) this tree's does not: " + " | ".join(listed[:5]))
+                    elif planted:
+                        print(f"flip {name} · {case}: the planted split passes the census, {planted} listed nothing")
+                    else:   # announced, never a pass: a tree with no such line has nothing to plant on
+                        print(f"flip {name} · {case}: unarmed — the clone holds no line to plant it on")
+                    failed += bool(planted) and not listed
     finally:
         run("reset", "-q", "--hard", start)
         _slug_cache.clear()

@@ -25,8 +25,10 @@ record, through `build_records.read_record` under the kind's entry; its `Caused-
 `<memory root>/builds/*/reviews/<stem>.md`, whose line must parse to the same value for every field either
 side carries. A malformed record, a `Caused-by` naming no review or two, a review whose line is refused,
 and a field whose two values differ are each one red line naming the record: exit 1. No record at all is
-`shape-run: unarmed — 0 shape-run record(s), no writer calls the verb yet`, exit 0, announced and never a
-green. Exit 2 where the tracked population cannot be read.
+`shape-run: unarmed — 0 shape-run record(s), <reason>`, exit 0, announced and never a green, its reason
+the `shape-run` row's `unarmed` key in the record-kind registry, read through
+`record_kinds.read_record_kinds`, the reason's one home (TOOL-dTotalRecall-53 S37). Exit 2 where the
+tracked population cannot be read.
 
 WHAT IT DOES NOT CHECK: that a review exit has a shape-run record (no writer calls the door yet), that the
 review record is the one its harness wrote, or a prose-wrapped line, which the strict grammar refuses.
@@ -48,7 +50,7 @@ from design_lib import DesignRefusal, read_tracked_builds  # noqa: E402  the tra
 SAY = "shape-run"
 KIND = "shape-run"
 LINE_HEAD = "review-shape"
-UNARMED = f"{SAY}: unarmed — 0 shape-run record(s), no writer calls the verb yet"
+UNARMED = f"{SAY}: unarmed — 0 shape-run record(s), "
 _N = r"(?:\d+|-)"
 #: The line's fields in line order: (the name the line spells, its sub-pattern, the optional run it belongs
 #: to or None). A run's fields are present together or absent together.
@@ -149,6 +151,22 @@ def read_shape_record(rel, text):
             "malformed": bad, "fields": fields}
 
 
+def read_unarmed_reason(root) -> str:
+    """The `shape-run` row's `unarmed` key, read through `record_kinds.read_record_kinds` at `root`
+    (TOOL-dTotalRecall-53 S37): the unarmed line's reason, spelled in the registry alone. A registry that is
+    absent or refused, or a row carrying no key, is said as such."""
+    import record_kinds  # noqa: E402  the registry's one reader
+    try:
+        rows = record_kinds.read_record_kinds(root) or []
+    except record_kinds.RecordKindsError as exc:
+        return f"the registry's reason does not read: {exc}"
+    row = next((r for r in rows if r.get("name") == KIND), None)
+    reason = (row or {}).get(record_kinds.UNARMED)
+    if isinstance(reason, str) and reason.strip():
+        return reason.strip()
+    return f"the registry's {KIND} row carries no {record_kinds.UNARMED} reason"
+
+
 def check_shape_runs(root):
     """S5: every tracked shape-run record against the line of the review record its `Caused-by` names.
     -> `(lines, exit)`: 0 green or unarmed, 1 a red, 2 an unreadable population."""
@@ -161,7 +179,7 @@ def check_shape_runs(root):
     except DesignRefusal as exc:
         return [f"{SAY}: refused · {exc}"], 2
     if not records:
-        return [UNARMED], 0
+        return [UNARMED + read_unarmed_reason(root)], 0
     review = re.compile(re.escape(memory_root) + r"/builds/[^/]+/reviews/(?P<stem>[^/]+)\.md")
     by_stem = {}
     for rel in tracked:

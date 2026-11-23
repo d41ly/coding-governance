@@ -71,6 +71,19 @@ def read_kind_rows(root: str) -> tuple:
 
 
 @functools.cache
+def read_tree_written_kinds(root: str) -> dict:
+    """`{path: Serves kind token or None}` over every tracked file under `root`'s memory root, each record's
+    kind `tree_lib.read_bindings` classifies `bound`, read once per process through
+    `record_kinds.read_written_kinds` (TOOL-dTotalRecall-53 S21); {} where git does not list the tree."""
+    _t, _i, record_kinds, _g = load_memory_modules()
+    try:
+        tracked = record_kinds.read_tracked(root, f"{record_kinds.read_memory_root(root)}/**")
+    except record_kinds.RecordKindsError:
+        return {}
+    return record_kinds.read_written_kinds(root, tracked)
+
+
+@functools.cache
 def read_anchor_mode(root: str) -> str:
     """`memory.legacy-anchors` at `root`, read once per process; its default where the read refuses."""
     load_memory_modules()
@@ -95,12 +108,13 @@ def check_spec_file(ctx, path) -> bool:
     return re.match(re.escape(ctx["memory_root"]) + SPEC_RE, path) is not None
 
 
-def derive_kind_row(ctx, path, text):
-    """The record-kind row a record at `path` takes: `derive_record_kind`'s, else, for a spec, the row
-    whose home admits it, so its `sections` table maps its headings."""
+def derive_kind_row(ctx, path):
+    """The record-kind row a record at `path` takes: `derive_record_kind`'s over the kind `read_bindings`
+    classified (`read_tree_written_kinds`), else, for a spec, the row whose home admits it, so its
+    `sections` table maps its headings."""
     _t, _i, record_kinds, _g = load_memory_modules()
     rows = list(read_kind_rows(str(ctx["root"])))
-    row = record_kinds.derive_record_kind(path, text, rows)
+    row = record_kinds.derive_record_kind(path, read_tree_written_kinds(str(ctx["root"])).get(path), rows)
     if row is None and check_spec_file(ctx, path):
         row = next((r for r in rows if r.get("name") == "spec"), None)
     return row
@@ -117,7 +131,8 @@ def extract_record(ctx, path, text=None):
         return ti.derive_tag_rows(text, "record-kind")
     _t, id_grammar, record_kinds, _g = load_memory_modules()
     lines = text.splitlines()
-    row = record_kinds.derive_record_kind(path, text, list(read_kind_rows(str(ctx["root"]))))
+    row = record_kinds.derive_record_kind(path, read_tree_written_kinds(str(ctx["root"])).get(path),
+                                          list(read_kind_rows(str(ctx["root"]))))
     tag = f"record.{row['name']}" if row else ""
     out = []
     if check_record_file(ctx, path):
@@ -139,7 +154,7 @@ def extract_section(ctx, path, text=None):
         return "" if (check_record_file(ctx, path) and path.endswith(".md")) or check_spec_file(ctx, path) else None
     tree_lib, _i, record_kinds, _g = load_memory_modules()
     mode = read_anchor_mode(str(ctx["root"]))
-    row = derive_kind_row(ctx, path, text)
+    row = derive_kind_row(ctx, path)
     try:
         sections = record_kinds.read_sections(row) if row else []
     except record_kinds.RecordKindsError:

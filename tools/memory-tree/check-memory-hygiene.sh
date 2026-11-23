@@ -1912,7 +1912,7 @@ $bad21u"
         print "  " p " — the name carries no date, so no id can be read from it"; next
       }
       rest = substr(base, 12)           # past the date prefix the test above proved is there
-      sub(/^[^-]*-/, "", rest)          # drop the kind, exactly as `${stem#*-}` did
+      sub(/^[^-]*-/, "", rest)          # drop the kind, exactly as `${stem#*-}` did  # census: kept slug-grammar not a unit id: the awk comment naming the stem expansion
       claimed = ""
       if (match(rest, "^(" famalt ")-(" slug ")-[0-9]+")) claimed = substr(rest, RSTART, RLENGTH)
       if (claimed == "") {
@@ -3651,7 +3651,7 @@ if [ -n "$alcut" ]; then
       while ((getline line < f) > 0) {    # from a fresh process per file, and losing it would
         sub(/\r$/, "", line)              # a CRLF worktree on Linux delivers the CR into awk
         $0 = line                         # attribute one record'"'"'s criteria to the next
-        if ($0 ~ /^\*\*Serves:\*\*/) j = ($0 ~ /\*\*Serves:\*\* *(log|journal) /)
+        if ($0 ~ /^\*\*Serves:\*\*/) j = ($0 ~ /\*\*Serves:\*\* *(log|journal) /)  # census: kept alias-compare both tokens: the pattern reads log and its alias as one kind
         if ($0 ~ /^\*\*Evidences:\*\* /) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
           u = (j ? $2 : ""); continue }
         if ($0 ~ /^#/) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }

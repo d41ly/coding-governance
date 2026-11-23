@@ -89,6 +89,8 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 | 4 | `TOOL-aCarriedStop-9` | no |
 | 5 | `TOOL-aCarriedStop-10` | no |
 
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
+
 Unordered: `TOOL-aCarriedStop-1`.
 <!-- /gen:build-order -->
 

@@ -1172,7 +1172,7 @@ cn_lines=$(wc -l < "$d/census" 2>/dev/null | tr -d ' ')
   && ok "AC2 control: the census took $cn_lines samples, so a snapshot held the leg and its nested run" \
   || nope "AC2 the census holds ${cn_lines:-0} line(s), so no snapshot ever held the leg — the arm below would pass by finding nothing"
 cn_bad=""
-for cn_p in "$(cat "$REC_GD/cn-wrapper.pid" 2>/dev/null)" "${cn_id##*-}" "$(cat "$REC_GD/cn-leg.pid" 2>/dev/null)" "$(cat "$REC_GD/cn-nested.pid" 2>/dev/null)"; do
+for cn_p in "$(cat "$REC_GD/cn-wrapper.pid" 2>/dev/null)" "${cn_id##*-}" "$(cat "$REC_GD/cn-leg.pid" 2>/dev/null)" "$(cat "$REC_GD/cn-nested.pid" 2>/dev/null)"; do  # census: kept slug-grammar not a unit id: a process id
   [ -n "$cn_p" ] || { cn_bad="$cn_bad (a pid file is missing)"; continue; }
   awk -F'\t' -v p="$cn_p" '{ n = split($3, r, " "); for (i = 1; i <= n; i++) if (r[i] ~ "^" p ":") f = 1 } END { exit !f }' "$d/census" 2>/dev/null \
     && cn_bad="$cn_bad $cn_p"

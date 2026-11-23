@@ -196,6 +196,8 @@ Ids whose spec moved past its audited revision: none — 0 of 30 unit id(s) carr
 | 7 | `DEPL-dRetiredFork-3` | no |
 | 8 | `DEPL-dRetiredFork-6` | no |
 | 9 | `TOOL-dRetiredFork-17` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

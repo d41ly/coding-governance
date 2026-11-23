@@ -1024,7 +1024,7 @@ def run_plant_populated_seen_red(top, results):
     ledger = "memory/builds/dFix/build/2026-01-01-build-TOOL-dFix-1-1-acceptance-ledger.md"
 
     def render_ledger(line):
-        return ("# %s — acceptance ledger\n\n**Serves:** journal %s\n\n**Evidences:** %s\n"
+        return ("# %s — acceptance ledger\n\n**Serves:** journal %s\n\n**Evidences:** %s\n"  # census: kept cause-writer fixture: a record head its fixture plants
                 "- AC1 — `ratchet.py populated` — observed\n%s\n" % (FIX_UNIT, FIX_UNIT, FIX_UNIT, line))
     seen = "- seen-red — `%s` — red `%s` — green `%s` — the population drained" % (LEGS["never-gains"], SHA_A, SHA_A)
     write_fixture_repo(top, [render_table()], {"pop/rows.txt": render_rows([]), ledger: render_ledger(seen),

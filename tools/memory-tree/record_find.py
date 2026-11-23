@@ -595,13 +595,13 @@ def build_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
     folder = f"memory/builds/{FIXTURE_BUILD}"
     write_fixture_file(root, f"{folder}/README.md", f"---\nslug: {FIXTURE_BUILD}\nids: TOOL-{FIXTURE_BUILD}-1\n---\n# {FIXTURE_BUILD}\n")
     write_fixture_file(root, f"{folder}/build/2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-deviation-1.md",
-                       f"# deviation\n\n**Serves:** deviation TOOL-{FIXTURE_BUILD}-1\n\n## Findings\n\nthe first\n\n"
+                       f"# deviation\n\n**Serves:** deviation TOOL-{FIXTURE_BUILD}-1\n\n## Findings\n\nthe first\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                        "## Findings\n\nthe second\n")
     policy = []
     if plant == "cap":
         for i in range(2, FIND_CAP + 2):
             write_fixture_file(root, f"{folder}/build/2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-deviation-{i}.md",
-                               f"# deviation {i}\n\n**Serves:** deviation TOOL-{FIXTURE_BUILD}-1\n")
+                               f"# deviation {i}\n\n**Serves:** deviation TOOL-{FIXTURE_BUILD}-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
     if plant in ("archive", "superseded", "superseded-refuse", "superseded-mark"):
         write_fixture_file(root, "memory/archive/2025-01-01-decisions.md",
                            "# Archived decisions\n\n## DEC-tFix-1 — the boojum colour is mauve\n\n"
@@ -611,7 +611,7 @@ def build_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
                            "# Decisions\n\n## DEC-tFix-2 — the boojum colour is teal\n\n"
                            "Supersedes DEC-tFix-1: the snark hunters paint the boojum teal.\n")
     if plant in ("over-report", "over-refuse", "over-off"):
-        head = f"# big\n\n**Serves:** deviation TOOL-{FIXTURE_BUILD}-1\n\n"
+        head = f"# big\n\n**Serves:** deviation TOOL-{FIXTURE_BUILD}-1\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
         n, rest = divmod(BIG_BYTES - len(head), 100)   # the slice is the text less its last newline
         write_fixture_file(root, f"{folder}/build/2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-deviation-big.md",
                            head + ("x" * 99 + "\n") * n + "y" * rest + "\n")

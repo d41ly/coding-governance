@@ -3642,7 +3642,7 @@ def write_handoff_fixture(repo):
     digest = lambda s: hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]  # noqa: E731
     marker = (f"<!-- gov:handoff role=gov-researcher build=bxFix unit=T-1 path={HANDOFF_FILE} "
               f"role-sha={digest(HANDOFF_ROLE)} task-sha={digest(HANDOFF_TASK)} -->")
-    for rel, text in ((HANDOFF_FILE, f"**Serves:** journal T-1\n\n# a handoff\n\n{marker}\n\n{HANDOFF_ROLE}{HANDOFF_TASK}"),
+    for rel, text in ((HANDOFF_FILE, f"**Serves:** journal T-1\n\n# a handoff\n\n{marker}\n\n{HANDOFF_ROLE}{HANDOFF_TASK}"),  # census: kept cause-writer fixture: the handoff record its fixture plants
                       (HARNESS_FILE, HARNESS_TEXT), (".claude/roles.json", json.dumps(LIMIT_ROLES))):
         Path(repo, rel).parent.mkdir(parents=True, exist_ok=True)
         Path(repo, rel).write_text(text, encoding="utf-8", newline="\n")
@@ -4290,7 +4290,7 @@ def derive_outside_probe_plant(cap):
     if cap.name == "memory-slices":  # TOOL-dTotalRecall-9 AC10: an over-cap read set, reported under either mode
         kit_dir, tool_dir = posixpath.dirname(rel), posixpath.dirname(posixpath.dirname(rel))
         record = "2026-01-01-build-TOOL-bFix-1-deviation-1"
-        body = "# big\n\n**Serves:** deviation TOOL-bFix-1\n\n" + ("x" * 99 + "\n") * 1300
+        body = "# big\n\n**Serves:** deviation TOOL-bFix-1\n\n" + ("x" * 99 + "\n") * 1300  # census: kept cause-writer fixture: the handoff record its fixture plants
         return {"files": {".memory-tree.conf": 'MEMORY_ROOT="memory"\nFAMILIES="tooling:TOOL"\n',
                           "memory/README.md": "# r\n", "memory/builds/bFix/README.md": "# bFix\n",
                           f"memory/builds/bFix/build/{record}.md": body},

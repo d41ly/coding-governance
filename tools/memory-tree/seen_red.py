@@ -280,7 +280,7 @@ def write_fixture_commit(top, files, message):
 
 
 def render_ledger(line):
-    return ("# TOOL-dFix-1 — acceptance ledger\n\n**Serves:** log TOOL-dFix-1\n\n**Evidences:** TOOL-dFix-1\n"
+    return ("# TOOL-dFix-1 — acceptance ledger\n\n**Serves:** log TOOL-dFix-1\n\n**Evidences:** TOOL-dFix-1\n"  # census: kept cause-writer fixture: the acceptance ledger its fixture plants
             "- AC1 — `bash tools/fix/added.test.sh` — exits 0\n%s\n" % line)
 
 

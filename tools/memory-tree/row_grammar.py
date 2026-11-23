@@ -1623,7 +1623,7 @@ def cmd_ages(root, conf):
         if d is None:
             undated.append((rel, n, r.id))
             continue
-        y, mo, dy = (int(x) for x in d.split("-"))
+        y, mo, dy = (int(x) for x in d.split("-"))  # census: kept slug-grammar not a unit id: a date
         dated.append(((today - datetime.date(y, mo, dy)).days, r.id, d))
     dated.sort()
     print(f"live keyed rows : {len(live)}")

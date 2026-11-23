@@ -145,6 +145,8 @@ Ids whose spec moved past its audited revision: none — 0 of 14 unit id(s) carr
 | 5 | `TOOL-aSurfacedLexicon-13`, `TOOL-aSurfacedLexicon-7` | no |
 | 6 | `TOOL-aSurfacedLexicon-10`, `TOOL-aSurfacedLexicon-11`, `TOOL-aSurfacedLexicon-8` | no |
 | 7 | `TOOL-aSurfacedLexicon-12` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

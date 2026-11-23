@@ -2642,5 +2642,5 @@ read_id_list_refusals() { # IDLIST value -> every refused token and why, on ONE 
 # from the driver with the expander above, and for the same reason: the leg reads the same blob per
 # home and a second spelling of "which folder" would send the two readers at different files.
 ask_home_of() { # ask id -> the slug segment, printed and left in `_ask_home` (TOOL-aSparedSpawn-8)
-  local _t="${1#*-}"; _ask_home=${_t%-*}; printf '%s' "$_ask_home"
+  local _t="${1#*-}"; _ask_home=${_t%-*}; printf '%s' "$_ask_home"  # census: kept slug-grammar the first and the last segment stripped
 }

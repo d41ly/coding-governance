@@ -346,6 +346,8 @@ Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 99 spec(s) at 
 | 14 | `TOOL-dSafePassage-51`, `TOOL-dSafePassage-57`, `TOOL-dSafePassage-58` | no |
 | 15 | `TOOL-dSafePassage-53`, `TOOL-dSafePassage-54`, `TOOL-dSafePassage-55`, `TOOL-dSafePassage-56`, `TOOL-dSafePassage-59` | unknown |
 | 16 | `TOOL-dSafePassage-100`, `TOOL-dSafePassage-101`, `TOOL-dSafePassage-102`, `TOOL-dSafePassage-103`, `TOOL-dSafePassage-104`, `TOOL-dSafePassage-61`, `TOOL-dSafePassage-72`, `TOOL-dSafePassage-73`, `TOOL-dSafePassage-74`, `TOOL-dSafePassage-75`, `TOOL-dSafePassage-76`, `TOOL-dSafePassage-77`, `TOOL-dSafePassage-78`, `TOOL-dSafePassage-80`, `TOOL-dSafePassage-81`, `TOOL-dSafePassage-82`, `TOOL-dSafePassage-83`, `TOOL-dSafePassage-84`, `TOOL-dSafePassage-86`, `TOOL-dSafePassage-87`, `TOOL-dSafePassage-88`, `TOOL-dSafePassage-89`, `TOOL-dSafePassage-90`, `TOOL-dSafePassage-91`, `TOOL-dSafePassage-92`, `TOOL-dSafePassage-93`, `TOOL-dSafePassage-94`, `TOOL-dSafePassage-95`, `TOOL-dSafePassage-96`, `TOOL-dSafePassage-97`, `TOOL-dSafePassage-98`, `TOOL-dSafePassage-99` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

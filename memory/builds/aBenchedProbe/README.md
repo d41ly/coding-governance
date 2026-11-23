@@ -91,6 +91,8 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 | 3 | `DEPL-aBenchedProbe-2` | no |
 | 4 | `DEPL-aBenchedProbe-3` | no |
 | 5 | `DEPL-aBenchedProbe-4` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

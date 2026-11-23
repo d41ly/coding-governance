@@ -111,6 +111,8 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 | 6 | `TOOL-dFramedEntrypoint-5` | no |
 | 7 | `TOOL-dFramedEntrypoint-6` | no |
 | 8 | `TOOL-dFramedEntrypoint-7` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

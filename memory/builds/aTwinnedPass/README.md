@@ -92,6 +92,8 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 | 4 | `TOOL-aTwinnedPass-5` | no |
 | 5 | `TOOL-aTwinnedPass-11` | no |
 | 6 | `TOOL-aTwinnedPass-13` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

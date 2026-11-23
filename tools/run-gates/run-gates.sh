@@ -2025,8 +2025,8 @@ ts_sweep_queue() {
     # ticket is young — so this line is redundant TODAY. That is exactly the point: it is what stops
     # a later edit to either signal deleting the ticket of the process doing the sweeping.
     [ -n "$TS_TICKET" ] && [ "$base" = "${TS_TICKET##*/}" ] && continue
-    stamp=${base%%-*}
-    pid=${base#*-}; pid=${pid%%-*}
+    stamp=${base%%-*}  # census: kept slug-grammar not a unit id: the ticket stamp
+    pid=${base#*-}; pid=${pid%%-*}  # census: kept slug-grammar not a unit id: a process id
     # A ticket whose name we cannot read is one we must NOT delete.
     case "$stamp" in [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]T[0-9][0-9][0-9][0-9][0-9][0-9]) ;; *) continue ;; esac
     case "$pid" in ''|*[!0-9]*) pid="" ;; esac

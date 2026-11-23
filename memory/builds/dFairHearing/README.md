@@ -204,6 +204,8 @@ Coverage of dFairHearing's 18 clause(s) and 10 owned node(s), over 45 spec(s) at
 | 31 | `TOOL-dFairHearing-47` | no |
 | 32 | `TOOL-dFairHearing-48` | no |
 | 33 | `TOOL-dFairHearing-50` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

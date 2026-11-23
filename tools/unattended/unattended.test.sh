@@ -1004,7 +1004,7 @@ for id in $ids; do
   n=$((n + 1))
   case "$MODE" in short) [ "$n" -gt 1 ] && continue ;; esac
   row=$(grep -E "^$id	" "$D/rows.tsv" 2>/dev/null | head -1)
-  [ -n "$row" ] || row=$(printf '%s\tOPEN\t-\t%s\t-\tyes\t-\t-\t-\t-' "$id" "$(printf '%s' "$id" | cut -d- -f2)")
+  [ -n "$row" ] || row=$(printf '%s\tOPEN\t-\t%s\t-\tyes\t-\t-\t-\t-' "$id" "$(printf '%s' "$id" | cut -d- -f2)")  # census: kept slug-grammar a test stub echoing the legacy ids its suite plants
   case "$MODE" in
     tenfield) printf 'ask\t%s\n' "$(printf '%s' "$row" | cut -f1-9)" ;;
     *)        printf 'ask\t%s\n' "$row" ;;
@@ -16543,7 +16543,7 @@ done
 [ "${IH_ASK_EMPTY:-0}" = 1 ] && { printf 'examined\t0\n'; exit 0; }
 c=0
 for id in $ids; do
-  h=${id#*-}; h=${h%-*}; s=OPEN
+  h=${id#*-}; h=${h%-*}; s=OPEN  # census: kept slug-grammar the first and the last segment stripped
   case " ${IH_ASK_CLOSED:-} " in *" $id "*) s=CLOSED ;; esac
   printf 'ask\t%s\t%s\t-\t%s\t%s\t-\t-\t-\t-\t-\n' "$id" "$s" "$h" "${IH_ASK_SEV:-HIGH}"; c=$((c + 1))
 done
@@ -22309,7 +22309,7 @@ remove_claim_refs
 seed_lease tTk s1 a live "$(derive_claim_now)" k1
 dm_got=$( export CLAUDE_CODE_SESSION_ID=s2; GOVFEED_DIR=""; load_driver_conf >/dev/null 2>&1
   read_claims strict >/dev/null 2>&1; check_claim_writable tTk take-over k1 s2 k1 >/dev/null 2>&1; printf '%s' "$CW_CLS" )
-same "DPR43 AC15 session s2 under the record's keepalive k1 reads a foreign- class in the take-over column" "${dm_got%%-*}" "foreign"
+same "DPR43 AC15 session s2 under the record's keepalive k1 reads a foreign- class in the take-over column" "${dm_got%%-*}" "foreign"  # census: kept slug-grammar the family at index 0
 remove_claim_refs; reset_tree
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -23427,7 +23427,7 @@ while [ $# -gt 0 ]; do
 done
 c=0
 for id in $ids; do
-  h=${id#*-}; h=${h%-*}
+  h=${id#*-}; h=${h%-*}  # census: kept slug-grammar the first and the last segment stripped
   printf 'ask\t%s\tOPEN\t-\t%s\tHIGH\t-\t-\t-\t-\t-\n' "$id" "$h"; c=$((c + 1))
 done
 printf 'examined\t%s\n' "$c"

@@ -161,11 +161,11 @@ let mode = "warn";
 let why = @WHY@;
 try {
   const hit = require(path.join(__dirname, @POLICY@, "policy-mirror.js")).readPolicy("install.on-shim-call", { repo: process.cwd() });
-  if (hit.value === "journal" || hit.value === "warn") [mode, why] = [hit.value, ""];
+  if (hit.value === "journal" || hit.value === "warn") [mode, why] = [hit.value, ""];  // census: kept alias-compare homonym: the shim install.on-shim-call mode
 } catch (_e) {
   // a read that fails reads warn, and the line says so; it never blocks the forward
 }
-if (mode !== "journal") process.stderr.write(@MOVED@ + why + "\n");
+if (mode !== "journal") process.stderr.write(@MOVED@ + why + "\n");  // census: kept alias-compare homonym: the shim install.on-shim-call mode
 const g = spawnSync("git", ["rev-parse", "--is-inside-work-tree", "--git-path", @JOURNAL@], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], windowsHide: true });
 const lines = g.status === 0 ? g.stdout.split(/\r?\n/) : [];
 if (lines[0] === "true" && lines[1]) {
@@ -209,11 +209,11 @@ PY_PRELUDE_BODY = r"""    # a read that fails reads warn, and the line says so; 
     try:
         p = _shim_sp.run([_shim_sys.executable, _shim_os.path.join(_SHIM_HERE, @POLICY@, "policy.py"), "get", @KEY@],
                          stdin=_shim_sp.DEVNULL, capture_output=True, text=True)
-        if p.returncode == 0 and p.stdout.strip() in ("warn", "journal"):
+        if p.returncode == 0 and p.stdout.strip() in ("warn", "journal"):  # census: kept alias-compare homonym: the shim install.on-shim-call mode
             mode, why = p.stdout.strip(), ""
     except OSError:
         pass
-    if mode != "journal":
+    if mode != "journal":  # census: kept alias-compare homonym: the shim install.on-shim-call mode
         print(@MOVED@ + why, file=_shim_sys.stderr)
     try:
         g = _shim_sp.run(["git", "rev-parse", "--is-inside-work-tree", "--git-path", @JOURNAL@],
@@ -589,7 +589,7 @@ def run_forward_plant(t: pathlib.Path, lang: str, mode: str) -> int:
     err = [ln for ln in p.stderr.splitlines() if ln.strip()]
     jpath = t / run_git(t, "rev-parse", "--git-path", JOURNAL).stdout.strip()
     jlines = jpath.read_text(encoding="utf-8").splitlines() if jpath.is_file() else []
-    expect_err = "none" if mode == "journal" else (
+    expect_err = "none" if mode == "journal" else (  # census: kept alias-compare homonym: the shim install.on-shim-call mode
         f"gov: {row['from']} has moved to {row['to']}; this forwarder is held only until its deprecation "
         f"window closes" + (" (the policy could not be read, so this reads warn)" if mode == "bogus" else ""))
     obs += [("exit", str(p.returncode), "3"),
@@ -603,7 +603,7 @@ def run_forward_plant(t: pathlib.Path, lang: str, mode: str) -> int:
         entry = json.loads(jlines[0]) if jlines else {}
     except ValueError:
         entry = {}
-    want_mode = "journal" if mode == "journal" else "warn"
+    want_mode = "journal" if mode == "journal" else "warn"  # census: kept alias-compare homonym: the shim install.on-shim-call mode
     obs.append(("journal line", " ".join(f"{k}={entry[k]}" for k in sorted(entry) if k != "utc") or "none",
                 f"from={row['from']} mode={want_mode} shim={row['id']} to={row['to']}"))
     obs.append(("journal keys", ",".join(entry) or "none", "utc,shim,from,to,mode"))

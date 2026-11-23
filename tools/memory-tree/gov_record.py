@@ -74,10 +74,14 @@ def run_spec(root, argv):
     """`new spec <id> --tier 1|2 [--order <n>] [--base <sha>]`: the `--new-spec` scaffold, after the build's
     lease or claim reads."""
     import gen_build_index as gbi  # noqa: E402  the scaffold, imported, never copied
+    from id_grammar import parse_id_parts  # noqa: E402  the one id parser (TOOL-dTotalRecall-53 S16)
     args = gbi.read_new_spec_args(argv)
-    parts = args["id"].split("-")
-    if len(parts) >= 3:
-        for line in build_records.check_mint_authority(root, "-".join(parts[1:-1])):
+    try:
+        slug = parse_id_parts(args["id"], root)[1]
+    except ValueError:   # an id the grammar refuses names no build; the scaffold refuses it with its reason
+        slug = None
+    if slug is not None:
+        for line in build_records.check_mint_authority(root, slug):
             print(line)
     return gbi.cmd_new_spec(str(root), gbi.load_conf(str(root)), args)
 
@@ -150,8 +154,11 @@ def write_new_ask(root, argv):
     parsed ask's clauses, through `derive_clauses`, graded by `backlog.check_ask_acceptable`, a false grade
     under `refuse` the refusal, before any listing, mint or write; the listing of the before-parse, an ask of
     the content key `exists`; the counter mint `build_records.write_seq_mint`; both rows rendered under the
-    minted id, written, staged and parsed back to the same count, the file put back as it was where the
-    read-back fails. ValueError for every refusal.
+    minted id, written by compare-and-swap (TOOL-dTotalRecall-53 S40): the file re-read just before the
+    write, a refusal where its bytes moved since the parse, then `legacy_ledger._write_atomic`'s temp file
+    and `os.replace`; staged and parsed back to the same count, the file put back as it was where the
+    read-back fails, which prints `refused ask:` naming the file and exits 3. ValueError for every other
+    refusal, exit 2; a refusal after the mint leaves the minted id unused.
     WHAT IT DOES NOT CHECK: an ask of the same key filed on another branch, which the counter hands the
     same id; an ask of the same text whose clauses differ, which is another key; the rows rendered under the
     minted id, which are counted and keyed, never graded; an ask the file already holds under the
@@ -245,8 +252,12 @@ def write_new_ask(root, argv):
     if word == "waiting":
         print(said)
         return 4
-    with open(path, "w", encoding="utf-8", newline="\n") as fh:
-        fh.write(render_rows(said))
+    from legacy_ledger import _write_atomic  # noqa: E402  the kit's one temp-file-and-replace write
+    now = path.read_bytes() if path.is_file() else None   # S40: compare, then swap, the file as parsed or nothing
+    if now != held:
+        raise ValueError(f"{rel} moved since it was parsed, another writer's bytes in it, so nothing was written and "
+                         f"{said} stays unused: file the ask again")
+    _write_atomic(path, render_rows(said).encode("utf-8"))
     subprocess.run(["git", "add", "--", rel], cwd=str(root), capture_output=True, check=False)
     back = backlog.parse_file(rel, path.read_bytes().decode("utf-8"), grammar)
     wrong = check_rows_added(before, back, said, level)
@@ -257,11 +268,12 @@ def write_new_ask(root, argv):
                            check=False)
             path.unlink()
         else:
-            path.write_bytes(held)
+            _write_atomic(path, held)
             subprocess.run(["git", "add", "--", rel], cwd=str(root), capture_output=True, check=False)
-        raise ValueError(f"{rel} did not read {said} back as one ask of key {key} and one SEV row at {level}: "
-                         f"the written rows {wrong or 'read another key'}, so the rows were removed and the file put "
-                         f"back as it was")
+        print(f"refused ask: {rel} did not read {said} back as one ask of key {key} and one SEV row at {level}: "
+              f"the written rows {wrong or 'read another key'}, so the rows were removed and the file put back as it "
+              f"was")
+        return 3
     print(f"wrote {rel} {said} key {key}")
     if not ready:
         print("graded: not ready (R5)")

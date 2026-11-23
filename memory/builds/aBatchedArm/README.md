@@ -116,6 +116,8 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 | 3 | `TOOL-aBatchedArm-5` | no |
 | 4 | `TOOL-aBatchedArm-1` | no |
 | 5 | `TOOL-aBatchedArm-2` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

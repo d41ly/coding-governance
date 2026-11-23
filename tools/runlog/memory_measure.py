@@ -15,12 +15,16 @@ returns None until the build writing the slice manifest gives it a body. A None 
 `unarmed`, never as zero bytes.
 
 A MEMORY PATH is a word of THIS clone's memory tree (TOOL-dTotalRecall-43 S16, S17), the root
-`runlog_lib.py#resolve_memory_root` returns. The word is folded, every `\\` to `/`, an MSYS `/c/` to
-`c:/` and a drive letter lower-cased; an absolute word counts only when it starts with the main worktree,
-or a `.claude/worktrees/<name>` worktree of it, then `/<root>/`, so the harness's auto-memory directory
-and another repository's `memory/` never count; a relative word counts when it starts `<root>/` or is
-`<root>` alone, so a kit directory whose name merely begins with the root's name never matches. A
-PowerShell command is folded before it is split, because `\\` is no escape character there.
+`runlog_lib.py#resolve_memory_root` returns. The word and the main worktree are folded by the kit's one
+fold, `model.py#derive_path_key` (TOOL-dTotalRecall-53 S24 S33): every `\\` to `/`, an MSYS `/<letter>/`
+to `<letter>:/`, a drive letter lower-cased, and on Windows the whole path. A relative word is resolved
+against the working directory the call's transcript record carries, so `./memory/x` and
+`../../memory/x` read as the paths they name; with none recorded, `.` segments fold away and a word
+climbing out with `..` counts nowhere. An absolute word counts only when it starts with the main
+worktree, or a `.claude/worktrees/<name>` worktree of it, then `/<root>/`, so the harness's auto-memory
+directory and another repository's `memory/` never count; an unresolved relative word counts when it
+starts `<root>/` or is `<root>` alone, so a kit directory whose name merely begins with the root's name
+never matches. A PowerShell command is folded before it is split, because `\\` is no escape character there.
 
 THE POPULATION. Every subagent transcript, direct and workflow, under the project directories the
 harness names for this clone: its main worktree, the parent of the git common dir, each character
@@ -51,6 +55,7 @@ import datetime
 import json
 import os
 import pathlib
+import posixpath
 import re
 import shutil
 import subprocess
@@ -63,6 +68,7 @@ if HERE not in sys.path:
     sys.path.insert(0, HERE)
 
 import extract as ex  # noqa: E402
+import model as mdl  # noqa: E402  the kit's one path fold
 import runlog_lib as rl  # noqa: E402
 
 READ_CHANNELS = ("slice", "read", "shell")
@@ -82,8 +88,7 @@ PROJECT_NAME_RE = re.compile(r"[^A-Za-z0-9-]")
 WORKTREE_INFIX = "--claude-worktrees-"
 # The folder a linked worktree of this clone sits in under its main worktree, the harness's own layout.
 WORKTREES_DIR = ".claude/worktrees"
-MSYS_ROOT_RE = re.compile(r"^/([A-Za-z])/")
-DRIVE_RE = re.compile(r"^[A-Za-z]:/")
+DRIVE_RE = re.compile(r"^[A-Za-z]:(?:/|$)")
 # The harness's folder for a Workflow run's agent transcripts under a session's `subagents/`: a transcript
 # layout name, not a kit, so the fixture names it once here.
 HARNESS_RUN_DIR = "workflows"
@@ -93,39 +98,41 @@ UNKNOWN_TYPE = "unknown"
 
 # ---------------------------------------------------------------------------------- one tool call
 
-def derive_folded_path(word) -> str:
-    """One path word folded for comparison (TOOL-dTotalRecall-43 S16): every `\\` to `/`, an MSYS root
-    `/<letter>/` to `<letter>:/`, and a drive letter lower-cased."""
-    folded = word.replace("\\", "/")
-    msys = MSYS_ROOT_RE.match(folded)
-    if msys:
-        folded = f"{msys.group(1)}:/{folded[msys.end():]}"
-    if DRIVE_RE.match(folded):
-        folded = folded[0].lower() + folded[1:]
-    return folded
+def check_absolute_path(folded) -> bool:
+    """Whether a folded path word is absolute: a `/` root or a drive."""
+    return folded.startswith("/") or bool(DRIVE_RE.match(folded))
 
 
-def check_memory_word(word, memory_root, main_worktree=None) -> bool:
-    """Whether one word names a memory path of THIS clone, folded by `derive_folded_path`
-    (TOOL-dTotalRecall-43 S16, S17). An absolute word counts only when it starts with the main worktree,
-    or a `.claude/worktrees/<name>` worktree of it, then `/<root>/`; so the harness's own auto-memory
-    directory and another repository's `memory/` never count, and with no main worktree known no
-    absolute word does. A relative word counts when it starts with `<root>/` or is `<root>` alone."""
-    if not isinstance(word, str):
+def check_memory_word(word, memory_root, main_worktree=None, cwd=None) -> bool:
+    """Whether one word names a memory path of THIS clone (TOOL-dTotalRecall-43 S16, S17), the word, the
+    root, `cwd` and the main worktree each folded by `model.derive_path_key`, the kit's one fold
+    (TOOL-dTotalRecall-53 S24 S33). A relative word is resolved against `cwd`, the command's working
+    directory, where it is an absolute path; else its `.` segments fold away and it counts when it starts
+    with `<root>/` or is `<root>` alone, a word climbing out with `..` counting nowhere. An absolute word
+    counts only when it starts with the main worktree, or a `.claude/worktrees/<name>` worktree of it, then
+    `/<root>/`; so the harness's own auto-memory directory and another repository's `memory/` never count,
+    and with no main worktree known no absolute word does."""
+    if not isinstance(word, str) or not word:
         return False
-    folded = derive_folded_path(word)
-    if not (folded.startswith("/") or DRIVE_RE.match(folded)):
-        return folded.startswith(memory_root + "/") or folded == memory_root
+    root = mdl.derive_path_key(memory_root)
+    folded = mdl.derive_path_key(word)
+    if not check_absolute_path(folded):
+        base = mdl.derive_path_key(cwd) if isinstance(cwd, str) else ""
+        if not check_absolute_path(base):
+            folded = posixpath.normpath(folded) if folded else folded
+            return folded.startswith(root + "/") or folded == root
+        folded = f"{base}/{folded}"
+    folded = posixpath.normpath(folded)
     if main_worktree is None:
         return False
-    main = derive_folded_path(str(main_worktree)).rstrip("/")
-    if folded.startswith(f"{main}/{memory_root}/"):
+    main = mdl.derive_path_key(str(main_worktree))
+    if folded.startswith(f"{main}/{root}/"):
         return True
     lead = f"{main}/{WORKTREES_DIR}/"
     if not folded.startswith(lead):
         return False
     name, _sep, rest = folded[len(lead):].partition("/")
-    return bool(name) and rest.startswith(memory_root + "/")
+    return bool(name) and rest.startswith(root + "/")
 
 
 def check_read_verb(words) -> bool:
@@ -144,9 +151,10 @@ def check_read_verb(words) -> bool:
     return False
 
 
-def derive_read_channel(name, tool_input, memory_root, main_worktree=None):
+def derive_read_channel(name, tool_input, memory_root, main_worktree=None, cwd=None):
     """`read`, `shell` or None for one tool call, decided from its input in memory and keeping none of it;
-    a path word is matched by `check_memory_word` against this clone's `main_worktree`."""
+    a path word is matched by `check_memory_word` against this clone's `main_worktree`, a relative one
+    resolved against `cwd`, the working directory its transcript record carries."""
     if not isinstance(tool_input, dict):
         return None
     if name in ex.SHELL_TOOLS:
@@ -156,11 +164,11 @@ def derive_read_channel(name, tool_input, memory_root, main_worktree=None):
         if name == "PowerShell":
             command = command.replace("\\", "/")
         for words, _sep in ex.extract_segments(command):
-            if check_read_verb(words) or any(check_memory_word(w, memory_root, main_worktree) for w in words):
+            if check_read_verb(words) or any(check_memory_word(w, memory_root, main_worktree, cwd) for w in words):
                 return "shell"
         return None
     if ex.TOOL_CLASSES.get(name) == "read":
-        if any(check_memory_word(tool_input.get(key), memory_root, main_worktree) for key in PATH_INPUTS):
+        if any(check_memory_word(tool_input.get(key), memory_root, main_worktree, cwd) for key in PATH_INPUTS):
             return "read"
     return None
 
@@ -182,12 +190,20 @@ def measure_agent_memory(path, memory_root, read_slice, coverage=None, main_work
     tree = ex.SessionTree(sid=path.stem, main=path)
     totals = {"read": 0, "shell": 0}
     pending = {}
-    records = (rec for _src, _file_no, _lineno, rec in ex.read_records(tree, coverage))
-    for kind, tid, name, value in ex.read_result_bytes(records):
+    cwd = [None]   # the working directory of the record whose events are read, as the harness records it
+
+    def read_cwd_records():
+        """Each transcript record, its `cwd` noted before its events are read (TOOL-dTotalRecall-53 S24)."""
+        for _src, _file_no, _lineno, rec in ex.read_records(tree, coverage):
+            if isinstance(rec, dict) and isinstance(rec.get("cwd"), str):
+                cwd[0] = rec["cwd"]
+            yield rec
+
+    for kind, tid, name, value in ex.read_result_bytes(read_cwd_records()):
         if not isinstance(tid, str):
             continue
         if kind == "use":
-            channel = derive_read_channel(name, value, memory_root, main_worktree)
+            channel = derive_read_channel(name, value, memory_root, main_worktree, cwd[0])
             if channel:
                 pending[tid] = channel
         else:
@@ -391,7 +407,8 @@ def resolve_landed_time(rev, root):
 FIXTURE_CASES = ("read-memory", "read-other", "grep-memory", "shell-path", "record-show", "gov-tag",
                  "recall-query", "shell-other", "foreign-dir", "outside-window", "median-under",
                  "median-over", "not-due", "unarmed", "empty", "privacy",
-                 "harness-memory", "msys-path", "foreign-memory-path", "bare-root")
+                 "harness-memory", "msys-path", "foreign-memory-path", "bare-root", "msys-d-drive", "dot-relative",
+                 "parent-relative")
 FIXTURE_CLOCK = "2026-12-15T00:00:00Z"
 # The scratch main worktree the planted project directories encode, and every planted absolute memory path
 # sits under (TOOL-dTotalRecall-43 S16): the memory measure counts this clone's tree alone.
@@ -438,6 +455,16 @@ FIXTURE_PLANTS = {
         ("Read", {"file_path": "C:\\fx\\other-tree\\memory\\DECISIONS.md"}, 800),
         ("Bash", {"command": "cat /c/fx/other-tree/memory/LIVE.md"}, 200)], 0)]},
     "bare-root": {"agents": [("main", "gov-builder", 1, [("Bash", {"command": "ls memory"}, 350)], 0)]},
+    # TOOL-dTotalRecall-53 S24: a clone on another drive read through its MSYS root, its main worktree spelled
+    # in another case on Windows, whose paths are case-blind; and two relative words resolved against the
+    # working directory each call's records carry. `main` is the plant's main worktree where it is not
+    # FIXTURE_MAIN; `cwd` the working directory every record of its agents carries.
+    "msys-d-drive": {"main": "D:/FX/Repo" if os.name == "nt" else "D:/fx/repo", "agents": [("main", "gov-builder", 1, [
+        ("Read", {"file_path": "/d/fx/repo/memory/LIVE.md"}, 450)], 0)]},
+    "dot-relative": {"cwd": FIXTURE_MAIN, "agents": [("main", "gov-builder", 1, [
+        ("Bash", {"command": "cat ./memory/LIVE.md"}, 300)], 0)]},
+    "parent-relative": {"cwd": FIXTURE_MAIN + "/tools/memory-tree", "agents": [("main", "gov-builder", 1, [
+        ("Bash", {"command": "cat ../../memory/LIVE.md"}, 250)], 0)]},
     "foreign-dir": {"agents": [("main", "gov-builder", 1, [("Read", {"file_path": FX_MEMORY_FILE}, 600)], 0),
                                ("foreign", "gov-builder", 1, [("Read", {"file_path": FX_MEMORY_FILE}, 5000)], 0)]},
     "outside-window": {"agents": [("main", "gov-builder", 1, [("Read", {"file_path": FX_MEMORY_FILE}, 600)], 0),
@@ -473,8 +500,9 @@ def build_fixture_result(result):
     return result
 
 
-def build_fixture_agent(start, calls) -> list:
-    """One agent transcript's records: a timestamped task, then each call as a `tool_use` and its result."""
+def build_fixture_agent(start, calls, cwd=None) -> list:
+    """One agent transcript's records: a timestamped task, then each call as a `tool_use` and its result,
+    each record carrying `cwd` where the plant gives one, as the harness records it."""
     records = [{"type": "user", "timestamp": render_utc(start), "message": {"role": "user", "content": "the task"}}]
     for i, (tool, tool_input, result) in enumerate(calls, 1):
         tid = f"toolu_fx_{i:03d}"
@@ -483,6 +511,9 @@ def build_fixture_agent(start, calls) -> list:
         records.append({"type": "user", "timestamp": render_utc(start + 2 * i), "message": {
             "role": "user", "content": [{"type": "tool_result", "tool_use_id": tid,
                                          "content": build_fixture_result(result)}]}})
+    if cwd is not None:
+        for rec in records:
+            rec["cwd"] = cwd
     return records
 
 
@@ -500,7 +531,7 @@ def write_memory_fixture(base, case):
     clock = ex.parse_time(FIXTURE_CLOCK)
     landed = clock - plant.get("landed_days", 40) * DAY_SECONDS
     projects = pathlib.Path(base) / "projects"
-    main_dir = PROJECT_NAME_RE.sub("-", FIXTURE_MAIN)
+    main_dir = PROJECT_NAME_RE.sub("-", plant.get("main", FIXTURE_MAIN))
     homes = {"main": main_dir, "workflow": main_dir, "worktree": main_dir + WORKTREE_INFIX + "side",
              "foreign": PROJECT_NAME_RE.sub("-", FIXTURE_FOREIGN)}
     slices = {}
@@ -514,7 +545,7 @@ def write_memory_fixture(base, case):
         if where == "workflow":
             sub = sub / HARNESS_RUN_DIR / "wf_fixture"
         name = f"agent-fx{n}"
-        records = build_fixture_agent(start, calls)
+        records = build_fixture_agent(start, calls, plant.get("cwd"))
         if plant.get("torn") and n == 0:
             records.append('{"type": "assistant", "torn')
         write_fixture_lines(sub / f"{name}.jsonl", records)
@@ -539,8 +570,8 @@ def print_memory_fixture(case) -> int:
             def read_slice(agent_path):
                 return slices.get(pathlib.Path(agent_path).name, 0)
         window = (landed, landed + WINDOW_DAYS * DAY_SECONDS)
-        population = measure_memory_population(projects, FIXTURE_MAIN, rl.MEMORY_ROOT_DEFAULT, window,
-                                               read_slice)
+        population = measure_memory_population(projects, FIXTURE_PLANTS[case].get("main", FIXTURE_MAIN),
+                                               rl.MEMORY_ROOT_DEFAULT, window, read_slice)
         totals = [derive_total(c) for _t, c in population["agents"] if derive_total(c) > 0]
         verdict = derive_memory_verdict(totals, ex.parse_time(FIXTURE_CLOCK), window,
                                         check_slice_armed(population["agents"]))

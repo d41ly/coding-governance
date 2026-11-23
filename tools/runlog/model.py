@@ -287,17 +287,18 @@ def parse_float(value) -> float | None:
 
 
 def derive_path_key(path) -> str:
-    """A worktree path in one spelling, so the driver's and the runner's copies of one path compare
-    equal: forward slashes, no trailing slash, and on Windows a lowercase drive, with the MSYS `/c/`
-    form folded to `c:/`."""
+    """A path in one spelling, so two copies of one path compare equal: the kit's one fold, read by the
+    worktree holds here and by `memory_measure.check_memory_word` (TOOL-dTotalRecall-53 S24 S33). Forward
+    slashes, no trailing slash, the MSYS `/c/` form folded to `c:/` and the drive letter lowercased on every
+    platform, as a transcript written on Windows reads the same anywhere; and on Windows, whose paths are
+    case-blind, the whole path lowercased, not the drive letter alone."""
     s = str(path or "").replace("\\", "/").rstrip("/")
-    if os.name == "nt":
-        m = re.match(r"/([A-Za-z])(/|$)", s)
-        if m:
-            s = f"{m.group(1)}:{s[2:]}"
-        if re.match(r"[A-Za-z]:", s):
-            s = s[0].lower() + s[1:]
-    return s
+    m = re.match(r"/([A-Za-z])(/|$)", s)
+    if m:
+        s = f"{m.group(1)}:{s[2:]}"
+    if re.match(r"[A-Za-z]:", s):
+        s = s[0].lower() + s[1:]
+    return s.lower() if os.name == "nt" else s
 
 
 def run_git(root, args, stdin=None) -> bytes:

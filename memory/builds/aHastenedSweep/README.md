@@ -90,6 +90,8 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 | 4 | `TOOL-aHastenedSweep-5` | no |
 | 5 | `TOOL-aHastenedSweep-6` | no |
 | 6 | `TOOL-aHastenedSweep-7` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

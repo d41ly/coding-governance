@@ -9864,7 +9864,7 @@ print_interrupted_acts() {
     [ -d "$_q" ] || continue
     for _tk in "$_q"/*; do
       [ -e "$_tk" ] || continue
-      _pid=${_tk##*/}; _pid=${_pid#*-}; _pid=${_pid%%-*}
+      _pid=${_tk##*/}; _pid=${_pid#*-}; _pid=${_pid%%-*}  # census: kept slug-grammar not a unit id: the ticket pid
       case "$_pid" in ""|*[!0-9]*) continue ;; esac
       if ! kill -0 "$_pid" 2>/dev/null; then
         _said=1
@@ -10957,7 +10957,7 @@ derive_review_signals() { # slug · stage -> sets _rs_why _rs_tier2 _rs_anchor; 
     _rs_id=${BASH_REMATCH[0]}
     case "$_rs_seen" in *" $_rs_id "*) ;; *)
       _rs_seen="$_rs_seen$_rs_id "; _rs_n=$((_rs_n + 1))
-      if [ -z "$_rs_anchor" ] || [ "$((10#${_rs_id##*-}))" -lt "$((10#${_rs_anchor##*-}))" ]; then _rs_anchor=$_rs_id; fi ;;
+      if [ -z "$_rs_anchor" ] || [ "$((10#${_rs_id##*-}))" -lt "$((10#${_rs_anchor##*-}))" ]; then _rs_anchor=$_rs_id; fi ;;  # census: kept slug-grammar the sequence after the last hyphen
     esac
     _rs_t=${_rs_row%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t##*|}
     [ "${_rs_t//[[:space:]]/}" != 2 ] || _rs_tier2=1
@@ -13016,7 +13016,7 @@ sys.exit(1)
 derive_ask_seq() { # family · slug -> one past the highest <family>-<slug>-<n> in the tracked and working trees
   local f=$1 s=$2 hi=0 v
   while IFS= read -r v; do
-    v=${v##*-}
+    v=${v##*-}  # census: kept slug-grammar the sequence after the last hyphen
     case "$v" in ''|*[!0-9]*) continue ;; esac
     [ "$((10#$v))" -gt "$hi" ] && hi=$((10#$v))
   done < <( { GIT grep -h -o -w -I -E --untracked "$f-$s-[0-9]+" 2>/dev/null
@@ -13289,7 +13289,7 @@ write_inherited_asks() { # slug · R · run dir
     # THE ID, minted under this run's slug: the owner id's family when the age probe named one, else
     # the first family of the build README's roster.
     fam=""
-    case "$ownid" in [A-Z]*-*) fam=${ownid%%-*} ;; esac
+    case "$ownid" in [A-Z]*-*) fam=${ownid%%-*} ;; esac  # census: kept slug-grammar the family at index 0
     [ -n "$fam" ] || fam=$(read_roster_family "$slug")
     if [ -z "$fam" ]; then
       echo "gates-green: no ask filed for leg $leg — the build README names no roster family and the age probe named no owner id, so there is no family to mint the id in"
@@ -13463,7 +13463,7 @@ write_flake_releases() { # R -> one line per release: closed or refused
     line=${line%$'\r'}
     case "$line" in "release  "*) ;; *) continue ;; esac
     rest=${line#release  }; leg=${rest%%  *}; rest=${rest#*  }; id=${rest%%  *}; why=${rest#*  }
-    home=${id#*-}; home=${home%-*}
+    home=${id#*-}; home=${home%-*}  # census: kept slug-grammar the first and the last segment stripped
     if [[ ! $id =~ ^${UNIT_ID_ERE}$ ]] || [ -z "$head" ] || [ "$why" = "$rest" ]; then
       echo "gates-green: releases — no ask closed: the line is not release  <leg>  <ask id>  <reason>, or HEAD does not resolve: $line"
       continue
@@ -17560,7 +17560,7 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
     }
     { sub(/\r$/, "") }
     /^$/ { next }
-    !body && (/^# / || /^\*\*Serves:\*\* (log|journal) / || /^\*\*Caused-by:\*\* / || /^Appended by /) { next }
+    !body && (/^# / || /^\*\*Serves:\*\* (log|journal) / || /^\*\*Caused-by:\*\* / || /^Appended by /) { next }  # census: kept alias-compare both tokens: the pattern reads log and its alias as one kind
     {
       body = 1
       k = split($0, f, " · "); c = split(f[1], w, " ")

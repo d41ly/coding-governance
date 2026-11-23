@@ -15,6 +15,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 
 | Class | Kind | Anchors | Universal | Description |
 |---|---|---:|---|---|
+| [a-cmd-percent-var-in-a-bash-criterion-stays-literal](a-cmd-percent-var-in-a-bash-criterion-stays-literal.md) | class | 2 |  | a spec criterion spells a cmd.exe `%VAR%` inside a bash command, bash leaves it literal, and the probe reads a path or value nobody meant |
 | [a-folded-field-leaves-its-row-shape-docs-behind](a-folded-field-leaves-its-row-shape-docs-behind.md) | class | 4 |  | a review fold adds a key to a declared row shape in the code and its gate, and the spec body and the README that describe that shape keep the old key set |
 | [a-gate-that-walks-the-repo-root-reads-other-worktrees](a-gate-that-walks-the-repo-root-reads-other-worktrees.md) | class | 8 |  | a gate that lists its files by walking the disk from the repo root also reads every untracked worktree an adopter parks inside the tree, so it reds on files the commit does not hold, and an attribution re-run in a fresh worktree calls that red OWN |
 | [a-grep-for-a-word-is-a-presence-probe](a-grep-for-a-word-is-a-presence-probe.md) | class | 3 |  | a grep for a word over a source file proves the word is there, not that the code around it runs, so a comment or a dead block satisfies the criterion it was written to observe |
@@ -193,6 +194,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-177 record(s): 174 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+178 record(s): 175 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

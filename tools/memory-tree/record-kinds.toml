@@ -27,6 +27,19 @@
 # joins through `python <prefix>/memory-tree/record_kinds.py new`, a `fence` row through its
 # `--form fence --validator <module>:<function>`, and `record_kinds.py --check` grades
 # the file; `record_kinds.py --purpose-review` derives a missing purpose and writes it as one line of its row.
+# `not-records`, the one top-level list before the rows, `{ glob, why }` per entry: the tracked files under the
+# memory root and outside its builds that are no record, so the homeless arm reads each file outside builds
+# as homed by a row, declared here, or red (TOOL-dTotalRecall-53 S23).
+
+not-records = [
+  { glob = "memory/gotchas/**", why = "a bug class the gotchas checklist reads, written by hand, no record" },
+  { glob = "memory/guides/**", why = "a rendered or authored guide the charter points at, no record" },
+  { glob = "memory/map/**", why = "the codebase map's dossiers and generated indexes, no record" },
+  { glob = "memory/README.md", why = "the memory tree's own front page" },
+  { glob = "memory/DECISIONS.md", why = "the decision register, read by recall as prose, no record" },
+  { glob = "memory/HYGIENE.md", why = "the hygiene contract, rendered from the kit's template" },
+  { glob = "memory/TEMPLATE-SPEC.md", why = "the spec format, rendered from the kit's template" },
+]
 
 [[record-kind]]
 name = "spec"

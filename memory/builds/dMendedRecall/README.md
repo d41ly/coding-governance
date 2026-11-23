@@ -70,6 +70,8 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-dMendedRecall-1`, `TOOL-dMendedRecall-2`, `TOOL-dMendedRecall-3` | yes |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

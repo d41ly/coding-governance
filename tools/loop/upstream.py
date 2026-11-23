@@ -394,7 +394,7 @@ def run_fixture(case, top):
             path = write_upstream_record(top, FX_BUILD, FX_UNIT, FX_ITEM, lines)
             print("%s · record · %s" % (SAY, path))
             text = (top / path).read_text(encoding="utf-8")
-            lost = [ln for ln in ["**Serves:** log %s" % FX_UNIT] + ["- " + ln for ln in lines]
+            lost = [ln for ln in ["**Serves:** log %s" % FX_UNIT] + ["- " + ln for ln in lines]  # census: kept cause-writer fixture: the record head its fixture reads back
                     if ln not in text.split("\n")]
             if lost:
                 print("%s · fixture · FAIL · the record %s lacks %s" % (SAY, path, lost[0]))

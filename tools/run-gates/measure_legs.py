@@ -605,7 +605,7 @@ def read_turnstile(ts_dir):
     except FileNotFoundError:
         queue = []
     for name in sorted(queue):
-        parts = name.split("-")
+        parts = name.split("-")  # census: kept slug-grammar not a unit id: a queue ticket file name
         if len(parts) >= 3 and parts[1].isdigit():
             tickets.append((name, int(parts[1]), read_ticket_stamp(name)))
     return {"holders": holders, "tickets": tickets}

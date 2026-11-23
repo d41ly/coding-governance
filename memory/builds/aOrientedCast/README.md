@@ -185,6 +185,8 @@ Ids whose spec moved past its audited revision: none — 0 of 33 unit id(s) carr
 | 27 | `TOOL-aOrientedCast-25` | no |
 | 28 | `TOOL-aOrientedCast-27` | no |
 | 29 | `TOOL-aOrientedCast-28` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -123,6 +123,8 @@ Ids whose spec moved past its audited revision: none — 0 of 12 unit id(s) carr
 | 10 | `TOOL-aQuenchedHarness-10` | no |
 | 11 | `TOOL-aQuenchedHarness-11` | no |
 | 13 | `TOOL-aQuenchedHarness-13` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

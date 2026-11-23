@@ -85,8 +85,8 @@ import tempfile
 
 # ---- the review-replay instance's constants, moved from review_replay.py with its core.
 APPENDIX_HEADING = "## Appendix — every finding"
-SERVES_PREFIX = "**Serves:** diff-review"
-SPEC_SERVES_PREFIX = "**Serves:** spec-audit"
+SERVES_PREFIX = "**Serves:** diff-review"  # census: kept cause-writer reader-prefix: the diff-review binding prefix it reads
+SPEC_SERVES_PREFIX = "**Serves:** spec-audit"  # census: kept cause-writer reader-prefix: the spec-audit binding prefix it reads
 SECTION_REF = re.compile(r"(?:§|\bsection\s+)\s*(\d+)", re.IGNORECASE)
 ITEM_SECTION = re.compile(r"\b(S|AC|F)(\d+)\b")
 #: The spec format's section for each item kind: scope §2, acceptance §6, open questions §8.
@@ -1893,7 +1893,7 @@ def run_selftest():
     def check_known_set_arm():
         """TOOL-dFairHearing-1 AC1, AC2: a known set whole, one row cut, one tag repeated, and a pair crossing sections."""
         rows = ["| a | x.md:[supervise] | high | no |", "| b | x.md:[act] | medium | no |", "| c | x.md:[spawn] | ungraded | yes |"]
-        head = "**Serves:** research X-1\n\n**Population:** {n} · reviewed 2 · escaped 1 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
+        head = "**Serves:** research X-1\n\n**Population:** {n} · reviewed 2 · escaped 1 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"  # census: kept cause-writer fixture: a record head its fixture plants
         whole = head.format(n=3) + "\n".join(rows) + "\n"
         known = parse_known_set(whole)
         if [(r["tag"], r["line"], r["escaped"]) for r in known["rows"]] != [("a", "[supervise]", False), ("b", "[act]", False), ("c", "[spawn]", True)]:
@@ -1914,8 +1914,8 @@ def run_selftest():
     def check_replay_manifest_arm():
         """TOOL-dFairHearing-23 AC2: four review runs, each with a report and a matched list, parse 4 of 4; one
         report's appendix cut parses 3 of 4; an unknown key still refuses by name."""
-        head = "**Serves:** research X-1\n\n**Population:** 2 · reviewed 2 · escaped 0 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
-        report = (f"**Serves:** spec-audit X-1\n\nReviewed: x.md@{'a' * 40}\n\nReview shape: raw 1, confirmed 1, refuted 0.\n\n" + APPENDIX_HEADING +
+        head = "**Serves:** research X-1\n\n**Population:** 2 · reviewed 2 · escaped 0 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"  # census: kept cause-writer fixture: a record head its fixture plants
+        report = (f"**Serves:** spec-audit X-1\n\nReviewed: x.md@{'a' * 40}\n\nReview shape: raw 1, confirmed 1, refuted 0.\n\n" + APPENDIX_HEADING +  # census: kept cause-writer fixture: a record head its fixture plants
                   "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n| 1 | l | x.md:[act] lifetime | confirmed |\n")
         with tempfile.TemporaryDirectory() as tmp:
             pathlib.Path(tmp, "known.md").write_text(head + "| a | x.md:[supervise] | high | no |\n| b | x.md:[act] | medium | no |\n", encoding="utf-8")
@@ -1940,14 +1940,14 @@ def run_selftest():
         """TOOL-dFairHearing-32 AC6: a run-case's subject is its report's `Reviewed:` pin or its range. A report
         whose subject blob is blanked refuses naming its case and `case_evidence`, and a known row with no
         source record refuses naming the row."""
-        head = "**Serves:** research X-1\n\n**Population:** 1 · reviewed 1 · escaped 0 · high 0\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
+        head = "**Serves:** research X-1\n\n**Population:** 1 · reviewed 1 · escaped 0 · high 0\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"  # census: kept cause-writer fixture: a record head its fixture plants
         rows = APPENDIX_HEADING + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n| 1 | l | x.md:[act] lifetime | confirmed |\n"
         with tempfile.TemporaryDirectory() as tmp:
             known = pathlib.Path(tmp, "known.md")
             known.write_text(head + "| a | x.md:[act] | medium | no |\n", encoding="utf-8")
             for name, pin in (("spec", f"Reviewed: x.md@{'a' * 40}"), ("diff", f"Range: {'b' * 40}...{'c' * 40} (round 1)"),
                               ("bare", "Reviewed: x.md@")):
-                pathlib.Path(tmp, f"{name}.md").write_text(f"**Serves:** spec-audit X-1\n\n{pin}\n\n"
+                pathlib.Path(tmp, f"{name}.md").write_text(f"**Serves:** spec-audit X-1\n\n{pin}\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                                                            f"Review shape: raw 1, confirmed 1, refuted 0.\n\n{rows}", encoding="utf-8")
 
             def derive_run_entry(n):
@@ -2020,7 +2020,7 @@ def run_selftest():
         """A key of three escaped plants and two run records pinning its SHA-256: the key path and the two record paths."""
         key = pathlib.Path(tmp, "key.md")
         reviewed = 1 if plant_c_escaped == "no" else 0
-        key.write_bytes((f"**Serves:** research X-1\n\n**Population:** 3 · reviewed {reviewed} · escaped {3 - reviewed} · high 0\n\n"
+        key.write_bytes((f"**Serves:** research X-1\n\n**Population:** 3 · reviewed {reviewed} · escaped {3 - reviewed} · high 0\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                          "| tag | address | grade | escaped |\n|---|---|---|---|\n| a | d.md:[plan] | high | yes |\n"
                          f"| b | d.md:[act] | medium | yes |\n| c | d.md:[spawn] | ungraded | {plant_c_escaped} |\n").encode("utf-8"))
         sha = hashlib.sha256(key.read_bytes()).hexdigest()
@@ -2029,7 +2029,7 @@ def run_selftest():
             refs = ["d.md:[plan] input", "d.md:[act] lifetime"] + (["d.md:[spawn] relaunch"] if r == 2 and run2_hits_c else [])
             rows = "".join(f"| {i} | walk-{i} | {ref} | high | confirmed |\n" for i, ref in enumerate(refs, 1))
             path = pathlib.Path(tmp, f"run{r}.md")
-            path.write_text(f"**Serves:** spec-audit PLAY-dXFix-1\n\n## Verdict: CLEAN WITH FIXES\n\nReview shape: confirmed {len(refs)}.\n\n"
+            path.write_text(f"**Serves:** spec-audit PLAY-dXFix-1\n\n## Verdict: CLEAN WITH FIXES\n\nReview shape: confirmed {len(refs)}.\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                             f"## Walk table — run {r} of 2, sliced by {('scenario', 'step')[r - 1]}\n"
                             f"walk-seed mode=reverted-escapes key-sha256={sha}\n\n| Item | Scenario | Actor | Needs | Witness | Route | Verdict |\n"
                             f"|---|---|---|---|---|---|---|\n| `plan` | S1 | = | = | = | = | holds |\n\n{APPENDIX_HEADING}\n\n"
@@ -2135,7 +2135,7 @@ def run_selftest():
         `known` line counts the headings' items and the findings `parse_record_findings` reads."""
         rows = (APPENDIX_HEADING + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n"
                 + "".join(f"| {i} | l | a.py:{i} | confirmed |\n" for i in (1, 2, 3)))
-        audit = (f"**Serves:** diff-review X-1\n\nRange: {'a' * 40}..{'b' * 40}\n\n### H1. one (finding 1)\n\n"
+        audit = (f"**Serves:** diff-review X-1\n\nRange: {'a' * 40}..{'b' * 40}\n\n### H1. one (finding 1)\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                  "### M1. two (h) (findings 2, 3)\n\n{extra}Review shape: raw 3, confirmed 3, refuted 0.\n\n" + rows)
         if extract_item_findings(audit.format(extra="")) != {"H1": ["1"], "M1": ["2", "3"]}:
             return f"the headings read {extract_item_findings(audit.format(extra=''))!r}"

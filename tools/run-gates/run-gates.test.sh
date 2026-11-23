@@ -3406,7 +3406,7 @@ for _k in 1 2; do
       GATE_LEGS="$OS/hold.json" RG_READY="$OS/ready.$_k" bash $KIT_REL/run-gates.sh ) >"$OS/killed.$_k" 2>&1 &
   _kbg=$!
   _i=0; while [ ! -s "$OS/ready.$_k" ] && [ "$_i" -lt 1200 ]; do sleep 0.1; _i=$((_i + 1)); done
-  _kpid=$(cat "$OM/.git/gate-run/current" 2>/dev/null); _kpid=${_kpid##*-}
+  _kpid=$(cat "$OM/.git/gate-run/current" 2>/dev/null); _kpid=${_kpid##*-}  # census: kept slug-grammar not a unit id: a process id
   n=$((n+1))
   if [ -s "$OS/ready.$_k" ] && [ -n "$_kpid" ]; then
     kill -9 "$_kpid" 2>/dev/null

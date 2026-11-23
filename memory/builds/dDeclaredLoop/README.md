@@ -326,6 +326,8 @@ Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 102 spec(s) 
 | 52 | `TOOL-dDeclaredLoop-115` | no |
 | 53 | `TOOL-dDeclaredLoop-116` | no |
 | 54 | `TOOL-dDeclaredLoop-117` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

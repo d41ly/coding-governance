@@ -3218,7 +3218,7 @@ const handOut = {
 if (!specAudit && specCommit) handOut.specCommit = specCommit
 // A CLEAN ROUND LEAVES NO RECORD, AND THE ROSTER IS WITHHELD UNTIL ONE EXISTS (closing review round
 // 2, cluster D). `tier2-review.js` returns `report: null` on both clean paths — zero findings, every
-// finding refuted — and writes the `**Serves:** spec-audit` binding line only in the synthesis pass
+// finding refuted — and writes the `**Serves:** spec-audit` binding line only in the synthesis pass  // census: kept cause-writer a comment naming the binding line
 // those paths skip. `specs-audited` is a machine DoD term at `--close` WHEN THE BUILD DECLARED THE
 // AUDIT (opt-in since TOOL-aBlindedTrial-3; `cleanRound` is false with it off, so this block is never
 // entered then): it joins every CLOSED unit id
@@ -3249,7 +3249,7 @@ if (cleanRound && !attended) {
   // TOOL-dTrueNorth-5 S2 - line 1 PINS each owed unit at the revision its subject carried, the line
   // `renderAuditBinding` gives a record the callee writes: this caller is the one other writer of a
   // spec-audit record, and a bare id here would read as audited at every later revision.
-  const pinnedLine = '**Serves:** spec-audit ' + owed.map(function (id) {
+  const pinnedLine = '**Serves:** spec-audit ' + owed.map(function (id) {  // census: kept cause-writer its cause line is spelled in the prompt below it
     const u = auditUnits.find(function (x) { return x.id === id })
     const s = subjects.find(function (x) { return x.path === u.specPath })
     return id + '@rev-' + s.rev

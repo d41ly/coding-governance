@@ -228,6 +228,8 @@ Coverage of dFurnishedOrders's 20 clause(s) and 14 owned node(s), over 60 spec(s
 | 31 | `TOOL-dFurnishedOrders-58`, `TOOL-dFurnishedOrders-59` | no |
 | 32 | `TOOL-dFurnishedOrders-60` | no |
 | 33 | `TOOL-dFurnishedOrders-61` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

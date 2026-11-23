@@ -111,6 +111,8 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 | 5 | `TOOL-dTracedLattice-4` | no |
 | 6 | `TOOL-dTracedLattice-5` | no |
 | 7 | `TOOL-dTracedLattice-7` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

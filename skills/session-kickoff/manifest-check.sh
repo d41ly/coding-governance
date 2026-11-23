@@ -1528,7 +1528,7 @@ check_card_citations() {
             elif [ "$n" -gt 1 ]; then note=" (ambiguous: $n matches)"; fi ;;
     esac
     if [ -n "$hit" ] && [ -n "$rng" ]; then
-      hi=${rng##*-}; count=$(awk 'END{print NR}' "$ROOT/$hit" 2>/dev/null); count=${count:-0}
+      hi=${rng##*-}; count=$(awk 'END{print NR}' "$ROOT/$hit" 2>/dev/null); count=${count:-0}  # census: kept slug-grammar not a unit id: a line range end
       if [ "$hi" -le "$count" ]; then continue; fi
       note=" (past end: $count lines)"
     elif [ -n "$hit" ]; then

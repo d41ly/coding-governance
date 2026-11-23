@@ -1018,7 +1018,7 @@ class Fixture:
                   ("Evidence", "the fixture"), ("Risk", risk), ("Approver", approver), ("Follow-through", follow),
                   ("Caused-by", unit if caused == "" else caused)]
         fields += [(k.capitalize(), v) for k, v in extra.items()]
-        text = "\n".join([f"# {unit} deviation {n}", "", f"**Serves:** deviation {unit}", ""]
+        text = "\n".join([f"# {unit} deviation {n}", "", f"**Serves:** deviation {unit}", ""]  # census: kept cause-writer fixture: a record head its fixture plants
                          + [f"- **{k}:** {v}" for k, v in fields if v is not None]) + "\n"
         return f"{TN}build/2026-10-21-build-{unit}-deviation-{n}.md", text
 
@@ -1038,15 +1038,15 @@ class Fixture:
     def render_prompt(self, unit, divergence):
         goal = ("DIVERGENCE: the spec's §6 cannot be built as written" if divergence
                 else "Fix the wording of the spec's fixture line.")
-        return "\n".join([f"# Revision — dTrueNorth: {unit}", "", f"**Serves:** research {unit}", "", "## The brief",
+        return "\n".join([f"# Revision — dTrueNorth: {unit}", "", f"**Serves:** research {unit}", "", "## The brief",  # census: kept cause-writer fixture: a record head its fixture plants
                           "", "### Goal", goal, "", "### Items", "1. revise it", ""])
 
     def render_audit(self, unit, pin):
-        return "\n".join([f"# M4 spec audit — {unit}", "", f"**Serves:** spec-audit {unit}"
+        return "\n".join([f"# M4 spec audit — {unit}", "", f"**Serves:** spec-audit {unit}"  # census: kept cause-writer fixture: a record head its fixture plants
                           + (f"@rev-{pin}" if pin else ""), "", "**Verdict:** CLEAN", ""])
 
     def render_ledger(self, unit, rev):
-        return "\n".join([f"# {unit} acceptance ledger", "", f"**Serves:** log {unit}", "",
+        return "\n".join([f"# {unit} acceptance ledger", "", f"**Serves:** log {unit}", "",  # census: kept cause-writer fixture: a record head its fixture plants
                           f"**Evidences:** {unit}", f"- AC1 — amended rev-{rev} — the fixture line narrowed, logged in §9",
                           "- AC2 — `fixture` — observed", ""])
 

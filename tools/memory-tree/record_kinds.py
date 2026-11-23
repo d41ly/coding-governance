@@ -77,17 +77,23 @@ writer. A graded deviation's `Follow-through: gap <key>` must name a key some tr
 holds, and no register holding a key reds. The HYGIENE template's `gen:record-kinds` region must be
 byte for byte what `--write` writes. THE POCKET ARM, `check_pockets`, lists the top-level entries of
 the common git dir (the inline `common_git_dir` block), skips git's own (`GIT_OWN`), and reds each
-entry no row's `<git-common-dir>/` home glob matches on its first segment. THE ALIAS JOIN reads the
+entry no row's `<git-common-dir>/` home glob matches on its first segment. THE HOMELESS ARM,
+`check_homeless_records`, reads every tracked file under the memory root outside `builds/`: each is homed
+by a row's tracked-path home glob, declared no record by a glob of the registry's top-level `not-records`
+list of `{ glob, why }` (`read_not_record_globs`), or red by path; it prints the population and each
+share, and reds an empty population (TOOL-dTotalRecall-53 S23). THE ALIAS JOIN reads the
 runlog kit's `SERVES_ALIASES` from its `record.py` by `ast` and reds where it differs from the
 `tree_lib.KIND_ALIASES` keys whose target is `log`; where that kit does not resolve it prints
 `unarmed` and passes, since this kit does not require it. THE ALIAS CENSUS, `check_alias_compares`,
-reads every tracked `*.py`, `*.sh` and `*.js` file under the tool root and lists each line spelling a
-`tree_lib.KIND_ALIASES` key as a quoted literal that is an operand of `==`, `!=`, `===` or `!==`, a
-member of the bracket after ` in (` or ` in [`, or in a `*.sh` file a `case` pattern: a retired kind
-token compared raw, where `tree_lib.resolve_kind` is the one reader. A listed line is red unless
-`ALIAS_COMPARE_KEPT` keys its file by its path under the tool root, and is then printed `kept <reason>`,
-the reason a fixture planting a legacy record on purpose or a homonym naming no record kind; a count
-line closes it. THE PENDING RULE reads `memory.map-purpose`
+reads every tracked `*.py`, `*.sh` and `*.js` file under the tool root and lists each line
+`derive_alias_hit` reads as spelling a `tree_lib.KIND_ALIASES` key as a comparison: a quoted operand of
+`==`, `!=`, `===` or `!==`, a member of the bracket after ` in (` or ` in [`, a whole alternative of a
+parenthesized regex alternation, a key quoted on a module constant's assignment, or in a `*.sh` file a
+`case` pattern, quoted or bare: a retired kind token compared raw, where `tree_lib.resolve_kind` is the one
+reader. A listed line is red unless the census marker on its line, `# census: kept alias-compare <reason>`
+(`//` in JavaScript, `id_grammar.read_kept_reason`), keeps it, printed `kept <reason>`. Then the build
+folders' Python scripts, each below its binding head, a hit kept only by its repository path in
+`ALIAS_COMPARE_KEPT`; a count line closes each walk. THE PENDING RULE reads `memory.map-purpose`
 once through `tree_lib.read_policy_value` and grades each `pending` row by it: under `review` an open
 ask, a row of a tracked `<memory root>/builds/*/BACKLOG.md` no `CLOSED` or `WONTDO` row names; under
 `ledger` `purpose-pending` and the node a row of that `[[ledger]]` population, a listed node now
@@ -134,10 +140,11 @@ is a row of the playbook kit's layer register: its shape only. A `WRITE_FOLDERS`
 folder (the product class's conf key) covers no home. A pocket's contents, which it never reads.
 Whether a derived purpose describes its node: the citation makes it checkable, never checked. An ask
 closed only by a spec header's `closes`, read as open. The chain rows, which `--check` never grades.
-The alias census does not see a comparison through a variable holding the alias, a regex form such as
-an `awk` alternation of both tokens, an unquoted shell test, or any file outside the tool root; a real
-kind comparison added to a kept file, which the file-keyed keep hides; or a kept file that no longer
-hits, which it keeps keying.
+The alias census does not see a comparison through a variable holding the alias, a regex form other
+than a parenthesized alternation, an unquoted shell test, a build folder's shell or JavaScript script,
+or any other file outside the tool root; whether a marker's lead opens a comment in its line's language;
+or a kept build-folder file that no longer hits, which its row keeps keying. The homeless arm does not
+check that a `not-records` glob matches any file, or that its `why` is true.
 """
 from __future__ import annotations
 
@@ -187,13 +194,16 @@ LAYER_RE = re.compile(r"layer\.[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)*")
 COMMON_DIR_HOME = "<git-common-dir>/"
 REF_HOME = "refs/gov/"
 #: Git's own entries of a common dir, never a pocket (TOOL-dTotalRecall-18 S6): `fnmatch` patterns over an
-#: entry's name, its transient state included (TOOL-dTotalRecall-43 S41), a lock, a merge, rebase, sequencer
-#: or bisect in flight, rerere's cache, a running gc and git-lfs's store.
+#: entry's name. The class is git's own transient and optional entries (TOOL-dTotalRecall-43 S41,
+#: TOOL-dTotalRecall-53 S41): its fixed layout; a lock, a merge, rebase, sequencer or bisect in flight and the
+#: message files a squash, a tag or a notes merge leaves; rerere's cache, a running gc, the fsmonitor
+#: daemon's state, gitk's cache and git-lfs's store.
 GIT_OWN = ("HEAD", "ORIG_HEAD", "FETCH_HEAD", "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD",
            "COMMIT_EDITMSG", "config", "description", "hooks", "index", "info", "logs", "objects",
            "packed-refs", "refs", "worktrees", "modules", "lost-found", "shallow", "gc.log",
            "*.lock", "MERGE_MSG", "MERGE_MODE", "AUTO_MERGE", "REBASE_HEAD", "rebase-merge", "rebase-apply",
-           "sequencer", "BISECT_*", "rr-cache", "gc.pid", "lfs")
+           "sequencer", "BISECT_*", "rr-cache", "gc.pid", "lfs", "SQUASH_MSG", "TAG_EDITMSG", "NOTES_MERGE_*",
+           "fsmonitor--daemon*", "gitk.cache")
 UNARMED = "unarmed"
 FORMS = ("fields", "header", "rows", "generated", "fence")
 SCHEMA_KEYS = ("form", "fields", "source", "validator")
@@ -210,13 +220,21 @@ FACTORY_SOURCE = re.compile(r"(?:^|/)build_records\.py:KINDS\.([^.]+)\.required$
 GAP_KEY_RE = re.compile(r"gap-[a-z]+-\d{2,3}")
 FOLLOW_GAP = re.compile(r"^gap (\S+)")
 NOT_ARMED = 3
-#: TOOL-dTotalRecall-40 S2: the files whose alias-compare hits are kept, `{<path under the tool root>: <reason>}`,
-#: each reason `fixture: ...` (a legacy record planted on purpose) or `homonym: ...` (a token naming no record
-#: kind). Each key is spelled in parts: the install-prefix ban reads a kit path.
-ALIAS_COMPARE_KEPT = {"/".join(("govkit", f)): "homonym: the shim's install.on-shim-call mode"
-                      for f in ("shims.py", "selftest.py")}
-#: The fixture's raw-compare plant, under the fixture's tool root; its red line names it by line.
+#: TOOL-dTotalRecall-40 S2, narrowed by TOOL-dTotalRecall-53 S34 S22: a hit under the tool root is kept by the
+#: census marker on its line (`id_grammar.read_kept_reason`, census `alias-compare`), so this keys only a build
+#: folder's script, whose bytes no pass writes, by its repository path: `{<path>: <reason>}`, until
+#: TOOL-dTotalRecall-56 moves the row to the path-keyed table.
+ALIAS_COMPARE_KEPT = {"memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py":
+                      "pinned instrument"}
+ALIAS_COMPARE_CENSUS = "alias-compare"
+#: The fixture's census plants, under the fixture's tool root, each `(path, text)`, its red line named by line:
+#: a raw compare (TOOL-dTotalRecall-40), an awk alternation beside a bare `case` pattern (TOOL-dTotalRecall-53
+#: S19) and an alias key assigned to a module constant (S39). `{a}` is the alias, spelled at plant time.
 ALIAS_COMPARE_PLANT = "planted/compare.py"
+ALIAS_PLANTS = {"raw-alias-compare": (ALIAS_COMPARE_PLANT, 'def read(kind):\n    if kind == "{a}":\n        return 1\n'),
+                "awk-regex-alias": ("planted/regex.sh", "#!/bin/sh\nawk '/^Serves: *(log|{a}) /' \"$1\"\n"
+                                                        "case $2 in\n  {a}) echo kind ;;\nesac\n"),
+                "alias-constant": ("planted/constant.py", 'KINDS = {{"{a}": "log"}}\n')}
 
 
 class RecordKindsError(Exception):
@@ -623,25 +641,17 @@ def check_sections(row: dict, text: str) -> list[str]:
 
 
 # -------------------------------------------------------------------------------- the population
-def derive_record_kind(path: str, text: str, rows: list[dict]) -> dict | None:
+def derive_record_kind(path: str, written_kind: str | None, rows: list[dict]) -> dict | None:
     """TOOL-dTotalRecall-42 S5: the row of the record's Serves kind, where one of that row's tracked-path
-    globs admits `path`; None otherwise. The kind is the first token of the first `**Serves:**` line
-    `tree_lib.BIND_RE` matches in the first `BIND_HEAD_LINES` unfenced lines, when it is a member of
-    `RECORD_KIND_TOKENS` or a `KIND_ALIASES` key, read through `resolve_kind`. A glob admits a path
-    segment by segment under `fnmatch.fnmatchcase`, the segment counts equal: `:(glob)`'s reading of a
-    glob with no `**`."""
-    import itertools
-    from tree_lib import BIND_HEAD_LINES, BIND_RE, KIND_ALIASES, RECORD_KIND_TOKENS, resolve_kind, unfenced
-    kind = None
-    for line in itertools.islice(unfenced(text.replace("\r\n", "\n")), BIND_HEAD_LINES):
-        m = BIND_RE.match(line)
-        if m and m.group("key") == "Serves":
-            toks = m.group("rest").split()
-            if toks and (toks[0] in RECORD_KIND_TOKENS or toks[0] in KIND_ALIASES):
-                kind = resolve_kind(toks[0])
-            break
-    if kind is None:
+    globs admits `path`; None otherwise. `written_kind` is the kind token `tree_lib.read_bindings` classified
+    for a `bound` record, read once by the caller, or None for a record not `bound` (TOOL-dTotalRecall-53
+    S21); it is read through `resolve_kind`, and no Serves line is parsed here. A glob admits a path segment
+    by segment under `fnmatch.fnmatchcase`, the segment counts equal: `:(glob)`'s reading of a glob with no
+    `**`."""
+    from tree_lib import resolve_kind
+    if written_kind is None:
         return None
+    kind = resolve_kind(written_kind)
     segs = path.split("/")
     for row in rows:
         if row.get("name") != kind:
@@ -654,6 +664,23 @@ def derive_record_kind(path: str, text: str, rows: list[dict]) -> dict | None:
     return None
 
 
+def read_written_kinds(root, paths) -> dict:
+    """`{path: kind token or None}`: the Serves kind `tree_lib.read_bindings` classifies for each of `paths`
+    that it reads `bound`, in one call, None for every other path (TOOL-dTotalRecall-53 S21), the argument
+    `derive_record_kind` takes. A conf that does not read classifies nothing."""
+    from build_records import read_design_conf
+    from tree_lib import read_bindings
+    paths = list(dict.fromkeys(paths))
+    try:
+        conf = read_design_conf(root)
+        conf = dict(conf, MEMORY_ROOT=(conf.get("MEMORY_ROOT") or "memory").strip().strip("/"))
+        binds = read_bindings(str(root), paths, conf) if paths else {}
+    except (OSError, ValueError, KeyError):
+        binds = {}
+    return {p: (binds.get(p) or {}).get("kind") if (binds.get(p) or {}).get("state") == "bound" else None
+            for p in paths}
+
+
 def scan_legacy_records(root, rows: list[dict], typed_kinds, other_kind: dict | None = None) -> dict:
     """`{row name: [path...]}`: every tracked record each `fields` row's home matches. A typed kind's row
     keeps only the paths its own name grammar (`build_records.derive_record_name`) also matches, and a
@@ -664,15 +691,20 @@ def scan_legacy_records(root, rows: list[dict], typed_kinds, other_kind: dict | 
     before the legacy ledger takes its rows out, and the `kind-schema` slice `--seed-legacy` prints."""
     from build_records import derive_record_name
     grammars = {k: derive_record_name(k) for k in typed_kinds}
-    decided = {}   # path -> its Serves kind's admitting row, one head read per path across the rows
-    out = {}
+    homes = []   # (row, its tracked paths), each home read once
     for row in rows:
         schema = row.get("schema") if isinstance(row.get("schema"), dict) else {}
         home = row.get("home")
-        if schema.get("form") != "fields" or not isinstance(home, str) or not home.strip():
-            continue
+        if schema.get("form") == "fields" and isinstance(home, str) and home.strip():
+            homes.append((row, read_tracked(root, home)))
+    # the untyped rows' paths, their Serves kinds classified by `read_bindings` in one call (S21)
+    written = read_written_kinds(root, [p for row, paths in homes if row.get("name") not in grammars for p in paths
+                                        if not any(g.search(p) for g in grammars.values())])
+    decided = {}   # path -> its Serves kind's admitting row, one decision per path across the rows
+    out = {}
+    for row, tracked in homes:
         name, keep, other = row.get("name"), [], []
-        for path in read_tracked(root, home):
+        for path in tracked:
             typed = [k for k, g in grammars.items() if g.search(path)]
             if name in grammars:
                 if name in typed:
@@ -681,11 +713,7 @@ def scan_legacy_records(root, rows: list[dict], typed_kinds, other_kind: dict | 
             if typed:
                 continue
             if path not in decided:
-                try:
-                    text = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace")
-                except OSError:
-                    text = ""
-                decided[path] = derive_record_kind(path, text, rows)
+                decided[path] = derive_record_kind(path, written.get(path), rows)
             (keep if decided[path] is None or decided[path] is row else other).append(path)
         out[name] = keep
         if other_kind is not None and name not in grammars:
@@ -1126,31 +1154,59 @@ def check_glob_path(glob: str, path: str) -> bool:
     return not tail or check_glob_path("/".join(tail), "/".join(segs[len(segs) - len(tail):]))
 
 
-def check_homeless_records(root, rows: list[dict]) -> tuple[list[str], list[str]]:
-    """S1 (gap-mem-16), the arm `homeless records`: `(lines, reds)` over every tracked file under the memory
-    root and outside its `builds/` whose first `tree_lib.BIND_HEAD_LINES` unfenced lines carry a
-    `**Serves:**` binding. Each is matched against every row's tracked-path home globs; one no row's home
-    admits is red, named by path. A file that is not UTF-8 binds nothing and is not read as a record."""
-    import itertools
-    from tree_lib import BIND_HEAD_LINES, BIND_RE, unfenced
+NOT_RECORDS = "not-records"
+
+
+def read_not_record_globs(root, kit_rel: str | None = None) -> tuple[list[str], list[str]]:
+    """`(globs, reds)`: the registry's top-level `not-records` list (TOOL-dTotalRecall-53 S23, §8 F4), each
+    entry `{ glob, why }`, a tracked-path glob of files under the memory root that are no record, and why. An
+    entry that is no table with a non-empty string `glob` and `why` is one red naming its place; an absent
+    list reads as none. RecordKindsError where the registry does not parse."""
+    path = pathlib.Path(root, kit_rel or derive_kit_rel(), REGISTRY)
+    if not path.is_file():
+        return [], []
+    try:
+        entries = tomllib.loads(path.read_bytes().decode("utf-8")).get(NOT_RECORDS, [])
+    except (UnicodeDecodeError, tomllib.TOMLDecodeError) as e:
+        raise RecordKindsError(f"{REGISTRY} does not parse: {e}") from None
+    if not isinstance(entries, list):
+        return [], [f"{NOT_RECORDS}: is no list of {{ glob, why }} tables"]
+    globs, reds = [], []
+    for n, e in enumerate(entries, 1):
+        if not (isinstance(e, dict) and all(isinstance(e.get(k), str) and e[k].strip() for k in ("glob", "why"))):
+            reds.append(f"{NOT_RECORDS} entry {n}: is no {{ glob, why }} table with both values non-empty strings")
+            continue
+        globs.append(e["glob"])
+    return globs, reds
+
+
+def check_homeless_records(root, rows: list[dict], kit_rel: str | None = None) -> tuple[list[str], list[str]]:
+    """S1 (gap-mem-16), the arm `homeless records`, widened by TOOL-dTotalRecall-53 S23: `(lines, reds)` over
+    every tracked file under the memory root and outside its `builds/`, bound or not. Each is homed when a
+    row's tracked-path home glob admits it, is no record when a glob of the registry's `not-records` list
+    (`read_not_record_globs`) admits it, or is red, named by path. It prints the population and each share,
+    and reds an empty population, where it selects nothing."""
     mr = read_memory_root(root)
     globs = [g for r in rows for g in derive_home_globs(r.get("home")) if not g.startswith((COMMON_DIR_HOME, REF_HOME))]
-    bound, reds = 0, []
-    for path in read_tracked(root, f"{mr}/**"):
-        if path.startswith(f"{mr}/builds/"):
-            continue
-        try:
-            text = pathlib.Path(root, path).read_bytes().decode("utf-8")
-        except (OSError, UnicodeDecodeError):
-            continue
-        head = itertools.islice(unfenced(text.replace("\r\n", "\n")), BIND_HEAD_LINES)
-        if not any((m := BIND_RE.match(ln)) and m.group("key") == "Serves" for ln in head):
-            continue
-        bound += 1
-        if not any(check_glob_path(g, path) for g in globs):
-            reds.append(f"{HOMELESS}: {path} carries a **Serves:** binding and no row's home admits it: give its "
-                        f"kind a row whose `home` glob matches it, or move it under its kind's home")
-    return [f"{HOMELESS} · {bound} bound file(s) under {mr}/ outside builds/ · {len(reds)} homeless"], reds
+    not_records, reds = read_not_record_globs(root, kit_rel)
+    reds = [f"{HOMELESS}: {r}" for r in reds]
+    population = [p for p in read_tracked(root, f"{mr}/**") if not p.startswith(f"{mr}/builds/")]
+    homed = other = homeless = 0
+    for path in population:
+        if any(check_glob_path(g, path) for g in globs):
+            homed += 1
+        elif any(check_glob_path(g, path) for g in not_records):
+            other += 1
+        else:
+            homeless += 1
+            reds.append(f"{HOMELESS}: {path} is under {mr}/ outside builds/ and neither a row's home nor a "
+                        f"`{NOT_RECORDS}` glob admits it: give its kind a row whose `home` glob matches it, or "
+                        f"declare it in the registry's `{NOT_RECORDS}` list with why it is no record")
+    if not population:
+        reds.append(f"{HOMELESS}: the arm selects nothing: no tracked file under {mr}/ outside builds/, so it "
+                    f"grades nothing")
+    return [f"{HOMELESS} · {len(population)} file(s) under {mr}/ outside builds/ · {homed} homed · {other} not "
+            f"records · {homeless} homeless"], reds
 
 
 def check_serves_aliases(root, kit_rel: str, tool_rel: str) -> tuple[str, list[str]]:
@@ -1180,36 +1236,76 @@ def read_code_paths(root, tool_rel: str) -> list[str]:
                    for p in read_tracked(root, f"{tool_rel}/**/*.{ext}" if tool_rel else f"**/*.{ext}")})
 
 
+def derive_alias_hit(ln: str, shell: bool, constant: bool = True) -> bool:
+    """Whether one code line spells a `tree_lib.KIND_ALIASES` key as a comparison (TOOL-dTotalRecall-40 S2,
+    widened by TOOL-dTotalRecall-53 S19 S39): a quoted literal that is an operand of `==`, `!=`, `===` or
+    `!==`, or a member of the bracket after ` in (` or ` in [`; a whole alternative of a parenthesized
+    alternation of two or more, the regex form an `awk` or `grep` pattern spells; where `constant`, a key
+    quoted on the line of an assignment to a module constant, `NAME = ...`, the tool root's alias tables;
+    and in a `*.sh` file a `case` pattern's alternative, quoted or bare."""
+    from tree_lib import KIND_ALIASES
+    aliases = sorted(KIND_ALIASES)
+    quoted = r"""(?P<q>["'])(?:%s)(?P=q)""" % "|".join(re.escape(a) for a in aliases)
+    if re.search(rf"(?:==|!=)=?\s*{quoted}", ln) or re.search(rf"{quoted}\s*(?:==|!=)", ln):
+        return True
+    if any(re.search(quoted, g) for g in re.findall(r" in [(\[]([^)\]]*)", ln)):
+        return True
+    for group in re.findall(r"\(([^()\n]*\|[^()\n]*)\)", ln):   # a regex alternation: each alternative whole
+        if any(alt.strip().removeprefix("?:").strip() in aliases for alt in group.split("|")):
+            return True
+    if constant and re.match(rf"[A-Z_][A-Z0-9_]* = .*{quoted}", ln):
+        return True
+    m = re.match(r"^\s*\(?([^()]*)\)", ln) if shell else None
+    return bool(m and any(re.fullmatch(quoted, alt.strip()) or alt.strip() in aliases for alt in m[1].split("|")))
+
+
 def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
     """TOOL-dTotalRecall-40 S2's alias census: `(lines, reds)` over every tracked `*.py`, `*.sh` and `*.js`
-    file under the tool root, each line spelling a `tree_lib.KIND_ALIASES` key as a quoted literal that is
-    an operand of an equality operator, a member of the bracket after an `in`, or in a `*.sh` file a `case`
-    pattern. A hit is red unless `ALIAS_COMPARE_KEPT` keys its file by its path under the tool root, and
-    is then printed `kept <reason>`; a count line closes the list. It reads, never writes."""
-    from tree_lib import KIND_ALIASES
-    quoted = r"""(?P<q>["'])(?:%s)(?P=q)""" % "|".join(re.escape(a) for a in sorted(KIND_ALIASES))
-    operands = (re.compile(rf"(?:==|!=)=?\s*{quoted}"), re.compile(rf"{quoted}\s*(?:==|!=)"))
-    member, token = re.compile(r" in [(\[]([^)\]]*)"), re.compile(quoted)
-    case = re.compile(r"^\s*\(?([^()]*)\)")
+    file under the tool root, each line `derive_alias_hit` reads as a comparison of a retired kind token. A
+    hit is red unless the census marker on its line, `# census: kept alias-compare <reason>` (`//` in
+    JavaScript, `id_grammar.read_kept_reason`, TOOL-dTotalRecall-53 S34), keeps it, printed `kept <reason>`.
+    Then the build folders' Python scripts, `<memory root>/builds/*/build/*.py`, each read below its
+    `BIND_HEAD_LINES` binding head (TOOL-dTotalRecall-53 S22) by every form but the module constant, a hit
+    kept only where `ALIAS_COMPARE_KEPT`
+    keys its file by its repository path. A count line closes each walk. It reads, never writes."""
+    from id_grammar import read_kept_reason
+    from tree_lib import BIND_HEAD_LINES
     paths = read_code_paths(root, tool_rel)
     lines, reds, kept = [], [], 0
     for path in paths:
-        key = path[len(tool_rel) + 1:] if tool_rel else path
         text = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace")
         for n, ln in enumerate(text.splitlines(), 1):
-            m = case.match(ln) if path.endswith(".sh") else None
-            if not (any(o.search(ln) for o in operands) or any(token.search(g) for g in member.findall(ln))
-                    or (m and any(token.fullmatch(alt.strip()) for alt in m[1].split("|")))):
+            if not derive_alias_hit(ln, path.endswith(".sh")):
                 continue
-            if key in ALIAS_COMPARE_KEPT:
+            reason = read_kept_reason(ln, ALIAS_COMPARE_CENSUS)
+            if reason:
                 kept += 1
-                lines.append(f"alias-compare · {path}:{n} · kept {ALIAS_COMPARE_KEPT[key]}")
+                lines.append(f"alias-compare · {path}:{n} · kept {reason}")
                 continue
             lines.append(f"alias-compare · {path}:{n} · red")
             reds.append(f"alias-compare {path}:{n}: compares a retired kind token raw, {ln.strip()[:120]!r}; read "
-                        f"the kind through tree_lib.resolve_kind, or key the file in ALIAS_COMPARE_KEPT with its reason")
+                        f"the kind through tree_lib.resolve_kind, or mark the line "
+                        f"`# census: kept {ALIAS_COMPARE_CENSUS} <reason>`")
     lines.append(f"alias-compare · {len(paths)} code files under {tool_rel or '.'} · {kept + len(reds)} hits · "
                  f"{kept} kept · {len(reds)} red")
+    folder = f"{read_memory_root(root)}/builds/*/build"
+    scripts, b_kept, b_red = read_tracked(root, f"{folder}/*.py"), 0, 0
+    for path in scripts:
+        body = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace").splitlines()
+        for n, ln in enumerate(body[BIND_HEAD_LINES:], BIND_HEAD_LINES + 1):
+            if not derive_alias_hit(ln, False, constant=False):   # a script's word list is no alias table
+                continue
+            if path in ALIAS_COMPARE_KEPT:
+                b_kept += 1
+                lines.append(f"alias-compare · {path}:{n} · kept {ALIAS_COMPARE_KEPT[path]}")
+                continue
+            b_red += 1
+            lines.append(f"alias-compare · {path}:{n} · red")
+            reds.append(f"alias-compare {path}:{n}: compares a retired kind token raw, {ln.strip()[:120]!r}; ask "
+                        f"its owner to read the kind through tree_lib.resolve_kind, or key the file in "
+                        f"ALIAS_COMPARE_KEPT with its reason")
+    lines.append(f"alias-compare · {len(scripts)} script(s) under {folder} · {b_kept + b_red} hits · {b_kept} kept · "
+                 f"{b_red} red")
     return lines, reds
 
 
@@ -1329,7 +1425,10 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
                         f"writes from the registry and a fresh read of the roles and items; run --write")
     pocket_lines, pocket_reds = check_pockets(root, rows)
     reds += pocket_reds
-    homeless_lines, homeless_reds = check_homeless_records(root, rows)
+    try:
+        homeless_lines, homeless_reds = check_homeless_records(root, rows, kit_rel)
+    except RecordKindsError as e:
+        return [f"{SAY}: refused · {e}"], 2
     reds += homeless_reds
     reds += check_spec_sections(rows)
     alias_line, alias_reds = check_serves_aliases(root, kit_rel, tool_rel)
@@ -1478,7 +1577,7 @@ def render_template(rows: list[dict], kind: str, typed_kinds=None) -> str | None
     if not row or schema.get("form") != "fields":
         return None
     factory = FACTORY_SOURCE.search(str(schema.get("source") or ""))
-    out = [f"# <unit id> {kind} <n> — <title>" if factory else "# <title>", "", f"**Serves:** {kind} <unit id>", ""]
+    out = [f"# <unit id> {kind} <n> — <title>" if factory else "# <title>", "", f"**Serves:** {kind} <unit id>", ""]  # census: kept cause-writer template: the head it prints for a hand-written record of a kind
     out += [f"- **{f}:** " for f in schema.get("fields", []) if f != "Serves"]
     return "\n".join(out) + "\n"
 
@@ -1915,11 +2014,16 @@ PLANTS = ("writer-missing", "check-unknown", "source-drift", "factory-kind-unrow
           "stream-fence-missing", "stream-validator-missing", "raw-alias-compare", "alias-compare-kept",
           "unarmed-reason", "unarmed-with-record", "unarmed-untyped", "home-slash", "home-directory", "shared-home",
           "homeless-record", "owner-graded", "bad-field-key", "stream-name-twice", "stream-foreign-unit",
-          "stream-two-fences")
+          "stream-two-fences", "unarmed-on-disallowed-form", "awk-regex-alias", "alias-constant", "homeless-empty")
+#: TOOL-dTotalRecall-53 S23: the fixture's `not-records` glob, its project registry's files, which
+#: `homeless-empty` takes out of git's index, so the homeless arm's population is empty
+FIXTURE_NOT_RECORDS = "memory/project/**"
 #: TOOL-dTotalRecall-42's fixture: the `unarmed` plants' key, each its row, the directory homes the deviation
-#: row takes, and the record serving `log` that `shared-home` plants under the research row's home
+#: row takes, and the record serving `log` that `shared-home` plants under the research row's home;
+#: `unarmed-on-disallowed-form` sets the key on the typed `stream-plan` row turned `header` (TOOL-dTotalRecall-53 S14)
 FIXTURE_UNARMED = "the fixture's planner arms it"
-FIXTURE_UNARMED_ROWS = {"unarmed-reason": "stream-plan", "unarmed-with-record": "stream-plan", "unarmed-untyped": "research"}
+FIXTURE_UNARMED_ROWS = {"unarmed-reason": "stream-plan", "unarmed-with-record": "stream-plan", "unarmed-untyped": "research",
+                        "unarmed-on-disallowed-form": "stream-plan"}
 FIXTURE_DIRECTORY_HOMES = {"home-slash": "memory/builds/*/build/", "home-directory": "memory/builds/*/build"}
 FIXTURE_SHARED = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-06-build-TOOL-{FIXTURE_BUILD}-1-shared-notes.md"
 #: TOOL-dTotalRecall-25's fixture: the well-formed plan of two streams, and each stream plant's edit of its fence
@@ -2021,6 +2125,8 @@ def build_fixture(tmp, plant: str | None = None):
         "check": SAY})
     for row in rows:
         row["purpose"] = {"text": f"the fixture's {row['name']} record", "source": "owner"}
+    if plant == "unarmed-on-disallowed-form":   # S14: the typed stream-plan row on the header form, keyed
+        next(r for r in rows if r["name"] == "stream-plan")["schema"]["form"] = "header"
     if plant in FIXTURE_DIRECTORY_HOMES:
         rows[-1]["home"] = FIXTURE_DIRECTORY_HOMES[plant]
     elif plant == "shared-home":   # the log row takes the research row's home
@@ -2044,7 +2150,8 @@ def build_fixture(tmp, plant: str | None = None):
                      "home": [f"{COMMON_DIR_HOME}stray/*"], "id-rule": "", "schema": {"form": "rows", "fields": []},
                      "writer": "hand", "readers": [], "readers-none": "a cache no role reads", "lifecycle": "out",
                      "check": SAY, "purpose": {"text": "the fixture's pocket", "source": "owner"}})
-    registry = "\n".join(render_row(r) for r in rows)
+    registry = (f'{NOT_RECORDS} = [{{ glob = "{FIXTURE_NOT_RECORDS}", why = "the fixture\'s project registry" }}]\n\n'
+                + "\n".join(render_row(r) for r in rows))
     if plant == "writer-missing":   # the deviation row, the last, loses its writer
         head, _, tail = registry.partition('name = "deviation"\n')
         registry = head + 'name = "deviation"\n' + tail.replace('writer = "hand"\n', "", 1)
@@ -2064,7 +2171,8 @@ def build_fixture(tmp, plant: str | None = None):
     write_fixture_file(derive_sibling_rel("loop", "loop_lib.py"), "# the fixture's loop kit: its definition\n")
     write_fixture_file(derive_sibling_rel("loop", "loop.toml"), "# the fixture's definition\n\n" + items)
     write_fixture_file(derive_sibling_rel("runlog", "record.py"), 'SERVES_KIND = "log"\nSERVES_ALIASES = '
-                       + ("()" if plant == "alias-drift" else '("journal",)') + "\n")
+                       + ("()" if plant == "alias-drift" else '("journal",)') +   # S39: the alias's own table, kept
+                       f"  # census: kept {ALIAS_COMPARE_CENSUS} the alias's own table\n")
     sibling = "/".join(("govkit", "registry.toml"))   # spelled in parts: the install-prefix ban reads a kit path
     write_fixture_file(f"{tool_rel}/{sibling}" if tool_rel else sibling,
         f'[[ledger]]\npopulation = "{LEGACY}"\nleg = "{SAY}"\nseed = ["python", "{prefix}/{kit_rel[len(tool_rel) + 1:] if tool_rel else kit_rel}/record_kinds.py", "--seed-legacy"]\n'
@@ -2084,7 +2192,7 @@ def build_fixture(tmp, plant: str | None = None):
                        + "\n".join(f'[[build]]\nslug = "{s}"\n' for s in FIXTURE_CHAIN))
     write_fixture_file(f"memory/builds/{FIXTURE_CHAIN[0]}/README.md",
                        f"# {FIXTURE_CHAIN[0]} — the fixture's first chain build\n\nIts README.\n")
-    write_fixture_file(FIXTURE_FROM, f"**Serves:** research {unit}\n\n| Kind | Owner | What names it |\n|---|---|---|\n"
+    write_fixture_file(FIXTURE_FROM, f"**Serves:** research {unit}\n\n| Kind | Owner | What names it |\n|---|---|---|\n"  # census: kept cause-writer fixture: a record head its fixture plants
                        f"| alpha | {FIXTURE_BUILD} | the fixture's first kind, which the review derives |\n"
                        f"| gamma | {FIXTURE_BUILD} | gamma |\n")
     if plant in FIXTURE_VALUES:
@@ -2094,7 +2202,7 @@ def build_fixture(tmp, plant: str | None = None):
     legacy_rows = [(old, "deviation")] + ([(new, "deviation")] if plant == "field-missing-legacy" else [])
     write_fixture_file(f"memory/project/{LEGACY}.txt", f"# ledger · {LEGACY} · key record path,section,check · direction shrink-only · drain key\n"
         + "".join(f"{p}\t{s}\tkind-schema\t1\t{'0' * 40}\tseeded\n" for p, s in legacy_rows))
-    write_fixture_file(old, f"# {unit} deviation 1 — an old form\n\n**Serves:** deviation {unit}\n\n- **Reason:** kept as it was\n")
+    write_fixture_file(old, f"# {unit} deviation 1 — an old form\n\n**Serves:** deviation {unit}\n\n- **Reason:** kept as it was\n")  # census: kept cause-writer fixture: a record head its fixture plants
     follow = "gap gap-mem-99" if plant == "gap-unresolved" else "gap gap-mem-01"
     values = {f: "the fixture" for f in dev}
     values.update(FIXTURE_DEVIATION_VALUES)   # S23: the owner's reader grades these, its closed sets included
@@ -2107,26 +2215,29 @@ def build_fixture(tmp, plant: str | None = None):
     write_fixture_file(new, "\n".join(body) + "\n")
     # The deviation home's glob matches it and the deviation grammar does not (§8 F8): the research row
     # grades it, so its missing deviation fields red nothing.
-    write_fixture_file(f"{build}/2026-01-03-build-{unit}-deviation-notes.md", f"**Serves:** research {unit}\n\nnotes, no field\n")
-    write_fixture_file(f"{build}/2026-01-01-build-{unit}-gap-register.md", f"**Serves:** research {unit}\n\n| Key | Gap |\n|---|---|\n"
+    write_fixture_file(f"{build}/2026-01-03-build-{unit}-deviation-notes.md", f"**Serves:** research {unit}\n\nnotes, no field\n")  # census: kept cause-writer fixture: a record head its fixture plants
+    write_fixture_file(f"{build}/2026-01-01-build-{unit}-gap-register.md", f"**Serves:** research {unit}\n\n| Key | Gap |\n|---|---|\n"  # census: kept cause-writer fixture: a record head its fixture plants
         "| gap-mem-01 | the fixture's one gap |\n")
     write_fixture_file(f"memory/builds/{FIXTURE_BUILD}/prompts/2026-01-01-prompt-{unit}-brief.md",
-                       f"**Serves:** log {unit}\n\nthe fixture's brief\n")
+                       f"**Serves:** log {unit}\n\nthe fixture's brief\n")  # census: kept cause-writer fixture: a record head its fixture plants
     if plant == "shared-home":
-        write_fixture_file(FIXTURE_SHARED, f"**Serves:** log {unit}\n\na log record under the research row's home\n")
+        write_fixture_file(FIXTURE_SHARED, f"**Serves:** log {unit}\n\na log record under the research row's home\n")  # census: kept cause-writer fixture: a record head its fixture plants
     if plant == "homeless-record":   # S1: a bound record outside builds/ that no row's home admits
-        write_fixture_file(FIXTURE_HOMELESS, f"# a note\n**Serves:** research {unit}\n\na record with no home\n")
+        write_fixture_file(FIXTURE_HOMELESS, f"# a note\n**Serves:** research {unit}\n\na record with no home\n")  # census: kept cause-writer fixture: a record head its fixture plants
     write_fixture_file(f"memory/builds/{FIXTURE_BUILD}/README.md",   # S58: the ids a stream plan's units join
                        f"---\nslug: {FIXTURE_BUILD}\nopened: 2026-01-01\nids: "
                        + " ".join(f"TOOL-{FIXTURE_BUILD}-{n}" for n in (1, 2, 3)) + f"\n---\n\n# {FIXTURE_BUILD}\n")
-    if plant in ("raw-alias-compare", "alias-compare-kept"):   # TOOL-dTotalRecall-40: the census's plant, its
-        from tree_lib import KIND_ALIASES                        # token read off the alias table, so no hit here
-        planted = ALIAS_COMPARE_PLANT if plant == "raw-alias-compare" else sorted(ALIAS_COMPARE_KEPT)[0]
-        write_fixture_file(f"{tool_rel}/{planted}" if tool_rel else planted,
-                           f"def read(kind):\n    if kind == {json.dumps(sorted(KIND_ALIASES)[0])}:\n        return 1\n")
+    if plant in ALIAS_PLANTS or plant == "alias-compare-kept":   # the census's plants, each token read off the
+        from tree_lib import KIND_ALIASES                          # alias table, so no hit here
+        planted, text = ALIAS_PLANTS.get(plant, ALIAS_PLANTS["raw-alias-compare"])
+        text = text.format(a=sorted(KIND_ALIASES)[0])
+        if plant == "alias-compare-kept":   # S34: the same compare, kept by the census marker on its line
+            text = text.replace(":\n        return", f":  # census: kept {ALIAS_COMPARE_CENSUS} homonym: a planted "
+                                                    f"mode\n        return", 1)
+        write_fixture_file(f"{tool_rel}/{planted}" if tool_rel else planted, text)
     fence = FIXTURE_FENCE.replace(*FIXTURE_STREAM_EDITS[plant], 1) if plant in FIXTURE_STREAM_EDITS else FIXTURE_FENCE
     if plant != "unarmed-reason":   # its stream-plan row carries the key and its home no plan
-        write_fixture_file(FIXTURE_PLAN, f"**Serves:** stream-plan {unit} TOOL-{FIXTURE_BUILD}-2 TOOL-{FIXTURE_BUILD}-3\n\n"
+        write_fixture_file(FIXTURE_PLAN, f"**Serves:** stream-plan {unit} TOOL-{FIXTURE_BUILD}-2 TOOL-{FIXTURE_BUILD}-3\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                            f"# {unit} stream-plan 1 — the fixture's plan\n\n{fence}")
     region = render_kind_region(tomllib.loads(registry)["record-kind"], read_view_joins(tmp, kit_rel))
     if plant == "region-edited":
@@ -2146,6 +2257,10 @@ def build_fixture(tmp, plant: str | None = None):
             raise RecordKindsError(f"the fixture's git {args[0]} refused: {p.stderr.strip()}")
     if plant in ("pocket-stray", "pocket-registered"):   # a pocket in the common dir, the worktree's own here
         common_git_dir(tmp).joinpath("stray").mkdir()
+    if plant == "homeless-empty":   # S23: no tracked file under the memory root outside builds/, the files kept
+        p = run_git(tmp, "rm", "-q", "-r", "--cached", "--", "memory/project")
+        if p.returncode != 0:
+            raise RecordKindsError(f"the fixture's git rm refused: {p.stderr.strip()}")
     return FIXTURE_TYPED + (("exception",) if plant == "factory-kind-unrowed" else ())
 
 
@@ -2250,6 +2365,10 @@ def run_selftest() -> int:
             "stream-fence-missing": (FIXTURE_PLAN, "fence"),
             "stream-validator-missing": ("row stream-plan", "record_kinds:no_such_check"),
             "raw-alias-compare": ("alias-compare", f"{ALIAS_COMPARE_PLANT}:2"),
+            "awk-regex-alias": ("alias-compare", f"{ALIAS_PLANTS['awk-regex-alias'][0]}:2"),
+            "alias-constant": ("alias-compare", f"{ALIAS_PLANTS['alias-constant'][0]}:1"),
+            "unarmed-on-disallowed-form": ("row stream-plan", f"`{UNARMED}` on a 'header' row"),
+            "homeless-empty": (HOMELESS, "the arm selects nothing"),
             "unarmed-with-record": ("row stream-plan", f"`{UNARMED}`"), "unarmed-untyped": ("row research", f"`{UNARMED}`"),
             "home-slash": ("row deviation", "names a directory"), "home-directory": ("row deviation", "names a directory"),
             "homeless-record": (HOMELESS, FIXTURE_HOMELESS), "owner-graded": ("row deviation", "Risk", "unbounded"),

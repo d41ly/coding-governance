@@ -39,6 +39,7 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-37](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A SPEC RUN'S CLOSE OWES TWO STEPS THE CLOSE SECTION DOES NOT STATE. A… |
 | [PLAY-dClosedLoop-38](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PACKET OWNS NO TRANSPORT POINT. cl-dClosedLoop-0333 names a lease… |
 | [PLAY-dClosedLoop-1002](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE DEPARTURES INSTRUMENT WRITES NO CAUSE LINE. Asked: the departures… |
+| [PLAY-dClosedLoop-1003](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE DEPARTURES INSTRUMENT COMPARES A RECORD KIND RAW. Asked: the… |
 | [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | MED | PLAY-dConvergedCharter-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dConvergedCharter-25](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-23 | 2026-11-04 | THE RELEASE ROUTE FILES ITS OWN ASK TEXT. DEPL-dShippedRelease-15 S10… |
 | [PLAY-dConvergedCharter-26](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-23 | 2026-11-04 | THE RELEASE-VERIFY READING HAS NO PRODUCER. TOOL-dTendedCadence-2 hands… |

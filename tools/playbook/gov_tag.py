@@ -430,7 +430,7 @@ MEMORY_BUILD = "memory/builds/bFix"
 MEMORY_RECORD = "2026-01-01-build-TOOL-bFix-1-research-1"
 MEMORY_FILES = {
     f"{MEMORY_BUILD}/README.md": "# bFix\n",
-    f"{MEMORY_BUILD}/build/{MEMORY_RECORD}.md": ("# research\n\n**Serves:** research TOOL-bFix-1\n\n## Findings\n\n"
+    f"{MEMORY_BUILD}/build/{MEMORY_RECORD}.md": ("# research\n\n**Serves:** research TOOL-bFix-1\n\n## Findings\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                                                 "the first findings\n\n## Findings\n\nthe second findings\n"),
     f"{MEMORY_BUILD}/spec/2026-01-01-spec-TOOL-bFix-1.md": ("# TOOL-bFix-1 — a fixture spec\n\n## 1. Goal\n\nthe goal\n\n"
                                                            "## 2. Scope (IN)\n\nthe scope\n"),

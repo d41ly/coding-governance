@@ -328,7 +328,7 @@ main() { # argv -> the verb's exit
     echo "pass-tree: '$slug' is not a build-folder name. $PT_USAGE" >&2; exit 2
   fi
   if [ "$verb" = --merge ]; then
-    local mid=${unit#*-}; mid=${mid%-*}
+    local mid=${unit#*-}; mid=${mid%-*}  # census: kept slug-grammar the first and the last segment stripped
     if ! [[ $unit =~ ^${UNIT_ID_ERE}$ ]] || [ "$mid" != "$slug" ]; then
       echo "pass-tree: '$unit' is not a unit id of build $slug. $PT_USAGE" >&2; exit 2
     fi

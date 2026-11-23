@@ -3499,20 +3499,20 @@ def test_id_parts_parse_under_each_tree_grammar():
 # S3 keys the census on the shape: three plants whose value is named for no id, or whose index or
 # unpacking reads past the family, are listed; an index-0 split and an `rsplit` sequence read are not.
 _SPLIT_PLANTS = {
-    "py-split": ("plant/py_split.py", 'slug = unit_id.split("-")[1]\n'),
-    "sh-cut": ("plant/sh_cut.sh", "slug=$(printf '%s' \"$unit_id\" | cut -d- -f2)\n"),
-    "sh-expansion": ("plant/sh_expansion.sh", "fam=${unit_id%%-*}\n"),
+    "py-split": ("plant/py_split.py", 'slug = unit_id.split("-")[1]\n'),  # census: kept slug-grammar fixture text the arm plants
+    "sh-cut": ("plant/sh_cut.sh", "slug=$(printf '%s' \"$unit_id\" | cut -d- -f2)\n"),  # census: kept slug-grammar fixture text the arm plants
+    "sh-expansion": ("plant/sh_expansion.sh", "fam=${unit_id%%-*}\n"),  # census: kept slug-grammar fixture text the arm plants
     "control": ("plant/control.py", 'stem = path.split("-")[0]\n'),
-    "py-unnamed": ("plant/py_unnamed.py", 'slug = i.split("-")[1]\n'),
-    "py-node": ("plant/py_node.py", "node = spec_id.split('-')[1][0]\n"),
-    "py-unpack": ("plant/py_unpack.py", 'fam, slug, seq = x.split("-")\n'),
+    "py-unnamed": ("plant/py_unnamed.py", 'slug = i.split("-")[1]\n'),  # census: kept slug-grammar fixture text the arm plants
+    "py-node": ("plant/py_node.py", "node = spec_id.split('-')[1][0]\n"),  # census: kept slug-grammar fixture text the arm plants
+    "py-unpack": ("plant/py_unpack.py", 'fam, slug, seq = x.split("-")\n'),  # census: kept slug-grammar fixture text the arm plants
     "py-head": ("plant/py_head.py", 'fam = x.split("-")[0]\n'),
     "py-rsplit": ("plant/py_rsplit.py", 'seq = x.rsplit("-", 1)[1]\n'),
 }
 _SPLIT_LISTED = {"py-split", "sh-cut", "sh-expansion", "py-unnamed", "py-node", "py-unpack"}
 # The re-pointed reader the clone reverts to its split, and the split it reverts to.
 _REPOINTED = ("        return backlog.load_id_grammar().parse_id_parts(ident, None, alt=backlog.ANY_FAMILY)[1]\n",
-              '        return ident.split("-")[1]\n')
+              '        return ident.split("-")[1]\n')  # census: kept slug-grammar fixture text the arm plants
 
 
 @check("the reader census lists each split shape, and the flip probe fails a clone that reverts a re-pointed reader")
@@ -3545,7 +3545,8 @@ def test_split_census_and_the_flip_probe_census_check():
         subprocess.run(["git", "-C", str(clone), "remote", "remove", "origin"], check=True, capture_output=True)
         probe = [sys.executable, str(grammar), "--flip-probe", str(clone)]
         green = subprocess.run(probe, cwd=str(root), capture_output=True, text=True, encoding="utf-8")
-        flips = [ln for ln in green.stdout.splitlines() if ln.startswith("flip ")]
+        # the six flip rows, never the census-case rows the hyphenated flip adds (TOOL-dTotalRecall-53 S1 S16)
+        flips = [ln for ln in green.stdout.splitlines() if ln.startswith("flip ") and " · " not in ln.split(":", 1)[0]]
         assert len(flips) == 6 and not [ln for ln in flips if "census lists" in ln], (
             f"the unreverted clone failed the census check:\n{green.stdout[-800:]}{green.stderr[-400:]}")
         reader = clone / mt / "migrate_backlog.py"

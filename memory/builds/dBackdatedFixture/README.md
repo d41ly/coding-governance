@@ -85,6 +85,8 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `DEPL-dBackdatedFixture-1` | no |
 | 2 | `DEPL-dBackdatedFixture-2` | no |
 | 3 | `DEPL-dBackdatedFixture-3` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

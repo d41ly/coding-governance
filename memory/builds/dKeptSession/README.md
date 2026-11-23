@@ -241,6 +241,8 @@ Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 64 spec(s) at
 | 34 | `KICK-dKeptSession-63` | no |
 | 35 | `KICK-dKeptSession-64` | no |
 | 36 | `KICK-dKeptSession-65` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

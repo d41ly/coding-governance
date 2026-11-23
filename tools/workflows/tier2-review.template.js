@@ -651,7 +651,7 @@ function renderAuditBinding(subjects) {
     if (SPEC_SUBJECT_PATH.test(String(x.path))) pins[x.id] = x.rev
     if (ids.indexOf(x.id) === -1) ids.push(x.id)
   })
-  return '**Serves:** spec-audit ' + ids.map(function (id) {
+  return '**Serves:** spec-audit ' + ids.map(function (id) {  // census: kept cause-writer its cause line is renderCauseLine, written under it
     return Object.prototype.hasOwnProperty.call(pins, id) ? id + '@rev-' + pins[id] : id
   }).join(' ')
 }

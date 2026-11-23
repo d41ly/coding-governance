@@ -1519,7 +1519,7 @@ def check_placement_plant(case, top, seen, bad):
         seen.append("record %s · %s" % (recs[0].name, " · ".join("%s %s" % kv for kv in got.items())))
         if rec["malformed"] or got != {"Item": PLACE_ITEM, "Disposition": "breakpoint", "Channel": "prompt",
                                        "Reason": "spec audit · request %s" % key} \
-                or "**Serves:** disposition TOOL-%s-1" % FX_LIVE not in text:
+                or "**Serves:** disposition TOOL-%s-1" % FX_LIVE not in text:  # census: kept cause-writer fixture: the disposition record its fixture reads back
             bad.append("the record reads %s, malformed %s" % (got, rec["malformed"]))
         bare = "dBare"   # a live build whose README names no unit spec: nothing to name the record under
         write_fixture_files(root, {"memory/builds/%s/README.md" % bare: "---\nslug: %s\nnode: a\nopened: 2026-11-01\n"

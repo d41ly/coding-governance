@@ -113,6 +113,8 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 | 4 | `TOOL-aBriskPreflight-7` | no |
 | 6 | `TOOL-aBriskPreflight-11`, `TOOL-aBriskPreflight-12` | no |
 | 7 | `TOOL-aBriskPreflight-19` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

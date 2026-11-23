@@ -216,6 +216,8 @@ Ids whose spec moved past its audited revision: none — 0 of 40 unit id(s) carr
 | 38 | `DEPL-cMendedVintage-27` | no |
 | 39 | `TOOL-cMendedVintage-12` | no |
 | 40 | `DEPL-cMendedVintage-28` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

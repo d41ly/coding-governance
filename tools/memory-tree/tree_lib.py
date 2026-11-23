@@ -629,7 +629,7 @@ RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "log", "research") + TYPED_RE
 # TOOL-dTotalRecall-18 S7: `journal` was the evidence kind's name until the kind became `log`. The old
 # token is a READ-ONLY alias: a record written under it is bound as written, so no records region
 # re-renders, and every comparison by value reads it through `resolve_kind`. No writer emits it.
-KIND_ALIASES = {"journal": "log"}
+KIND_ALIASES = {"journal": "log"}  # census: kept alias-compare the alias table itself
 
 
 def resolve_kind(token):
@@ -1162,11 +1162,11 @@ def write_leg_fixture(root) -> None:
         LEG_FIXTURE["spec"]: "# ARCH-tOne-1 — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-08-01 · node a · "
                              "Tier-2 · base 0123abcd · order 1\n\n## 4. Design\n\n### Files touched (estimate)\n\n"
                              "- `src/leg.py`\n",
-        LEG_FIXTURE["fenced"]: "# fenced\n\n```\n**Serves:** research ARCH-tOne-9\n```\n\n"
-                               "**Serves:** research ARCH-tOne-1\n",
-        LEG_FIXTURE["crlf"]: "# crlf\r\n\r\n**Serves:** research ARCH-tOne-1\r\n\r\nbody\r\n",
+        LEG_FIXTURE["fenced"]: "# fenced\n\n```\n**Serves:** research ARCH-tOne-9\n```\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
+                               "**Serves:** research ARCH-tOne-1\n",  # census: kept cause-writer fixture: a record head its fixture plants
+        LEG_FIXTURE["crlf"]: "# crlf\r\n\r\n**Serves:** research ARCH-tOne-1\r\n\r\nbody\r\n",  # census: kept cause-writer fixture: a record head its fixture plants
         LEG_FIXTURE["cites"]: "# d\n\n- ARCH-tOne-1 · a decision, its notes at `memory/nowhere/gone.md`\n",
-        LEG_FIXTURE["edited"]: "# edited\n\n**Serves:** none — a scratch note\n\nfirst\n",
+        LEG_FIXTURE["edited"]: "# edited\n\n**Serves:** none — a scratch note\n\nfirst\n",  # census: kept cause-writer fixture: a record head its fixture plants
     }
     for rel, text in plant.items():
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
@@ -1189,7 +1189,7 @@ def write_leg_fixture(root) -> None:
     read_git_output(str(root), (*who, "commit", "-q", "--no-verify", "-m", "leg fixture rendered"))
     with open(root / LEG_FIXTURE["edited"], "ab") as fh:
         fh.write(b"second\n")
-    (root / LEG_FIXTURE["untracked"]).write_bytes(b"# untracked\n\n**Serves:** research ARCH-tOne-1\n")
+    (root / LEG_FIXTURE["untracked"]).write_bytes(b"# untracked\n\n**Serves:** research ARCH-tOne-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
 
 
 def build_fixture_index(root) -> pathlib.Path:

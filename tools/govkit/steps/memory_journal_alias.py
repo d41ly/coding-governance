@@ -61,7 +61,7 @@ def main(argv: list[str]) -> int:
               file=sys.stderr)
         return 1
     rows = [ln.split("\t") for ln in p.stdout.splitlines()]
-    read = sum(1 for r in rows if r[0] == "S" and len(r) > 2 and r[2] == "journal")
+    read = sum(1 for r in rows if r[0] == "S" and len(r) > 2 and r[2] == "journal")  # census: kept alias-compare the alias census: it counts the records the alias still binds
     refused = [r for r in rows if r[0] == "A" and len(r) > 2 and r[2].startswith("first token journal")]
     for r in refused:
         print(f"{STEP_ID}: {r[1]} · {r[2]}")

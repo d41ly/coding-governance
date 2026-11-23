@@ -100,6 +100,8 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 | 3 | `TOOL-dGatedProse-2` | no |
 | 4 | `TOOL-dGatedProse-3` | no |
 | 5 | `TOOL-dGatedProse-4` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -107,6 +107,8 @@ Ids whose spec moved past its audited revision: none — 0 of 9 unit id(s) carry
 | 6 | `TOOL-dLadderedRemote-7` | no |
 | 7 | `TOOL-dLadderedRemote-8` | no |
 | 8 | `TOOL-dLadderedRemote-9` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

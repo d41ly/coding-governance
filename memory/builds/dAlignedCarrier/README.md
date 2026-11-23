@@ -75,6 +75,8 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 |---|---|---|
 | 1 | `TOOL-dAlignedCarrier-1`, `TOOL-dAlignedCarrier-2`, `TOOL-dAlignedCarrier-3`, `TOOL-dAlignedCarrier-4`, `TOOL-dAlignedCarrier-6` | no |
 | 2 | `TOOL-dAlignedCarrier-5` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -185,6 +185,8 @@ Coverage of dIndexedDesign's 16 clause(s) and 28 owned node(s), over 40 spec(s) 
 | 19 | `TOOL-dIndexedDesign-46`, `TOOL-dIndexedDesign-47`, `TOOL-dIndexedDesign-48`, `TOOL-dIndexedDesign-49`, `TOOL-dIndexedDesign-51` | no |
 | 20 | `TOOL-dIndexedDesign-52` | no |
 | 21 | `TOOL-dIndexedDesign-53` | no |
+
+A step's `Parallel` yes means its units share an order; BUILD-METHOD M6 still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
