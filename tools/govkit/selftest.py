@@ -4256,6 +4256,7 @@ def check_reviewer_merge(tmp: pathlib.Path) -> None:
     step_py = HERE / "steps" / "reviewer_merge.py"
     kit_dirs = dict(KIT_DIRS, loop=resolve_kit_dir("loop", "loop_lib.py", HERE))
     merged = "gov-reviewer"
+    rk_name, pk_name = kit_dirs["roles"].name, kit_dirs["policy"].name  # each kit home, read from its own location
     stems = ["gov-%s-reviewer" % lens for lens in ("spec", "diff")]
     tags = ["role." + s for s in stems]
     seed = (KIT_DIRS["roles"] / "house" / "policy.toml").read_text(encoding="utf-8")
@@ -4277,7 +4278,7 @@ def check_reviewer_merge(tmp: pathlib.Path) -> None:
         return list(json.loads(p.read_text(encoding="utf-8"))["roles"]) if p.is_file() else []
 
     def read_house(t: pathlib.Path) -> dict:
-        return tomllib.loads((t / PFX / "roles" / "house" / "policy.toml").read_text(encoding="utf-8"))
+        return tomllib.loads((t / PFX / rk_name / "house" / "policy.toml").read_text(encoding="utf-8"))
 
     def write_old_workflows(kit: pathlib.Path) -> None:
         # the workflow table before the merge: each finder stage held its own reviewer
@@ -4293,7 +4294,7 @@ def check_reviewer_merge(tmp: pathlib.Path) -> None:
                                                  "AGENTS.md": (GOV_ROOT / "AGENTS.md").read_bytes()})
         for home in ("roles", "loop") + (("policy",) if policy_kit else ()):
             shutil.copytree(kit_dirs[home], t / PFX / home, ignore=shutil.ignore_patterns("__pycache__"))
-        kit = t / PFX / "roles"
+        kit = t / PFX / rk_name
         for s in stems:
             (kit / "agents" / (s + ".agent.md")).write_text(role_text.replace("name: " + merged, "name: " + s, 1),
                                                            encoding="utf-8", newline="\n")
@@ -4339,7 +4340,7 @@ def check_reviewer_merge(tmp: pathlib.Path) -> None:
               up.returncode == 0 and (agents / (merged + ".md")).is_file()
               and not any((agents / (s + ".md")).exists() for s in stems)
               and merged in after and not set(stems) & set(after)
-              and not any((t / PFX / "roles" / "agents" / (s + ".agent.md")).exists() for s in stems),
+              and not any((t / PFX / rk_name / "agents" / (s + ".agent.md")).exists() for s in stems),
               up.stdout + up.stderr + str(after))
         check("reviewer-merge-AC1 %s ...and the witness exits 1 before the up and 0 after it" % tag,
               w0.returncode == 1 and w1.returncode == 0, w0.stdout + w1.stdout)
@@ -4352,7 +4353,7 @@ def check_reviewer_merge(tmp: pathlib.Path) -> None:
     p = subprocess.run([sys.executable, str(HERE / "upgrade_steps.py"), "list"], capture_output=True, text=True,
                        encoding="utf-8", errors="replace")
     ids = [ln.split(" · ")[1] for ln in p.stdout.splitlines()
-           if ln.startswith("upgrade-steps: ") and ln.split(" · ")[-1].endswith("roles/kit.toml")]
+           if ln.startswith("upgrade-steps: ") and ln.split(" · ")[-1].endswith(rk_name + "/kit.toml")]
     check("reviewer-merge-AC9 upgrade_steps.py list orders roles/reviewers-to-gov-reviewer after every other row of "
           "the roles descriptor", p.returncode == 0 and ids[-1:] == ["roles/reviewers-to-gov-reviewer"],
           p.stdout[-1500:] + p.stderr)
@@ -4361,14 +4362,14 @@ def check_reviewer_merge(tmp: pathlib.Path) -> None:
     def read_stage_efforts(t: pathlib.Path) -> dict:
         out = {}
         for wf in ("spec-review", "spec-write", "closing-review"):
-            p = subprocess.run([sys.executable, str(t / PFX / "roles" / "handoff.py"), "stage-efforts", wf],
+            p = subprocess.run([sys.executable, str(t / PFX / rk_name / "handoff.py"), "stage-efforts", wf],
                                cwd=str(t), capture_output=True, text=True, encoding="utf-8", errors="replace")
             out[wf] = json.loads(p.stdout) if p.returncode == 0 and p.stdout.strip() else p.stderr
         return out
 
     t = build_merge_target("rm-ac2", levels=("medium", "high"), old_workflows=True)
     was = read_stage_efforts(t)
-    shutil.copyfile(KIT_DIRS["roles"] / "workflows.toml", t / PFX / "roles" / "workflows.toml")
+    shutil.copyfile(KIT_DIRS["roles"] / "workflows.toml", t / PFX / rk_name / "workflows.toml")
     settle(t, "the update's workflow table")
     up = run_step("up", t)
     now, house = read_stage_efforts(t), read_house(t)
@@ -4399,7 +4400,7 @@ def check_reviewer_merge(tmp: pathlib.Path) -> None:
     settle(t, "the merge")
 
     def read_policy_key(key: str) -> str:
-        return subprocess.run([sys.executable, str(t / PFX / "policy" / "policy.py"), "get", key, "--rev", "HEAD"],
+        return subprocess.run([sys.executable, str(t / PFX / pk_name / "policy.py"), "get", key, "--rev", "HEAD"],
                               cwd=str(t), capture_output=True, text=True, encoding="utf-8",
                               errors="replace").stdout.strip()
 
@@ -4467,7 +4468,7 @@ def check_reviewer_merge(tmp: pathlib.Path) -> None:
           up.returncode == 1 and "[[role]] row 1" in up.stderr and status == "", up.stdout + up.stderr + status)
     t = build_merge_target("rm-ac6-text", keep_roles=False, texts={stems[1]: "Read each changed caller.\n"})
     up = run_step("up", t)
-    house_dir = t / PFX / "roles" / "house"
+    house_dir = t / PFX / rk_name / "house"
     check("reviewer-merge-AC6 a non-empty old house text lands in %s.md under a line naming its stem, the old file "
           "gone" % merged,
           up.returncode == 0 and "Read each changed caller." in (house_dir / (merged + ".md")).read_text(encoding="utf-8")

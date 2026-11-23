@@ -335,15 +335,15 @@ def check_key_conflicts(where: str, key: str, held: dict, merged) -> list[str]:
     def test_same(x, y) -> bool:
         return type(x) is type(y) and x == y
 
-    def show(v) -> str:
+    def render_value(v) -> str:
         return "nothing" if v is None else json.dumps(v)
 
     if test_same(a, b) and (a is None or merged is None or test_same(a, merged)):
         return []
     if test_same(a, b):
-        return [f"{where} {key}: {OLD[0]} and {OLD[1]} hold {show(a)} and {MERGED} already holds {show(merged)}; "
+        return [f"{where} {key}: {OLD[0]} and {OLD[1]} hold {render_value(a)} and {MERGED} already holds {render_value(merged)}; "
                 f"remedy: give the three one value or remove {MERGED}'s in {where}, commit, and re-run the step"]
-    return [f"{where} {key}: {OLD[0]} holds {show(a)} and {OLD[1]} holds {show(b)}, so {MERGED} would widen one "
+    return [f"{where} {key}: {OLD[0]} holds {render_value(a)} and {OLD[1]} holds {render_value(b)}, so {MERGED} would widen one "
             f"reviewer's stages or narrow the other's; remedy: give both stems one value, or remove both, in "
             f"{where}, commit, and re-run the step"]
 
@@ -422,15 +422,15 @@ def write_overlay_values(text: str) -> str:
         i = j
     got = "".join(out)
 
-    def map_values(v):
+    def derive_mapped(v):
         if isinstance(v, dict):
-            return {k: map_values(x) for k, x in v.items()}
+            return {k: derive_mapped(x) for k, x in v.items()}
         if isinstance(v, list):
-            return [map_values(x) for x in v]
+            return [derive_mapped(x) for x in v]
         return TAG + MERGED if v in OLD_TAGS else v
 
     try:
-        same = map_values(tomllib.loads(text.removeprefix(BOM))) == tomllib.loads(got.removeprefix(BOM))
+        same = derive_mapped(tomllib.loads(text.removeprefix(BOM))) == tomllib.loads(got.removeprefix(BOM))
     except tomllib.TOMLDecodeError:
         same = False
     if not same:
