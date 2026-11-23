@@ -65,12 +65,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   Beneath `frontier:`, `--plan <slug>` prints the build's breakpoints, the loop kit's
   `breakpoints.py list` verbatim (`TOOL-dDeclaredLoop-19`): one
   `breakpoint: <name> · <before|at|after> <item tag> · <reviewer|owner> · <cause>[ · <release>]` line each,
-  the reviews `review.<stage>` places, the owner gates `autonomy` places, each `review.breakpoints`
+  the reviews `review.<stage>` places, the owner gates `autonomy` and `attendance` place, each `review.breakpoints`
   member, and under `decisions.major = "author-owner-ratifies"` the owner item at `item.build.ratify`
   where a tracked spec carries a fork resolved `(agent, <date>, delegated)`. An owner line's release is
   `authorization`, `held` or `released <record> <word>`, and `passed before placement` on each owner gate
   of a build whose README's first commit does not contain the loop kit's placement of the module
-  (`TOOL-dDeclaredLoop-53`), which no hold reads as `held`. Beside an owner gate reading `held` where no
+  (`TOOL-dDeclaredLoop-53`), which no hold reads as `held`. Under an `attendance` value that adds an
+  interaction, a `breakpoints: attendance · <value> · adds <members>` line follows the breakpoint lines, before
+  any `breakpoints: held` line, naming each interaction still a stand-in (`KICK-dKeptSession-17`); no hold
+  reads it. Beside an owner gate reading `held` where no
   commit adds the build's README under the memory root, a last `breakpoints: held · no commit adds <path> ·
   root from <conf>` line names the path looked for and the conf its root came from, `.unattended.conf`,
   `.memory-tree.conf` or `default` (`TOOL-dDeclaredLoop-64`, `TOOL-dDeclaredLoop-75`); no hold reads it. Fire a review line through `--trigger` with its

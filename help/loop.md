@@ -470,7 +470,7 @@ step of the phase it was held from, which the driver writes as the run's `held-f
 - **The hold:** the driver's `--phase` asks this map which step exits a move crosses. When an owner
   gate sits at one of them and still reads `held`, the move is refused before anything is written,
   naming the gate and how to release it, as `--close` is held. A move that crosses no exit, or only
-  exits no gate holds, goes through as before. Under the default `autonomy`, the only owner gate is the
+  exits no gate holds, goes through as before. Under the default `autonomy` and `attendance`, the only owner gate is the
   plan gate, which the authorization releases, so nothing new is held.
 
 ## When a parent build is withdrawn
@@ -1804,7 +1804,7 @@ spec audit's opt-in stays yours.
 ## Where a build stops for a review or for you
 
 A breakpoint is a place at an item boundary where a build stops, before, at or after an item, for a
-reviewer or for you, the owner. Reviews and owner gates are one list, and four keys in
+reviewer or for you, the owner. Reviews and owner gates are one list, and five keys in
 `.governance/policy.toml` place them:
 
 - `review.<stage>`, one per stage: `off` places no review, `opt-in` places one only where the build opts
@@ -1817,6 +1817,17 @@ reviewer or for you, the owner. Reviews and owner gates are one list, and four k
 - `autonomy`, default `plan-only`: an owner gate at `item.plan.exit`. `three-gates` adds one at
   `item.design.exit` and one before `item.deploy.mandate`; `every-stage` adds one at each stage's exit
   item besides.
+- `attendance`, default `unattended`: how closely you follow the build, which adds only your own <!-- usage: policy:attendance 603ed07d -->
+  interactions. `unattended` adds nothing. `announce` adds an announcement of each act and the
+  questions you are asked live. `confirm-steps` adds those and an owner gate at each stage's exit item,
+  and `confirm-acts` adds those and an owner gate before each item a role carries out. A position
+  `autonomy` already gates keeps that one gate, so `every-stage` beside `confirm-steps` adds none. No
+  value changes an item, who carries it out, the driver or a binding: what each value adds is a row of
+  the loop file's `[[attendance]]` table, and `python tools/loop/loop_lib.py --check` refuses a row
+  naming anything outside the closed set of owner interactions. A gate at a stage's exit holds both
+  `--close` and the `--phase` move across that exit; a gate before an item holds `--close`. The
+  announcement and the live questions are not built yet: the list names them as stand-ins for
+  dWellOiledMachine and dFurnishedOrders, which add them.
 - `review.breakpoints`, default empty: each item tag you list places a review before that item. A tag
   the build's items do not declare is refused, naming the key and the tag, and a renamed tag follows
   its item.
@@ -1846,10 +1857,13 @@ shows instead of reading as an ordinary hold; a build with no held gate prints n
   repository's top level and prints one line per breakpoint, in item order:
   `breakpoint: <name> · <before|at|after> <item tag> · <reviewer|owner> · <cause>`, and for an owner
   line ` · authorization`, ` · held`, ` · released <record> <word>` or ` · passed before placement`.
-  `--spec-audit` lists Design's opted-in audit, and `--delegated-fork` the owner item. The unattended driver's `--plan <slug>` prints
+  `--spec-audit` lists Design's opted-in audit, and `--delegated-fork` the owner item. Under an
+  `attendance` value that adds anything, one more line follows the breakpoints,
+  `breakpoints: attendance · <value> · adds <members> · announce: stand-in dWellOiledMachine · ask-live: stand-in dFurnishedOrders`,
+  naming what the value adds and which of it is still a stand-in; under `unattended` none prints. The unattended driver's `--plan <slug>` prints
   the same lines after its `frontier:` line. It exits 2 printing `breakpoints: refused` and why on a
-  value outside its key's set or an undeclared tag, and `breakpoints: unarmed` where the policy or
-  memory-tree kit is not installed.
+  value outside its key's set, an `attendance` value no `[[attendance]]` row of the loop file declares, or
+  an undeclared tag, and `breakpoints: unarmed` where the policy or memory-tree kit is not installed.
 - **Read one stage:** `python tools/loop/breakpoints.py stage --stage <stage> --build <slug>` prints <!-- usage: script:tools/loop/breakpoints.py#stage 1a9b01b0 -->
   `breakpoints: stage <stage> · <value> · <owed|opt-in|not-owed>`, read from the policy file at your
   default branch's landed revision, or at `--rev <rev>`. The unattended driver's preflight reads
@@ -1858,7 +1872,9 @@ shows instead of reading as an ordinary hold; a build with no held gate prints n
   a scratch repository: `values`, `placed`, `ratification`, `stage`, `driver-close`, `driver-optin`,
   `driver-plan`, `pre-placement`, `driver-pre-placement`, `pre-placement-records-root`, `unattended-root`,
   `confs-disagree`, `readded`, the module taken out of a scratch repository and committed back, its
-  placement still the first commit that added it, or `no-own-conf-read`, the one that reads the module's own file and no scratch
+  placement still the first commit that added it, `attendance-values`, each `attendance` value's list,
+  `attendance-missing`, a value whose row is left out refused, `attendance-plan`, the driver's `--plan`
+  and `--phase` hold under `confirm-steps`, or `no-own-conf-read`, the one that reads the module's own file and no scratch
   repository, naming each conf name or conf reader call in its code. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
 
 The list does not fire a review: you, or the run, fire each review line through the driver's
@@ -2284,13 +2300,15 @@ outside the flow, one that lives in code with a deadline of its own.
   `item.review.<name>`, carry the step `none` and sit in no step, and the same for the probe program
   and the entry program, `loop: program probe` and `loop: program entry`. Where the playbook kit is not installed, a `loop: inputs unarmed` line comes first
   and the inputs go unchecked. Then it prints one `loop: item` line per item, saying where each of
-  its fields comes from, or `pending` or `unarmed`, and a `loop: items` count line. Then it
-  prints the witness classes, one line per witness alias and per step's and item's witness, one line per
+  its fields comes from, or `pending` or `unarmed`, and a `loop: items` count line. It prints one
+  `loop: attendance <value> · adds <members|none>` line per `[[attendance]]` row, before the
+  witness lines, and refuses a row carrying a key but `value` and `adds`, a member outside the closed
+  set of owner interactions, or a value given twice. Then it prints the witness classes, one line per witness alias and per step's and item's witness, one line per
   actor-list row with its build, and the base it compared the list against, or `no comparison` and
   why. A `loop: actor-list builds` line follows, naming the builds folder, or `foreign` and why, then
   one `loop: computed-witness` line per computed witness with the item it serves, its class, its
-  writer and the build that arms it. It exits 0, or 1 when an item, the list or a computed witness is
-  refused.
+  writer and the build that arms it. It exits 0, or 1 when an item, an attendance row, the list or a
+  computed witness is refused.
 
   ```text
   loop: step step.build · order 3 · state building · exit item.build.exit
@@ -2366,7 +2384,10 @@ outside the flow, one that lives in code with a deadline of its own.
   it must draw: `conf-opener-literal`, `conf-opener-constant` and `conf-opener-local` add a function,
   declared nowhere, that opens a conf by its literal name, through a module constant or through a
   local name; `conf-route-opens-none` empties the route; `conf-openers-none` empties every declared
-  opener; and `conf-module-unparsable` adds a definition that does not parse. The files on disk are never changed. `python tools/loop/loop_lib.py --selftest` runs every
+  opener; and `conf-module-unparsable` adds a definition that does not parse. The attendance cases
+  break the `confirm-acts` row and each exits 1 naming it: `attendance-actor` gives it an `actor` key
+  that would hand an item to you, `attendance-member` adds `driver:owner` to what it adds, and
+  `attendance-twice` gives the value a second row. The files on disk are never changed. `python tools/loop/loop_lib.py --selftest` runs every
   case and holds each to the exit and line it owes, one `PASS` or `FAIL` line per case and a summary;
   gov's own `loop definition fixtures` gate runs it, with no guard, so every bar runs these cases.
 - **Check the re-run stand-in:** `python tools/loop/loop_witness.py --fixture --plant acceptance` runs <!-- usage: script:tools/loop/loop_witness.py 6de87be4 -->
