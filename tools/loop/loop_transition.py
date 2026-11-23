@@ -132,7 +132,9 @@ TRANSITION_FIELDS = ("stand-in", "composition", "scenario", "scenario-settled") 
 #: The mail guard's bound in seconds on the unattended driver's `--mail read` (KICK-dKeptSession-5 S9),
 #: twice the kickoff engine's claims read, since the guard fetches every build's mail refs.
 MAIL_GUARD_SECONDS = 30
-#: The columns of one `--mail read` row, in order (KICK-dKeptSession-5 S6), and the states a move disposes.
+#: The first eleven columns of one `--mail read` row, in order (KICK-dKeptSession-5 S6), which the guard
+#: reads; the row's later columns, `seq`, `after` and `content-key` (KICK-dKeptSession-27 S4), it does
+#: not. Then the states a move disposes.
 MAIL_COLUMNS = ("id", "kind", "to", "state", "first-seen", "from-build", "subject", "answers", "ref", "commit", "reply")
 MAIL_DISPOSED_STATES = ("answered", "acked", "expired")
 #: The record kind a disposed message is written as (KICK-dKeptSession-5 S12).

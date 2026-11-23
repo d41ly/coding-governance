@@ -48,7 +48,7 @@
 #   unattended.sh --lease fence build <slug> [--after <tip>]       # the fence an effect push carries: this session's lease, its tip and a beat on it; one line, pushes nothing; --after re-fences a same-holder, same-epoch move from <tip>
 #   unattended.sh --register decision <build> <item> <fork> <file> # one create-only decision on the remote, keyed by item and fork; 0 written, 1 exists, 2 not written
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
-#   unattended.sh --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] <body file>   # one message on this session's own mail ref; 0 posted, 1 duplicate or lost, 2 not written; `mail — off` exit 2 while RUN_CLAIMS is not on
+#   unattended.sh --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] <body file>   # one message on this session's own mail ref; 0 posted, 1 duplicate or lost, 2 not written; `mail — off` exit 2 while RUN_CLAIMS is not on
 #   unattended.sh --mail read <who> [--open] [--ids]               # the mailbox of a build or a recipient, one TAB row per message; --open the open rows, --ids their ids on one line or none
 #   unattended.sh --mail ack <slug> <id>                           # an ack of a message addressed to <slug>, posted to its sender's build; the post's exits
 #   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
@@ -3789,18 +3789,25 @@ write_mail_ref() { # ref · tip read or empty · message -> 0 written, 1 lost, 2
 # tag, which name the ref; the kind, one of the loop kit's closed `[mail]` set as its `--mail-kinds`
 # prints it; `check_mail_recipient`; the body and the values, built by `build_gov_message` and held to
 # the record factory's field shapes (§8 F7), so a disposal can never be refused by a line of the body;
-# the one remote (check 24); ONE bounded, pruned fetch of the sender build's mail refs into this
-# node's cache, sighted into the feed; the id, `derive_message_id` over the eight fields, the content
-# key `none`; `check_mail_duplicate`; the tip read from this session's cache ref; `write_mail_ref`.
+# the interface (KICK-dKeptSession-27 S3): a `confirmed` or `changed` post names the file of the
+# interface it announces, the ninth argument, and no other kind names one, the word `none` where
+# absent; the one remote (check 24); ONE bounded, pruned fetch of the sender build's mail refs into
+# this node's cache, sighted into the feed; the id, `derive_message_id` over the eight fields, the
+# content key `derive_gov_id --file <interface file>` on a `confirmed` or `changed` post and `none`
+# on any other; `check_mail_duplicate`; the tip read from this session's cache ref; its order (S1,
+# S2): `seq` 1 where that tip is empty, else the tip's first-parent count plus one, and on `seq` 1
+# `after` the id of the tip of the build's other cached ref first sighted last, an unsighted tip
+# newest, ties to the lesser ref, or `none`; `write_mail_ref`.
 # ONE LINE PER OUTCOME: `mail — posted <id> · <ref>` exit 0; `mail — duplicate <id> · <ref>` or `mail —
 # lost <id> · <ref> · <why>` exit 1; `mail — not written · <why>`, `mail — not written: <why>` for no
 # session or no fleet row, or `mail — not written <id> · <ref> · <why>` exit 2. The record is
 # `gov-mail <slug>/<id>`, a blank line, the keys `id`, `build`, `from-tag`, `from-session`, `to`,
-# `kind`, `item`, `pass`, `subject` and `answers`, each absent one `none`, a blank line and the body.
+# `kind`, `item`, `pass`, `subject`, `answers`, `seq`, `after` and `content-key`, each absent one
+# `none`, a blank line and the body. `seq` is no field of the id, so a retried post keeps its id.
 # WHAT THIS DOES NOT CHECK: the body for secrets (gap-rt-44); that the recipient exists.
-write_mail_post() { # slug · to · kind · subject · item · pass · answers · body file -> 0 posted, 1 duplicate or lost, 2 not written
-  local slug="${1:-}" to="${2:-}" kind="${3:-}" sub="${4:-}" it="${5:-none}" ps="${6:-none}" an="${7:-none}" f="${8:-}"
-  local sid="${CLAUDE_CODE_SESSION_ID:-}" tag py d kinds n v id tip rc ref
+write_mail_post() { # slug · to · kind · subject · item · pass · answers · body file · interface file or none -> 0 posted, 1 duplicate or lost, 2 not written
+  local slug="${1:-}" to="${2:-}" kind="${3:-}" sub="${4:-}" it="${5:-none}" ps="${6:-none}" an="${7:-none}" f="${8:-}" ifc="${9:-none}"
+  local sid="${CLAUDE_CODE_SESSION_ID:-}" tag py d kinds n v id tip rc ref ck=none seq=1 aft=none t
   local forged='^[[:space:]]*[*][*][A-Za-z][A-Za-z-]*( [a-z]+)?:[*][*]'
   [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 2; }
   check_slug_shape "$slug" || { echo "mail — not written · the build is no build-folder name: $slug"; return 2; }
@@ -3828,6 +3835,12 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
   done
   n=$(LC_ALL=C awk '$0 == "~~~~" || /^[[:space:]]*[*][*][A-Za-z][A-Za-z-]*( [a-z]+)?:[*][*]/ || /^- [*][*][A-Z][a-z-]+( [a-z]+)?:[*][*] ./ { print NR; exit }' "$f")
   [ -z "$n" ] || { echo "mail — not written · the body's line $n would read as a record field or its fence once the message is disposed: $f"; return 2; }
+  case "$kind:$ifc" in
+    confirmed:none|changed:none) echo "mail — not written · a $kind post names the interface it announces: --interface <file>"; return 2 ;;
+    confirmed:*|changed:*) ck=$(derive_gov_id --file "$ifc") || { echo "mail — not written · the interface file cannot be read: $ifc"; return 2; } ;;
+    *:none) ;;
+    *) echo "mail — not written · --interface names the interface of a confirmed or changed post, not a $kind"; return 2 ;;
+  esac
   resolve_claim_remote || { echo "mail — not written · the clone does not declare exactly one remote, check 24"; return 2; }
   d=$(mktemp -d) || { echo "mail — not written · no scratch directory to bound the read in"; return 2; }
   observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+refs/gov/mail/$slug/*:refs/gov/remote/mail/$slug/*" && rc=0 || rc=$?
@@ -3838,7 +3851,7 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
     *) echo "mail — not written · the remote did not answer, git fetch exited $rc: $CR_URL"; return 2 ;;
   esac
   add_feed_sightings refs/gov/remote/
-  id=$(derive_message_id "$slug" "$it" "$ps" "$kind" "$sub" "$an" "$to" none) || { echo "mail — not written · the message id did not derive"; return 2; }
+  id=$(derive_message_id "$slug" "$it" "$ps" "$kind" "$sub" "$an" "$to" "$ck") || { echo "mail — not written · the message id did not derive"; return 2; }
   check_mail_duplicate "$slug" "$id"; rc=$?
   case "$rc" in
     0) ;;
@@ -3846,8 +3859,27 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
     *) echo "mail — not written · the mail cache could not be read, so a retried post cannot be told apart"; return 2 ;;
   esac
   tip=$(GIT rev-parse --verify -q "refs/gov/remote/${ref#refs/gov/}^{commit}" 2>/dev/null) || tip=""; tip=${tip%$'\r'}
+  if [ -n "$tip" ]; then
+    seq=$(GIT rev-list --first-parent --count "$tip" 2>/dev/null) && seq=${seq%$'\r'} && [[ $seq =~ ^[0-9]+$ ]] \
+      || { echo "mail — not written · the mail cache could not be read, so the message's sequence number cannot be derived"; return 2; }
+    seq=$((seq + 1))
+  else
+    t=$(GIT for-each-ref --format='%(refname)%09%(objectname)%09%(subject)' "refs/gov/remote/mail/$slug/" 2>/dev/null) \
+      || { echo "mail — not written · the mail cache could not be read, so the session's predecessor cannot be named"; return 2; }
+    t=$(MP_OWN="refs/gov/remote/${ref#refs/gov/}" MP_HDR="gov-mail $slug/" awk -F'\t' -v pre="refs/gov/remote/" '
+      { sub(/\r$/, ""); h = ENVIRON["MP_HDR"]; x = substr($3, length(h) + 1) }
+      $1 != ENVIRON["MP_OWN"] && substr($3, 1, length(h)) == h && length(x) == 12 && x ~ /^[0-9a-f]+$/ {
+        print "refs/gov/" substr($1, length(pre) + 1) "\t" $2 "\t" x }' <<<"$t")
+    # read_first_seen keys on the first two fields of each line, so the id rides along as the third.
+    [ -z "$t" ] || aft=$(MP_SEEN=$(read_first_seen <<<"$t") awk -F'\t' '
+      BEGIN { split(ENVIRON["MP_SEEN"], s, "\n") }
+      { n++; k = s[n]; sub(/\r$/, "", k); if (k == "" || k == "-") k = "~"
+        if (b == "" || k > bk || (k == bk && $1 < br)) { b = $3; bk = k; br = $1 } }
+      END { print (b == "" ? "none" : b) }' <<<"$t")
+  fi
   build_gov_message "gov-mail $slug/$id" "$f" id "$id" build "$slug" from-tag "$tag" from-session "$sid" to "$to" \
-    kind "$kind" item "$it" pass "$ps" subject "$sub" answers "$an" || { echo "mail — not written · $GOVMSG_WHY"; return 2; }
+    kind "$kind" item "$it" pass "$ps" subject "$sub" answers "$an" seq "$seq" after "${aft:-none}" content-key "$ck" \
+    || { echo "mail — not written · $GOVMSG_WHY"; return 2; }
   write_mail_ref "$ref" "$tip" "$GOVMSG"; rc=$?
   case "$rc" in
     0) echo "mail — posted $id · $ref"; return 0 ;;
@@ -3863,8 +3895,9 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
 # the cached mail refs, none run where none is cached, split by `CLAIM_KV_AWK`'s strict `read_kv` in one
 # `awk`; `read_first_seen` over each message's ref and commit; one `awk` deciding each state. It prints
 # one TAB row per message whose `to` passes `check_mail_addressed <to> <who>`, oldest sighting first:
-# id, kind, to, state, first-seen, from-build, subject, answers, ref (the remote's name), commit, reply.
-# Rows sharing an id collapse to the earliest `first-seen`, ties to the lesser ref; `-` unsighted reads
+# id, kind, to, state, first-seen, from-build, subject, answers, ref (the remote's name), commit, reply,
+# then seq, after and content-key (KICK-dKeptSession-27 S4), read from the record beside the six keys
+# it requires and never required, `-` where a record carries none. Rows sharing an id collapse to the earliest `first-seen`, ties to the lesser ref; `-` unsighted reads
 # after every stamp. THE STATES (S7): a row of kind `answer` or `ack` is `reply` and never open; any
 # other is `answered` where a cached `answer` names its id in `answers`, `acked` where an `ack` does
 # and no `answer`, `open` otherwise, its `reply` the id of the earliest-sighted message deciding that
@@ -3910,17 +3943,20 @@ read_mailbox() { # who · soft|strict -> 0 with one TAB row per message addresse
       for (k in want) if (!(k in v) || v[k] == "") ok = 0
       if (ok) {
         r = "refs/gov/" substr(src, length(pre) + 1)
-        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", v["id"], v["kind"], v["to"], v["build"], v["subject"], v["answers"], r, sha
+        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", v["id"], v["kind"], v["to"], v["build"], v["subject"], v["answers"], r, sha
+        for (k = 1; k <= 3; k++) printf "\t%s", ((O[k] in v) && v[O[k]] != "" ? v[O[k]] : "-")
+        printf "\n"
         printf "%s\t%s\n", r, sha > ENVIRON["MB_PAIRS"]
       }
       src = ""
     }
-    BEGIN { split("id build to kind subject answers", K, " "); for (j in K) want[K[j]] = 1 }
+    BEGIN { split("id build to kind subject answers", K, " "); for (j in K) want[K[j]] = rd[K[j]] = 1
+            split("seq after content-key", O, " "); for (j in O) rd[O[j]] = 1 }
     /^\001/ { flush(); split(substr($0, 2), a, "\t"); src = a[1]; sha = a[2]; sub(/\r$/, "", sha); split("", v); st = 0; next }
     { sub(/\r$/, "")
       if (st == 0) { hdr = $0; st = 1; next }
       if (st == 1) { st = ($0 == "" ? 2 : 3); next }
-      if (st == 2) { if ($0 == "") { st = 3; next } read_kv($0, want, v, 0) } }
+      if (st == 2) { if ($0 == "") { st = 3; next } read_kv($0, rd, v, 0) } }
     END { flush() }' "$d/log" >"$d/rows"
   if [ ! -s "$d/rows" ]; then rm -rf "$d"; return 0; fi
   read_first_seen <"$d/pairs" >"$d/seen"
@@ -3950,7 +3986,7 @@ read_mailbox() { # who · soft|strict -> 0 with one TAB row per message addresse
         else if ((id SUBSEP "answer") in rep) { st = "answered"; rp = rep[id SUBSEP "answer"] }
         else if ((id SUBSEP "ack") in rep) { st = "acked"; rp = rep[id SUBSEP "ack"] }
         else { st = "open"; rp = "-" }
-        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", id, x[2], x[3], st, seen[best[id]], x[4], x[5], x[6], x[7], x[8], rp
+        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", id, x[2], x[3], st, seen[best[id]], x[4], x[5], x[6], x[7], x[8], rp, x[9], x[10], x[11]
       } }' "$d/seen" "$d/rows")
   rm -rf "$d"
   return 0
@@ -3995,6 +4031,31 @@ print_mailbox() { # who · open 0|1 · ids 0|1 -> 0 read or off, 2 not read
     else printf '%s\n' "$line"; fi
   done
   [ "${3:-0}" = 0 ] || printf '%s\n' "${ids:-none}"
+  return 0
+}
+
+# THE DEPENDENT'S CHECK (KICK-dKeptSession-27 S5), a function no verb prints: the key `derive_gov_id
+# --file <interface file>` derives, then `read_mailbox <slug> soft`, then over that read's `confirmed`
+# and `changed` rows whose subject is <subject>, the row whose `content-key` equals the key, the
+# lesser id where two do, since both announce the same text. It never chooses by `first-seen`, `seq`
+# or fetch order, so a `changed` relayed ahead of the `confirmed` it supersedes is still the one acted
+# on (P40). ONE LINE: `interface — current <id> · <kind> · key <k>` exit 0; `interface — unconfirmed ·
+# key <k>` exit 1; `interface — not read · <the read's first line>` or `interface — not read · the
+# interface file cannot be read: <file>` exit 2, never `unconfirmed`, so a refusal is not read as a
+# stale interface; `interface — off` exit 2 while RUN_CLAIMS is not `on`, the mailbox then unread.
+# WHAT THIS DOES NOT CHECK: where the interface's text comes from, nor what a dependent does on a
+# current `changed`, KICK-dKeptSession-7's.
+check_interface_notice() { # slug · subject · interface file -> 0 current, 1 unconfirmed, 2 off or not read
+  local slug="${1:-}" sub="${2:-}" f="${3:-}" k rows hit
+  [ "$RUN_CLAIMS" = on ] || { echo "interface — off"; return 2; }
+  k=$(derive_gov_id --file "$f") || { echo "interface — not read · the interface file cannot be read: $f"; return 2; }
+  rows=$(read_mailbox "$slug" soft) || { echo "interface — not read · ${rows%%$'\n'*}"; return 2; }
+  hit=$(IN_SUB="$sub" IN_KEY="$k" awk -F'\t' '
+    { sub(/\r$/, "") }
+    ($2 == "confirmed" || $2 == "changed") && $7 == ENVIRON["IN_SUB"] && $14 == ENVIRON["IN_KEY"] && (b == "" || $1 < b) { b = $1; kd = $2 }
+    END { if (b != "") print b " · " kd }' <<<"$rows")
+  [ -n "$hit" ] || { echo "interface — unconfirmed · key $k"; return 1; }
+  echo "interface — current $hit · key $k"
   return 0
 }
 
@@ -19830,16 +19891,16 @@ while [ $# -gt 0 ]; do
     # recipient's messages, an ack; no slug verb, because `post`, `read` or `ack` comes first.
     --mail)         refuse_waive_unless_preflight --mail
                     shift; MV_ACT=${1:-}; [ $# -eq 0 ] || shift
-                    MV_POS=(); MV_TO=""; MV_KIND=""; MV_SUB=""; MV_ITEM=""; MV_PASS=""; MV_ANS=""; MV_OPEN=0; MV_IDS=0; MV_FLAGS=""; _rl_rc=""
+                    MV_POS=(); MV_TO=""; MV_KIND=""; MV_SUB=""; MV_ITEM=""; MV_PASS=""; MV_ANS=""; MV_IFC=""; MV_OPEN=0; MV_IDS=0; MV_FLAGS=""; _rl_rc=""
                     while [ $# -gt 0 ]; do
                       case "$1" in
-                        --to|--kind|--subject|--item|--pass|--answers)
+                        --to|--kind|--subject|--item|--pass|--answers|--interface)
                           if [ $# -lt 2 ]; then echo "mail — not written · $1 takes a value"; _rl_rc=2; break; fi
-                          case "$1" in --to) MV_TO=$2 ;; --kind) MV_KIND=$2 ;; --subject) MV_SUB=$2 ;; --item) MV_ITEM=$2 ;; --pass) MV_PASS=$2 ;; *) MV_ANS=$2 ;; esac
+                          case "$1" in --to) MV_TO=$2 ;; --kind) MV_KIND=$2 ;; --subject) MV_SUB=$2 ;; --item) MV_ITEM=$2 ;; --pass) MV_PASS=$2 ;; --interface) MV_IFC=$2 ;; *) MV_ANS=$2 ;; esac
                           MV_FLAGS="$MV_FLAGS $1"; shift 2 ;;
                         --open) MV_OPEN=1; MV_FLAGS="$MV_FLAGS $1"; shift ;;
                         --ids)  MV_IDS=1; MV_FLAGS="$MV_FLAGS $1"; shift ;;
-                        --*) echo "mail — not written · --mail takes --to, --kind, --subject, --item, --pass, --answers, --open or --ids, not $1"; _rl_rc=2; break ;;
+                        --*) echo "mail — not written · --mail takes --to, --kind, --subject, --item, --pass, --answers, --interface, --open or --ids, not $1"; _rl_rc=2; break ;;
                         *) MV_POS+=("$1"); shift ;;
                       esac
                     done
@@ -19847,10 +19908,10 @@ while [ $# -gt 0 ]; do
                     elif [ "$MV_ACT" = post ]; then
                       if [ "${#MV_POS[@]}" != 2 ] || [ "$MV_OPEN$MV_IDS" != 00 ] || [[ " $MV_FLAGS " != *" --to "* ]] \
                           || [[ " $MV_FLAGS " != *" --kind "* ]] || [[ " $MV_FLAGS " != *" --subject "* ]]; then
-                        echo "mail — not written · the form is --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] <body file>"; _rl_rc=2
-                      else write_mail_post "${MV_POS[0]}" "$MV_TO" "$MV_KIND" "$MV_SUB" "${MV_ITEM:-none}" "${MV_PASS:-none}" "${MV_ANS:-none}" "${MV_POS[1]}"; _rl_rc=$?; fi
+                        echo "mail — not written · the form is --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] <body file>"; _rl_rc=2
+                      else write_mail_post "${MV_POS[0]}" "$MV_TO" "$MV_KIND" "$MV_SUB" "${MV_ITEM:-none}" "${MV_PASS:-none}" "${MV_ANS:-none}" "${MV_POS[1]}" "${MV_IFC:-none}"; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = read ]; then
-                      if [ "${#MV_POS[@]}" != 1 ] || [ -n "$MV_TO$MV_KIND$MV_SUB$MV_ITEM$MV_PASS$MV_ANS" ]; then
+                      if [ "${#MV_POS[@]}" != 1 ] || [ -n "$MV_TO$MV_KIND$MV_SUB$MV_ITEM$MV_PASS$MV_ANS$MV_IFC" ]; then
                         echo "mail — not read · the form is --mail read <who> [--open] [--ids]"; _rl_rc=2
                       else print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS"; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = ack ]; then

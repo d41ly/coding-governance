@@ -7183,6 +7183,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "check_interface_notice",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_invariant",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
