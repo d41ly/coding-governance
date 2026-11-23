@@ -957,8 +957,10 @@ write_roles none
 # checker and settings rule 7 admits, and pipes one Agent payload to agent-cap.js, printing
 # `<case> · <value> · Agent · exit <code> · <stderr>`. Staged against the base hook, which has no
 # rule 9, the spawn-none row exits 0 and reds. WHAT THIS DOES NOT CHECK: a Workflow payload, which the
-# same rule judges through the same call, and the real policy reader.
-for ac9_p in spawn-none spawn-item; do
+# same rule judges through the same call, and the real policy reader. The item-skipped row
+# (KICK-dKeptSession-43 AC4) reads the card engine's `item — skipped: <why> · at <sha8>` line: staged
+# against KICK-dKeptSession-8's arm, which throws on it as malformed, it exits 2 and reds.
+for ac9_p in spawn-none spawn-item item-skipped; do
   ac9_line=$(bash "$HERE/actions-free.fixture.sh" --plant "$ac9_p" 2>&1 | grep -F -- "$ac9_p · read-only-probes · Agent · " | head -n 1)
   case $ac9_p in
     spawn-none) case $ac9_line in
@@ -970,6 +972,11 @@ for ac9_p in spawn-none spawn-item; do
         *' · exit 0 · '*actions.free*|'') echo "FAIL rule9 AC5: a spawn inside the item in flight passes with no actions.free line: ${ac9_line:-no line}"; fail=$((fail+1)) ;;
         *' · exit 0 · '*) echo "ok   rule9 AC5: a spawn inside the item in flight passes with no actions.free line"; pass=$((pass+1)) ;;
         *) echo "FAIL rule9 AC5: a spawn inside the item in flight passes with no actions.free line: $ac9_line"; fail=$((fail+1)) ;;
+      esac ;;
+    item-skipped) case $ac9_line in
+        *' · exit 0 · agent-cap: rule 9 unarmed — item pointer skipped: no loop kit position.py resolves in this tree'*)
+          echo "ok   rule9 KICK-dKeptSession-43 AC4: a spawn at a skipped item pointer admits with the unarmed line"; pass=$((pass+1)) ;;
+        *) echo "FAIL rule9 KICK-dKeptSession-43 AC4: a spawn at a skipped item pointer admits with the unarmed line: ${ac9_line:-no line}"; fail=$((fail+1)) ;;
       esac ;;
   esac
 done

@@ -32,6 +32,9 @@
 #   throw        a directory at the card file's path: echo x > f
 #   no-helper    no policy reader beside the hooks: echo x > f
 #   refusal      the policy reader throws a PolicyRefusal: echo x > f
+#   item-skipped  read-only-probes, item skipped: echo x > f and git commit -m x to scratch-guard.js, and
+#                an Agent payload to agent-cap.js (KICK-dKeptSession-43)
+#   item-malformed read-only-probes, item ???: echo x > f
 # Exit 0 once every call of the case ran; 2 on a usage error or a scratch repository that could not
 # be built. It judges nothing: the hooks kit's suites read its lines. WHAT IT DOES NOT DO: run any
 # payload's command, or read the real policy or kickoff kits.
@@ -39,7 +42,7 @@ set -u
 [ "${1:-}" = --plant ] && [ -n "${2:-}" ] || { echo "actions-free.fixture: usage: bash actions-free.fixture.sh --plant <case>"; exit 2; }
 PLANT=$2
 case $PLANT in
-  probes-none|probes-item|reads-none|anything-none|spawn-none|spawn-item|no-pointers|no-route|other-owner|throw|no-helper|refusal) ;;
+  probes-none|probes-item|reads-none|anything-none|spawn-none|spawn-item|no-pointers|no-route|other-owner|throw|no-helper|refusal|item-skipped|item-malformed) ;;
   *) echo "actions-free.fixture: no case $PLANT"; exit 2 ;;
 esac
 HERE=.; [[ $0 == */* ]] && HERE=${0%/*}
@@ -165,5 +168,13 @@ case $PLANT in
   refusal)
     write_fixture_card "$SID" none; write_fixture_value refusal
     run_fixture_call '(a PolicyRefusal)' 'echo x > f' scratch-guard.js Bash 'echo x > f' ;;
+  item-skipped)
+    write_fixture_card "$SID" 'skipped: no loop kit position.py resolves in this tree'; write_fixture_value read-only-probes
+    run_fixture_call read-only-probes 'echo x > f' scratch-guard.js Bash 'echo x > f'
+    run_fixture_call read-only-probes 'git commit -m x' scratch-guard.js Bash 'git commit -m x'
+    run_fixture_call read-only-probes 'Agent' agent-cap.js Agent 'a fixture prompt' ;;
+  item-malformed)
+    write_fixture_card "$SID" '???'; write_fixture_value read-only-probes
+    run_fixture_call read-only-probes 'echo x > f' scratch-guard.js Bash 'echo x > f' ;;
 esac
 exit 0
