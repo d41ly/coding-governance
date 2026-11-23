@@ -83,6 +83,12 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every new Python text read or write, subprocess call included, names `encoding="utf-8"`. No shipped file spells a
   kit path literally: build a path from a variable or from the file's own location. Every code citation in a record
   names its full path. The pass legs red on each of these.
+- This is round two. Round one (`wf_210dcba7-3d4`) wrote nothing and handed back four divergences; the main loop
+  decided each in `build/2026-11-23-build-TOOL-dBoundRoles-20-4-main-loop-decision.md`, which binds over the spec as
+  the owner's ruling does: read it whole before you write. It adds `tools/playbook/gov_tag.py` and
+  `tools/playbook/adopt-playbook.sh` to the write set, homes the matrix arm in `check_role_acts`, lists a repository
+  role in the index with no body or agent file, and hands `check_actor_patch` the gov row's original actor role.
+  Every claim round one confirmed still holds at this dispatch's base; do not re-derive them.
 - The owner ruled on 2026-11-23, "Build gaps here", and that ruling binds over this spec wherever it still says the
   unit waits on an ask: read `build/2026-11-23-build-TOOL-dBoundRoles-20-2-owner-ruling.md` whole before you write.
   Section 8 F8's pick moved from (a) to (b), and the four gaps it names were each built as their own unit before you,
