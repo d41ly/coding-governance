@@ -40253,6 +40253,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_extract_env_dropped",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_extract_env_reads",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
