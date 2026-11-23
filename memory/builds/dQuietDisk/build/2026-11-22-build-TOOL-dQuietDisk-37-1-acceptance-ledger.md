@@ -21,3 +21,4 @@ This pass ran no merge bar, no self-test suite, no self-test runner and no gate 
 - seen-red — `python resolver (behaviour + inline parity + idiom ban)` — red `aa5409b3` — green `aa5409b3` — the Python sweep without its `py:` test
 - seen-red — `selftest harness self-test` — red `2e09f6cb` — green `2e09f6cb` — the key without its argument fold and, in its own run, the old sleep-1 builder with the second racer six seconds late
 - seen-red — `run-selftests self-test` — red `aa5409b3` — green `aa5409b3` — the export of the runner's root before the serial rows dropped
+- seen-red — `govkit selftest` — red `aa5409b3` — green `aa5409b3` — `derive_kit_attestations` without its row-hash clause and, in the same run, `blob_at` sending a CR name to the batch
