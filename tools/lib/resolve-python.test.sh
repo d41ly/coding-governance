@@ -689,13 +689,14 @@ done
 # inline block, else the block in the one sibling it sources by a column-0 `. "$KIT_DIR/<name>"` line,
 # as the driver sources `lib-unattended.sh`, and for the canonical `gov-feed.sh` the canonical
 # `health-log.sh` beside it; a carrier with none prints `<file>: no health_log_sh beside gov_feed_sh`.
-# The two cuts run in an empty environment under `set -u`, inside a scratch repository holding one
-# commit: a fresh take of `gov-feed.lock` and its release, the break of a planted stale lock and its
-# release, and one `add_feed_event` of that commit. A call that exits non-zero, `unbound variable` or
+# The two cuts run in an empty environment under `set -u`, inside a scratch repository whose commit
+# touches a file under its memory root: a fresh take of `gov-feed.lock` and its release, the break of
+# a planted stale lock and its release, one `add_feed_event` of that commit and one `add_record_events`
+# of it (TOOL-dTotalRecall-24 S9). A call that exits non-zero, `unbound variable` or
 # `command not found` on stderr (a `$( )` dies alone and its caller runs on), or a lock directory left
-# behind prints `<file>: <first stderr line>`; and the append must grow the scratch common dir's
-# `gov-feed.log` by one line, else `<file>: add_feed_event appended <n> lines` (S20), since a
-# `feed: NOTE` line exits 0. An empty population is its own red (S2), and the population is read with
+# behind prints `<file>: <first stderr line>`; and each append must grow the scratch common dir's
+# `gov-feed.log` by one line, else `<file>: add_feed_event appended <n> lines` (S20) or
+# `<file>: add_record_events appended <n> lines`, since a `feed: NOTE` line exits 0. An empty population is its own red (S2), and the population is read with
 # the parity loop's pathspec, the canonical kept in it (S32), so no record carrying the marker joins.
 # WHAT THIS DOES NOT CHECK: a name the block reads only on a path the five calls do not take, such as
 # the guard-cleared branch; carrier code outside the block; a sibling sourced by any other spelling.
@@ -703,7 +704,7 @@ read_feed_carriers() { # -> every tracked file under the parity loop's pathspec 
   git grep -l '^# >>> gov_feed_sh' -- '*.sh' '*.py' '.githooks/*' WIRE-INTO-PROJECT.md | tr -d '\r'
 }
 check_feed_copies() { # carrier file… -> `<file>: <first stderr line>` per copy that fails alone, rc 1; none, rc 0
-  local f rc e1 hs s n fc="$TMP/feed-copies" out=""
+  local f rc e1 hs s n r fc="$TMP/feed-copies" out=""
   [ "$#" -gt 0 ] || { echo "no inline copy of 'gov_feed_sh' found — the carrier arm would be judging an empty population"; return 1; }
   mkdir -p "$fc"
   for f in "$@"; do
@@ -721,7 +722,9 @@ check_feed_copies() { # carrier file… -> `<file>: <first stderr line>` per cop
     blk health_log_sh "$hs" > "$fc/health.cut"
     (unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE; cd "$fc/run" && git init -q . \
       && git -c user.name=t -c user.email=t@x -c commit.gpgsign=false -c core.hooksPath="$fc/no-hooks" \
-         commit -q --no-verify --allow-empty -m feed) >/dev/null 2>&1 || { out="$out$f: the scratch repository could not be made"$'\n'; continue; }
+         commit -q --no-verify --allow-empty -m feed && mkdir memory && printf 'r\n' > memory/r.md && git add memory/r.md \
+      && git -c user.name=t -c user.email=t@x -c commit.gpgsign=false -c core.hooksPath="$fc/no-hooks" \
+         commit -q --no-verify -m record) >/dev/null 2>&1 || { out="$out$f: the scratch repository could not be made"$'\n'; continue; }
     (cd "$fc/run" && env -i PATH="$PATH" HOME="$HOME" bash -c 'set -u; . "$1"; . "$2"
       c=$(git rev-parse --path-format=absolute --git-common-dir); c=${c%$'\''\r'\''}
       write_dir_lock "$c/gov-feed.lock" t1 "$NODE_LOCK_BOUND" node || { echo "a fresh take exited $?" >&2; exit 1; }
@@ -729,7 +732,8 @@ check_feed_copies() { # carrier file… -> `<file>: <first stderr line>` per cop
       mkdir "$c/gov-feed.lock" && printf "%s\n" "$(( EPOCHSECONDS - 1 ))" > "$c/gov-feed.lock/until"
       write_dir_lock "$c/gov-feed.lock" t2 "$NODE_LOCK_BOUND" node || { echo "the stale break exited $?" >&2; exit 1; }
       remove_dir_lock "$c/gov-feed.lock" t2 || { echo "the release after the break exited $?" >&2; exit 1; }
-      add_feed_event refs/gov/bar-red "$(git rev-parse HEAD)" || { echo "add_feed_event exited $?" >&2; exit 1; }' \
+      add_feed_event refs/gov/bar-red "$(git rev-parse HEAD)" || { echo "add_feed_event exited $?" >&2; exit 1; }
+      add_record_events refs/heads/main "$(git rev-parse HEAD)" || { echo "add_record_events exited $?" >&2; exit 1; }' \
       _ "$fc/health.cut" "$fc/feed.cut") >/dev/null 2>"$fc/err"; rc=$?
     e1=""; { IFS= read -r e1 < "$fc/err"; } 2>/dev/null || :; e1=${e1%$'\r'}
     if [ "$rc" != 0 ] || grep -qE 'unbound variable|command not found' "$fc/err"; then
@@ -737,8 +741,9 @@ check_feed_copies() { # carrier file… -> `<file>: <first stderr line>` per cop
     elif [ -e "$fc/run/.git/gov-feed.lock" ] || [ -e "$fc/run/.git/gov-feed.lock.break" ]; then
       out="$out$f: a gov-feed.lock directory remains after the calls"$'\n'
     else
-      n=0; [ ! -f "$fc/run/.git/gov-feed.log" ] || n=$(grep -c '' "$fc/run/.git/gov-feed.log")
-      [ "$n" = 1 ] || out="$out$f: add_feed_event appended $n lines"$'\n'
+      n=0; r=0; [ ! -f "$fc/run/.git/gov-feed.log" ] || { n=$(grep -c '' "$fc/run/.git/gov-feed.log"); r=$(grep -c $'\trecord\t' "$fc/run/.git/gov-feed.log"); }
+      if [ "$((n - r))" != 1 ]; then out="$out$f: add_feed_event appended $((n - r)) lines"$'\n'
+      elif [ "$r" != 1 ]; then out="$out$f: add_record_events appended $r lines"$'\n'; fi
     fi
   done
   [ -z "$out" ] && return 0
@@ -783,6 +788,11 @@ fc_take='    write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" no
 write_feed_plant "$fc_take" "    [ -n \"\${ROOT:-}\" ] || exit 0; ${fc_take#    }" "$fp/rootless.sh" || bad "the ROOT-skip plant matched no line of the canonical gov_feed_sh"; ok
 fc_got=$(check_feed_copies "$fp/rootless.sh"); fc_rc=$?
 [ "$fc_rc|$fc_got" = "1|$fp/rootless.sh: add_feed_event appended 0 lines" ] || bad "the carrier arm passed a copy whose append never writes (rc $fc_rc): $fc_got"; ok
+# TOOL-dTotalRecall-24 AC11: the record path's root read reaching for a name no carrier sets, read only
+# where the scratch repository declares no root, so only the record call can red it.
+write_feed_plant '  [ -n "$v" ] || v=memory' '  [ -n "$v" ] || v=$MEMORY_ROOT' "$fp/record.sh" || bad "the record plant matched no line of the canonical gov_feed_sh"; ok
+fc_got=$(check_feed_copies "$fp/record.sh"); fc_rc=$?
+case "$fc_rc|$fc_got" in "1|$fp/record.sh: "*"MEMORY_ROOT: unbound variable") ok ;; *) bad "the carrier arm passed a copy whose record path reads an unset MEMORY_ROOT (rc $fc_rc): $fc_got" ;; esac
 mkdir -p "$fp/pop" && printf '# >>> gov_feed_sh\n' > "$fp/pop/a.sh" && printf '# >>> gov_feed_sh\n' > "$fp/pop/notes.md"
 fc_got=$(unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE; cd "$fp/pop" && git init -q . && git add a.sh notes.md && read_feed_carriers)
 [ "$fc_got" = a.sh ] || bad "the carrier population read a Markdown record carrying the marker: ${fc_got//$'\n'/ | }"; ok
@@ -2071,6 +2081,24 @@ fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && FEED_WRITER_HELPER_FNS="$FEED_WR
 [ "$fw_got" = "FEED_WRITER_HELPER_FNS names no_such_fn(), which is no function of the files read" ] \
   || bad "the census passed a stale helper entry: ${fw_got//$'\n'/ | }"; ok
 blk gov_feed_sh "$HERE/gov-feed.sh" | grep -q scan_feed_writers && bad "the census ships inside the gov_feed_sh block every carrier copies"; ok
+# TOOL-dTotalRecall-24 AC6 — THE LANDING ARM. Its lines end ` landing`, and its list grades name
+# FEED_LANDING_PUSH_FNS, so they read apart from the limb-2 hit the lander's candidate-ref push already
+# prints (TOOL-dWitnessedBar-6). The population's landing lines each sit in a scope calling
+# `add_record_events`; a planted default-branch push with no such call prints its line; a list entry
+# naming no function, or one whose body runs no `git push`, prints its name; and a population holding
+# no landing line says so rather than passing.
+fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && scan_feed_writers $fw_pop 2>&1 | tr -d '\r' | grep -E ' landing$|^FEED_LANDING_PUSH_FNS|landing arm')
+[ -z "$fw_got" ] || bad "a landing push of the default branch skips the record events: ${fw_got//$'\n'/ | }"; ok
+printf '%s\n' 'land_writer() {' '  git push "$remote" "HEAD:refs/heads/$def"' '}' > "$fw/land.sh"
+fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && scan_feed_writers $fw_pop "$fw/land.sh" 2>&1 | tr -d '\r' | grep -E ' landing$|^FEED_LANDING_PUSH_FNS|landing arm')
+[ "$fw_got" = "$fw/land.sh:2 landing" ] || bad "the census passed a landing push with no add_record_events call: ${fw_got//$'\n'/ | }"; ok
+fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && FEED_LANDING_PUSH_FNS="$FEED_LANDING_PUSH_FNS no_such_pusher add_feed_event" && scan_feed_writers $fw_pop 2>&1 | tr -d '\r' | grep '^FEED_LANDING_PUSH_FNS' | sort)
+[ "$fw_got" = "FEED_LANDING_PUSH_FNS names add_feed_event(), whose own body holds no git push line"$'\n'"FEED_LANDING_PUSH_FNS names no_such_pusher(), which is no function of the files read" ] \
+  || bad "the census passed a stale landing pusher entry: ${fw_got//$'\n'/ | }"; ok
+printf '%s\n' 'quiet() {' '  :' '}' > "$fw/quiet.sh"
+fw_got=$(. "$HERE/gov-feed.sh" && FEED_LANDING_PUSH_FNS="" && scan_feed_writers "$fw/quiet.sh" 2>&1 | tr -d '\r' | grep 'landing arm')
+[ "$fw_got" = "no line of the files read carries a landing push of the default branch, so the landing arm matched nothing and passes nothing" ] \
+  || bad "the landing arm read a population holding no landing line as a pass: ${fw_got//$'\n'/ | }"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

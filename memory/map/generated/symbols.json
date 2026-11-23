@@ -873,6 +873,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "add_feed_event",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "add_feed_sightings",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
@@ -1081,6 +1086,31 @@
       "id": "add_recipe_seam",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "add_record_events",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "add_record_events",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "add_record_events",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "add_record_events",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "add_record_events",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "add_record_kind",
@@ -12463,6 +12493,31 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "derive_feed_row",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "derive_feed_row",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "derive_feed_row",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "derive_feed_row",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "derive_feed_row",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_fetch_url",
       "kind": "function",
       "file": "tools/loop/position.py"
@@ -13998,6 +14053,31 @@
       "file": "tools/codebase-map/replay-phrases.py"
     },
     {
+      "id": "derive_record_events",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "derive_record_events",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "derive_record_events",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "derive_record_events",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "derive_record_events",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_record_field",
       "kind": "function",
       "file": "tools/memory-tree/shape_run.py"
@@ -14031,6 +14111,31 @@
       "id": "derive_record_roots",
       "kind": "function",
       "file": "tools/codebase-map/map_diff.py"
+    },
+    {
+      "id": "derive_record_rows",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "derive_record_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "derive_record_rows",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "derive_record_rows",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "derive_record_rows",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_record_shown",
@@ -26048,6 +26153,31 @@
       "file": "tools/memory-tree/record_causes.py"
     },
     {
+      "id": "read_record_root",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "read_record_root",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "read_record_root",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "read_record_root",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "read_record_root",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_record_slugs",
       "kind": "function",
       "file": "tools/workflows/review_dispose.py"
@@ -26556,6 +26686,11 @@
       "id": "read_rp_line",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_rr_field",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "read_ru_key",
@@ -37298,6 +37433,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_rr_git",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_runlog",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -43388,6 +43528,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "write_dir_lock_wait",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "write_disposal_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -43524,6 +43669,31 @@
     },
     {
       "id": "write_feed",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_feed_lines",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "write_feed_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "write_feed_lines",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "write_feed_lines",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "write_feed_lines",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },

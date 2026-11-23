@@ -710,7 +710,13 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `extra`, `order` or `torn` line per finding, 0 otherwise. `--feed rebuild` writes the derived feed
   where none is present, `seq` from 1, and exits 2 naming one that is. `--feed print [--from <seq>]`
   replays every event at or after `<seq>`, in file order. It takes no slug and reads no remote;
-  `UNATTENDED-STOPS.md` §7 is what the feed records.
+  `UNATTENDED-STOPS.md` §7 is what the feed records. Every landing the lander makes also appends a
+  `record` event per distinct key of each landed commit touching a record under `MEMORY_ROOT`: ref
+  `refs/heads/<default>`, the record file's blob, `-` where it is absent after the commit, and the
+  commit. `--feed check` also holds those events, as sets, to the walk of the default branch up to the
+  newest one any branch reaches, naming `missing`, `extra`, or `unread` for a `MEMORY_ROOT` that is no
+  plain relative path; `--feed rebuild` then appends the record events of the remote default branch's
+  tracking ref, and exits 2 with `feed: no record events were rebuilt: <why>` where none resolves.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it

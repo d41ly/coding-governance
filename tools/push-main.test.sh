@@ -224,7 +224,9 @@ fail=0
 # every later unit adding an `ok` row that runs there raises it.
 # 103 = 101 + TOOL-dPlacedRequest-99 S3's two fenced-landing rows, 55 and 56, one `ok` call site run
 # twice by its loop, counted off the block; no suite ran in the pass.
-FLOOR_ASSERTIONS=103
+# 105 = 103 + TOOL-dTotalRecall-24's two RE AC7 rows, one per landing path, counted off the block; no
+# suite ran in the pass.
+FLOOR_ASSERTIONS=105
 n=0; skipped=0
 ok()  { echo "  ok   — $1"; n=$((n + 1)); }
 bad() { echo "  FAIL — $1"; fail=1; }
@@ -823,6 +825,29 @@ remafter=$(git ls-remote "$tmp/remote2.git" refs/heads/main | awk '{print $1}')
 out21b=$( cd "$tmp/work2" && bash "$lander" 2>&1 ); rc21b=$?
 [ "$rc21b" = 0 ] && case "$out21b" in *"landed main on origin"*) true ;; *) false ;; esac \
   && ok "21b the no-argument invocation still lands from the primary tree" || bad "21b rc=$rc21b $out21b"
+
+# RE AC7 (TOOL-dTotalRecall-24 S5) — EACH LANDING PATH APPENDS THE LANDED RANGE'S RECORD EVENTS to the
+#      node's change feed, the common dir's `gov-feed.log` the worktree and the primary tree share: a
+#      run branch carrying a record commit lands through --land, then a record commit on the primary
+#      tree's default branch lands through the attended path. Staged RED by deleting either success
+#      branch's `add_record_events` call: that landing's line is absent.
+re_feed="$(git -C "$tmp/work2" rev-parse --path-format=absolute --git-common-dir)/gov-feed.log"
+build_main; build_feat
+mkdir -p "$tmp/wt/memory"; echo "r $RANDOM" > "$tmp/wt/memory/land.md"; git -C "$tmp/wt" add memory/land.md
+git -C "$tmp/wt" commit -q -m "TOOL-tFix-5: a record"; re_c=$(git -C "$tmp/wt" rev-parse HEAD)
+re_out=$(run_wt --prepare --slug tFix 2>&1 && run_wt --land --slug tFix 2>&1); re_rc=$?
+re_l=$(printf 'refs/heads/main\trecord\t%s\t%s' "$(git -C "$tmp/wt" rev-parse "$re_c:memory/land.md")" "$re_c")
+[ "$re_rc" = 0 ] && cut -f2-5 "$re_feed" 2>/dev/null | grep -qxF "$re_l" \
+  && ok "RE AC7 --land appends the landed record commit's event to the feed" \
+  || bad "RE AC7 --land (rc $re_rc) left no record event for ${re_c:0:8} in the feed: $re_out"
+build_main; git -C "$tmp/work2" checkout -q main
+mkdir -p "$tmp/work2/memory"; echo "a $RANDOM" > "$tmp/work2/memory/attended.md"; git -C "$tmp/work2" add memory/attended.md
+git -C "$tmp/work2" commit -q -m "a record, landed attended"; re_c=$(git -C "$tmp/work2" rev-parse HEAD)
+re_out=$( cd "$tmp/work2" && bash "$lander" 2>&1 ); re_rc=$?
+re_l=$(printf 'refs/heads/main\trecord\t%s\t%s' "$(git -C "$tmp/work2" rev-parse "$re_c:memory/attended.md")" "$re_c")
+[ "$re_rc" = 0 ] && cut -f2-5 "$re_feed" 2>/dev/null | grep -qxF "$re_l" \
+  && ok "RE AC7 the attended path appends the landed record commit's event to the feed" \
+  || bad "RE AC7 the attended landing (rc $re_rc) left no record event for ${re_c:0:8} in the feed: $re_out"
 
 # 22 — an OBSERVATION failure exits 3 and never 2, so a driver cannot read a network fault as a
 #      misdeclared flag. Two causes, one code.

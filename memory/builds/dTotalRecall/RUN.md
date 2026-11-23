@@ -354,3 +354,13 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T08:30:19Z brief · item TOOL-dTotalRecall-67 · reason b56fa1cefa46 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-67-build-brief.md
 
 2026-11-23T08:31:36Z dispatch · item c2368995 TOOL-dTotalRecall-67 · reason memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-55.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-56.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-57.md memory/builds/dTotalRecall/build tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-67.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-67-1-acceptance-ledger.md
+
+2026-11-23T08:43:39Z brief · item TOOL-dTotalRecall-24 · reason 8fcbcde94fdd memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-24-build-brief.md
+
+2026-11-23T08:45:05Z dispatch · item 55f322f2 TOOL-dTotalRecall-24 · reason tools/lib/gov-feed.sh tools/push-main.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/memory-tree/gov-claim.sh tools/lib/resolve-python.test.sh tools/unattended/unattended.test.sh tools/push-main.test.sh help/loop.md tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-24.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-24-1-acceptance-ledger.md
+2026-11-23T08:53:54Z draw · re-dispatch · TOOL-dTotalRecall-24 · 48/186 · 20261123T085354Z-ad61a2
+
+2026-11-23T08:53:54Z dispatch · item 55f322f2 TOOL-dTotalRecall-24 · reason memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md memory/builds/dTotalRecall/build
+2026-11-23T09:13:00Z draw · re-dispatch · TOOL-dTotalRecall-24 · 49/186 · 20261123T091300Z-93cbe7
+
+2026-11-23T09:13:00Z dispatch · item 55f322f2 TOOL-dTotalRecall-24 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
