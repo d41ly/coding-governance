@@ -4278,6 +4278,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_session_fixture",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "build_session_tree",
       "kind": "function",
       "file": "tools/runlog/extract.py"
@@ -6408,6 +6413,11 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "check_effort_floor",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_emitted",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -6736,6 +6746,11 @@
       "id": "check_fragments",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_frame_arm",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "check_framing_arm",
@@ -12353,6 +12368,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "derive_frame",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "derive_from_states",
       "kind": "function",
       "file": "tools/loop/loop_table.py"
@@ -12616,6 +12636,11 @@
       "id": "derive_host_note",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "derive_house_source",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "derive_hygiene_plant",
@@ -18676,6 +18701,11 @@
       "id": "measure_population",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
+      "id": "measure_population_entries",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "measure_predictors",
@@ -25578,6 +25608,11 @@
       "file": "tools/playbook/gov_tag.py"
     },
     {
+      "id": "read_return_bounds",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "read_return_dir",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
@@ -29903,6 +29938,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "render_return_contract",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "render_role",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -29936,6 +29976,11 @@
       "id": "render_row_after",
       "kind": "function",
       "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "render_row_contract",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "render_row_order",
@@ -34816,6 +34861,11 @@
       "id": "run_handoff",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "run_handoff_render",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "run_harness",
@@ -41681,6 +41731,11 @@
       "id": "write_agent_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "write_agent_transcript",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "write_alias_copies",

@@ -942,6 +942,7 @@ check_arm "arm 18 the render's ATTENDED bullet names the chain's two verbs" "$_v
 # ---- arm 19 (TOOL-aProfiledEffort-2 AC9): `handoff.py stage-efforts` and `role-efforts` hand a named
 # ---- model to the resolver. ONE profile, `tfam`, is appended to the fixture's policy after the
 # ---- scaffold: it answers the model id `vendor-tfam-9`, and no profile answers `vendor-other-9`.
+# ---- Every appended level sits at the floor `medium` or above, which R12 holds (TOOL-dBoundRoles-23 S7).
 # ---- 19a's expected bytes come from A19P, an inline program that imports nothing from the kit and
 # ---- reads the fixture's `[effort]` tables, its workflow table and the scaffolded role index, so
 # ---- the guard shares no code with the verbs it guards. The arm reads no git revision. 19c's last
@@ -966,7 +967,7 @@ else:
     out = {k: over.get(k, level(s)) for k, s in stages.items()}
 sys.stdout.buffer.write((json.dumps(out, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8"))'
 build_fixture; _rc19=$?
-printf '%s\n' '' '[effort.profiles.tfam]' 'match = ["tfam"]' 'default = "low"' '' \
+printf '%s\n' '' '[effort.profiles.tfam]' 'match = ["tfam"]' 'default = "medium"' '' \
    '[effort.profiles.tfam.roles]' 'gov-builder = "max"' '' \
    '[effort.profiles.tfam.stages.closing-review]' 'synthesis = "xhigh"' >> "$FX/$KREL/house/policy.toml"
 _a19=1; _b19=1; _c19=1; _d19=1; [ "$_rc19" = 0 ] || _a19=0
@@ -995,7 +996,7 @@ check_arm "arm 19 an empty or whitespace-only --model refuses with exit 2, namin
 # is a model two profiles match. Both verbs exit 1 with stdout empty and a stderr naming R12 and
 # both `match` keys, and no Traceback. The append comes last: `tven` also answers `vendor-other-9`,
 # which 19b reads as unmatched.
-printf '%s\n' '' '[effort.profiles.tven]' 'match = ["vendor"]' 'default = "low"' >> "$FX/$KREL/house/policy.toml"
+printf '%s\n' '' '[effort.profiles.tven]' 'match = ["vendor"]' 'default = "medium"' >> "$FX/$KREL/house/policy.toml"
 _e19=1
 for _w in roles build; do
   _q=(stage-efforts "$_w"); [ "$_w" = roles ] && _q=(role-efforts)
@@ -1052,10 +1053,10 @@ fi
 # ---- failing case, observed at the close and not by the pass that wrote this: a render that writes
 # ---- no `effort` key, under which the edited policy still checks clean.
 build_fixture
-printf '%s\n' '' '[effort.profiles.tfam]' 'match = ["tfam"]' 'default = "low"   # a21' >> "$FX/$KREL/house/policy.toml"
+printf '%s\n' '' '[effort.profiles.tfam]' 'match = ["tfam"]' 'default = "high"   # a21' >> "$FX/$KREL/house/policy.toml"
 (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1); _rc21=$?
 check_arm "arm 21 a policy that gains a profile scaffolds and checks clean" "$([ "$_rc21" = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
-sed -i 's/^default = "low"   # a21$/default = "max"/' "$FX/$KREL/house/policy.toml"
+sed -i 's/^default = "high"   # a21$/default = "max"/' "$FX/$KREL/house/policy.toml"
 out=$(run_adopter --check); rc=$?
 check_arm "arm 21 a profile level edited with no re-render is a drifted index, named" \
    "$([ "$rc" = 1 ] && [[ $out == *'drift .claude/roles.json'* ]] && [[ $out != *'drift .claude/agents/'* ]] && echo 1 || echo 0)"
@@ -2194,7 +2195,7 @@ check_arm "arm 38 AC2 the skeptic's render handing a scratch spec exits 0" "$([ 
 kit = pathlib.Path(sys.argv[1]); src = (kit / "handoff.py").read_text(encoding="utf-8")
 anchor = "    if declaration is not None:\n        # TOOL-dBoundRoles-3 S2"
 (kit / "handoff_a38.py").write_text(src.replace(anchor, sys.argv[2] + "\n" + anchor, 1), encoding="utf-8", newline="\n")' \
-  "$FX/$FXK" $'    blocks.append("### framing:added\\n\\n```")'
+  "$FX/$FXK" $'    blocks.append(("added", "### framing:added\\n\\n```", None))'
 _ls=$(ls -A "$A38P")
 (cd "$FX" && "$PY" -B "$FXK/handoff_a38.py" render --role gov-skeptic --build tFix --unit TOOL-tFix-1 --input "spec=$A38S" \
    --input "diff=one diff line" >/dev/null 2>"$A38E"); _rc=$?

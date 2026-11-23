@@ -92,8 +92,26 @@ reference; this page is the short version.
    the task-sha covers. The prompt writer's own task is your details as you gave them, and is never
    framed. Under `requesting-worker-rendered` you render the role's task yourself, with no
    `--framed-by`. A handoff to another session, `gov-session`, takes no prompt writer.
+
+   After the opening line, the task's blocks always run in one order, the frame, whatever order the
+   render met them in: the role and its job (`### item`, `### framing:job`), the material (each input
+   block, then `### inputs`), the boundaries (`### allowance`), the population
+   (`### framing:population`), the upstream rows (`### upstream:rows`), the row contract
+   (`### row contract`, one row per member: id, evidence of search, a verdict from the role's
+   `outcome` set or `undecided`, and a reason), the added hunts (`### framing:added`), the no-stop
+   line (`### framing:no-stop`, which then defines "incomplete" against the population), and the
+   return contract last (`### return`, `### witness`). A part with no block is left out. Every list
+   is bounded: a population lists at most twelve entries, its lines opening with `- `, and closes with
+   `… and <n> more; the full list is <the prompt writer's transcript>`. An item's `### return` states
+   `<field>: at most <n> entries` for each list field, `n` the population's entry count or twelve,
+   and the return check refuses a reply whose list is longer, naming the field and the bound. With
+   upstream rows handed, `### return` repeats the rule for answering them under `## Upstream`. An
+   item's task framed by a prompt writer whose return carries no `population` is refused, naming
+   `framing:population`: no item lists its own population, so the prompt writer's steps for finding
+   it are the population.
 5. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
-   which starts without the full charter and at the reasoning effort the policy file sets. It
+   which starts without the full charter and at the reasoning effort the policy file sets, held to
+   the floor `medium` that only your own policy key goes below (see "The effort floor" below). It
    carries the practices its role cites and the charter's Protocols and Facts sections, first.
    The dispatcher passes the level for the model in use: a harness call carries `efforts`, the JSON
    `handoff.py stage-efforts <workflow> --model <id>` prints, where `<id>` is the session's own
@@ -192,6 +210,16 @@ refuses the render, naming the key.
   `roles.effort.default` for every role, or `roles.model.<role>.claude-code`. A set key wins over
   `<prefix>/roles/house/policy.toml`, whose `[effort]` tables set levels per role and per harness stage
   where no key is set; with neither, a role runs at the `effort` its role file declares.
+- **The effort floor is `medium`.** No role or stage runs below `medium` unless you, the owner, set a
+  lower level as a `roles.effort.*` key in `.governance/policy.toml`, the file the policy guard
+  keeps an agent's change out of. That key is the one exception, and it holds only while
+  `policy-file.guard` is `owner-only`, its default. Under `agents-with-reason` or
+  `agents-within-mandate` a level below `medium` there is refused, naming `policy-file.guard`,
+  because those values let an agent's change write the file. Everywhere else a level below `medium`
+  is refused, naming the level, where it came from, the floor and the key to set instead: the house
+  file's `[effort]` and `[effort.profiles.<name>]` tables (an R12 defect), a role file's `effort` (an
+  R2 defect), and a stage row's own `effort` when it resolves. The floor cannot tell your commit from
+  a live run's own change to the policy file, which the guard admits on that run's branch.
 - **Change the gates a role may run:** a role's `gates` field lists the only gate legs its agent may
   run, and a `[gates]` row of the house file applies only to a role carrying no such field.
   `gov-spec-writer` and `gov-builder` carry theirs as fields, so a house row does not change them.

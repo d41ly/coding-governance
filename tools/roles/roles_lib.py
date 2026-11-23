@@ -59,6 +59,13 @@ READ_KEYS = frozenset("%s:%s" % (f, n) for f, names in READ_FAMILIES.items() for
 #: Code 2.1.292, whose agent loader and `Workflow` `agent()` options both take these five names; the
 #: integer form only the loader accepts is refused, so one level is legal on both carriers.
 EFFORT_LEVELS = tuple("low medium high xhigh max".split())
+#: The floor every resolved or declared level holds (TOOL-dBoundRoles-23 S5), its one spelling: a level below
+#: it passes `check_effort_floor` only from a `roles.effort.*` key of the guarded policy file, and only while
+#: that file's `policy-file.guard` is `owner-only`, under which the owner's terminal commit writes there.
+EFFORT_FLOOR = "medium"
+EFFORT_POLICY_FILE = ".governance/policy.toml"
+EFFORT_POLICY_PREFIX = "roles.effort."
+EFFORT_GUARD_KEY, EFFORT_GUARD_OWNER = "policy-file.guard", "owner-only"
 POLICY_EFFORT_KEYS = ("default", "roles", "stages")
 #: One word of a model id, a run of lower-case letters and digits (TOOL-aProfiledEffort-1):
 #: `resolve_profile` splits a lower-cased id into them, and a profile's `match` entry is exactly one.
@@ -158,6 +165,17 @@ WORK_ORDER_KIND = {"kind": "work-order", "tag": "record-kind.work-order", "folde
 #: The five blocks an item's work order carries at the end of `## Task`, in order: the kind's parts after the
 #: marker and the two sections, so `render_handoff` writes and `check_handoff` reads one list.
 WORK_ORDER_BLOCKS = WORK_ORDER_KIND["parts"][3:]
+#: The work order's frame, shared interface I15 (TOOL-dBoundRoles-23 S1): aScoutedSeam's prompt skeleton, its
+#: nine slots in order. Every block of the work-order template's `reads` fill carries one, and `derive_frame`
+#: sorts that fill by it; the practices, the card's block and the opening line ahead of it carry none (§8 F5).
+FRAME_SLOTS = ("role", "material", "boundaries", "population", "upstream", "contract", "added", "no-stop", "return")
+#: The bound on a list the frame renders, and on a return's `list` field where no population sets one (S3,
+#: §4 "The bound"), pinned from the night pass two's reuse-scout contract, "at most twelve seams" (NT-10).
+FRAME_LIST_BOUND = 12
+#: A `list` field's bound as a work order's `### return` block states it, and the pattern `check_return`
+#: reads it back by, so the bound lives in the rendered work order and nowhere else.
+RETURN_BOUND_LINE = "%s: at most %d entries"
+RETURN_BOUND_RE = re.compile(r"^(?P<field>[A-Za-z][A-Za-z0-9_-]*): at most (?P<bound>[0-9]+) entries$")
 #: The charter's drive section heading and one drive line, `- <stage> · <role> — ` (PLAY-dOrderedCharter-6).
 DRIVE_HEAD = "## Drive — "
 DRIVE_LINE_RE = re.compile(r"^- \S+ · (\S+) — ")
@@ -572,6 +590,34 @@ def read_policy_setting(key, root, with_default=False):
     if value is None or not (with_default or source in ("file", "last-valid")):
         return None
     return value
+
+
+def check_effort_floor(level, source, root=None):
+    """Refuse a level below `EFFORT_FLOOR` by its source (TOOL-dBoundRoles-23 S5, S6, §4 "The floor"). `source`
+    names where the level was read: a `roles.effort.*` key, which `read_policy_setting` reads from the policy
+    file, or any other source, the house file, a role's declaration or a stage row. A level at the floor or
+    above, or one outside `EFFORT_LEVELS` (the level checks name that), passes. Below it, a policy-file key
+    passes only while `policy-file.guard`, read through `read_policy_setting` in the repository at `root` (the
+    working directory when None), is `owner-only` or unread, the owner's terminal commit being what writes
+    the file there; under any other value RolesError names the guard and its value. Every other source is a
+    RolesError naming the level, its source, the floor and the owner as the remedy's actor.
+
+    WHAT THIS DOES NOT CHECK: whose commit wrote a policy-file level. The guard's run admission lands a live
+    run's change under every `policy-file.guard` value, and a floor reading provenance from the file alone
+    cannot tell it from the owner's; that path is the guard's to close (§8 F6)."""
+    if level not in EFFORT_LEVELS or EFFORT_LEVELS.index(level) >= EFFORT_LEVELS.index(EFFORT_FLOOR):
+        return
+    remedy = ("only the owner sets a lower level, as a %s* key in the guarded policy file %s"
+              % (EFFORT_POLICY_PREFIX, EFFORT_POLICY_FILE))
+    if str(source).startswith(EFFORT_POLICY_PREFIX):
+        guard = read_policy_setting(EFFORT_GUARD_KEY, root if root is not None else ".", with_default=True)
+        if guard is None or guard == EFFORT_GUARD_OWNER:
+            return
+        raise RolesError("%s from %s in %s is below the floor %s, and %s is %s, under which an agent's change "
+                         "may write that file; %s, while %s is %s"
+                         % (level, source, EFFORT_POLICY_FILE, EFFORT_FLOOR, EFFORT_GUARD_KEY, guard, remedy,
+                            EFFORT_GUARD_KEY, EFFORT_GUARD_OWNER))
+    raise RolesError("%s from %s is below the floor %s; %s" % (level, source, EFFORT_FLOOR, remedy))
 
 
 def check_load_set(root, kit_dir, blocks, points=(), reach=False):
@@ -1166,6 +1212,9 @@ def load_policy(kit_dir, roles, workflows, notes=None):
     `match` list of words and the keys of `[effort]` itself, graded by the same helper. A word two
     profiles hold is a defect on the later one. Which words are model families is not checked, so
     two profiles holding different words of one id load, and `resolve_profile` refuses that id.
+
+    Every level of either table is held to `EFFORT_FLOOR` (TOOL-dBoundRoles-23 S5): a house level below it is
+    an R12 defect naming the floor and the policy key the owner writes instead, `check_effort_floor`'s line.
     """
     path = pathlib.Path(kit_dir) / "house" / "policy.toml"
     where = path.as_posix()
@@ -1185,6 +1234,12 @@ def load_policy(kit_dir, roles, workflows, notes=None):
         if value not in EFFORT_LEVELS:
             bad.append("%s: R12 — %s — %r is not a level; the levels are %s"
                        % (where, key, value, ", ".join(EFFORT_LEVELS)))
+            return
+        # TOOL-dBoundRoles-23 S5: the house file is a fallback held to the floor, a profile's levels included
+        try:
+            check_effort_floor(value, "the house file's " + key)
+        except RolesError as e:
+            bad.append("%s: R12 — %s — %s" % (where, key, e))
 
     by_name = {w.get("name"): w for w in workflows}
 
@@ -1488,8 +1543,13 @@ def check_return(role, text, root=None, work_order=None):
     fields. `root` defaults to the toplevel of the working directory. RolesError on a slot the catalogue
     lacks, or a role file or template that does not parse.
 
+    With `work_order` given, a `list` field longer than the bound the work order's return contract states
+    for it, `read_return_bounds`' read of that file under `root`, is a defect naming the field and the
+    bound (TOOL-dBoundRoles-23 S3).
+
     WHAT THIS DOES NOT CHECK: that an `answers` is present where the work order is given, the field's
-    presence being TOOL-dBoundRoles-17's; what a `text` value says; nor which commit a `sha` names."""
+    presence being TOOL-dBoundRoles-17's; what a `text` value says; nor which commit a `sha` names; nor a
+    bound where the work order file does not read or its `### return` block states none."""
     import subprocess
     roles = load_roles(pathlib.Path(__file__).absolute().parent)
     if role not in roles:
@@ -1524,7 +1584,53 @@ def check_return(role, text, root=None, work_order=None):
         elif work_order is not None and said != derive_answers_value(*work_order):
             defects.append("answers — %s is not %s, the work order this agent was handed"
                            % (json.dumps(said, ensure_ascii=False), derive_answers_value(*work_order)))
+    bounds = read_return_bounds(root, work_order) if work_order is not None else {}
+    for name, kind, _optional in template:
+        value = obj.get(name)
+        if kind == "list" and name in bounds and isinstance(value, list) and len(value) > bounds[name]:
+            defects.append("%s — %d entries, past the bound of %d the work order's return contract states, `%s`"
+                           % (name, len(value), bounds[name], RETURN_BOUND_LINE % (name, bounds[name])))
     return defects
+
+
+def read_return_bounds(root, work_order):
+    """`{field: bound}` of the `RETURN_BOUND_RE` lines of the last `### return` block of the work order
+    `work_order`, a `(path, task_sha)` pair, its file read under `root` (TOOL-dBoundRoles-23 S3): the lines
+    `read_unfenced_lines` yields from that heading to the next heading, so a line inside handed content is
+    none. `{}` where the path is not repo-relative and free of `..` segments, or its file does not read as
+    UTF-8. WHAT IT DOES NOT CHECK: that the file's task-sha is the pair's."""
+    rel = str(work_order[0] or "").replace("\\", "/")
+    if not rel or rel.startswith("/") or re.match(r"^[A-Za-z]:", rel) or ".." in rel.split("/"):
+        return {}
+    try:
+        text = (pathlib.Path(root) / rel).read_bytes().decode("utf-8").replace("\r\n", "\n")
+    except (OSError, UnicodeDecodeError):
+        return {}
+    bounds, inside = {}, False
+    for _n, line in read_unfenced_lines(text):
+        if line is None:
+            continue
+        if line.startswith("#"):
+            inside = line.rstrip() == "### return"
+            bounds = {} if inside else bounds
+            continue
+        m = RETURN_BOUND_RE.match(line.rstrip()) if inside else None
+        if m:
+            bounds[m.group("field")] = int(m.group("bound"))
+    return bounds
+
+
+def derive_frame(blocks):
+    """The blocks of a work order's `reads` fill in frame order (TOOL-dBoundRoles-23 S1, shared interface I15):
+    each block a tuple whose first item is its slot and second its text, any further items carried along,
+    sorted by the slot's place in `FRAME_SLOTS`, a stable sort, so two blocks of one slot keep the order
+    they were added in. RolesError naming every block, by its first line, whose slot is none or outside
+    `FRAME_SLOTS`, so no block is placed silently."""
+    bad = [b for b in blocks if b[0] not in FRAME_SLOTS]
+    if bad:
+        raise RolesError("\n".join("the frame block %s carries the slot %r, which is not one of %s"
+                                   % (str(b[1]).split("\n", 1)[0], b[0], ", ".join(FRAME_SLOTS)) for b in bad))
+    return sorted(blocks, key=lambda b: FRAME_SLOTS.index(b[0]))
 
 
 def scan_work_orders(root, memory_root, slots):
@@ -1650,19 +1756,32 @@ def resolve_effort(policy, slot, model, root):
     """A role's level for its agent type, the first of (TOOL-dBoundRoles-21 S2, §4 "The order"): the
     policy key `roles.effort.<slot>`, then `roles.effort.default`, both read in the repository at
     `root`; then the house file's level table `model` takes, its `roles` entry, else its `default`;
-    then the role's declared `effort`. RolesError where none of them gives a level."""
-    level = read_policy_setting(f"roles.effort.{slot}", root)
+    then the role's declared `effort`. RolesError where none of them gives a level, and where the level it
+    takes is below `EFFORT_FLOOR` from a source `check_effort_floor` refuses (TOOL-dBoundRoles-23 S5)."""
+    source = "roles.effort." + slot
+    level = read_policy_setting(source, root)
     if level is None:
-        level = read_policy_setting("roles.effort.default", root)
+        source = "roles.effort.default"
+        level = read_policy_setting(source, root)
     if level is None:
         table = resolve_house_table(policy, model)
-        level = table.get("roles", {}).get(slot, table["default"]) if table is not None else None
+        if table is not None:
+            tail = "roles." + slot if slot in table.get("roles", {}) else "default"
+            level, source = table.get("roles", {}).get(slot, table["default"]), derive_house_source(policy, model, tail)
     if level is None:
-        level = policy.get("declared", {}).get(slot)
+        level, source = policy.get("declared", {}).get(slot), "the role %s's declared effort" % slot
     if not level:
         raise RolesError("%s — no policy key, no house file and no declared effort give the role a level"
                          % slot)
+    check_effort_floor(level, source, root)
     return level
+
+
+def derive_house_source(policy, model, tail):
+    """The source `check_effort_floor` names for a house-file level: `the house file's <table>.<tail>`, the
+    table `effort.profiles.<name>` where `resolve_profile` names one for `model`, else `effort`."""
+    name = resolve_profile(policy, model)
+    return "the house file's %s.%s" % ("effort.profiles." + name if name else "effort", tail)
 
 
 def resolve_stage_efforts(policy, workflow, model, root):
@@ -1672,7 +1791,8 @@ def resolve_stage_efforts(policy, workflow, model, root):
     repository at `root`; then the house file's level table `model` takes, where present, its
     `stages.<workflow>` entry, else its `roles` entry, else its `default`; then the row's own `effort`;
     then the role's declared `effort`, through `resolve_effort`. The rows are `derive_stage_rows`',
-    the one read of them (TOOL-dBoundRoles-16 S8), so a row a kind defaults is resolved."""
+    the one read of them (TOOL-dBoundRoles-16 S8), so a row a kind defaults is resolved. Each level taken is
+    held to `EFFORT_FLOOR` by its source, `check_effort_floor`'s RolesError naming it (TOOL-dBoundRoles-23 S5)."""
     name, out = workflow.get("name"), {}
     table = held = None   # the house table, resolved at the first stage no key gives a level
     rows = {}
@@ -1680,19 +1800,27 @@ def resolve_stage_efforts(policy, workflow, model, root):
         if isinstance(row.get("key"), str):
             rows.setdefault(row["key"], row)
     for key, slot in derive_stage_map(workflow).items():
-        level = read_policy_setting(f"roles.effort.{name}.{key}", root)
-        if level is None:
-            level = read_policy_setting(f"roles.effort.{slot}", root)
-        if level is None:
-            level = read_policy_setting("roles.effort.default", root)
+        level = None
+        for source in (f"roles.effort.{name}.{key}", f"roles.effort.{slot}", "roles.effort.default"):
+            level = read_policy_setting(source, root)
+            if level is not None:
+                break
         if level is None:
             if not held:
                 table, held = resolve_house_table(policy, model), True
             if table is not None:
-                level = table.get("stages", {}).get(name, {}).get(key) or table.get("roles", {}).get(slot, table["default"])
+                staged = table.get("stages", {}).get(name, {}).get(key)
+                tail = ("stages.%s.%s" % (name, key) if staged else
+                        "roles." + slot if slot in table.get("roles", {}) else "default")
+                level = staged or table.get("roles", {}).get(slot, table["default"])
+                source = derive_house_source(policy, model, tail)
         if level is None:
-            level = rows[key].get("effort")
-        out[key] = level if level is not None else resolve_effort(policy, slot, model, root)
+            level, source = rows[key].get("effort"), "the stage row %s.%s's own effort" % (name, key)
+        if level is None:
+            out[key] = resolve_effort(policy, slot, model, root)
+            continue
+        check_effort_floor(level, source, root)
+        out[key] = level
     return out
 
 
