@@ -13193,6 +13193,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "derive_mail_chain",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "derive_mail_ref",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"

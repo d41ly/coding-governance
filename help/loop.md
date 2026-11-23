@@ -609,8 +609,14 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   |---|---|---|
   | `landed`, `superseded`, `withdrawn` | your build's own move | at its next move |
   | `confirmed`, `changed`, current | your build's own move | at its next move, once the parent's interfaces check names it current |
-  | `confirmed`, `changed`, seen strictly before the current one | the same | with the current one |
-  | `changed`, not current | nobody here | the re-entry that consumes it, or its deadline |
+  | `confirmed`, `changed`, superseded by the current one by content key or by the session chain | the same | with the current one |
+  | `confirmed`, `changed`, neither current nor superseded | nobody here | the re-entry that consumes it, or its deadline |
+
+  A notice is superseded when its content key equals the current one's, or when the parent's session
+  chain places it before the current one: an earlier `seq` on the same session's ref, or a session the
+  current one's session took over, named by the `after` of its first message, never the order your
+  node happened to see them in. A notice the chain places after the current one, or cannot place, stays
+  open and holds the move.
 
   A check of the parent's interfaces that cannot be read prints
   `mail — interfaces <parent> unread · <why>` on stderr and acknowledges nothing from that parent. A
@@ -689,9 +695,12 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   `landed` the move acknowledges, then records), `acks-confirmed` (a `confirmed` whose key recomputes at
   the parent lease's witness, acknowledged over the real interfaces check), `acks-superseded` (a
   `confirmed` and the later `changed` the check names current, both acknowledged; then another parent's
-  pair the check does not confirm, refusing the next move) and `acks-failed` (one ack across two moves,
+  pair the check does not confirm, refusing the next move), `acks-failed` (one ack across two moves,
   then a refused ack and one whose launch fails, each printing `mail — ack not posted`, refusing the third
-  move), `notify-micro`, `notify-park-landing`, `notify-every` and `notify-park-only` (one move under
+  move), `acks-takeover` (a take-over's `changed` seen before the `confirmed` of the session it took
+  over: both acknowledged over the real interfaces check, and the chain reads the same with their
+  first sightings swapped) and `acks-later-key` (a later `changed` on the take-over's own ref stays
+  open and refuses the move), `notify-micro`, `notify-park-landing`, `notify-every` and `notify-park-only` (one move under
   that `notify.owner` value, `notify-micro` setting none, then a park and a landing reported, printing
   `loop: fixture · progress <n>`, the progress lines the value let through) and `notify-shape` (an
   `AGENTS.md` whose `progress` definition drops ` · <detail>`, so the check owes one finding). `check --selftest` runs every case, and gov's own
