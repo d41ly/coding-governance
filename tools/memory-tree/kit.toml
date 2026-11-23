@@ -1025,6 +1025,39 @@ witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{t
 surfaces = ["conf-key:.memory-tree.conf#LIVE_ROW_PIN", "file:memory/project/conf-scalar-pins.txt"]
 needs-target = false
 
+# TOOL-dTotalRecall-20: dTotalRecall's three moves an adopter can see. The journal step grades the
+# target's `journal` records through the alias and writes nothing; the front-matter step grades each
+# build README's keys before the schema's refusal meets them, and writes nothing; the retag writes
+# each untagged record heading's derived anchor as its authored tag, only under the target's own
+# `memory.legacy-anchors = "retag"`, through a before-image its down restores. Each runs gov's code
+# over the target's files and none of the target's, so none needs the target.
+[[upgrade]]
+id = "memory-tree/serves-journal-read-as-log"
+up = ["python", "{gov}/govkit/steps/memory_journal_alias.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/memory_journal_alias.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/memory_journal_alias.py", "witness", "{target}"]
+resume = "atomic"
+surfaces = ["serves-kind:journal"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/readme-front-matter-graded"
+up = ["python", "{gov}/govkit/steps/memory_front_matter.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/memory_front_matter.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/memory_front_matter.py", "witness", "{target}"]
+resume = "atomic"
+surfaces = ["front-matter:build-readme"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/legacy-anchors-retag"
+up = ["python", "{gov}/govkit/steps/memory_retag.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/memory_retag.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/memory_retag.py", "witness", "{target}"]
+resume = "atomic"
+surfaces = ["record-headings:memory-root"]
+needs-target = false
+
 # THE RATCHET PACK (TOOL-dWitnessedBar-14): one leg per row of retrofit's `[ratchet]` table, each a verb
 # of `ratchet.py`; `untouched quiet` and `merge` are plants of `ratchet selftest`, and the touch join is
 # `build.scope`'s, printed unarmed by `ratchet.py --list`. An adopter receives these two legs; the

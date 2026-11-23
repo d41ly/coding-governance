@@ -6205,6 +6205,11 @@
     {
       "id": "check_conservation",
       "kind": "function",
+      "file": "tools/govkit/steps/memory_retag.py"
+    },
+    {
+      "id": "check_conservation",
+      "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
@@ -7658,6 +7663,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "check_memory_tree_steps",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_merge_arm",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
@@ -8826,6 +8836,11 @@
       "id": "check_resolves",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "check_retag_conservation",
+      "kind": "function",
+      "file": "tools/govkit/steps/memory_retag.py"
     },
     {
       "id": "check_retired",
@@ -10669,6 +10684,11 @@
     },
     {
       "id": "cmd_print_bindings",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_print_front_matter_findings",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },
@@ -14313,6 +14333,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_retag",
+      "kind": "function",
+      "file": "tools/govkit/steps/memory_retag.py"
+    },
+    {
       "id": "derive_retired_rows",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -16313,6 +16338,11 @@
       "file": "tools/runlog/extract.py"
     },
     {
+      "id": "extract_shim_block",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
+    },
+    {
       "id": "extract_spec_head",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
@@ -18146,6 +18176,21 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/memory_front_matter.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/memory_journal_alias.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/memory_retag.py"
     },
     {
       "id": "main",
@@ -20953,6 +20998,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "print_heading_anchors",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "print_host",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -21111,6 +21161,11 @@
       "id": "print_pin_rows",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_plan",
+      "kind": "function",
+      "file": "tools/govkit/steps/memory_retag.py"
     },
     {
       "id": "print_plan",
@@ -24143,6 +24198,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_heading_anchors",
+      "kind": "function",
+      "file": "tools/govkit/steps/memory_retag.py"
+    },
+    {
       "id": "read_held",
       "kind": "function",
       "file": "tools/govkit/steps/inherited_red.py"
@@ -26456,6 +26516,16 @@
       "id": "read_result_fa5",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "read_retag_plan",
+      "kind": "function",
+      "file": "tools/govkit/steps/memory_retag.py"
+    },
+    {
+      "id": "read_retag_population",
+      "kind": "function",
+      "file": "tools/govkit/steps/memory_retag.py"
     },
     {
       "id": "read_retired",
@@ -36128,6 +36198,11 @@
       "file": "tools/govkit/matrix.py"
     },
     {
+      "id": "run_index_mode",
+      "kind": "function",
+      "file": "tools/govkit/steps/memory_journal_alias.py"
+    },
+    {
       "id": "run_inproc",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -37791,6 +37866,16 @@
       "id": "run_shell_role_scan",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_shim_new_build_to_record",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "run_shim_new_spec_to_record",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "run_ships_join",
@@ -41076,6 +41161,11 @@
       "id": "test_fork_count",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "test_forwarded_new_spec",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "test_fresh_ac1_extracted_at",

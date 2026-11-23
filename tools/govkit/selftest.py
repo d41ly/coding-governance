@@ -4116,6 +4116,132 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
           and (t / ".governance" / "policy.toml").read_bytes() == pol0, up.stdout + up.stderr)
 
 
+#: TOOL-dTotalRecall-20's planted adopter: two `journal` records and one `log` record, the first holding two
+#: `## Notes` headings, a spec carrying a heading the retag must never touch, and a README carrying an
+#: unknown key and a typed derived one.
+MT_RECORD = "memory/builds/xOne/build/2026-01-01-build-TOOL-xOne-1-a.md"
+MT_README = "memory/builds/xOne/README.md"
+MT_SPEC = "memory/builds/xOne/spec/2026-01-01-spec-TOOL-xOne-1.md"
+MT_FILES = {
+    ".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n',
+    MT_README: "---\nslug: xOne\nopened: 2026-01-01\nids: TOOL-xOne-1\nparent: dX\nnode: d\n---\n\n# xOne\n",
+    MT_RECORD: "**Serves:** journal TOOL-xOne-1\n\n# A\n\n## Notes\n\nx\n\n## Findings\n\nz\n\n## Notes\n\ny\n",
+    "memory/builds/xOne/build/2026-01-01-build-TOOL-xOne-1-b.md": "**Serves:** journal TOOL-xOne-1\n\n# B\n\nb\n",
+    "memory/builds/xOne/build/2026-01-01-build-TOOL-xOne-1-c.md": "**Serves:** log TOOL-xOne-1\n\n# C\n\nc\n",
+    MT_SPEC: "# TOOL-xOne-1 — x\n\n**Status:** OPEN · rev-1 · 2026-01-01 · node x · Tier-1 · base 0123abcd\n\n## Notes\n\nq\n",
+}
+
+
+def check_memory_tree_steps(tmp: pathlib.Path) -> None:
+    """TOOL-dTotalRecall-20 AC1 AC4 AC5 AC6 AC7 AC8 — the three memory-tree step programs over a planted
+    adopter, each run under `-I` as the runner runs it, and the journal step over a scratch copy of gov
+    whose `gen_build_index.py` is renamed. Its RED is the retag writing under `derived`: AC6's arm reads the
+    tree changed."""
+    steps = {name: HERE / "steps" / f"memory_{name}.py" for name in ("journal_alias", "front_matter", "retag")}
+
+    def run_step(name: str, *args, prog: pathlib.Path | None = None) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(prog or steps[name]), *[str(a) for a in args]],
+                              capture_output=True, text=True, encoding="utf-8", errors="replace", env=STEPS_ENV)
+
+    def read_tree(t: pathlib.Path) -> dict:
+        return {p.relative_to(t).as_posix(): p.read_bytes() for p in t.rglob("*")
+                if p.is_file() and ".git" not in p.relative_to(t).parts}
+
+    t = build_target(tmp, None, "mt-journal", MT_FILES)
+    up = run_step("journal_alias", "up", t)
+    status = run_gov_git(t, "status", "--porcelain")
+    check("[dTR-20 AC1] the journal step counts the two `journal` records read through the alias, exits 0 and "
+          "writes nothing", up.returncode == 0 and "journal 2 record(s) read as log" in up.stdout and status == "",
+          up.stdout + up.stderr + status)
+
+    sources = {n: p.read_text(encoding="utf-8") for n, p in steps.items()}
+    banned = _re.compile(r"^\s*(import|from) +(tree_lib|gen_build_index|tag_index|policy_value)\b|spec_from_file_location", _re.M)
+    check("[dTR-20 AC8] no step imports a memory-tree or playbook module, and the retag reads its key through "
+          "govkit's own reader", not any(banned.search(s) for s in sources.values())
+          and 'read_policy_value("memory.legacy-anchors"' in sources["retag"], str({n: bool(banned.search(s))
+                                                                                   for n, s in sources.items()}))
+    gcopy = tmp / "mt-gov" / KIT_NAMES["govkit"]
+    (gcopy / "steps").mkdir(parents=True)
+    for rel in ("govkit.py", "upgrade_steps.py", "steps/memory_journal_alias.py"):
+        shutil.copyfile(HERE / rel, gcopy / rel)
+    (gcopy.parent / KIT_NAMES["memory-tree"]).mkdir()
+    shutil.copyfile(KIT_DIRS["memory-tree"] / "gen_build_index.py",
+                    gcopy.parent / KIT_NAMES["memory-tree"] / "gen_build_index.renamed.py")
+    up = run_step("journal_alias", "up", t, prog=gcopy / "steps" / "memory_journal_alias.py")
+    check("[dTR-20 AC8] with gov's gen_build_index.py renamed in a scratch copy, the journal step exits 1 naming "
+          "the memory-tree kit", up.returncode == 1 and "the memory-tree kit does not resolve" in up.stderr,
+          up.stdout + up.stderr)
+
+    readme = (t / MT_README).read_bytes()
+    up = run_step("front_matter", "up", t)
+    check("[dTR-20 AC4] unarmed, the front-matter step exits 1 naming `parent` unknown and no `node` derived, says "
+          "the population is unarmed, and leaves the README's bytes",
+          up.returncode == 1 and f"{MT_README}: parent unknown" in up.stdout and "node derived" not in up.stdout
+          and "legacy population unarmed" in up.stderr and (t / MT_README).read_bytes() == readme,
+          up.stdout + up.stderr)
+    (t / "kit").mkdir()
+    (t / "kit" / "kit.toml").write_text(
+        '[[ledger]]\npopulation = "build-readme-typed-derived"\nleg = "memory hygiene"\nseed = []\nkey = "record"\n'
+        'fields = ["path"]\ndrain = "key"\ndirection = "shrink-only"\n'
+        'home = "memory/project/build-readme-typed-derived.txt"\n', encoding="utf-8", newline="\n")
+    (t / "memory" / "project").mkdir(parents=True)
+    (t / "memory" / "project" / "build-readme-typed-derived.txt").write_text(
+        "# ledger · build-readme-typed-derived · key record path · direction shrink-only · drain key\n",
+        encoding="utf-8", newline="\n")
+    settle(t, "the legacy population armed, listing no README")
+    up = run_step("front_matter", "up", t)
+    check("[dTR-20 AC4] armed with no README listed, the front-matter step prints `node` derived too",
+          up.returncode == 1 and f"{MT_README}: parent unknown" in up.stdout and f"{MT_README}: node derived" in up.stdout,
+          up.stdout + up.stderr)
+    (t / MT_README).write_text(MT_FILES[MT_README].replace("parent: dX\nnode: d\n", ""), encoding="utf-8", newline="\n")
+    settle(t, "authored keys only")
+    up = run_step("front_matter", "up", t)
+    check("[dTR-20 AC4] over a README carrying only authored keys the front-matter step exits 0",
+          up.returncode == 0 and "0 front-matter finding(s)" in up.stdout, up.stdout + up.stderr)
+
+    t = build_target(tmp, None, "mt-retag", MT_FILES)
+    for label, policy in (("no policy row for the key", None), ("`derived`", 'legacy-anchors = "derived"')):
+        if policy:
+            (t / ".governance").mkdir(exist_ok=True)
+            (t / ".governance" / "policy.toml").write_text(f"[memory]\n{policy}\n", encoding="utf-8", newline="\n")
+            settle(t, "derived")
+        pre = read_tree(t)
+        got = {v: run_step("retag", v, t) for v in ("plan", "up", "witness")}
+        check(f"[dTR-20 AC6] under {label}, the retag's plan, up and witness exit 0 and write nothing",
+              all(p.returncode == 0 for p in got.values()) and read_tree(t) == pre,
+              " | ".join(p.stdout + p.stderr for p in got.values()))
+    (t / ".governance" / "policy.toml").write_text('[memory]\nlegacy-anchors = "retag"\n', encoding="utf-8", newline="\n")
+    settle(t, "retag")
+    pre = read_tree(t)
+    dry = run_step("retag", "up", t, "--dry-run")
+    check("[dTR-20 AC5] under `retag`, up --dry-run prints the plan, the second `## Notes` as [notes-2], and the "
+          "conservation table, and writes nothing",
+          dry.returncode == 0 and f"{MT_RECORD}:13 · ## [notes-2] Notes" in dry.stdout
+          and f"{MT_RECORD}:5 · ## [notes] Notes" in dry.stdout and f"conservation · {MT_RECORD} · 3 ·" in dry.stdout
+          and read_tree(t) == pre, dry.stdout + dry.stderr)
+    up = run_step("retag", "up", t)
+    want = MT_FILES[MT_RECORD].replace("## Notes\n\nx", "## [notes] Notes\n\nx").replace(
+        "## Findings", "## [findings] Findings").replace("## Notes\n\ny", "## [notes-2] Notes\n\ny")
+    wit = run_step("retag", "witness", t)
+    check("[dTR-20 AC5] up writes those bytes, the planted spec untouched, and the witness then exits 0",
+          up.returncode == 0 and (t / MT_RECORD).read_text(encoding="utf-8") == want
+          and (t / MT_SPEC).read_bytes() == pre[MT_SPEC] and wit.returncode == 0, up.stdout + up.stderr + wit.stdout)
+    down = run_step("retag", "down", t)
+    check("[dTR-20 AC5] down restores every file byte-identical", down.returncode == 0 and read_tree(t) == pre,
+          down.stdout + down.stderr)
+
+    lst = subprocess.run([sys.executable, str(HERE / "upgrade_steps.py"), "list"], capture_output=True, text=True,
+                         encoding="utf-8", errors="replace", cwd=str(GOV_ROOT))
+    ids = [ln.split(" · ")[1] for ln in lst.stdout.splitlines() if " · memory-tree/" in ln and "retired" not in ln]
+    mine = ["memory-tree/serves-journal-read-as-log", "memory-tree/readme-front-matter-graded",
+            "memory-tree/legacy-anchors-retag"]
+    check("[dTR-20 AC7] upgrade_steps.py list prints the three memory-tree rows, in order",
+          [i for i in ids if i in mine] == mine, lst.stdout[-1500:] + lst.stderr)
+    got = {n: run_step(n, "witness", GOV_ROOT) for n in steps}
+    check("[dTR-20 AC7] each program's witness exits 0 against gov's own root",
+          all(p.returncode == 0 for p in got.values()), " | ".join(p.stdout + p.stderr for p in got.values()))
+
+
 def check_kickoff_facts_step() -> None:
     """TOOL-dPlacedRequest-9 AC1 AC3 AC4 AC5 AC6 AC7 AC9, and the step's and the verb's refusals — the step's `--fixture --plant <case>` for every
     case it declares, each under `-I` as the runner runs a step, each in its own throwaway repository: an
@@ -6564,6 +6690,7 @@ def main() -> int:
         check_upgrade_steps(tmp / "dsp")
         check_succession(tmp / "dsc")
         check_fanout_step(tmp / "dfs")
+        check_memory_tree_steps(tmp / "dmt")
         check_kickoff_facts_step()
         check_review_rounds_step(tmp / "drr")
         check_inherited_red_step(tmp / "dir")

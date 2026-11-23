@@ -364,3 +364,13 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T09:13:00Z draw · re-dispatch · TOOL-dTotalRecall-24 · 49/186 · 20261123T091300Z-93cbe7
 
 2026-11-23T09:13:00Z dispatch · item 55f322f2 TOOL-dTotalRecall-24 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-23T09:29:20Z brief · item TOOL-dTotalRecall-20 · reason 0e3ccb8168d3 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-20-build-brief.md
+
+2026-11-23T09:32:49Z dispatch · item f8156b85 TOOL-dTotalRecall-20 · reason tools/memory-tree/kit.toml tools/govkit/shims.toml tools/govkit/shims.py tools/govkit/steps/memory_journal_alias.py tools/govkit/steps/memory_front_matter.py tools/govkit/steps/memory_retag.py tools/govkit/selftest.py tools/memory-tree/gen_build_index.py tools/playbook/gov_tag.py help/upgrade-steps.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-20.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-20-1-acceptance-ledger.md
+2026-11-23T09:42:03Z draw · re-dispatch · TOOL-dTotalRecall-20 · 50/186 · 20261123T094203Z-01b969
+
+2026-11-23T09:42:04Z dispatch · item f8156b85 TOOL-dTotalRecall-20 · reason help/shims.md
+2026-11-23T09:58:03Z draw · re-dispatch · TOOL-dTotalRecall-20 · 51/186 · 20261123T095803Z-e9d46f
+
+2026-11-23T09:58:03Z dispatch · item f8156b85 TOOL-dTotalRecall-20 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md

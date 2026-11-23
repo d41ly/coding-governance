@@ -3,7 +3,14 @@
 **What it is.** When gov moves a command, a hook path or a module import, the old path keeps working
 for a while as a **forwarder**: a small generated file at the old path that forwards every call to
 the new one. Your scripts and hooks keep running while you move them over, and the forwarder tells
-you where the surface went. Gov has moved no surface yet, so no forwarder ships today.
+you where the surface went.
+
+Two forwarders ship today, both for a flag of a script that stays rather than for a whole path: the
+memory-tree kit's `gen_build_index.py --new-build` and `gen_build_index.py --new-spec` now forward
+to the record door, `gov_record.py new build-readme` and `gov_record.py new spec`. Every argument after
+the flag passes through unchanged, so the call writes what the door writes and exits as the door does:
+a refused call prints `refused build-readme: <why>` (or `refused spec:`) and exits 2, where the old
+flag printed `build-index: <why>` and exited 1.
 
 ## What you see when you call a moved path
 
@@ -54,3 +61,9 @@ window closes, a later release may take the forwarder away.
 A moved surface is one `[[shim]]` row in `tools/govkit/shims.toml`; `python tools/govkit/shims.py
 --write` renders its forwarder and `--check` reds one edited by hand. `--fixture --plant
 <sh|js|py|module|window|parity-edit>` builds a scratch repository and prints what a forwarder did.
+
+A row of the `verb` kind forwards one flag of a script that stays. Its `from` is the script's path
+and the flag, its `to` the target script's path and its words. Its forwarder is a block inside the
+`from` script, the function `run_shim_<slug>`, written above the script's `def main(` line and called
+by the script's dispatch for that flag. `--check` compares the block with its render while the row is
+open, and reds a block still present once the row is closed.

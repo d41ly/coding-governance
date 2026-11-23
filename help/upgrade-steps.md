@@ -473,7 +473,7 @@ Then commit the result, `.governance/steps/govkit/` included.
 
 ## What this release's steps do to your repository
 
-Six moves reach an installed repository through `update`, each named here with what it leaves
+Seven moves reach an installed repository through `update`, each named here with what it leaves
 behind.
 
 - **Your kickoff manifest's facts move into the overlay.** The step
@@ -529,6 +529,19 @@ behind.
   over a receipt claiming `roles` without `loop` that is `--kits`-scoped, or that cannot work the
   gain out because the receipt records no `gov_commit` or the registry is unreadable at a vintage,
   is refused before it writes, naming why; `apply --kits roles,loop` installs both.
+- **Three memory-tree steps grade your records, and one may retag them.** The step
+  `memory-tree/serves-journal-read-as-log` reads every record whose `**Serves:**` kind is `journal`
+  through its alias, `log`, prints how many it read and rewrites none; it stops `update` only on a
+  record the alias does not reach. The step `memory-tree/readme-front-matter-graded` grades each
+  build README's front matter against the declared keys and prints `<path>: <key> unknown` for a key
+  outside them, and `<path>: <key> derived` for a typed derived key where its legacy population is
+  armed; it writes nothing and stops `update` on any finding, so you edit the key before your next
+  hygiene run refuses it. The step `memory-tree/legacy-anchors-retag` writes only where your
+  committed policy sets `memory.legacy-anchors = "retag"`: each untagged `##` heading of a record
+  takes its derived anchor as its authored tag, `## [<anchor>] <heading>`, specs, fenced blocks and
+  generated regions untouched and every other byte kept; under `derived`, the default, or `none` it
+  writes nothing. Its down puts every record back byte-for-byte. Commit the result,
+  `.governance/steps/memory-tree/` included.
 
 ## How gov proves a step before you meet it
 

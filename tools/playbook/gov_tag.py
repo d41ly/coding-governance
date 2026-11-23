@@ -2,6 +2,7 @@
 
     python gov_tag.py show|where|refs|check <address> [--json]
     python gov_tag.py bundle <address> [--inline --bytes <n>] [--under <dir>] [--json]
+    python gov_tag.py anchors <path>
     python gov_tag.py check [--base <rev>] [--only type-registered|target-resolves]
     python gov_tag.py --rebuild | --gc | --list-positional
     python gov_tag.py --fixture --plant <case> [--set <key>=<value>]
@@ -14,7 +15,9 @@ name-check slot (PLAY-dOrderedCharter-10), and the `purpose` arm, the namespace 
 `purpose-source` and the chain registry joined to the design view (PLAY-dOrderedCharter-22), and the `positional` arm, the
 tree's positional references against `positional-refs.txt` with every pinned line and symbol citation resolved
 (PLAY-dOrderedCharter-26, `positional.py`), the list under `<MEMORY_ROOT>/project/` (PLAY-dOrderedCharter-72).
-`bundle` prints the node and every inbound edge as ranges to pull, and `check --only` runs one edge arm alone (PLAY-dOrderedCharter-25, `tag_bundle.py`). An address is a tag, `doc.<name>#<seg>`, or a
+`bundle` prints the node and every inbound edge as ranges to pull, and `check --only` runs one edge arm alone (PLAY-dOrderedCharter-25, `tag_bundle.py`). `anchors`
+prints each untagged `##` heading of one file outside fences and generated regions with its derived anchor,
+`tags: anchor <line> <anchor>`, opening no index (TOOL-dTotalRecall-20). An address is a tag, `doc.<name>#<seg>`, or a
 positional label `aliases.toml` maps. `--gc` collects the index rows of every extractor version no live
 worktree derives (PLAY-dOrderedCharter-51 S5). Every line opens `tags:`; `--json` is the index's only JSON.
 Exit 0 green, 1 red, 2 a refusal (an unreadable registry, a refused policy read, a locked index).
@@ -1513,9 +1516,42 @@ def run_positional_plant(root, top, plant, say, check) -> int:
     return 0 if ok and out_rc == 1 and kept else 1
 
 
+#: TOOL-dTotalRecall-20 §4 "The anchors verb": a heading already carrying an authored `[<tag>] `, and the two
+#: marker lines of a generated region, whose headings a writer re-renders and so are never tagged
+AUTHORED_TAG_RE = re.compile(r"\[[^\]\s]+\] ")
+GEN_REGION_RE = re.compile(r"<!-- (/?)gen:(\S+) -->")
+
+
+def print_heading_anchors(path) -> int:
+    """`anchors <path>` (TOOL-dTotalRecall-20 §4): one `tags: anchor <line> <anchor>` line per unfenced `##`
+    heading of the file at `path` outside a generated region whose text opens no `[<tag>] `, its anchor the
+    one `derive_anchor` gives it with one `seen` set over every unfenced `##` heading in document order, as
+    `extract_doc` walks them, so a repeated heading takes `-2` and `-3`. It opens no index and reads no
+    policy key. Exit 0, or 2 with a `tags: refused` line where the path does not read."""
+    try:
+        text = pathlib.Path(path or "").read_bytes().decode("utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        print(f"tags: refused · anchors {path}: {exc}", file=sys.stderr)
+        return 2
+    seen, region = set(), None
+    for n, line in ti.scan_unfenced(text):
+        hit = GEN_REGION_RE.fullmatch(line.strip())
+        if hit and region is None and not hit[1]:
+            region = hit[2]
+        elif hit and hit[1] and hit[2] == region:
+            region = None
+        if not line.startswith("## "):
+            continue
+        head = line[3:].strip()
+        anchor = ti.derive_anchor(head, seen)
+        if anchor and region is None and not AUTHORED_TAG_RE.match(head):
+            print(f"tags: anchor {n} {anchor}")
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="gov_tag.py", description="the tag resolver (gov tag)")
-    ap.add_argument("verb", nargs="?", choices=("show", "where", "refs", "check", "bundle"))
+    ap.add_argument("verb", nargs="?", choices=("show", "where", "refs", "check", "bundle", "anchors"))
     ap.add_argument("address", nargs="?")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--base")
@@ -1542,6 +1578,8 @@ def main(argv=None) -> int:
     try:
         if a.fixture:
             return run_fixture(a.plant, sets)
+        if a.verb == "anchors":
+            return print_heading_anchors(a.address)
         root = resolve_repo_root()
         if a.list_positional:
             for row in read_positional(root):

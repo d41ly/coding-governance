@@ -9,8 +9,9 @@
     python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
     python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
     python <prefix>/memory-tree/gen_build_index.py --doctor <slug> # every failing rule for one build folder
-    python <prefix>/memory-tree/gen_build_index.py --new-spec <ID> --tier <1|2>  # a spec skeleton
+    python <prefix>/memory-tree/gen_build_index.py --new-spec <ID> --tier <1|2>  # forwarded to `gov_record.py new spec`
     python <prefix>/memory-tree/gen_build_index.py --print-relations  # every README relation edge and its state
+    python <prefix>/memory-tree/gen_build_index.py --print-front-matter-findings  # each README key the schema refuses
     python <prefix>/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
 
 WHAT --check-format DOES NOT CHECK. It grades POSITION for every tracked build README and SHAPE — the
@@ -1703,6 +1704,41 @@ def cmd_print_typed_derived(root: str, conf: dict) -> int:
             continue
         if any(k in fm for k in DERIVED_KEYS):
             print(f"{rel}\t1")
+    return 0
+
+
+def cmd_print_front_matter_findings(root: str, conf: dict) -> int:
+    """`--print-front-matter-findings` (TOOL-dTotalRecall-20 S4), the grade an upgrade step reads before
+    unit 4's refusal meets an adopter. Each tracked build README `cmd_print_typed_derived` walks has its
+    key lines, line 1's `---` to the next, graded against the declarations the parser and `collect`
+    read: `<path>: <key> unknown` for a key `FRONT_MATTER_KEYS` does not name, `parse_front_matter`'s
+    refusal; `<path>: <key> derived` for a key of `DERIVED_KEYS` where `read_typed_derived_paths` reads
+    the legacy population armed and the README outside it, `collect`'s. Unarmed, `collect`'s unarmed
+    line goes to stderr and no `derived` finding prints. Exits 0 having printed.
+
+    WHAT IT DOES NOT CHECK: a value against its type, which `collect` refuses by name, and a README
+    whose front matter does not open at line 1 or never closes, which `collect` refuses; it is skipped."""
+    m = conf["MEMORY_ROOT"]
+    legacy, unarmed = read_typed_derived_paths(root)
+    if legacy is None:
+        print(f"front-matter: legacy population unarmed: {unarmed}", file=sys.stderr)
+    for rel in sorted(p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
+                      if p.endswith("/README.md") and p.count("/") == 3):
+        text, _why = read_text_or_none(os.path.join(root, rel))
+        lines = (text or "").split("\n")
+        if lines[0].strip() != "---":
+            continue
+        end = next((i for i, line in enumerate(lines[1:], start=1) if line.strip() == "---"), None)
+        if end is None:
+            continue
+        for line in lines[1:end]:
+            if ":" not in line:
+                continue
+            key = line.partition(":")[0].strip()
+            if key not in FRONT_MATTER_KEYS:
+                print(f"{rel}: {key} unknown")
+            elif key in DERIVED_KEYS and legacy is not None and rel not in legacy:
+                print(f"{rel}: {key} derived")
     return 0
 
 
@@ -6825,6 +6861,50 @@ def test_coverage_stub(arm) -> None:
                 sys.modules["design_lib"] = slot
 
 
+def test_forwarded_new_spec(arm) -> None:
+    """TOOL-dTotalRecall-20 AC2 — `--new-spec`, forwarded by its shim block to the record door, in one clone of
+    a seed repository, and the door's `new spec` in its twin: the same bytes written, `--order` included, one
+    stderr line naming both, one journal line. Its RED is the forward dropping `--order`: the twin's header
+    then carries `order 3` and the forwarded one does not, so the byte compare fails."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    with tempfile.TemporaryDirectory() as tmp:
+        seed = os.path.join(tmp, "seed")
+        write_text(os.path.join(seed, kit_rel(), "record-kinds.toml"), read_text(os.path.join(here, "record-kinds.toml")))
+        write_text(os.path.join(seed, ".memory-tree.conf"), 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n')
+        write_text(os.path.join(seed, ".unattended.conf"), 'RUN_CLAIMS="on"\n')
+        write_text(os.path.join(seed, "memory", "TEMPLATE-SPEC.md"),
+                   read_text(os.path.join(here, "SPEC-TEMPLATE.template.md")))
+        write_text(os.path.join(seed, "memory", "builds", "xNew", "README.md"), "---\nslug: xNew\n---\n\n# xNew\n")
+        run("git", "init", "-q", "--template=", cwd=seed)
+        run("git", "add", "-A", cwd=seed)
+        run("git", "commit", "-q", "-m", "seed", "--no-verify", cwd=seed)
+        got = {}
+        for name, argv in (("fwd", [os.path.join(here, "gen_build_index.py"), "--new-spec"]),
+                           ("door", [os.path.join(here, "gov_record.py"), "new", "spec"])):
+            run("git", "clone", "-q", seed, name, cwd=tmp)
+            t = os.path.join(tmp, name)
+            p = subprocess.run([sys.executable, *argv, "TOOL-xNew-1", "--tier", "2", "--order", "3"], cwd=t,
+                               capture_output=True, text=True, encoding="utf-8", errors="replace",
+                               stdin=subprocess.DEVNULL)
+            specs = [s for s in run("git", "ls-files", "-o", "--exclude-standard", cwd=t).split("\n") if "-spec-" in s]
+            journal = os.path.join(t, run("git", "rev-parse", "--git-path", "govkit/shim-calls.jsonl", cwd=t).strip())
+            got[name] = {"rc": p.returncode, "err": p.stderr,
+                         "spec": open(os.path.join(t, specs[0]), "rb").read() if len(specs) == 1 else None,
+                         "journal": read_text(journal).splitlines() if os.path.isfile(journal) else []}
+        fwd, door = got["fwd"], got["door"]
+        arm("TOOL-dTotalRecall-20 AC2 — the forwarded --new-spec writes the bytes `new spec` writes, `order 3` "
+            "in both headers", "True",
+            lambda: str(fwd["rc"] == door["rc"] == 0 and door["spec"] is not None and fwd["spec"] == door["spec"]
+                        and b" order 3\n" in door["spec"]))
+        arm("TOOL-dTotalRecall-20 AC2 — the forward prints one stderr line naming both, and the door none", "True",
+            lambda: str([ln for ln in fwd["err"].splitlines() if "has moved to" in ln] == [
+                f"gov: {kit_rel()}/gen_build_index.py --new-spec has moved to {kit_rel()}/gov_record.py new spec; "
+                f"this forwarder is held only until its deprecation window closes"] and "has moved to" not in door["err"]))
+        arm("TOOL-dTotalRecall-20 AC2 — the forward adds one journal line naming its shim", "True",
+            lambda: str(len(fwd["journal"]) == 1 and '"shim": "memory-tree/new-spec-to-record"' in fwd["journal"][0]
+                        and not door["journal"]))
+
+
 def test_front_matter_schema(arm) -> None:
     """TOOL-dTotalRecall-4 — the declared front matter: an unknown key refused by name, line and set; a
     value outside its type refused, tree-free in the parser and tree-bound in `collect`; the derived
@@ -10641,6 +10721,7 @@ def cmd_selftest() -> int:
             check_expand_contract())))
     test_asbuilt_view(arm)
     test_front_matter_schema(arm)
+    test_forwarded_new_spec(arm)
 
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it
@@ -10981,6 +11062,100 @@ def cmd_new_spec(root: str, conf: dict, args: dict) -> int:
     return 0
 
 
+# >>> gov:shim memory-tree/new-build-to-record
+# tools/memory-tree/gen_build_index.py --new-build moved to tools/memory-tree/gov_record.py new build-readme: this forwarder is held until install.deprecation-window closes it.
+# Rendered by shims.py from shims.toml; edit the row, never this block.
+def run_shim_new_build_to_record(argv):
+    import json as _shim_json
+    import os as _shim_os
+    import subprocess as _shim_sp
+    import sys as _shim_sys
+    import time as _shim_time
+    import runpy as _shim_runpy
+
+    _SHIM_HERE = _shim_os.path.dirname(_shim_os.path.abspath(__file__))
+    # a read that fails reads warn, and the line says so; neither branch blocks the forward
+    mode, why = "warn", " (the policy could not be read, so this reads warn)"
+    try:
+        p = _shim_sp.run([_shim_sys.executable, _shim_os.path.join(_SHIM_HERE, "../policy", "policy.py"), "get", "install.on-shim-call"],
+                         stdin=_shim_sp.DEVNULL, capture_output=True, text=True)
+        if p.returncode == 0 and p.stdout.strip() in ("warn", "journal"):
+            mode, why = p.stdout.strip(), ""
+    except OSError:
+        pass
+    if mode != "journal":
+        print("gov: tools/memory-tree/gen_build_index.py --new-build has moved to tools/memory-tree/gov_record.py new build-readme; this forwarder is held only until its deprecation window closes" + why, file=_shim_sys.stderr)
+    try:
+        g = _shim_sp.run(["git", "rev-parse", "--is-inside-work-tree", "--git-path", "govkit/shim-calls.jsonl"],
+                         stdin=_shim_sp.DEVNULL, capture_output=True, text=True)
+        lines = g.stdout.splitlines() if g.returncode == 0 else []
+    except OSError:
+        lines = []
+    if lines[:1] == ["true"] and len(lines) > 1:
+        line = {"utc": _shim_time.strftime("%Y-%m-%dT%H:%M:%SZ", _shim_time.gmtime()), "shim": "memory-tree/new-build-to-record",
+                "from": "tools/memory-tree/gen_build_index.py --new-build", "to": "tools/memory-tree/gov_record.py new build-readme", "mode": mode}
+        try:
+            _shim_os.makedirs(_shim_os.path.dirname(lines[1]) or ".", exist_ok=True)
+            with open(lines[1], "a", encoding="utf-8", newline="\n") as f:
+                f.write(_shim_json.dumps(line) + "\n")
+        except OSError:
+            pass
+    else:
+        print("gov: shim memory-tree/new-build-to-record journaled nothing: the call runs outside a git work tree", file=_shim_sys.stderr)
+    _SHIM_TARGET = _shim_os.path.join(_SHIM_HERE, "gov_record.py")
+    _shim_sys.argv = [_SHIM_TARGET, "new", "build-readme", *argv]
+    _shim_runpy.run_path(_SHIM_TARGET, run_name="__main__")
+    return 0
+# <<< gov:shim memory-tree/new-build-to-record
+
+
+# >>> gov:shim memory-tree/new-spec-to-record
+# tools/memory-tree/gen_build_index.py --new-spec moved to tools/memory-tree/gov_record.py new spec: this forwarder is held until install.deprecation-window closes it.
+# Rendered by shims.py from shims.toml; edit the row, never this block.
+def run_shim_new_spec_to_record(argv):
+    import json as _shim_json
+    import os as _shim_os
+    import subprocess as _shim_sp
+    import sys as _shim_sys
+    import time as _shim_time
+    import runpy as _shim_runpy
+
+    _SHIM_HERE = _shim_os.path.dirname(_shim_os.path.abspath(__file__))
+    # a read that fails reads warn, and the line says so; neither branch blocks the forward
+    mode, why = "warn", " (the policy could not be read, so this reads warn)"
+    try:
+        p = _shim_sp.run([_shim_sys.executable, _shim_os.path.join(_SHIM_HERE, "../policy", "policy.py"), "get", "install.on-shim-call"],
+                         stdin=_shim_sp.DEVNULL, capture_output=True, text=True)
+        if p.returncode == 0 and p.stdout.strip() in ("warn", "journal"):
+            mode, why = p.stdout.strip(), ""
+    except OSError:
+        pass
+    if mode != "journal":
+        print("gov: tools/memory-tree/gen_build_index.py --new-spec has moved to tools/memory-tree/gov_record.py new spec; this forwarder is held only until its deprecation window closes" + why, file=_shim_sys.stderr)
+    try:
+        g = _shim_sp.run(["git", "rev-parse", "--is-inside-work-tree", "--git-path", "govkit/shim-calls.jsonl"],
+                         stdin=_shim_sp.DEVNULL, capture_output=True, text=True)
+        lines = g.stdout.splitlines() if g.returncode == 0 else []
+    except OSError:
+        lines = []
+    if lines[:1] == ["true"] and len(lines) > 1:
+        line = {"utc": _shim_time.strftime("%Y-%m-%dT%H:%M:%SZ", _shim_time.gmtime()), "shim": "memory-tree/new-spec-to-record",
+                "from": "tools/memory-tree/gen_build_index.py --new-spec", "to": "tools/memory-tree/gov_record.py new spec", "mode": mode}
+        try:
+            _shim_os.makedirs(_shim_os.path.dirname(lines[1]) or ".", exist_ok=True)
+            with open(lines[1], "a", encoding="utf-8", newline="\n") as f:
+                f.write(_shim_json.dumps(line) + "\n")
+        except OSError:
+            pass
+    else:
+        print("gov: shim memory-tree/new-spec-to-record journaled nothing: the call runs outside a git work tree", file=_shim_sys.stderr)
+    _SHIM_TARGET = _shim_os.path.join(_SHIM_HERE, "gov_record.py")
+    _shim_sys.argv = [_SHIM_TARGET, "new", "spec", *argv]
+    _shim_runpy.run_path(_SHIM_TARGET, run_name="__main__")
+    return 0
+# <<< gov:shim memory-tree/new-spec-to-record
+
+
 def main(argv: list) -> int:
     global _COVERAGE_MEMO
     mode = argv[1] if len(argv) > 1 else "--check"
@@ -10994,12 +11169,14 @@ def main(argv: list) -> int:
     if mode not in ("--check", "--write", "--write-staged", "--check-format", "--print-bindings", "--survey",
                     "--check-asbuilt",
                     "--report", "--bump", "--asks", "--new-build", "--placed-build", "--new-spec", "--doctor",
-                    "--check-coverage", "--print-front-matter", "--print-typed-derived", "--print-relations"):
+                    "--check-coverage", "--print-front-matter", "--print-typed-derived", "--print-relations",
+                    "--print-front-matter-findings"):
         print("usage: gen_build_index.py "
               "[--check [--staged|--with-verdicts]|--write|--write-staged|--check-coverage [--staged]|"
               "--check-asbuilt [--staged]|"
               "--check-format|--survey|--report|--bump|"
               "--print-bindings|--print-front-matter <slug>|--print-typed-derived|--print-relations|"
+              "--print-front-matter-findings|"
               "--asks|--new-build|--placed-build|--new-spec|--doctor|--selftest]")
         return 2
     # TOOL-dTrueNorth-27 S4: `--with-verdicts` is `--check`'s alone, and never beside `--staged`, whose
@@ -11029,10 +11206,13 @@ def main(argv: list) -> int:
     # TOOL-dTotalRecall-4 S3, S4 — two read-only printers whose stdout is a value a program parses, so
     # a refusal goes to stderr and exits 2.
     # TOOL-dTotalRecall-6 S8 — `--print-relations` is a third, the edge list TOOL-dTotalRecall-22 reads.
-    if mode in ("--print-front-matter", "--print-typed-derived", "--print-relations"):
+    # TOOL-dTotalRecall-20 S4 — `--print-front-matter-findings` a fourth, the grade the upgrade step reads.
+    if mode in ("--print-front-matter", "--print-typed-derived", "--print-relations", "--print-front-matter-findings"):
         try:
             if mode == "--print-typed-derived":
                 return cmd_print_typed_derived(root, conf)
+            if mode == "--print-front-matter-findings":
+                return cmd_print_front_matter_findings(root, conf)
             if mode == "--print-relations":
                 return cmd_print_relations(root, conf)
             if len(argv) != 3 or argv[2].startswith("--"):
@@ -11080,12 +11260,14 @@ def main(argv: list) -> int:
             print(f"build-index: {exc}")
             return 2
     try:
+        # TOOL-dTotalRecall-20 S2: the two scaffold verbs are forwarded to the record door by the shim
+        # rows' rendered blocks above `main`, every argument passed through, the door's exit the call's.
         if mode == "--new-build":
-            return cmd_new_build(root, conf, read_new_build_args(argv[2:]))
+            return run_shim_new_build_to_record(argv[2:])
         if mode == "--placed-build":
             return cmd_placed_build(root, conf, read_placed_build_args(argv[2:]))
         if mode == "--new-spec":
-            return cmd_new_spec(root, conf, read_new_spec_args(argv[2:]))
+            return run_shim_new_spec_to_record(argv[2:])
         if mode == "--check-format":
             return cmd_check_format(root, conf)
         if mode == "--survey":

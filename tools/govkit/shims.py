@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""shims.py — forwarders for a moved command, hook path or module import (TOOL-dSafePassage-6).
+"""shims.py — forwarders for a moved command, hook path or module import (TOOL-dSafePassage-6), or for a
+flag of a script that stays, a `verb` row's block inside that script (TOOL-dTotalRecall-20).
 
     python <this kit>/shims.py --write | --check
     python <this kit>/shims.py --fixture --plant <sh|js|py|module> [--mode warn|journal|unset|bogus]
@@ -10,7 +11,10 @@
 
 `shims.toml` beside this file declares one `[[shim]]` row per moved surface. `--write` renders each
 open row's forwarder at its `from` path from one template per language, `--check` compares each with
-its render and asserts each closed row's file is absent. A forwarder reads the adopter's
+its render and asserts each closed row's file is absent. A `verb` row's forwarder is a block between
+`# >>> gov:shim <id>` and `# <<< gov:shim <id>` inside its `from` script, above its `def main(` line:
+`--write` replaces or inserts it, `--check` compares it and refuses it once the row is closed, and
+the script's dispatch calls its `run_shim_<slug>(argv)` for the flag. A forwarder reads the adopter's
 `install.on-shim-call` through the policy kit's reader for its language, at the landed revision, in
 the repository the call runs in: `warn` (the default, and every failed read) prints one stderr line
 and journals the call, `journal` journals it silently; neither ever blocks the forward. The journal is
@@ -39,18 +43,23 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import textwrap
 import tomllib
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import govkit  # noqa: E402 — the deployer's own tool-root, token and policy readers, as matrix.py imports it
 
 SHIMS_NAME = "shims.toml"
-KINDS = ("command", "hook", "module")
+KINDS = ("command", "hook", "module", "verb")
 LANGS = {".sh": "sh", ".js": "js", ".py": "py"}
 MARKER = "gov:shim"
 JOURNAL = "govkit/shim-calls.jsonl"
 # A path segment: no quote, space, `$` or backslash can reach a rendered forwarder.
 SEGMENT = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]*")
+# TOOL-dTotalRecall-20 S3: a `verb` row's words after its script path, each a flag or a bare word, so
+# no quote or space reaches the rendered block; and its slug, which names the block's function.
+VERB_WORD = re.compile(r"-{0,2}[a-z][a-z0-9-]*")
+VERB_SLUG = re.compile(r"[a-z][a-z0-9-]*")
 NO_RELEASE = "no release has been cut: dShippedRelease defines release tags"
 # The location variables a hook exports: the fixture's git reads the scratch repository it names.
 GIT_LOCATION_VARS = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
@@ -63,7 +72,11 @@ def read_shim_rows(root, troot: str | None = None) -> list[dict]:
     A malformed row, a duplicate id or an unreadable file is a Refusal: the declaration is the one
     write boundary every forwarder's bytes pass through. Where `troot` is given, `{prefix}` resolves
     against it rather than the root's own tool root, for a reader comparing the rows with an install
-    at another prefix (TOOL-dSafePassage-87 S11); the file is still found at the root's own."""
+    at another prefix (TOOL-dSafePassage-87 S11); the file is still found at the root's own.
+
+    A `verb` row (TOOL-dTotalRecall-20 S3) spells a flag of a script that stays: its `from` and `to`
+    split on spaces into a `.py` path, which `from` and `to` keep for every reader comparing paths,
+    and its words, kept as `from-words` (exactly one flag) and `to-words`."""
     root = pathlib.Path(root)
     path = govkit.resolve_tool_path(root, govkit.GOVKIT_DIR.name, SHIMS_NAME)
     try:
@@ -88,6 +101,11 @@ def read_shim_rows(root, troot: str | None = None) -> list[dict]:
         row = dict(raw)
         for k in ("from", "to"):
             spelled = raw[k] if isinstance(raw[k], str) else ""
+            if raw["kind"] == "verb":
+                spelled, *words = spelled.split(" ")
+                if not all(VERB_WORD.fullmatch(w) for w in words):
+                    raise govkit.Refusal(f"shims: {where} {k} {raw[k]!r} holds a word outside -{{0,2}}[a-z][a-z0-9-]*")
+                row[f"{k}-words"] = words
             rel = govkit.resolve_prefix_token(spelled, troot)
             if not rel or not all(SEGMENT.fullmatch(s) for s in rel.split("/")):
                 raise govkit.Refusal(f"shims: {where} {k} {raw[k]!r} is not a relative path inside the tree")
@@ -95,8 +113,15 @@ def read_shim_rows(root, troot: str | None = None) -> list[dict]:
         ext = posixpath.splitext(row["from"])[1]
         if ext not in LANGS or posixpath.splitext(row["to"])[1] != ext or row["from"] == row["to"]:
             raise govkit.Refusal(f"shims: {where} from and to must be two .sh, .js or .py paths of one language")
-        if raw["kind"] == "module" and ext != ".py":
-            raise govkit.Refusal(f"shims: {where} is a module row, so its paths end in .py")
+        if raw["kind"] in ("module", "verb") and ext != ".py":
+            raise govkit.Refusal(f"shims: {where} is a {raw['kind']} row, so its paths end in .py")
+        if raw["kind"] == "verb":
+            flag = row["from-words"]
+            if len(flag) != 1 or not flag[0].startswith("-"):
+                raise govkit.Refusal(f"shims: {where} is a verb row, so its from names its script and exactly one flag")
+            if not VERB_SLUG.fullmatch(raw["id"].split("/")[-1]):
+                raise govkit.Refusal(f"shims: {where} is a verb row, so its id's slug is [a-z][a-z0-9-]*, "
+                                     f"the name of its block's function")
         row["lang"] = LANGS[ext]
         row["policy"] = govkit.resolve_prefix_token("{prefix}/policy", troot)
         rows.append(row)
@@ -166,19 +191,20 @@ if (r.signal) process.exit(128 + (require("os").constants.signals[r.signal] || 0
 process.exit(r.status);
 """
 
-PY_PRELUDE = r"""# @MARKER@ — rendered by shims.py from shims.toml; edit the row, never this file.
-# @FROM@ moved to @TO@: this forwarder is held until install.deprecation-window closes it.
-import json as _shim_json
+# The `py` prelude's parts, held once for the `py` template and the `verb` block (TOOL-dTotalRecall-20
+# S3): its imports and its directory line, indented four spaces inside a `verb` block, and its body,
+# the stderr line under `warn` and the journal line under both, already a function's body in either.
+PY_IMPORTS = r"""import json as _shim_json
 import os as _shim_os
 import subprocess as _shim_sp
 import sys as _shim_sys
 import time as _shim_time
+"""
 
-_SHIM_HERE = _shim_os.path.dirname(_shim_os.path.abspath(__file__))
+PY_HERE = r"""_SHIM_HERE = _shim_os.path.dirname(_shim_os.path.abspath(__file__))
+"""
 
-
-def _run_shim_prelude():
-    # a read that fails reads warn, and the line says so; neither branch blocks the forward
+PY_PRELUDE_BODY = r"""    # a read that fails reads warn, and the line says so; neither branch blocks the forward
     mode, why = "warn", @WHY@
     try:
         p = _shim_sp.run([_shim_sys.executable, _shim_os.path.join(_SHIM_HERE, @POLICY@, "policy.py"), "get", @KEY@],
@@ -206,11 +232,30 @@ def _run_shim_prelude():
             pass
     else:
         print(@NOGIT@, file=_shim_sys.stderr)
+"""
 
+PY_PRELUDE = (r"""# @MARKER@ — rendered by shims.py from shims.toml; edit the row, never this file.
+# @FROM@ moved to @TO@: this forwarder is held until install.deprecation-window closes it.
+""" + PY_IMPORTS + "\n" + PY_HERE + "\n\ndef _run_shim_prelude():\n" + PY_PRELUDE_BODY + r"""
 
 _run_shim_prelude()
 _SHIM_TARGET = _shim_os.path.join(_SHIM_HERE, @TO_REL@)
-"""
+""")
+
+# A `verb` row's block, placed above its script's `def main(` line: one function, so no statement of
+# it runs at import and two blocks in one script share no name. Its forward runs the `to` script as
+# `__main__` under its own path, its words and the caller's arguments, so the call exits as it does.
+PY_VERB_BLOCK = (r"""# >>> @MARKER@
+# @FROM@ moved to @TO@: this forwarder is held until install.deprecation-window closes it.
+# Rendered by shims.py from shims.toml; edit the row, never this block.
+def run_shim_@SLUG@(argv):
+""" + textwrap.indent(PY_IMPORTS + "import runpy as _shim_runpy\n", "    ") + "\n"
+    + textwrap.indent(PY_HERE, "    ") + PY_PRELUDE_BODY + r"""    _SHIM_TARGET = _shim_os.path.join(_SHIM_HERE, @TO_REL@)
+    _shim_sys.argv = [_SHIM_TARGET, @TO_WORDS@*argv]
+    _shim_runpy.run_path(_SHIM_TARGET, run_name="__main__")
+    return 0
+# <<< @MARKER@
+""")
 
 PY_COMMAND_TAIL = r"""import runpy as _shim_runpy
 
@@ -232,11 +277,14 @@ _shim_sys.modules[__name__] = _shim_mod
 def render_shim(row: dict) -> str:
     """The forwarder `row` renders: its language's template with its marker line, its target and the
     policy kit spelled relative to the forwarder's own directory, so it works at any install prefix,
-    and every literal quoted for its language."""
+    and every literal quoted for its language. A `verb` row renders its block, the `py` prelude inside
+    one function, its lines and journal naming each path with its words (TOOL-dTotalRecall-20 S3)."""
     here = posixpath.dirname(row["from"]) or "."
     to_rel = posixpath.relpath(row["to"], here)
     policy_rel = posixpath.relpath(row["policy"], here)
-    moved = (f"gov: {row['from']} has moved to {row['to']}; this forwarder is held only until "
+    src = " ".join([row["from"], *row.get("from-words", [])])
+    dst = " ".join([row["to"], *row.get("to-words", [])])
+    moved = (f"gov: {src} has moved to {dst}; this forwarder is held only until "
              f"its deprecation window closes")
     why = " (the policy could not be read, so this reads warn)"
     nogit = f"gov: shim {row['id']} journaled nothing: the call runs outside a git work tree"
@@ -252,20 +300,33 @@ def render_shim(row: dict) -> str:
         q = json.dumps
         subs = {"@WHY@": q(why), "@POLICY@": q(policy_rel), "@MOVED@": q(moved), "@JOURNAL@": q(JOURNAL),
                 "@NOGIT@": q(nogit), "@TO_REL@": q(to_rel), "@ID@": q(row["id"]),
-                "@FROM_Q@": q(row["from"]), "@TO_Q@": q(row["to"]), "@KEY@": q("install.on-shim-call"),
+                "@FROM_Q@": q(src), "@TO_Q@": q(dst), "@KEY@": q("install.on-shim-call"),
                 "@NOSTART@": q(f"gov: shim {row['id']} could not start its target: ")}
         if row["lang"] == "js":
             text = JS_TEMPLATE
+        elif row["kind"] == "verb":
+            text = PY_VERB_BLOCK
+            subs |= {"@SLUG@": row["id"].split("/")[-1].replace("-", "_"),
+                     "@TO_WORDS@": "".join(q(w) + ", " for w in row["to-words"])}
         else:
             text = PY_PRELUDE + (PY_MODULE_TAIL if row["kind"] == "module" else PY_COMMAND_TAIL)
-    subs |= {"@MARKER@": f"{MARKER} {row['id']}", "@FROM@": row["from"], "@TO@": row["to"]}
+    subs |= {"@MARKER@": f"{MARKER} {row['id']}", "@FROM@": src, "@TO@": dst}
     for k, v in subs.items():
         text = text.replace(k, v)
     return text
 
 
+def extract_shim_block(text: str, shim_id: str) -> re.Match | None:
+    """The `verb` row `shim_id`'s block in a script's `text`, its two marker lines included, or None
+    where no opening marker line is closed by its own."""
+    mark = re.escape(f"{MARKER} {shim_id}")
+    return re.search(rf"^# >>> {mark}\n.*?^# <<< {mark}\n", text, re.M | re.S)
+
+
 def write_shims(root) -> list[str]:
-    """Render every open row's forwarder at its `from` path, LF, and return the paths written."""
+    """Render every open row's forwarder at its `from` path, LF, and return the paths written. A `verb`
+    row's block replaces its present block between its markers, or is inserted above the script's
+    `def main(` line; a script holding no such line, or an opened block never closed, is a Refusal."""
     root = pathlib.Path(root)
     wrote = []
     for row in read_shim_rows(root):
@@ -273,6 +334,23 @@ def write_shims(root) -> list[str]:
             continue
         dest = root / row["from"]
         text = render_shim(row)
+        if row["kind"] == "verb":
+            try:
+                script = dest.read_bytes().decode("utf-8")
+            except (OSError, UnicodeDecodeError) as exc:
+                raise govkit.Refusal(f"shims: {row['id']}: cannot read {row['from']}: {exc}") from None
+            hit = extract_shim_block(script, row["id"])
+            at = re.search(r"^def main\(", script, re.M)
+            if hit is None and re.search(rf"^# >>> {re.escape(MARKER)} {re.escape(row['id'])}$", script, re.M):
+                raise govkit.Refusal(f"shims: {row['id']}: {row['from']} opens its block and never closes it")
+            if hit is None and at is None:
+                raise govkit.Refusal(f"shims: {row['id']}: {row['from']} has no `def main(` line to place its block above")
+            new = (script[:hit.start()] + text + script[hit.end():] if hit
+                   else script[:at.start()] + text + "\n\n" + script[at.start():])
+            if new != script:
+                dest.write_bytes(new.encode("utf-8"))
+                wrote.append(row["from"])
+            continue
         if not dest.is_file() or dest.read_bytes() != text.encode("utf-8"):
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(text.encode("utf-8"))
@@ -282,12 +360,26 @@ def write_shims(root) -> list[str]:
 
 def check_shim_parity(root) -> tuple[int, list[str]]:
     """-> (rows graded, findings): an open row whose forwarder is absent or differs from its render,
-    and a closed row whose file is still present."""
+    and a closed row whose file is still present. A `verb` row's script stays, so its BLOCK is graded:
+    absent or differing from its render while the row is open, still present once it is closed."""
     root = pathlib.Path(root)
     rows = read_shim_rows(root)
     findings = []
     for row in rows:
         dest = root / row["from"]
+        if row["kind"] == "verb":
+            script = dest.read_bytes().decode("utf-8", "replace") if dest.is_file() else ""
+            hit = extract_shim_block(script, row["id"])
+            opened = re.search(rf"^# >>> {re.escape(MARKER)} {re.escape(row['id'])}$", script, re.M)
+            if row["closed"]:
+                if opened:
+                    findings.append(f"shims: {row['id']} is closed and its block in {row['from']} is still present")
+            elif hit is None:
+                findings.append(f"shims: {row['id']} has no block in {row['from']}; run shims.py --write")
+            elif hit.group(0) != render_shim(row):
+                findings.append(f"shims: {row['id']}'s block in {row['from']} differs from its render; "
+                                f"a forwarder is never edited by hand, run shims.py --write")
+            continue
         if row["closed"]:
             if dest.exists():
                 findings.append(f"shims: {row['id']} is closed and {row['from']} is still present")
