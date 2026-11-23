@@ -317,3 +317,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T07:53:12Z brief · item KICK-dKeptSession-11 · reason 62436af1ddd9 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-11-build-brief.md
 
 2026-11-23T07:56:11Z dispatch · item e9301de4 KICK-dKeptSession-11 · reason tools/loop/loop_transition.py tools/loop/README.md tools/loop/kit.toml memory/map/generated/symbols.json tools/run-gates/selftest-budgets.txt tools/unattended/unattended.sh tools/unattended/unattended.test.sh coding-governance-agents.template.md memory/guides/SESSION-KICKOFF.md AGENTS.md .governance/instructions.lock tools/template-size-highwater.txt help/loop.md tools/govkit/usage.toml memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-11-1-acceptance-ledger.md
+
+2026-11-23T08:23:42Z brief · item KICK-dKeptSession-43 · reason 82dcb4bb34c7 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-43-build-brief.md
+
+2026-11-23T08:26:46Z dispatch · item b2e66e44 KICK-dKeptSession-43 · reason tools/hooks/scratch-guard.js tools/hooks/actions-free.fixture.sh tools/hooks/scratch-guard.test.sh tools/hooks/agent-cap.test.sh tools/hooks/README.md tools/hooks/agent-cap.js tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-43-1-acceptance-ledger.md
