@@ -44,6 +44,7 @@ import tempfile
 
 sys.dont_write_bytecode = True
 KIT = pathlib.Path(os.path.abspath(__file__)).parent
+TOOL_ROOT_NAME = KIT.parent.name   # the tool root as this tree places it, so a fixture lays its kits out at the installed prefix
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 
@@ -587,7 +588,7 @@ def build_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
     run_fixture_git(root, "config", "core.autocrlf", "false")
     for home, anchor in FIXTURE_KITS:
         src = KIT if home == KIT.name else resolve_kit_dir(home, anchor, KIT)
-        shutil.copytree(src, root / "tools" / home, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        shutil.copytree(src, root / TOOL_ROOT_NAME / home, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     write_fixture_file(root, ".memory-tree.conf",
                        'MEMORY_ROOT="memory"\nDISCIPLINES="tooling decisions"\nFAMILIES="tooling:TOOL decisions:DEC"\n')
     write_fixture_file(root, "memory/README.md", "# memory\n")
@@ -631,7 +632,7 @@ def build_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
 def run_fixture_cli(root, argv) -> tuple[int, list[str]]:
     """The fixture's own copy of the door run in it, as an operator runs it."""
     env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
-    p = subprocess.run([sys.executable, str(root / "tools" / KIT.name / "gov_record.py"), *argv], cwd=str(root),
+    p = subprocess.run([sys.executable, str(root / TOOL_ROOT_NAME / KIT.name / "gov_record.py"), *argv], cwd=str(root),
                        env=env, capture_output=True, text=True, encoding="utf-8", errors="replace",
                        stdin=subprocess.DEVNULL)
     return p.returncode, [ln for ln in (p.stdout + p.stderr).splitlines() if ln.strip()]
