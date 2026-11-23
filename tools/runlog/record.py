@@ -1344,9 +1344,10 @@ def check_commitment(root, record_path, journal_root, memory_root=None) -> tuple
 # `source` is TOOL-dLoggedFlight-20 S7's: a row that renders a time beside a source `sources` does not
 # declare that time may come from. It is its OWN rule and not `cell` because the row's source passed
 # its class — `driver` is a source the model has — and a refusal naming `cell` would send a reader
-# looking for a value outside a vocabulary rather than for a time a journal produced.
+# looking for a value outside a vocabulary rather than for a time a journal produced. `cause` is
+# `check_cause_line`'s (TOOL-dTotalRecall-36 S4), reached once the head admits the line (TOOL-dTotalRecall-48).
 RECORD_RULES = ("headings", "first-cell", "cell", "absolute-path", "uuid", "data", "size", "serves", "line",
-                "name", "unreadable", "source")
+                "name", "unreadable", "source", "cause")
 # A build's runs are refused under these, and the leg's own liveness assertions under the last two.
 RUN_RULES = ("run-start", "run-window")
 LIVENESS_RULES = ("root", "glob")

@@ -303,3 +303,12 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T04:16:35Z brief · item TOOL-dTotalRecall-48 · reason 3493141e23df memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-48-build-brief.md
 
 2026-11-23T04:20:47Z dispatch · item c4a7d234 TOOL-dTotalRecall-48 · reason tools/runlog/record.py tools/runlog/selftest.py tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-48.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-48-1-acceptance-ledger.md
+2026-11-23T04:31:09Z draw · fix-pass · TOOL-dTotalRecall-48 · 39/186 · 20261123T043109Z-724c79
+
+2026-11-23T04:31:09Z dispatch · item 4d1d9899 TOOL-dTotalRecall-48 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-48-deviation-1005.md
+2026-11-23T04:34:48Z draw · re-dispatch · TOOL-dTotalRecall-48 · 40/186 · 20261123T043448Z-85f193
+
+2026-11-23T04:34:48Z dispatch · item 4d1d9899 TOOL-dTotalRecall-48 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+2026-11-23T04:40:03Z draw · re-dispatch · TOOL-dTotalRecall-48 · 41/186 · 20261123T044003Z-e59edd
+
+2026-11-23T04:40:03Z dispatch · item 4d1d9899 TOOL-dTotalRecall-48 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-48-deviation-1005.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-48-1-acceptance-ledger.md tools/runlog/record.py tools/runlog/selftest.py

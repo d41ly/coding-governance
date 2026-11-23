@@ -7847,6 +7847,9 @@ def test_schema_ac2_refusals():
                                              lambda ln: "**Serves:** journal " + other)),
         ("serves undefined-id", build_variant(clean, lambda ln: ln.startswith("**Serves:** "),
                                               lambda ln: f"**Serves:** journal X-{FX_SLUG}-99")),
+        # TOOL-dTotalRecall-48 S2: the cause line the head admits names an id the record does not serve.
+        ("cause unserved", build_variant(clean, lambda ln: ln.startswith("**Caused-by:** "),
+                                         lambda ln: f"**Caused-by:** X-{FX_SLUG}-9")),
         ("line free-text", (free_text, free_line + 1)),
     ]
     variants = [(label, (text.encode("utf-8"), line)) for label, (text, line) in variants]
