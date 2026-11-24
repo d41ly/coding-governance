@@ -47,7 +47,7 @@ case $PLANT in
 esac
 HERE=.; [[ $0 == */* ]] && HERE=${0%/*}
 HERE="$(cd "$HERE" && pwd)"
-KIT_REL=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || { echo "actions-free.fixture: $HERE is in no git checkout"; exit 2; }
+KIT_REL=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || { echo "actions-free.fixture: $HERE is in no git checkout"; exit 2; }
 KIT_REL=${KIT_REL%/}
 case $KIT_REL in */*) PARENT=${KIT_REL%/*}/ ;; *) PARENT="" ;; esac
 TMP=$(mktemp -d) || { echo "actions-free.fixture: no scratch directory"; exit 2; }
@@ -63,6 +63,7 @@ KEY=item.build.base@TOOL-tFix-1#aaaa0001
   && git -C "$R" init -q \
   && printf 'a\n' > "$R/src/a.js" \
   && git -C "$R" add src/a.js \
+  && ! git -C "$R" diff --cached --quiet \
   && git -C "$R" -c user.name=f -c user.email=f@f -c commit.gpgsign=false commit -q -m seed \
   && cp "$HERE/scratch-guard.js" "$HERE/agent-cap.js" "$HOOKS/"; } >/dev/null 2>&1 \
   || { echo "actions-free.fixture: the scratch repository under $TMP could not be built"; exit 2; }
@@ -115,7 +116,7 @@ run_fixture_call() {
     else d.tool_input = { command: arg }
     process.stdout.write(JSON.stringify(d))' "$4" "$5" "$SID" "$TOP")
   err=$(printf '%s' "$payload" | (cd "$R" && env -u CLAUDE_PROJECT_DIR -u GOV_SETTINGS_JSON node "$HOOKS/$3" 2>&1 >/dev/null)); code=$?
-  err=$(printf '%s' "$err" | tr -d '\r' | awk 'NF { printf "%s%s", (n++ ? " ¶ " : ""), $0 }')
+  err=$(awk '{ gsub(/\r/, "") } NF { printf "%s%s", (n++ ? " ¶ " : ""), $0 }' <<<"$err")
   printf '%s · %s · %s · exit %s · %s\n' "$PLANT" "$1" "$2" "$code" "${err:-(empty stderr)}"
 }
 # run_fixture_acts <value>: the four acts AC1 refuses at item none

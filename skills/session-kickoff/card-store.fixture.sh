@@ -739,7 +739,7 @@ print("|".join(k for k in t.RECORD_KIND_TOKENS if k not in t.TYPED_RECORD_KINDS)
     for k in "${typed[@]}"; do
       printf '**Serves:** %s TOOL-tFix-1\n\n# a %s record\n' "$k" "$k" > "$R/memory/builds/tFix/build/2026-01-03-build-TOOL-tFix-1-$k-1.md"
     done
-    git -C "$R" add -A memory && git -C "$R" commit -q -m "fixture: a record of every typed kind"
+    git -C "$R" add -A memory && ! git -C "$R" diff --cached --quiet && git -C "$R" commit -q -m "fixture: a record of every typed kind"
     run_card_engine "$R" --card --pointers --build tFix --session t1
     read_ref_card "$O" > "$S/card"
     read_card_section "$S/card" | sed -n 's/^records — //p' | sed 's/ · /\n/g' | awk '{ print $1 }' > "$S/kinds"
@@ -838,11 +838,11 @@ print("|".join(k for k in t.RECORD_KIND_TOKENS if k not in t.TYPED_RECORD_KINDS)
       "$(tr -d '\r' < "$OUT" | grep -qx 'position — skipped: the card routes no build' && grep -q '^orientation — t1 · ' "$OUT" && grep -q '^READY — none yet' "$OUT"; echo $?)"
     run_card_append; set_card_answer act item.build.unit-pass
     f=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file loop position.py); [ -n "$f" ] || { echo "card-store: no position.py resolves in $R"; exit 2; }
-    mv -f "$f" "$f.aside" || { echo "card-store: $f could not be moved aside"; exit 2; }
+    t=$(mktemp "$S/position.XXXXXXXX") && cp -p "$f" "$t" && rm -f "$f" || { echo "card-store: $f could not be moved aside"; exit 2; }
     run_card_replay
     print_card_held "AC3 no position.py resolving prints position — skipped: no loop kit, and the card" \
       "$(tr -d '\r' < "$OUT" | grep -qx 'position — skipped: no loop kit' && grep -q '^READY — tFix' "$OUT"; echo $?)"
-    mv -f "$f.aside" "$f" || { echo "card-store: $f could not be restored"; exit 2; }
+    cp -p "$t" "$f" || { echo "card-store: $f could not be restored"; exit 2; }
     t0=$EPOCHSECONDS; run_card_replay; t1=$EPOCHSECONDS
     set_card_position delay 30
     t2=$EPOCHSECONDS; CARD_POSITION_BOUND=2 run_card_replay; t3=$EPOCHSECONDS

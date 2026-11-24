@@ -310,9 +310,10 @@ add_claim_sighting() { # clone dir · ref · tree · commit · seen-utc
 # `gov-claim` identity, its message as `KICK-dKeptSession-5`'s post recorded it, with no deadline, set on
 # <ref> of the bare <git dir> by `update-ref`, so no post and no push writes it.
 seed_mail_at() { # git dir · ref · build · id · to · kind · answers -> the commit
-  local t c
+  local t c m
   t=$(git --git-dir="$1" mktree </dev/null)
-  c=$(git --git-dir="$1" -c user.name=gov-claim -c user.email=gov-claim@invalid commit-tree "$t" -m "$(printf 'gov-mail %s/%s\n\nid: %s\nbuild: %s\nfrom-tag: b\nfrom-session: %s\nto: %s\nkind: %s\nitem: none\npass: none\nsubject: planted\nanswers: %s\n\nplanted on %s' "$3" "$4" "$4" "$3" "${2##*/}" "$5" "$6" "$7" "$2")")
+  printf -v m 'gov-mail %s/%s\n\nid: %s\nbuild: %s\nfrom-tag: b\nfrom-session: %s\nto: %s\nkind: %s\nitem: none\npass: none\nsubject: planted\nanswers: %s\n\nplanted on %s' "$3" "$4" "$4" "$3" "${2##*/}" "$5" "$6" "$7" "$2"
+  c=$(git --git-dir="$1" -c user.name=gov-claim -c user.email=gov-claim@invalid commit-tree "$t" -m "$m")
   git --git-dir="$1" update-ref "$2" "$c"; printf '%s\n' "$c"
 }
 # TOOL-aWokenSentinel-17 — the `--status` line is read by FIELD, never as "everything after
@@ -20968,7 +20969,7 @@ same "KDS5 AC2 --kind chat exits 2 naming the closed set and the remote gains no
   "$mb_rc $(grep -c "^mail — not written · the kind 'chat' is none of the closed set: confirm-request " <<<"$mb_out") $(read_mail_refs)" "2 1 $mb_n"
 same "KDS5 AC2 the loop kit's --mail-kinds prints the twelve kinds" \
   "$( set +u; . "$SCRIPT" >/dev/null 2>&1; mb_py=$(resolve_python 2>/dev/null); mb_k=$(resolve_kit_dir "$mb_py" loop loop_lib.py "$KIT_DIR" 2>/dev/null)
-      [ -f "$mb_k/loop_lib.py" ] || mb_k="$(git -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$mb_k"
+      [ -f "$mb_k/loop_lib.py" ] || mb_k="$(unset GIT_DIR GIT_WORK_TREE; git -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$mb_k"
       "$mb_py" "$mb_k/loop_lib.py" --mail-kinds | tr -d '\r' | tr '\n' ' ')" \
   "confirm-request confirmed changed overlap takeover landed question answer ack intake withdrawn superseded "
 # ---- AC3
@@ -20977,7 +20978,7 @@ printf 'line one\n\nline three\n\n\n' > "$mb_d/reg.txt"
 mb_out=$( cd "$mb_d/A" || exit 1; set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
   build_gov_message h "$mb_d/big.txt" k v; printf '%s ' "$?"
   build_gov_message h "$mb_d/nul.txt" k v; printf '%s ' "$?"
-  build_gov_message h "$mb_d/body.txt" k "$(printf 'a\nb')"; printf '%s\n' "$?" )
+  build_gov_message h "$mb_d/body.txt" k $'a\nb'; printf '%s\n' "$?" )
 same "KDS5 AC3 a 4097-byte body, a NUL and a value holding a newline each return 2" "$mb_out" "2 2 2"
 ( cd "$mb_d/A" && CLAUDE_CODE_SESSION_ID=s1 GOV_RUNLOG=0 bash "$SCRIPT" --register decision fx item.plan.x fork-1 "$mb_d/reg.txt" >/dev/null 2>&1
   CLAUDE_CODE_SESSION_ID=s1 GOV_RUNLOG=0 bash "$SCRIPT" --register problem "a subject" item.plan.x "$mb_d/reg.txt" >/dev/null 2>&1 )
