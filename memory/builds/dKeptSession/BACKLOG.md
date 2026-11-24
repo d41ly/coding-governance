@@ -21,12 +21,22 @@
 - DEFERRED · KICK-dKeptSession-29 · until KICK-dKeptSession-65 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, KICK-dKeptSession-65 at order 36 today, closes it (README rule 1)
 - SEV · KICK-dKeptSession-66 · MED · dKeptSession builds a second resume switch or re-spells its line
 - SEV · KICK-dKeptSession-68 · LOW · the listed namespaces stay unpurposed; `arm_purposes` reports them awaiting review and stays green
+- KEEP · KICK-dKeptSession-68 · awaiting the owner
 - SEV · KICK-dKeptSession-70 · LOW · a ledger line names a leg no manifest runs and reads as observed
+- KEEP · KICK-dKeptSession-70 · awaiting the owner
 - SEV · KICK-dKeptSession-71 · LOW · a superseded sibling text goes unanswered in the ledger
+- KEEP · KICK-dKeptSession-71 · awaiting the owner
 - SEV · KICK-dKeptSession-72 · LOW · a new arm's suite has no runner and its RED-first observation no home
+- KEEP · KICK-dKeptSession-72 · awaiting the owner
 - SEV · KICK-dKeptSession-73 · LOW · a pass edits a template and leaves its render stale
+- KEEP · KICK-dKeptSession-73 · awaiting the owner
 - SEV · KICK-dKeptSession-74 · LOW · a new symbol reds the map's freshness leg at the pass
+- KEEP · KICK-dKeptSession-74 · awaiting the owner
 - SEV · KICK-dKeptSession-75 · LOW · a reconcile leaves a spec's leg line naming a retired leg or missing a new one
+- KEEP · KICK-dKeptSession-75 · awaiting the owner
 - SEV · KICK-dKeptSession-76 · MED · a superseded criterion stands unanswered once its subject moves
+- KEEP · KICK-dKeptSession-76 · awaiting the owner
 - SEV · KICK-dKeptSession-77 · LOW · a bare scope item reads as the citing spec's own
+- KEEP · KICK-dKeptSession-77 · awaiting the owner
 - SEV · KICK-dKeptSession-78 · LOW · the audits' classes recur with no checklist entry selecting them
+- KEEP · KICK-dKeptSession-78 · awaiting the owner
