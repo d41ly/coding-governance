@@ -86,7 +86,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 91 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 91 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14
 ids TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27 TOOL-dTotalRecall-28
 ids TOOL-dTotalRecall-29 TOOL-dTotalRecall-30 TOOL-dTotalRecall-31 TOOL-dTotalRecall-32 TOOL-dTotalRecall-33 TOOL-dTotalRecall-34 TOOL-dTotalRecall-35 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42
@@ -176,7 +176,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113
 | [TOOL-dTotalRecall-78 — the S19 sweep visits every unit's pass commit by the driver's rule in a placed scratch worktree, and a commit it cannot resolve or check out is a printed red](spec/2026-10-26-spec-TOOL-dTotalRecall-78.md) | 36 | 2 | CLOSED | rev-3 | 2026-11-24 |
 | [TOOL-dTotalRecall-79 — the ratchet leg's red spans are derived from the corrected sweep by a derivation seen to find a known red, and unit 76's AC13 certification is recorded against them](spec/2026-10-26-spec-TOOL-dTotalRecall-79.md) | 36 | 2 | CLOSED | rev-3 | 2026-11-24 |
 | [TOOL-dTotalRecall-80 — unit 69's AC1 pair is answered by manifest-check's own C5 verdict at unit 69's pass commit and at its parent, replacing unit 76's S20 answer](spec/2026-10-26-spec-TOOL-dTotalRecall-80.md) | 36 | 2 | CLOSED | rev-4 | 2026-11-24 |
-| [TOOL-dTotalRecall-85 — unit 76's S1 to S4 reads of units 55, 56 and 57 are made again at verified revisions, each count printed beside the sha it was read at](spec/2026-10-26-spec-TOOL-dTotalRecall-85.md) | 36 | 2 | INPROGRESS | rev-3 | 2026-11-24 |
+| [TOOL-dTotalRecall-85 — unit 76's S1 to S4 reads of units 55, 56 and 57 are made again at verified revisions, each count printed beside the sha it was read at](spec/2026-10-26-spec-TOOL-dTotalRecall-85.md) | 36 | 2 | CLOSED | rev-3 | 2026-11-24 |
 | [TOOL-dTotalRecall-86 — unit 76's S5 and S6 reads of unit 70's table and unit 46's strings are made again at verified revisions, so an unresolved pass is a red and never a count](spec/2026-10-26-spec-TOOL-dTotalRecall-86.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-24 |
 | [TOOL-dTotalRecall-90 — units 82 to 84's S1 counts are read again with every line labelled and an unresolved pass printed red, and each decision they fed is made from its own line](spec/2026-10-26-spec-TOOL-dTotalRecall-90.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-24 |
 | [TOOL-dTotalRecall-88 — the round-7 minors: each reading of units 71 to 76 that observed nothing or two things is made once at the tip, and each gap it hid is closed](spec/2026-10-26-spec-TOOL-dTotalRecall-88.md) | 37 | 2 | DEFERRED | rev-4 | 2026-11-24 |
@@ -193,7 +193,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-2 | 2026-11-24 |
 <!-- /gen:build-units -->
 
-Records: 856 bound to this build, across 4 record folder(s).
+Records: 857 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -307,7 +307,7 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 | red-fix | `2026-11-24-build-TOOL-dTotalRecall-60-red-fix-26.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md` and 24 more under build/ |
 | widen | `2026-11-23-build-TOOL-dTotalRecall-9-widen-10.md`, `2026-11-23-build-TOOL-dTotalRecall-51-widen-7.md` and 13 more under build/ |
 | research | `2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md`, `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md` and 112 more under build/ |
-| logs | `2026-11-24-build-TOOL-dTotalRecall-87-1-builder-return.md`, `2026-11-24-build-TOOL-dTotalRecall-87-1-acceptance-ledger.md` and 143 more under build/ |
+| logs | `2026-11-24-build-TOOL-dTotalRecall-87-1-builder-return.md`, `2026-11-24-build-TOOL-dTotalRecall-87-1-acceptance-ledger.md` and 144 more under build/ |
 | open asks | `BACKLOG.md`, 16 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->
