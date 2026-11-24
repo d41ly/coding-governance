@@ -175,7 +175,7 @@ ids TOOL-dBoundRoles-86 TOOL-dBoundRoles-87 TOOL-dBoundRoles-88 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-93 — the closing review's round-2 mediums: a PowerShell block is read as its own command, and the arms and leg guards the fold left out](spec/2026-11-24-spec-TOOL-dBoundRoles-93.md) | 47 | 2 | CLOSED | rev-1 | 2026-11-24 |
 <!-- /gen:build-units -->
 
-Records: 595 bound to this build, across 4 record folder(s).
+Records: 597 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -36,3 +36,16 @@ skills/session-kickoff/manifest-check.test.sh	mkdir -p "$mm_dir" && printf -- '-
 {prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"source": "{prefix}/hooks/agent-cap.js"	1	2698e0c3ecd6861c25ec60ab843e69a282a829de	widened:2026-11-23-build-TOOL-dBoundRoles-44-widen-13
 {prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"path": ".claude/hooks/agent-cap.test.sh",	1	2698e0c3ecd6861c25ec60ab843e69a282a829de	widened:2026-11-23-build-TOOL-dBoundRoles-44-widen-13
 {prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"source": "{prefix}/hooks/agent-cap.test.sh"	1	2698e0c3ecd6861c25ec60ab843e69a282a829de	widened:2026-11-23-build-TOOL-dBoundRoles-44-widen-13
+.governance/install.json	"path": "tools/roles/agents/gov-diff-reviewer.agent.md",	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-18-widen-19
+.governance/install.json	"source": "tools/roles/agents/gov-diff-reviewer.agent.md"	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-18-widen-19
+.governance/install.json	"path": "tools/roles/agents/gov-spec-reviewer.agent.md",	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-18-widen-19
+.governance/install.json	"source": "tools/roles/agents/gov-spec-reviewer.agent.md"	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-18-widen-19
+.governance/install.json	"path": "tools/roles/house/gov-diff-reviewer.md",	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-18-widen-19
+.governance/install.json	"source": "tools/roles/house/gov-diff-reviewer.md"	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-18-widen-19
+.governance/install.json	"path": "tools/roles/house/gov-spec-reviewer.md",	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-18-widen-19
+.governance/install.json	"source": "tools/roles/house/gov-spec-reviewer.md"	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-18-widen-19
+{prefix}/roles/kit.toml	"installable:{prefix}/roles/agents/gov-spec-reviewer.agent.md",	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-18-widen-19
+{prefix}/roles/kit.toml	"installable:{prefix}/roles/agents/gov-diff-reviewer.agent.md"]	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-18-widen-19
+.governance/steps/roles/house-overlays-to-instructions.before.json	"tools/roles/house/gov-session.md": {	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-19-widen-20
+{prefix}/roles/kit.toml	"file:{prefix}/roles/house/gov-session.md", "file:{prefix}/roles/house/gov-skeptic.md",	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-19-widen-20
+{prefix}/roles/kit.toml	"installable:{prefix}/roles/house/gov-session.md", "installable:{prefix}/roles/house/gov-skeptic.md",	1	c2378668b8a5509575947edb0e2f3fe676c55370	widened:2026-11-24-build-TOOL-dBoundRoles-19-widen-20
