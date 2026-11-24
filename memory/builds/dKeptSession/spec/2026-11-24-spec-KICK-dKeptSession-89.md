@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-24-build-KICK-dKeptSession-89-widen-10.md](../build/2026-11-24-build-KICK-dKeptSession-89-widen-10.md) | widen | — |
 | [2026-11-24-prompt-KICK-dKeptSession-89-1-spec-writer.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-89-1-spec-writer.md) | journal | — |
+| [2026-11-24-prompt-KICK-dKeptSession-89-2-builder.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-89-2-builder.md) | journal | — |
 | [2026-11-24-prompt-KICK-dKeptSession-89-build-brief.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-89-build-brief.md) | research | — |
 | [2026-11-24-prompt-KICK-dKeptSession-89-spec-brief.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-89-spec-brief.md) | research | — |
 
