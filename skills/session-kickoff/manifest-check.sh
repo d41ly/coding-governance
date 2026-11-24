@@ -1612,7 +1612,14 @@ check_card_route() {
         fence = 0; hit = 0; f = root "/" usp[i]
         while (!hit && (getline l < f) > 0) {
           sub(/\r$/, "", l)
-          if (l ~ /^ ? ? ?(```|~~~)/) { fence = !fence; continue }
+          # The length rule parse_spec_h1 and the write gate read too (TOOL-dBoundRoles-56): a backtick opener with
+          # a backtick after its run opens nothing, and only a run of its character at least as long closes it.
+          s = l; sub(/^ ? ? ?/, "", s); c = substr(s, 1, 1)
+          if (match(s, (c == "~") ? "^~~~+" : "^```+")) {
+            rest = substr(s, RLENGTH + 1)
+            if (!fence) { if (c == "~" || !index(rest, "`")) { fence = RLENGTH; fc = c; continue } }
+            else if (c == fc && RLENGTH >= fence && rest ~ /^[ \t]*$/) { fence = 0; continue }
+          }
           if (fence || l !~ /^#[ \t]/) continue
           split(l, w, /[ \t]+/); t = w[2]; gsub(/[`*]/, "", t); sub(/[:.,;]+$/, "", t)
           if (t == uid[i]) hit = 1

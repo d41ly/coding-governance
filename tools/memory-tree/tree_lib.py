@@ -336,7 +336,7 @@ def parse_conf(text: str, conf: dict) -> dict:
     return conf
 
 
-def unfenced_lines(text: str):
+def unfenced_lines(text: str, by_length: bool = False):
     """Yield (lineno, line) for every line OUTSIDE a fenced block, then the open fence's line.
 
     The final yield is `(opened_at, None)` when the document ends inside a fence, and nothing when it
@@ -345,21 +345,34 @@ def unfenced_lines(text: str):
     index generator both ended silently with the fence still open, dropping every later line at
     exit 0. That is invisible by construction: a fence opened near the top of a row document hides
     every duplicate below it, and hiding duplicates is what the check that reads this exists to stop.
+
+    `by_length` takes the length rule the spec H1 readers share (TOOL-dBoundRoles-56 S1), the one the
+    roles kit's `read_unfenced_lines` and the hooks kit's `readUnfencedLines` walk: a fence opens on a
+    line of at most three spaces of indent and a run of three or more backticks or tildes, a backtick
+    run whose line holds a backtick after it opens nothing, and the fence closes only on a line of the
+    same character whose run is at least as long, with nothing after it but whitespace. The default is
+    the row readers' rule: any indent, and any line opening with the opener's marker closes.
     """
     fence = ""
     opened_at = 0
     for n, line in enumerate(text.split("\n"), 1):
-        stripped = line.lstrip()
-        if stripped.startswith("```") or stripped.startswith("~~~"):
-            mark = "```" if stripped.startswith("```") else "~~~"
-            if not fence:
-                fence, opened_at = mark, n
-                continue
+        if by_length:
+            m = re.match(r" {0,3}(`{3,}|~{3,})(.*)", line, re.S)
+            mark, rest = m.groups() if m else ("", "")
+            opens = mark != "" and not (mark[0] == "`" and "`" in rest)
+            closes = mark[:1] == fence[:1] and len(mark) >= len(fence) and not rest.strip(" \t\r")
+        else:
+            stripped = line.lstrip()
+            mark = stripped[:3] if stripped.startswith(("```", "~~~")) else ""
             # Only the marker that OPENED the fence closes it: a ``` line inside a ~~~ block is
             # content, not a toggle.
-            if mark == fence:
-                fence = ""
-                continue
+            opens, closes = mark != "", mark == fence
+        if not fence and opens:
+            fence, opened_at = mark, n
+            continue
+        if fence and closes:
+            fence = ""
+            continue
         if not fence:
             yield n, line
     if fence:
@@ -404,13 +417,14 @@ def parse_spec_h1(rel: str, text: str, memory_root: str, families) -> tuple[int,
 
     `rel` is repo-relative and must sit under `<memory_root>/builds/<slug>/spec/`, at any depth. The
     first UNFENCED H1 whose first token is `<FAMILY>-<slug>-<seq>` wins, one per file. `families`
-    is the prefixes alone (`TOOL`, not `tooling:TOOL`).
+    is the prefixes alone (`TOOL`, not `tooling:TOOL`). Unfenced is the length rule, `by_length`, as
+    KICK R4 and the hooks kit's `readSpecH1Id` read it (TOOL-dBoundRoles-56).
     """
     if not build_spec_path_re(memory_root).match(rel):
         return None
     alt = "|".join(sorted(set(families))) or "(?!)"
     pat = re.compile(r"^#\s+[`*]*(?P<id>(?:" + alt + r")-[A-Za-z0-9]+-\d+)\b")
-    for n, line in unfenced_lines(text):
+    for n, line in unfenced_lines(text, by_length=True):
         if line is None:
             continue
         m = pat.match(line)

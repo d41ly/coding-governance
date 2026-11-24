@@ -1224,10 +1224,14 @@ function * readUnfencedLines(text) {
 }
 
 /**
- * A spec's H1 id, '' when it has none — the H1 read R4 and tree_lib.parse_spec_h1 make (S8): the
- * first UNFENCED `#` line, its first token with backticks and asterisks stripped and trailing `:.,;`
- * dropped. checkBuildable and readDispatchedUnits both read it here (TOOL-aSmoothedDispatch-6 S4), its lines
- * those `readUnfencedLines` yields, so a short run inside a long fence closes nothing (TOOL-dBoundRoles-50 S9).
+ * A spec's H1 id, '' when it has none (S8): the first UNFENCED `#` line, its first token with backticks and
+ * asterisks stripped and trailing `:.,;` dropped. checkBuildable and readDispatchedUnits both read it here
+ * (TOOL-aSmoothedDispatch-6 S4), its lines those `readUnfencedLines` yields. Its two twins are KICK R4, which is
+ * manifest-check.sh's `check_card_route`, and tree_lib's `parse_spec_h1`, which walks `unfenced_lines` with
+ * `by_length`. All three share one fence rule, the length rule (TOOL-dBoundRoles-50 S9, TOOL-dBoundRoles-56): a
+ * fence opens on at most three spaces and a run of three or more, a backtick run whose line holds a backtick
+ * after it opens nothing, and the fence closes only on a run of its character at least as long with nothing but
+ * whitespace after it. Beyond fences they differ: R4 takes any unfenced H1 naming the unit, the other two the first.
  */
 function readSpecH1Id(text) {
   for (const [, raw] of readUnfencedLines(String(text || ''))) {

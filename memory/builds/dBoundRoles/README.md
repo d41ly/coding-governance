@@ -152,7 +152,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-44 — the round-1 audit's 11 docs-and-records minors: memory readers re-derived, frozen receipt waived, gotcha pages re-pointed, two Skills fitted, legacy registry named, workflow suites re-keyed and the close's harness swap checked](spec/2026-10-26-spec-TOOL-dBoundRoles-44.md) | 29 | 2 | CLOSED | rev-6 | 2026-11-23 |
 | [TOOL-dBoundRoles-50 — the round-1 audit of units 37 to 44, its 24 roles-code minors: one fence walker per language, fence-aware marker readers, live leg names, waiver and registry rows kept true, and criteria that can fail](spec/2026-10-26-spec-TOOL-dBoundRoles-50.md) | 30 | 2 | CLOSED | rev-6 | 2026-11-23 |
 | [TOOL-dBoundRoles-51 — the round-1 audit of units 37 to 44, its 8 records-and-Skills minors: build order verified, the policy mirror's net diff, append-only records observed by class, one owner per ledger verdict, and the recall Skill off a refused tool](spec/2026-10-26-spec-TOOL-dBoundRoles-51.md) | 30 | 2 | CLOSED | rev-3 | 2026-11-23 |
-| [TOOL-dBoundRoles-56 — the three readers of a spec's H1 share one fence rule: `parse_spec_h1` and KICK R4 move with `checkBuildable` onto the length rule, and one fixture set sees one id from all three](spec/2026-10-26-spec-TOOL-dBoundRoles-56.md) | 31 | 2 | INPROGRESS | rev-3 | 2026-11-22 |
+| [TOOL-dBoundRoles-56 — the three readers of a spec's H1 share one fence rule: `parse_spec_h1` and KICK R4 move with `checkBuildable` onto the length rule, and one fixture set sees one id from all three](spec/2026-10-26-spec-TOOL-dBoundRoles-56.md) | 31 | 2 | CLOSED | rev-3 | 2026-11-24 |
 | [TOOL-dBoundRoles-57 — the memory-recall kit's description invariant follows the Skill off the refused tools: augments shell `grep` and `git grep`, and names neither search tool](spec/2026-10-26-spec-TOOL-dBoundRoles-57.md) | 31 | 2 | INPROGRESS | rev-3 | 2026-11-22 |
 | [TOOL-dBoundRoles-58 — the 35 minors of auditing units 45 to 51: criteria passable on a correct build, one typed set and one block reader at spawn, one extents record at render, the H1 parity's consumers, and AMENDED answers naming a revision](spec/2026-10-26-spec-TOOL-dBoundRoles-58.md) | 32 | 2 | DEFERRED | rev-6 | 2026-11-22 |
 | [TOOL-dBoundRoles-60 — the round-1 audit of units 52 to 58, its 37 minors: criteria that can fail and can pass, arms observed where their code lives, one read-key parse, floors moved with their arms, and write sets that name every file a pass writes](spec/2026-10-26-spec-TOOL-dBoundRoles-60.md) | 33 | 2 | DEFERRED | rev-8 | 2026-11-22 |
@@ -166,7 +166,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 515 bound to this build, across 4 record folder(s).
+Records: 517 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

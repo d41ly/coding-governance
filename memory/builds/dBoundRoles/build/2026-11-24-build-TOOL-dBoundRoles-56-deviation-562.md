@@ -1,0 +1,15 @@
+# TOOL-dBoundRoles-56 deviation 562 — the builder's departures from the one-fence-rule spec
+
+**Serves:** deviation TOOL-dBoundRoles-56
+
+- **Departs from:** `TOOL-dBoundRoles-56@rev-3` [S4, S5, §4, §5, §7]
+- **Hand-off:** spec-to-code
+- **Before:** S4 names only a comment edit over `readSpecH1Id`, whose scan still toggled at the spec's HEAD. S5 gives each of its fixtures one live H1 and all but one of them a decoy, though its own list holds three decoys (DERIVED from S5's list) and a fixture whose only H1 is the one inside the unclosed fence; it runs `parse_spec_h1` by `python3 -c`, and reuses the scratch-guard suite's drive of `manifest-check.sh` for R4. The Files touched of section 4 name no kickoff manifest, no budget row and no record; section 5 says the kickoff engine's size leg reads `manifest-check.sh`'s bytes; section 7 names `agent-cap self-test`.
+- **After:** `readSpecH1Id` already reads through `readUnfencedLines` at base, so S4 changes the comment alone, as the brief rules, and the comment names `check_card_route`, `parse_spec_h1`, the rule and the one difference beyond fences. S5's fixtures are the ones its list describes: the first, second and fourth hold a decoy, and the fourth holds no live H1, so its three readers must each yield none. The case runs `parse_spec_h1` by the suite's resolved interpreter, `$TESTPY`, as every other arm does, since a bare launcher can be the store stub. R4 runs through the suite's `SG_WRITER`, over a scratch repository that tracks a stand-in `corpus_ids.py` printing every fixture id, the kickoff suite's own flat-reader shape, because `corpus_ids.py` refuses a tree without the memory-tree kit's hygiene script and a real id set would let R3 answer for R4; the case skips, announced, in a tree that carries no kickoff writer or no memory-tree kit, as that suite's AC10 arm does. The pass re-stamps `memory/guides/SESSION-KICKOFF.md`, raises the suite's assertion floor, and scales its row in `tools/run-gates/selftest-budgets.txt`. The size leg's `argv` in `tools/gate-legs.json` reads `skills/session-kickoff/SKILL.md`, so no byte of `manifest-check.sh` moves it. `agent-cap self-test` is read as `spawn-guard self-test`, as the main loop's decision rules.
+- **Cause:** builder discovery
+- **Reason:** each change is mechanical and inside the declared write set, and none is a design choice the spec leaves open; the fixture counts, the launcher, the risk line and the re-stamp are the restatements `TOOL-dBoundRoles-60` carries over this spec.
+- **Evidence:** the build brief `memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-56-build-brief.md`, the main loop's decision `memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-43-1-main-loop-decision.md`, and the acceptance ledger `memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-56-1-acceptance-ledger.md`.
+- **Risk:** additive
+- **Approver:** author, the gov-builder pass of the unattended run, under the build README's `author-recorded` value; reported by the `report` value
+- **Follow-through:** none
+- **Caused-by:** TOOL-dBoundRoles-56

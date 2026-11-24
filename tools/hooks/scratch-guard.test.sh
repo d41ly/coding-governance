@@ -2147,6 +2147,68 @@ while IFS= read -r sgbr50_l; do
 done < "$TMP/br50.out"
 [ "$(grep -c '^ok   BR50-' "$TMP/br50.out")" = 4 ] || { echo "FAIL BR50 the walker program printed $(grep -c '^ok   BR50-' "$TMP/br50.out") ok rows of 4"; fail=$((fail+1)); }
 
+# ---- TOOL-dBoundRoles-56 AC1 (S5): the three readers of a spec's H1 share the length rule. Five fixture specs,
+# each one fence edge, go to `parse_spec_h1`, to the exported `checkBuildable` and to the kickoff writer's R4, which
+# `--card --append` runs; each must read the live H1 and none the decoy a fence holds. The fixture tracks a stand-in
+# id reader defining every id, as the kickoff suite's flat-reader arm does, so R3 never answers for R4. The staged break, owed at the close: R4's `fence = !fence` toggle back, which admits the first fixture's
+# decoy. WHAT IT DOES NOT CHECK: a spec holding two live H1s, where R4 takes either and the other two the first.
+SGBR56="$TMP/sgbr56"; SGBR56_MT="$HERE/../$SG_K_MEMORY_TREE"
+if [ ! -f "$SG_WRITER" ] || [ ! -f "$SGBR56_MT/tree_lib.py" ]; then
+  echo "SKIP BR56 the kickoff kit's writer is not at $SG_WRITER or memory-tree's tree_lib.py is not at $SGBR56_MT, so there are not three readers to compare"
+else
+  sgbr56_build=mem/builds/zHeadParity
+  sgbr56_st='**Status:** INPROGRESS · rev-1 · 2026-11-24 · node d · Tier-2'
+  mkdir -p "$SGBR56/$sgbr56_build/spec" "$SGBR56/$sgbr56_build/prompts" "$SGBR56/kit"
+  printf 'print("# id-ere: TOOL-zHeadParity-[0-9]+")\nfor n in (1, 2, 3, 5, 11, 12, 14): print("TOOL-zHeadParity-" + str(n))\n' > "$SGBR56/kit/corpus_ids.py"
+  printf 'MEMORY_ROOT=mem\n' > "$SGBR56/.memory-tree.conf"
+  printf '# a brief\n' > "$SGBR56/$sgbr56_build/prompts/b.md"
+  printf '%s\n' '````' '```' '# TOOL-zHeadParity-11 — quoted' '````' '# TOOL-zHeadParity-1 — live' '' "$sgbr56_st" > "$SGBR56/$sgbr56_build/spec/f1.md"
+  printf '%s\n' '~~~' '```' '# TOOL-zHeadParity-12 — quoted' '~~~' '# TOOL-zHeadParity-2 — live' '' "$sgbr56_st" > "$SGBR56/$sgbr56_build/spec/f2.md"
+  printf '%s\n' '```run `x`' '# TOOL-zHeadParity-3 — live' '' "$sgbr56_st" > "$SGBR56/$sgbr56_build/spec/f3.md"
+  printf '%s\n' '```' '# TOOL-zHeadParity-14 — quoted' '' "$sgbr56_st" > "$SGBR56/$sgbr56_build/spec/f4.md"
+  printf '%s\n' '    ```' '# TOOL-zHeadParity-5 — live' '' "$sgbr56_st" > "$SGBR56/$sgbr56_build/spec/f5.md"
+  git init -q "$SGBR56" && $SGGIT -C "$SGBR56" add -A 2>/dev/null && $SGGIT -C "$SGBR56" commit -q -m fixture
+  (cd "$SGBR56" && bash "$SG_WRITER" --card --write --session sgtest-br56 </dev/null >"$TMP/br56.out" 2>&1)
+  sed -i "s/^READY — none yet\$/$SG_READY/" "$SGBR56/.git/orientation/sgtest-br56.md"
+  # Each of the three answers with one word per route asked: `admit`, `refuse` for a refusal by the H1
+  # itself, or the refusal's own words, which match no expectation below.
+  for sgbr56_row in \
+    'f1 1 11 a decoy after a three-backtick line inside a four-backtick fence' \
+    'f2 2 12 a decoy after a backtick line inside a tilde fence' \
+    'f3 3 - a backtick line whose info string holds a backtick' \
+    'f4 - 14 a fence never closed holding the only H1' \
+    'f5 5 - a four-space-indented backtick line'; do
+    read -r sgbr56_f sgbr56_live sgbr56_decoy sgbr56_label <<< "$sgbr56_row"
+    sgbr56_rel="$sgbr56_build/spec/$sgbr56_f.md"; sgbr56_want="" sgbr56_kick="" sgbr56_ids=""
+    sgbr56_id=none; [ "$sgbr56_live" = - ] || sgbr56_id="TOOL-zHeadParity-$sgbr56_live"
+    for sgbr56_n in "$sgbr56_live=admit" "$sgbr56_decoy=refuse"; do
+      [ "${sgbr56_n%%=*}" = - ] && continue
+      sgbr56_want="$sgbr56_want ${sgbr56_n#*=}"; sgbr56_u="TOOL-zHeadParity-${sgbr56_n%%=*}"; sgbr56_ids="$sgbr56_ids $sgbr56_u"
+      if printf '## route\n- build: zHeadParity\n- unit: %s · spec %s\n- brief: %s/prompts/b.md\n' "$sgbr56_u" "$sgbr56_rel" "$sgbr56_build" \
+           | (cd "$SGBR56" && bash "$SG_WRITER" --card --append --session sgtest-br56 >"$TMP/br56.out" 2>&1); then
+        sgbr56_kick="$sgbr56_kick admit"
+      elif grep -qF "route R4 REFUSED" "$TMP/br56.out" && grep -qF "carries no unfenced H1 whose first token is $sgbr56_u;" "$TMP/br56.out"; then
+        sgbr56_kick="$sgbr56_kick refuse"
+      else
+        sgbr56_kick="$sgbr56_kick $(tail -1 "$TMP/br56.out")"
+      fi
+    done
+    sgbr56_py=$("$TESTPY" -c 'import sys; sys.path.insert(0, sys.argv[1]); from tree_lib import parse_spec_h1, read_text; hit = parse_spec_h1(sys.argv[3], read_text(sys.argv[2]), "mem", ["TOOL"]); print(hit[1] if hit else "none")' \
+      "$SGBR56_MT" "$SGBR56/$sgbr56_rel" "$sgbr56_rel" 2>&1 | tr -d '\r')
+    sgbr56_js=$(node -e '
+const [hook, dir, spec, ...units] = process.argv.slice(1), sg = require(hook)
+for (const unit of units) {
+  const why = sg.checkBuildable({ unit, spec }, "zHeadParity", dir, "mem", Buffer.from(""))
+  process.stdout.write(" " + (why === "" ? "admit" : / has H1 naming /.test(why) ? "refuse" : why))
+}' "$HOOK" "$SGBR56" "$sgbr56_rel" $sgbr56_ids 2>&1)
+    for sgbr56_n in "parse_spec_h1 reads $sgbr56_id;$sgbr56_py;$sgbr56_id" "checkBuildable answers$sgbr56_want;$sgbr56_js;$sgbr56_want" "R4 answers$sgbr56_want;$sgbr56_kick;$sgbr56_want"; do
+      IFS=';' read -r sgbr56_name sgbr56_got sgbr56_exp <<< "$sgbr56_n"
+      if [ "$sgbr56_got" = "$sgbr56_exp" ]; then echo "ok   BR56-AC1 $sgbr56_label: $sgbr56_name"; pass=$((pass+1))
+      else echo "FAIL BR56-AC1 $sgbr56_label: $sgbr56_name — got '$sgbr56_got'"; fail=$((fail+1)); fi
+    done
+  done
+fi
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
@@ -2209,8 +2271,10 @@ n=$((pass+fail))
 # same rule.
 # 450 = 446 + the 4 BR50 rows TOOL-dBoundRoles-50 added (2 walker rows, 1 checkBuildable row and 1
 # allowance row; its count row prints only on a red), counted by hand under the same rule.
+# 465 = 450 + the 15 BR56-AC1 rows TOOL-dBoundRoles-56 added (three readers over five fixtures), counted by
+# hand under the same rule; a tree with no kickoff writer or no memory-tree kit skips them, as AC10's arm does.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=450
+FLOOR_ASSERTIONS=465
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
