@@ -7,7 +7,7 @@ The gov-builder return for the pass dispatched at `12d219431` from [2026-11-24-p
 
 ## Why
 
-Built to spec rev-4 with no divergence. `id_grammar.py#check_marker_domain` is called in the build-folder walks of `check_cause_writers` and `check_alias_compares`, before any skip or keep. AC1 to AC4 are observed by probe. The §7 legs and both New arms' RED-first observations are owed to the close.
+Built to spec rev-4 with no divergence. `id_grammar.py#check_marker_domain` is called in the build-folder walks of `check_cause_writers` and `check_alias_compares`, before any skip or keep. AC1 to AC4 are observed by probe (DERIVED 2026-11-24). The §7 legs and both New arms' RED-first observations are owed to the close.
 
 ## Summary
 
