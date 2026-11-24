@@ -19,19 +19,19 @@ hold-code: host-owner-action
 held-from: RUNNING
 refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 9024276e335603927483bb4f978c986e7b258b89
-phase: HELD
+witness: 25df45c46e3d7dc7e7245635bac9ea5c54c04f55
+phase: RUNNING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dtotalrecall-ae256e
 anchor-kind: default-branch
 cli-version: 2.1.326
-lease-utc: 2026-11-22T02:23:18Z
+lease-utc: 2026-11-24T02:14:06Z
 pid-image: claude.exe
-host: compeeto
-pid: 28116
-session: 16f4ad58-6904-4a66-bc18-9482a47ce656
-keepalive: 5a8cd3c4
+host: desktop-v6fbsjd
+pid: 5448
+session: 9067262b-db21-4497-8ba8-ef2deab46f53
+keepalive: 3c88023a
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 anchor-ref: refs/heads/main
@@ -509,3 +509,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T20:35:21Z dispatch · item c736ff00 TOOL-dTotalRecall-57 · reason tools/memory-tree/check-memory-hygiene.test.sh
 
 2026-11-23T20:53:05Z hold · item host-owner-action · reason until owner · reaped 5a8cd3c4 · resume none(owner)
+
+2026-11-24T02:14:14Z resume · item dTotalRecall · reason held · keepalive 3c88023a · manual
