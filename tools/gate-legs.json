@@ -1166,7 +1166,8 @@
       "{prefix}/memory-tree/",
       "{prefix}/check-spec-tokens.py",
       "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py"
+      "{prefix}/policy/policy.py",
+      "{prefix}/policy/presets.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1211,7 +1212,8 @@
       "{prefix}/lib/",
       "{prefix}/memory-tree/",
       "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py"
+      "{prefix}/policy/policy.py",
+      "{prefix}/policy/presets.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -2218,7 +2220,9 @@
       "{prefix}/policy/policy.py",
       "{prefix}/memory-tree/backlog.py",
       "{prefix}/memory-tree/coverage_join.py",
-      "{prefix}/memory-tree/legacy_ledger.py"
+      "{prefix}/memory-tree/legacy_ledger.py",
+      "{prefix}/policy/presets.py",
+      "{prefix}/memory-tree/design_lib.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -2248,7 +2252,9 @@
       "{prefix}/policy/policy.py",
       "{prefix}/memory-tree/backlog.py",
       "{prefix}/memory-tree/coverage_join.py",
-      "{prefix}/memory-tree/legacy_ledger.py"
+      "{prefix}/memory-tree/legacy_ledger.py",
+      "{prefix}/policy/presets.py",
+      "{prefix}/memory-tree/design_lib.py"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -3267,7 +3273,9 @@
       "{prefix}/policy/policy.py",
       "{prefix}/memory-tree/backlog.py",
       "{prefix}/memory-tree/coverage_join.py",
-      "{prefix}/memory-tree/legacy_ledger.py"
+      "{prefix}/memory-tree/legacy_ledger.py",
+      "{prefix}/policy/presets.py",
+      "{prefix}/memory-tree/design_lib.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3976,6 +3984,9 @@
       "{prefix}/runlog/extract.py",
       "{prefix}/runlog/model.py",
       "{prefix}/runlog/runlog_lib.py",
+      "{prefix}/runlog/runlog.py",
+      "{prefix}/runlog/prose.py",
+      "{prefix}/playbook/layers.toml",
       "{prefix}/branch-reconcile/kit.toml",
       "{prefix}/drift-audit/kit.toml",
       "{prefix}/gate-lint/kit.toml",

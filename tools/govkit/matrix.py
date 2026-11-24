@@ -97,10 +97,12 @@ SCRATCH_EXPECT = {
     # table quietly describe a leg that had stopped being emitted.
 }
 
-#: The five answers shapes 6 and 7 fix over the stubs (PLAY-dOrderedCharter-80 S7), one constant so the
-#: default install and the aged one cannot drift apart.
+#: The six answers shapes 6 and 7 fix over the stubs (PLAY-dOrderedCharter-80 S7), one constant so the
+#: default install and the aged one cannot drift apart; `preset` is the policy kit's, which the
+#: registry default selects and intake never defaults (KICK-dKeptSession-4 S4).
 INSTALL_ANSWERS = {"memory_root": "memory", "playbook_path": "docs/PARALLEL.md", "playbook_dir": "docs",
-                   "manifest_path": "docs/SESSION-KICKOFF.md", "user_skills": "~/.claude/skills"}
+                   "manifest_path": "docs/SESSION-KICKOFF.md", "user_skills": "~/.claude/skills",
+                   "preset": "standard"}
 
 
 def derive_bullet_placeholders() -> set[str]:
@@ -861,7 +863,7 @@ def main() -> int:
         (g / ".governance").mkdir(exist_ok=True)
         (g / ".governance" / "deploy.toml").write_text(
             'gov_source = "."' + NL + f'prefix = "{PFX[:-1]}"' + NL + "drop_blocks = []" + NL
-            + render_deploy_tail(install, {"playbook_path": "docs/PARALLEL.md"}),
+            + render_deploy_tail(install, {"playbook_path": "docs/PARALLEL.md", "preset": "standard"}),
             encoding="utf-8", newline=NL)
         git(g, "add", "-A"); git(g, "commit", "-qm", "governance")
 

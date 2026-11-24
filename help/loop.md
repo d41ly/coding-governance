@@ -49,6 +49,18 @@ Three alias rows map older words onto members: `attach` means `amend`, `defer` m
 look alike and are not this set: a review round's exit (`fold` or `promote`), the `class:`, `new:`,
 `gate:` and `none` lines of a review finding, and triage's verdicts on a build in planning.
 
+And the one closed set of mail kinds, the words a mailbox message's `kind` may be. The unattended
+driver's `--mail post` refuses any other before it writes, and `python tools/loop/loop_lib.py
+--mail-kinds` prints them one per line:
+
+```toml
+[mail]
+kinds = ["confirm-request", "confirmed", "changed", "overlap", "takeover", "landed", "question", "answer", "ack",
+         "intake", "withdrawn", "superseded"]
+```
+
+An empty list, a word given twice or a word outside a tag segment's shape refuses the whole file.
+
 ## Each step's program
 
 Each step is a program of items, one `[[item]]` row per item, and `--check` prints how many each
@@ -362,7 +374,19 @@ and builds.
   item that is no tag or resolves to nothing, an outcome outside its item's set, or a disposition
   outside the set. It also joins every item's cross-step routes, an outcome sent to `transition` or
   to an item of another step, with the build table both ways: a route with no row, a row on no
-  route, and a row entering another state than the routed item's step are each refused. It exits 2
+  route, and a row entering another state than the routed item's step are each refused. It joins the
+  build rows from `none` with the dispositions a claim admits and each one's first move, both ways:
+  each admitted disposition must be in the disposition set and have exactly one row firing its first
+  move, and every build row from `none` must fire the first move of an admitted disposition. It prints
+  the join as one line, each disposition with the state its row enters:
+
+  ```text
+  loop: entry rows · new → planning · patch → designing · repeat → designing
+  ```
+
+  A disposition no single row fires prints `?`, and each break is refused on a line opening `entry
+  rows · `. A `repeat` request names its playbook by path, a repo-relative path the placement check
+  holds, until the playbook record kind lands. It exits 2
   when the file holds no transition row, so it never admits a move over nothing. `check --selftest`
   runs `check`, every case below and each kind of answer, and the `loop transition tables` gate
   runs it on every push and landing.
@@ -384,12 +408,16 @@ and builds.
   stays), `unrouted-row` (a row on an outcome routed inside its own step), `owed-stale` (an owed row a
   build row covers), `stand-in` (a stale and a mis-owned stand-in row), `terminal-from` (a row leaving
   landed), `terminal-open` (landed added to the open states), `unit-terminal-from` (a unit row from
-  `@open`, so leaving deployed) and `level-no-terminal` (`unit-terminal` taken out of `[states]`). The
-  files on disk are never changed.
+  `@open`, so leaving deployed), `level-no-terminal` (`unit-terminal` taken out of `[states]`),
+  `entry-row-missing` (the `repeat` row from `none` deleted), `entry-set-missing` (`repeat` taken out
+  of the disposition set), `entry-row-extra` (a row from `none` on the claim carrying `ask`, which no
+  claim admits) and `entry-row-twice` (the `repeat` row from `none` written twice). The files on disk
+  are never changed.
 
 The tables do not judge whether a move's witness holds, which is the writer's precondition, or
 whether a state is reachable or a cycle terminates. The feature and unit rows are not joined to the
-routes, and a feature's state, its least-advanced unit's, is the mover's call.
+routes, and a feature's state, its least-advanced unit's, is the mover's call. An entry row's `to`,
+the state the entry rows' line prints, is not judged either: the table's own rows decide it.
 
 ## Which state and step each run phase reads
 
@@ -458,7 +486,7 @@ step of the phase it was held from, which the driver writes as the run's `held-f
 - **The hold:** the driver's `--phase` asks this map which step exits a move crosses. When an owner
   gate sits at one of them and still reads `held`, the move is refused before anything is written,
   naming the gate and how to release it, as `--close` is held. A move that crosses no exit, or only
-  exits no gate holds, goes through as before. Under the default `autonomy`, the only owner gate is the
+  exits no gate holds, goes through as before. Under the default `autonomy` and `attendance`, the only owner gate is the
   plan gate, which the authorization releases, so nothing new is held.
 
 ## When a parent build is withdrawn
@@ -540,8 +568,8 @@ policy key `transitions.record` in `.governance/policy.toml` says which:
 - **`trailer`**: the move's commit carries
   `Gov-Transition: <from> -> <to> · build=<slug> · item=<tag> · sha=<sha8>`, with any extra field, such
   as `stand-in=<owner>`, `composition=<sha8>`, `scenario=<tags>` and `scenario-settled=<entries>`,
-  after it. The rework budget's `budget=` and `draw=` are derived fields too: the writer adds them,
-  and a `--field` giving either is refused.
+  after it. The rework budget's `budget=` and `draw=` are derived fields too, and so is `disposed=`,
+  the mail the move disposed: the writer adds them, and a `--field` giving any of them is refused.
 - **`log`**: a record in the build's `build/` folder, `<date>-build-<id>-transition-<n>.md`, holding
   the same fields as `- **Build:**`, `- **From:**`, `- **To:**`, `- **Item:**` and `- **Sha:**` lines,
   where `<id>` is the lowest unit id a spec under the build defines.
@@ -581,6 +609,54 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   A move made before the build has its first spec writes the trailer and no record; the next move
   after the first spec writes the missing records first, in move order.
 
+  Before anything else, the move reads the build's mailbox once, with the unattended driver's
+  `--mail read <slug>`. A message addressed to the build, or to one of its units, that is neither
+  answered, acknowledged nor past its deadline holds the move: it prints `refused — <slug> · mail open <id> …` naming
+  every open message and exits 1 writing nothing, so answer or acknowledge each (`--mail answer
+  <slug> <id> <body file>` for a question, `--mail ack <slug> <id>`) and record the move again. Before
+  that refusal, once the move itself checks, the move acknowledges each notice it has consumed, posting one `--mail ack <slug>
+  <id> [<id> ...]` for them all, so a parent's notice never holds your build until its deadline. A move
+  refused for its item, outcome, witness, field, tree verdict, scenario or value posts no
+  acknowledgement at all, so the notice stays open for the move you record next. An acknowledged notice no longer
+  holds the move, and your build's next move disposes of it. The acknowledgements are all or nothing: the
+  move acknowledges the notices it has consumed only when no other message is open, and prints
+  `mail — acked <kind> <id> from build:<parent>` for each; otherwise it acknowledges none, and the refusal
+  names every open message. To order a parent's notices the move also reads every message that parent
+  wrote, with `--mail read <parent> --local --sent`, from the copy its first read fetched. A failed ack prints
+  `mail — ack not posted <id> · rc <n>` (`rc -` where the driver could not be launched or did not answer
+  in time) on stderr and
+  leaves the notice open, so the move is refused on it. Where every message holding the move is one
+  whose acknowledgement was refused, the refusal names that cause instead of `mail open`:
+  `refused — <slug> · mail ack not posted: <id> · <the ack's first line>`, one per message joined by
+  `; `, such as `mail — not written: no session id` when your harness exports no
+  `CLAUDE_CODE_SESSION_ID`, or an origin out of reach; fix that and record the move again:
+
+  | Kind addressed to your build | Acknowledged by | When |
+  |---|---|---|
+  | `landed`, `superseded`, `withdrawn` | your build's own move | at its next move with no other message open |
+  | `confirmed`, `changed`, current | your build's own move | at its next move with no other message open, once the parent's interfaces check names it current |
+  | `confirmed`, `changed`, superseded by the current one by content key or by the session chain | the same | with the current one |
+  | `confirmed`, `changed`, neither current nor superseded | nobody here | the re-entry that consumes it, or its deadline |
+
+  A notice is superseded when its content key equals the current one's, or when the parent's session
+  chain places it before the current one: an earlier `seq` on the same session's ref, or a session the
+  current one's session took over, named by the `after` of its first message, never the order your
+  node happened to see them in. A notice the chain places after the current one, or cannot place, stays
+  open and holds the move.
+
+  A check of the parent's interfaces that cannot be read prints
+  `mail — interfaces <parent> unread · <why>` on stderr and acknowledges nothing from that parent. A
+  `question`, an `intake` or an `overlap` is never acknowledged for you. A mailbox that is not read passes with one
+  `loop: mail · unarmed · <why>` line: `RUN_CLAIMS` off, no unattended driver beside the loop kit, or
+  a repository with no `.unattended.conf`. A read that cannot answer, no bash that can run the driver,
+  no answer within its 30 s (PINNED) or a failed read with no row, is `loop: unanswered · mail unknown:
+  ...`, exit 2, never an empty mailbox. The driver runs under the bash that can see it, never the bare
+  name `bash`, which on Windows can reach WSL and its other filesystem: `GOV_BASH`, when set, is the
+  only one tried, and a node where none can see the driver refuses the move as `mail unknown`. Past the guard, each answered, acknowledged or expired message no
+  earlier move named is disposed: the move's trailer and record carry `disposed=<id>+<id>`, and where
+  `log` is selected one `<date>-build-<id>-mailbox-message-<n>.md` record per message, its fields and
+  its body, is written beside the move's own record in the same commit. A message is disposed once.
+
   A backward move, such as testing back to building on a code miss, is recorded through the same
   writer and channels as a forward one, with the same trailer fields and record lines, and the check
   holds it the same way. The `loop: recorded` line names the move's direction, `forward`, `backward`
@@ -588,8 +664,8 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   trailer or the record.
 
 - **Check a build's moves:** `check --build <slug>` holds each log record to its move's trailer, names <!-- usage: script:tools/loop/loop_transition.py#check 53beaa6b -->
-  a record no trailer backs, and holds the `transition` definition in your `AGENTS.md` to the line the
-  writer prints. It exits 0 clean and 1 on a finding, printing
+  a record no trailer backs, and holds the `transition` and `progress` definitions in your `AGENTS.md` to
+  the lines the writer prints. It exits 0 clean and 1 on a finding, printing
   `pending — <n> move(s) before the build's first spec` while moves wait on a spec, or `unstored`
   where the set stores nothing. Both
   verbs exit 2 when `transitions.record` does not resolve, and 2 `unarmed` where the policy kit is not
@@ -600,12 +676,73 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   python tools/loop/loop_transition.py check --build <slug>
   ```
 
+- **Report progress to the owner:** the policy key `notify.owner` picks the events you hear of as a <!-- usage: script:tools/loop/loop_transition.py#progress 0eca9616 -->
+  `progress — <slug> · <event> · <detail>` line in the final message. `turn-micro-formats`, the default,
+  reports none, so you hear through the micro-formats that end each turn as before; `park-and-landing`
+  reports a parked decision and a landing; `every-transition` reports those and every recorded move;
+  `park-only` reports a parked decision alone. No value pushes anything anywhere: the line is printed,
+  never sent. `python tools/loop/loop_transition.py progress --build <slug> --event <event> --detail <text>`
+  prints the line where the value picks `park`, `landing` or `transition`, and nothing otherwise,
+  exit 0; any other event exits 2. The unattended driver's `--park` and `--landed` run it for you, and
+  `record` prints the move's line itself under `every-transition`. A value that does not resolve is said
+  as `loop: unanswered`, and inside a move as one `loop: progress · unread` line that never refuses it.
+
+  ```toml
+  [notify]
+  owner = "park-and-landing"
+  ```
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->
+  ```bash
+  python tools/loop/loop_transition.py progress --build <slug> --event park --detail "item <tag>"
+  ```
+
 - **See it on a scratch repository:** `--fixture --plant <case>` builds a scratch repository holding <!-- usage: script:tools/loop/loop_transition.py 930359dc -->
   the build `tFix`, records a move there, runs the check and removes it. The cases are `default`,
   `subset-trailer-line`, `subset-log`, `empty-set`, `log-drift`, `orphan-log`, `no-row`, `line-drift`,
   `pre-spec`, `field`, `backward-rows` (three moves forward and three back, each trailer and read
-  printed with its direction) and `skip-backward` (the same six moves, the last one's record deleted,
-  so the check names the move back that owes it). `check --selftest` runs every case, and gov's own
+  printed with its direction), `skip-backward` (the same six moves, the last one's record deleted,
+  so the check names the move back that owes it), `descope-spent` (a rework budget of 0: the move
+  back refused as spent, then a descope recorded), `mail-open` (an open question on a scratch remote
+  refusing the move), `mail-disposed` (the question acknowledged, disposed once), `mail-expired` (the
+  question with a 30-hour deadline, first seen 31 hours ago (PINNED) and never answered, disposed as
+  expired), `mail-argv` (the
+  mailbox read's command line recorded and held to the located driver and the bash that sees it),
+  `mail-no-driver` (no driver found, the move recorded with the mailbox unarmed), `mail-no-bash`
+  (no bash that sees the driver, the move refused as `mail unknown`), `deps-notices` (a second
+  build naming `tFix` in `parents:`: the move out of Design posts it one `confirmed` keyed over the
+  spec listing at the move's commit, and a second exit from Design posts `changed`, never a second
+  `confirmed`), `notices-two-dependents` (two dependents and three exits from Design: each reads one
+  `confirmed` and two `changed`, passes `1`, `2` and `3`), `notices-refused` (the post to one
+  dependent refused: the move still records and prints the refusal's line), `notices-repeat-key` (one
+  dependent and three exits from Design, the spec unchanged between the last two: the third repeats
+  the second's spec listing, and every notice is still posted, its pass `3` telling it apart),
+  `notices-reposted` (the Design exit's post to one dependent refused: the next move posts it again to
+  that dependent alone, each then holding one `confirmed` of pass `1`), `acks-landed` (a parent's
+  `landed` the move acknowledges, then records), `acks-confirmed` (a `confirmed` whose key recomputes at
+  the parent lease's witness, acknowledged over the real interfaces check), `acks-superseded` (a
+  `confirmed` and the later `changed` the check names current, both acknowledged; then another parent's
+  pair the check does not confirm, refusing the next move), `acks-failed` (one ack across two moves,
+  then a refused ack and one whose launch fails, each printing `mail — ack not posted`, refusing the third
+  move naming each cause), `acks-no-session` (the `landed` of `acks-landed` with no
+  `CLAUDE_CODE_SESSION_ID`: the ack is refused and the move refused naming `no session id`, the notice
+  still open), `acks-refused-witness`, `acks-refused-field` and `acks-refused-scenario` (the `landed` of
+  `acks-landed`, then the move refused for a witness that names no commit, a derived `--field` or a
+  scenario conflict: no acknowledgement posted and the notice still open), `acks-takeover` (a take-over's `changed` seen before the `confirmed` of the session it took
+  over: both acknowledged over the real interfaces check, and the chain reads the same with their
+  first sightings swapped), `acks-later-key` (a later `changed` on the take-over's own ref stays
+  open, so the move acknowledges nothing and is refused naming every open notice), `acks-withdrawn` (a
+  parent's lone `withdrawn` acknowledged, printing its `mail — acked` line, and the move recorded) and
+  `acks-withdrawn-question` (a `withdrawn` beside an open `question`: neither acknowledged, the move
+  refused naming both, and the `withdrawn` still open after it), `chain-two-dependents` (a parent that
+  wrote to two dependents and was taken over: each dependent's move acknowledges both its notices,
+  ordered over every message the parent wrote, and a recipient form refused that read),
+  `notify-micro`, `notify-park-landing`, `notify-every` and `notify-park-only` (one move under
+  that `notify.owner` value, `notify-micro` setting none, then a park and a landing reported, printing
+  `loop: fixture · progress <n>`, the progress lines the value let through), `notify-shape` (an
+  `AGENTS.md` whose `progress` definition drops ` · <detail>`, so the check owes one finding) and
+  `notify-composition-unread` (two moves under `every-transition`, the second one's composition read
+  unread: it still prints its progress line beside `loop: composition · unread`). `check --selftest` runs every case, and gov's own
   `loop transition record` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
@@ -757,7 +894,12 @@ below); `select` and the transition writer take them as `--fact <name>=<value>` 
 with `adopter` at its second segment. `extends` names the scenario whose facts, entry step, activated
 rows and hand-overs it starts from, each key you set standing in place of the parent's whole. Its
 `activates` holds, per kind tag, the rows it adds to that kind's composition for a build placed under
-it, each meeting every refusal an overlay row of that kind meets:
+it, each meeting every refusal an overlay row of that kind meets. Its slot, `preset` and `overrides`,
+sets policy for the builds placed under it alone: `preset = "strict"` names a shipped preset, and
+`overrides = { "review.max-rounds" = 5 }` sets keys on top of it, so a high-precision scenario runs
+strict while the repository runs standard. A build reads the slot after your policy file's own values
+and before the repository's preset (`python tools/policy/policy.py get <key> --build <slug>` shows it),
+and `check` refuses a slot that sets a key presets never touch or breaks a pair rule:
 
 ```toml
 [[scenario]]
@@ -862,7 +1004,11 @@ A placed `new`, `patch` or `repeat` request becomes a build with `bash tools/una
 
 A decision or a problem is filed once on the remote with `bash tools/unattended/unattended.sh --register decision <build> <item> <fork> <file>` or `--register problem <subject> <item> <file>`. A decision is keyed by the item that raised the question and its fork, never by its wording, so a second session deciding the same slot is refused with exit 1 and shown the first one's record; a problem's id comes from your session, the item, the subject and the text, so two different problems on one path both land and a retried filing is refused. The text file is capped at 4096 bytes (PINNED) of plain text. It prints `register — written <ref>` (exit 0), `register — exists <ref>` (exit 1) or names why nothing was written (exit 2), and does nothing while `RUN_CLAIMS` is off. <!-- usage: verb:unattended.sh:--register 371297d7 -->
 
-A build, a unit of a build, a cadence run or a recorded request is leased on the remote with `bash tools/unattended/unattended.sh --lease acquire build <slug>` (or `unit <slug> <id>`, `run <cadence> <period>`, `request <content key>`, the last refused `no-record` where the remote holds no `refs/gov/requests/<content key>`, and the slug `request` reserved for it as `run` is); `renew` takes `--witness <sha>`, `release` with no `--as` hands the lease over as `released`, which anyone takes at the next epoch, while `--as landed|withdrawn` leaves a build or unit lease a tombstone (a cadence run lease takes `--as landed|aborted`), `take-over` takes a stale foreign lease and raises its epoch, `offer <kind> <name> [<sub>] --to <tag>` (or `--to <tag>/<session>`) offers an absent or released lease to one node, or one session of it, without assigning it, every other caller refused `offered` until `leases.offer-seconds` after its first sighting of the offer, `acquire build <slug> --for draw` holds a closed build's tombstone for a patch build's draw, `--lease flush` pushes the writes this node queued while the remote did not answer, refusing one whose last fetch is older than `leases.queued-claim-days`, and `--lease prune` deletes the run leases and legacy run claims terminal that long, never a build's; `fence build <slug> [--after <tip>]` prints the fence the lander's push carries and writes nothing, `--after` re-fencing a move of the lease by its own holder at the same epoch. Each prints one line, `lease — <tail> · <act> · epoch <n>`, or names the refusal: `live-holder`, `tombstone`, `epoch-fence`, `overlap`, `offline`, `offered`, `terminal` or `no-record`. With no session id from the harness (`CLAUDE_CODE_SESSION_ID` unset, empty or `absent`) the acts that write a holder, `acquire`, `take-over`, `renew`, `release` and `offer`, print `lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder` and exit 2 before reading anything, because an absent session would name every id-less session on your node; `flush`, `prune` and `fence` name no holder and run as they do with a session, so a headless supervisor still prunes and a fence from a terminal or CI still answers. A run's own claim, identified by its keepalive, is unaffected. `--lease status <kind> <name> [<sub>]` reads one lease and writes nothing: one TAB-separated line, its tail, fleet tag, session, status, verdict and epoch, or `lease — none · <tail>`; it is how a reader tells two sessions of one node apart, which `--claims` cannot. With `RUN_CLAIMS` off every act but `fence` prints `lease — off · <tail>` and exits 0 having written nothing, and `fence` prints `fence — none · leases are off`. An offer is refused `offered` over an offer still open, whoever it names, and when `--to` names your own tag or your own session on it; another session on your tag is a hand-over and lands. An offer over a build or unit tombstone is refused `tombstone`, and `terminal` stays a cadence or legacy claim's. A create whose last commit this node's feed holds but git can no longer read, after a `git prune` say, is refused `epoch-fence` for a build or unit lease, whose epoch it cannot continue, and is a plain create at epoch 1 for a cadence run. An offline write whose ref's newest queued line is not a readable queued commit, a commit this clone does not hold or a line of another shape, prints `lease not written — <tail> · queued commit unreadable; nothing queued` and exits 2, queueing nothing, rather than building on that line, an older one or the cached tip. The `leases.*` policy keys shape it: `memory/guides/UNATTENDED-STOPS.md` section 7. <!-- usage: verb:unattended.sh:--lease f067f09f -->
+A message for another build, or for the session working on it, is posted with `bash tools/unattended/unattended.sh --mail post <slug> --to <recipient> --kind <kind> --subject <text> <body file>`, `<slug>` your own build, `--item`, `--pass` and `--answers <id>` optional, and `--interface <file>` required on a `confirmed` or `changed` post and refused on any other: it names the file of the interface the notice announces, whose content key the message carries. `--default <text>` is the answer the message takes if nobody answers it in time: required on a `question` or a `confirm-request`, optional on any other kind, which otherwise records `ack`. Every message also records its `deadline`, the hours your landed `flow.wait-ceiling` policy key reads at the post. The recipient is one of four forms: `build:<slug>`, `unit:<id>`, `node:<fleet tag>` or the bare word `project`; the kind one of the loop definition's `[mail]` set above, except `ack` and `answer`, which `--mail post` refuses (exit 2), naming `--mail ack` or `--mail answer`: those verbs read the row they reply to first, so no other build's post can release your question. Each session writes its own ref, `refs/gov/mail/<slug>/<fleet tag>/<session>`, one commit per post on the one before, so two writers never contend; the message's id comes from what it says, never from your session, so a retried post is refused as `mail — duplicate <id> · <ref>` (exit 1). The body file is capped at 4096 bytes (PINNED) of plain text, and a line that would read as a record field, or a `~~~~` line, is refused. It prints `mail — posted <id> · <ref>` (exit 0) or names why nothing was written (exit 2). `--mail read <slug>` prints the build's mailbox, one TAB row per message addressed to the build or one of its units: id, kind, to, state, first sighting, sender's build, subject, the id it answers, ref, commit, the reply that decided its state, then `seq`, the message's place on its session's ref, `after`, on a session's first message the last message the build's previous session wrote, so a take-over names its predecessor, and `content-key`, then `deadline` and `default`, each `-` on an older message that carries none. A record whose id is not twelve lower-case hex digits, whose kind is none of the `[mail]` set or whose build is not the one its ref names, and every record on a ref whose build segment is no build's slug, is not read: no reader of your mailbox sees it. A dependent acts on the `confirmed` or `changed` row whose content key equals the key of the interface text it reads now, never on the order messages arrived in. A message is `open` until an `answer` names it (`answered`), an `ack` does (`acked`), or your node first saw it more than its `deadline` hours ago by your own clock (`expired`), its `default` then the answer; a message your node has not seen yet never expires. An `answer` or `ack` itself reads `reply` and never waits. `--open` prints only the open rows and `--ids` their ids on one line, or `none`; with the remote unreachable it prints `mail — local copy: <why>` and reads what your clone last fetched, and `--local` reads that copy without trying the remote at all. `--sent`, given your build's slug, prints every message your build wrote, whoever it was addressed to, each in the state its recipient's mailbox shows. `--mail notice <slug> [--item <instance key>] [--local] [--ring <ref> <id>]` prints the build's unread mail on one line, as "See the build's unread mail as it arrives" under "Where a build is, and what runs next" below says; `--ring` takes the live channel's ref and message id, checks both, and then reads the mailbox, never the ring. `--mail ack <slug> [<id> ...]` acknowledges each message addressed to your build, posting an `ack` to its sender's build. An id named twice is acknowledged once, and a list given empty exits 0 before anything is read. It reads the remote first, so with the remote unreachable it prints `mail — not read · <why>` and refuses the ack (exit 2), nothing posted. An id your build has already acknowledged, whatever state its row reads, is skipped with `mail — already acked <id>` on stderr, and a list holding only skipped ids exits 0 and writes nothing. The rest land together or not at all, so where any id names no message addressed to your build, or the write is refused or lost, nothing is posted and every message stays open. It exits 0 once every ack is posted or every id skipped, 1 when the write is lost, and 2 when it refuses, an unreachable remote among them, and a message your build already holds under the ack's own id that is no ack of that id: `--mail ack` reports that duplicate as a refusal (exit 2), where `--mail post` exits 1. `--mail answer <slug> <question id> <body file> [--cite <path>@<sha>]...` answers a `question` addressed to your build, posting an `answer` to the asker's build with the question's subject; its body is your file followed by one `cites <path>@<sha>` line per `--cite`, in the order you gave them. Each cite must name a file your clone holds at that commit, its sha 7 to 40 lower-case hex digits, or nothing is written (exit 2), as for an id naming no question addressed to your build or a body file that cannot be read; a question already `answered`, `acked` or `expired` prints `answer — <id> · <state>` and exits 1. Only `answer` takes `--cite`. While a message addressed to a build is open, that build's moves are refused (see "Recording a build's move" above). With `RUN_CLAIMS` off a post, an ack and an answer print `mail — off` and exit 2, and a read or a notice prints it and exits 0. <!-- usage: verb:unattended.sh:--mail 4c1a862e -->
+
+Once a post, an ack or an answer has written its message, it rings the other sessions live, and its posted line is followed by one `ring —` line. The mailbox is always written first, and the ring carries only the message's mail ref and id, which `--mail notice --ring` takes, so a ring that never arrives costs only the time until the next mailbox read. Your landed `deps.messaging` policy key picks the channels: under `live-and-mailbox`, the default, and `live-only` the post rings each live channel the harness offers, and since this harness offers none between sessions it prints `ring — none · no live channel in this harness (stand-in dWellOiledMachine)` until dWellOiledMachine adds a doorbell; `live-only` still writes the mailbox. Under `mailbox-only` it rings nothing and prints `ring — off (deps.messaging: mailbox-only)`. A `deps.messaging` that cannot be read rings as `live-and-mailbox` and says why in one `unattended: NOTE -` line on stderr, and the ring never changes the post's exit. <!-- usage: policy:deps.messaging 21013b0f -->
+
+A build, a unit of a build, a cadence run or a recorded request is leased on the remote with `bash tools/unattended/unattended.sh --lease acquire build <slug>` (or `unit <slug> <id>`, `run <cadence> <period>`, `request <content key>`, the last refused `no-record` where the remote holds no `refs/gov/requests/<content key>`, and the slug `request` reserved for it as `run` is); `renew` takes `--witness <sha>`, `release` with no `--as` hands the lease over as `released`, which anyone takes at the next epoch, while `--as landed|withdrawn` leaves a build or unit lease a tombstone (a cadence run lease takes `--as landed|aborted`), `take-over` takes a stale foreign lease and raises its epoch, `offer <kind> <name> [<sub>] --to <tag>` (or `--to <tag>/<session>`) offers an absent or released lease to one node, or one session of it, without assigning it, every other caller refused `offered` until `leases.offer-seconds` after its first sighting of the offer, `acquire build <slug> --for draw` holds a closed build's tombstone for a patch build's draw, `--lease flush` pushes the writes this node queued while the remote did not answer, refusing one whose last fetch is older than `leases.queued-claim-days`, and `--lease prune` deletes the run leases and legacy run claims terminal that long, never a build's; `fence build <slug> [--after <tip>]` prints the fence the lander's push carries and writes nothing, `--after` re-fencing a move of the lease by its own holder at the same epoch. Each prints one line, `lease — <tail> · <act> · epoch <n>`, or names the refusal: `live-holder`, `tombstone`, `epoch-fence`, `overlap`, `offline`, `offered`, `terminal` or `no-record`. With no session id from the harness (`CLAUDE_CODE_SESSION_ID` unset, empty or `absent`) the acts that write a holder, `acquire`, `take-over`, `renew`, `release` and `offer`, print `lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder` and exit 2 before reading anything, because an absent session would name every id-less session on your node; `flush`, `prune` and `fence` name no holder and run as they do with a session, so a headless supervisor still prunes and a fence from a terminal or CI still answers. A run's own claim, identified by its keepalive, is unaffected. `--lease status <kind> <name> [<sub>]` reads one lease and writes nothing: one TAB-separated line, its tail, fleet tag, session, status, verdict and epoch, or `lease — none · <tail>`; it is how a reader tells two sessions of one node apart, which `--claims` cannot. `--lease show build <slug>` reads one build lease's witness and writes nothing: the commit alone, or `-` where the lease holds none or no lease exists; a dependent build reads its parent's witness with it, and any other shape exits 2. With `RUN_CLAIMS` off every act but `fence` prints `lease — off · <tail>` and exits 0 having written nothing, and `fence` prints `fence — none · leases are off`. An offer is refused `offered` over an offer still open, whoever it names, and when `--to` names your own tag or your own session on it; another session on your tag is a hand-over and lands. An offer over a build or unit tombstone is refused `tombstone`, and `terminal` stays a cadence or legacy claim's. A create whose last commit this node's feed holds but git can no longer read, after a `git prune` say, is refused `epoch-fence` for a build or unit lease, whose epoch it cannot continue, and is a plain create at epoch 1 for a cadence run. An offline write whose ref's newest queued line is not a readable queued commit, a commit this clone does not hold or a line of another shape, prints `lease not written — <tail> · queued commit unreadable; nothing queued` and exits 2, queueing nothing, rather than building on that line, an older one or the cached tip. The `leases.*` policy keys shape it: `memory/guides/UNATTENDED-STOPS.md` section 7. <!-- usage: verb:unattended.sh:--lease f067f09f -->
 
 Each node also keeps a change feed of every governance ref write it made or saw, in `gov-feed.log` under its git common dir. `bash tools/unattended/unattended.sh --feed check` holds that feed to the governance refs the clone holds and names each `missing`, `duplicate`, `extra`, `order` or `torn` line with exit 1; `--feed rebuild` writes the feed from those refs on a node that has none, and `--feed print --from <seq>` replays it from a sequence number. <!-- usage: verb:unattended.sh:--feed 4f313579 -->
 
@@ -928,8 +1074,9 @@ and a token, compares without it on both sides; a URL git rewrote through `url.<
 still reads skipped. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
 engine answers on your local witnesses, so no unit reads `deployed`, and prints
 `interrupt — remote · none` with no remote-tip claim. A tracking ref you deleted reads the same. An owed parked decision or an unpassed hold answers
-`awaiting`; a `parents:` build that has not landed answers `blocked`; an undecided ask answers
-`awaiting` only when no item can run.
+`awaiting`; a `parents:` build that has not landed answers `blocked` where its cause holds the
+build's step, as [Coordinating with a parent build](#coordinating-with-a-parent-build) describes; an
+undecided ask answers `awaiting` only when no item can run.
 
 The frontier is every item of the build's step whose witness does not hold and whose needs are
 witnessed, in the order the composition lists them; the next item is its first entry. A refused item
@@ -942,7 +1089,7 @@ The unattended driver's `--plan` prints the engine's answer as its `next:` line,
 shapes it always printed, and beneath it a `frontier:` line naming the frontier's tags, or
 `frontier: none`. `--status` prints the engine's lines after its status line.
 
-- **Read a build's position:** `python tools/loop/position.py <slug>` prints a `position —` line with <!-- usage: script:tools/loop/position.py 8d078234 -->
+- **Read a build's position:** `python tools/loop/position.py <slug>` prints a `position —` line with <!-- usage: script:tools/loop/position.py c1931acf -->
   the state, the step, the answer and its reason, one `unit —` line per unit, the `next —` item with
   its actor and its instance key, a `frontier —` line, one `refusal —` line per refusal the run
   recorded with its item, key and reason, each `interrupt —`, then every file and ref it read as
@@ -957,6 +1104,40 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   held`, exit 0, `loop: refused` with the reason, exit 1, or `loop: unarmed`, exit 2, where your
   composition does not read. With no composition it checks against gov's own items. The driver's
   `--refused` runs it and records nothing unless it exits 0.
+- **Read the build's mail at an item boundary:** `<slug> --mail-interrupts` lists each open message
+  addressed to the build as `interrupt — mailbox · <id> <kind> from <build>`, oldest sighting first,
+  and exits 0; `--local` reads your node's cached copy with no fetch. The kickoff engine's
+  `--card --boundary` verb runs it after every crossing, so a message waits one item, not one step;
+  the lines appear at your next shell call after the verb finishes. An `intake`, an amendment from a
+  session that does not hold the build's lease, ends ` · amendment`: as the lease holder, dispose it
+  with the driver's mail verbs. The `mailbox.reads` policy key says when the list is read: <!-- usage: policy:mailbox.reads 6509cdac -->
+  `every-item` (the default) lists every kind; `transitions-only` reads no mail at the boundary and
+  prints `interrupt — mailbox · read at transitions (mailbox.reads: transitions-only)`; and
+  `every-item-amendments-at-transitions` lists every kind but `intake`, counting the held ones as
+  `interrupt — mailbox · <n> intake held to the next transition`. Under every value the transition
+  guard still reads the mailbox at each move. A driver that is not installed, a repository with no
+  `.unattended.conf`, `RUN_CLAIMS` off or a failed read prints `interrupt — mailbox · unarmed ·
+  <why>`, and a refused `mailbox.reads` reads as its default, saying so on an `interrupt — mailbox`
+  line. Every other engine call keeps its `interrupt — mailbox · unarmed` line and reads no mail.
+- **See the build's unread mail as it arrives:** at every crossing the `--card --boundary` verb also
+  runs the unattended driver's `--mail notice <slug> --item <key>` before the mailbox step. It fetches
+  the mail refs once, under the driver's remote bound, and prints `notice — mail — <n> unread for
+  <slug> · <id> <id> … · fetched · item <key>`, or `notice — mail — none for <slug> · fetched · item
+  <key>`; the mailbox step then reads that fresh copy with `--local`, so the boundary fetches once. A
+  failed fetch names your node's cached copy and its age instead, ` · local copy <n>s old (<why>)`.
+  The `mailbox.notice` policy key says when you are shown it: <!-- usage: policy:mailbox.notice 1a6cbc4e -->
+  `every-item` (the default) at each item boundary; `every-tool-call` also after every tool call,
+  where the unattended kit's `mail-notice.js` hook, finding your build on the route of the tree's
+  card file `.claude/orientation-card.md` whose `card-owner —` line names your session, else on your
+  run lease, adds `mail — <n> unread for <slug> · <ids> · local
+  copy <n>s old` to the session's context from the copy the last notice wrote, with no network call, <!-- usage: hook:mail-notice d1c1243b -->
+  and starts one `--mail notice` in the background once that copy is older than
+  `mailbox.fetch-seconds` (60 by default, 10 at least, PINNED from its catalogue row), so a message <!-- usage: policy:mailbox.fetch-seconds 15fe6233 -->
+  posted on another machine reaches you within twice that; after a failed fetch the hook starts no
+  other until twice `mailbox.fetch-seconds` has passed, so an unreachable remote is not fetched at
+  every tool call; and `off`, under which no `notice —` line
+  prints and the mailbox step fetches for itself. A value you change in the policy file reaches the
+  hook at the next notice, since the notice writes both values into the copy the hook reads.
 - **See it on a fixture:** `--fixture --plant <case>` builds a scratch repository with a bare remote,
   but none for `no-remote`, plants one case, prints the engine's lines and one line ending `held` or
   `MISSED`, and removes it: `steps`, `typed-status`, `idempotent`, `owner-decision`, `parent-unlanded`,
@@ -973,8 +1154,21 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   `ssh-userinfo-remote` (the aged reflog, then a fetch over an ssh shim from a URL with a user part,
   read from `FETCH_HEAD`), `url-forms` (a fetch failing at connect from a URL carrying a password,
   which no line prints, then one row per configured and written URL pair, `equal` or `unequal`),
-  `plan-line` and `status-line`; `frontier-refused`,
-  `frontier-bad-key`, `plan-frontier`, `built-unarmed` and the last two run the unattended driver. Every
+  `plan-line`, `status-line`, `boundary` (the item boundary over planted engine answers),
+  `mail-open` (an open question, an open intake and an answered question listed as the two open
+  ones), `mail-transitions-only`, `mail-amendments` (a `changed` listed and the `intake` held),
+  `mail-unarmed` (no unattended kit found), `mail-refused` (an invalid `mailbox.reads` read as its
+  default), `mail-forged` (`mail-open`'s messages beside four forged ones, a malformed id, a kind
+  outside the set, a build other than its ref's and a ref whose build segment is no slug, none of
+  them listed), and the seven dependency cases: `deps-wait` (`wait-for-landing`: Design runs, Build
+  blocked `not landed`), `deps-unreachable` (no parent lease blocks Build, a live one confirmed lets
+  it run), `deps-order` (`order-only` runs Build), `deps-confirmed` (Build waits on a confirmation
+  whose key recomputes, ignores a newer one that does not, waits again when the witness moves, and
+  reads a refused check as `confirmation unread`), `deps-design-only`, `deps-anything` and
+  `deps-strict` (the `strict` preset's two values, then an invalid `deps.coordination` held as
+  `policy unread`); `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `built-unarmed`,
+  `plan-line`, `status-line`, the six `mail-` cases and the seven `deps-` cases run the unattended
+  driver. Every
   case runs with an empty global and system git config, so no setting of your machine's reaches it. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->
@@ -983,6 +1177,64 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   python tools/loop/position.py --fixture --plant steps
   python tools/loop/position.py --selftest
   ```
+
+## Coordinating with a parent build
+
+A build whose README names other builds in `parents:` coordinates with each of them before it waits
+for their landing. The engine reads every parent that has not landed for its reach: `reachable`
+while the parent's build lease reads `live` or `held` to the unattended driver's `--lease status
+build <parent>`, else `unreachable`. A parent whose newest recorded move enters `landed` is done and
+holds nothing. Two policy keys, read at the landed revision in your build's own scenario slot, decide
+what an unlanded parent holds:
+
+- **`deps.coordination`** — `message-then-progress` (the default) holds your Build items on an
+  `unreachable` parent and reads `deps.early-build` for a `reachable` one; `wait-for-landing` holds
+  Build as `not landed` until the parent lands; `order-only` holds nothing, the cause `order only`.
+- **`deps.early-build`** — `confirmed-interfaces` (the default) runs Build once the parent has
+  confirmed its interfaces to you, `awaiting confirmed` until then; `design-only` holds Build as
+  `not landed`; `anything-coordinated` runs it as `coordinated`.
+
+The `strict` preset sets `wait-for-landing` and `design-only`. Design items run under every value: the
+gate holds a build's Build step and every step after it, never its Design. A key that does not read,
+an invalid value with no valid revision before it say, reads no default: the parent's cause is
+`policy unread`, holding Build, and one `position: NOTE · <key> unread: <why>` line prints. Each
+unlanded parent prints one line, `interrupt — dependency · <parent> · <reach> · <cause>
+(deps.coordination: <value>)`, and where it holds, the answer is `blocked` naming it.
+
+The notices are mail, posted through the mailbox's own writer:
+
+- **`confirmed`** — when a parent moves from designing to building, it posts `interfaces <parent>`
+  to each build naming it in `parents:`, keyed over the bytes of `git ls-tree -r` of its `spec/`
+  folder at the transition commit. A later exit from Design posts `changed` with the new key.
+  `python tools/loop/loop_transition.py dependents --build <slug>` lists who those builds are, read
+  from the "Child builds" line of the parent's own README, which `gen_build_index.py --write`
+  renders: a dependent opened after the parent's last render is not notified until the next one. <!-- usage: script:tools/loop/loop_transition.py#dependents b7ddefe3 -->
+- **`landed`** — `--landed <parent>` posts `landing <parent>` with the landed sha to each of them,
+  and a post that fails prints its line without failing the landing.
+
+Each notice names its pass, so a later one is a new message and never a repeat the mailbox refuses: a
+Design exit posts `--pass <n>`, `<n>` the parent's count of exits from Design, `1` for the first, and a
+landing posts `--pass <sha8>`, the landed sha's first eight hex, so a re-landing after a revert reaches
+each dependent too.
+A post the mailbox refuses anyway, whatever its `--pass`, prints `notice — not posted <kind> to build:<dependent> · rc <n> · <the post's first line>` and fails neither the move nor the landing.
+A refused interface notice is not lost: every later move of the parent that is not itself an exit
+from Design checks each dependent's mailbox for the latest exit's notice, with the driver's
+`check_interface_notice`, and posts that notice again, same pass, only to a dependent that does not
+hold it; a dependent holding the current interface is never posted to again, and a check that cannot
+read prints `loop: notice · unread · <dependent> · <why>`. A refused `landed` is posted again by
+running `--landed <parent>` again: its recorded exit posts once more, and a dependent that already
+holds the notice refuses it as a duplicate.
+
+Under `confirmed-interfaces` the dependent reads the parent's lease witness with the driver's
+`--lease show build <parent>`, recomputes the key over the parent's `spec/` listing at that commit,
+fetching it once where it is missing, and runs Build only where a `confirmed` or `changed` message
+from the parent carries that key: the key decides, never the order the messages arrived in. A moved witness that no message's key
+matches reads `awaiting confirmed` again; a check that cannot be read reads `confirmation unread`
+with one `position: NOTE · interfaces <parent> unread: <line>`, never as unconfirmed. The
+dependent's next move with no other message open acknowledges each notice it has consumed; a `changed`
+it has not consumed holds its moves until the re-entry or its deadline. Nothing here re-enters a dependent's units on a
+`changed`, and no request for confirmation is answered for you: the parent's session answers one by
+hand with `--mail post --kind confirmed --answers <id> --interface <file>`.
 
 ## The item kind, `kind.item`
 
@@ -1308,14 +1560,15 @@ rename always leaves the record your stage follows; a stage tag of yours that di
 
 ## Making a new part
 
-Six kinds of the kinds register have a factory in this kit: a command, a policy key, a hook, a role,
-a workflow and a scenario. A factory writes a new instance that already conforms, then runs the kind's gate over
+Seven kinds of the kinds register have a factory in this kit: a command, a policy key, a preset, a
+hook, a role, a workflow and a scenario. A factory writes a new instance that already conforms, then runs the kind's gate over
 the whole population. You reach each one through the register's one verb, which appends your name and
 flags to the factory its row names:
 
 ```text
 python <prefix>/playbook/core.py new command <verb> --kit <id> --run <path>
 python <prefix>/playbook/core.py new policy-key <name> --allowed <toml> --default <toml> --summary <text> --usage <text> --owner <build>
+python <prefix>/playbook/core.py new preset <name> --from <preset>
 python <prefix>/playbook/core.py new hook <name> --kit <id> --event <event> [--matcher <m>]
 python <prefix>/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --returns <text> --output <text> --ceiling <bytes>
 python <prefix>/playbook/core.py new workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>
@@ -1337,6 +1590,11 @@ naming it.
   `policy-check:` line. A default the row's own `allowed` refuses is red on `arm_shape`. A loop bound or
   deadline key is red on `arm_direction`, since the factory writes no `direction`. It writes the
   catalogue only, never `.governance/policy.toml` or the mirror `.governance/policy.json`.
+- **A preset:** `python tools/loop/factories.py preset <name> --from <preset>` appends a <!-- usage: script:tools/loop/factories.py#preset 50dec72b -->
+  `[preset.<name>]` table to the policy kit's preset store, `presets.toml`, copying every key of the
+  shipped preset `--from` names, and adds the name to the policy catalogue's `preset` row. Its gate is
+  `arm_presets` of `policy check`, run in process. A `--from` that names no preset of the store, or a
+  name the store already holds, exits 2 before anything is written.
 - **A hook:** `python tools/loop/factories.py hook <name> --kit <id> --event <event> --matcher <m>` <!-- usage: script:tools/loop/factories.py#hook 7f9371c9 -->
   writes `<name>.js` and `<name>.fragment.json` beside the descriptor whose `id` is `--kit`, and a
   `[[files]]` row shipping each one where no `include` of that descriptor already does. `--matcher`
@@ -1368,7 +1626,10 @@ naming it.
   `command-new`, `policy-key-new`, `hook-new`, `role-new` and `workflow-new`. Each `-hand` case writes
   a hand-made instance that does not conform and expects the same gate red: `command-hand`,
   `policy-key-hand`, `hook-hand`, `role-hand` and `workflow-hand`. `scenario-new` and `scenario-hand`
-  do the same for a scenario, the hand row naming an entry step that does not exist. `factory-restores` gives a policy
+  do the same for a scenario, the hand row naming an entry step that does not exist. `preset-new` runs
+  the preset factory from `standard` and expects green, with the preset kind off the pending list of
+  `core.py kinds`; `preset-from-unknown` names a `--from` the store lacks and expects exit 2 with the
+  clone left clean. `factory-restores` gives a policy
   key a default its own row refuses, and expects exit 1 with the clone left clean.
   `factory-restores-create` runs the hook factory, which creates its files, after committing a hand
   fragment that holds the hook gate red, and expects exit 1 with no created file left on disk and the
@@ -1591,7 +1852,7 @@ spec audit's opt-in stays yours.
 ## Where a build stops for a review or for you
 
 A breakpoint is a place at an item boundary where a build stops, before, at or after an item, for a
-reviewer or for you, the owner. Reviews and owner gates are one list, and four keys in
+reviewer or for you, the owner. Reviews and owner gates are one list, and five keys in
 `.governance/policy.toml` place them:
 
 - `review.<stage>`, one per stage: `off` places no review, `opt-in` places one only where the build opts
@@ -1604,6 +1865,17 @@ reviewer or for you, the owner. Reviews and owner gates are one list, and four k
 - `autonomy`, default `plan-only`: an owner gate at `item.plan.exit`. `three-gates` adds one at
   `item.design.exit` and one before `item.deploy.mandate`; `every-stage` adds one at each stage's exit
   item besides.
+- `attendance`, default `unattended`: how closely you follow the build, which adds only your own <!-- usage: policy:attendance 603ed07d -->
+  interactions. `unattended` adds nothing. `announce` adds an announcement of each act and the
+  questions you are asked live. `confirm-steps` adds those and an owner gate at each stage's exit item,
+  and `confirm-acts` adds those and an owner gate before each item a role carries out. A position
+  `autonomy` already gates keeps that one gate, so `every-stage` beside `confirm-steps` adds none. No
+  value changes an item, who carries it out, the driver or a binding: what each value adds is a row of
+  the loop file's `[[attendance]]` table, and `python tools/loop/loop_lib.py --check` refuses a row
+  naming anything outside the closed set of owner interactions. A gate at a stage's exit holds both
+  `--close` and the `--phase` move across that exit; a gate before an item holds `--close`. The
+  announcement and the live questions are not built yet: the list names them as stand-ins for
+  dWellOiledMachine and dFurnishedOrders, which add them.
 - `review.breakpoints`, default empty: each item tag you list places a review before that item. A tag
   the build's items do not declare is refused, naming the key and the tag, and a renamed tag follows
   its item.
@@ -1633,10 +1905,13 @@ shows instead of reading as an ordinary hold; a build with no held gate prints n
   repository's top level and prints one line per breakpoint, in item order:
   `breakpoint: <name> · <before|at|after> <item tag> · <reviewer|owner> · <cause>`, and for an owner
   line ` · authorization`, ` · held`, ` · released <record> <word>` or ` · passed before placement`.
-  `--spec-audit` lists Design's opted-in audit, and `--delegated-fork` the owner item. The unattended driver's `--plan <slug>` prints
+  `--spec-audit` lists Design's opted-in audit, and `--delegated-fork` the owner item. Under an
+  `attendance` value that adds anything, one more line follows the breakpoints,
+  `breakpoints: attendance · <value> · adds <members> · announce: stand-in dWellOiledMachine · ask-live: stand-in dFurnishedOrders`,
+  naming what the value adds and which of it is still a stand-in; under `unattended` none prints. The unattended driver's `--plan <slug>` prints
   the same lines after its `frontier:` line. It exits 2 printing `breakpoints: refused` and why on a
-  value outside its key's set or an undeclared tag, and `breakpoints: unarmed` where the policy or
-  memory-tree kit is not installed.
+  value outside its key's set, an `attendance` value no `[[attendance]]` row of the loop file declares, or
+  an undeclared tag, and `breakpoints: unarmed` where the policy or memory-tree kit is not installed.
 - **Read one stage:** `python tools/loop/breakpoints.py stage --stage <stage> --build <slug>` prints <!-- usage: script:tools/loop/breakpoints.py#stage 1a9b01b0 -->
   `breakpoints: stage <stage> · <value> · <owed|opt-in|not-owed>`, read from the policy file at your
   default branch's landed revision, or at `--rev <rev>`. The unattended driver's preflight reads
@@ -1645,7 +1920,9 @@ shows instead of reading as an ordinary hold; a build with no held gate prints n
   a scratch repository: `values`, `placed`, `ratification`, `stage`, `driver-close`, `driver-optin`,
   `driver-plan`, `pre-placement`, `driver-pre-placement`, `pre-placement-records-root`, `unattended-root`,
   `confs-disagree`, `readded`, the module taken out of a scratch repository and committed back, its
-  placement still the first commit that added it, or `no-own-conf-read`, the one that reads the module's own file and no scratch
+  placement still the first commit that added it, `attendance-values`, each `attendance` value's list,
+  `attendance-missing`, a value whose row is left out refused, `attendance-plan`, the driver's `--plan`
+  and `--phase` hold under `confirm-steps`, or `no-own-conf-read`, the one that reads the module's own file and no scratch
   repository, naming each conf name or conf reader call in its code. `--selftest` runs them all, and gov's own `loop breakpoint fixtures` gate runs them.
 
 The list does not fire a review: you, or the run, fire each review line through the driver's
@@ -1742,7 +2019,7 @@ continues or amends a live build is sent there rather than opened as a new one. 
 
 ## The entry items: orienting, placing and claiming a request
 
-Before any step, a request passes through the entry program: five items tagged `item.entry.<name>`, which
+Before any step, a request passes through the entry program: six items tagged `item.entry.<name>`, which
 sit in no step, as the review and probe programs' items do, and which `--check` prints as
 `loop: program entry`.
 
@@ -1753,6 +2030,7 @@ sit in no step, as the review and probe programs' items do, and which `--check` 
 | `item.entry.place-check` | `command:entry.place-check` | `item.entry.orient` | the request's own declaration, `placement.py place --request <key> --declared <word> [<build>]`, then `placement.py check` |
 | `item.entry.place-owner` | `owner` | `item.entry.orient` | your disposition record naming `item.entry.place-owner`, read by `placement.py place --request <key> --owner <record>` |
 | `item.entry.claim` | `command:entry.claim` | any one of the three placing items | the unattended driver's `--entry-claim`, which claims the build on `refs/gov/claims/<slug>` |
+| `item.entry.mailbox-answer` | `command:mailbox.answer` | none | a `question` addressed to a build, answered with the unattended driver's `--mail answer` |
 
 `item.entry.orient` answers the value of the policy key `placement`, `agent-places`, `declared-checked`
 or `owner-places`, and each value routes to the placing item it names; its `probe` goes to the probe
@@ -1772,6 +2050,17 @@ planning and a `repeat` into designing, while a `patch` moves through `item.plan
 budget; `awaiting` comes back to the claim while another party holds the build, drawing nothing, until
 `flow.wait-ceiling` passes and it answers `refused`; and `refused` goes to `backlog.py`, the `ask:`
 line or owner item the driver prints.
+
+`item.entry.mailbox-answer` is a question to a build. It answers `answered` once an `answer` names the
+question, `awaiting` while the question is still open, and `defaulted` once the question has expired
+past its `deadline` or been acknowledged without an answer, the asker's `--default` then standing as
+the answer. `answered` and `defaulted` go to the unattended driver's stand-in; `awaiting` comes back to
+the item, a declared wait, until `flow.wait-ceiling` passes and it answers `defaulted`. Nothing
+dispatches the item yet: an attended session answers with `--mail answer` when the mail interrupt
+shows the question, and an unattended build, which nobody answers, takes the default at the deadline.
+While the build waits, its lease is renewed under `leases.renewal: progress`: each of the driver's own
+claim writes that finds no transition differing from the lease's `witness` renews on the oldest open
+question to the build and keeps that `witness`.
 
 ## Testing outside Test: the probe program
 
@@ -1975,6 +2264,12 @@ No ending raises `flow.rework-budget`: raising it stays yours.
   then one `loop: budget · no draw id · <row>` line per draw row written before draw ids, each counted as
   its own draw, so a count of zero read under the wrong root shows where it looked.
 
+- **See the state:** `python tools/loop/budget.py state --build <slug>` runs at your repository's top <!-- usage: script:tools/loop/budget.py#state 7be78ec8 -->
+  level and prints one line, the budget's state and nothing else: `open <spent>/<total>` once it is
+  frozen, `spent` once every draw it allows is made, or `unfrozen <spent>/<total>` before its freeze;
+  exit 0. It refuses as `origin` does, exit 2. Your build's card shows the same line as its `budget —`
+  pointer.
+
 - **End a spent build:** `bash tools/unattended/unattended.sh --exhausted <slug>` records the ending <!-- usage: verb:unattended.sh:--exhausted 40c08fe9 -->
   once, as a `decision` row the wrap-up shows you, and prints what comes next: `close-incomplete`
   files each open unit with `--rescope <slug> --act defer` and then runs `--abort <slug> --code
@@ -2046,20 +2341,22 @@ outside the flow, one that lives in code with a deadline of its own.
 
 ## How to use it
 
-- **Read the loop:** `python tools/loop/loop_lib.py --check` prints one line per step and per <!-- usage: script:tools/loop/loop_lib.py a3a33b34 -->
+- **Read the loop:** `python tools/loop/loop_lib.py --check` prints one line per step and per <!-- usage: script:tools/loop/loop_lib.py d50887a1 -->
   workflow with its order, step and reach word, then the dispositions and one line per alias. It
   prints one `loop: program` line per step, with its items in an order where each comes after the
   items it needs, then a `loop: program review` line for the review program, whose items are tagged
   `item.review.<name>`, carry the step `none` and sit in no step, and the same for the probe program
   and the entry program, `loop: program probe` and `loop: program entry`. Where the playbook kit is not installed, a `loop: inputs unarmed` line comes first
   and the inputs go unchecked. Then it prints one `loop: item` line per item, saying where each of
-  its fields comes from, or `pending` or `unarmed`, and a `loop: items` count line. Then it
-  prints the witness classes, one line per witness alias and per step's and item's witness, one line per
+  its fields comes from, or `pending` or `unarmed`, and a `loop: items` count line. It prints one
+  `loop: attendance <value> · adds <members|none>` line per `[[attendance]]` row, before the
+  witness lines, and refuses a row carrying a key but `value` and `adds`, a member outside the closed
+  set of owner interactions, or a value given twice. Then it prints the witness classes, one line per witness alias and per step's and item's witness, one line per
   actor-list row with its build, and the base it compared the list against, or `no comparison` and
   why. A `loop: actor-list builds` line follows, naming the builds folder, or `foreign` and why, then
   one `loop: computed-witness` line per computed witness with the item it serves, its class, its
-  writer and the build that arms it. It exits 0, or 1 when an item, the list or a computed witness is
-  refused.
+  writer and the build that arms it. It exits 0, or 1 when an item, an attendance row, the list or a
+  computed witness is refused.
 
   ```text
   loop: step step.build · order 3 · state building · exit item.build.exit
@@ -2085,6 +2382,16 @@ outside the flow, one that lives in code with a deadline of its own.
   exits 1 for an actor entry the list does not hold, and for a list row that no actor entry matches.
   A `DOD_EXTRA` actor entry is admitted, its line ending `adopter-declared, not on the shipped list`.
   Check 53 of the unattended leg runs it over the driver's `DOD_CORE` and your conf's `DOD_EXTRA`.
+
+- **List the steps:** `python tools/loop/loop_lib.py --steps` prints one line per step, its tag, a
+  tab and the state the build is in during that step, in the loop's order, and exits 0. It reads the
+  file as `--check` does and exits 1 with a `loop:` line when the file is refused. The runlog kit's
+  orientation report reads a session's stage through it.
+
+  ```text
+  step.plan	planning
+  step.design	designing
+  ```
 
 - **See each item's scope:** `python tools/loop/loop_lib.py --scopes` checks the file as `--check` does,
   then prints one line per item with the instruction units scoped to it. It runs the playbook kit's
@@ -2125,7 +2432,10 @@ outside the flow, one that lives in code with a deadline of its own.
   it must draw: `conf-opener-literal`, `conf-opener-constant` and `conf-opener-local` add a function,
   declared nowhere, that opens a conf by its literal name, through a module constant or through a
   local name; `conf-route-opens-none` empties the route; `conf-openers-none` empties every declared
-  opener; and `conf-module-unparsable` adds a definition that does not parse. The files on disk are never changed. `python tools/loop/loop_lib.py --selftest` runs every
+  opener; and `conf-module-unparsable` adds a definition that does not parse. The attendance cases
+  break the `confirm-acts` row and each exits 1 naming it: `attendance-actor` gives it an `actor` key
+  that would hand an item to you, `attendance-member` adds `driver:owner` to what it adds, and
+  `attendance-twice` gives the value a second row. The files on disk are never changed. `python tools/loop/loop_lib.py --selftest` runs every
   case and holds each to the exit and line it owes, one `PASS` or `FAIL` line per case and a summary;
   gov's own `loop definition fixtures` gate runs it, with no guard, so every bar runs these cases.
 - **Check the re-run stand-in:** `python tools/loop/loop_witness.py --fixture --plant acceptance` runs <!-- usage: script:tools/loop/loop_witness.py 6de87be4 -->

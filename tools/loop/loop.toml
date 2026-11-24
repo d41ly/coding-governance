@@ -276,6 +276,31 @@ means = "ask"
 word = "refuse-as-duplicate"
 means = "continue"
 
+# The mailbox's one closed kind set (KICK-dKeptSession-5 S3): the words a message's `kind` may be,
+# checked by the unattended driver's `--mail post` before any commit, read through `read_mail_kinds`.
+[mail]
+kinds = ["confirm-request", "confirmed", "changed", "overlap", "takeover", "landed", "question", "answer", "ack",
+         "intake", "withdrawn", "superseded"]
+
+# What each value of the `attendance` policy key adds (KICK-dKeptSession-17 S2): one row per value, its keys
+# exactly `value` and `adds`, each member of `adds` one of loop_lib.py's closed ATTENDANCE_INTERACTIONS, owner
+# interactions only, so no row selects an actor, the driver or a binding; read through `read_attendance`.
+[[attendance]]
+value = "unattended"
+adds = []
+
+[[attendance]]
+value = "announce"
+adds = ["announce", "ask-live"]
+
+[[attendance]]
+value = "confirm-steps"
+adds = ["announce", "ask-live", "confirm-step-exit"]
+
+[[attendance]]
+value = "confirm-acts"
+adds = ["announce", "ask-live", "confirm-before-act"]
+
 [[checklist]]
 registry = "DOD_CORE"
 handle = "gates-green"
@@ -1207,6 +1232,10 @@ key = "PostToolUse {prefix}/process-monitor/procmon-hook.js"
 stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
 
 [[hook]]
+key = "PostToolUse {prefix}/unattended/mail-notice.js"
+stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
+
+[[hook]]
 key = "PreToolUse {prefix}/hooks/agent-cap.js"
 stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
 
@@ -1252,7 +1281,7 @@ stage = ["step.plan", "step.design", "step.build"]
 
 # ---- The entry program (TOOL-dPlacedRequest-3) -------------------------------------------------------
 # The flow's router before any step (flow-steps' [entry]): orient, place by the policy key `placement`,
-# claim. Each row sits in no step. entry.orient's placing outcome is the value `policy.py get placement`
+# claim, and answer a question to a build. Each row sits in no step. entry.orient's placing outcome is the value `policy.py get placement`
 # returns at the item boundary, one outcome per value; the three placing rows share one route table, and a
 # failed placement.check is the item's refusal, back to it by default. item.entry.intake joins
 # entry.orient's needs when dWellOiledMachine declares it.
@@ -1325,6 +1354,25 @@ draws = { slug-taken = "route-back" }
 waits = ["awaiting"]
 deadline = "policy.flow.wait-ceiling"
 on-deadline = "refused"
+
+# mailbox.answer, before any step (flow-steps' [entry]; KICK-dKeptSession-25): a question to a build,
+# answered by the role owning the asked interface or item once `next` dispatches it; until then the
+# asker's default answers it past the deadline (cl-dClosedLoop-0162), the same stand-in covering the role.
+[[item]]
+tag = "item.entry.mailbox-answer"
+step = "none"
+actor = "command:mailbox.answer"   # the stand-in covering the owning role until `next` (cl-dClosedLoop-0504)
+needs = []
+inputs = ["layer.flow:the question message", "layer.memory:the asked interface's declaration or the asked item's witnesses"]
+allowance = "one answer commit on the answering session's mail ref"
+returns = "the answer's mail commit"
+outcomes = ["answered", "awaiting", "defaulted"]
+witness = { class = "history", by = "derive_mail_answer_outcome over the question's mail rows" }
+owner = "dKeptSession"
+routes = { answered = "stand-in:{prefix}/unattended/unattended.sh", awaiting = "item.entry.mailbox-answer", defaulted = "stand-in:{prefix}/unattended/unattended.sh" }
+waits = ["awaiting"]
+deadline = "policy.flow.wait-ceiling"
+on-deadline = "defaulted"
 
 # ---- Plan's program ----------------------------------------------------------------------------------
 
@@ -2323,3 +2371,11 @@ point = "point.instruction.signed-proof"
 key = "instructions.edit"
 value = "flow-only"
 point = "point.instruction.flow"
+
+# build.closes = after-release-verifies needs point.flow.release, the release slot, Flow's core point in
+# Deploy where integrations' engines attach: `strict` and `guarded` close a build only after its release
+# verifies (KICK-dKeptSession-1 S4).
+[[selects]]
+key = "build.closes"
+value = "after-release-verifies"
+point = "point.flow.release"

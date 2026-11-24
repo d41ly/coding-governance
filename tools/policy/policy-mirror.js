@@ -12,13 +12,15 @@
 //   2. L, the landed revision: `bash <kit>/policy-shim.sh landed`, run in top. Its refusal is a
 //      PolicyRefusal carrying the shim's reason.
 //   3. The mirror text, `git cat-file blob L:.governance/policy.json`, and the blob ids of
-//      `.governance/policy.toml`, `<kit>/catalogue.toml` and each path of the mirror's
-//      `legacy_blobs` at L, null where absent. A missing mirror, or text that does not parse as a JSON
-//      mirror, is ABSENT.
+//      `.governance/policy.toml`, `<kit>/catalogue.toml`, each name of MIRROR_KIT_INPUTS as
+//      `<kit>/<name>`, and each path of MIRROR_LEGACY_INPUTS, at L, null where absent: the reader's
+//      own list, never the stored mirror's keys (KICK-dKeptSession-49, KICK-dKeptSession-62). A
+//      missing mirror, or text that does not parse as a JSON mirror, is ABSENT.
 //   4. Every recorded id equals its id at L: the mirror is FRESH, and a key it holds is returned
 //      with its recorded source and reason, each `{rev}` the render wrote in the reason filled with
 //      `<L8>, the landed revision` (TOOL-dGroundRules-65). A key it does not hold goes to step 6.
-//   5. Any id differing, a legacy input's among them, or no `legacy_blobs` at all: the mirror is
+//   5. Any id differing, a legacy input's among them, an expected input the mirror does not record,
+//      a legacy input's included, or no `legacy_blobs` at all: the mirror is
 //      STALE (TOOL-dGroundRules-21 S17), so a landing that changes `.agent-cap.conf` alone is never
 //      read through a mirror holding the old limit.
 //   6. ABSENT, STALE or a missing key: `policy-shim.sh get policy-file.on-invalid`. Any value but
@@ -46,6 +48,15 @@ const GIT_LOCATION_VARS = new Set(["GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE",
 const ENV = Object.fromEntries(Object.entries(process.env).filter(([k]) => !GIT_LOCATION_VARS.has(k.toUpperCase())));
 // Forward slashes: the shim finds its kit by cutting its own path at the last `/`.
 const SHIM = path.join(__dirname, "policy-shim.sh").split(path.sep).join("/");
+// The kit-relative inputs the reader owes, by name: each is compared at L whether or not the stored
+// mirror records it, so a mirror rendered before one joined its render reads STALE
+// (KICK-dKeptSession-49 S1). The preset store, which the preset step reads (KICK-dKeptSession-40).
+const MIRROR_KIT_INPUTS = ["presets.toml"];
+// The repository-relative inputs the reader owes, a copy of policy.py's LEGACY_INPUTS compared at L
+// as MIRROR_KIT_INPUTS is, so a mirror missing one reads STALE (KICK-dKeptSession-62 S24). The
+// policy fixtures' `mirror-input-parity` holds both lists to policy.py's; adding an input is THE RULE
+// in this kit's README, "The mirror".
+const MIRROR_LEGACY_INPUTS = [".agent-cap.conf", ".governance/instructions.toml"];
 
 class PolicyRefusal extends Error {}
 
@@ -158,8 +169,10 @@ function readLandedRevision(top) {
 }
 
 // -> { doc, policyBlob, catalogueBlob, legacyStale } at the landed revision L: the parsed mirror or
-// null (ABSENT), the two blob ids, null where absent, and whether any `legacy_blobs` entry, or its
-// absence, differs from L.
+// null (ABSENT), the two blob ids, null where absent, and whether any input of the expected list,
+// each name of MIRROR_KIT_INPUTS by the kit's place and then each path of MIRROR_LEGACY_INPUTS, has
+// a recorded id differing from L, an input the map does not record differing from every id, or the
+// map is absent. A key the map records beyond that list is never read.
 function readMirrorAt(top, landed, kitRel) {
   const m = runGit(top, ["cat-file", "blob", `${landed}:${MIRROR_REL}`]);
   let doc = null;
@@ -171,14 +184,17 @@ function readMirrorAt(top, landed, kitRel) {
     }
   }
   if (!doc || typeof doc !== "object" || !doc.keys || typeof doc.keys !== "object") doc = null;
-  const legacy = doc && doc.legacy_blobs && typeof doc.legacy_blobs === "object" ? Object.keys(doc.legacy_blobs) : [];
+  const kit = kitRel ? kitRel + "/" : "";
+  const recorded = doc && doc.legacy_blobs && typeof doc.legacy_blobs === "object" ? doc.legacy_blobs : null;
+  const legacy = [...MIRROR_KIT_INPUTS.map((n) => kit + n), ...MIRROR_LEGACY_INPUTS];
   // One call for every id: `rev-parse` stops at the first absent path, `--batch-check` says `missing`.
   const ids = runGit(top, ["cat-file", "--batch-check"],
-    [POLICY_REL, `${kitRel ? kitRel + "/" : ""}catalogue.toml`, ...legacy].map((p) => `${landed}:${p}\n`).join(""));
+    [POLICY_REL, `${kit}catalogue.toml`, ...legacy].map((p) => `${landed}:${p}\n`).join(""));
   const [policyBlob, catalogueBlob, ...legacyIds] = (ids.stdout || "").split("\n")
     .map((ln) => (/^[0-9a-f]{40,64} blob /.test(ln) ? ln.split(" ")[0] : null));
-  const legacyStale = !!doc && (!doc.legacy_blobs || typeof doc.legacy_blobs !== "object"
-    || legacy.some((p, i) => doc.legacy_blobs[p] !== (legacyIds[i] || null)));
+  // An input the map does not record is `undefined`, which differs from every id, null included.
+  const legacyStale = !!doc && (!recorded || legacy.some((p, i) =>
+    (Object.prototype.hasOwnProperty.call(recorded, p) ? recorded[p] : undefined) !== (legacyIds[i] || null)));
   return { doc, policyBlob: policyBlob || null, catalogueBlob: catalogueBlob || null, legacyStale };
 }
 

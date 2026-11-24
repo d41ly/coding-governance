@@ -56,10 +56,10 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # where it does not resolve, never a default, and its leg is gov's own [[exempt_leg]].
 # The transition record's module, loop_transition.py (TOOL-dDeclaredLoop-3), reads each Gov-Transition
 # trailer through the memory-tree kit's commit_trailers.py and writes and reads the log record through
-# its build_records.py, under the edge above, and reads `transitions.record` through the policy kit's
-# policy.py, found through loop_parents.py's `read_policy_kit`. It takes no edge to that kit: `record`
-# and `check` exit 2 `unarmed` where it does not resolve, never a default, and its leg is gov's own
-# [[exempt_leg]].
+# its build_records.py, under the edge above, and reads `transitions.record` and `notify.owner`
+# (KICK-dKeptSession-11) through the policy kit's policy.py, found through loop_parents.py's
+# `read_policy_kit`. It takes no edge to that kit: `record`, `check` and `progress` exit 2 `unarmed` where
+# it does not resolve, never a default, and its leg is gov's own [[exempt_leg]].
 # The policy file's guard (TOOL-dDeclaredLoop-2): floor.py reads the `[floor]` table through the policy
 # kit's policy.py; guard.py runs that kit's guard.py, the minimal guard, as a subprocess and calls its
 # helpers, reads `policy-file.guard` and `policy-file.on-missing-expansion` through policy.py, reads the
@@ -162,8 +162,9 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # and draws through it, so its driver plants run that driver with no edge either. Its leg, `loop budget
 # fixtures`, is gov's own [[exempt_leg]], no row here.
 # The breakpoints (TOOL-dDeclaredLoop-19): breakpoints.py lists a build's reviews and owner gates from
-# `autonomy`, `decisions.major`, `review.<stage>` and `review.breakpoints`, read through the policy kit by
-# `read_policy_kit` and composition.py's `read_tag_policy`, its tags through loop_items.py's
+# `autonomy`, `attendance`, `decisions.major`, `review.<stage>` and `review.breakpoints`, read through the
+# policy kit by `read_policy_kit` and composition.py's `read_tag_policy`, and from the definition's
+# `[[attendance]]` rows through loop_lib.py's `read_attendance` (KICK-dKeptSession-17), its tags through loop_items.py's
 # `read_composed_items`, so the playbook kit is reached as a subprocess with no edge, and each owner gate's
 # release through adapt.py's disposition read under the edge above. The unattended driver finds it by
 # `resolve_kit_dir` for `--plan`, `--close` and its spec-audit opt-in, and reads nothing where it does not

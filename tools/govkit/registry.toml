@@ -584,6 +584,8 @@ guard = [
   "{prefix}/memory-tree/backlog.py",
   "{prefix}/memory-tree/coverage_join.py",
   "{prefix}/memory-tree/legacy_ledger.py",
+  "{prefix}/policy/presets.py",
+  "{prefix}/memory-tree/design_lib.py",
 ]
 chunk = "declarations"
 subject = "repo"
@@ -610,6 +612,8 @@ guard = [
   "{prefix}/memory-tree/backlog.py",
   "{prefix}/memory-tree/coverage_join.py",
   "{prefix}/memory-tree/legacy_ledger.py",
+  "{prefix}/policy/presets.py",
+  "{prefix}/memory-tree/design_lib.py",
 ]
 chunk = "selftests"
 subject = "repo"
@@ -1324,6 +1328,8 @@ guard = [
   "{prefix}/memory-tree/backlog.py",
   "{prefix}/memory-tree/coverage_join.py",
   "{prefix}/memory-tree/legacy_ledger.py",
+  "{prefix}/policy/presets.py",
+  "{prefix}/memory-tree/design_lib.py",
 ]
 chunk = "selftests"
 subject = "kit"
@@ -1786,6 +1792,9 @@ guard = [
   "{prefix}/runlog/extract.py",
   "{prefix}/runlog/model.py",
   "{prefix}/runlog/runlog_lib.py",
+  "{prefix}/runlog/runlog.py",
+  "{prefix}/runlog/prose.py",
+  "{prefix}/playbook/layers.toml",
   "{prefix}/branch-reconcile/kit.toml",
   "{prefix}/drift-audit/kit.toml",
   "{prefix}/gate-lint/kit.toml",
@@ -2788,3 +2797,27 @@ fields = ["conf", "key"]
 drain = "key"
 direction = "shrink-only"
 home = "memory/project/legacy-homes.txt"
+
+# The policy kit's two plain-name lists (KICK-dKeptSession-69 S5, §8 F2): gov's own, as the legacy list
+# is, since both derive from gov's catalogue and the unnamed keys from gov's design view, so no
+# target is written either and neither owes a step. Each seed is the policy kit's derivation, one
+# `<name> 1` row per derived name.
+[[ledger]]
+population = "unnamed-keys"
+leg = "policy check"
+seed = ["python", "{prefix}/policy/policy.py", "lists", "--derive", "unnamed-keys"]
+key = "key"
+fields = ["name"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/unnamed-keys.txt"
+
+[[ledger]]
+population = "unpurposed-namespaces"
+leg = "policy check"
+seed = ["python", "{prefix}/policy/policy.py", "lists", "--derive", "unpurposed-namespaces"]
+key = "key"
+fields = ["namespace"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/unpurposed-namespaces.txt"

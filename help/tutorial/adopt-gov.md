@@ -11,10 +11,13 @@ command, and `GOV` set in your shell to the path of your gov checkout.
 ## 1. Answer the install's questions
 
 `intake` writes `.governance/deploy.toml`, the kits you select and the answers they need. It refuses to
-guess an answer, and names each one it is missing.
+guess an answer, and names each one it is missing. The policy kit asks one question no probe can answer,
+the repository's preset, its posture: `velocity`, `standard`, `strict` or `guarded`. This tutorial
+answers `standard`, the catalogue's default; [the policy page](../policy.md#install) says what each
+answer means.
 
 ```bash
-python "$GOV/tools/govkit/govkit.py" intake --target . --kits playbook,playbook-render,memory-tree,policy
+python "$GOV/tools/govkit/govkit.py" intake --target . --kits playbook,playbook-render,memory-tree,policy --answer preset=standard
 ```
 
 The charter's render asks for values no probe can derive in an empty repository: what the product is, how

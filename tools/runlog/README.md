@@ -1,6 +1,6 @@
 # runlog — one line grammar for run logs, and one reader for them
 
-<!-- gov:kit runlog@1.18 -->
+<!-- gov:kit runlog@1.19 -->
 
 Three producers append one line per act to a machine-local journal: the unattended driver, the gate
 runner and the pre-push hook. Several consumers read those lines. This kit gives all of them ONE
@@ -149,7 +149,10 @@ python <this kit>/runlog.py extract --session <sid>          # one session, attr
 python <this kit>/runlog.py extract --discover [--slug <s>]  # runs with no journal: a heuristic
 python <this kit>/runlog.py extract --measure <projects dir>  # rate and peak memory, writes nothing
 python <this kit>/runlog.py extract --ready <projects dir>    # spend before READY, writes nothing
+python <this kit>/runlog.py extract --orient <projects dir> --slug <slug> [--repo <dir>]
+                                        # spend before the first item action, per stage
 python <this kit>/runlog.py narration --session <sid> --from <t> --to <t>
+python <this kit>/runlog.py context <transcript>               # how full the main context window is
 ```
 
 **Where it reads.** A session id is any UUID-shaped `sess.*` value on the slug's `start` lines,
@@ -208,6 +211,69 @@ keeps times and counts only, matching both witnesses in memory, and writes nothi
 session is a `DEAD PROBE`, exit 2. What `--ready` cannot see: a session that reached READY with
 neither witness, which it counts as not ready, and a READY line quoted inside a longer message, which
 it counts as the witness.
+
+**`--orient`** reports what each session of one build spent before its first item action, per stage
+of the build, and holds the report as the `orient.budget` policy key says (KICK-dKeptSession-9). Its
+sessions are the ones the two attributions name for `--slug`: a preflight call under the projects
+dir, a heuristic, and the driver journal of `--repo` (the working directory by default). It prints
+one `orient row` per file, the main file and each agent file, with its `attribution`, its `source`
+(`main` or the agent file's stem), its `stage`, its `action`, the class of its first `edit`, `write`
+or `git-commit` tool event or `none`, its `calls`, the tool events before that action, its
+`tokens`, the four counts of the usage before it, and its `context`, the main file's last main
+usage before it as `context` reads it. The stage is the step whose state the build entered at the
+newest transition at or before the session's first timed record, read with git in `--repo` on the
+channels `transitions.record` selects and mapped through the loop kit's `--steps` verb; `none` where
+no transition precedes it, and every row `none`, with one NOTE, where nothing is stored or the
+policy or loop kit does not answer. Per stage it prints the quartiles of `calls` over the rows with
+an action and their evidence ceiling, the nearest-rank 90th percentile, derived at every run; a
+stage with fewer than `ORIENT_CEILING_FLOOR` such rows has none and prints `orient — no ceiling`.
+The key's three values:
+
+- `record-only`, the catalogue default and what an unreadable policy reads, with one NOTE: the rows
+  and the quartiles, no warning.
+- `warn-at-evidence-ceiling`: also one `orient WARN` per row whose `calls` pass its stage's ceiling.
+- `owner-ceiling`: also one `orient WARN` per row whose `calls` pass the owner's cap,
+  `budgets.orient-calls` in the policy kit's cap census, each row judged by that kit's `budgets.py
+  check` and followed by its verdict line. Where `budgets.enforce` or `budgets.pinned` makes the cap
+  refuse, the row prints `orient REFUSED` and the report exits 1. An unset cap, or 0, is no owner
+  number: one NOTE, read as `record-only`.
+
+It exits 0 otherwise, writes nothing, and a projects dir with no session of the slug is a `DEAD
+PROBE`, exit 2. What `--orient` cannot see: which file an action wrote, since the extract keeps no
+path, so a session whose first write is its card route counts that write as its action; a session
+neither attribution names; and an agent file's own context, since `context` is always the main file's.
+
+**`context`** prints how full one session's main context window is (KICK-dKeptSession-14): `<n>%`, the
+`in`, `cache_read` and `cache_write` of the transcript's last `usage` event with `src` `main`, summed by
+`derive_context_tokens` (the one such sum, which `--ready` calls too), over the window
+`derive_context_window` derives for the event's model (KICK-dKeptSession-30), times 100 rounded down,
+with `context: window <tokens> · <source>` on stderr; or `none` when the transcript holds no main
+usage, and nothing on stderr. It parses the main file alone, so no subagent's request can decide the
+share, keeps no text, writes nothing and exits 0, or 2 when the path names no file. The window is the
+harness's `CLAUDE_CODE_MAX_CONTEXT_TOKENS` where it is set to a positive integer, source `env`, or
+`env, advisory` for a model id starting `claude-`, since the harness honours the variable only where its
+own gate passes and never for a first-party model, so the figure is the owner's declaration and not a
+window the harness enforces (KICK-dKeptSession-56 S14); else
+the smallest `CONTEXT_WINDOW_RUNGS` rung at or above the largest context the node has observed for
+that model, source `observed <n> on <model>`: the largest main `usage` sum on the model and the
+largest `preTokens` of a main compaction whose newest earlier main usage in the same transcript is on
+that model (KICK-dKeptSession-47), a sidechain record in the main file read as `agent` and joining no
+model (KICK-dKeptSession-62), across the newest `CONTEXT_WINDOW_SCAN` main transcripts under the
+read transcript's own projects root, none linked from outside it, each parsed as its main file alone, the read transcript's own
+parse standing in for its file; else the bottom rung, source `no observation`. An observation past
+the top rung is its own window. No transcript record names the window a session runs, so every
+session of a model observed past 200000 under the root reads the 1M rung, a 200k session of that
+model included; that session reads its own window only with `CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000`
+set (KICK-dKeptSession-48). The share passes 100% only where the variable is set below the
+context read or the transcript is outside the scan. `measure_context_fill(transcript, until=None)` is
+the same read for a caller, `(share, window, source)` at or before an epoch second, `(None, None,
+None)` with no main usage, and `derive_context_fill(ev, *, window=None, root=None)` the share of one
+event a caller already holds, over `window` or, when it is None, the window derived for the event's
+model under `root`, the projects root the caller resolved (KICK-dKeptSession-46); with neither it
+raises `ValueError`, and it never derives a window under a root no caller passed. `--orient` derives
+each model's window once under the dir it reads, so a transcript under `<dir>/<project>/` reads the
+same share from its row as from `context`. The kickoff engine's
+`context —` line reads it, as the `context.on-full` and `context.threshold` policy keys decide.
 
 **The self-test never reads or writes a real store.** Its `main` aims `HOME`, `USERPROFILE`,
 `LOCALAPPDATA`, `XDG_STATE_HOME` and `CLAUDE_CONFIG_DIR` at a decoy tree holding a canary transcript

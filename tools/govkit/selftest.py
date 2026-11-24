@@ -878,6 +878,7 @@ playbook_path = "docs/PARALLEL.md"
 playbook_dir = "docs"
 manifest_path = "docs/SESSION-KICKOFF.md"
 user_skills = "~/.claude/skills"
+preset = "standard"
 """
 
 # TOOL-aScouredKit-13. DEPLOY_FULL declares `kits = ["memory-tree"]`, and until that unit landed
@@ -4130,7 +4131,8 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
     each run under `-I` as the runner runs it, the limit read back through gov's own policy reader."""
     step_py = HERE / "steps" / "fanout_cap.py"
     policy_py = KIT_DIRS["policy"] / "policy.py"
-    scaffold = subprocess.run([sys.executable, str(policy_py), "scaffold"], capture_output=True).stdout
+    scaffold = subprocess.run([sys.executable, str(policy_py), "scaffold", "--preset", "standard"],
+                              capture_output=True).stdout
 
     def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
         return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t)], capture_output=True,

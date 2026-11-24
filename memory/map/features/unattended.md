@@ -13,7 +13,7 @@ stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
 gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded", "unattended protocol size", "unattended skill size"]
 kits = ["unattended"]
 git-hooks = []
-harness-hooks = ["PreToolUse tools/unattended/gate-guard.js", "Stop tools/unattended/stop-guard.js", "StopFailure tools/unattended/stall-recorder.js"]
+harness-hooks = ["PostToolUse tools/unattended/mail-notice.js", "PreToolUse tools/unattended/gate-guard.js", "Stop tools/unattended/stop-guard.js", "StopFailure tools/unattended/stall-recorder.js"]
 workflow-scripts = ["unattended-build.js", "unattended-unit.js"]
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
@@ -31,7 +31,7 @@ gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mod
   "porcelain-diff-names-a-rename-by-its-destination.md", "a-helper-extraction-blinds-a-per-function-rule.md",
   "agent-output-interpolated-into-an-instruction.md", "fixed-base-assumes-one-commit-per-pass.md",
   "refusal-branch-with-no-arm.md", "trailer-parse-reads-only-the-final-block.md",
-  "usage-exit-list-lags-its-function.md"]
+  "usage-exit-list-lags-its-function.md", "header-rationale-contradicts-the-registration.md"]
 guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md", "UNATTENDED-STOPS.md", "UNATTENDED-ASKS.md"]
 backlog-shards = []
 lexicon-verbs = []

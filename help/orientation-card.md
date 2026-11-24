@@ -117,6 +117,79 @@ terminal state, a second terminal move keeps it and prints `card — snapshot ke
 recorded`. Once a build's card is at a terminal step, appending a route to that build is refused
 with `route R7 REFUSED`.
 
+## The card's pointers
+
+The build's card, and a session card once its first item boundary is crossed, carry a `## pointers`
+section directly above the `READY` line, saying where the build is now rather than where it started:
+
+```text
+## pointers
+records — journal memory/builds/dExample/build/2026-10-27-build-KICK-dExample-1-agent-ledger.md · spec-audit memory/builds/dExample/reviews/2026-10-27-review-KICK-dExample-1-spec-audit.md
+forks — memory/builds/dExample/spec/2026-10-27-spec-KICK-dExample-3.md §8
+item — item.build.base@KICK-dExample-2#3f9c2a71 · at 8c1e0b42
+budget — open 3/10
+mail — 6299617af701
+```
+
+- `records —` names the build's newest record of each base kind, one per kind, read by the memory-tree
+  kit's `gen_build_index.py --latest-records <slug>`: a spec audit, a diff review, a journal and a
+  research record. A typed record, such as a deviation, a red-fix or a transition, is never named,
+  so however many your build keeps, the line stays short.
+- `forks —` names the spec of each unit whose open questions are still unresolved, with its `§8`, or
+  `none`.
+- `item —` names the item in flight, the loop kit's instance key, or `none` while the build waits on
+  something other than an item, and the commit it was read at. While the remote is stale or the
+  build's inputs do not read, the item already named is kept.
+- `budget —` shows the build's remaining rework budget, the line the loop kit's `budget.py state`
+  prints, one of three: `budget — open <n>/<total>`, `budget — spent` or `budget — unfrozen <n>/<total>`.
+  `open` is a frozen budget with `<n>` of its `<total>` draws made, `spent` one with none left, and
+  `unfrozen` one not yet frozen at the end of design. Only you, the owner, raise the budget;
+  nothing on the card does. With no loop kit in the repository it reads `budget — skipped:
+  no loop kit`, which hides the budget rather than showing it as zero.
+- `mail —` names each open message addressed to the build or one of its units, by id, the unattended
+  driver's `--mail read <slug> --open --ids`, or `none`. An open message holds the build's moves until
+  it is answered, acknowledged or past its deadline ([the loop's moves](loop.md)). With `RUN_CLAIMS`
+  off it reads `mail — skipped: RUN_CLAIMS is off`, never `none`.
+
+A line whose source does not answer reads `<word> — skipped: <why>`. `manifest-check.sh --card
+--check` refuses a stored section missing one of its lines and names `--card --pointers`, which
+renders the section afresh; a card written before a line was added reads that way until then.
+
+**When the section is rewritten.** Every publish and every follow writes a fresh section into the
+build's card. Between those, the item boundary does: after a commit, the session's next shell call
+notices that HEAD has moved past the `at` of its card's `item —` line and starts `manifest-check.sh
+--card --boundary --build <slug> --session <sid>` in the background, so the call is not held up. The
+verb moves `at` to HEAD and reads the build's current item. When the item has changed it prints
+`boundary — <old> → <new>` and rewrites your session card's section. A crossing then prints the
+build's unread mail as a `notice —` line, as `mailbox.notice` says. The verb then lists each open
+message addressed to the build as an `interrupt — mailbox` line, as `mailbox.reads` says; see "Where a
+build is, and what runs next" in [the loop page](loop.md). The `card.pointers` policy key
+decides whether the build's card is published too: <!-- usage: policy:card.pointers 6940ded3 -->
+
+- `every-item` (the default): the build's card is published at every item boundary.
+- `at-transitions`: only your session card is rewritten; the build's card gets a fresh section at the
+  next stage move.
+
+The verb's lines are reported to the session at the shell call after it finishes. Run
+`manifest-check.sh --card --pointers --build <slug> --session <sid>` to write the section by hand.
+A card the section would push past `CARD_CAP_BYTES` is not written and prints `card — pointers not
+written: <n> bytes over the cap`.
+
+**With no item in flight.** While your session's card file reads `item — none`, the hooks hold each
+tool call to the `actions.free` policy key: <!-- usage: policy:actions.free c5786fdc -->
+
+- `read-only-probes` (the default): a read is admitted; a write, a commit, a push or an agent spawn
+  is refused.
+- `item-reads-only`: every call is refused except the two commands that move the session to its next
+  item, the loop kit's position engine (`position.py <slug> --boundary <pointer>`) and the kickoff
+  checker (`manifest-check.sh --card --boundary`).
+- `recorded-anything`: every call is admitted, and each one the default would refuse is written as one
+  line to `gov-free-actions.log` in the repository's git directory.
+
+Once the line names an item, every call is admitted under all three values. A refusal names the
+value, the call and the build, and gives the remedy: run the act inside the item that owns it, or
+file it as an intake. A card file with no `## pointers` section holds no call to the key.
+
 ## Finding the card on another session or machine
 
 `manifest-check.sh --card --lookup --build <slug> --session <sid>` reads the build's card from the
@@ -140,8 +213,11 @@ again and prints the resume lines after the card:
 
 ```text
 route — re-checked · ok
-resume — fresh recommended: idle 1840s past 300s (resume.context: fresh-when-idle)
+resume — fresh recommended: idle 1840s past 300s · in C:/work/repo/.claude/worktrees/dExample (resume.context: fresh-when-idle)
 partial — 2 uncommitted path(s) · resume.partial: continue-item · kept, the item continues, its witness still owed
+position — act · next item.build.unit-pass
+lead — the compaction summary is a lead, never a source: check it against the position above and the card's pointers
+context — 72% of window · past 60% · fresh at next item boundary (context.on-full: fresh-at-boundary)
 ```
 
 `resume.context` decides the recommendation. `fresh-when-idle`, the default, recommends a fresh
@@ -152,3 +228,59 @@ verdict is a pass, and otherwise reads as `fresh-when-idle` and says why. `resum
 what to do with uncommitted work: `continue-item`, `restart-item` (commit the work to
 `partial/<slug>/<sid8>`, then restore the tree) or `ask-owner`. The kickoff skill's resume paragraph
 states each act. The replay itself changes nothing in your tree.
+
+The `position —` line is where the build stands, as the loop kit's position engine re-derives it from
+witnesses (`position.py <slug> --json`): its answer, and for `act` the next item, else `next none`.
+It is always the engine's answer, never the card's stored `item —` pointer; where the two differ, trust
+the position line. A card that routes no build, a tree with no loop kit, or an engine that does not
+answer within its bound prints `position — skipped:` and why, and the card still prints. After a
+compaction, and only then, a `lead —` notice follows the `position —` line: the harness's summary of
+the conversation is a paraphrase nothing checks, so read it as a lead and check what it claims against
+the position line and the card's `## pointers` before you act on it. A resume restores the transcript
+itself and prints no notice.
+
+The `context —` line shows how full the session's context window is, as a whole percent: the tokens
+its last request read, as its transcript records them, over the window derived per model from this
+node's observed usage: `CLAUDE_CODE_MAX_CONTEXT_TOKENS` where the harness sets it, else the largest
+context this node's recent transcripts show on that model, rounded up to the 200k or the 1M window.
+No transcript names the window a session runs, so on a node that runs one model at both windows a
+200k session reads its fill against the 1M window unless the owner starts it with
+`CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000` set. The harness honours that variable only where its own gate
+passes, never for a first-party `claude-` model, so for such a model the card still takes the figure
+as your declaration of the window and names its source `env, advisory`.
+A subagent's requests never count. The `context.on-full` policy key decides what a filling window leads to, and
+`context.threshold` where it starts: <!-- usage: policy:context.on-full 50e931f0 --> <!-- usage: policy:context.threshold ba7d79dc -->
+
+- `fresh-at-boundary` (the default): once the share reaches `context.threshold` (`60%` by default),
+  end the session at its next item boundary and start a fresh one, which reorients from the card.
+  The replay prints `context — 72% of window · past 60% · fresh at next item boundary
+  (context.on-full: fresh-at-boundary)`, or `context — 41% of window · under 60%` below it. At the
+  item boundary itself, the background boundary verb adds `context — 72% of window · past 60% · fresh
+  now, at this item boundary (context.on-full: fresh-at-boundary)` to the lines reported at your next
+  shell call: that is the point to stop. Below the threshold the boundary prints nothing.
+- `compact-with-card`: nothing is measured at a boundary; the harness compacts the session when its
+  window fills and the replay puts the card back. The replay prints `context — 41% of window
+  (context.on-full: compact-with-card)`.
+
+When the transcript cannot be read, or the measure does not answer within its bound, the replay
+prints `context — skipped:` and why, and the card still prints; a boundary prints nothing.
+
+The card-import fixture's verdict lives in one file per clone, `card-fixture.verdict` in the
+`orientation` folder of the git common directory, so every worktree reads the same one. Record it on
+a machine by running `manifest-check.sh --card --fixture-run <empty-dir>`: it runs
+`card-compaction.fixture.sh` in that directory, which starts two headless sessions and takes
+minutes, then writes and prints one line such as `card-fixture — pass · fixture 3f9c2a71 · cli
+2.1.308 · 2026-10-27T09:14:02+0000`. The version is that of the `claude` first on PATH, the
+binary the fixture launches. A pass counts only while the fixture file is still the one it names and
+the tested version is both PATH's `claude` now and the version of the session reading it, so editing
+the fixture, upgrading the CLI on PATH, or starting a session whose harness runs another version
+makes it stale, and the override returns until you run the fixture again. Versions compare field by
+field as numbers, a missing field read as 0, so a recorded `cli 2.1` and a `2.1.0` are one version,
+and `2.1.10` is newer than `2.1.9`. The reason names the two
+versions that differ: `recorded under cli <old>, PATH now <new>` or `fixture ran cli <x>, this
+session runs <y>`. A version that cannot be read on any side, the recorded one, PATH's or the
+session's, is red too, as `cli version unknown` with the side named. A machine whose IDE harness and
+PATH binary run different versions never passes until the two run one version and the fixture is
+run again. With no file, the reason printed is `no recorded run`. Every fresh recommendation names the tree to start in after `· in`: the worktree the
+build's card was published from, when `git worktree list` still lists it, else `a new worktree of
+<slug>`.

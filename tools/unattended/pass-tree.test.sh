@@ -6,12 +6,17 @@
 # ONE fixture repository under one `mktemp -d`, removed on exit. `main` carries the base commit and
 # then `m1.txt`, the default branch moving on; `run`, checked out, is cut from the base and carries the
 # records commit C, the run-state file with one dispatch row per merged unit. The base holds the conf,
-# a fixture kit whose two `[[generated]]` rows, `fx-out.txt` and `fx-new.txt`, share one generator
+# a fixture kit whose stage-1 `[[generated]]` rows, `fx-out.txt` and `fx-new.txt`, share one generator
 # `render.sh` (the sorted tracked `p*.txt` files, into `fx-out.txt` and a `gen:fx` region of the
 # README), and a copy of the run-gates kit's `regen.py` with what it imports, at that kit's place under
 # this suite's tool root. `render.sh` takes three switches, each off unless a block sets it:
 # `FX_RENDER_FAIL` (T4), and `FX_RENDER_NEW` and `FX_RENDER_STRAY` (T7), which make the write create
 # `fx-new.txt`, a generated output never tracked before, and `fx-stray.txt`, which no row covers.
+# The kit's third row, `fx-rev.txt` at stage 2, is written by `rev.sh` (KICK-dKeptSession-67), a
+# renderer of the committed revision modelled on the policy mirror's: each tracked `in-*.txt` with its
+# blob id at HEAD, and in both modes a refusal, exit 2, while an input differs from its blob at HEAD.
+# The base carries `in-0.txt`, and its commit is amended with the render, since a root commit has no
+# HEAD to render from.
 #
 # A PASS IS SIMULATED, NEVER BUILT. `add_fixture_pass` does what the runtime and the builder's first
 # order do, a worktree on a new branch at `main`, both in the runtime's spelling (`worktree-agent-<id>`
@@ -119,6 +124,13 @@ generator = "render.sh"
 write = ["bash", "{kit}/render.sh"]
 check = ["bash", "{kit}/render.sh", "--check"]
 stage = 1
+
+[[generated]]
+path = "fx-rev.txt"
+generator = "rev.sh"
+write = ["bash", "{kit}/rev.sh"]
+check = ["bash", "{kit}/rev.sh", "--check"]
+stage = 2
 EOF
 cat > "$FX_REL/render.sh" <<'EOF'
 #!/usr/bin/env bash
@@ -142,9 +154,31 @@ fi
 printf '%s\n' "$list" > fx-out.txt
 printf '%s\n' "$readme" > README.md
 EOF
+cat > "$FX_REL/rev.sh" <<'EOF'
+#!/usr/bin/env bash
+# The fixture's renderer of a committed revision, as the policy mirror is one: each tracked in-*.txt
+# with its blob id at HEAD, sorted, into fx-rev.txt. In both modes, while an input's bytes differ from
+# its blob at HEAD, an input absent at HEAD included, it exits 2 naming the input; --check compares.
+set -u
+list=$(git ls-files -- 'in-*.txt' | sort | while IFS= read -r p; do
+  h=$(git rev-parse -q --verify "HEAD:$p" 2>/dev/null) || h=""
+  if [ -z "$h" ] || [ "$h" != "$(git hash-object -- "$p" 2>/dev/null)" ]; then
+    printf 'fx-rev: refused · %s · uncommitted changes; the render reads a revision, commit first\n' "$p" >&2
+    exit 2
+  fi
+  printf '%s %s\n' "$p" "$h"
+done) || exit 2
+if [ "${1:-}" = --check ]; then
+  [ "$(cat fx-rev.txt 2>/dev/null)" = "$list" ]
+  exit
+fi
+printf '%s\n' "$list" > fx-rev.txt
+EOF
 printf '# fixture\n\n<!-- gen:fx -->\n<!-- /gen:fx -->\n\nprose\n' > README.md
+printf 'in 0\n' > in-0.txt
 cp "$REPO/$RG_REL/regen.py" "$REPO/$RG_REL/profile_bar.py" "$RG_REL/" || { echo "FAIL cannot copy regen.py"; exit 2; }
-git add -A && bash "$FX_REL/render.sh" && git add -A && git commit -q -m base || { echo "FAIL base commit"; exit 2; }
+git add -A && bash "$FX_REL/render.sh" && git add -A && git commit -q -m base \
+  && bash "$FX_REL/rev.sh" && git add -A && git commit -q --amend --no-edit || { echo "FAIL base commit"; exit 2; }
 BASE=$(git rev-parse HEAD)
 git checkout -q -b run
 mkdir -p memory/builds/tRun
@@ -290,6 +324,10 @@ check_same "T4 HEAD is the pre-merge sha (AC4)" "$(git rev-parse HEAD)" "$h0"
 check_same "T4 the tree is clean (AC4)" "$(git status --porcelain)" ""
 [ -e fx-partial.txt ]; check_same "T4 fx-partial.txt is gone (AC4)" "$?" 1
 git rev-parse -q --verify MERGE_HEAD >/dev/null; check_same "T4 no merge is in progress (AC4)" "$?" 1
+# KICK-dKeptSession-67 AC3: the regeneration ran with HEAD detached on the provisional merge, so the
+# restore put it back on the run's branch. Staged break: the restore's re-attach replaced by a
+# `reset --hard` to the pre-merge sha leaves HEAD detached, and this arm alone reds.
+check_same "T4 HEAD is back on the run's branch (KICK-dKeptSession-67 AC3)" "$(git symbolic-ref -q HEAD)" "refs/heads/run"
 
 # ---- T5 (AC5): --remove takes away an uncommitted pass and refuses a committed one ----------------------
 run_tool --remove tRun --branch worktree-agent-p5
@@ -421,6 +459,34 @@ run_tool --remove tRun --branch worktree-wf_x
 check_same "TP11 --remove of a wf_ name off the runtime's structure exits 1 (AC5)" "$rc" 1
 check_has "TP11 the off-structure refusal is the shape's (AC5)" "$err" "is not a branch the runtime cuts for a pass"
 [ -d "$R/.claude/worktrees/wf_x" ]; check_same "TP11 the off-structure tree remains (AC5)" "$?" 0
+
+# ---- K67 (KICK-dKeptSession-67 AC1, AC2): the regeneration renders over the merge as committed -------
+# Pass 13 adds in-13.txt in one commit and carries rev.sh's re-render in a second; pass 14 adds
+# in-14.txt and carries the base's fx-rev.txt unrendered. Neither conflicts. rev.sh refuses an input
+# HEAD lacks, so a regeneration with HEAD on the pre-merge commit fails on pass 13's merge: the staged
+# break, and the block's RED-first reading, is pass-tree.sh at ce776cccc, where that merge exits 1.
+add_fixture_pass 13 && ( cd "$R/.claude/worktrees/agent-p13" && printf 'in 13\n' > in-13.txt && git add -- in-13.txt \
+  && git commit -q -m "build TOOL-tRun-13" -m "Pass: TOOL-tRun-13" && bash "$FX_REL/rev.sh" && git add -- fx-rev.txt \
+  && git commit -q -m "build TOOL-tRun-13: the render" -m "Pass: TOOL-tRun-13" ) || { echo "FAIL pass 13"; exit 2; }
+add_fixture_pass 14 && ( cd "$R/.claude/worktrees/agent-p14" && printf 'in 14\n' > in-14.txt && git add -- in-14.txt \
+  && git commit -q -m "build TOOL-tRun-14" -m "Pass: TOOL-tRun-14" ) || { echo "FAIL pass 14"; exit 2; }
+P13=$(git rev-parse worktree-agent-p13); R13=$(git show worktree-agent-p13:fx-rev.txt); R14=$(git show worktree-agent-p14:fx-rev.txt)
+h0=$(git rev-parse HEAD)
+run_tool --merge tRun --pass TOOL-tRun-13 --branch worktree-agent-p13 --from "$C"
+check_same "K67 --merge of pass 13, which changed an input of a renderer of HEAD, exits 0 (AC1)" "$rc" 0
+check_same "K67 pass 13's merge prints one sha alone on stdout (AC1)" "$out" "$(git rev-parse HEAD)"
+check_lacks "K67 pass 13's merge prints no REFUSING line (AC1)" "$err" "pass-tree: REFUSING"
+check_same "K67 pass 13's merge has the pre-merge HEAD as its first parent (AC1)" "$(git rev-parse "$out^1")" "$h0"
+check_same "K67 pass 13's merge has pass 13's tip as its second parent (AC1)" "$(git rev-parse "$out^2")" "$P13"
+check_same "K67 the merge's fx-rev.txt is pass 13's render (AC1)" "$(git show HEAD:fx-rev.txt)" "$R13"
+bash "$FX_REL/rev.sh" --check; check_same "K67 rev.sh --check reads the merge's render fresh (AC1)" "$?" 0
+check_same "K67 HEAD is on the run's branch after the merge (AC1)" "$(git symbolic-ref HEAD)" "refs/heads/run"
+run_tool --merge tRun --pass TOOL-tRun-14 --branch worktree-agent-p14 --from "$C"
+check_same "K67 --merge of pass 14, carrying the base's render, exits 0 (AC2)" "$rc" 0
+check_same "K67 pass 14's merge prints one sha alone on stdout (AC2)" "$out" "$(git rev-parse HEAD)"
+[ "$(git show HEAD:fx-rev.txt)" != "$R14" ]; check_same "K67 the merge's fx-rev.txt differs from pass 14's stale bytes (AC2)" "$?" 0
+check_same "K67 fx-rev.txt lists in-14.txt at its blob in the merge (AC2)" "$(grep -c "^in-14.txt $(git rev-parse HEAD:in-14.txt)\$" fx-rev.txt)" 1
+bash "$FX_REL/rev.sh" --check; check_same "K67 rev.sh --check reads pass 14's merge fresh (AC2)" "$?" 0
 
 [ "$st" = 0 ] && { echo "PASS ($n assertions)"; exit 0; }
 echo "FAIL ($n assertions)"; exit 1

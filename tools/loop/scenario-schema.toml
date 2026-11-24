@@ -9,7 +9,10 @@
 # One [[field]] row per key but `tag`, each a scalar: `extends`, a composed scenario's tag or `none`;
 # `admits`, a table from a fact name to the values that admit; `entry`, the gov step whose state a build
 # row out of `none` enters; `activates`, a table from a kind tag to that kind's rows; and `then`, a list
-# of { at = <gov step tag>, scenario = <tag> }, the scenario that takes over at that step's exit. No field
+# of { at = <gov step tag>, scenario = <tag> }, the scenario that takes over at that step's exit; and the
+# slot (KICK-dKeptSession-20), `preset`, a shipped preset's name, and `overrides`, a table from a dotted
+# policy key to its value, which a build placed under the scenario reads after the policy file's own
+# values and before the repository's preset. No field
 # declares `widens` or `fixed-by`, so each is fixed by its undeclared class: a repository extends a gov
 # scenario where it would patch one.
 
@@ -35,4 +38,12 @@ shape = "scalar"
 
 [[field]]
 name = "then"
+shape = "scalar"
+
+[[field]]
+name = "preset"
+shape = "scalar"
+
+[[field]]
+name = "overrides"
 shape = "scalar"

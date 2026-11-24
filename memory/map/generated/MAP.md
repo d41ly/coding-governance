@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 226 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 177 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 226 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 179 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -278,6 +278,7 @@ Inventories: gate-legs: 226 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · 
 | `PostToolUse memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js` | closed-loop-atlas |
 | `PostToolUse tools/memory-recall/recall-opened.js` | memory-recall |
 | `PostToolUse tools/process-monitor/procmon-hook.js` | process-monitor |
+| `PostToolUse tools/unattended/mail-notice.js` | unattended |
 | `PreToolUse tools/hooks/agent-cap.js` | agent-cap |
 | `PreToolUse tools/hooks/scratch-guard.js` | agent-cap |
 | `PreToolUse tools/unattended/gate-guard.js` | unattended |
@@ -384,6 +385,7 @@ Inventories: gate-legs: 226 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · 
 | `degradation-known-but-unreported.md` | review-harnesses |
 | `destructive-step-before-its-precondition.md` | unattended |
 | `doc-names-an-argument-the-code-never-reads.md` | memory-tree-hygiene |
+| `docstring-misnames-a-returned-value.md` | runlog |
 | `empty-field-collapses-unless-it-is-last.md` | run-gates |
 | `fail-count-reads-a-pattern-the-row-never-prints.md` | run-gates |
 | `failed-stage-reads-as-nothing-staged.md` | push-main |
@@ -408,6 +410,7 @@ Inventories: gate-legs: 226 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · 
 | `guard-fed-the-value-it-supersedes.md` | unattended |
 | `hand-named-gate-list-green-while-the-bar-reds.md` | build-method |
 | `hand-typed-count-of-an-enumerated-population.md` | run-gates |
+| `header-rationale-contradicts-the-registration.md` | unattended |
 | `held-suite-guard-misses-a-sibling-kit.md` | agent-cap |
 | `helper-whose-only-caller-is-its-selftest.md` | memory-tree-hygiene |
 | `heredoc-escape-reaches-the-regex.md` | baseline |

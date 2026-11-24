@@ -459,7 +459,6 @@ Cite ids, never line numbers.
 | [TOOL-dDeclaredLoop-101](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE ABSENT-EXPANSION REFUSAL ADMITS A VALUE ON A CORE POINT.… |
 | [TOOL-dDeclaredLoop-102](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A NEW POLICY KEY LANDS WITHOUT ITS PRESET VALUES. v2:1421 lets no key… |
 | [TOOL-dDeclaredLoop-103](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE MAILBOX INTERRUPT NAMES THE WRONG ARMING BUILD.… |
-| [TOOL-dDeclaredLoop-104](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE REMAINING REWORK BUDGET HAS NO ONE-LINE READER.… |
 | [TOOL-dDeclaredLoop-105](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE TRANSITION READER RETURNS NO COMMIT OR DATE. KICK-dKeptSession-9… |
 | [TOOL-dDeclaredLoop-106](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PER-ORDER RETURN SCHEMA IS HANDED IN A CIRCLE.… |
 | [TOOL-dDeclaredLoop-107](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | A DROPPED, INVENTED OR DOUBLED ROW STANDS ON A RECORD EDGE.… |
@@ -471,6 +470,7 @@ Cite ids, never line numbers.
 | [TOOL-dDeclaredLoop-114](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-16 | A NUMERIC PATCH DIRECTION FOR THE CLASSIFIER. TOOL-dDeclaredLoop-33's… |
 | [TOOL-dDeclaredLoop-118](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | AN ITEM ROW MAY NAME A PROGRAM OUTSIDE THE FIVE STEPS.… |
 | [TOOL-dDeclaredLoop-119](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | AN ITEM THAT WRITES NO RECORD KIND HAS NO RETURNS VALUE.… |
+| [TOOL-dDeclaredLoop-121](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE PLAIN ENGINE CALL STILL PRINTS A MAIL LINE. TOOL-dDeclaredLoop-7… |
 | [TOOL-dDerivedDocket-38](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/run-gates/run-selftests.sh SELECTS SUITES ONLY BY A --kit <dir>… |
 | [TOOL-dDerivedDocket-39](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | govkit's requires_if SELECTS NO KIT AT APPLY. Its one reader is… |
 | [TOOL-dDerivedDocket-40](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO LEASE-MATRIX ROW NAMES WHO REACHES IT, AND NOTHING COUNTS ROWS… |
@@ -748,6 +748,7 @@ Cite ids, never line numbers.
 | [TOOL-dWellOiledMachine-128](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE PERIOD KEY HAS NO MONTH AND NO LANDING COUNT. derive_period knows… |
 | [TOOL-dWellOiledMachine-129](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | TWO STALL AND LOOP CLASSES HAVE NO WRITER. cl-dClosedLoop-0473 trends… |
 | [TOOL-dWellOiledMachine-130](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE PRE-PUSH HOOK. TOOL-dWitnessedBar-73 S6 put… |
+| [TOOL-dWellOiledMachine-131](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | THE ACT IS THE NINTH FIELD OF derive_message_id. The act joins… |
 | [TOOL-dWitnessedBar-31](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-28 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dWitnessedBar-32](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | THE enforces EDGE ROW OMITS principle. PLAY-dOrderedCharter-7 S2 admits… |
 | [TOOL-dWitnessedBar-33](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | THE DOSSIERS' gate-legs CLAIMS AND THE LEGS' tests EDGES ARE ONE FACT… |

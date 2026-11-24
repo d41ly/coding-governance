@@ -1852,6 +1852,124 @@ HOOK=$sg_hook
   && { echo "ok   TOOL-dPlacedRequest-95 AC1 fixture 3: the commit's PreToolUse ran no checker the target tracks"; pass=$((pass+1)); } \
   || { echo "FAIL TOOL-dPlacedRequest-95 AC1 fixture 3: tracked '$sg95_tracked', or the target's checker ran and wrote its marker"; fail=$((fail+1)); }
 
+# ---- KICK-dKeptSession-13 AC5 (S7): the item-boundary step starts the verb detached, at a moved HEAD alone ----
+# A scratch repository whose card file is owned by session sgtest-ib, routes the build tIb and holds an
+# `item —` line. checkItemBoundary is called with a stub checker per case, each stub appending its argv to
+# its own calls file, sleeping 5 s, then writing its done file. Holds when: `at` equal to HEAD, a role
+# agent's payload, and a card another session owns start no stub; a stale `at` starts one, with the
+# boundary verb's flags and `--out` naming `<common dir>/orientation/sgtest-ib.boundary`, the step
+# returning before the stub is done; and a waiting `.boundary` file is returned and unlinked. Staged
+# against a step that compares nothing, the at-equal-to-HEAD row reds; against a synchronous spawn, the
+# return row. WHAT THIS DOES NOT CHECK: the verb the real checker runs, which the card-store plants cover.
+sgib="$TMP/sgib"; sgib_r="$sgib/repo"; mkdir -p "$sgib/stubs" "$sgib_r/.claude"
+git init -q "$sgib_r" && printf 'x\n' > "$sgib_r/x.txt" && $SGGIT -C "$sgib_r" add x.txt && $SGGIT -C "$sgib_r" commit -q -m one
+sgib_h=$(git -C "$sgib_r" rev-parse --short=8 HEAD)
+sgib_c=$(cd "$sgib_r" && node -p 'process.cwd()')
+mkdir -p "$sgib_r/.git/orientation"
+# write_sgib_card <owner> <at, or none for no section>
+write_sgib_card() {
+  { printf '[.claude/orientation-card.md · Level 1 · a fixture direction]\ncard-owner — %s · absent\n## route\n- build: tIb\n' "$1"
+    [ "$2" = none ] || printf '## pointers\nrecords — none\nforks — none\nitem — item.build.base@TOOL-tIb-1#aaaa0001 · at %s\n' "$2"
+    printf 'READY — tIb\n[/.claude/orientation-card.md]\n'; } > "$sgib_r/.claude/orientation-card.md"
+}
+for sgib_s in equal role other stale ctx bare; do
+  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "%s"\nsleep 5\n: > "%s"\n' "$sgib/calls-$sgib_s" "$sgib/done-$sgib_s" > "$sgib/stubs/$sgib_s.sh"
+done
+# run_sgib <stub> <agent_type or -> — the step's elapsed ms, its return and whether the stub is done, one line
+run_sgib() {
+  node -e 'const m = require(process.argv[1]); const d = { hook_event_name: "PreToolUse", tool_name: "Bash", tool_input: { command: "true" }, session_id: "sgtest-ib", cwd: process.argv[2] }
+    if (process.argv[4] !== "-") d.agent_type = process.argv[4]
+    const t = Date.now(); const out = m.checkItemBoundary(d, {}, process.argv[3]); const ms = Date.now() - t
+    console.log(ms + " " + JSON.stringify(out) + " " + require("fs").existsSync(process.argv[5]))' "$HOOK" "$sgib_c" "$sgib/stubs/$1.sh" "$2" "$sgib/done-$1" 2>&1
+}
+write_sgib_card sgtest-ib "$sgib_h"; run_sgib equal - > "$sgib/out-equal"
+write_sgib_card sgtest-ib 00000000; run_sgib role gov-builder > "$sgib/out-role"
+write_sgib_card sgtest-other 00000000; run_sgib other - > "$sgib/out-other"
+write_sgib_card sgtest-ib 00000000; run_sgib stale - > "$sgib/out-stale"
+write_sgib_card sgtest-ib none; run_sgib bare - > "$sgib/out-bare"
+printf 'boundary — K1 → K2\n' > "$sgib_r/.git/orientation/sgtest-ib.boundary"
+write_sgib_card sgtest-ib "$sgib_h"; run_sgib ctx - > "$sgib/out-ctx"
+for sgib_i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do [ -f "$sgib/calls-stale" ] && [ -f "$sgib/calls-bare" ] && break; sleep 1; done
+sleep 1
+for sgib_s in equal role other ctx; do
+  [ ! -e "$sgib/calls-$sgib_s" ] && { echo "ok   KICK-dKeptSession-13 AC5 case $sgib_s starts no boundary verb"; pass=$((pass+1)); } \
+    || { echo "FAIL KICK-dKeptSession-13 AC5 case $sgib_s started the boundary verb: $(<"$sgib/calls-$sgib_s") · $(<"$sgib/out-$sgib_s")"; fail=$((fail+1)); }
+done
+sgib_want="--card --boundary --build tIb --session sgtest-ib --out "
+case "$(grep -c . "$sgib/calls-stale" 2>/dev/null);$(<"$sgib/calls-stale")" in
+  "1;$sgib_want"*/orientation/sgtest-ib.boundary) echo "ok   KICK-dKeptSession-13 AC5 a stale at starts one detached --card --boundary, --out naming the .boundary file"; pass=$((pass+1)) ;;
+  *) echo "FAIL KICK-dKeptSession-13 AC5 a stale at starts one detached --card --boundary: $(cat "$sgib/calls-stale" 2>&1) · $(<"$sgib/out-stale")"; fail=$((fail+1)) ;;
+esac
+case "$(<"$sgib/out-stale")" in
+  *' "" false') echo "ok   KICK-dKeptSession-13 AC5 the step returned before the stub was done"; pass=$((pass+1)) ;;
+  *) echo "FAIL KICK-dKeptSession-13 AC5 the step returned before the stub was done: $(<"$sgib/out-stale")"; fail=$((fail+1)) ;;
+esac
+[ "$(grep -c . "$sgib/calls-bare" 2>/dev/null)" = 1 ] && { echo "ok   KICK-dKeptSession-13 AC5 a card with no ## pointers starts the verb"; pass=$((pass+1)); } \
+  || { echo "FAIL KICK-dKeptSession-13 AC5 a card with no ## pointers starts the verb: $(<"$sgib/out-bare")"; fail=$((fail+1)); }
+case "$(<"$sgib/out-ctx")" in
+  *' "boundary — K1 → K2" '*) [ ! -e "$sgib_r/.git/orientation/sgtest-ib.boundary" ] \
+    && { echo "ok   KICK-dKeptSession-13 AC5 a waiting .boundary file is returned and unlinked"; pass=$((pass+1)); } \
+    || { echo "FAIL KICK-dKeptSession-13 AC5 the .boundary file was returned and left in place"; fail=$((fail+1)); } ;;
+  *) echo "FAIL KICK-dKeptSession-13 AC5 a waiting .boundary file is returned: $(<"$sgib/out-ctx")"; fail=$((fail+1)) ;;
+esac
+for sgib_i in 1 2 3 4 5 6 7 8; do [ -f "$sgib/done-stale" ] && [ -f "$sgib/done-bare" ] && break; sleep 1; done
+
+# ---- KICK-dKeptSession-8 AC1-AC4, AC6, AC7: the actions.free arm over each value and pointer ----
+# Each case of actions-free.fixture.sh, beside this file, builds its own scratch repository holding
+# copies of this kit's hooks, a card file whose ## pointers the case writes, and stubs of the policy
+# reader and the kickoff checker, then prints one line per call: `<case> · <value> · <call> · exit
+# <code> · <stderr>`. Each row reads one line. Staged against the base hook, which admits a Bash write
+# with no item in flight, every refusal row exits 0 and reds, and the unarmed rows print no line.
+# WHAT THIS DOES NOT CHECK: the real policy reader, the real kickoff checker, or a card file the card
+# engine wrote; rule 9's spawn rows are agent-cap.test.sh's.
+sgaf="$TMP/sgaf"; mkdir -p "$sgaf"
+for sgaf_p in probes-none probes-item reads-none anything-none no-pointers no-route other-owner throw no-helper refusal item-skipped item-malformed; do
+  bash "$HERE/actions-free.fixture.sh" --plant "$sgaf_p" > "$sgaf/$sgaf_p" 2>&1
+done
+# check_free_line <name> <case> <value> <call> <what follows the call: exit <code>, or the log's count> [needle ...]:
+# every needle present, a `!needle` absent
+check_free_line() {
+  local name=$1 out="$sgaf/$2" pre="$2 · $3 · $4 · " want=$5 line ok=1 nd; shift 5
+  line=$(grep -F -- "$pre" "$out" | head -n 1)
+  case $line in "$pre$want · "*) ;; *) ok=0 ;; esac
+  for nd in "$@"; do
+    case $nd in
+      '!'*) case $line in *"${nd#!}"*) ok=0 ;; esac ;;
+      *) case $line in *"$nd"*) ;; *) ok=0 ;; esac ;;
+    esac
+  done
+  if [ "$ok" = 1 ]; then echo "ok   $name"; pass=$((pass+1))
+  else echo "FAIL $name: ${line:-no line for $pre in $(head -c 400 "$out")}"; fail=$((fail+1)); fi
+}
+check_free_line "KICK-dKeptSession-8 AC1 git status at item none under read-only-probes is admitted" probes-none read-only-probes 'git status' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC1 echo x > f is refused, class write" probes-none read-only-probes 'echo x > f' "exit 2" 'actions.free (read-only-probes)' 'this Bash write' 'item — none'
+check_free_line "KICK-dKeptSession-8 AC1 git commit is refused, class commit" probes-none read-only-probes 'git commit -m x' "exit 2" 'actions.free (read-only-probes)' 'this Bash commit' 'item — none'
+check_free_line "KICK-dKeptSession-8 AC1 git push is refused, class push" probes-none read-only-probes 'git push' "exit 2" 'actions.free (read-only-probes)' 'this Bash push' 'item — none'
+check_free_line "KICK-dKeptSession-8 AC1 an Edit the route admits is refused, class write" probes-none read-only-probes 'Edit src/a.js' "exit 2" 'actions.free (read-only-probes)' 'this Edit write' 'item — none'
+for sgaf_v in read-only-probes item-reads-only recorded-anything; do
+  for sgaf_c in 'echo x > f' 'git commit -m x' 'git push' 'Edit src/a.js'; do
+    check_free_line "KICK-dKeptSession-8 AC2 $sgaf_c inside the item in flight is admitted under $sgaf_v" probes-item "$sgaf_v" "$sgaf_c" "exit 0" '(empty stderr)'
+  done
+done
+check_free_line "KICK-dKeptSession-8 AC3 git status at item none under item-reads-only is refused, class read" reads-none item-reads-only 'git status' "exit 2" 'actions.free (item-reads-only)' 'this Bash read'
+check_free_line "KICK-dKeptSession-8 AC3 the position engine's --boundary is admitted" reads-none item-reads-only 'position.py --boundary' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC3 the kickoff checker's --card --boundary is admitted" reads-none item-reads-only 'manifest-check.sh --card --boundary' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC4 echo x > f under recorded-anything is admitted" anything-none recorded-anything 'echo x > f' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC4 git status under recorded-anything is admitted" anything-none recorded-anything 'git status' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC4 the log holds one line, the write, naming the session" anything-none recorded-anything 'log' '1 line(s)' ' · tFixSession-1 · write · Bash · item none' '!· read ·'
+check_free_line "KICK-dKeptSession-8 AC6 a card file with no ## pointers adds no arm and prints nothing" no-pointers read-only-probes 'echo x > f' "exit 0" '(empty stderr)'
+check_free_line "KICK-dKeptSession-8 AC6 pointers and no route admit with the unarmed line" no-route read-only-probes 'echo x > f' "exit 0" 'scratch-guard: actions.free unarmed — ' 'routes no build'
+check_free_line "KICK-dKeptSession-8 AC6 pointers owned by another session admit with the unarmed line" other-owner read-only-probes 'echo x > f' "exit 0" 'scratch-guard: actions.free unarmed — ' 'tFixOther-2'
+check_free_line "KICK-dKeptSession-8 AC6 a card file that does not read refuses, naming the arm" throw read-only-probes 'echo x > f' "exit 2" 'the actions.free arm threw'
+check_free_line "KICK-dKeptSession-8 AC7 no policy reader reads the default, refusing with one NOTE" no-helper '(no policy reader)' 'echo x > f' "exit 2" 'actions.free (read-only-probes) refuses this Bash write' 'NOTE — no policy kit resolves beside this hook, so actions.free reads read-only-probes'
+check_free_line "KICK-dKeptSession-8 AC7 a refused read reads the default, refusing with one NOTE" refusal '(a PolicyRefusal)' 'echo x > f' "exit 2" 'actions.free (read-only-probes) refuses this Bash write' 'NOTE — actions.free could not be read (' ', so it reads read-only-probes'
+# KICK-dKeptSession-43 AC1-AC3: the card engine's `item — skipped: <why> · at <sha8>` line leaves the arm
+# unarmed and says so, and any other line refuses naming it. Staged against KICK-dKeptSession-8's arm,
+# which parses the skipped line as malformed, the two skipped rows exit 2 and red.
+check_free_line "KICK-dKeptSession-43 AC1 echo x > f at a skipped item pointer admits with the unarmed line" item-skipped read-only-probes 'echo x > f' "exit 0" 'scratch-guard: actions.free unarmed — item pointer skipped: no loop kit position.py resolves in this tree'
+check_free_line "KICK-dKeptSession-43 AC2 git commit at a skipped item pointer admits with the unarmed line" item-skipped read-only-probes 'git commit -m x' "exit 0" 'scratch-guard: actions.free unarmed — item pointer skipped: no loop kit position.py resolves in this tree'
+check_free_line "KICK-dKeptSession-43 AC3 a malformed item pointer refuses, naming the line" item-malformed read-only-probes 'echo x > f' "exit 2" 'the actions.free arm threw' 'item pointer malformed: item — ???'
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
@@ -1901,8 +2019,12 @@ n=$((pass+fail))
 # its run_card row and its marker row), counted by hand under the same rule.
 # 401 = 400 + the every-host TOOL-dPlacedRequest-34 AC28 row, left out of the count until TOOL-dPlacedRequest-99 S7;
 # AC28's MSYS-fold row runs on a MINGW, MSYS or CYGWIN host alone, and its skip elsewhere keeps it out.
+# 430 = 401 + the 29 check_free_line rows KICK-dKeptSession-8 added (5 for AC1, 12 for AC2, 3 for AC3,
+# 3 for AC4, 4 for AC6 and 2 for AC7), counted by hand under the same rule.
+# 433 = 430 + the 3 check_free_line rows KICK-dKeptSession-43 added (1 each for AC1, AC2 and AC3),
+# counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=401
+FLOOR_ASSERTIONS=433
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

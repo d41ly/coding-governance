@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""selftest.py — the runlog kit's arms. gov:kit runlog@1.18
+"""selftest.py — the runlog kit's arms. gov:kit runlog@1.19
 
     python <this kit>/selftest.py
 
@@ -478,7 +478,71 @@ from collections import Counter  # noqa: E402
 # `unknown` pair line. The figures arm's mixed scenario now carries a two-block message and a
 # sidechain record, which move its pinned narration line and add no check.
 # 1 + 1 = 2
-ASSERTION_FLOOR = 1580
+# RAISED 1580 -> 1587 by KICK-dKeptSession-14, the context fill: ONE new arm with 4 checks —
+# `test_extract_context_fill`'s CLI share of the `context-fill` scenario's last main request, the
+# earlier request read through `until`, an agent file read alone printing `none`, and the liveness that
+# the whole tree's last usage is the agent's. Its decoy checks move it by 3.
+# 4 + 3 = 7
+# RAISED 1587 -> 1595 by KICK-dKeptSession-30, the derived window: ONE new arm with 5 checks —
+# `test_extract_context_window`'s 900000-token sibling read alone (AC1), the 150000-token turn beside
+# it (AC2), that read under CLAUDE_CODE_MAX_CONTEXT_TOKENS set to 500000 and to `x` (AC4), and the
+# turn read alone (AC3). Its decoy checks move it by 3.
+# 5 + 3 = 8
+# RAISED 1595 -> 1612 by KICK-dKeptSession-9, the orientation report: ONE new arm with 14 checks —
+# `test_extract_orient`'s row per file, the edit row's counts stopping at its edit, the no-edit row
+# counted to its end and the agent file's row (AC1); both stages under the default channels and under
+# `log`, and every row `none` with one NOTE under `micro-format` alone (AC2); the strict read, its one
+# WARN past p90 and the build stage's missing ceiling (AC3, AC6); standard's quiet report (AC4); the
+# owner's cap at 30 and its absence (AC5); and the empty dir's DEAD PROBE (AC6). Its decoy checks move
+# it by 3.
+# 14 + 3 = 17
+# RAISED 1612 -> 1618 by KICK-dKeptSession-45, the window's default root: ONE new arm with 3 checks —
+# `test_extract_context_window_root`'s read under a scratch CLAUDE_CONFIG_DIR beside an empty home
+# (AC1), the home's own projects read with that variable unset (liveness), and the bottom rung with a
+# `no root:` source when no root variable is set (AC3). Its decoy checks move it by 3.
+# 3 + 3 = 6
+# RAISED 1618 -> 1624 by KICK-dKeptSession-46, the caller's root: ONE new arm with 3 checks —
+# `test_extract_context_fill_root`'s orient row reading the window under its `--orient` dir (AC1),
+# `runlog.py context` reading the same transcript at the same share (AC2), and the fill raising with
+# neither window nor root (AC3). The context-fill liveness check now passes its case's root and adds
+# none. Its decoy checks move it by 3.
+# 3 + 3 = 6
+# RAISED 1624 -> 1629 by KICK-dKeptSession-47, the attributed compaction: ONE new arm with 2 checks —
+# `test_extract_context_window_compact`'s 150000-token turn beside another model's 900000-token
+# compaction reading 75% (AC1), and beside its own model's reading 15% (AC2). Its decoy checks move
+# it by 3.
+# 2 + 3 = 5
+# RAISED 1629 -> 1630 by KICK-dKeptSession-48, the mixed-window override: NO new arm, so no decoy
+# check moves, and one check lands in `test_extract_context_window` — the 150000-token turn beside its
+# 900000-token sibling read under CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000 at 75% with source env (AC1).
+# 1 + 0 = 1
+# RAISED 1630 -> 1632 by KICK-dKeptSession-44, the refused orient row: NO new arm, so no decoy check
+# moves, and two checks land in `test_extract_orient` — the owner-ceiling case under
+# `budgets.enforce = "refuse"` and with the cap in `budgets.pinned`, each refusing the 40-call row (AC9).
+# 2 + 0 = 2
+# RAISED 1632 -> 1643 by KICK-dKeptSession-62, the minors batch: TWO new arms with 2 checks each —
+# `test_extract_main_transcripts_inside`'s raw glob listing a linked transcript and
+# `derive_main_transcripts` omitting it (AC17), and `test_extract_env_reads`'s variables all aimed or
+# dropped and a planted read named (AC24) — and one check in `test_extract_context_window_compact`'s
+# loop, the main-file sidechain compaction left at 75% (AC10). Their decoy checks move it by 6.
+# 1 + 2 + 2 + 6 = 11
+# RAISED 1643 -> 1646 by KICK-dKeptSession-63, the minors batch: NO new arm, so no decoy check moves,
+# and three checks land in two arms — `test_extract_env_reads`' population from the import graph holding
+# extract and model, and its planted read in a copy of model.py named (AC14), its two checks before
+# graded over that population; and `test_extract_main_transcripts_inside`'s two measures counting the
+# linked session out (AC23), behind the arm's own link-or-skip branch as its AC17 checks are.
+# 2 + 1 + 0 = 3
+# RAISED 1646 -> 1651 by KICK-dKeptSession-64, the minors batch: ONE new arm with 2 checks —
+# `test_extract_env_dropped`'s child started under GOV_REMOTE and GOV_DEFAULT_BRANCH planted, whose run
+# of `main` resolves a remote-less repository to no remote and no refusal (AC10), and the same call with
+# `model` imported alone refusing naming GOV_REMOTE (liveness). Its decoy checks move it by 3.
+# 2 + 3 = 5
+# RAISED 1651 -> 1658 by KICK-dKeptSession-65, the minors batch: ONE new arm with 4 checks —
+# `test_gov_remote_scrub`'s scrub statements of `main` naming both variables in a no-raise form, run
+# alone in a child with neither set and in one with both planted (AC4), and a bare-`del` copy graded
+# raising (liveness). Its decoy checks move it by 3.
+# 4 + 3 = 7
+ASSERTION_FLOOR = 1658
 
 PASS = []
 FAIL = []
@@ -1655,6 +1719,22 @@ def build_projects(prefix):
     return base, projects
 
 
+def build_dir_link(target, link):
+    """A directory link at `link` naming `target`: a symlink, else a junction where a symlink needs a
+    privilege this node lacks. -> `symlink`, `junction`, or '' where the node makes neither, which its
+    caller announces as a skip."""
+    try:
+        os.symlink(target, link, target_is_directory=True)
+        return "symlink"
+    except (OSError, NotImplementedError):
+        try:
+            import _winapi
+            _winapi.CreateJunction(str(target), str(link))
+            return "junction"
+        except (ImportError, OSError, AttributeError):
+            return ""
+
+
 def build_arm_env(base):
     """The CLI's environment for one arm: EVERY root it resolves aimed under the arm's own scratch."""
     env = dict(os.environ)
@@ -1824,18 +1904,7 @@ def test_extract_ac1_session_ids():
     # nodes lack, so a junction is the fallback, and a node offering neither says so.
     outside = base / "outside"
     sid_e = build_scenario(outside, "order", project="linked-target")
-    link = projects / "linked"
-    made_link = ""
-    try:
-        os.symlink(outside / "linked-target", link, target_is_directory=True)
-        made_link = "symlink"
-    except (OSError, NotImplementedError):
-        try:
-            import _winapi
-            _winapi.CreateJunction(str(outside / "linked-target"), str(link))
-            made_link = "junction"
-        except (ImportError, OSError, AttributeError):
-            made_link = ""
+    made_link = build_dir_link(outside / "linked-target", projects / "linked")
     if not made_link:
         print("  skip extract AC1 containment: this node can make neither a symlink nor a junction, "
               "so the escape arm is UNEXERCISED here")
@@ -2160,6 +2229,559 @@ def test_extract_ready():
     got = rx.measure_ready_tree(none)
     check("extract ready liveness: with the witness removed and only the placeholder line, ready=0",
           (got["sessions"], got["ready"]), (1, 0))
+
+
+def test_extract_context_fill():
+    """KICK-dKeptSession-14 AC1: the fill is the main file's last main usage over the 200000 rung the
+    case's root derives, never an earlier turn's and never a subagent's, though the agent's request is
+    the session's last."""
+    base, projects = build_projects("runlog-fill-")
+    sid = build_scenario(projects, "context-fill")
+    main = projects / FIXTURE_PROJECT / f"{sid}.jsonl"
+    r = run_runlog(["context", str(main)], base, build_arm_env(base))
+    check("extract context-fill AC1: runlog.py context prints 60%, the last main request's 120000 of 200000",
+          (r.returncode, r.stdout.strip()), (0, "60%"))
+    t_mid = rx.parse_time("2026-09-13T10:00:10Z")
+    check("extract context-fill: with `until` before the compaction the earlier request's 180000 reads 0.9",
+          rx.measure_context_fill(main, until=t_mid)[0], 0.9)
+    agent = next((projects / FIXTURE_PROJECT / sid / "subagents").glob("agent-*.jsonl"))
+    r = run_runlog(["context", str(agent)], base, build_arm_env(base))
+    check("extract context-fill: an agent file read as a transcript holds no main usage, so prints none",
+          (r.returncode, r.stdout.strip()), (0, "none"))
+    usage = [e for e in rx.extract_session(rx.resolve_session_tree(sid, projects))["events"]
+             if e["kind"] == "usage"]
+    check("extract context-fill liveness: the whole tree's last usage is the agent's 190000, 0.95, the "
+          "decoy the share must not read",
+          (usage[-1]["src"], rx.derive_context_fill(usage[-1], root=projects)) if usage else None,
+          ("agent", 0.95))
+
+
+def test_extract_context_window():
+    """KICK-dKeptSession-30 AC1 to AC4 and KICK-dKeptSession-48 AC1: the window is derived per model
+    from what the transcripts under the read transcript's own projects root observed, rounded up to a
+    rung, and the harness's CLAUDE_CODE_MAX_CONTEXT_TOKENS wins where it is a positive integer, so a
+    200k session on a root that observed the model past 200000 reads its own window only under that
+    variable at 200000. `main` drops that variable before any arm, so each read here sets it in its
+    own child's environment or not at all."""
+    base, alone = build_projects("runlog-window-sibling-")
+    sid = build_scenario(alone, "context-window-sibling")
+    r = run_runlog(["context", str(alone / FIXTURE_PROJECT / f"{sid}.jsonl")], base, build_arm_env(base))
+    check("extract context-window AC1: a 900000-token main turn alone reads 90% of the 1000000 rung",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()),
+          (0, "90%", "context: window 1000000 · observed 900000 on fixture-model"))
+    base, both = build_projects("runlog-window-both-")
+    sid = build_scenario(both, "context-window")
+    build_scenario(both, "context-window-sibling")
+    main = both / FIXTURE_PROJECT / f"{sid}.jsonl"
+    r = run_runlog(["context", str(main)], base, build_arm_env(base))
+    check("extract context-window AC2: a 150000-token turn beside its sibling's 900000 reads 15%",
+          (r.returncode, r.stdout.strip()), (0, "15%"))
+    env = build_arm_env(base)
+    env["CLAUDE_CODE_MAX_CONTEXT_TOKENS"] = "500000"
+    r = run_runlog(["context", str(main)], base, env)
+    check("extract context-window AC4: CLAUDE_CODE_MAX_CONTEXT_TOKENS=500000 reads 30% with source env",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()), (0, "30%", "context: window 500000 · env"))
+    env = build_arm_env(base)
+    env["CLAUDE_CODE_MAX_CONTEXT_TOKENS"] = "200000"
+    r = run_runlog(["context", str(main)], base, env)
+    check("extract context-window KICK-dKeptSession-48 AC1: a 200k session beside a 1M sibling reads its "
+          "own window, 75%, under CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()), (0, "75%", "context: window 200000 · env"))
+    # KICK-dKeptSession-56 AC12: the same turn on a first-party `claude-` model, whose window the harness
+    # never takes from the variable, reads the owner's figure with its source marked advisory; the
+    # fixture-model read above is the other model's, plain `env`
+    first = both / FIXTURE_PROJECT / f"{uuid.uuid4()}.jsonl"
+    write_transcript_lines(first, json.loads(json.dumps(TRANSCRIPTS["scenarios"]["context-window"]["main"])
+                                             .replace('"fixture-model"', '"claude-fixture-model"')))
+    r = run_runlog(["context", str(first)], base, env)
+    check("extract context-window KICK-dKeptSession-56 AC12: a claude- model's turn under "
+          "CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000 reads 75% with source env, advisory",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()), (0, "75%", "context: window 200000 · env, advisory"))
+    env["CLAUDE_CODE_MAX_CONTEXT_TOKENS"] = "x"
+    r = run_runlog(["context", str(main)], base, env)
+    check("extract context-window AC4: a malformed CLAUDE_CODE_MAX_CONTEXT_TOKENS is ignored, so AC2's 15%",
+          (r.returncode, r.stdout.strip()), (0, "15%"))
+    base, small = build_projects("runlog-window-alone-")
+    sid = build_scenario(small, "context-window")
+    r = run_runlog(["context", str(small / FIXTURE_PROJECT / f"{sid}.jsonl")], base, build_arm_env(base))
+    check("extract context-window AC3: the 150000-token turn alone reads 75% of the 200000 rung it observed",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()),
+          (0, "75%", "context: window 200000 · observed 150000 on fixture-model"))
+
+
+def test_extract_context_window_compact():
+    """KICK-dKeptSession-47 AC1 and AC2: a compaction joins a model's observation only when the newest
+    main usage before it in its transcript is on that model, so another model's 900000-token compaction
+    leaves the 150000-token turn on the 200000 rung, and the model's own lifts it to the 1000000 rung.
+    KICK-dKeptSession-62 AC10: the same compaction on an `isSidechain` record of the main file, read as
+    `agent`, joins no model, so the turn stays at 75%."""
+    for name, want in (("context-window-compact-other",
+                        ("AC1: another model's 900000 compaction leaves the 150000-token turn at 75%",
+                         (0, "75%", "context: window 200000 · observed 150000 on fixture-model"))),
+                       ("context-window-compact-own",
+                        ("AC2: the model's own 900000 compaction lifts the 150000-token turn to 15%",
+                         (0, "15%", "context: window 1000000 · observed 900000 on fixture-model"))),
+                       ("context-window-compact-sidechain",
+                        ("KICK-dKeptSession-62 AC10: a 900000 compaction on a main-file sidechain record "
+                         "leaves the 150000-token turn at 75%",
+                         (0, "75%", "context: window 200000 · observed 150000 on fixture-model")))):
+        base, projects = build_projects("runlog-window-compact-")
+        sid = build_scenario(projects, "context-window")
+        build_scenario(projects, name)
+        r = run_runlog(["context", str(projects / FIXTURE_PROJECT / f"{sid}.jsonl")], base,
+                       build_arm_env(base))
+        check(f"extract context-window compact {want[0]}",
+              (r.returncode, r.stdout.strip(), r.stderr.strip()), want[1])
+
+
+def test_extract_context_window_root():
+    """KICK-dKeptSession-45 AC1 and AC3: with no root given, the window scans the projects root
+    `resolve_projects_root` resolves, so a node's CLAUDE_CONFIG_DIR is read before the profile's home,
+    and with no root resolving it reads the bottom rung with a `no root:` source instead of raising.
+    Each read is a child `python -c` in the kit, so the environment it is given is the one it reads."""
+    base, cfg_projects = build_projects("runlog-window-root-")
+    build_scenario(cfg_projects, "context-window-sibling")
+    empty = base / "empty"
+    empty.mkdir()
+    home = base / "home"
+    build_scenario(home / ".claude" / "projects", "context-window-sibling")
+    probe = "import extract; print(repr(extract.derive_context_window('fixture-model')))"
+
+    def run_window(env):
+        r = subprocess.run([sys.executable, "-c", probe], cwd=str(HERE), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        EMITTED.extend((r.stdout, r.stderr))
+        try:
+            return r.returncode, ast.literal_eval(r.stdout.strip())
+        except (ValueError, SyntaxError):
+            return r.returncode, r.stdout.strip() + r.stderr.strip()[-200:]
+
+    env = build_arm_env(base)
+    env.update(CLAUDE_CONFIG_DIR=str(base), HOME=str(empty), USERPROFILE=str(empty))
+    check("extract context-window root AC1: CLAUDE_CONFIG_DIR's projects are scanned before the empty "
+          "home's, so the sibling's 900000 reads the 1000000 rung",
+          run_window(env), (0, (1000000, "observed 900000 on fixture-model")))
+    env = build_arm_env(base)
+    env.pop("CLAUDE_CONFIG_DIR")
+    env.update(HOME=str(home), USERPROFILE=str(home))
+    check("extract context-window root liveness: with CLAUDE_CONFIG_DIR unset the home's .claude/projects "
+          "is scanned, so the same observation reads", run_window(env),
+          (0, (1000000, "observed 900000 on fixture-model")))
+    env = build_arm_env(base)
+    for var in ("CLAUDE_CONFIG_DIR", "HOME", "USERPROFILE"):
+        env.pop(var)
+    rc, got = run_window(env)
+    check("extract context-window root AC3: with no root resolving the bottom rung reads with a `no root:` "
+          "source and the read exits 0",
+          (rc, got[0] if isinstance(got, tuple) else got,
+           isinstance(got, tuple) and got[1].startswith("no root: runlog: no transcripts root resolves")),
+          (0, 200000, True))
+
+
+def test_extract_main_transcripts_inside():
+    """KICK-dKeptSession-62 AC17: `derive_main_transcripts`, the one population the window scan and
+    `scan_preflights` read, omits a transcript under a project directory linked from outside the root,
+    so the window reads the root's own 150000-token turn and never the linked 900000. The raw glob
+    listing the linked transcript is the liveness that the link was made and is walked. Both measures
+    read the same population, so each counts the linked session out too (KICK-dKeptSession-63 AC23)."""
+    base, projects = build_projects("runlog-inside-")
+    sid = build_scenario(projects, "context-window")
+    outside = base / "outside"
+    far = build_scenario(outside, "context-window-sibling", project="linked-target")
+    made_link = build_dir_link(outside / "linked-target", projects / "linked")
+    if not made_link:
+        print("  skip extract KICK-dKeptSession-62 AC17: this node can make neither a symlink nor a junction, "
+              "so the linked-transcript arm is UNEXERCISED here")
+        return
+    check(f"extract KICK-dKeptSession-62 AC17 liveness: the raw glob lists the {made_link}ed transcript beside "
+          "the root's own", sorted(p.name[:-len(".jsonl")] for p in projects.glob("*/*.jsonl")), sorted([sid, far]))
+    check(f"extract KICK-dKeptSession-62 AC17: derive_main_transcripts omits the {made_link}ed transcript, so "
+          "the window reads the root's own 150000-token turn",
+          ([p.name[:-len(".jsonl")] for p in rx.derive_main_transcripts(projects)],
+           rx.derive_context_window("fixture-model", root=projects)),
+          ([sid], (200000, "observed 150000 on fixture-model")))
+    check(f"extract KICK-dKeptSession-63 AC23: measure_tree and measure_ready_tree each count the {made_link}ed "
+          "session out, scanning the root's own session alone",
+          (rx.measure_tree(projects)["sessions"], rx.measure_ready_tree(projects)["sessions"]), (1, 1))
+
+
+# A variable read by name: `env.get("X")`, `env["X"]`, `os.environ.get("X")`, `os.environ["X"]` or
+# `os.getenv("X")`, the forms the extractor reads its roots and its window variable through.
+ENV_READ_RE = re.compile(r"""(?:\benv|\bos\.environ)(?:\.get\(|\[)\s*["']([A-Za-z_][A-Za-z0-9_]*)["']"""
+                         r"""|\bos\.getenv\(\s*["']([A-Za-z_][A-Za-z0-9_]*)["']""")
+
+
+def read_env_reads(text):
+    """Every variable name `text` reads by a literal name through ENV_READ_RE's forms, sorted."""
+    return sorted({a or b for a, b in ENV_READ_RE.findall(text)})
+
+
+def read_arm_guarded():
+    """The names no arm inherits from the machine, read off this suite's own source by `ast`: each
+    DECOY_VARS root, each `env["<name>"]` `build_arm_env` sets, and each `os.environ.pop("<name>", ...)`
+    `main` makes before the `try` its arms run in."""
+    tree = ast.parse(HERE.joinpath("selftest.py").read_text(encoding="utf-8"))
+    funcs = {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
+    names = {var for var, _sub in DECOY_VARS}
+    for node in ast.walk(funcs["build_arm_env"]):
+        if isinstance(node, ast.Assign):
+            names.update(t.slice.value for t in node.targets if isinstance(t, ast.Subscript)
+                         and isinstance(t.slice, ast.Constant) and isinstance(t.slice.value, str))
+    for stmt in funcs["main"].body:
+        if isinstance(stmt, ast.Try):
+            break
+        names.update(node.args[0].value for node in ast.walk(stmt)
+                     if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                     and node.func.attr == "pop" and ast.unparse(node.func.value) == "os.environ"
+                     and node.args and isinstance(node.args[0], ast.Constant))
+    return names
+
+
+def derive_kit_imports():
+    """The kit's own modules the CLI or this suite imports, by name, sorted (KICK-dKeptSession-63 S14):
+    every `import x` or `from x import ...`, at any depth of `runlog.py` or `selftest.py` read by `ast`,
+    whose `x.py` sits in this kit's directory, the two roots themselves left out. The population
+    `test_extract_env_reads` reads, so a module a case reaches is graded without being listed."""
+    roots = ("runlog", "selftest")
+    names = set()
+    for root in roots:
+        for node in ast.walk(ast.parse(HERE.joinpath(root + ".py").read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Import):
+                names.update(a.name.split(".")[0] for a in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
+                names.add(node.module.split(".")[0])
+    return sorted(n for n in names if n not in roots and HERE.joinpath(n + ".py").is_file())
+
+
+def test_extract_env_reads():
+    """KICK-dKeptSession-62 AC24, the class of KICK-dKeptSession-30's popped window variable, over the
+    population `derive_kit_imports` derives from the import graph (KICK-dKeptSession-63 S14): every
+    variable each of those modules reads by name is a DECOY_VARS root, set by `build_arm_env` or popped
+    by `main` before any arm runs, so no case reads it from the machine. The population holds
+    `extract` and `model` at the least, its liveness; the same reader over a copy of `extract.py`
+    adding `env.get("RUNLOG_PLANTED")`, and of `model.py` adding `os.environ.get("RUNLOG_PLANTED")`,
+    names that variable."""
+    guarded = read_arm_guarded()
+    population = derive_kit_imports()
+    check("extract KICK-dKeptSession-63 AC14: the import graph's population holds extract and model",
+          {"extract", "model"} <= set(population), True)
+    loose = {m: [v for v in read_env_reads((HERE / f"{m}.py").read_text(encoding="utf-8")) if v not in guarded]
+             for m in population}
+    check("extract KICK-dKeptSession-62 AC24 KICK-dKeptSession-63 S14: every variable each imported kit module "
+          "reads by name is aimed or dropped before any arm runs, extract.py over at least the decoy roots",
+          (len(read_env_reads((HERE / "extract.py").read_text(encoding="utf-8"))) >= len(DECOY_VARS),
+           {m: v for m, v in loose.items() if v}), (True, {}))
+    for mod, line in (("extract", '\n_PLANTED = env.get("RUNLOG_PLANTED")\n'),
+                      ("model", '\n_PLANTED = os.environ.get("RUNLOG_PLANTED")\n')):
+        planted = (HERE / f"{mod}.py").read_text(encoding="utf-8") + line
+        check(f"extract KICK-dKeptSession-62 AC24 KICK-dKeptSession-63 AC14: a copy of {mod}.py adding a read of "
+              "RUNLOG_PLANTED reds naming that variable",
+              [v for v in read_env_reads(planted) if v not in guarded], ["RUNLOG_PLANTED"])
+
+
+def test_extract_env_dropped():
+    """KICK-dKeptSession-64 S10, AC10: `main` drops `GOV_REMOTE` and `GOV_DEFAULT_BRANCH` ahead of its
+    arm loop, so an in-process `rl_model.resolve_remote` never reads the machine's choice. A child
+    process started under both planted runs this module's own `main` over one injected arm, which
+    resolves a remote-less scratch repository in-process: no remote, no branch, no refusal. The
+    liveness: the same call in a child importing `model` alone, the plant in place, refuses naming
+    GOV_REMOTE. WHAT THIS DOES NOT CHECK: a variable `main` never names, which the import-graph arm
+    above reads."""
+    base = pathlib.Path(tempfile.mkdtemp(prefix="runlog-envdrop-"))
+    SCRATCH.append(base)
+    repo = base / "repo"
+    repo.mkdir()
+    run_git(["init", "-q"], repo)
+    env = dict(os.environ, GOV_REMOTE="planted", GOV_DEFAULT_BRANCH="planted", PYTHONIOENCODING="utf-8")
+    via_main = ("import importlib.util, sys\n"
+                "spec = importlib.util.spec_from_file_location('runlog_selftest_child', sys.argv[1])\n"
+                "m = importlib.util.module_from_spec(spec)\n"
+                "spec.loader.exec_module(m)\n"
+                "for k in [k for k in vars(m) if k.startswith('test_')]:\n"
+                "    delattr(m, k)\n"
+                "m.test_planted = lambda: print('RESOLVED %r' % (m.rl_model.resolve_remote(sys.argv[2]),))\n"
+                "m.ASSERTION_FLOOR = 0\n"
+                "sys.exit(m.main())\n")
+    alone = ("import sys\n"
+             "sys.path.insert(0, sys.argv[1])\n"
+             "import model\n"
+             "print('RESOLVED %r' % (model.resolve_remote(sys.argv[2]),))\n")
+    got = {}
+    for name, code, target in (("main", via_main, HERE / "selftest.py"), ("alone", alone, HERE)):
+        r = subprocess.run([sys.executable, "-c", code, str(target), str(repo)], cwd=str(base),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
+        got[name] = (r.returncode, [ln for ln in r.stdout.splitlines() if ln.startswith("RESOLVED ")])
+    check("extract KICK-dKeptSession-64 AC10: a child started under GOV_REMOTE and GOV_DEFAULT_BRANCH planted "
+          "runs main, whose arm resolves a remote-less repository to no remote, no branch and no refusal",
+          got["main"], (0, ["RESOLVED ('', '', '', '')"]))
+    check("extract KICK-dKeptSession-64 AC10 liveness: model imported alone under the same plant refuses "
+          "naming GOV_REMOTE",
+          [ln.startswith("RESOLVED ('', '', '', 'GOV_REMOTE names planted,") for ln in got["alone"][1]], [True])
+
+
+#: The two variables `main` scrubs ahead of its `try` for `rl_model.resolve_remote` (KICK-dKeptSession-63 S14).
+GOV_SCRUB_VARS = ("GOV_REMOTE", "GOV_DEFAULT_BRANCH")
+
+
+def read_main_scrub(text):
+    """The statements of `main`'s body ahead of its `try` that hold a GOV_SCRUB_VARS name, read off
+    `text` by `ast` (KICK-dKeptSession-65 S14, S15), as `(source, names, no_raise)` triples. No-raise is
+    one of the two forms S14 admits: an `os.environ.pop(<name>, None)` call, or a lone
+    `del os.environ[<name>]` under an `if <name> in os.environ` guard with no `else`."""
+    tree = ast.parse(text)
+    main = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main")
+    out = []
+    for stmt in main.body:
+        if isinstance(stmt, ast.Try):
+            break
+        names = sorted({n.value for n in ast.walk(stmt) if isinstance(n, ast.Constant) and n.value in GOV_SCRUB_VARS})
+        if not names:
+            continue
+        call = stmt.value if isinstance(stmt, ast.Expr) else None
+        popped = (isinstance(call, ast.Call) and ast.unparse(call.func) == "os.environ.pop" and len(call.args) == 2
+                  and isinstance(call.args[1], ast.Constant) and call.args[1].value is None)
+        guarded = (len(names) == 1 and isinstance(stmt, ast.If) and not stmt.orelse
+                   and ast.unparse(stmt.test) == "%r in os.environ" % names[0]
+                   and [ast.unparse(s) for s in stmt.body] == ["del os.environ[%r]" % names[0]])
+        out.append((ast.unparse(stmt), names, popped or guarded))
+    return out
+
+
+def test_gov_remote_scrub():
+    """KICK-dKeptSession-65 S5, AC4: `main`'s statements ahead of its `try` that name GOV_REMOTE or
+    GOV_DEFAULT_BRANCH name both, each in a form that cannot raise, and compiled alone after `import os`
+    they raise nothing in a child started with neither variable set and leave neither set in a child
+    started with both planted. The liveness: the same reader over a copy of this file whose GOV_REMOTE
+    pop is a bare `del` grades that statement raising, and its child with neither set exits on KeyError.
+    One fact per arm: `test_extract_env_dropped` reads what `main`'s arms resolve under the plant; this
+    arm reads the scrub statements themselves. WHAT THIS DOES NOT CHECK: a scrub placed after the `try`."""
+    text = HERE.joinpath("selftest.py").read_text(encoding="utf-8")
+    bare = text.replace('os.environ.pop("GOV_REMOTE", None)', 'del os.environ["GOV_REMOTE"]')
+    scrub = read_main_scrub(text)
+    staged = read_main_scrub(bare)
+    tail = "\nprint(sorted(k for k in %r if k in os.environ))\n" % (GOV_SCRUB_VARS,)
+    clean = {k: v for k, v in os.environ.items() if k not in GOV_SCRUB_VARS}
+    clean["PYTHONIOENCODING"] = "utf-8"
+    got = {}
+    for name, rows, env in (("unset", scrub, clean),
+                            ("planted", scrub, dict(clean, GOV_REMOTE="planted", GOV_DEFAULT_BRANCH="planted")),
+                            ("bare", staged, clean)):
+        code = "import os\n" + "\n".join(src for src, _names, _ok in rows) + tail
+        r = subprocess.run([sys.executable, "-I", "-c", code], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        got[name] = (r.returncode, r.stdout.strip(), "KeyError" in r.stderr)
+    check("scrub KICK-dKeptSession-65 AC4: main's statements ahead of its try naming GOV_REMOTE or "
+          "GOV_DEFAULT_BRANCH name both, each an os.environ.pop(<name>, None) or a guarded del",
+          (sorted({n for _src, names, _ok in scrub for n in names}), all(ok for _src, _names, ok in scrub)),
+          (sorted(GOV_SCRUB_VARS), True))
+    check("scrub KICK-dKeptSession-65 AC4: compiled alone in a child with neither variable set, they raise nothing",
+          got["unset"], (0, "[]", False))
+    check("scrub KICK-dKeptSession-65 AC4: compiled alone in a child with both planted, they leave neither set",
+          got["planted"], (0, "[]", False))
+    check("scrub KICK-dKeptSession-65 AC4 liveness: a copy whose GOV_REMOTE pop is a bare del grades it raising, "
+          "and its child with neither set exits on KeyError",
+          ([ok for _src, names, ok in staged if names == ["GOV_REMOTE"]], got["bare"][0] != 0, got["bare"][2]),
+          ([False], True, True))
+
+
+# KICK-dKeptSession-9: the orientation report's fixture. Each design session starts between the two
+# transitions and each build session after the second, so the stage is read off the commit dates.
+ORIENT_SLUG = "fx"
+ORIENT_MOVES = (("2026-09-01T00:00:00Z", "planning", "designing"), ("2026-09-20T00:00:00Z", "designing", "building"))
+ORIENT_DESIGN_START = "2026-09-13T10:00:00Z"
+ORIENT_BUILD_START = "2026-09-25T10:00:00Z"
+
+
+def build_orient_transcript(projects, start, calls, action=True, after=2, agent_calls=None):
+    """One planted session of ORIENT_SLUG under `projects`, its first record at the epoch `start`: the
+    driver's preflight, `calls` - 1 reads, one Edit where `action`, then `after` more reads. Every
+    tool call is one request of 60011 tokens whose context is 60010. With `agent_calls`, one agent file
+    of that many sidechain reads and no edit sits beside it. Its session id comes back."""
+    sid = str(uuid.uuid4())
+
+    def render_stamp(i):
+        return time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime(start + i))
+
+    def render_call(i, name, args, side=False):
+        return {"type": "assistant", "uuid": f"{sid[:8]}-{'s' if side else 'a'}{i}", "timestamp": render_stamp(i),
+                "isSidechain": side, "requestId": f"req-{sid[:8]}-{'s' if side else 'a'}{i}",
+                "message": {"id": f"msg-{sid[:8]}-{i}", "role": "assistant", "model": "fixture-model",
+                            "content": [{"type": "tool_use", "id": f"toolu_{sid[:8]}_{i}", "name": name,
+                                         "input": args}],
+                            "usage": {"input_tokens": 10, "output_tokens": 1, "cache_read_input_tokens": 60000,
+                                      "cache_creation_input_tokens": 0}}}
+    read = ("Read", {"file_path": "notes.txt"})
+    calls_made = ([("Bash", {"command": f"bash unattended.sh --preflight {ORIENT_SLUG}"})] + [read] * (calls - 1)
+                  + ([("Edit", {"file_path": "notes.txt", "old_string": "a", "new_string": "b"})] if action else [])
+                  + [read] * after)
+    records = [{"type": "user", "uuid": f"{sid[:8]}-u0", "timestamp": render_stamp(0),
+                "message": {"role": "user", "content": "Start the fixture work."}, "origin": {"kind": "human"}}]
+    records += [render_call(i, name, args) for i, (name, args) in enumerate(calls_made, 1)]
+    home = pathlib.Path(projects) / FIXTURE_PROJECT
+    write_transcript_lines(home / f"{sid}.jsonl", records)
+    if agent_calls:
+        write_transcript_lines(home / sid / "subagents" / "agent-orient.jsonl",
+                               [render_call(100 + i, *read, side=True) for i in range(agent_calls)])
+    return sid
+
+
+def build_orient_repo(base):
+    """A repository on `main` with no remote, holding ORIENT_SLUG's two moves on both stored channels:
+    each commit, dated as ORIENT_MOVES says, adds the move's transition record and carries its
+    `Gov-Transition` trailer. -> (repo, the function committing a policy file)."""
+    repo = base / "repo"
+    hooks = base / "nohooks"
+    for d in (repo, hooks):
+        d.mkdir()
+    ident = ["-c", "user.name=runlog selftest", "-c", "user.email=selftest@runlog.invalid",
+             "-c", "commit.gpgsign=false", "-c", "core.hooksPath=" + hooks.as_posix()]
+    run_git(["init", "-q"], repo)
+    run_git(["symbolic-ref", "HEAD", "refs/heads/main"], repo)
+
+    def write_commit(message, date=None):
+        env = {**os.environ, **({"GIT_AUTHOR_DATE": date, "GIT_COMMITTER_DATE": date} if date else {})}
+        run_git(["add", "-A"], repo)
+        subprocess.run(["git", *ident, "commit", "-q", "--allow-empty", "-m", message], cwd=str(repo),
+                       capture_output=True, env=env)
+    folder = repo / "memory" / "builds" / ORIENT_SLUG / "build"
+    folder.mkdir(parents=True)
+    for n, (date, frm, to) in enumerate(ORIENT_MOVES, 1):
+        (folder / f"{date[:10]}-build-KICK-{ORIENT_SLUG}-1-transition-{n}.md").write_bytes(
+            (f"# KICK-{ORIENT_SLUG}-1 transition {n} — {frm} -> {to}\n\n**Serves:** transition KICK-{ORIENT_SLUG}-1\n\n"
+             f"- **Build:** {ORIENT_SLUG}\n- **From:** {frm}\n- **To:** {to}\n").encode("utf-8"))
+        write_commit(f"loop transition({ORIENT_SLUG}): {frm} -> {to}\n\nGov-Transition: {frm} -> {to} · "
+                     f"build={ORIENT_SLUG} · item=item.plan.exit · sha=0123abcd", date)
+
+    def write_policy(text):
+        (repo / ".governance").mkdir(exist_ok=True)
+        (repo / ".governance" / "policy.toml").write_bytes(text.encode("utf-8"))
+        write_commit("the case's policy file")
+    return repo, write_policy
+
+
+def test_extract_orient():
+    """KICK-dKeptSession-9 AC1 to AC6: `extract --orient` over 29 planted sessions of one build, 23 of
+    them between its move into designing and its move into building and 6 after: 21 design sessions
+    of 3 calls before their edit, one of 40, one with no edit and an agent file, and 6 build sessions
+    of 3 calls. Each run commits its policy file first, since the policy reader reads the landed
+    revision and never the working tree."""
+    base, projects = build_projects("runlog-orient-")
+    design = rx.parse_time(ORIENT_DESIGN_START)
+    sids = [build_orient_transcript(projects, design + 600 * k, 3) for k in range(21)]
+    heavy = build_orient_transcript(projects, design + 600 * 21, 40)
+    idle = build_orient_transcript(projects, design + 600 * 22, 3, action=False, agent_calls=1)
+    built = [build_orient_transcript(projects, rx.parse_time(ORIENT_BUILD_START) + 600 * k, 3) for k in range(6)]
+    repo, write_policy = build_orient_repo(base)
+    argv = ["extract", "--orient", str(projects), "--slug", ORIENT_SLUG, "--repo", str(repo)]
+
+    def run_orient(policy):
+        write_policy(policy)
+        r = run_runlog(argv, base, build_arm_env(base))
+        lines = r.stdout.splitlines()
+        rows = {(m["sid"], m["source"]): m for m in (dict(kv.split("=", 1) for kv in ln.split()[3:] if "=" in kv)
+                                                      for ln in lines if ln.startswith("runlog: orient row "))}
+        return r, lines, rows
+    r, lines, rows = run_orient('preset = "strict"\n')
+    check("orient AC1: one row per session file, 29 main files and the one agent file",
+          (r.returncode, len(rows), sorted({src for _sid, src in rows})), (0, 30, ["agent-orient", "main"]))
+    check("orient AC1: a 3-call session's row stops at its edit: calls, tokens and context before it",
+          {k: rows.get((sids[0], "main"), {}).get(k) for k in ("action", "calls", "tokens", "context")},
+          {"action": "edit", "calls": "3", "tokens": "180033", "context": "30%"})
+    check("orient AC1: the session with no edit reads action=none, its calls counted to the file's end",
+          {k: rows.get((idle, "main"), {}).get(k) for k in ("action", "calls")}, {"action": "none", "calls": "5"})
+    check("orient AC1: the agent file is its own row, its source the file's stem",
+          {k: rows.get((idle, "agent-orient"), {}).get(k) for k in ("action", "calls", "stage")},
+          {"action": "none", "calls": "1", "stage": "step.design"})
+    check("orient AC2: under the default channels the earlier row reads step.design and the later step.build",
+          (rows.get((sids[0], "main"), {}).get("stage"), rows.get((built[0], "main"), {}).get("stage")),
+          ("step.design", "step.build"))
+    check("orient AC3: a strict-named policy file reads warn-at-evidence-ceiling from presets.toml",
+          sum("orient.budget=warn-at-evidence-ceiling" in ln for ln in lines if ln.startswith("runlog: orient (")), 1)
+    check("orient AC3: the 22 design rows derive p90 3, and only the 40-call row warns past it",
+          ([ln.split(" calls ", 1)[1] for ln in lines if ln.startswith("runlog: orient WARN")],
+           [ln.split("sid=")[1].split()[0] for ln in lines if ln.startswith("runlog: orient WARN")],
+           any(ln.startswith("runlog: orient stage step.design n=22 ") and ln.endswith(" ceiling p90=3")
+               for ln in lines)),
+          (["40 past the evidence ceiling 3 (p90 of n=22)"], [heavy], True))
+    check("orient AC6: the 6 build rows derive no ceiling, and say so",
+          "runlog: orient — no ceiling · step.build · n=6 under 20" in lines, True)
+    r, lines, rows = run_orient('preset = "strict"\n[transitions]\nrecord = ["log"]\n')
+    check("orient AC2: with transitions.record = [\"log\"] the records give the same two stages",
+          (rows.get((sids[0], "main"), {}).get("stage"), rows.get((built[0], "main"), {}).get("stage")),
+          ("step.design", "step.build"))
+    r, lines, rows = run_orient('[transitions]\nrecord = ["micro-format"]\n')
+    check("orient AC2 liveness: with nothing stored every row reads none, under one NOTE naming the key",
+          ({row.get("stage") for row in rows.values()},
+           sum(ln.startswith("runlog: orient NOTE transitions.record") for ln in lines)), ({"none"}, 1))
+    r, lines, rows = run_orient('preset = "standard"\n')
+    check("orient AC4: a standard-named file reads record-only: every row, no WARN, exit 0",
+          (r.returncode, len(rows), sum("orient.budget=record-only" in ln for ln in lines),
+           sum(ln.startswith("runlog: orient WARN") for ln in lines)), (0, 30, 1, 0))
+    r, lines, rows = run_orient('[orient]\nbudget = "owner-ceiling"\n\n[budgets]\n"orient-calls" = 30\n')
+    check("orient AC5: owner-ceiling at 30 warns on the 40-call row alone, the budgets kit's line after it",
+          (r.returncode, [ln.split("sid=")[1] for ln in lines if ln.startswith("runlog: orient WARN")],
+           sum(ln.startswith("BUDGET WARN — orient-calls") for ln in lines)),
+          (0, [f"{heavy} source=main stage=step.design calls 40 past the owner ceiling 30"], 1))
+    # KICK-dKeptSession-44 S11: the same case under `budgets.enforce = "refuse"`, then with the cap in
+    # `budgets.pinned`, each refusing the 40-call row alone and exiting 1.
+    for label, budgets in (("orient-refuse", 'enforce = "refuse"\n'), ("orient-pinned", 'pinned = ["orient-calls"]\n')):
+        r, lines, rows = run_orient('[orient]\nbudget = "owner-ceiling"\n\n[budgets]\n' + budgets + '"orient-calls" = 30\n')
+        check(f"orient AC5 {label}: owner-ceiling at 30 refuses the 40-call row alone, exit 1",
+              (r.returncode, [ln.split("sid=")[1] for ln in lines if ln.startswith("runlog: orient REFUSED")]),
+              (1, [f"{heavy} source=main stage=step.design calls 40 past the owner ceiling 30"]))
+    r, lines, rows = run_orient('[orient]\nbudget = "owner-ceiling"\n')
+    check("orient AC5: owner-ceiling with no budgets.orient-calls prints one NOTE naming it and no WARN",
+          (r.returncode, sum(ln.startswith("runlog: orient NOTE budgets.orient-calls") for ln in lines),
+           sum("WARN" in ln for ln in lines)), (0, 1, 0))
+    _base, empty = build_projects("runlog-orient-empty-")
+    r = run_runlog(["extract", "--orient", str(empty), "--slug", ORIENT_SLUG, "--repo", str(repo)], base,
+                   build_arm_env(base))
+    check("orient AC6: a projects dir holding no session of the slug is a DEAD PROBE, exit 2",
+          (r.returncode, r.stdout.startswith("runlog: orient DEAD PROBE")), (2, True))
+
+
+def test_extract_context_fill_root():
+    """KICK-dKeptSession-46 AC1 to AC3: one main transcript under an `--orient` dir runs the preflight,
+    then the `context-window-sibling` 900000-token main request, then an Edit in a record carrying no
+    usage. Its orient row and `runlog.py context` both derive the window under that dir, the 1000000
+    rung, so both read 90%; the arm's environment aims every root at an empty scratch, whose bottom
+    rung would read 450%. With neither window nor root the fill raises."""
+    base, projects = build_projects("runlog-fill-root-")
+    sid = str(uuid.uuid4())
+    sibling = TRANSCRIPTS["scenarios"]["context-window-sibling"]["main"]
+    records = [sibling[0],
+               {"type": "assistant", "uuid": "fr-a0", "timestamp": "2026-09-13T11:00:01.000Z",
+                "message": {"role": "assistant", "content": [
+                    {"type": "tool_use", "id": "toolu_fr_0", "name": "Bash",
+                     "input": {"command": f"bash unattended.sh --preflight {ORIENT_SLUG}"}}]}},
+               sibling[1],
+               {"type": "assistant", "uuid": "fr-a2", "timestamp": "2026-09-13T11:00:10.000Z",
+                "message": {"role": "assistant", "content": [
+                    {"type": "tool_use", "id": "toolu_fr_2", "name": "Edit",
+                     "input": {"file_path": "notes.txt", "old_string": "a", "new_string": "b"}}]}}]
+    main = projects / FIXTURE_PROJECT / f"{sid}.jsonl"
+    write_transcript_lines(main, records)
+    repo, _write_policy = build_orient_repo(base)
+    r = run_runlog(["extract", "--orient", str(projects), "--slug", ORIENT_SLUG, "--repo", str(repo)], base,
+                   build_arm_env(base))
+    rows = [dict(kv.split("=", 1) for kv in ln.split()[3:] if "=" in kv)
+            for ln in r.stdout.splitlines() if ln.startswith("runlog: orient row ")]
+    check("context-fill root AC1: the orient row's window is derived under the --orient dir, so the "
+          "sibling's 900000 reads 90% of the 1000000 rung",
+          (r.returncode, [(row.get("sid"), row.get("action"), row.get("context")) for row in rows]),
+          (0, [(sid, "edit", "90%")]))
+    r = run_runlog(["context", str(main)], base, build_arm_env(base))
+    check("context-fill root AC2: runlog.py context reads the same transcript at the same 90%",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()),
+          (0, "90%", "context: window 1000000 · observed 900000 on fixture-model"))
+    usage = [e for e in rx.extract_session(rx.resolve_session_tree(sid, projects))["events"]
+             if e["kind"] == "usage"]
+    try:
+        got = ("returned", rx.derive_context_fill(usage[-1])) if usage else None
+    except ValueError as exc:
+        got = ("raised", "root=" in str(exc))
+    check("context-fill root AC3: with neither window nor root the fill raises ValueError naming root=",
+          got, ("raised", True))
 
 
 def test_extract_ac10_members():
@@ -8992,6 +9614,14 @@ def main():
     for var, sub in DECOY_VARS:
         os.environ[var] = str(decoy / sub)
     os.environ.pop("RUNLOG_STATE_DIR", None)
+    # The harness's window variable (KICK-dKeptSession-30 S4) goes too, so no node's setting moves a
+    # context arm; the one arm that reads it sets it in its own child's environment.
+    os.environ.pop("CLAUDE_CODE_MAX_CONTEXT_TOKENS", None)
+    # The remote and branch `model.resolve_remote` reads (KICK-dKeptSession-63 S14) go too: the lander's
+    # post-merge hook exports GOV_REMOTE, and the in-process `rl_model` calls and every `build_arm_env`
+    # copy would otherwise read the machine's choice instead of the fixture's own remotes.
+    os.environ.pop("GOV_REMOTE", None)
+    os.environ.pop("GOV_DEFAULT_BRANCH", None)
     try:
         for name, fn in sorted(globals().items()):
             if name.startswith("test_") and callable(fn):

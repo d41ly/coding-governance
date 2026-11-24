@@ -616,9 +616,12 @@ BIND_HEAD_LINES = 12
 # kickoff engine through the factory's `write_record`, no door. `probe-trigger` and `probe`
 # (TOOL-dPlacedRequest-7 S6) are a probe opened at an item boundary and the probe it opened, its head, its
 # method, its run lines and its verdict, written by the loop kit's probe.py through `write_record`, no door.
+# `mailbox-message` (KICK-dKeptSession-5 S12) is one mailbox message a build's transition disposed, its
+# fields and its body in one fenced block, written by the loop kit's transition writer through
+# `write_record`, no door.
 TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition", "acceptance",
                       "transition", "recommendation", "widen", "leg-tail", "flake", "gate-health", "card",
-                      "probe-trigger", "probe")
+                      "probe-trigger", "probe", "mailbox-message")
 RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally

@@ -9,248 +9,414 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-asks-at-landing: KICK-dKeptSession-29=DEFERRED
-units-at-landing: KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65
-gates-run: unattended-17930237966129261149-272420 105ae5c0
-parked-surfaced: yes, 65 surfaced
-keepalive-reaped: yes
-refreshed-at: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d · park · 0 touching
+hold-run: 
+hold-streak: 1 · at d1c32738
+resume-owed: none · owner
+held-at: 2026-11-23T20:47:28Z
+hold-reason: the owner moved the run to node a (2026-11-23): resume there by the handoff memory/builds/dKeptSession/prompts/2026-11-23-prompt-KICK-dKeptSession-80-4-session.md; KICK-dKeptSession-80's in-progress merge was aborted on node d and nothing of it is on the branch
+hold-until: owner
+hold-code: host-owner-action
+held-from: VERIFYING
+refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 85eb778a0729203280a8edfec633debdabb582c2
-phase: LANDING
-spec-audit: 2026-10-21
+witness: 5f32c80ff3a832ccff25c85338e2c4c04d5aa3d9
+phase: VERIFYING
 may: PLAY-dClosedLoop-3
 mode: slug
-run-branch: refs/heads/branch/unattended-dkeptsession-dd0ede
+run-branch: refs/heads/branch/unattended-dkeptsession-a0567a
 anchor-kind: default-branch
-cli-version: 2.1.308
-lease-utc: 2026-10-25T22:54:35Z
+cli-version: 2.1.326
+lease-utc: 2026-11-24T02:15:00Z
 pid-image: claude.exe
-host: compeeto-agent
-pid: 30412
-session: 7b83d341-b894-474a-9793-b9a2975dc79b
-keepalive: 62252c37
-anchor-url: https://github.com/d41ly/coding-governance.git
-anchor-sha: 462d20f3510072a1dddb5b948370937cfd3bbe0e
+host: desktop-v6fbsjd
+pid: 4552
+session: 6ec40829-e8bb-473e-8d92-378a7dcabcbb
+keepalive: 996b51d4
+anchor-url: https://github.com/d41ly/coding-governance
+anchor-sha: c2a407b0390f3d57a118b58e376c326aeb207c13
 anchor-ref: refs/heads/main
-base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
+base: c2a407b0390f3d57a118b58e376c326aeb207c13
 
 ## Parked
 
-2026-10-26T01:26:06Z review · item dKeptSession-spec-set-r1 · reason verdict BLOCKED · blockers 2 · BOUNDED · highs 12 · minors 42 · disposition promote
+2026-11-21T13:26:22Z brief · item KICK-dKeptSession-1 · reason b9a738e8e603 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md
 
-2026-10-26T01:38:09Z rescope · item add KICK-dKeptSession-30 · reason spec-audit round1 of the dKeptSession spec set, finding id 16 at BLOCKER, report item B1
+2026-11-21T13:27:22Z dispatch · item a4dd146d KICK-dKeptSession-1 · reason tools/policy/presets.toml tools/policy/presets.py tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md tools/loop/guard.py tools/loop/loop.toml tools/loop/factories.py tools/loop/README.md tools/playbook/kinds.toml tools/playbook/core-pending.txt help/reference/kinds.md help/policy.md
+2026-11-21T14:01:58Z budget · frozen · 64 unit(s) · 132
+2026-11-21T14:01:58Z draw · re-dispatch · KICK-dKeptSession-1 · 1/132 · 20261121T140158Z-b911aa
 
-2026-10-26T01:38:19Z rescope · item add KICK-dKeptSession-31 · reason spec-audit round1 of the dKeptSession spec set, finding id 54 at BLOCKER, report item B2; id 4 is the same defect at HIGH, item H3, promoted as KICK-dKeptSession-35
+2026-11-21T14:01:58Z dispatch · item a186ba16 KICK-dKeptSession-1 · reason tools/policy/presets.toml tools/policy/presets.py tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md tools/loop/guard.py tools/loop/loop.toml tools/loop/factories.py tools/loop/README.md tools/playbook/kinds.toml tools/playbook/core-pending.txt tools/gate-legs.json help/reference/kinds.md help/policy.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-1-1-acceptance-ledger.md
+2026-11-21T14:43:57Z draw · re-dispatch · KICK-dKeptSession-1 · 2/132 · 20261121T144357Z-a0ccc9
 
-2026-10-26T01:38:21Z rescope · item add KICK-dKeptSession-32 · reason spec-audit round1 of the dKeptSession spec set, finding id 1 at HIGH, report item H1
+2026-11-21T14:43:57Z dispatch · item 516f40f9 KICK-dKeptSession-1 · reason tools/policy/presets.toml tools/policy/presets.py tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md tools/loop/guard.py tools/loop/loop.toml tools/loop/factories.py tools/loop/README.md tools/playbook/kinds.toml tools/playbook/core-pending.txt tools/gate-legs.json help/reference/kinds.md help/policy.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-1-1-acceptance-ledger.md
+2026-11-21T14:46:05Z draw · re-dispatch · KICK-dKeptSession-1 · 3/132 · 20261121T144605Z-f38af8
 
-2026-10-26T01:38:23Z rescope · item add KICK-dKeptSession-33 · reason spec-audit round1 of the dKeptSession spec set, finding id 17 at HIGH, report item H2, which it shares with id 2, promoted as KICK-dKeptSession-34
+2026-11-21T14:46:05Z dispatch · item 1de08794 KICK-dKeptSession-1 · reason tools/policy/presets.toml tools/policy/presets.py tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md tools/loop/guard.py tools/loop/loop.toml tools/loop/factories.py tools/loop/README.md tools/playbook/kinds.toml tools/playbook/core-pending.txt tools/gate-legs.json help/reference/kinds.md help/policy.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-1-1-acceptance-ledger.md tools/check-line-length.test.sh tools/hooks/agent-cap.test.sh tools/unattended/check-unattended.test.sh tools/unattended/unattended.test.sh
 
-2026-10-26T01:38:25Z rescope · item add KICK-dKeptSession-34 · reason spec-audit round1 of the dKeptSession spec set, finding id 2 at HIGH, report item H2, which it shares with id 17, promoted as KICK-dKeptSession-33
+2026-11-21T15:34:23Z brief · item KICK-dKeptSession-1 · reason 0b2fea5d1b46 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-1-rebuild-brief.md
+2026-11-21T15:35:49Z draw · re-dispatch · KICK-dKeptSession-1 · 4/132 · 20261121T153549Z-69cdb6
 
-2026-10-26T01:38:27Z rescope · item add KICK-dKeptSession-35 · reason spec-audit round1 of the dKeptSession spec set, finding id 4 at HIGH, report item H3; id 54 is the same defect at BLOCKER, item B2, promoted as KICK-dKeptSession-31
+2026-11-21T15:35:49Z dispatch · item 897f5ab9 KICK-dKeptSession-1 · reason help/policy.md help/reference/kinds.md tools/gate-legs.json tools/govkit/usage.toml tools/loop/README.md tools/loop/factories.py tools/loop/guard.py tools/loop/loop.toml tools/playbook/core-pending.txt tools/playbook/kinds.toml tools/policy/README.md tools/policy/check_policy.py tools/policy/policy.py tools/policy/presets.py tools/policy/presets.toml memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-1-1-acceptance-ledger.md
+2026-11-21T15:51:37Z draw · re-dispatch · KICK-dKeptSession-1 · 5/132 · 20261121T155137Z-3f9b70
 
-2026-10-26T01:38:30Z rescope · item add KICK-dKeptSession-36 · reason spec-audit round1 of the dKeptSession spec set, finding id 22 at HIGH, report item H4
+2026-11-21T15:51:38Z dispatch · item d717c27d KICK-dKeptSession-1 · reason help/policy.md help/reference/kinds.md tools/gate-legs.json tools/govkit/usage.toml tools/loop/README.md tools/loop/factories.py tools/loop/guard.py tools/loop/loop.toml tools/playbook/core-pending.txt tools/playbook/kinds.toml tools/policy/README.md tools/policy/check_policy.py tools/policy/policy.py tools/policy/presets.py tools/policy/presets.toml memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-1-1-acceptance-ledger.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json help/loop.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T01:38:33Z rescope · item add KICK-dKeptSession-37 · reason spec-audit round1 of the dKeptSession spec set, finding id 26 at HIGH, report item H5, which it shares with id 58, promoted as KICK-dKeptSession-38
+2026-11-21T15:53:13Z brief · item KICK-dKeptSession-1 · reason 23a780f91fa3 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-1-commit-brief.md
 
-2026-10-26T01:38:35Z rescope · item add KICK-dKeptSession-38 · reason spec-audit round1 of the dKeptSession spec set, finding id 58 at HIGH, report item H5, which it shares with id 26, promoted as KICK-dKeptSession-37
+2026-11-21T16:11:15Z brief · item KICK-dKeptSession-19 · reason b9a738e8e603 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md
 
-2026-10-26T01:38:38Z rescope · item add KICK-dKeptSession-39 · reason spec-audit round1 of the dKeptSession spec set, finding id 32 at HIGH, report item H6
+2026-11-21T16:12:42Z dispatch · item 4dbd3e52 KICK-dKeptSession-19 · reason tools/policy/policy.py tools/policy/unnamed-keys.txt tools/policy/check_policy.py tools/policy/kit.toml tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-19-1-acceptance-ledger.md
+2026-11-21T16:31:27Z draw · re-dispatch · KICK-dKeptSession-19 · 6/132 · 20261121T163127Z-18e19c
 
-2026-10-26T01:38:40Z rescope · item add KICK-dKeptSession-40 · reason spec-audit round1 of the dKeptSession spec set, finding id 47 at HIGH, report item H7
+2026-11-21T16:31:27Z dispatch · item af83c474 KICK-dKeptSession-19 · reason tools/policy/policy.py tools/policy/unnamed-keys.txt tools/policy/check_policy.py tools/policy/kit.toml tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-19-1-acceptance-ledger.md
 
-2026-10-26T01:38:42Z rescope · item add KICK-dKeptSession-41 · reason spec-audit round1 of the dKeptSession spec set, finding id 45 at HIGH, report item H8; ids 7 and 34 are the same defect at MEDIUM, item M4, batched into KICK-dKeptSession-44
+2026-11-21T17:01:57Z brief · item KICK-dKeptSession-33 · reason b9a738e8e603 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md
 
-2026-10-26T01:38:44Z rescope · item add KICK-dKeptSession-42 · reason spec-audit round1 of the dKeptSession spec set, finding id 55 at HIGH, report item H9
+2026-11-21T17:03:21Z dispatch · item db7f0041 KICK-dKeptSession-33 · reason tools/policy/presets.toml tools/policy/presets.py tools/policy/check_policy.py tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-33-1-acceptance-ledger.md
 
-2026-10-26T01:38:46Z rescope · item add KICK-dKeptSession-43 · reason spec-audit round1 of the dKeptSession spec set, finding id 57 at HIGH, report item H10
+2026-11-21T17:17:17Z brief · item KICK-dKeptSession-2 · reason 7f0285b83e86 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-2-build-brief.md
 
-2026-10-26T01:38:49Z rescope · item add KICK-dKeptSession-44 · reason spec-audit round1 of the dKeptSession spec set, minors batch, MEDIUM ids 3 5 6 7 34 8 37 9 10 11 15 19 20 21 46 23 24 27 33 35 36 40 48 49 50 51 52 56 59 60 61 62 63 and LOW ids 12 13 14 44 18 41 42 43 53
+2026-11-21T17:18:39Z dispatch · item bd980b21 KICK-dKeptSession-2 · reason tools/policy/policy.py tools/policy/presets.py tools/policy/check_policy.py tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-2-1-acceptance-ledger.md
 
-2026-10-26T03:37:07Z rescope · item add KICK-dKeptSession-45 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 28 at HIGH, report item H1, which it shares with id 38, promoted as KICK-dKeptSession-46; id 18 is the same defect at MEDIUM, item M12, batched into KICK-dKeptSession-56
+2026-11-21T17:44:26Z brief · item KICK-dKeptSession-3 · reason 9cfd9ae78e94 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-3-build-brief.md
 
-2026-10-26T03:37:12Z rescope · item add KICK-dKeptSession-46 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 38 at HIGH, report item H1, which it shares with id 28, promoted as KICK-dKeptSession-45
+2026-11-21T17:45:50Z dispatch · item c1aa24bf KICK-dKeptSession-3 · reason tools/policy/policy.py tools/policy/check_policy.py tools/playbook/policy_value.py tools/playbook/render_playbook.py tools/playbook/instruction_units.py tools/govkit/entries/playbook.kit.toml tools/govkit/usage.toml .governance/instructions.lock memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json help/policy.md help/charter.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-3-1-acceptance-ledger.md
+2026-11-21T17:51:12Z draw · re-dispatch · KICK-dKeptSession-3 · 7/132 · 20261121T175112Z-819c73
 
-2026-10-26T03:37:15Z rescope · item add KICK-dKeptSession-47 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 16 at HIGH, report item H2; id 44 is the same defect at MEDIUM, item M25, batched into KICK-dKeptSession-56
+2026-11-21T17:51:12Z dispatch · item e793d2fb KICK-dKeptSession-3 · reason tools/policy/policy.py tools/policy/check_policy.py tools/playbook/policy_value.py tools/playbook/render_playbook.py tools/playbook/instruction_units.py tools/govkit/entries/playbook.kit.toml tools/govkit/usage.toml coding-governance-agents.template.md AGENTS.md .governance/instructions.lock memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json help/policy.md help/charter.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-3-1-acceptance-ledger.md
 
-2026-10-26T03:37:17Z rescope · item add KICK-dKeptSession-48 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 43 at HIGH, report item H8
+2026-11-21T18:13:13Z brief · item KICK-dKeptSession-34 · reason 3022f2c40e91 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-34-build-brief.md
 
-2026-10-26T03:37:28Z rescope · item add KICK-dKeptSession-49 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 22 at HIGH, report item H3, which it shares with id 48, promoted as KICK-dKeptSession-50; id 9 is the same defect at MEDIUM, item M8, batched into KICK-dKeptSession-56
+2026-11-21T18:14:39Z dispatch · item 7b25e1b9 KICK-dKeptSession-34 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-34-1-acceptance-ledger.md
 
-2026-10-26T03:37:30Z rescope · item add KICK-dKeptSession-50 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 48 at HIGH, report item H3, which it shares with id 22, promoted as KICK-dKeptSession-49
+2026-11-21T18:27:05Z brief · item KICK-dKeptSession-40 · reason d67bf8d161c1 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-40-build-brief.md
 
-2026-10-26T03:37:32Z rescope · item add KICK-dKeptSession-51 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 39 at HIGH, report item H4; id 8 is the same defect at MEDIUM, item M7, batched into KICK-dKeptSession-56
+2026-11-21T18:30:03Z dispatch · item ec95533c KICK-dKeptSession-40 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/presets.py tools/policy/presets.toml tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-40-1-acceptance-ledger.md
 
-2026-10-26T03:37:34Z rescope · item add KICK-dKeptSession-52 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 3 at HIGH, report item H5
+2026-11-21T18:44:16Z brief · item KICK-dKeptSession-4 · reason aab981689f69 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-4-build-brief.md
 
-2026-10-26T03:37:36Z rescope · item add KICK-dKeptSession-53 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 4 at HIGH, report item H6
+2026-11-21T18:45:45Z dispatch · item eabd0d44 KICK-dKeptSession-4 · reason tools/policy/kit.toml tools/policy/adopt-policy.sh tools/policy/adopt-policy.test.sh tools/policy/policy.py tools/policy/check_policy.py memory/map/generated/symbols.json tools/policy/README.md tools/govkit/selftest.py tools/govkit/steps/kickoff_facts_to_overlay.py tools/govkit/matrix.py tools/govkit/usage.toml help/policy.md help/tutorial/adopt-gov.md help/tasks/change-a-gov-rule.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-4-1-acceptance-ledger.md
 
-2026-10-26T03:37:38Z rescope · item add KICK-dKeptSession-54 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 21 at HIGH, report item H7
+2026-11-21T19:12:36Z brief · item KICK-dKeptSession-49 · reason 1dcea1645043 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-49-build-brief.md
 
-2026-10-26T03:37:40Z rescope · item add KICK-dKeptSession-55 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 49 at HIGH, report item H9
+2026-11-21T19:14:38Z dispatch · item cd808f85 KICK-dKeptSession-49 · reason tools/policy/policy-mirror.js tools/policy/check_policy.py memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-49-1-acceptance-ledger.md
+2026-11-21T19:35:00Z draw · re-dispatch · KICK-dKeptSession-49 · 8/132 · 20261121T193500Z-91a52c
 
-2026-10-26T03:37:42Z rescope · item add KICK-dKeptSession-56 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, minors batch, MEDIUM ids 1 2 5 6 7 8 9 10 11 17 18 19 20 23 24 25 27 29 30 31 32 34 35 36 37 40 44 45 46 47 50 51 52 54 and LOW ids 12 13 14 15 26 33 41 42 53 55 56
+2026-11-21T19:35:00Z dispatch · item b34582fb KICK-dKeptSession-49 · reason tools/policy/policy-mirror.js tools/policy/check_policy.py tools/policy/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-49-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T04:00:18Z review · item dKeptSession-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 11 · minors 45 · disposition promote
+2026-11-21T19:45:19Z brief · item KICK-dKeptSession-50 · reason 949a38b4aadf memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-50-build-brief.md
 
-2026-10-26T04:54:58Z rescope · item add KICK-dKeptSession-57 · reason spec-audit round1 of the round-2 promotions KICK-dKeptSession-45 to -56, finding id 1 at HIGH, report item H1
+2026-11-21T19:46:41Z dispatch · item a21b9965 KICK-dKeptSession-50 · reason tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-50-1-acceptance-ledger.md
 
-2026-10-26T04:54:59Z rescope · item add KICK-dKeptSession-58 · reason spec-audit round1 of the round-2 promotions KICK-dKeptSession-45 to -56, finding id 9 at HIGH, report item H2
+2026-11-21T19:54:14Z brief · item KICK-dKeptSession-54 · reason ce8c622ea915 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-54-build-brief.md
+2026-11-21T20:05:09Z draw · re-dispatch · KICK-dKeptSession-50 · 9/132 · 20261121T200509Z-25ac70
 
-2026-10-26T04:55:01Z rescope · item add KICK-dKeptSession-59 · reason spec-audit round1 of the round-2 promotions KICK-dKeptSession-45 to -56, finding id 10 at HIGH, report item H3, which it shares with id 23, promoted as KICK-dKeptSession-60; id 33 is the same defect at MEDIUM, item M16, batched into KICK-dKeptSession-62
+2026-11-21T20:05:09Z dispatch · item 1c090563 KICK-dKeptSession-50 · reason tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-50-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T04:55:05Z rescope · item add KICK-dKeptSession-60 · reason spec-audit round1 of the round-2 promotions KICK-dKeptSession-45 to -56, finding id 23 at HIGH, report item H3, which it shares with id 10, promoted as KICK-dKeptSession-59
+2026-11-21T20:42:19Z dispatch · item 055582fb KICK-dKeptSession-54 · reason memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-54-1-acceptance-ledger.md
 
-2026-10-26T04:55:08Z rescope · item add KICK-dKeptSession-61 · reason spec-audit round1 of the round-2 promotions KICK-dKeptSession-45 to -56, finding id 31 at HIGH, report item H4
+2026-11-21T21:09:55Z brief · item KICK-dKeptSession-20 · reason 1de718b05c8b memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-20-build-brief.md
 
-2026-10-26T04:55:11Z rescope · item add KICK-dKeptSession-62 · reason spec-audit round1 of the round-2 promotions KICK-dKeptSession-45 to -56, minors batch, MEDIUM ids 2 3 4 5 6 7 11 12 13 14 15 19 20 21 22 24 25 26 27 28 29 32 33 34 35 37 38 and LOW ids 8 16 30 36 39
+2026-11-21T21:11:20Z dispatch · item 04abaa3a KICK-dKeptSession-20 · reason tools/loop/scenario-schema.toml tools/loop/scenario.py tools/loop/README.md tools/policy/presets.py tools/policy/policy.py tools/policy/README.md tools/govkit/usage.toml help/policy.md help/loop.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-20-1-acceptance-ledger.md
 
-2026-10-26T05:10:28Z review · item dKeptSession-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 32 · disposition promote
+2026-11-21T21:54:44Z brief · item KICK-dKeptSession-32 · reason ff45f44eaa2d memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-32-build-brief.md
 
-2026-10-26T05:52:35Z rescope · item add KICK-dKeptSession-63 · reason spec-audit round1 of the round-3 promotions KICK-dKeptSession-57 to -62, minors batch, MEDIUM ids 1 2 3 4 10 11 12 13 14 15 18 20 21 24 25 26 27 and LOW ids 5 7 8 9 19 22 23 30 31
+2026-11-21T21:56:09Z dispatch · item 38533a59 KICK-dKeptSession-32 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-32-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T06:06:41Z review · item dKeptSession-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 26 · disposition promote
+2026-11-21T22:21:09Z decision · item loop transition record's 120 s ceiling (PINNED, tools/gate-legs.json): raise it, or split the leg, before order step 25 · reason By the plant estimates in specs 7, 35, 11, 52, 53 and 61, the leg reaches its 120 s ceiling at order step 25 (units 35 and 42) and about 219 s by unit 61 (PINNED estimate, KICK-dKeptSession-61). Options: (a) the owner raises the ceiling, (b) the leg is split into two legs. A declared ceiling is the owner's to move (BUILD-METHOD) and gate-legs.json names no row a run may raise, so the run cannot do either. Each of those specs now stops its unit before landing if the measured time reaches the ceiling, and never edits gate-legs.json.
 
-2026-10-26T06:35:54Z rescope · item add KICK-dKeptSession-64 · reason spec-audit round1 of the round-4 minors batch KICK-dKeptSession-63, minors batch, MEDIUM ids 1 2 3 4 5 11 12 13 14 15 19 20 21 and LOW ids 6 7 8 9 10 17 18
+2026-11-21T22:26:45Z brief · item KICK-dKeptSession-58 · reason a01f1514197c memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-58-build-brief.md
 
-2026-10-26T07:02:31Z review · item dKeptSession-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 20 · disposition promote
+2026-11-21T22:28:10Z dispatch · item c34de6d4 KICK-dKeptSession-58 · reason memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-58-1-acceptance-ledger.md
 
-2026-10-26T07:47:36Z rescope · item add KICK-dKeptSession-65 · reason spec-audit round1 of the round-5 minors batch KICK-dKeptSession-64, minors batch, MEDIUM ids 1 2 3 4 9 10 11 15 16 20 21 23 24 and LOW ids 5 6 7 8 12 13 14 17 18 19 22 25 26
+2026-11-21T22:38:16Z brief · item KICK-dKeptSession-59 · reason d107e4d1d87a memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-59-build-brief.md
 
-2026-10-26T07:59:05Z review · item dKeptSession-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 26 · disposition promote
+2026-11-21T22:39:37Z dispatch · item ca226f9f KICK-dKeptSession-59 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-59-1-acceptance-ledger.md
 
-2026-10-26T08:00:08Z decision · item Should this build's spec-audit promotion chain stop at the first round confirming no BLOCKER and no HIGH, as the owner ruled for dPlacedRequest (2026-10-25) and dDeclaredLoop (2026-10-24)? Rounds 4 to 6 confirmed 0 highs and 26, 20, 26 minors at precision 0.84 to 0.95, each minors batch breeding the next, so M4's precision bound does not end it. · reason options: (a) continue M4 as written, one full audit round per minors batch until a round's precision falls under 0.5; (b) stop the chain and close the last batches under a recorded override of specs-audited citing an owner ruling. Taken: (a), because (b) moves M4's bound, a governance carrier, which veto 2 reserves to the owner and no ruling for this build exists; the run keeps auditing and the owner may rule (b) at any turn.
+2026-11-21T22:51:01Z brief · item KICK-dKeptSession-60 · reason 1095181b0d72 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-60-build-brief.md
 
-2026-10-26T08:32:20Z rescope · item defer KICK-dKeptSession-1 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-21T22:52:26Z dispatch · item 5198e204 KICK-dKeptSession-60 · reason tools/policy/README.md tools/policy/policy.py memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-60-1-acceptance-ledger.md
 
-2026-10-26T08:32:23Z rescope · item defer KICK-dKeptSession-19 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-21T23:07:19Z brief · item KICK-dKeptSession-16 · reason 0243d2e02294 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-16-build-brief.md
 
-2026-10-26T08:32:25Z rescope · item defer KICK-dKeptSession-33 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-21T23:08:49Z dispatch · item ca43769b KICK-dKeptSession-16 · reason tools/policy/catalogue.toml tools/policy/policy.py tools/policy/check_policy.py tools/policy/unpurposed-namespaces.txt tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-16-1-acceptance-ledger.md
 
-2026-10-26T08:32:27Z rescope · item defer KICK-dKeptSession-2 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-21T23:51:02Z rescope · item add KICK-dKeptSession-67 · reason pass-tree.sh's regen runs mirror --write over the uncommitted merge, and cmd_mirror refuses while a mirror input differs from HEAD, so no pass changing tools/policy/catalogue.toml or presets.toml can merge: KICK-dKeptSession-16's green pass is refused, and 14 open specs touch those inputs. A blocker between the run and its landing is a discovery (protocol section 11), adopted as this unit.
 
-2026-10-26T08:32:30Z rescope · item defer KICK-dKeptSession-3 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-21T23:51:02Z rescope · item defer KICK-dKeptSession-16 · reason its green pass (8426252e0 plus its mirror commit 4ee5af863) cannot merge until KICK-dKeptSession-67 lets pass-tree.sh merge a pass that changes a mirror input; re-dispatched after 67 lands
 
-2026-10-26T08:32:32Z rescope · item defer KICK-dKeptSession-34 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T00:20:03Z brief · item KICK-dKeptSession-67 · reason 1f477ee42e08 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-67-build-brief.md
 
-2026-10-26T08:32:34Z rescope · item defer KICK-dKeptSession-40 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T00:25:45Z dispatch · item 7d4c4653 KICK-dKeptSession-67 · reason tools/unattended/pass-tree.sh tools/unattended/pass-tree.test.sh tools/unattended/README.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-67-1-acceptance-ledger.md
+2026-11-22T00:41:20Z draw · re-dispatch · KICK-dKeptSession-16 · 10/132 · 20261122T004120Z-2e40a1
 
-2026-10-26T08:32:35Z rescope · item defer KICK-dKeptSession-4 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T00:41:20Z dispatch · item 53d80cea KICK-dKeptSession-16 · reason tools/policy/catalogue.toml tools/policy/policy.py tools/policy/check_policy.py tools/policy/unpurposed-namespaces.txt tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-16-1-acceptance-ledger.md
 
-2026-10-26T08:32:37Z rescope · item defer KICK-dKeptSession-49 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T00:50:17Z brief · item KICK-dKeptSession-12 · reason 3353573b62e4 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-12-build-brief.md
 
-2026-10-26T08:32:39Z rescope · item defer KICK-dKeptSession-50 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T00:51:48Z dispatch · item 0c57f16e KICK-dKeptSession-12 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md help/orientation-card.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-12-1-acceptance-ledger.md
 
-2026-10-26T08:32:40Z rescope · item defer KICK-dKeptSession-54 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T01:19:10Z brief · item KICK-dKeptSession-13 · reason 051873635d64 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-13-build-brief.md
 
-2026-10-26T08:32:42Z rescope · item defer KICK-dKeptSession-20 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T01:23:36Z dispatch · item 5caf0cd7 KICK-dKeptSession-13 · reason tools/loop/position.py tools/run-gates/selftest-budgets.txt skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-store.fixture.sh tools/memory-tree/gen_build_index.py tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt help/reference/policy.md memory/project/docs-undocumented.txt help/orientation-card.md memory/map/generated/symbols.json memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-13-1-acceptance-ledger.md
 
-2026-10-26T08:32:43Z rescope · item defer KICK-dKeptSession-32 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T02:05:07Z brief · item KICK-dKeptSession-37 · reason bbdb9ac9b579 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-37-build-brief.md
 
-2026-10-26T08:32:45Z rescope · item defer KICK-dKeptSession-58 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T02:06:32Z dispatch · item 020af060 KICK-dKeptSession-37 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-37-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T08:32:47Z rescope · item defer KICK-dKeptSession-59 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T04:53:43Z rescope · item add KICK-dKeptSession-69 · reason origin/main moved 634 commits past BASE (dWitnessedBar landed at 8b8b1374) and the primary tree fast-forwarded, so every commit here ran main's hooks over the pre-main tree and was refused; the reconcile merge ad02f1a6a is this unit's build. A blocker between the run and its landing is a discovery, adopted as this unit.
 
-2026-10-26T08:32:48Z rescope · item defer KICK-dKeptSession-60 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T05:25:24Z decision · item dWitnessedBar's packet pin: run, at a console, python memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --repin memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py · reason origin/main 8b8b1374 moved the schedule instrument (pinned 5aa5421e265b, HEAD holds 6184e5717b59), so dWitnessedBar's packet reds its pin arm on main itself. check-spec-tokens reds the live tree over it, and --dispatch (check 49) refuses every dispatch while it does. --repin admits only an owner at a console, and the spec-token waiver ledger is shrink-only, so the run cannot clear it. Options: (a) the owner re-pins and the run resumes; (b) the owner rules dWitnessedBar terminal so its packet leaves the live tree.
 
-2026-10-26T08:32:50Z rescope · item defer KICK-dKeptSession-16 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T05:27:36Z hold · item host-owner-action · reason until owner · reaped f586eb4e · resume none(owner)
 
-2026-10-26T08:32:52Z rescope · item defer KICK-dKeptSession-12 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T12:58:57Z resume · item dKeptSession · reason held · keepalive 64fde974 · manual
+2026-11-22T13:03:51Z draw · re-dispatch · KICK-dKeptSession-37 · 11/132 · 20261122T130351Z-321a17
 
-2026-10-26T08:32:53Z rescope · item defer KICK-dKeptSession-13 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T13:03:51Z dispatch · item bfc2a0b0 KICK-dKeptSession-37 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-37-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T08:32:55Z rescope · item defer KICK-dKeptSession-37 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T13:31:59Z brief · item KICK-dKeptSession-38 · reason ea9b5ee789e9 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-38-build-brief.md
 
-2026-10-26T08:32:57Z rescope · item defer KICK-dKeptSession-38 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T13:34:46Z dispatch · item 55584c3f KICK-dKeptSession-38 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh help/orientation-card.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-38-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T08:32:58Z rescope · item defer KICK-dKeptSession-26 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T13:55:12Z brief · item KICK-dKeptSession-69 · reason c482a95796cf memory/builds/dKeptSession/prompts/2026-11-22-prompt-KICK-dKeptSession-69-build-brief.md
 
-2026-10-26T08:33:00Z rescope · item defer KICK-dKeptSession-15 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T13:57:58Z dispatch · item 9165482e KICK-dKeptSession-69 · reason memory/builds/dKeptSession/spec/2026-11-22-spec-KICK-dKeptSession-69.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md
 
-2026-10-26T08:33:01Z rescope · item defer KICK-dKeptSession-14 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T14:00:46Z brief · item KICK-dKeptSession-26 · reason 949de18446d6 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-26-build-brief.md
 
-2026-10-26T08:33:03Z rescope · item defer KICK-dKeptSession-30 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T14:03:45Z rescope · item defer KICK-dKeptSession-69 · reason its acceptance ledger owes AC2, AC3, AC9 and AC11-AC14 to the close's bar run (check 23 refused the CLOSED flip at 302081de8), and its open closing dispatch held the build README every later unit declares (check 49); it is re-dispatched at the close, where a builder pass completes the ledger from the bar's records and flips it CLOSED
 
-2026-10-26T08:33:05Z rescope · item defer KICK-dKeptSession-9 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T14:07:46Z dispatch · item 12a85f18 KICK-dKeptSession-26 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-store.fixture.sh tools/loop/budget.py tools/run-gates/selftest-budgets.txt tools/govkit/usage.toml help/loop.md help/orientation-card.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-26-1-acceptance-ledger.md
 
-2026-10-26T08:33:06Z rescope · item defer KICK-dKeptSession-28 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T15:08:58Z brief · item KICK-dKeptSession-15 · reason f0041b6a0f12 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-15-build-brief.md
 
-2026-10-26T08:33:08Z rescope · item defer KICK-dKeptSession-45 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T15:11:44Z dispatch · item 040cc07e KICK-dKeptSession-15 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh help/orientation-card.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-15-1-acceptance-ledger.md
 
-2026-10-26T08:33:10Z rescope · item defer KICK-dKeptSession-46 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T15:49:22Z brief · item KICK-dKeptSession-14 · reason e09209ac4a1a memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-14-build-brief.md
 
-2026-10-26T08:33:11Z rescope · item defer KICK-dKeptSession-47 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T15:52:26Z dispatch · item 3519a6e0 KICK-dKeptSession-14 · reason tools/runlog/extract.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/fixtures/transcripts.json tools/runlog/README.md skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/map/generated/symbols.json tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt help/orientation-card.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-14-1-acceptance-ledger.md
+2026-11-22T16:07:55Z draw · re-dispatch · KICK-dKeptSession-14 · 12/132 · 20261122T160755Z-47301f
 
-2026-10-26T08:33:13Z rescope · item defer KICK-dKeptSession-48 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T16:07:55Z dispatch · item 3e016974 KICK-dKeptSession-14 · reason tools/runlog/extract.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/fixtures/transcripts.json tools/runlog/README.md skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/map/generated/symbols.json tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt help/orientation-card.md help/reference/policy.md memory/project/docs-undocumented.txt memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-14-1-acceptance-ledger.md
 
-2026-10-26T08:33:14Z rescope · item defer KICK-dKeptSession-22 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T16:39:01Z brief · item KICK-dKeptSession-30 · reason 911d05c03786 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-30-build-brief.md
 
-2026-10-26T08:33:16Z rescope · item defer KICK-dKeptSession-31 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T16:41:50Z dispatch · item ddf04ac1 KICK-dKeptSession-30 · reason tools/runlog/extract.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/fixtures/transcripts.json help/orientation-card.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-30-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+2026-11-22T16:55:51Z draw · re-dispatch · KICK-dKeptSession-30 · 13/132 · 20261122T165551Z-552023
 
-2026-10-26T08:33:18Z rescope · item defer KICK-dKeptSession-5 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T16:55:51Z dispatch · item 84869f49 KICK-dKeptSession-30 · reason tools/runlog/extract.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/fixtures/transcripts.json help/orientation-card.md tools/runlog/README.md tools/policy/catalogue.toml .governance/policy.json skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-30-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T08:33:19Z rescope · item defer KICK-dKeptSession-23 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T17:18:42Z brief · item KICK-dKeptSession-9 · reason 336894884c01 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-9-build-brief.md
 
-2026-10-26T08:33:21Z rescope · item defer KICK-dKeptSession-36 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T17:21:29Z dispatch · item 068f3bb1 KICK-dKeptSession-9 · reason tools/runlog/extract.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/README.md tools/policy/caps.toml tools/policy/check_policy.py tools/gate-legs.json memory/guides/SESSION-KICKOFF.md tools/loop/loop_lib.py tools/govkit/usage.toml help/loop.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-9-1-acceptance-ledger.md
 
-2026-10-26T08:33:22Z rescope · item defer KICK-dKeptSession-39 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T17:53:36Z brief · item KICK-dKeptSession-28 · reason e56b075db03a memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-28-build-brief.md
 
-2026-10-26T08:33:24Z rescope · item defer KICK-dKeptSession-51 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T17:56:31Z dispatch · item eba383dc KICK-dKeptSession-28 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-28-1-acceptance-ledger.md
 
-2026-10-26T08:33:25Z rescope · item defer KICK-dKeptSession-27 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T18:26:19Z brief · item KICK-dKeptSession-45 · reason 0575c0e1cb8a memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-45-build-brief.md
 
-2026-10-26T08:33:27Z rescope · item defer KICK-dKeptSession-24 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T18:29:03Z dispatch · item 1869396c KICK-dKeptSession-45 · reason tools/runlog/extract.py tools/runlog/selftest.py memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-45-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T08:33:29Z rescope · item defer KICK-dKeptSession-10 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T18:46:50Z brief · item KICK-dKeptSession-46 · reason eb79182b79d7 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-46-build-brief.md
 
-2026-10-26T08:33:30Z rescope · item defer KICK-dKeptSession-25 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T18:49:22Z dispatch · item 0794ab40 KICK-dKeptSession-46 · reason tools/runlog/extract.py tools/runlog/selftest.py memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-46-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+2026-11-22T19:00:17Z draw · re-dispatch · KICK-dKeptSession-46 · 14/132 · 20261122T190017Z-8c7997
 
-2026-10-26T08:33:32Z rescope · item defer KICK-dKeptSession-21 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T19:00:17Z dispatch · item 1a1584ef KICK-dKeptSession-46 · reason tools/runlog/extract.py tools/runlog/selftest.py tools/runlog/README.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-46-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T08:33:34Z rescope · item defer KICK-dKeptSession-6 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T19:19:07Z brief · item KICK-dKeptSession-47 · reason 960cf0d65a6f memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-47-build-brief.md
 
-2026-10-26T08:33:36Z rescope · item defer KICK-dKeptSession-7 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T19:21:45Z dispatch · item 15d224e5 KICK-dKeptSession-47 · reason tools/runlog/extract.py tools/runlog/fixtures/transcripts.json tools/runlog/selftest.py memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-47-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+2026-11-22T19:36:20Z draw · re-dispatch · KICK-dKeptSession-47 · 15/132 · 20261122T193620Z-032bca
 
-2026-10-26T08:33:38Z rescope · item defer KICK-dKeptSession-35 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T19:36:20Z dispatch · item 0eaad14e KICK-dKeptSession-47 · reason tools/runlog/extract.py tools/runlog/README.md tools/runlog/fixtures/transcripts.json tools/runlog/selftest.py memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-47-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T08:33:40Z rescope · item defer KICK-dKeptSession-42 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T19:54:27Z brief · item KICK-dKeptSession-48 · reason 4c9c677f0f81 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-48-build-brief.md
 
-2026-10-26T08:33:42Z rescope · item defer KICK-dKeptSession-8 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T19:57:06Z dispatch · item 23e49663 KICK-dKeptSession-48 · reason tools/runlog/extract.py tools/runlog/README.md help/orientation-card.md tools/runlog/selftest.py memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-48-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T08:33:44Z rescope · item defer KICK-dKeptSession-11 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T20:13:42Z brief · item KICK-dKeptSession-22 · reason 277aa1e0f90d memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-22-build-brief.md
 
-2026-10-26T08:33:48Z rescope · item defer KICK-dKeptSession-43 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T20:16:19Z dispatch · item 244faa72 KICK-dKeptSession-22 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-22-1-acceptance-ledger.md
 
-2026-10-26T08:33:50Z rescope · item defer KICK-dKeptSession-52 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T20:51:40Z brief · item KICK-dKeptSession-31 · reason 5b2c3b11f334 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-31-build-brief.md
 
-2026-10-26T08:33:53Z rescope · item defer KICK-dKeptSession-53 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T20:55:42Z brief · item KICK-dKeptSession-5 · reason a76f7eb28b3c memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-5-build-brief.md
 
-2026-10-26T08:33:55Z rescope · item defer KICK-dKeptSession-55 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T20:58:23Z dispatch · item 9afb6eb7 KICK-dKeptSession-5 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt tools/loop/loop.toml tools/loop/README.md tools/loop/loop_lib.py tools/loop/loop_transition.py tools/loop/claim.py tools/run-gates/selftest-budgets.txt tools/run-gates/run-selftests.sh tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-store.fixture.sh help/loop.md help/orientation-card.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-5-1-acceptance-ledger.md
 
-2026-10-26T08:33:57Z rescope · item defer KICK-dKeptSession-17 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T21:59:58Z dispatch · item 4051be5c KICK-dKeptSession-31 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-31-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T08:33:59Z rescope · item defer KICK-dKeptSession-61 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T22:21:14Z brief · item KICK-dKeptSession-23 · reason 55bd32b25645 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-23-build-brief.md
 
-2026-10-26T08:34:00Z rescope · item defer KICK-dKeptSession-18 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T22:23:56Z dispatch · item 6d4895a2 KICK-dKeptSession-23 · reason tools/unattended/unattended.test.sh tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-23-1-acceptance-ledger.md
 
-2026-10-26T08:34:02Z rescope · item defer KICK-dKeptSession-41 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T22:48:13Z brief · item KICK-dKeptSession-36 · reason 1137ccc56350 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-36-build-brief.md
 
-2026-10-26T08:34:04Z rescope · item defer KICK-dKeptSession-44 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T22:50:52Z dispatch · item 7b18560e KICK-dKeptSession-36 · reason tools/loop/loop_transition.py tools/run-gates/selftest-budgets.txt help/loop.md tools/loop/README.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-36-1-acceptance-ledger.md
 
-2026-10-26T08:34:07Z rescope · item defer KICK-dKeptSession-56 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T23:16:48Z brief · item KICK-dKeptSession-39 · reason 31a70ebebef9 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-39-build-brief.md
 
-2026-10-26T08:34:09Z rescope · item defer KICK-dKeptSession-57 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T23:19:38Z dispatch · item 06575789 KICK-dKeptSession-39 · reason tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-39-1-acceptance-ledger.md
+2026-11-22T23:28:03Z draw · re-dispatch · KICK-dKeptSession-39 · 16/132 · 20261122T232803Z-e8aec9
 
-2026-10-26T08:34:11Z rescope · item defer KICK-dKeptSession-62 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T23:28:03Z dispatch · item 211d3809 KICK-dKeptSession-39 · reason tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-39-1-acceptance-ledger.md
 
-2026-10-26T08:34:13Z rescope · item defer KICK-dKeptSession-63 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T23:51:15Z brief · item KICK-dKeptSession-51 · reason 686d20cf6133 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-51-build-brief.md
 
-2026-10-26T08:34:17Z rescope · item defer KICK-dKeptSession-64 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-22T23:53:49Z dispatch · item 614fda11 KICK-dKeptSession-51 · reason tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dWellOiledMachine/BACKLOG.md memory/builds/dWellOiledMachine/README.md memory/backlog/TOOL.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-51-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
-2026-10-26T08:34:21Z rescope · item defer KICK-dKeptSession-65 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+2026-11-23T00:30:27Z brief · item KICK-dKeptSession-27 · reason cd23931c3543 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-27-build-brief.md
 
-2026-10-26T14:36:32Z override · item specs-audited · reason the owner ruled 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md) that this build's spec-audit chain stops at the first round confirming no BLOCKER and no HIGH, round 4, and that the remaining minors batches close under this override; KICK-dKeptSession-65, round 6's minors batch, is the one spec no spec-audit record names, its round 7 stopped in its lens stage by that ruling
+2026-11-23T00:33:05Z dispatch · item dba19c7a KICK-dKeptSession-27 · reason tools/unattended/unattended.sh memory/map/generated/symbols.json tools/unattended/unattended.test.sh tools/run-gates/selftest-budgets.txt tools/loop/loop_transition.py tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-27-1-acceptance-ledger.md
 
-2026-10-26T14:36:32Z override · item closing-review-recorded · reason a spec run writes no code, so its diff is specs and records only; the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md) takes the six-round spec-audit chain as the review of this spec-only diff, as for dPlacedRequest; the build run's closing diff review over the code is unaffected and stays owed
+2026-11-23T00:58:59Z brief · item KICK-dKeptSession-24 · reason 8ee3fec1498a memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-24-build-brief.md
+
+2026-11-23T01:01:43Z dispatch · item 8d3d4a0e KICK-dKeptSession-24 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/loop/loop_transition.py tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json help/loop.md tools/loop/README.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md skills/session-kickoff/card-store.fixture.sh memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-24-1-acceptance-ledger.md
+2026-11-23T01:22:10Z draw · re-dispatch · KICK-dKeptSession-24 · 17/132 · 20261123T012210Z-b8f539
+
+2026-11-23T01:22:10Z dispatch · item 819f9588 KICK-dKeptSession-24 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/loop/loop_transition.py tools/loop/claim.py help/orientation-card.md tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json help/loop.md tools/loop/README.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md skills/session-kickoff/card-store.fixture.sh memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-24-1-acceptance-ledger.md
+
+2026-11-23T02:02:50Z brief · item KICK-dKeptSession-10 · reason 3515c423f53d memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-10-build-brief.md
+
+2026-11-23T02:06:02Z dispatch · item 4cb5c80c KICK-dKeptSession-10 · reason tools/loop/position.py tools/loop/loop_transition.py tools/loop/placement.py tools/loop/README.md tools/govkit/usage.toml tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json help/reference/policy.md help/loop.md help/orientation-card.md memory/project/docs-undocumented.txt tools/unattended/VERBS.template.md tools/policy/presets.toml memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-10-1-acceptance-ledger.md
+
+2026-11-23T02:50:13Z brief · item KICK-dKeptSession-25 · reason e31edb800f35 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-25-build-brief.md
+
+2026-11-23T02:53:07Z dispatch · item 4312d320 KICK-dKeptSession-25 · reason tools/loop/loop.toml tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md help/loop.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-25-1-acceptance-ledger.md
+
+2026-11-23T03:38:07Z brief · item KICK-dKeptSession-21 · reason 62b98f3f63d2 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-21-build-brief.md
+
+2026-11-23T03:40:56Z dispatch · item b81f959d KICK-dKeptSession-21 · reason tools/unattended/unattended.sh tools/unattended/mail-notice.js tools/unattended/mail-notice.fragment.json .claude/settings.json tools/loop/loop.toml memory/map/features/unattended.md skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh tools/unattended/unattended.test.sh tools/run-gates/selftest-budgets.txt tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json help/reference/policy.md help/loop.md help/orientation-card.md memory/project/docs-undocumented.txt tools/unattended/README.md tools/unattended/run-lease.js tools/unattended/check-unattended.sh tools/loop/README.md .governance/install.json memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-21-1-acceptance-ledger.md
+2026-11-23T04:12:35Z draw · re-dispatch · KICK-dKeptSession-21 · 18/132 · 20261123T041235Z-4b9ecf
+
+2026-11-23T04:12:35Z dispatch · item ab9f0545 KICK-dKeptSession-21 · reason tools/unattended/unattended.sh tools/unattended/mail-notice.js tools/unattended/mail-notice.fragment.json .claude/settings.json tools/loop/loop.toml memory/map/features/unattended.md skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh tools/unattended/unattended.test.sh tools/run-gates/selftest-budgets.txt tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json help/reference/policy.md help/loop.md help/orientation-card.md memory/project/docs-undocumented.txt tools/unattended/README.md tools/unattended/run-lease.js tools/unattended/check-unattended.sh tools/loop/README.md .governance/install.json memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-21-1-acceptance-ledger.md memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
+
+2026-11-23T04:47:23Z brief · item KICK-dKeptSession-6 · reason 5bf463e33cae memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-6-build-brief.md
+
+2026-11-23T04:50:05Z dispatch · item d9c74789 KICK-dKeptSession-6 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json help/reference/policy.md memory/project/docs-undocumented.txt memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-6-1-acceptance-ledger.md
+
+2026-11-23T05:22:26Z brief · item KICK-dKeptSession-7 · reason 77122c1afa77 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-7-build-brief.md
+
+2026-11-23T05:26:37Z dispatch · item 1624ad70 KICK-dKeptSession-7 · reason tools/loop/position.py tools/loop/loop_transition.py tools/loop/breakpoints.py tools/loop/placement.py memory/map/generated/symbols.json tools/run-gates/selftest-budgets.txt tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/loop/README.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-7-1-acceptance-ledger.md
+
+2026-11-23T06:20:44Z brief · item KICK-dKeptSession-35 · reason 7b63024f7c22 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-35-build-brief.md
+
+2026-11-23T06:23:20Z dispatch · item 41cb5bb3 KICK-dKeptSession-35 · reason tools/loop/loop_transition.py tools/loop/README.md tools/run-gates/selftest-budgets.txt tools/unattended/unattended.sh tools/unattended/unattended.test.sh help/loop.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-35-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T06:52:02Z brief · item KICK-dKeptSession-42 · reason 1f72228d919e memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-42-build-brief.md
+
+2026-11-23T06:54:46Z dispatch · item 7ebc3364 KICK-dKeptSession-42 · reason tools/loop/loop_transition.py tools/loop/README.md tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json help/loop.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-42-1-acceptance-ledger.md
+
+2026-11-23T07:18:00Z brief · item KICK-dKeptSession-8 · reason 6deda691deba memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-8-build-brief.md
+
+2026-11-23T07:20:53Z dispatch · item 3bb09d88 KICK-dKeptSession-8 · reason tools/hooks/scratch-guard.js tools/hooks/agent-cap.js tools/hooks/actions-free.fixture.sh tools/hooks/kit.toml tools/hooks/scratch-guard.test.sh tools/hooks/agent-cap.test.sh tools/hooks/README.md tools/workflows/README.md tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json help/orientation-card.md memory/project/docs-undocumented.txt memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-8-1-acceptance-ledger.md
+
+2026-11-23T07:53:12Z brief · item KICK-dKeptSession-11 · reason 62436af1ddd9 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-11-build-brief.md
+
+2026-11-23T07:56:11Z dispatch · item e9301de4 KICK-dKeptSession-11 · reason tools/loop/loop_transition.py tools/loop/README.md tools/loop/kit.toml memory/map/generated/symbols.json tools/run-gates/selftest-budgets.txt tools/unattended/unattended.sh tools/unattended/unattended.test.sh coding-governance-agents.template.md memory/guides/SESSION-KICKOFF.md AGENTS.md .governance/instructions.lock tools/template-size-highwater.txt help/loop.md tools/govkit/usage.toml memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-11-1-acceptance-ledger.md
+
+2026-11-23T08:23:42Z brief · item KICK-dKeptSession-43 · reason 82dcb4bb34c7 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-43-build-brief.md
+
+2026-11-23T08:26:46Z dispatch · item b2e66e44 KICK-dKeptSession-43 · reason tools/hooks/scratch-guard.js tools/hooks/actions-free.fixture.sh tools/hooks/scratch-guard.test.sh tools/hooks/agent-cap.test.sh tools/hooks/README.md tools/hooks/agent-cap.js tools/run-gates/selftest-budgets.txt memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-43-1-acceptance-ledger.md
+
+2026-11-23T08:49:06Z brief · item KICK-dKeptSession-52 · reason ffef6f3e294b memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-52-build-brief.md
+
+2026-11-23T08:51:56Z dispatch · item c371a17b KICK-dKeptSession-52 · reason tools/loop/loop_transition.py tools/loop/README.md help/loop.md tools/run-gates/selftest-budgets.txt memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-52-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T09:15:31Z brief · item KICK-dKeptSession-53 · reason f9a6808f86cf memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-53-build-brief.md
+
+2026-11-23T09:18:56Z dispatch · item d1a67039 KICK-dKeptSession-53 · reason tools/loop/loop_transition.py tools/loop/placement.py tools/loop/README.md help/loop.md memory/map/generated/symbols.json tools/run-gates/selftest-budgets.txt memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-53-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T09:41:13Z brief · item KICK-dKeptSession-55 · reason c129c3d823ad memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-55-build-brief.md
+
+2026-11-23T09:43:55Z dispatch · item 636b709c KICK-dKeptSession-55 · reason tools/loop/loop_transition.py tools/loop/README.md help/loop.md tools/run-gates/selftest-budgets.txt memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-55-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T10:05:09Z brief · item KICK-dKeptSession-17 · reason f2b112f593c1 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-17-build-brief.md
+
+2026-11-23T10:08:17Z dispatch · item 476a9dd9 KICK-dKeptSession-17 · reason tools/loop/loop.toml tools/loop/loop_lib.py memory/map/generated/symbols.json tools/loop/breakpoints.py tools/loop/kit.toml tools/loop/README.md tools/run-gates/selftest-budgets.txt help/loop.md memory/project/docs-undocumented.txt tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-17-1-acceptance-ledger.md
+
+2026-11-23T10:36:41Z brief · item KICK-dKeptSession-61 · reason ff61539ec7dd memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-61-build-brief.md
+
+2026-11-23T10:40:19Z dispatch · item 16e8868c KICK-dKeptSession-61 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/loop/loop_transition.py tools/loop/README.md tools/run-gates/selftest-budgets.txt tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-61-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T11:13:13Z brief · item KICK-dKeptSession-18 · reason 635a80244df0 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-18-build-brief.md
+
+2026-11-23T11:16:08Z dispatch · item 76ed28fd KICK-dKeptSession-18 · reason tools/loop/loop_table.py tools/loop/README.md memory/map/generated/symbols.json help/loop.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-18-1-acceptance-ledger.md
+
+2026-11-23T11:36:13Z brief · item KICK-dKeptSession-41 · reason 175f33441401 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-41-build-brief.md
+
+2026-11-23T11:39:08Z dispatch · item 64e2edcc KICK-dKeptSession-41 · reason tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json help/reference/policy.md memory/project/docs-undocumented.txt memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-41-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T12:01:42Z brief · item KICK-dKeptSession-44 · reason debd1db5aebf memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-44-build-brief.md
+
+2026-11-23T12:05:51Z dispatch · item 5576eefd KICK-dKeptSession-44 · reason tools/policy/check_policy.py tools/policy/adopt-policy.sh tools/policy/presets.py help/policy.md tools/loop/loop_transition.py tools/run-gates/selftest-budgets.txt tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/mail-notice.js tools/unattended/kit.toml tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/memory-tree/gen_build_index.py skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh help/orientation-card.md tools/runlog/runlog.py tools/runlog/extract.py tools/runlog/selftest.py memory/guides/SESSION-KICKOFF.md memory/map/features/unattended.md memory/map/generated/symbols.json memory/builds/dDeclaredLoop/BACKLOG.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-44-1-acceptance-ledger.md memory/builds/dKeptSession/README.md
+2026-11-23T12:35:23Z draw · re-dispatch · KICK-dKeptSession-44 · 19/132 · 20261123T123523Z-4b2bef
+
+2026-11-23T12:35:23Z dispatch · item fffadfd8 KICK-dKeptSession-44 · reason tools/policy/check_policy.py tools/policy/adopt-policy.sh tools/policy/presets.py help/policy.md tools/loop/loop_transition.py tools/loop/README.md tools/run-gates/selftest-budgets.txt tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/mail-notice.js tools/unattended/kit.toml tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/memory-tree/gen_build_index.py skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh help/orientation-card.md tools/runlog/runlog.py tools/runlog/extract.py tools/runlog/selftest.py memory/guides/SESSION-KICKOFF.md memory/map/features/unattended.md memory/map/generated/symbols.json memory/builds/dDeclaredLoop/BACKLOG.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-44-1-acceptance-ledger.md memory/builds/dKeptSession/README.md
+2026-11-23T12:57:00Z draw · re-dispatch · KICK-dKeptSession-44 · 20/132 · 20261123T125700Z-532b2e
+
+2026-11-23T12:57:00Z dispatch · item c3311169 KICK-dKeptSession-44 · reason tools/policy/check_policy.py tools/policy/adopt-policy.sh tools/policy/adopt-policy.test.sh tools/policy/presets.py help/policy.md tools/loop/loop_transition.py tools/loop/README.md tools/run-gates/selftest-budgets.txt tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/mail-notice.js tools/unattended/kit.toml tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/memory-tree/gen_build_index.py skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh help/orientation-card.md tools/runlog/runlog.py tools/runlog/extract.py tools/runlog/selftest.py memory/guides/SESSION-KICKOFF.md memory/map/features/unattended.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dDeclaredLoop/BACKLOG.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-44-1-acceptance-ledger.md memory/builds/dKeptSession/README.md
+
+2026-11-23T13:49:23Z brief · item KICK-dKeptSession-56 · reason 601fd3b6779d memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-56-build-brief.md
+
+2026-11-23T13:52:01Z dispatch · item b9b73f4a KICK-dKeptSession-56 · reason tools/loop/loop_transition.py tools/loop/claim.py tools/loop/README.md tools/run-gates/selftest-budgets.txt tools/runlog/extract.py tools/runlog/selftest.py tools/runlog/README.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json tools/policy/presets.py tools/policy/check_policy.py tools/unattended/unattended.test.sh help/orientation-card.md help/loop.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-56-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T14:43:44Z brief · item KICK-dKeptSession-57 · reason 79d7930e2f42 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-57-build-brief.md
+
+2026-11-23T14:46:39Z dispatch · item 4580ab42 KICK-dKeptSession-57 · reason .governance/policy.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-57-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T15:04:16Z brief · item KICK-dKeptSession-62 · reason 631c3b33d042 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-62-build-brief.md
+
+2026-11-23T15:07:01Z dispatch · item df77c676 KICK-dKeptSession-62 · reason tools/runlog/extract.py tools/runlog/selftest.py tools/runlog/fixtures/transcripts.json tools/runlog/README.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/unattended/mail-notice.js tools/hooks/scratch-guard.js tools/lib/resolve-python.test.sh tools/memory-tree/design_lib.py tools/loop/loop_transition.py tools/loop/README.md tools/policy/policy-mirror.js tools/policy/check_policy.py tools/policy/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-62-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T15:53:01Z brief · item KICK-dKeptSession-63 · reason af00e44503d7 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-63-build-brief.md
+
+2026-11-23T15:59:04Z dispatch · item d5a795ec KICK-dKeptSession-63 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/lib/gov-ref.sh tools/run-gates/post-merge.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/loop/loop_transition.py tools/loop/README.md tools/policy/check_policy.py tools/policy/README.md tools/policy/policy.py tools/runlog/selftest.py tools/runlog/extract.py tools/memory-tree/gen_build_index.py memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-63-1-acceptance-ledger.md memory/map/generated/symbols.json memory/builds/dKeptSession/README.md
+
+2026-11-23T16:35:19Z brief · item KICK-dKeptSession-64 · reason 8909b80ed344 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-64-build-brief.md
+
+2026-11-23T16:38:14Z dispatch · item 592ede12 KICK-dKeptSession-64 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/runlog/selftest.py tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-64-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T17:10:43Z brief · item KICK-dKeptSession-65 · reason d4fc317afb08 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-65-build-brief.md
+
+2026-11-23T17:14:17Z dispatch · item deca46e1 KICK-dKeptSession-65 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/runlog/selftest.py memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-65-1-acceptance-ledger.md memory/builds/dKeptSession/BACKLOG.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/LIVE.md
+
+2026-11-23T18:02:54Z review · item dKeptSession · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 0 · round-minors 8 · CONVERGED · highs 0 · minors 8 · to units · disposition promote
+
+2026-11-23T18:27:34Z rescope · item add KICK-dKeptSession-79 · reason the closing diff review's round 1 (c3ba5199b, wf_72f622df-161) exited CONVERGED with 5 mediums and 3 lows confirmed; --disposition promote batches them into one unit, the eight sharing tools/run-gates/selftest-budgets.txt
+
+2026-11-23T18:47:11Z brief · item KICK-dKeptSession-79 · reason 56dbcfac457f memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-79-build-brief.md
+
+2026-11-23T18:50:08Z dispatch · item 4f8a25dd KICK-dKeptSession-79 · reason tools/unattended/unattended.sh tools/unattended/mail-notice.js tools/unattended/unattended.test.sh tools/loop/loop_transition.py tools/loop/position.py tools/runlog/extract.py tools/runlog/README.md help/loop.md tools/loop/README.md tools/unattended/README.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/run-gates/selftest-budgets.txt memory/gotchas/docstring-misnames-a-returned-value.md memory/gotchas/header-rationale-contradicts-the-registration.md memory/gotchas/INDEX.md memory/map/features/runlog.md memory/map/features/unattended.md memory/builds/dKeptSession/build/2026-11-23-build-KICK-dKeptSession-79-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-79-1-acceptance-ledger.md
+2026-11-23T18:53:45Z draw · re-dispatch · KICK-dKeptSession-79 · 21/132 · 20261123T185345Z-e2e0fb
+
+2026-11-23T18:53:45Z dispatch · item ff350cd9 KICK-dKeptSession-79 · reason tools/unattended/unattended.sh tools/unattended/mail-notice.js tools/unattended/unattended.test.sh tools/loop/loop_transition.py tools/loop/position.py tools/runlog/extract.py tools/runlog/README.md help/loop.md tools/loop/README.md tools/unattended/README.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/run-gates/selftest-budgets.txt memory/gotchas/docstring-misnames-a-returned-value.md memory/gotchas/header-rationale-contradicts-the-registration.md memory/gotchas/INDEX.md memory/map/features/runlog.md memory/map/features/unattended.md memory/builds/dKeptSession/build/2026-11-23-build-KICK-dKeptSession-79-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-79-1-acceptance-ledger.md memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
+
+2026-11-23T20:21:56Z rescope · item add KICK-dKeptSession-80 · reason push-main.sh --prepare refused the landing: origin/main moved 193 commits to 525f3ab97 past KICK-dKeptSession-69's reconcile at 8b8b1374, and the merge conflicts in 33 files; a blocker between the run and its own landing is a discovery adopted now
+
+2026-11-23T20:27:19Z brief · item KICK-dKeptSession-80 · reason 0213b3c6943d memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-80-build-brief.md
+
+2026-11-23T20:30:22Z dispatch · item 2beba7bf KICK-dKeptSession-80 · reason tools/govkit/registry.toml tools/lib/resolve-python.test.sh tools/policy/catalogue.toml tools/policy/check_policy.py .governance/policy.json help/reference/policy.md memory/map/generated/MAP.md memory/map/generated/symbols.json tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/dBoundRoles/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dCalibratedLens/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dConvergedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dDeclaredLoop/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dFairHearing/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dFurnishedOrders/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dGroundRules/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dIndexedDesign/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dMindYourWords/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dOrderedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dRankedPlan/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dSafePassage/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dScopedBuild/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dShippedRelease/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dTendedCadence/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dTrueNorth/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dWellOiledMachine/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dKeptSession/build/2026-11-23-build-KICK-dKeptSession-80-1-acceptance-ledger.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-80-1-acceptance-ledger.md
+
+2026-11-23T20:47:29Z hold · item host-owner-action · reason until owner · reaped 64fde974 · resume none(owner)
+
+2026-11-24T02:15:10Z resume · item dKeptSession · reason held · keepalive 996b51d4 · manual
+2026-11-24T03:12:17Z draw · re-dispatch · KICK-dKeptSession-80 · 22/132 · 20261124T031217Z-ec2c32
+
+2026-11-24T03:12:17Z dispatch · item 87640872 KICK-dKeptSession-80 · reason memory/builds/dKeptSession/spec/2026-11-23-spec-KICK-dKeptSession-80.md memory/builds/dKeptSession/build/2026-11-23-build-KICK-dKeptSession-80-1-acceptance-ledger.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md
+
+2026-11-24T03:21:54Z brief · item KICK-dKeptSession-80 · reason 4fd7cfdfd115 memory/builds/dKeptSession/prompts/2026-11-24-prompt-KICK-dKeptSession-80-pass-brief.md
+
+2026-11-24T05:04:19Z brief · item KICK-dKeptSession-69 · reason 5459a7e0b023 memory/builds/dKeptSession/prompts/2026-11-24-prompt-KICK-dKeptSession-69-close-brief.md
+2026-11-24T05:08:01Z draw · re-dispatch · KICK-dKeptSession-69 · 23/132 · 20261124T050801Z-7df8e6
+
+2026-11-24T05:08:01Z dispatch · item 17ada699 KICK-dKeptSession-69 · reason memory/builds/dKeptSession/spec/2026-11-22-spec-KICK-dKeptSession-69.md memory/builds/dKeptSession/build/2026-11-22-build-KICK-dKeptSession-69-1-acceptance-ledger.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md
+
+2026-11-24T07:39:27Z rescope · item add KICK-dKeptSession-89 · reason push-main.sh --prepare refused the landing: merge-losses reads four definitions of tools/policy/policy.py lost by the first reconcile ad02f1a6a, check_shrink_list, read_shrink_base, write_shrink_file and write_shrink_list, whose deletion KICK-dKeptSession-69 S5 made on purpose; the merge's message is published and cannot carry a superseded line, so the tip takes the names back, TOOL-aTrimmedWait-19's route; a blocker between the run and its own landing is a discovery adopted now
+
+2026-11-24T07:57:10Z brief · item KICK-dKeptSession-89 · reason b3680acb7aa6 memory/builds/dKeptSession/prompts/2026-11-24-prompt-KICK-dKeptSession-89-build-brief.md
+
+2026-11-24T08:00:50Z dispatch · item f29330c4 KICK-dKeptSession-89 · reason tools/policy/policy.py tools/policy/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dKeptSession/spec/2026-11-24-spec-KICK-dKeptSession-89.md memory/builds/dKeptSession/build/2026-11-24-build-KICK-dKeptSession-89-1-acceptance-ledger.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md

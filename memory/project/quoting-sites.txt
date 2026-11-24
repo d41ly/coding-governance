@@ -42,11 +42,11 @@ tools/unattended/check-unattended.sh	tab-ifs-read	1	85a1c45076fd9093f1b9a08a2d72
 tools/unattended/check-unattended.test.sh	heredoc-source	2	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/gate-guard.test.sh	tab-ifs-read	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/lib-unattended.sh	tab-ifs-read	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/unattended/pass-tree.test.sh	heredoc-source	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/unattended/pass-tree.test.sh	heredoc-source	2	d4f64934ca1b987434214ea8412f2f1950416afa	widened:2026-11-24-build-KICK-dKeptSession-80-widen-7
 tools/unattended/runlog-writer.test.sh	heredoc-source	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/runlog-writer.test.sh	tab-ifs-read	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/stop-guard.test.sh	heredoc-source	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/unattended/unattended.sh	tab-ifs-read	19	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-35
+tools/unattended/unattended.sh	tab-ifs-read	27	d4f64934ca1b987434214ea8412f2f1950416afa	widened:2026-11-24-build-KICK-dKeptSession-80-widen-7
 tools/unattended/unattended.test.sh	tab-ifs-read	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/check-protocol-parity.test.sh	tab-ifs-read	4	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/check-review-join.test.sh	heredoc-source	9	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
