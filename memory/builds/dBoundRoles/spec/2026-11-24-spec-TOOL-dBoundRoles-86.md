@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-86 — the shell-write arm reads operands and redirects per simple command
 
-**Status:** OPEN · rev-1 · 2026-11-24 · node a · Tier-2 · base f3ec096a8 · streams tooling · order 40
+**Status:** INPROGRESS · rev-1 · 2026-11-24 · node a · Tier-2 · base f3ec096a8 · streams tooling · order 40
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-24-prompt-TOOL-dBoundRoles-86-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-86-build-brief.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-86-spec-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-86-spec-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

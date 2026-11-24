@@ -23,8 +23,8 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: f3ec096a83f63cac1ff056b7df11820845fb722b
-phase: SPECCING
+witness: c12557bfa8e15fd741eaa7bf1ea3a167222f29af
+phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
@@ -606,3 +606,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T12:49:13Z rescope · item add TOOL-dBoundRoles-91 · reason closing diff review round 1 item H5 (findings 9 and 13): the declaration verb reads gov's rows alone
 
 2026-11-24T12:49:16Z rescope · item add TOOL-dBoundRoles-92 · reason closing diff review round 1 minors M1 to M14 and L1 to L4, batched into one unit, with unit 43's owed atomic step key
+
+2026-11-24T13:19:52Z brief · item TOOL-dBoundRoles-86 · reason d168703d9e29 memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-86-build-brief.md
