@@ -11355,7 +11355,6 @@ memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-1-reground-r
 memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-a.md	267 rows	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-64-promoted-fix-return.md	3 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	15 calls	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	68 specs	1	0a39514a607e6b338e9d65be955b32e4f7f7755e	widened:2026-11-23-build-KICK-dKeptSession-80-widen-4
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-6-spec-reviewer.md	10 specs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-6-spec-reviewer.md	26 specs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-7-spec-writer.md	49152 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12580,6 +12579,10 @@ memory/builds/dPromptedSeam/reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-3-d
 memory/builds/dPromptedSeam/reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-2.md	10s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPromptedSeam/reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-2.md	8s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPromptedSeam/spec/2026-08-25-spec-dPromptedSeam-3.md	5 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	11,442 files	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	120 s	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	1557 lines	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	60 s	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
 memory/builds/dRankedPlan/RUN.md	390s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dRankedPlan/build/2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md	16 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dRankedPlan/build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md	122 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -15132,7 +15135,4 @@ memory/map/features/row-grammar.md	137 rows	1	9e21ac760dc0a43d6ed007396922722cce
 memory/map/features/runlog.md	100,000 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/features/unattended-mandate.md	2 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/generated/CARDS.md	1024 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	11,442 files	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
-memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	120 s	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
-memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	1557 lines	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
-memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	60 s	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
+memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	69 specs	1	271522b238d91bd98e8a5dbc39dd717d759dc1b2	widened:2026-11-24-build-KICK-dKeptSession-89-widen-10
