@@ -23,19 +23,19 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 760ca206c03ebef3ad175da9e0f6942201e1f8be
-phase: HELD
+witness: e5b7d10df17b8079cfcf4702f74be74eda9c67d0
+phase: RUNNING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
 anchor-kind: default-branch
 cli-version: 2.1.326
-lease-utc: 2026-11-23T09:35:54Z
+lease-utc: 2026-11-24T02:12:39Z
 pid-image: claude.exe
-host: compeeto
-pid: 17632
-session: b48c5b81-0c25-4457-90e8-da811a25e0e9
-keepalive: 675b83bc
+host: desktop-v6fbsjd
+pid: 17368
+session: e3282daf-390c-439b-a9f4-1bf8f9ed9630
+keepalive: 32792f1d
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 anchor-ref: refs/heads/main
@@ -530,3 +530,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T20:18:04Z brief · item TOOL-dBoundRoles-51 · reason 24975578914a memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-51-build-brief.md
 
 2026-11-23T20:40:25Z hold · item host-owner-action · reason until owner · reaped 675b83bc · resume none(owner)
+
+2026-11-24T02:12:47Z resume · item dBoundRoles · reason held · keepalive 32792f1d · manual
