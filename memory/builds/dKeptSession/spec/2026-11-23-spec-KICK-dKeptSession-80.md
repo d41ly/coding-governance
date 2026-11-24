@@ -1,6 +1,6 @@
 # KICK-dKeptSession-80 — the run branch reconciled with origin/main at 525f3ab97 in one merge commit, each conflict resolved by its kind
 
-**Status:** INPROGRESS · rev-1 · 2026-11-23 · node d · Tier-2 · base 0a39514a · streams tooling · order 38 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-2 · 2026-11-24 · node d · Tier-2 · base 0a39514a · streams tooling · order 38 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -37,10 +37,12 @@ KICK-dKeptSession-69's procedure re-keyed to `525f3ab97`, so `--prepare` can run
 
 - **S1** — The reconcile commit, KICK-dKeptSession-69 S1 re-keyed. The main loop runs `git merge --no-ff
   --no-commit origin/main` in the run worktree. The builder resolves the conflicts by S2, S3, S5 and S6,
-  makes S4 in that worktree, and commits nothing. The main loop then commits the merge with this unit's
-  acceptance ledger and the trailer `Pass: KICK-dKeptSession-80`, through `git commit` with the hooks
-  running. A refused commit goes back to the builder; the merge is never committed with a hook skipped.
-  Observed by AC1, AC2.
+  makes S4 in that worktree, and commits nothing. The main loop then commits the merge with the trailer
+  `Pass: none`, through `git commit` with the hooks running; it holds neither this spec's CLOSED flip
+  nor the acceptance ledger. The unit's pass commit follows it, carries `Pass: KICK-dKeptSession-80`,
+  and holds that flip, the acceptance ledger and the indexes their render moves, as §4 "Two commits"
+  says. A refused commit goes back to the builder; neither commit is made with a hook skipped. Observed
+  by AC1, AC2.
 - **S2** — The five generated outputs are re-rendered, never hand-merged, KICK-dKeptSession-69 S2's rule:
   `.governance/policy.json`, `help/reference/policy.md`, `memory/map/generated/MAP.md`,
   `memory/map/generated/symbols.json` and `tools/gate-legs.json`. Each is first checked out from main's
@@ -67,7 +69,7 @@ KICK-dKeptSession-69's procedure re-keyed to `525f3ab97`, so `--prepare` can run
 - The full bar's own reds on the merged tree. The brief records the close's full bar at `0a39514a6` RED
   against the run's pre-merge tree (UNVERIFIED here: no record in this tree holds that reading). Most of
   those legs grade registries and code main changed, so they can only be read on the merged tree. The
-  main loop re-runs the bar after this commit, attributes each red against `origin/main`, and clears the
+  main loop re-runs the bar after the merge commit, attributes each red against `origin/main`, and clears the
   run's own reds through the red-fix lane, one record each. This unit fixes none of them.
 - The plain manifest check's check 5 at the merge commit. It reds there by construction (§4 "The
   manifest stamp"), and the close's re-stamp clears it, as `4d56510fe` did after KICK-dKeptSession-69.
@@ -132,6 +134,9 @@ KICK-dKeptSession-69's procedure re-keyed to `525f3ab97`, so `--prepare` can run
   catalogue input is staged changed (`tools/policy/guard.py#check_mirror_render`), and a refused change
   is admitted on a live run's branch (`tools/policy/guard.py#check_run_mandate`), which this branch is
   while `RUN.md` reads VERIFYING.
+- `.governance/instructions.lock` merges `ours`, the attribute line
+  `tools/playbook/render_playbook.py#write_charter_lock` appends, so the merge alone keeps the run's
+  `renderer` line and a render moves it to the merged kit's version.
 - The merge driver `tools/memory-tree/merge-rows.py` resolved every registry row in the trial, its two
   report lines reading `0 row conflicts, 0 structure conflicts`, PINNED 2026-11-23.
 
@@ -144,6 +149,23 @@ KICK-dKeptSession-69's procedure re-keyed to `525f3ab97`, so `--prepare` can run
 | `tools/lib/resolve-python.test.sh` | Hunk 1: the run's two rows, then main's seven, so each side's rows keep their order. Hunk 2: the run's comment paragraph, then main's. |
 | `tools/policy/catalogue.toml` | Main's three `[[key]]` rows first, so the keys stay contiguous, then the run's fourteen `[[namespace]]` rows, which close the file as at the run head. |
 | `tools/policy/check_policy.py` | The run's `import presets` line directly after `import budgets`, beside the other two module imports, then main's `import atexit`, `import pathlib` and its three inline blocks byte for byte, since each is a gated copy of `owned_scratch.py`. |
+
+### Two commits
+
+The reconcile is two commits, the merge and the unit's pass commit, as TOOL-aSparedSpawn-32 §4 states
+and as this run's first reconcile, `ad02f1a6a`, was made. The merge can carry no `Pass:` trailer naming
+the unit, for two checks taken together, both under code 49:
+
+- `tools/unattended/unattended.sh#check_commit_message`, the hook's `--check-commit`, grades a trailered
+  commit's whole index against the pass's declaration. A merge's index holds every path main's side
+  moved, and it refuses the commit naming each one the declaration does not cover. It takes `Pass: none`
+  at its word and asks no pass.
+- `tools/unattended/unattended.sh#verb_dispatch` refuses a declaration overlapping a path `SHARED_RECORDS`
+  of `.unattended.conf` names. Main's side moved one of those, `memory/project/readme-contract.txt`, so
+  the widening the first refusal prints is refused by the second.
+
+The merge is therefore `dcb75b59e`, `Pass: none`, holding the resolution, the renders and the stamp. The
+pass commit after it holds only paths a pass may declare, the ones "Files touched" lists for it.
 
 ### The provisional window
 
@@ -180,7 +202,7 @@ and `verify-paths:` lines are identical and stay.
 
 - That the merged tree is green beyond the criteria below. Every other leg is the close's (§3).
 - That a packet's `rendered at` names a reachable commit. No reader resolves the field.
-- That check 9 stays green past this commit. It reads 9 at the merge, PINNED 2026-11-23, so the next
+- That check 9 stays green past the merge commit. It reads 9 at the merge, PINNED 2026-11-23, so the next
   non-merge watched commit reds it unless that commit advances `last-body-change`.
 
 ### Inventory
@@ -190,16 +212,16 @@ Nothing is minted. The one new record is this unit's acceptance ledger.
 ### Migration
 
 None for adopters: nothing ships that main did not already ship. Reversal is `git revert -m 1` of the
-reconcile commit.
+merge commit.
 
 ### Rollout
 
-Live at the commit. The main loop re-runs the bar on the merged tree, then `--prepare` again.
+Live at the merge commit. The main loop re-runs the bar on the merged tree, then `--prepare` again.
 
 ### Files touched (estimate)
 
-Every other path `git diff --name-only HEAD origin/main` lists arrives as the merge writes it, and any
-other output S4's window rewrites arrives as it writes it.
+The merge commit writes the paths below. Every other path `git diff --name-only HEAD origin/main` lists
+arrives as the merge writes it, and any other output S4's window rewrites arrives as it writes it.
 
 - `.memory-tree.conf`, `tools/govkit/registry.toml`, `tools/lib/resolve-python.test.sh`,
   `tools/policy/catalogue.toml`, `tools/policy/check_policy.py`: S3
@@ -230,16 +252,27 @@ other output S4's window rewrites arrives as it writes it.
   `memory/builds/dTrueNorth/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md`,
   `memory/builds/dWellOiledMachine/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md`,
   `memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md`
-- `memory/builds/dKeptSession/build/2026-11-23-build-KICK-dKeptSession-80-1-acceptance-ledger.md`: S1
+- `.governance/instructions.lock`: the window's render moves its charter row's `renderer` line, from
+  `playbook-render@1.45` to `playbook-render@1.48`, PINNED 2026-11-24 at `dcb75b59e`
 - `memory/builds/dKeptSession/README.md`, `memory/LIVE.md`, `memory/backlog/KICK.md`: rendered by S4's
   regeneration and the memory-hygiene leg's staged write, never hand-edited
+
+The pass commit writes these, and they are its declaration:
+
+- `memory/builds/dKeptSession/spec/2026-11-23-spec-KICK-dKeptSession-80.md`: S1, the CLOSED flip
+- `memory/builds/dKeptSession/build/2026-11-23-build-KICK-dKeptSession-80-1-acceptance-ledger.md`: S1
+- `memory/builds/dKeptSession/README.md`, `memory/LIVE.md`, `memory/backlog/KICK.md`: S1, the indexes the
+  flip and the ledger move, rendered and never hand-edited
 
 ### Alternatives rejected
 
 - **Hand-merge the generated outputs, or keep one side's bytes.** No hand can reproduce a render's bytes,
   and either side's bytes are stale against the merged inputs.
 - **Commit the merge, then regenerate in a follow-up commit.** The merge's hooks would grade it before its
-  outputs are fresh, and the brief allows one commit.
+  outputs are fresh. The pass commit that follows the merge carries no regeneration the merge owed.
+- **One commit, the merge carrying the unit's trailer.** Rev-1 chose it on the ground that the brief
+  allows one commit. `2026-11-24-prompt-KICK-dKeptSession-80-divergence-brief` corrects that ground, and
+  code 49 refuses the commit, as "Two commits" says.
 - **Keep main's side of each packet.** It drops the owner's schedule repin record, which no agent may
   write back.
 - **Render the packets after the re-attach, at the merge's first parent.** HEAD would then name the
@@ -265,18 +298,23 @@ other output S4's window rewrites arrives as it writes it.
 
 ## 6. Acceptance criteria
 
-Each criterion is observed in the run worktree, after the main loop's reconcile commit unless it says
-"staged", which reads the resolved merge before that commit.
+Each criterion is observed in the run worktree and names what it reads. "Staged" reads the resolved merge
+before its commit. "The merge" is the merge commit `dcb75b59e`, the one merge commit whose second parent
+is `525f3ab97` in `git log --merges --format='%H %P' HEAD --not 525f3ab97`. "The pass commit" is the
+unit's commit of S1. A criterion read at the pass commit is read over its staged tree, which that
+commit records unchanged, except AC2's trailer half, which the main loop reads after it.
 
-- **AC1** — Staged: `git ls-files -u` prints nothing. At the commit, `git grep -l -e '^<<<<<<< ' -e
-  '^>>>>>>> ' HEAD --` prints nothing.
+- **AC1** — Staged: `git ls-files -u` prints nothing. At the merge, `git grep -l -e '^<<<<<<< ' -e
+  '^>>>>>>> ' dcb75b59e --` prints nothing.
   Red when: a conflict is left unmerged or a marker is committed.
   figure: no tracked file of either parent carries a marker line, PINNED 2026-11-23.
-- **AC2** — `git rev-parse HEAD^2` prints `525f3ab9766e1c117a600cfd756593de5b46a8b6`, `git rev-parse HEAD^1`
-  prints the run head the merge started from, and `git log -1 --format=%B | grep -c '^Pass:
-  KICK-dKeptSession-80$'` prints `1`.
-  Red when: the reconcile is a rebase, a squash, a merge of another tip, or a commit without the trailer.
-- **AC3** — `python tools/run-gates/regen.py --check` exits 0, and `python
+- **AC2** — At the merge, `git rev-parse dcb75b59e^2` prints `525f3ab9766e1c117a600cfd756593de5b46a8b6`,
+  `git rev-parse dcb75b59e^1` prints the run head the merge started from, and `git log -1 --format=%B
+  dcb75b59e | grep -c '^Pass: none$'` prints `1`. At the pass commit, `git log --first-parent --format=%B
+  dcb75b59e..HEAD | grep -c '^Pass: KICK-dKeptSession-80$'` prints `1`.
+  Red when: the reconcile is a rebase, a squash or a merge of another tip, the merge names a pass, or
+  the commits after it carry the unit's trailer on none or on more than one.
+- **AC3** — At the pass commit, `python tools/run-gates/regen.py --check` exits 0, and `python
   tools/playbook/render_playbook.py --reference --check` exits 0.
   Red when: a generated output is hand-merged or left at one side's bytes.
 - **AC4** — `grep '^PROJECT_REGISTRY_EXTRA=' .memory-tree.conf | tr ' "' '\n\n' | grep -cx -e
@@ -303,7 +341,7 @@ Each criterion is observed in the run worktree, after the main loop's reconcile 
   init_owned_tempdir() -> str:'` prints `2`, and `python -m py_compile tools/policy/check_policy.py`
   exits 0.
   Red when: the presets import or main's inline blocks are dropped, or the join does not parse.
-- **AC9** — `python tools/chain-packet.py --check <slug>` exits 0 for each of the 22 slugs §4 "Files
+- **AC9** — At the pass commit, `python tools/chain-packet.py --check <slug>` exits 0 for each of the 22 slugs §4 "Files
   touched" lists. `grep -c '^- repinned inside a live chain run: '` over each packet prints `2`. A plain
   `python tools/check-spec-tokens.py` prints `spec-tokens: packet join · 1 live chain run(s) · 1
   packet(s) checked` and no row carrying `[packet]`.
@@ -311,10 +349,11 @@ Each criterion is observed in the run worktree, after the main loop's reconcile 
   merged tree.
   cost: each `--check` walks the instrument once, about 20 seconds, PINNED 2026-11-23.
   figure: the live count is PINNED 2026-11-23 from the trial tree's `RUN.md` phases.
-- **AC10** — Staged: `bash skills/session-kickoff/manifest-check.sh --staged` exits 0. At the commit,
-  `grep -c '^last-audit: ' memory/guides/SESSION-KICKOFF.md` prints `1` and its sha is `git rev-parse
-  HEAD^1`, `grep -c '^last-body-change: 95a4a1188a65ed95efba0d40c5624b38b8e2b3c1$'` prints `1`, `grep -c
-  -e 'even if its repo is gone' -e 'over a harnessed unit'` prints `2`, and a plain `bash
+- **AC10** — Staged: `bash skills/session-kickoff/manifest-check.sh --staged` exits 0. At the merge, `git
+  grep -h -c <pattern> dcb75b59e -- memory/guides/SESSION-KICKOFF.md` prints `1` for `'^last-audit: '`, whose sha
+  is the merge's first parent, `git rev-parse dcb75b59e^1`, prints `1` for `'^last-body-change:
+  95a4a1188a65ed95efba0d40c5624b38b8e2b3c1$'`, and prints `2` for `-e 'even if its repo is gone' -e 'over a
+  harnessed unit'`. At the pass commit, a plain `bash
   skills/session-kickoff/manifest-check.sh` prints no `MANIFEST check 9 FAILED` line.
   Red when: both stamps are kept, the stamp names a commit the audit did not read, main's
   `last-body-change` is kept, or a side's dated correction is lost.
@@ -323,8 +362,12 @@ Each criterion is observed in the run worktree, after the main loop's reconcile 
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `kickoff-manifest ratchet` · `policy fixtures` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `routed-commits selftest` · `scratch-guard self-test` · `kit/dogfood doc parity` · `straggler-guard arms` · `transition-audit arms`
 
-No suite runs in this pass. The pass's own legs are `bash tools/run-gates/pass-legs.sh --base <the run
-head>`, which the main loop runs over the staged merge before its commit.
+No suite runs in this pass. The pass's own legs are `bash tools/run-gates/pass-legs.sh --base <the merge's
+first parent>`, which the main loop runs over the merge commit, after it and not over the staged merge.
+Over the staged merge the runner exits 2, because `tools/policy/policy.py#cmd_mirror` renders a committed
+revision and refuses an input that differs from HEAD's. At `dcb75b59e` they read RED on two legs, PINNED
+2026-11-24: `kickoff-manifest ratchet`, whose check 5 is red by §3's own words, and `govkit selfcheck`, a
+merged-tree red §3 gives the close.
 
 ## 8. Open questions
 
@@ -335,6 +378,10 @@ none
 - rev-1 · 2026-11-23 · initial draft, from the brief `2026-11-23-prompt-KICK-dKeptSession-80-spec-brief`,
   grounded at `0a39514a6` and at `origin/main` `525f3ab97` through `git show` and a read-only `git
   merge-tree`, with KICK-dKeptSession-69's S1, S2 and S4 re-keyed.
+- rev-2 · 2026-11-24 · S1 · §3 · §4 · §6 · AC1 AC2 AC3 AC9 AC10 · §7 · the merge carries `Pass: none` and
+  the pass commit after it the trailer, the flip and the ledger, by
+  `2026-11-24-prompt-KICK-dKeptSession-80-divergence-brief`; the unit's code had started, and the
+  departure was found at the merge's commit, which code 49 refused.
 
 ## 10. Reuse audit
 

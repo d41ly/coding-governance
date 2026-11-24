@@ -165,7 +165,7 @@ ids KICK-dKeptSession-71 KICK-dKeptSession-72 KICK-dKeptSession-73 KICK-dKeptSes
 | [KICK-dKeptSession-64 — the round-4 minors batch's audit's 20 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-64.md) | 35 | 2 | CLOSED | rev-5 | 2026-11-23 |
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | CLOSED | rev-4 | 2026-11-23 |
 | [KICK-dKeptSession-79 — the closing diff review's eight minors: a fetched mail record validated once, a refused move posting no ack, a failed fetch spacing the next, and the gaps the review found](spec/2026-11-23-spec-KICK-dKeptSession-79.md) | 37 | 2 | CLOSED | rev-2 | 2026-11-23 |
-| [KICK-dKeptSession-80 — the run branch reconciled with origin/main at 525f3ab97 in one merge commit, each conflict resolved by its kind](spec/2026-11-23-spec-KICK-dKeptSession-80.md) | 38 | 2 | INPROGRESS | rev-1 | 2026-11-23 |
+| [KICK-dKeptSession-80 — the run branch reconciled with origin/main at 525f3ab97 in one merge commit, each conflict resolved by its kind](spec/2026-11-23-spec-KICK-dKeptSession-80.md) | 38 | 2 | INPROGRESS | rev-2 | 2026-11-24 |
 <!-- /gen:build-units -->
 
 Records: 512 bound to this build, across 4 record folder(s).

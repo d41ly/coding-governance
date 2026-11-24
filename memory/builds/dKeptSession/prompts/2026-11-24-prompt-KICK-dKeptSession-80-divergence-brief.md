@@ -17,7 +17,7 @@ S1 and AC2 say the merge commit itself carries `Pass: KICK-dKeptSession-80`. Che
 - one of them, `memory/project/readme-contract.txt`, is a shared record by `SHARED_RECORDS` of `.unattended.conf`,
   and `--dispatch` refused the widening the refusal itself printed, naming that record.
 
-TOOL-aSparedSpawn-32 §4 records the same wall and the same route, and this run's first reconcile, `ad02f1a6a`,
+TOOL-aSparedSpawn-32 §4 states the same wall and the same route, and this run's first reconcile, `ad02f1a6a`,
 took it: the merge carries `Pass: none` and the unit's pass commit follows it. The main loop has committed the
 merge that way, as `dcb75b59e`, with the CLOSED flip and the ledger held out of it. Revise the spec to that.
 
