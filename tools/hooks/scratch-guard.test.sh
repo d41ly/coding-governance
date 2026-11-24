@@ -1638,10 +1638,10 @@ rm -rf "$SGWT/kit"
 # main, the none-role-shell, allowance-out and throw exit-2 rows exit 0; against the scanner at base,
 # every BR7-AC1 to AC3 row naming a target and the home-sed row read none. The exit-0 rows are the
 # near-misses and the main loop's controls.
-# scan_targets <name> <want> <command> [<cwd>] — scanWriteTargets' answer as `value:why` pairs joined by `;`.
+# scan_targets <name> <want> <command> [<cwd> [<tool>]] — scanWriteTargets' answer as `value:why` pairs joined by `;`.
 scan_targets() {
   local got
-  got=$(node -e 'const t=require(process.argv[1]).scanWriteTargets(process.argv[2],process.argv[3]||"");console.log("["+t.map((x)=>x.value+":"+x.why).join(";")+"]")' "$HOOK" "$3" "${4:-}" 2>&1)
+  got=$(node -e 'const t=require(process.argv[1]).scanWriteTargets(process.argv[2],process.argv[3]||"",process.argv[4]||undefined);console.log("["+t.map((x)=>x.value+":"+x.why).join(";")+"]")' "$HOOK" "$3" "${4:-}" "${5:-}" 2>&1)
   if [ "$got" = "[$2]" ]; then echo "ok   $1"; pass=$((pass+1)); else echo "FAIL $1 (read '$got', want '[$2]')"; fail=$((fail+1)); fi
 }
 scan_targets "BR7-AC1 sed-in-place: sed -i names its file operand" 'a.py:sed -i' "sed -i 's/a/b/' a.py"
@@ -1660,6 +1660,37 @@ scan_targets "BR7-AC3 git-apply-heredoc: the same patch in a heredoc" 'd.py:git 
 $(cat "$TMP/sw7.patch")
 EOF"
 scan_targets "BR7-AC3 git apply --check writes nothing" '' 'git apply --check sw7.patch' "$SG_TMP_N"
+# ---- TOOL-dBoundRoles-86: the exact value of each redirect operator, of the target-directory option --
+# ---- and of a substitution. Against a REDIRECT that needs a separator before it, as at base, the glued -
+# ---- rows read none; with the target-directory loop cut from scanWriteOperands, its rows read `a` -------
+scan_targets "BR86 redirect: a glued > after a word" 'f:redirect' 'echo a>f'
+scan_targets "BR86 redirect: a glued >> after a word" 'f:redirect' 'echo a>>f'
+scan_targets "BR86 redirect: a digit run ending a word is no descriptor" 'f:redirect' 'echo a2>f'
+scan_targets "BR86 redirect: n>" 'f:redirect' 'x 2>f'
+scan_targets "BR86 redirect: n>> spaced" 'f:redirect' 'x 2>> f'
+scan_targets "BR86 redirect: {v}>" 'f:redirect' 'x {v}>f'
+scan_targets "BR86 redirect: >|" 'f:redirect' 'x >|f'
+scan_targets "BR86 redirect: &>" 'f:redirect' 'x &>f'
+scan_targets "BR86 redirect: &>>" 'f:redirect' 'x &>>f'
+scan_targets "BR86 redirect: <>" 'f:redirect' 'x <>f'
+scan_targets "BR86 redirect: >&f" 'f:redirect' 'x >&f'
+scan_targets "BR86 redirect: >& f" 'f:redirect' 'x >& f'
+scan_targets "BR86 redirect: PowerShell's *> takes the star" 'f:redirect;d:mkdir' 'mkdir d *>f' '' PowerShell
+scan_targets "BR86 redirect: two on one word" 'f:redirect;g:redirect' 'x >f>g'
+scan_targets "BR86 redirect: the word past a line continuation" 'f:redirect' 'x > \
+ f'
+scan_targets "BR86 redirect: a -c body's" 'f:redirect' "bash -c 'echo x > f'"
+scan_targets "BR86 redirect: a quoted arrow of a -c body is none" '' 'bash -c "echo \"see > b\""'
+scan_targets "BR86 redirect: duplications and closes are none" '' 'x 2>&1 3>&- 4<&5 >& 2'
+scan_targets "BR86 redirect: input redirects and a here-string are none" '' 'x <f <<<g'
+scan_targets "BR86 redirect: process substitutions are none" '' 'tee >(cat) <(y)'
+scan_targets "BR86 target directory: -t <dir>" 'd:cp destination' 'cp -t d a'
+scan_targets "BR86 target directory: a cluster ending in t" 'd:mv destination' 'mv -vt d a'
+scan_targets "BR86 target directory: -t<dir>" 'd:install destination' 'install -td a'
+scan_targets "BR86 target directory: --target-directory <dir>" 'd:cp destination' 'cp --target-directory d a'
+scan_targets "BR86 target directory: --target-directory=<dir>" 'd:cp destination' 'cp --target-directory=d a'
+scan_targets "BR86 target directory: rsync's -t is none" 'd:rsync destination' 'rsync -t a d'
+scan_targets "BR86 substitution: an operand after one is read" 'd:cp destination' 'cp $(echo a) d'
 sg7_k=$(HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
   node -e 'console.log(require(process.argv[1]).checkCommand(process.argv[2],process.env).bad.map((b)=>b.kind+":"+b.why).join(";"))' "$HOOK" "sed -i 's/a/b/' ~/x" 2>&1)
 [ "$sg7_k" = 'home:sed -i' ] && { echo "ok   BR7-AC8 home-sed: checkCommand reads sed -i on ~/x as a home finding"; pass=$((pass+1)); } \
@@ -1752,6 +1783,80 @@ SG7_PRELOAD="$SG_TMP_N/sw7throw.js"
 run_shell_write "BR7-AC7 a throw in the arm, gov-builder -> deny naming the shell-write arm" 2 "any;;the shell-write arm threw" gov-builder "sed -i 's/a/b/' a.py" session_id=sgtest-o1 agent_id=a7
 run_shell_write "BR7-AC7 a throw in the arm, the main loop -> allow, stderr EMPTY" 0 empty - "sed -i 's/a/b/' a.py" session_id=sgtest-o1
 unset SG7_PRELOAD
+# ---- TOOL-dBoundRoles-86: the spelling family. One node program calls checkShellWrites over the write --
+# ---- gate's fixture: each row is a verdict, a role, a tool and a spelling whose @ is the target, run at --
+# ---- a path of the fixture outside the role's class, and at a path in no repository, which is null under -
+# ---- any row. A `deny` row refuses the first naming it; an `admit` row admits both. -
+# ---- A new spelling is one row here and owes both runs. Against the scanner at base every spelling of ---
+# ---- the closing review's B1 fails its deny run or its admit run, but the backslash-continued cp, which -
+# ---- base reads and a walk ended at any newline loses, and the quoted arrow, the near-miss. --------------
+scan_shell_spellings() {
+  cat > "$TMP/sw86.js" <<'SW86'
+const [hook, top, product, outside] = process.argv.slice(2)
+const g = require(hook)
+const rows = [
+  ['deny', 'gov-spec-writer', 'Bash', 'cp a @'],
+  ['deny', 'gov-spec-writer', 'Bash', 'cp a @ 2>/dev/null'],
+  ['deny', 'gov-spec-writer', 'Bash', 'cp a @ 2>&1'],
+  ['deny', 'gov-spec-writer', 'Bash', 'cp a @\necho hi'],
+  ['deny', 'gov-spec-writer', 'Bash', 'cp a \\\n @'],
+  ['deny', 'gov-spec-writer', 'Bash', 'cp a @ # note'],
+  ['deny', 'gov-spec-writer', 'Bash', 'cp a 2>&1 @'],
+  ['deny', 'gov-spec-writer', 'Bash', 'cp a >|/dev/null @'],
+  ['deny', 'gov-spec-writer', 'Bash', 'cp $(echo a) @'],
+  ['deny', 'gov-spec-writer', 'Bash', 'cp -t @ a'],
+  ['deny', 'gov-spec-writer', 'Bash', 'if cp a @; then :; fi'],
+  ['deny', 'gov-spec-writer', 'PowerShell', 'cp a `\n @'],
+  ['deny', 'gov-researcher', 'Bash', 'cp a.py @ 2>/dev/null'],
+  ['deny', 'gov-researcher', 'Bash', 'cp a.py @\ngrep x b'],
+  ['deny', 'gov-researcher', 'Bash', 'mkdir -p @ 2>/dev/null'],
+  ['deny', 'gov-researcher', 'Bash', 'mkdir -p @\ngit status'],
+  ['deny', 'gov-researcher', 'Bash', 'echo a>@'],
+  ['deny', 'gov-researcher', 'Bash', 'cat>@'],
+  ['deny', 'gov-researcher', 'Bash', 'echo x >|@'],
+  ['deny', 'gov-researcher', 'Bash', 'echo x &>>@'],
+  ['deny', 'gov-researcher', 'Bash', 'echo x >&@'],
+  ['deny', 'gov-researcher', 'Bash', 'echo a=>@'],
+  ['deny', 'gov-researcher', 'Bash', 'echo -> @'],
+  ['deny', 'gov-researcher', 'Bash', 'echo [[ a > @ ]]'],
+  ['deny', 'gov-researcher', 'Bash', '[[ a > b ]] && echo x > @'],
+  ['deny', 'gov-researcher', 'Bash', '((echo x) > @; (true))'],
+  ['deny', 'gov-researcher', 'PowerShell', '((echo x > @))'],
+  ['deny', 'gov-researcher', 'PowerShell', 'x *>@'],
+  ['admit', 'gov-researcher', 'Bash', 'echo "a->@"'],
+  ['admit', 'gov-researcher', 'Bash', 'echo a \\> @'],
+  ['admit', 'gov-researcher', 'Bash', '[[ a > @ ]]'],
+  ['admit', 'gov-researcher', 'Bash', 'if [[ a > @ ]]; then :; fi'],
+  ['admit', 'gov-researcher', 'Bash', '(( a > @ ))'],
+  ['admit', 'gov-researcher', 'Bash', 'ls 2>&1 # a > @'],
+]
+const run = (cmd, type, tool) => g.checkShellWrites(cmd, { tool_name: tool, cwd: top, agent_type: type, session_id: 'sgtest-o1' }, {})
+for (const [verdict, role, tool, spelling] of rows) {
+  // outside the role's class: a product path for the spec role; for the none role a path no card is read for
+  const inside = role === 'gov-spec-writer' ? product : 'sw86.py'
+  for (const [where, target] of [['a path outside its class', inside], ['a path in no repository', outside]]) {
+    let got
+    try { got = run(spelling.split('@').join(target), role, tool) } catch (e) { got = { threw: String(e) } }
+    const want = target === inside ? verdict : 'admit'
+    const ok = want === 'admit' ? got === null : Boolean(got && got.deny && got.deny.toLowerCase().includes(`/${inside}`))
+    console.log(`${ok ? 'ok  ' : 'FAIL'} BR86 ${role}, ${tool}: ${JSON.stringify(spelling)} at ${where} -> ${want}${ok ? '' : ` (read ${JSON.stringify(got)})`}`)
+  }
+}
+console.log(`rows ${rows.length * 2}`)
+SW86
+  node "$TMP/sw86.js" "$HOOK" "$SG_CWD_WT" "$SGP/sw86.py" "$SG_NOREPO_FWD/sw86.py" > "$TMP/sw86.out" 2>&1
+  local l rows=0
+  while IFS= read -r l; do
+    case $l in
+      ok\ *) echo "$l"; pass=$((pass+1)) ;;
+      rows\ *) rows=${l#rows } ;;
+      FAIL\ *) echo "$l"; fail=$((fail+1)) ;;
+      *) echo "FAIL BR86 the spelling family printed: $l"; fail=$((fail+1)) ;;
+    esac
+  done < "$TMP/sw86.out"
+  [ "$rows" -gt 0 ] || { echo "FAIL BR86 the spelling family printed no row count"; fail=$((fail+1)); }
+}
+scan_shell_spellings
 write_roles absent
 
 # ==================================================================================================
@@ -2273,8 +2378,10 @@ n=$((pass+fail))
 # allowance row; its count row prints only on a red), counted by hand under the same rule.
 # 465 = 450 + the 15 BR56-AC1 rows TOOL-dBoundRoles-56 added (three readers over five fixtures), counted by
 # hand under the same rule; a tree with no kickoff writer or no memory-tree kit skips them, as AC10's arm does.
+# 560 = 465 + the 95 rows TOOL-dBoundRoles-86 added (27 scan_targets rows, and the 68 rows its spelling family
+# prints, its count row printing only on a red), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=465
+FLOOR_ASSERTIONS=560
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
