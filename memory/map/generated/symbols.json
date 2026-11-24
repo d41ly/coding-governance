@@ -8398,6 +8398,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "check_program_rows",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
       "id": "check_projection",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -8776,6 +8781,11 @@
       "id": "check_rerun_plant",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "check_reserved_words",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "check_residue_gone",
