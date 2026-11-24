@@ -57,3 +57,4 @@ tools/lexicon/lexicon.py` exited 1 on its verb-offender pin, 1432 offenders over
 `check_mail_deadline`, `derive_bound_seconds`, `run_deadline_arm` or `read_deadline_keys`.
 `gen_map.py --write` added those four rows to `memory/map/generated/symbols.json` and moved nothing
 else.
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `mail-expired`: the guard reads `expired` as `open`

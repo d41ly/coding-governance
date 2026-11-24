@@ -78,3 +78,6 @@ against an unchanged key reported as crossed.
   position fixtures` row's grep printed `plants=32` (DERIVED, that probe). The `boundary` case read
   alone by direct CLI three times took 0.146 s, 0.138 s and 0.141 s (DERIVED), so the row's note
   re-reads its proxy at 68.5 s and the budget 432 stands over 103 (DERIVED from the row's 68.3 s).
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `boundary`: an unchanged key reported as crossed
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `pointers-render`: the pointers section written empty
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `pointers-boundary`: a crossing that leaves the stored `item —` unchanged

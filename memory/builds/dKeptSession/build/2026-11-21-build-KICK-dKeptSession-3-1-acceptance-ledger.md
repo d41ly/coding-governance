@@ -61,3 +61,6 @@ observation of each `New arm:` line: `preset-diff` on its two staged breaks, `ch
 - The over-cap map case of `check_map_arms` still refuses with the shorter preset line: `instruction-map:
   2288 over MAP_CAP_BYTES` (DERIVED, that run). One `preset --diff` over gov's tree took 0.27 s
   (DERIVED, that run), under `MAP_PRESET_SECONDS`.
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `preset-diff`: a key the preset equals forced into the diff
+- seen-red — `playbook render selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `check_map_arms`: the map's new last line left out
+- seen-red — `instruction units selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `map-held`: a map that lets the refusal raise

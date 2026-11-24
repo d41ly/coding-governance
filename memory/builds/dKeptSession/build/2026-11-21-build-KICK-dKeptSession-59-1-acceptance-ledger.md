@@ -40,3 +40,4 @@ observed once by this pass; the close's observation is still the main loop's.
   literal without its closing bracket, it answered 1 with 1 wrong (DERIVED, that probe), naming the
   `JSONDecodeError`. Neither passed.
 - S2 — not observed, as the spec states: a placement unit 49's own Non-goals already make.
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `mirror-input-parity`: the Python list carries an input the JS list lacks

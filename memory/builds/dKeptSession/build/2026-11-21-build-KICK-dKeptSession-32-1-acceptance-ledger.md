@@ -56,3 +56,4 @@ Unit 4 is CLOSED, so its spec and its ledger are not written; its two passages a
   `python -c` count of `scan_keys` over each render).
 - AC5 — `grep -n "as a comment" README.md` in the policy kit printed one line, the `policy.py scaffold` entry's, saying a row the named preset assigns is written as a comment naming the preset's value.
 - AC6 — this ledger holds each of unit 4's two passages once, quoted under S4 above; the pass's staged paths name neither unit 4's spec nor its acceptance ledger, and the `git diff --name-only` over the pass's range is owed to the close.
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `scaffold-preset`: `render_scaffold` writes every literal row under a preset

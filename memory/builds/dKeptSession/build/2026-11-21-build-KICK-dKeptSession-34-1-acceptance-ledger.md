@@ -43,3 +43,5 @@ kit copy, since `budgets.py` runs as its own process.
   `preset = "strict"` it exited 0 with `guide-bytes\t-\trefuse\tnone` and the line `budgets:
   guide-bytes · budgets.enforce is refuse · ...`. The two rows' value and source are `-` and `none`
   each; 3 assertions, 0 wrong (DERIVED, that probe).
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `preset-every-key`: the step answers a value for an unassigned row
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `preset-derived-cap`: the step answers a value for an unassigned row

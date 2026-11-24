@@ -135,6 +135,7 @@ write.
 - AC14 — observed at the pass, `"test_gov_remote_scrub"` counted once; the clean re-render read after the commit is owed to the close:
   `python tools/memory-tree/gen_build_index.py --write` ran before the commit and its output is
   committed, and `grep -c '"test_gov_remote_scrub"' memory/map/generated/symbols.json` printed `1`.
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_gov_remote_scrub`: the scrub is a bare `del`
 
 ## The unit 64 texts answered (AC13)
 

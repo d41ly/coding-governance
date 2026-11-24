@@ -70,3 +70,9 @@ of both `New arm:` lines, the four `presets-*` cases and `adopter-fresh-target`'
   fed `x` exit 2 printing `loop-guard: refused · stdin:1 · "x" is not <key>=<toml value>`.
 - AC13 — `extract_arm_rows` — over the README, its names equal `ARMS` in order, `arm_presets` opening
   `finding`, each row's word equal to its arm's `empty`. The installed `--check` is owed.
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `presets-complete`: the store check answers no finding
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `presets-pairs`: the pair rule answers no finding
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `presets-repo`: the preset half of a policy file answers no problem
+- seen-red — `policy fixtures` — red `f6a0d7aaf` — green `f6a0d7aaf` — `presets-core-only`: no preset is loaded
+- seen-red — `loop factories fixtures` — red `45016a2c4` — green `45016a2c4` — `preset-from-unknown`: an unknown `--from` not refused before the write
+- seen-red — `loop factories fixtures` — red `45016a2c4` — green `45016a2c4` — `preset-new`: the factory leaves the catalogue row without the name

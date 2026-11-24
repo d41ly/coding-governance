@@ -118,6 +118,10 @@ the leg's 120s ceiling stays the owner's (PINNED 2026-11-23, `tools/gate-legs.js
 - AC25 — `grep -n '\.claude' extract.py` printed two lines, both inside `resolve_projects_root`, and the `derive_context_window` range less its docstring holds no `expanduser` or `.claude` (DERIVED, that grep and an `ast` probe).
 - AC26 — `grep -n 'HOME=str(empty), USERPROFILE=str(empty)' selftest.py` printed one line, inside `test_extract_context_window_root` (DERIVED, that grep).
 - AC27 — `grep -n "are a step, and" gen_build_index.py` printed `render_order`'s docstring line (DERIVED, that grep).
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_extract_context_window_compact`: a sidechain compaction folded in
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_extract_main_transcripts_inside`: a transcript linked from outside counted in
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_extract_env_reads`: the reader finds no variable read
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `mirror-legacy-expected`: the reader owes no legacy input
 
 ## What the close owes
 

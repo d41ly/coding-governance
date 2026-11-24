@@ -103,6 +103,11 @@ owner's.
 - AC12 — observed: `cmp tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md` exited 0, and `grep -c 'mail-forged\|acks-refused-witness\|notify-composition-unread' help/loop.md` printed 3 (DERIVED).
 - AC13 — observed: `grep -c '^FLOOR_ASSERTIONS=4223$' tools/unattended/unattended.test.sh` and `grep -c '^FLOOR_SHARD_8=1440$' tools/unattended/unattended.test.sh` printed 1 each, and `grep -c '^same "KDS79 ' tools/unattended/unattended.test.sh` printed 6 (DERIVED).
 - AC14 — observed: the import probe printed `44 45` (DERIVED), and the `loop transition record` and `loop position fixtures` rows carry `plants=44` and `plants=45` and name this unit.
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-refused-witness`: the ack block run before `derive_move`
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-refused-field`: the ack block run before `derive_move`
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-refused-scenario`: the ack block run before `derive_move`
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `notify-composition-unread`: the progress step reads the composition's `unread` again
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `mail-forged`: a `flush()` admitting on header and keys alone
 
 ## Owed to the close
 

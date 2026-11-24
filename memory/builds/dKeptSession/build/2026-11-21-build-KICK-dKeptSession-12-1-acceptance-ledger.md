@@ -52,3 +52,4 @@ reader is defined and no `· in` text is printed.
   value with no `claude-code_` prefix returned 1 with nothing printed, and `derive_cli_line` still
   printed its `cli —` cell from it. `grep -c 'claude-code_\*' manifest-check.sh` printed 1 (DERIVED,
   that probe).
+- seen-red — `manifest-check self-test` — red `45016a2c4` — green `45016a2c4` — `context-fixture-red`: a recorded red read as a run that could pass

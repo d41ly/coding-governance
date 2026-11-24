@@ -105,6 +105,8 @@ pinned version's count is not read here and is owed to a node holding it.
 - AC36 — `grep -c "def check_pairs" presets.py` printed 1, and `python scenario.py --fixture --plant slot-refused` printed its pair row refused by `presets.py pairs` naming the pair, then `held` (DERIVED, those runs).
 - AC37 — over the 60 commits `git log --format=%h 462d20f3..HEAD -- tools/govkit/subject-pins.tsv` printed, `git show --name-only --format= <h> -- tools/gate-legs.json 'tools/*kit.toml'` printed a path for each (DERIVED, a probe over that range).
 - AC38 — `tr -s ' \r\n' ' '` over this ledger piped into `grep -c` reads each of the two sibling passages once; the `git diff --name-only <pass base> HEAD --` over the named units' specs and ledgers is read at the commit, and the main loop confirms it.
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `mail-read-crash`: a crashed mailbox read taken as zero rows
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `presets-repo`: a declared name may shadow a shipped preset
 
 ## What the close owes
 

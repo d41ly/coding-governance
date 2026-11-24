@@ -97,6 +97,9 @@ and the `New arm:` line's RED-first observation, the cases `reader-join`, `purpo
   both paths, the key's word count printed `2`, and the whole output of AC9's three runs holds no
   `guard-trace · WRONG` line (DERIVED, at `f9bff5b86`). At `815c02ef8`, the main loop's,
   `bash tools/memory-tree/check-memory-hygiene.sh --only 3` printed no failure line.
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `purposes-drain`: the drain writes nothing
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `purposes-new`: the population is compared with nothing
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `reader-join`: the population is compared with nothing
 
 ## Superseded text
 

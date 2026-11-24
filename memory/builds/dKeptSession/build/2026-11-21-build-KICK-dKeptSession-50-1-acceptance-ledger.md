@@ -49,3 +49,4 @@ Unit 40's criteria are joined by AC1 and AC2 below, for the pre-unit mirror they
   `check_policy.py`, each naming `GOVKIT_RERENDER`, against 1 and 0 at the base, with 0 refused in
   each (DERIVED, that probe).
 - AC4 — the squeezed ledger piped into `grep -c` of each of the two passages S4 quotes printed `1`, and `git diff --name-only 3e14697d --` over unit 40's spec and its acceptance ledger, the working tree included, printed nothing (DERIVED, that probe).
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `mirror-upgrade`: `check_mirror_text` compares no `legacy_blobs`

@@ -66,3 +66,4 @@ tools/lexicon/lexicon.py` exited 1 on its verb-offender pin, 1432 offenders over
 `readMailNotice`, `checkFetchDue`, `runDetachedFetch` or `renderMailNotice`. `gen_map.py --write`
 added those functions' rows and the hook's `main` to `memory/map/generated/symbols.json` and the hook's key to `MAP.md`,
 `CARDS.md` and `inventories.json`.
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `mail-notice-boundary`: the notice step left out of the boundary verb

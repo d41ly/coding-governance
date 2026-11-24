@@ -43,3 +43,4 @@ Unit 30 is CLOSED, so its spec and ledger stay as they are and the answer is her
 - AC4 — over `tools/runlog/README.md` the new clause counts 1 and `largest compaction` 0, and over `tools/runlog/extract.py` the new docstring clause counts 1 and `largest integer compaction` 0 (DERIVED, `tr` and `grep` at the commit).
 - Beyond the criteria, a direct read of `derive_context_window` over `held` events read `no observation` for a compaction timed before the transcript's only usage, and the 1000000 rung for one timed after it (DERIVED, a `python -c` probe).
 - `ASSERTION_FLOOR` rises from 1624 to 1629: the new case's 2 checks and its 3 decoy checks (PINNED, the count its `RAISED` comment prices).
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_extract_context_window_compact`: every compaction folded into the observation

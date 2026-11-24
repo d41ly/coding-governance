@@ -85,3 +85,7 @@ and the RED-first observation of the `New arm:` line, the five `purposes-*` case
   `patch`, `placement`, `plan`, `probe`, `prompts`, `release`, `resume`, `retrofit`, `reuse`,
   `roles`, `run`, `tests`, `trace`, `transitions`, `verdict`. The one ask putting them to the owner
   in this build's `BACKLOG.md` is the main loop's, as S8 states, and is not filed by this pass.
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `purposes-new`: the list is compared with nothing
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `purposes-listed`: a listed namespace reds
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `purposes-map-purpose`: a value other than `review` said nowhere
+- seen-red — `policy fixtures` — red `f6a0d7aaf` — green `f6a0d7aaf` — `purposes-shape`: the namespace rows read unchecked

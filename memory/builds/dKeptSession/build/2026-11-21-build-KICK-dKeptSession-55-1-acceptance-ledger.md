@@ -75,3 +75,5 @@ lists is in this unit's files (DERIVED, that run). The close owes these: the eig
 --selftest`, §7's legs, and the new arm's RED-first observation on scratch copies of
 `write_consumed_acks` that write no `mail — acked` line (AC1) and that ack whatever the guard then
 reads (AC2).
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-withdrawn`: a `withdrawn` row is never consumed
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-withdrawn-question`: acks posted although another row stays open

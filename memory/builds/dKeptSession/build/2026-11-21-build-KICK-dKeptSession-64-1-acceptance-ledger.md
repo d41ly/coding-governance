@@ -239,6 +239,7 @@ quoted as breaking the rule (DERIVED, the legs each names read against the `name
 - AC18 — over `tools/lib/gov-ref.sh`'s `gov_ref_sh` block, the count with comment lines dropped printed `0` and without the filter `1`; the block's `write_gov_ref` calls `add_feed_event` once per trailing argument on the line before its `write_feed_success` call (DERIVED, those commands).
 - AC19 — the answer to 63's AC13 above names the `spec tokens (a spec's own names resolve)` leg's `guards` hits as the criterion and carries no `--legs-for` population; AC8's probe read the join's `[guards]` output, never `print_legs_for`'s (DERIVED, the probe's own grep).
 - AC20 — `python tools/codebase-map/gen_map.py --check` exited `0` after the re-render, and `grep -c '"derive_kit_imports"' memory/map/generated/symbols.json` printed `1` (DERIVED, those commands).
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_extract_env_dropped`: `main` drops no GOV_REMOTE, the unset sitting elsewhere
 
 ## What the close owes
 

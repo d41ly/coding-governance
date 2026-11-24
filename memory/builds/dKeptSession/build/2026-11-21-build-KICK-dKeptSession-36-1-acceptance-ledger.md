@@ -47,6 +47,9 @@ the five new selftest cases and `check_plant_tokens` over the re-priced row amon
   `loop transition record` row of `tools/run-gates/selftest-budgets.txt` carries `plants=18` and no
   other `plants=` token, re-priced to 67 from r 44.3s, the earlier r 40.8s plus mail-argv 1.6s,
   mail-no-driver 1.4s and mail-no-bash 0.5s (PINNED, node d, 2026-11-23).
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `mail-argv`: the read launches bare `bash`
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `mail-no-bash`: a None bash read as an absent mailbox
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `mail-no-driver`: an unresolved driver raised as unknown, not read unarmed
 
 ## The pass's own reads
 

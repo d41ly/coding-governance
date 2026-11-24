@@ -66,3 +66,6 @@ observation of the `New arm:` line over `tools/loop/scenario.py`, the plants sta
   `pairs` over non-JSON stdin exited 2 (DERIVED, that probe).
 - Naming — `python tools/lexicon/lexicon.py` exited 0 (DERIVED, that run) with its P1 offender count
   unchanged from the base's run.
+- seen-red — `loop scenario fixtures` — red `45016a2c4` — green `45016a2c4` — `slot-builds`: the read order without `read_scenario_value`
+- seen-red — `loop scenario fixtures` — red `f6a0d7aaf` — green `f6a0d7aaf` — `slot-refused`: a key presets never touch read unchecked
+- seen-red — `loop scenario fixtures` — red `45016a2c4` — green `45016a2c4` — `slot-conflict`: the read order without `read_scenario_value`

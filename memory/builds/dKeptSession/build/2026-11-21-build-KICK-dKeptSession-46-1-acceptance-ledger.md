@@ -42,3 +42,4 @@ Units 30 and 9 are CLOSED, so their specs and ledgers stay as they are and the a
 - AC4 — the three passages are quoted above, each once; `git diff --name-only` from the pass's base over the specs and acceptance ledgers of units 30 and 9 prints nothing, since this commit writes none of them (DERIVED, that probe at the commit).
 - AC5 — the `context` paragraph of `tools/runlog/README.md` names `derive_context_fill(ev, *, window=None, root=None)` and no longer holds the phrase its default-root sentence carried (DERIVED, `tr` and `grep` at the commit).
 - `ASSERTION_FLOOR` rises from 1618 to 1624: the new case's 3 checks and its 3 decoy checks (PINNED, the count its `RAISED` comment prices).
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_extract_context_fill_root`: `derive_context_fill` falls back to the default root

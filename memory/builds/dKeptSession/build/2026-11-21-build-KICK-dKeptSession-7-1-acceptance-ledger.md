@@ -74,3 +74,11 @@ over 1421 (DERIVED, that run), the count unit 6 read at its base, and `--offende
 unit's functions, nested helpers included. `gen_map.py --write` added the unit's functions, its two
 plant runners and the suite's `write_landed_dependent` to `memory/map/generated/symbols.json`, and
 rewrote no other map file.
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `deps-notices`: the notice call left out of the Design exit
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `deps-wait`: the gate read without the `wait-for-landing` value
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `deps-order`: the `order-only` value unread
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `deps-unreachable`: an unreachable parent read as reachable
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `deps-confirmed`: an unconfirmed interface holds nothing
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `deps-design-only`: the `design-only` value unread
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `deps-anything`: the `anything-coordinated` value unread
+- seen-red — `loop position fixtures` — red `f6a0d7aaf` — green `f6a0d7aaf` — `deps-strict`: the two keys never read from the preset

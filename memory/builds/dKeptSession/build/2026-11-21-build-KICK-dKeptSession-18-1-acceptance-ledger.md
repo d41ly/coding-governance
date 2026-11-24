@@ -36,6 +36,10 @@ arm runs after the route join.
 - AC4 — `grep -c 'FIRST_MOVES' loop_table.py` printed 6 and the `sed` range of `check_entry_rows`'s body piped to `grep -cE '"(new|patch|repeat)"'` printed 0 (DERIVED, those commands at observation time).
 - AC5 — in `help/`, `grep -c 'entry rows' loop.md` printed 2, `grep -c 'by path' loop.md` printed 1, on the sentence that a `repeat` request names its playbook by path, and `grep -c 'entry-row-twice' loop.md` printed 1; `python tools/govkit/docs_leg.py --fingerprints` printed `6513b6ba` for `script:tools/loop/loop_table.py` and `0011b11d` for its `#check` row, the anchors' own, unmoved (DERIVED, those commands at observation time).
 - AC6 — `python -I -c` importing `loop_table` printed 5 for `__doc__.count('entry rows')`, and `grep -c 'entry-row-missing' README.md` in the loop kit's directory printed 1 (DERIVED, those commands at observation time).
+- seen-red — `loop transition tables` — red `45016a2c4` — green `45016a2c4` — `entry-row-missing`: a first move with no build row read unchecked
+- seen-red — `loop transition tables` — red `45016a2c4` — green `45016a2c4` — `entry-set-missing`: a first move outside the disposition set read unchecked
+- seen-red — `loop transition tables` — red `45016a2c4` — green `45016a2c4` — `entry-row-extra`: a build row no first move fires read unchecked
+- seen-red — `loop transition tables` — red `45016a2c4` — green `45016a2c4` — `entry-row-twice`: two build rows for one first move read unchecked
 
 ## Owed to the close
 

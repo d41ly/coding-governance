@@ -52,3 +52,4 @@ its spec nor its acceptance ledger is written here (F1, resolved (b)).
 - `fixture-run`, re-pointed: KICK-dKeptSession-12 AC4's plant pinned `cli 9.9.2` from `AI_AGENT`, which
   the verdict no longer reads, so the plant now puts a stub `claude` answering 9.9.2 first on PATH; its
   five rows held (DERIVED, that run).
+- seen-red — `manifest-check self-test` — red `45016a2c4` — green `45016a2c4` — `fixture-run-cli`: the verdict records `read_session_cli_version`'s answer

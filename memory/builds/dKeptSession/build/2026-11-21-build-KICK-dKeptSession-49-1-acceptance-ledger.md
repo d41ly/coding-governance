@@ -45,3 +45,4 @@ passages of `2026-10-26-spec-KICK-dKeptSession-40.md` read as S1 of this unit sa
 - AC3 — the squeezed `tools/policy/README.md` piped into `grep -c "the helper reads a mirror whose recorded id differs at L"` printed `0`, and into `grep -c "MIRROR_KIT_INPUTS"` printed `1` (DERIVED, that probe).
   The same pipes over the README at the base printed `1` and `0` (DERIVED, that probe).
 - AC4 — the squeezed ledger piped into `grep -c "compares every key of"` and into `grep -c "Neither holds a list of its own"` each printed `1`, and `git diff --name-only d3b51e46 HEAD --` over unit 40's spec and its acceptance ledger printed nothing (DERIVED, that probe).
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `mirror-pre-unit-stale`: the reader lists only the mirror's recorded keys

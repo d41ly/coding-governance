@@ -158,6 +158,9 @@ the manifest read at the pass). Each exit-0 query closed with
 - AC25 — `grep -c -F '(# |// )>>> ' resolve-python.test.sh` in `tools/lib/` printed `3` (DERIVED, that command).
 - AC26 — over the staged kit declaring `MIRROR_KIT_INPUTS` twice the case printed `WRONG: policy-mirror.js holds 2 MIRROR_KIT_INPUTS declaration(s), not one`, and over one declaring `MIRROR_LEGACY_INPUTS` nowhere `WRONG: policy-mirror.js holds 0 MIRROR_LEGACY_INPUTS declaration(s), not one` (DERIVED, those runs).
 - AC27 — this ledger quotes the nine superseded texts above. The `tr` and `grep -c` reads and the `git diff --name-only fb72d2a5f HEAD -- memory/builds/dKeptSession/build/` read are made at the commit, and the main loop confirms them.
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_extract_main_transcripts_inside`: a transcript linked from outside counted in
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_extract_env_reads`: `model.py` reads a planted variable no arm drops
+- seen-red — `policy fixtures` — red `f6a0d7aaf` — green `f6a0d7aaf` — `mirror-input-parity`: a doubled declaration read by its first
 
 ## What the close owes
 

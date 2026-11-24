@@ -64,3 +64,5 @@ counts 3 region-eight `same` (DERIVED, its own lines), raising `FLOOR_ASSERTIONS
 anchor carries, so no anchor moves. `python tools/lexicon/lexicon.py` exited 1 on its verb-offender
 pin, 1432 over 1421 (DERIVED, that run), the count unit 7 read at its base, and no offender it lists is
 in this unit's files. The new arms' RED-first observations and §7's legs are the close's.
+- seen-red — `loop transition record` — red `f6a0d7aaf` — green `f6a0d7aaf` — `notices-two-dependents`: `--pass` dropped from the notice post
+- seen-red — `loop transition record` — red `f6a0d7aaf` — green `f6a0d7aaf` — `notices-refused`: a refused post said nowhere

@@ -59,3 +59,5 @@ ledger is written here (F1, resolved (b)).
   nothing (DERIVED, that probe, over the committed pass).
 - `--list` prints 46 plants, two more than at the base (DERIVED, `--list` piped into `grep -c .`), and
   `FLOOR_ASSERTIONS` rises from 420 to 422 (PINNED, one ok row per new plant from the suite's loop).
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `fixture-cli-unknown`: an unknown PATH version read as equal
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `fixture-cli-path-differs`: the session's version alone compared

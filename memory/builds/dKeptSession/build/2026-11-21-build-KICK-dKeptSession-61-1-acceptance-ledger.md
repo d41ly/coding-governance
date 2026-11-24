@@ -57,6 +57,7 @@ per parent judged. Units 53 and 55 are CLOSED, so neither spec nor ledger of the
 - AC6 — `docs_leg.py --fingerprints` printed `4c1a862e` for `verb:unattended.sh:--mail`, the fingerprint `help/loop.md`'s anchor now carries, re-stamped from `e05e3012` (DERIVED, that command and the grep); `script:tools/loop/loop_transition.py` stayed `930359dc` (DERIVED, that command). `grep -c -- '--sent'` printed at least 1 for `help/loop.md`, `tools/unattended/VERBS.template.md` and `tools/loop/README.md`, `chain-two-dependents` is in `help/loop.md`, and `cmp` of the template and `memory/guides/UNATTENDED-VERBS.md` printed nothing (DERIVED, those commands at observation time).
 - AC7 — the scratch probe ran the block's helpers and its lines verbatim, outside the suite: sessions `s1` and `s2` of build `fx` post to `build:fy` and `build:fz`, and its `same` lines on `--mail read fy` and on the `--sent` read of `fx` held (DERIVED, that probe). The suite's own run is the close's.
 - AC8 — the same probe ran the block's `--mail read build:fx --sent` and `--sent` ack lines, and its four `same` held, `assertions 4 status 0` (DERIVED, that probe). The suite's own run is the close's.
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `chain-two-dependents`: the chain placed over the dependent's own rows alone
 
 ## What the close owes
 

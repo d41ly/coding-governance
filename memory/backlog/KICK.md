@@ -30,3 +30,11 @@ Cite ids, never line numbers.
 | [KICK-dKeptSession-76](../builds/dKeptSession/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | THE LEDGER LINT FOR A SUPERSEDED CRITERION'S MOVED SUBJECT. A… |
 | [KICK-dKeptSession-77](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE SPEC-TOKENS CHECK FOR A BARE SCOPE ITEM. A bare S<n> in a sentence… |
 | [KICK-dKeptSession-78](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE BUG-CLASS CHECKLIST ENTRIES OF THE ROUND-4 AND ROUND-5 AUDITS. The… |
+| [KICK-dKeptSession-81](../builds/dKeptSession/BACKLOG.md) | OPEN | MED | — | 2026-11-24 | THE HELD SUITES' BUDGET ROWS RE-READ. The units grew held suites whose… |
+| [KICK-dKeptSession-82](../builds/dKeptSession/BACKLOG.md) | OPEN | MED | — | 2026-11-24 | THE ARMS THAT CAN PASS BY FINDING NOTHING. tools/loop/breakpoints.py's… |
+| [KICK-dKeptSession-83](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-24 | THE REFUSAL BRANCHES NO ARM REACHES. The branches… |
+| [KICK-dKeptSession-84](../builds/dKeptSession/BACKLOG.md) | OPEN | MED | — | 2026-11-24 | THE MANIFEST-CHECK SUITE'S EXACT REPLAY CHECK. Units 14 and 15 print a… |
+| [KICK-dKeptSession-85](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-24 | THE TEXT DEBTS OF UNITS 21 AND 53 AND THE WRAPPED SPANS.… |
+| [KICK-dKeptSession-86](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-24 | THE ARMS NOT SEEN RED AT THE CLOSE.… |
+| [KICK-dKeptSession-87](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-24 | THE TAG INDEX GROWS AND --gc CANNOT COLLECT IT.… |
+| [KICK-dKeptSession-88](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-24 | THE PINNED CLI READING AND UNIT 56'S AC24. Units 44 S7 and 56 AC16 owe… |

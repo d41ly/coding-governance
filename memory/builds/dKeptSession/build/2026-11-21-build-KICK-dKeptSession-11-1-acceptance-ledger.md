@@ -67,3 +67,8 @@ its output names none of this unit's functions. `gen_map.py --write` added `chec
 `derive_owner_events`, `read_policy_value`, `render_progress_line` and `print_progress` and dropped
 `check_transition_definition` in `memory/map/generated/symbols.json`, and rewrote no other map file.
 The RED-first observations of the plants and the suite block, and the legs of §7, are the close's.
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `notify-every`: no progress line printed for a transition, as the base module
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `notify-park-landing`: a progress line printed whatever the value selects
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `notify-park-only`: a progress line printed whatever the value selects
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `notify-shape`: the line definition check answers no finding
+- seen-red — `loop transition record` — red `f6a0d7aaf` — green `f6a0d7aaf` — `notify-micro`: a progress line printed whatever the value selects

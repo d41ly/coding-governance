@@ -52,3 +52,4 @@ each on its staged break and green once restored.
 - AC8, owed — the docs leg's run arm over `help/tutorial/adopt-gov.md` is a gate leg's arm, so this pass did not run it.
   The tutorial's intake line now ends `--answer preset=standard`, the answer AC1 observed intake to
   need.
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `intake-preset`: the scaffold writes a preset whatever the answer

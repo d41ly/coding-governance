@@ -46,3 +46,4 @@ Unit 30 is CLOSED, so its spec and ledger stay as they are and the answer is her
 - AC4 — both passages are quoted above, and the joined ledger counts each 1; `git diff --name-only` from the pass's base over unit 30's spec and its acceptance ledger prints nothing, since this commit writes neither (DERIVED, that probe at the commit).
 - AC5 — over the joined `tools/runlog/README.md`, `a 200k session of that model included` counts 1 and unit 47's `whose newest earlier main usage in the same transcript is on that model` counts 1, and `grep -c` for the variable at 200000 prints 1 (DERIVED, `tr` and `grep` at the commit).
 - `ASSERTION_FLOOR` rises from 1629 to 1630: the one check S3 adds and no decoy check (PINNED, the count its `RAISED` comment prices).
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_extract_context_window`: the variable ranked under the observation

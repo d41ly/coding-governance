@@ -35,3 +35,4 @@ beside its generator `policy.py`, so the landing's `regen.py --write` or the mai
   gov's committed mirror predates the input until it is rendered, which this pass does not write.
 - AC5 — `grep -n "legacy_blobs" policy.md` in `help/` printed the guard section's one line, which names the policy kit's `presets.toml` and opens the list of its three inputs.
   The fanout conf and the instruction overlay follow it in that list.
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `mirror-presets-stale`: the input list omits the store

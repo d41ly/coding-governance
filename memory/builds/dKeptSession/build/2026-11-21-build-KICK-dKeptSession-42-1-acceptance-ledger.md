@@ -60,6 +60,10 @@ at the ceiling is superseded for this run by the main loop, which parks the rais
 - AC5 — the grep printed three lines of `help/loop.md` (DERIVED, that grep at observation time): the table's header row `| Kind addressed to your build | Acknowledged by | When |` in the guard paragraph under "Recording a build's move", the sentence `dependent's next move acknowledges each notice it has consumed …` inside `## Coordinating with a parent build`, and the fixture-cases sentence naming `acks-landed`.
 - AC6 — the probe printed `26` and the grep `plants=26`, and `acks-landed`, `acks-confirmed`, `acks-superseded` and `acks-failed` are keys of `PLANTS` (DERIVED, those commands at observation time).
 - AC7 — the grep printed the README's mail-guard paragraph and its fixture sentence, both naming `write_consumed_acks`, and in `loop_transition.py` the module docstring's mail-guard paragraph and plant sentence and `write_transition`'s docstring, each naming `write_consumed_acks` or `acks-landed` (DERIVED, that grep at observation time).
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-landed`: the `write_consumed_acks` call left out of `write_transition`
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-confirmed`: the `write_consumed_acks` call left out of `write_transition`
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-superseded`: the `write_consumed_acks` call left out of `write_transition`
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-failed`: the `write_consumed_acks` call left out of `write_transition`
 
 ## Owed to the close
 

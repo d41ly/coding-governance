@@ -62,3 +62,7 @@ together (DERIVED, the sum of those runs), for the main loop's re-price from its
 - AC6 — `grep -n "lead —" help/orientation-card.md` printed the example line and the paragraph line naming both `lead —` and `position —`.
   (DERIVED, that probe.)
 - `--list` prints six plants more than at the base (DERIVED, the PLANTS line's diff), and `FLOOR_ASSERTIONS` rises from 427 to 433 (PINNED, one ok row per new plant from the suite's loop).
+- seen-red — `manifest-check self-test` — red `45016a2c4` — green `45016a2c4` — `position-act`: a replay that prints no position
+- seen-red — `manifest-check self-test` — red `45016a2c4` — green `45016a2c4` — `lead-resume`: a notice after a resume
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `position-awaiting`: a replay that prints no position
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `lead-compact`: no notice after a compaction

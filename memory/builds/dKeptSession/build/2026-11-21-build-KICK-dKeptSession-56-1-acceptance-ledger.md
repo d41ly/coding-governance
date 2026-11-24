@@ -134,6 +134,11 @@ registry's rows): they are the legs that run units 35, 36 and 42's plants in
 - AC33 — this ledger cites `ARMS_FLOORS` and `REFUSAL_CEILINGS` by key and by no line, as S43 above records.
 - AC34 — `record` over the `notices-two-dependents` scratch with `loop_transition.read_transitions` rebound to raise `ValueError` and `breakpoints.run_sourced` wrapped exited 2, the wrapper recording no post (DERIVED, that probe), as S45 above records.
 - AC35 — `tr -s ' \r\n' ' '` over this ledger piped into `grep -c` reads each of the four quoted passages once, and `git diff --name-only <pass base> HEAD -- memory/builds/dKeptSession/build/` lists this ledger alone, both read at the closing commit, and the main loop confirms it.
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-no-session`: the refused ack leaves no cause, so the guard reads `mail open`
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `notices-reposted`: the re-post left out of every later move
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `presets-derived`: the stage default reads another member
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_extract_context_window`: a `claude-` model under the variable read as `env`
+- seen-red — `manifest-check self-test` — red `45016a2c4` — green `45016a2c4` — `fixture-cli-short`: the versions compared as strings
 
 ## What the close owes
 

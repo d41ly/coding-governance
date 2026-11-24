@@ -56,3 +56,9 @@ of 1421 (DERIVED, that run), the count unit 24's ledger read at its base, and `-
 of `read_mail_interrupts`, `check_mail_plant`, `run_mail_interrupts` or the nested `resolve_empty_kit`.
 `gen_map.py --write` added those three functions to `memory/map/generated/symbols.json` and moved
 nothing else. Both `New arm:` lines' RED-first observations are the close's.
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `mail-open`: the interrupt left `unarmed`
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `mail-transitions-only`: the `transitions-only` value unread
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `mail-amendments`: the amendments never held
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `mail-unarmed`: an unarmed read printed as no message
+- seen-red — `loop position fixtures` — red `45016a2c4` — green `45016a2c4` — `mail-refused`: a refused key said nowhere
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `mail-boundary`: the interrupts step left out of the crossing

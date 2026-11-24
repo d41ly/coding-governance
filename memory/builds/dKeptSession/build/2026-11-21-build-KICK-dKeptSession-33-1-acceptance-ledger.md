@@ -49,3 +49,4 @@ RED-first observation of the `New arm:` line, the `presets-derived` case's four 
   naming `maintain.fixes` with the six review stage keys from `review.plan`; `grep -n
   "literal" README.md` in the policy kit printed line 35, the `presets.toml` row naming the `literal`
   list.
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `presets-derived`: the store check answers no finding

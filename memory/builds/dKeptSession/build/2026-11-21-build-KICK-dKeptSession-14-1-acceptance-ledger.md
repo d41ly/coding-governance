@@ -75,3 +75,7 @@ the same replays, so those arms read two computed lines where they expect none.
 - AC11 — `python tools/playbook/render_playbook.py --reference` re-rendered the page after the anchors stood; `grep -n -A1` over it showed each `context.*` key's section followed by a `Documented on [help/orientation-card.md]` line, and `card.pointers` moved there off `## Not yet summarised`, now counting 223 rows (DERIVED, that render); `grep -cP '^policy:context\.' memory/project/docs-undocumented.txt` printed `0`; `docs_leg.py --fingerprints` named `help/orientation-card.md` for both keys.
   The `--check` form is the close's.
 - The plants `fixture-run`, `replay-order` and `lead-compact` still held over the changed engine and stub policy kit (DERIVED, those runs). `--list` prints five plants more than at the base (DERIVED, the PLANTS line's diff); `FLOOR_ASSERTIONS` rises from 433 to 438 and `ASSERTION_FLOOR` from 1580 to 1587 (PINNED, the counts each comment prices).
+- seen-red — `runlog selftest` — red `f6a0d7aaf` — green `f6a0d7aaf` — `test_extract_context_fill`: a later usage, whoever made it, read as the main session's
+- seen-red — `manifest-check self-test` — red `45016a2c4` — green `45016a2c4` — `fill-fresh-past`: a crossing past the threshold that prints nothing
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `fill-under`: a fill under the threshold read as past it
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `fill-replay`: a replay that prints no `context —` line

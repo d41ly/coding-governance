@@ -76,3 +76,5 @@ unit's files (DERIVED, that run). The close owes these: the two plants' and the 
 `check --selftest`, §7's legs, and the new arm's RED-first observation on scratch copies of
 `write_consumed_acks` selecting by `first-seen`, of `derive_mail_chain` ordering by `first-seen`, of
 one acking every row the chain relates, and of `write_fixture_gov_ref` with no `parent`.
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-takeover`: the session chain places no row
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `acks-later-key`: every row the parent wrote is acked, placed or not

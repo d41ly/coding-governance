@@ -70,3 +70,6 @@ here, `budget-open`, at 58 s (DERIVED, that run).
   already there plus the case's 3.5 s (DERIVED, from the case's reading).
   1.5 r rounds up to 272 s, under the row's 498 s, which stands (DERIVED, from the case's reading).
 - `--list` prints 51 plants, five more than at the base (DERIVED, `--list` piped into `grep -c .`), and `FLOOR_ASSERTIONS` rises from 422 to 427 (PINNED, one ok row per new plant from the suite's loop).
+- seen-red — `loop budget fixtures` — red `45016a2c4` — green `45016a2c4` — `state-answers`: a `state` line that is not `budget_state`'s answer
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `budget-open`: a stored `## pointers` that lacks `budget —`
+- seen-red — `manifest-check self-test` — red `f6a0d7aaf` — green `f6a0d7aaf` — `budget-spent`: a stored `## pointers` that lacks `budget —`

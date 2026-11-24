@@ -57,3 +57,5 @@ restored.
   not read (No such file or directory), no traceback, the refusal re-raised across the `__main__` module. With `presets.py`
   removed from that copy too, a file naming no preset read `budgets.enforce` as before, and the
   `strict`-named file refused with one line naming `presets.py`.
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `preset-every-key`: `read_preset_value` dropped from the resolution order
+- seen-red — `policy fixtures` — red `f6a0d7aaf` — green `f6a0d7aaf` — `resolution-order`: `read_preset_value` dropped from the resolution order

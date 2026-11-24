@@ -25,6 +25,7 @@
 | [2026-11-24-build-KICK-dKeptSession-80-red-fix-29.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-29.md) | red-fix | — |
 | [2026-11-24-build-KICK-dKeptSession-80-red-fix-30.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-30.md) | red-fix | — |
 | [2026-11-24-build-KICK-dKeptSession-80-red-fix-31.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-31.md) | red-fix | — |
+| [2026-11-24-build-KICK-dKeptSession-80-seen-red.md](../build/2026-11-24-build-KICK-dKeptSession-80-seen-red.md) | research | — |
 | [2026-11-24-build-KICK-dKeptSession-80-widen-5.md](../build/2026-11-24-build-KICK-dKeptSession-80-widen-5.md) | widen | — |
 | [2026-11-24-build-KICK-dKeptSession-80-widen-6.md](../build/2026-11-24-build-KICK-dKeptSession-80-widen-6.md) | widen | — |
 | [2026-11-24-build-KICK-dKeptSession-80-widen-7.md](../build/2026-11-24-build-KICK-dKeptSession-80-widen-7.md) | widen | — |

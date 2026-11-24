@@ -54,6 +54,12 @@ row's budget and the leg's ceiling.
 - AC7 — the catalogue probe in the policy kit's directory printed `dKeptSession unattended`; `grep -c 'usage: policy:attendance ' loop.md` in `help/` printed `1`, the anchor carrying `603ed07d`, the fingerprint `docs_leg.py --fingerprints` printed and then mapped to `help/loop.md`; `grep -cP '^policy:attendance\t' memory/project/docs-undocumented.txt` printed `0` (DERIVED, those commands at observation time).
 - AC8 — the `loop_lib` probe printed `59` and the grep `plants=59`; the `breakpoints` probe printed `17` and the grep `plants=17`; the six plants are keys of the two `PLANTS` (DERIVED, those commands at observation time).
 - AC9 — `cmp` of the verb guide's template and its copy exited 0, and the five greps printed `1`, `1`, `1`, `1` and `2` (DERIVED, those commands at observation time).
+- seen-red — `loop definition fixtures` — red `45016a2c4` — green `45016a2c4` — `attendance-actor`: an attendance row read with any key
+- seen-red — `loop definition fixtures` — red `45016a2c4` — green `45016a2c4` — `attendance-member`: an attendance member read unchecked
+- seen-red — `loop definition fixtures` — red `45016a2c4` — green `45016a2c4` — `attendance-twice`: a repeated attendance value read unchecked
+- seen-red — `loop breakpoint fixtures` — red `45016a2c4` — green `45016a2c4` — `attendance-values`: a `confirm-step-exit` member placing no gate
+- seen-red — `loop breakpoint fixtures` — red `45016a2c4` — green `45016a2c4` — `attendance-missing`: a value no row declares read unchecked
+- seen-red — `loop breakpoint fixtures` — red `45016a2c4` — green `45016a2c4` — `attendance-plan`: a `confirm-step-exit` member placing no gate
 
 ## The budget rows
 

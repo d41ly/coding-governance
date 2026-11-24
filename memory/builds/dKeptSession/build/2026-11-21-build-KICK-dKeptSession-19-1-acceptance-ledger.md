@@ -60,3 +60,5 @@ naming clause and grown list and `reader-join-blank`'s blank conf, in `tools/pol
 - AC7 — `grep -n "unnamed-keys" policy.md` — in `help/`, lines 112, 114 and 118 of the bullet
   "See which keys no build has picked up", line 114 saying a key leaves `unnamed-keys.txt` by its
   owner build's deviation moving a naming clause onto its row, drained by `lists --write`.
+- seen-red — `policy fixtures` — red `45016a2c4` — green `45016a2c4` — `reader-join`: no key reads unnamed
+- seen-red — `policy fixtures` — red `f6a0d7aaf` — green `f6a0d7aaf` — `reader-join-blank`: a blank design read as a finding

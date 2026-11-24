@@ -65,3 +65,4 @@ after the edits, so `memory/map/generated/symbols.json` does not move; the plant
 run), the count unit 35's ledger records at its base, and no offender it lists is in this unit's files. The
 `notices-repeat-key` case of `check --selftest`, §7's legs and the new arm's RED-first observation are
 the close's.
+- seen-red — `loop transition record` — red `f6a0d7aaf` — green `f6a0d7aaf` — `notices-repeat-key`: `--pass` dropped from the notice post

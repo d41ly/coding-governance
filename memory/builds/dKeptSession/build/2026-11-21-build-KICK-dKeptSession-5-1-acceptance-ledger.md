@@ -94,3 +94,10 @@ the spec read CLOSED.
   (DERIVED, that probe.)
 - AC12 — a `python -c` probe rebinding `loop_witness.resolve_bash` to `None` raised `ValueError: mail unknown: no bash that can see <driver>` from `read_mail_rows` over clone A; `claim.py --fixture --plant mail-held` printed `claim: mail-held · held exit 1 · held`, its run carrying `claim held — dRunAgain · mail open a1b2c3d4e5f6`.
   (DERIVED, that probe.)
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `mail-open`: the guard reads no mail: `held` is always empty
+- seen-red — `loop transition record` — red `45016a2c4` — green `45016a2c4` — `mail-disposed`: no state counts as disposed
+- seen-red — `loop claim fixtures` — red `45016a2c4` — green `45016a2c4` — `mail-held`: a held move named as a row miss
+- seen-red — `loop definition fixtures` — red `45016a2c4` — green `45016a2c4` — `mail-kinds-repeated`: the `[mail]` kinds graded for no repeat
+- seen-red — `manifest-check self-test` — red `45016a2c4` — green `45016a2c4` — `mail-open`: a pointers writer omitting the `mail —` line
+- seen-red — `manifest-check self-test` — red `45016a2c4` — green `45016a2c4` — `mail-none`: a pointers writer omitting the `mail —` line
+- seen-red — `manifest-check self-test` — red `45016a2c4` — green `45016a2c4` — `mail-off`: a pointers writer omitting the `mail —` line
