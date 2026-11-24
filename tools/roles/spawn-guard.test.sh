@@ -679,7 +679,7 @@ MD = render_marker(dashed, task, item="-")
 write_prompt_file(dashed, MD, task)
 write_prompt_file(spec, render_marker(spec, task), task)
 # TOOL-dBoundRoles-6 - the handoff re-rendered after the role body gained one line: its role section and
-# its marker's role-sha are the new text's; the `ok` handoff above is the one rendered before.
+# the role-sha of its marker is the new text; the `ok` handoff above is the one rendered before.
 rerendered = pre + "2026-10-11-prompt-T-1-3-researcher.md"
 MR = render_marker(rerendered, task, r_sec=role + "One more line.\n\n")
 write_prompt_file(rerendered, MR, task, role + "One more line.\n\n")
