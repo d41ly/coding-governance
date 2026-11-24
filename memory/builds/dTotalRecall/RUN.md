@@ -524,3 +524,13 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T03:17:03Z brief · item TOOL-dTotalRecall-60 · reason 93c11e359d39 memory/builds/dTotalRecall/prompts/2026-11-24-prompt-TOOL-dTotalRecall-60-build-brief.md
 
 2026-11-24T03:23:47Z dispatch · item 74f2d411 TOOL-dTotalRecall-60 · reason tools/memory-tree/id_grammar.py tools/memory-tree/record_causes.py tools/memory-tree/check-memory-hygiene.test.sh tools/memory-recall/selftest.py tools/policy/check_policy.py tools/process-monitor/census.py tools/runlog/record.py tools/runlog/README.md memory/map/generated tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-60.md memory/builds/dTotalRecall/build/2026-11-24-build-TOOL-dTotalRecall-60-1-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md
+
+2026-11-24T03:50:27Z brief · item TOOL-dTotalRecall-65 · reason b9af3b91d35a memory/builds/dTotalRecall/prompts/2026-11-24-prompt-TOOL-dTotalRecall-65-build-brief.md
+
+2026-11-24T03:57:27Z dispatch · item cb72756e TOOL-dTotalRecall-65 · reason tools/memory-tree/tree_lib.py tools/memory-tree/record_causes.py tools/memory-tree/record_kinds.py tools/memory-tree/check-memory-hygiene.test.sh memory/project/census-kept-paths.txt .memory-tree.conf memory/map/generated tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-65.md memory/builds/dTotalRecall/build/2026-11-24-build-TOOL-dTotalRecall-65-1-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md
+2026-11-24T04:12:35Z draw · re-dispatch · TOOL-dTotalRecall-65 · 72/186 · 20261124T041235Z-4b436a
+
+2026-11-24T04:12:35Z dispatch · item cb72756e TOOL-dTotalRecall-65 · reason memory/builds/dTotalRecall/build/2026-11-24-build-TOOL-dTotalRecall-65-deviation-1012.md
+2026-11-24T04:19:32Z draw · re-dispatch · TOOL-dTotalRecall-65 · 73/186 · 20261124T041932Z-89c208
+
+2026-11-24T04:19:32Z dispatch · item cb72756e TOOL-dTotalRecall-65 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

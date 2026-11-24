@@ -651,52 +651,49 @@ RECORD_KEY_RE = re.compile(r"\d{4}-\d{2}-\d{2}-(?:build|review|prompt)-[A-Za-z0-
 # the prefix its Serves line wears
 HEAD_EDGE_RE = re.compile(BIND_PREFIX + r"\*\*(?P<key>Made-by|Caused-by):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$")
 # TOOL-dTotalRecall-55 S1 S3: a census keeps a hit in a file no pass may edit by one path-keyed row held
-# outside the file's bytes, `(census, path, reason)`: the census named by its function, one tracked file, and
-# the reason printed beside the hit. A file a pass may edit keeps its hit by the census marker on its line
-# instead (`id_grammar.read_kept_reason`, TOOL-dTotalRecall-53 S34). `read_kept_rows` is the table's one reader.
-CENSUS_KEPT_PATHS = (
-    ("check_cause_writers", "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py",
-     "pinned instrument"),
-    ("check_cause_writers", "memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py",
-     "pinned instrument"),
-    ("check_cause_writers", "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py",
-     "outside the write set"),
-    ("check_cause_writers", "memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-fold-inventory.py",
-     "outside the write set"),
-    ("check_cause_writers", "memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-walk-seed.py",
-     "outside the write set"),
-    ("check_cause_writers", "memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-73-harness.py",
-     "outside the write set"),
-    ("check_cause_writers", "memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-93-ab.py",
-     "outside the write set"),
-    ("check_cause_writers", "memory/builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signer.py",
-     "outside the write set"),
-    # TOOL-dTotalRecall-56 S2: the departures instrument's `journal` compare, drained by ask PLAY-dClosedLoop-1003
-    ("check_alias_compares", "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py",
-     "pinned instrument"),
-)
-
-
+# outside the file's bytes, `<census>\t<path>\t<reason>`: the census named by its function, one tracked file,
+# and the reason printed beside the hit. The rows are the project's, in this registry under its memory root, and
+# this kit ships none (TOOL-dTotalRecall-65 S1 S3). A file a pass may edit keeps its hit by the census marker on
+# its line instead (`id_grammar.read_kept_reason`, TOOL-dTotalRecall-53 S34).
+CENSUS_KEPT_REGISTRY = "census-kept-paths.txt"
 #: TOOL-dTotalRecall-57 S1: the files a row may keep, the build folders' files no pass of a build may edit;
 #: every other file keeps its hit by the census marker on its line
 KEPT_PATH_DOMAIN = "memory/builds/*/build/*"
 
 
-def read_kept_rows(census, table=CENSUS_KEPT_PATHS) -> dict:
-    """`{path: reason}`: the rows of `table` naming `census`; the table's one reader (TOOL-dTotalRecall-55 S1).
-    ValueError naming the row where any row of the whole table, whatever census asked, names a path outside
-    `KEPT_PATH_DOMAIN` (TOOL-dTotalRecall-57 S1). It does not check that a row's file exists, is tracked or is
-    pinned, nor that a row is filed under the right census."""
-    for _census, path, _reason in table:
+def read_kept_rows(census, root) -> dict:
+    """`{path: reason}`: the rows of `root`'s CENSUS_KEPT_REGISTRY naming `census`, `{}` where the file is absent;
+    its one reader (TOOL-dTotalRecall-55 S1, TOOL-dTotalRecall-65 S2). `#` comments and blank lines are skipped.
+    ValueError naming the registry where any row of it, whatever census asked, holds fewer than three TAB fields,
+    the line named, or names a path outside `KEPT_PATH_DOMAIN` (TOOL-dTotalRecall-57 S1). It does not check that
+    a row's file exists, is tracked or is pinned, that a pair is unique, nor that a row is filed under the right
+    census."""
+    from design_lib import read_design_conf   # noqa: E402  the conf's one reader; at call time, no cycle
+    memory = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/") or "memory"
+    registry = pathlib.Path(root, memory, "project", CENSUS_KEPT_REGISTRY)
+    if not registry.is_file():
+        return {}
+    kept = {}
+    for n, raw in enumerate(read_text(str(registry)).split("\n"), 1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        fields = line.split("\t", 2)
+        if len(fields) < 3:
+            raise ValueError(f"{CENSUS_KEPT_REGISTRY} line {n}: {line!r} holds {len(fields)} TAB field(s), and a row "
+                             "is a census, a path and a reason")
+        row_census, path, reason = fields
         if not fnmatch.fnmatchcase(path, KEPT_PATH_DOMAIN):
-            raise ValueError(f"CENSUS_KEPT_PATHS row {path}: is no file under {KEPT_PATH_DOMAIN}, and an editable "
+            raise ValueError(f"{CENSUS_KEPT_REGISTRY} row {path}: is no file under {KEPT_PATH_DOMAIN}, and an editable "
                              "file is kept by its census marker: mark the kept line `# census: kept <census> <reason>`")
-    return {path: reason for c, path, reason in table if c == census}
+        if row_census == census:
+            kept[path] = reason
+    return kept
 
 
-def read_kept_path(census, path, table=CENSUS_KEPT_PATHS):
-    """The reason `table` keeps `path` by for `census`, or None (TOOL-dTotalRecall-55 S1)."""
-    return read_kept_rows(census, table).get(path)
+def read_kept_path(census, path, root):
+    """The reason `root`'s registry keeps `path` by for `census`, or None (TOOL-dTotalRecall-55 S1)."""
+    return read_kept_rows(census, root).get(path)
 
 
 def read_header_edges(text: str, path: str, binding=None) -> list:

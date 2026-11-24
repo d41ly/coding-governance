@@ -93,8 +93,9 @@ parenthesized regex alternation, a key quoted on a module constant's assignment,
 reader. A listed line is red unless the census marker on its line, `# census: kept alias-compare <reason>`
 (`//` in JavaScript, `id_grammar.read_kept_reason`), keeps it, printed `kept <reason>`. Then the build
 folders' Python scripts, each below its binding head, a hit kept only by its file's path-keyed row of
-`tree_lib.CENSUS_KEPT_PATHS`, a table holding a row outside `tree_lib.KEPT_PATH_DOMAIN` red naming it and
-read as no row (TOOL-dTotalRecall-57 S1), and a line carrying the marker red whatever keeps its file
+the project registry `census-kept-paths.txt` (`tree_lib.read_kept_rows`, TOOL-dTotalRecall-65 S2), a registry
+holding a malformed row, or one outside `tree_lib.KEPT_PATH_DOMAIN`, red naming it and read as no row
+(TOOL-dTotalRecall-57 S1), and a line carrying the marker red whatever keeps its file
 (`id_grammar.check_marker_domain`, TOOL-dTotalRecall-58 S3); a count line closes each walk. THE PENDING RULE reads `memory.map-purpose`
 once through `tree_lib.read_policy_value` and grades each `pending` row by it: under `review` an open
 ask, a row of a tracked `<memory root>/builds/*/BACKLOG.md` no `CLOSED` or `WONTDO` row names; under
@@ -1255,22 +1256,21 @@ def derive_alias_hit(ln: str, shell: bool, constant: bool = True) -> bool:
     return bool(m and any(re.fullmatch(quoted, alt.strip()) or alt.strip() in aliases for alt in m[1].split("|")))
 
 
-def check_alias_compares(root, tool_rel: str, kept=None) -> tuple[list[str], list[str]]:
+def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
     """TOOL-dTotalRecall-40 S2's alias census: `(lines, reds)` over every tracked `*.py`, `*.sh` and `*.js`
     file under the tool root, each line `derive_alias_hit` reads as a comparison of a retired kind token. A
     hit is red unless the census marker on its line, `# census: kept alias-compare <reason>` (`//` in
     JavaScript, `id_grammar.read_kept_reason`, TOOL-dTotalRecall-53 S34), keeps it, printed `kept <reason>`.
     Then the build folders' Python scripts, `<memory root>/builds/*/build/*.py`, each read below its
     `BIND_HEAD_LINES` binding head (TOOL-dTotalRecall-53 S22) by every form but the module constant, a hit
-    kept only where `tree_lib.read_kept_path` answers for its file's row of `CENSUS_KEPT_PATHS`, census
-    `check_alias_compares` (TOOL-dTotalRecall-56 S1), the rows read from `kept`, `tree_lib.CENSUS_KEPT_PATHS`
-    where None. A `kept` table holding a row outside `tree_lib.KEPT_PATH_DOMAIN` is one red naming the row, and
-    the walk reads every hit unkept (TOOL-dTotalRecall-57 S1 S3). Each line of those scripts, head included,
+    kept only where `tree_lib.read_kept_path` answers for its file's row of `root`'s
+    `census-kept-paths.txt`, census `check_alias_compares` (TOOL-dTotalRecall-56 S1, TOOL-dTotalRecall-65 S2). A
+    registry holding a malformed row, or one outside `tree_lib.KEPT_PATH_DOMAIN`, is one red naming it, and the
+    walk reads every hit unkept (TOOL-dTotalRecall-57 S1 S3). Each line of those scripts, head included,
     carrying this census's marker is red, whatever row keeps the file and outside that walk's count line
     (TOOL-dTotalRecall-58 S3). A count line closes each walk. It reads, never writes."""
     from id_grammar import check_marker_domain, read_kept_reason
-    from tree_lib import BIND_HEAD_LINES, CENSUS_KEPT_PATHS, read_kept_path, read_kept_rows
-    kept = CENSUS_KEPT_PATHS if kept is None else kept
+    from tree_lib import BIND_HEAD_LINES, CENSUS_KEPT_REGISTRY, read_kept_path, read_kept_rows
     paths = read_code_paths(root, tool_rel)
     lines, reds, n_kept = [], [], 0
     for path in paths:
@@ -1289,11 +1289,12 @@ def check_alias_compares(root, tool_rel: str, kept=None) -> tuple[list[str], lis
                         f"`# census: kept {ALIAS_COMPARE_CENSUS} <reason>`")
     lines.append(f"alias-compare · {len(paths)} code files under {tool_rel or '.'} · {n_kept + len(reds)} hits · "
                  f"{n_kept} kept · {len(reds)} red")
+    admitted = True
     try:   # TOOL-dTotalRecall-57 S1: a row naming an editable file is red, and the walk reads every hit unkept
-        read_kept_rows("check_alias_compares", kept)
+        read_kept_rows("check_alias_compares", root)
     except ValueError as exc:
         reds.append(f"alias-compare {exc}")
-        kept = ()
+        admitted = False
     folder = f"{read_memory_root(root)}/builds/*/build"
     scripts, b_kept, b_red = read_tracked(root, f"{folder}/*.py"), 0, 0
     for path in scripts:
@@ -1304,7 +1305,7 @@ def check_alias_compares(root, tool_rel: str, kept=None) -> tuple[list[str], lis
         for n, ln in enumerate(text.splitlines()[BIND_HEAD_LINES:], BIND_HEAD_LINES + 1):
             if not derive_alias_hit(ln, False, constant=False):   # a script's word list is no alias table
                 continue
-            reason = read_kept_path("check_alias_compares", path, kept)
+            reason = read_kept_path("check_alias_compares", path, root) if admitted else None
             if reason:
                 b_kept += 1
                 lines.append(f"alias-compare · {path}:{n} · kept {reason}")
@@ -1313,7 +1314,7 @@ def check_alias_compares(root, tool_rel: str, kept=None) -> tuple[list[str], lis
             lines.append(f"alias-compare · {path}:{n} · red")
             reds.append(f"alias-compare {path}:{n}: compares a retired kind token raw, {ln.strip()[:120]!r}; ask "
                         f"its owner to read the kind through tree_lib.resolve_kind, or key the file in "
-                        f"tree_lib.CENSUS_KEPT_PATHS with its reason")
+                        f"{CENSUS_KEPT_REGISTRY} with its reason")
     lines.append(f"alias-compare · {len(scripts)} script(s) under {folder} · {b_kept + b_red} hits · {b_kept} kept · "
                  f"{b_red} red")
     return lines, reds
@@ -2027,8 +2028,10 @@ PLANTS = ("writer-missing", "check-unknown", "source-drift", "factory-kind-unrow
           "stream-two-fences", "unarmed-on-disallowed-form", "awk-regex-alias", "alias-constant", "homeless-empty",
           "unkept-build-alias", "marker-in-kept-script")
 #: TOOL-dTotalRecall-56 S1: `unkept-build-alias`'s build-folder script, its raw compare below the binding head and
-#: no `tree_lib.CENSUS_KEPT_PATHS` row for its path, since the table is the real module's
+#: no row for its path, since its fixture holds no `census-kept-paths.txt`
 FIXTURE_BUILD_ALIAS = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-07-build-TOOL-{FIXTURE_BUILD}-1-probe.py"
+#: TOOL-dTotalRecall-65 S2: `marker-in-kept-script`'s build-folder script, which its fixture's registry keeps by row
+FIXTURE_KEPT_SCRIPT = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-08-build-TOOL-{FIXTURE_BUILD}-1-kept.py"
 #: TOOL-dTotalRecall-53 S23: the fixture's `not-records` glob, its project registry's files, which
 #: `homeless-empty` takes out of git's index, so the homeless arm's population is empty
 FIXTURE_NOT_RECORDS = "memory/project/**"
@@ -2254,9 +2257,11 @@ def build_fixture(tmp, plant: str | None = None):
         write_fixture_file(FIXTURE_BUILD_ALIAS, "# a build folder's probe\n" * BIND_HEAD_LINES
                            + ALIAS_PLANTS["raw-alias-compare"][1].format(a=sorted(KIND_ALIASES)[0]))
     if plant == "marker-in-kept-script":   # TOOL-dTotalRecall-58 S3: the same, marked, at a path kept by row
-        from tree_lib import BIND_HEAD_LINES, KIND_ALIASES, read_kept_rows
+        from tree_lib import BIND_HEAD_LINES, CENSUS_KEPT_REGISTRY, KIND_ALIASES
         text = ALIAS_PLANTS["raw-alias-compare"][1].format(a=sorted(KIND_ALIASES)[0])
-        write_fixture_file(next(iter(read_kept_rows("check_alias_compares"))), "# a kept script\n" * BIND_HEAD_LINES
+        write_fixture_file(f"memory/project/{CENSUS_KEPT_REGISTRY}",
+                           f"check_alias_compares\t{FIXTURE_KEPT_SCRIPT}\toutside the write set\n")
+        write_fixture_file(FIXTURE_KEPT_SCRIPT, "# a kept script\n" * BIND_HEAD_LINES
                            + text.replace(":\n        return", f":  # census: kept {ALIAS_COMPARE_CENSUS} x\n        return", 1))
     fence =FIXTURE_FENCE.replace(*FIXTURE_STREAM_EDITS[plant], 1) if plant in FIXTURE_STREAM_EDITS else FIXTURE_FENCE
     if plant != "unarmed-reason":   # its stream-plan row carries the key and its home no plan
@@ -2346,8 +2351,8 @@ def run_fixture(plant: str | None) -> tuple[list[str], int]:
             text = pathlib.Path(tmp, derive_kit_rel(), TEMPLATE).read_bytes().decode("utf-8")
             head += [f"{SAY}: fixture pipe-cell · region · {ln}" for ln in text.split("\n") if ln.startswith("| `research` |")]
         if plant == "marker-in-kept-script":   # TOOL-dTotalRecall-58 AC3
-            from tree_lib import BIND_HEAD_LINES, read_kept_rows
-            at = f"{next(iter(read_kept_rows('check_alias_compares')))}:{BIND_HEAD_LINES + 2}"
+            from tree_lib import BIND_HEAD_LINES
+            at = f"{FIXTURE_KEPT_SCRIPT}:{BIND_HEAD_LINES + 2}"
             red = [ln for ln in lines if ln.startswith(f"{SAY}: RED ")]
             ok = rc == 1 and len(red) == 1 and red[0].startswith(f"{SAY}: RED {ALIAS_COMPARE_CENSUS} {at}: carries ")
             lines = lines + [f"{SAY}: fixture {plant} · {'PASS' if ok else 'FAIL'} · check exit {rc} · a census marker "
