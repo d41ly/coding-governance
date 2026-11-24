@@ -54,11 +54,13 @@ reference; this page is the short version.
    `cmd:` for a typed argument. The class, `witnessed`, `decided` or `claimed`, is derived from the key
    and its source, never typed. The content follows its fact line inside a fence of backticks one
    longer than any backtick run it holds, so a fact line or `gov:handoff` marker line the content
-   quotes, as a spec often does, is read as text, never as a fact or a marker. A typed value,
+   quotes, as a spec often does, is read as text, never as a fact or a marker. A typed input,
    `--input question=` or `--input diff=`, is your own text and is written without a fence. A line
-   of it that reads as a heading, a fact line, a `gov:handoff` marker line or a `Framed by:` line is
-   refused, naming `input:<name>` and the line, and so is a fence it opens and never closes. To quote
-   such lines, hand them in a file with `--input spec=<path>`. The task is checked block by block:
+   of it that reads as a `### ` heading, a fact line, a `gov:handoff` marker line or a `Framed by:`
+   line is refused, inside a fence or not, and a carriage return before it hides none of them. So is
+   a `# ` or `## ` heading outside a fence, and a fence it opens and never closes, such as one line of
+   a pair. The refusal names `input:<name>` and the line. To quote such lines, hand them in a file
+   with `--input spec=<path>`. The task is checked block by block:
    a render in which a block would start inside a fence an earlier block left open, a handed block's
    content would be read outside its own fence, or the task would end inside an unclosed fence is
    refused, naming the block and the line, and nothing is written. `handoff.py facts --build <slug> --unit <id> --input prompt=<brief>
@@ -412,12 +414,14 @@ of a return that is no valid refusal, and 2 when a reader it asks refuses.
   A fact line or marker line inside a fence is content and is neither re-cut nor counted.
 - A handoff whose `## Task` section ends inside a fence that never closes. The refusal names the line
   of the file the fence opened at. Re-render the handoff.
-- A handoff whose typed block, `### input:question` or `### input:diff`, holds a fact line, a
-  `gov:handoff` marker line or a `Framed by:` line, inside a fence or not, or leaves a fence open. The
-  refusal names the block and the line of the file. Correct the value and re-render the handoff.
+- A handoff whose typed input block, `### input:question` or `### input:diff`, holds a fact line, a
+  `gov:handoff` marker line or a `Framed by:` line, inside a fence or not, or leaves a fence open. It is
+  checked in the prompt and then in the file, before the marker lines of either are counted. The
+  refusal names the block and the line. Correct the value and re-render the handoff.
 - A handoff whose fences were moved across its blocks: a fact line that does not sit two lines below
   its block's heading, or a handed block whose content does not sit inside its own fence, or whose
-  fence is followed by anything but blank lines before the next block. The task envelope's closing
+  fence is followed by anything but blank lines before the next block. A typed input is written
+  unfenced, so its block is held to the first rule only. The task envelope's closing
   line may follow the last one. The refusal names the block and the line of the file. Re-render the
   handoff.
 - A tool write to `.claude/roles.json`, or to the agent file `.claude/agents/<role>.md` of a role the

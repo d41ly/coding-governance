@@ -7913,6 +7913,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "check_open_fence",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_operand",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
@@ -9761,6 +9766,11 @@
       "id": "check_two_writers",
       "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "check_typed_input",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
     },
     {
       "id": "check_unclosed",
@@ -14426,6 +14436,11 @@
       "id": "derive_seed_prefix",
       "kind": "function",
       "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
+      "id": "derive_seed_writes",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_seeded_home",
@@ -21443,6 +21458,11 @@
       "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
+      "id": "readSectionLead",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
+    },
+    {
       "id": "readSegment",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -21511,6 +21531,11 @@
       "id": "readSuiteLegs",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readTaskBlocks",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "readThrottleSeconds",
@@ -27518,6 +27543,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "read_typed_names",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
       "id": "read_unbound_names",
       "kind": "function",
       "file": "tools/run-gates/py_reads.py"
@@ -29813,6 +29843,11 @@
       "file": "tools/loop/placement.py"
     },
     {
+      "id": "render_flip",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
       "id": "render_for_work_order",
       "kind": "function",
       "file": "tools/roles/handoff.py"
@@ -29861,6 +29896,11 @@
       "id": "render_grade_tsv",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_graded_section",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "render_handed_fence",
@@ -33461,11 +33501,6 @@
       "id": "resolve_step_argv",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
-    },
-    {
-      "id": "resolve_subagent_dir",
-      "kind": "function",
-      "file": "tools/roles/handoff.py"
     },
     {
       "id": "resolve_table",

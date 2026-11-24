@@ -3205,13 +3205,12 @@ def check_agent_default(tmp: pathlib.Path) -> None:
 def derive_seed_expected(target: pathlib.Path, descs: dict, selection: list[str]) -> list[dict]:
     """TOOL-dBoundRoles-49 S1: the seed rows a `plan` of `target` over `selection` previews, DERIVED
     from the plan model and never typed. The rows `planned_writes` returns from gov's root, `target`'s
-    own deploy answers and a fresh `Report`, kept where `kind` is `write`, `role` is `seed` and no
-    token is `missing`: the one predicate `cmd_plan` prints both `write|seed` and `KEEP|seed` from, so
-    the preview and its expectation cannot classify a row two ways (TOOL-dClosedLexicon-13). Runs no
-    case and writes nothing."""
+    own deploy answers and a fresh `Report`, kept by `derive_seed_writes`: the one predicate `cmd_plan`
+    prints both `write|seed` and `KEEP|seed` from, so the preview and its expectation cannot classify a
+    row two ways (TOOL-dClosedLexicon-13, TOOL-dBoundRoles-58 S31). Runs no case and writes nothing."""
     gk = govkit_module()
     rows = gk.planned_writes(GOV_ROOT, target, gk.load_deploy(target), descs, selection, gk.Report())
-    return [x for x in rows if x["kind"] == "write" and x["role"] == "seed" and not x["missing"]]
+    return gk.derive_seed_writes(rows)
 
 
 #: TOOL-dBoundRoles-40 §4 Inventory: the recorded harness stage's run id and agent id, and the bound
@@ -11084,6 +11083,15 @@ user_skills = "/tmp/gk-fake-skills"
                   _seed_got == len(_seed_rows) and marks.get("ORDER|project-owned") == 34,
                   "previewed %d seed row(s), the plan model derives %d, by kit %s; marks %s"
                   % (_seed_got, len(_seed_rows), _seed_by_kit, marks))
+            # TOOL-dBoundRoles-58 AC31: the seed condition is spelled once, in `derive_seed_writes`, which the
+            # preview and its expectation both call. Staged against a copy inlined in `cmd_plan`, the case
+            # reds. WHAT IT DOES NOT CHECK: a third reader of the same condition.
+            _calls58 = {f.__name__: "derive_seed_writes" in f.__code__.co_names
+                        for f in (_gk49.cmd_plan, derive_seed_expected)}
+            _inline58 = [f.__name__ for f in (_gk49.cmd_plan, derive_seed_expected)
+                         if "seed" in f.__code__.co_consts]
+            check("[dBR-58 AC31] cmd_plan and derive_seed_expected read one seed predicate, neither spelling its own",
+                  all(_calls58.values()) and not _inline58, "calls %s, spelled in %s" % (_calls58, _inline58))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
             check("...and NO project-owned row is previewed as a write",

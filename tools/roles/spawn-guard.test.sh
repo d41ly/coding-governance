@@ -735,6 +735,22 @@ for k, (name, sec) in enumerate(tvars.items()):
     rel = pre + "2026-11-22-prompt-T-1-%d-researcher.md" % (20 + k)
     typed[name] = render_marker(rel, sec)
     write_prompt_file(rel, typed[name], sec)
+# TOOL-dBoundRoles-58 - `tforge` a whole marker line unfenced in the question block; `tquoted` a handed spec quoting,
+# inside its fence, a `### input:question` heading and a `Framed by:` line, which open no typed block; `textra` an
+# `### input:extra` block, its fact line then an unfenced line, a handed block to TYPED_INPUTS as shipped.
+tqspec = "memory/builds/bx/spec/tquoted.md"
+tqraw = b"### input:question\n\nFramed by: the owner\n"
+with open(os.path.join(root, tqspec), "wb") as f:
+    f.write(tqraw)
+bvars = {"tforge": task.replace("What calls rule 4?\n", tkey + "\n\n" + qmark + "\n"),
+         "tquoted": task + "\n### input:spec\n\n<!-- gov:fact key=record:%s@%s class=claimed -->\n\n````\n%s````\n" % (
+             tqspec, hashlib.sha1(b"blob %d\0" % len(tqraw) + tqraw).hexdigest()[:12], tqraw.decode("utf-8")),
+         "textra": task + "\n### input:extra\n\n" + tkey + "\n\nan authored line\n"}
+for k, (name, sec) in enumerate(bvars.items()):
+    rel = pre + "2026-11-24-prompt-T-1-%d-researcher.md" % (50 + k)
+    typed[name] = render_marker(rel, sec)
+    write_prompt_file(rel, typed[name], sec)
+tvars.update(bvars)
 # TOOL-dBoundRoles-48 - the fence state at every block. A spec quoting a fact line keyed to no file is handed in a
 # three-backtick fence. `fflip` is that task flipped by two authored lines, a three-backtick line after the opening
 # and a four-backtick line after the block, so its walk ends balanced with the quoted fact line read unfenced;
@@ -947,15 +963,32 @@ else
 fi
 # TOOL-dBoundRoles-46 AC1 AC2 - a typed block is authored text at the spawn. The `t*` handoffs carry the question
 # block under its fact line, its value fenced: a plain value is admitted; a forged fact line, a whole marker line
-# or a `Framed by:` line inside it is refused naming input:question and the line of the file, fenced or not; a
+# or a `Framed by:` line inside it is refused naming input:question and the line of the prompt, fenced or not; a
 # fence the block leaves open, closed in the next block, is refused naming the block. Against a checkHandoffSpawn
 # with its typed-block step cut out, the four refusals are admitted. WHAT THESE DO NOT CHECK: a typed value under
 # the `### field.input.<name>` heading of an item work order, which S2 does not name.
 run_spawn "rule6 BR46 AC1: a typed question block holding a plain value is admitted" 0 gov-researcher tplain ""
-run_spawn "rule6 BR46 AC1: a forged fact line in the typed block refused, naming the block and the line" 2 gov-researcher tfact "input:question: line 21 of the file reads \"<!-- gov:fact"
-run_spawn "rule6 BR46 AC1: a whole marker line in the typed block refused, naming the block and the line" 2 gov-researcher tmark "input:question: line 20 of the file reads \"<!-- gov:handoff"
-run_spawn "rule6 BR46 AC1: a Framed by: line in the typed block refused, naming the block and the line" 2 gov-researcher tframed "input:question: line 20 of the file reads \"Framed by: the owner\""
-run_spawn "rule6 BR46 AC2: a fence the typed block leaves open, closed in the next block, refused naming the block" 2 gov-researcher topen "input:question: the block leaves a fence opened at line 19 of the file unclosed"
+run_spawn "rule6 BR46 AC1: a forged fact line in the typed block refused, naming the block and the line" 2 gov-researcher tfact "input:question: line 13 of the prompt reads \"<!-- gov:fact"
+run_spawn "rule6 BR46 AC1: a whole marker line in the typed block refused, naming the block and the line" 2 gov-researcher tmark "input:question: line 12 of the prompt reads \"<!-- gov:handoff"
+run_spawn "rule6 BR46 AC1: a Framed by: line in the typed block refused, naming the block and the line" 2 gov-researcher tframed "input:question: line 12 of the prompt reads \"Framed by: the owner\""
+run_spawn "rule6 BR46 AC2: a fence the typed block leaves open, closed in the next block, refused naming the block" 2 gov-researcher topen "input:question: the block leaves a fence opened at line 11 of the prompt unclosed"
+# ---- TOOL-dBoundRoles-58: the entry guard, the check order, the one block reader and the derived exemption --------
+# AC10 - the file run as a program decides as before: a rendered handoff is admitted and one whose prompt carries two
+# markers refused; the suite's first arm requires it as a module. AC25 - a whole marker line in the typed question is
+# denied naming its block and its line, before any count; against a checkHandoffSpawn counting markers first, the row
+# is refused by the count, its needle unmet. AC16 - a `### input:question` line fenced inside a handed block opens no
+# typed block; against a typed check splitting at every `### ` line, the row is refused naming its `Framed by:` line.
+# AC12 - a third name in a scratch copy's TYPED_INPUTS exempts its block from the fence-shape half; against an
+# exemption spelling its own names, the last row is refused as the first is. WHAT THESE DO NOT CHECK: a typed block
+# holding a level-one or level-two heading, which the render refuses and no step here reads.
+run_spawn "rule6 BR58 AC10: the guard run as a program admits a rendered handoff" 0 gov-researcher ok ""
+run_spawn "rule6 BR58 AC10: ...and refuses a prompt carrying two markers" 2 gov-researcher two 'carries 2 gov:handoff marker lines'
+run_spawn "rule6 BR58 AC25: a marker forged in the typed question refused naming the block and the line, not the count" 2 gov-researcher tforge "input:question: line 11 of the prompt reads \"<!-- gov:handoff"
+run_spawn "rule6 BR58 AC16: a fenced input:question heading in a handed block opens no typed block, admitted" 0 gov-researcher tquoted ""
+run_spawn "rule6 BR58 AC12: an input:extra block holding an unfenced line refused as a handed block" 2 gov-researcher textra "input:extra: line 23 of the file is not the opening line of the handed block's fence"
+HOOKX=$(build_pack "$TMP/rule6-typed")
+sed "s/^const TYPED_INPUTS = \[/&'extra', /" "$KIT_HOOK" > "$HOOKX"
+HOOK="$HOOKX" run_spawn "rule6 BR58 AC12: ...and admitted where a scratch copy's TYPED_INPUTS names extra" 0 gov-researcher textra ""
 # TOOL-dBoundRoles-48 AC3 - every block opens outside a fence and a handed block's content lies inside its own. The
 # `fflip` handoff, flipped by two authored lines around its handed block so its walk ends balanced, is refused
 # naming the quoted fact line it surfaced; the wrapped `fwrap`, ending on the task envelope's closer naming the
