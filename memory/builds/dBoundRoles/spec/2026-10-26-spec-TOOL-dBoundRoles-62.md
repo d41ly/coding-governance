@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-62 — the spawn guard's suite carries the floor unit 60's AC15 checks, and AC15 refuses a suite with no floor and names its units suite by suite
 
-**Status:** DEFERRED · rev-5 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-5 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -19,6 +19,7 @@
 | [2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md) | journal | TOOL-dBoundRoles-43 TOOL-dBoundRoles-50 TOOL-dBoundRoles-56 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-11-23-prompt-TOOL-dBoundRoles-62-2-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-62-2-spec-writer.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief.md) | journal | TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-11-24-prompt-TOOL-dBoundRoles-62-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-62-build-brief.md) | journal | — |
 | [2026-10-26-review-TOOL-dBoundRoles-61-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-61-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-61 TOOL-dBoundRoles-63 |
 
 <!-- /gen:spec-records -->
