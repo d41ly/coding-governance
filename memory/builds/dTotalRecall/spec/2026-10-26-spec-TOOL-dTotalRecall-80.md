@@ -12,6 +12,7 @@
 | [2026-10-26-build-TOOL-dTotalRecall-80-deviation-801.md](../build/2026-10-26-build-TOOL-dTotalRecall-80-deviation-801.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-80-deviation-802.md](../build/2026-10-26-build-TOOL-dTotalRecall-80-deviation-802.md) | deviation | — |
 | [2026-11-24-build-TOOL-dTotalRecall-80-1-acceptance-ledger.md](../build/2026-11-24-build-TOOL-dTotalRecall-80-1-acceptance-ledger.md) | log | — |
+| [2026-11-24-build-TOOL-dTotalRecall-80-1-builder-return.md](../build/2026-11-24-build-TOOL-dTotalRecall-80-1-builder-return.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dTotalRecall-80-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-80-build-brief.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dTotalRecall-80-reground-brief.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-80-reground-brief.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dTotalRecall-80-reground-spec-writer.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-80-reground-spec-writer.md) | log | — |
