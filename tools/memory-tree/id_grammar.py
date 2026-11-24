@@ -519,6 +519,10 @@ def grammar_for(root=None) -> Grammar:
 # The session era's correction tail, `[a-z]*` after the final digits (`_eras`): `-9b` parses as `-9`.
 SUFFIX_RE = re.compile(r"(?<=\d)[a-z]+$")
 
+# `parse_id_parts`' compiled token regexes, keyed by the resolved root, "" for None, and the caller's `alt`
+# (TOOL-dTotalRecall-66 S35). A process whose conf moves clears it with `_slug_cache`, as `run_flip_probe` does.
+_token_cache: dict[tuple, re.Pattern] = {}
+
 
 def parse_id_parts(ident: str, root, *, alt: str | None = None) -> tuple:
     """-> (family, slug, seq) of one session-era id, `seq` an int (TOOL-dTotalRecall-54 S1 to S3).
@@ -527,10 +531,13 @@ def parse_id_parts(ident: str, root, *, alt: str | None = None) -> tuple:
     by the grammar's own id regex, whose groups are unnamed. `alt` is the family alternation, by default `grammar_for(root).families`, the declared
     and cited families together; the slug class always comes from `root`, None the tree this file
     lives in. One trailing correction suffix is stripped first. A flat or node-scoped id, an
-    undeclared family, a malformed id and a pinned `@rev-N` id raise ValueError naming it."""
-    if alt is None:
-        alt = "|".join(grammar_for(root).families)
-    token_re = load_sibling("tree_lib").build_id_token_re(alt, root)
+    undeclared family, a malformed id and a pinned `@rev-N` id raise ValueError naming it; a root with no usable
+    conf raises ConfError, and no regex of it is kept."""
+    key = (str(pathlib.Path(root).resolve()) if root is not None else "", alt)
+    token_re = _token_cache.get(key)
+    if token_re is None:
+        fams = "|".join(grammar_for(root).families) if alt is None else alt
+        token_re = _token_cache[key] = load_sibling("tree_lib").build_id_token_re(fams, root)
     m = token_re.fullmatch(SUFFIX_RE.sub("", ident))
     if m is None or m.group("rev") is not None:
         raise ValueError(f"not an id under this tree's grammar: {ident}")
@@ -1037,8 +1044,9 @@ def run_flip_probe(clone) -> int:
     global _default, _cached
     clone = pathlib.Path(clone).resolve()
     # The copy `tree_lib` imports, whose slug cache the parser's token regex reads: a second module
-    # when this one runs as `__main__`, so both caches are cleared at each flip.
+    # when this one runs as `__main__`, so both copies' caches are cleared at each flip.
     twin = load_sibling("id_grammar")
+    caches = (_slug_cache, _token_cache, twin._slug_cache, twin._token_cache)
 
     def run(*args: str) -> str:
         return subprocess.run(["git", "-C", str(clone), "-c", "user.name=flip-probe",
@@ -1061,8 +1069,8 @@ def run_flip_probe(clone) -> int:
     policy = clone / ".governance" / "policy.toml"
     node, memory_root = read_slug_node(clone)
     depth = len(memory_root.split("/"))
-    _slug_cache.clear()
-    twin._slug_cache.clear()
+    for cache in caches:
+        cache.clear()
     base_mint = derive_slug_grammar(clone).mint_re.pattern
     own_splits = {tuple(h.split(":", 2)[::2]) for h in scan_readers(repo_root())
                   if _READER_SPLIT_SHAPE.search(h.split(":", 2)[2])}
@@ -1083,8 +1091,8 @@ def run_flip_probe(clone) -> int:
                               f"# {slug}\n", encoding="utf-8", newline="\n")
             run("add", "--", policy.relative_to(clone).as_posix(), readme.relative_to(clone).as_posix())
             run("commit", "-q", "--no-verify", "-m", f"flip-probe: {name}")
-            _slug_cache.clear()
-            twin._slug_cache.clear()
+            for cache in caches:
+                cache.clear()
             _default = _cached = None
             g = derive_slug_grammar(clone)
             why = []
@@ -1141,8 +1149,8 @@ def run_flip_probe(clone) -> int:
                     failed += bool(planted) and not listed
     finally:
         run("reset", "-q", "--hard", start)
-        _slug_cache.clear()
-        twin._slug_cache.clear()
+        for cache in caches:
+            cache.clear()
         _default = _cached = None
     return 1 if failed else 0
 

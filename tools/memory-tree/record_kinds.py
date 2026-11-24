@@ -94,8 +94,9 @@ reader. A listed line is red unless the census marker on its line, `# census: ke
 (`//` in JavaScript, `id_grammar.read_kept_reason`), keeps it, printed `kept <reason>`. Then the build
 folders' Python scripts, each below its binding head, a hit kept only by its file's path-keyed row of
 the project registry `census-kept-paths.txt` (`tree_lib.read_kept_rows`, TOOL-dTotalRecall-65 S2), a registry
-holding a malformed row, or one outside `tree_lib.KEPT_PATH_DOMAIN`, red naming it and read as no row
-(TOOL-dTotalRecall-57 S1), and a line carrying the marker red whatever keeps its file
+holding a malformed row, or one outside `tree_lib.build_kept_path_re`'s domain, red naming it and read as no row
+(TOOL-dTotalRecall-57 S1), a row whose file that walk lists no raw compare in red, drained
+(TOOL-dTotalRecall-66 S3), and a line carrying the marker red whatever keeps its file
 (`id_grammar.check_marker_domain`, TOOL-dTotalRecall-58 S3); a count line closes each walk. THE PENDING RULE reads `memory.map-purpose`
 once through `tree_lib.read_policy_value` and grades each `pending` row by it: under `review` an open
 ask, a row of a tracked `<memory root>/builds/*/BACKLOG.md` no `CLOSED` or `WONTDO` row names; under
@@ -1265,8 +1266,9 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
     `BIND_HEAD_LINES` binding head (TOOL-dTotalRecall-53 S22) by every form but the module constant, a hit
     kept only where `tree_lib.read_kept_path` answers for its file's row of `root`'s
     `census-kept-paths.txt`, census `check_alias_compares` (TOOL-dTotalRecall-56 S1, TOOL-dTotalRecall-65 S2). A
-    registry holding a malformed row, or one outside `tree_lib.KEPT_PATH_DOMAIN`, is one red naming it, and the
-    walk reads every hit unkept (TOOL-dTotalRecall-57 S1 S3). Each line of those scripts, head included,
+    registry holding a malformed row, or one outside `tree_lib.build_kept_path_re`'s domain, is one red naming it,
+    and the walk reads every hit unkept (TOOL-dTotalRecall-57 S1 S3). A row whose file the walk lists no hit in,
+    its compare gone or the file not walked, is one red, drained (TOOL-dTotalRecall-66 S3). Each line of those scripts, head included,
     carrying this census's marker is red, whatever row keeps the file and outside that walk's count line
     (TOOL-dTotalRecall-58 S3). A count line closes each walk. It reads, never writes."""
     from id_grammar import check_marker_domain, read_kept_reason
@@ -1289,14 +1291,13 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
                         f"`# census: kept {ALIAS_COMPARE_CENSUS} <reason>`")
     lines.append(f"alias-compare · {len(paths)} code files under {tool_rel or '.'} · {n_kept + len(reds)} hits · "
                  f"{n_kept} kept · {len(reds)} red")
-    admitted = True
     try:   # TOOL-dTotalRecall-57 S1: a row naming an editable file is red, and the walk reads every hit unkept
-        read_kept_rows("check_alias_compares", root)
+        kept, admitted = read_kept_rows("check_alias_compares", root), True
     except ValueError as exc:
         reds.append(f"alias-compare {exc}")
-        admitted = False
+        kept, admitted = {}, False
     folder = f"{read_memory_root(root)}/builds/*/build"
-    scripts, b_kept, b_red = read_tracked(root, f"{folder}/*.py"), 0, 0
+    scripts, b_kept, b_red, hits = read_tracked(root, f"{folder}/*.py"), 0, 0, set()
     for path in scripts:
         text = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace")
         for n, finding in check_marker_domain(path, text, ALIAS_COMPARE_CENSUS):
@@ -1305,6 +1306,7 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
         for n, ln in enumerate(text.splitlines()[BIND_HEAD_LINES:], BIND_HEAD_LINES + 1):
             if not derive_alias_hit(ln, False, constant=False):   # a script's word list is no alias table
                 continue
+            hits.add(path)
             row = read_kept_path("check_alias_compares", path, root) if admitted else None
             reason = row["reason"] if row else None
             if reason:
@@ -1316,6 +1318,11 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
             reds.append(f"alias-compare {path}:{n}: compares a retired kind token raw, {ln.strip()[:120]!r}; ask "
                         f"its owner to read the kind through tree_lib.resolve_kind, or key the file in "
                         f"{CENSUS_KEPT_REGISTRY} with its reason")
+    for path in kept:   # TOOL-dTotalRecall-66 S3: a row cannot outlive its hit
+        if path not in hits:
+            why = "holds no raw compare" if path in scripts else "is no file the build-folder walk reads"
+            lines.append(f"alias-compare · kept row · {path} · red · drained")
+            reds.append(f"alias-compare {CENSUS_KEPT_REGISTRY} {path}: {why}, so the row keeps nothing; drain the row")
     lines.append(f"alias-compare · {len(scripts)} script(s) under {folder} · {b_kept + b_red} hits · {b_kept} kept · "
                  f"{b_red} red")
     return lines, reds
@@ -2027,12 +2034,15 @@ PLANTS = ("writer-missing", "check-unknown", "source-drift", "factory-kind-unrow
           "unarmed-reason", "unarmed-with-record", "unarmed-untyped", "home-slash", "home-directory", "shared-home",
           "homeless-record", "owner-graded", "bad-field-key", "stream-name-twice", "stream-foreign-unit",
           "stream-two-fences", "unarmed-on-disallowed-form", "awk-regex-alias", "alias-constant", "homeless-empty",
-          "unkept-build-alias", "marker-in-kept-script")
+          "unkept-build-alias", "marker-in-kept-script", "alias-row-drained", "alias-row-outside-domain")
 #: TOOL-dTotalRecall-56 S1: `unkept-build-alias`'s build-folder script, its raw compare below the binding head and
 #: no row for its path, since its fixture holds no `census-kept-paths.txt`
 FIXTURE_BUILD_ALIAS = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-07-build-TOOL-{FIXTURE_BUILD}-1-probe.py"
 #: TOOL-dTotalRecall-65 S2: `marker-in-kept-script`'s build-folder script, which its fixture's registry keeps by row
 FIXTURE_KEPT_SCRIPT = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-08-build-TOOL-{FIXTURE_BUILD}-1-kept.py"
+#: TOOL-dTotalRecall-66 S6: `alias-row-outside-domain`'s row, a file under the fixture's tool root, as
+#: `alias-row-drained`'s (S4) is FIXTURE_KEPT_SCRIPT with its raw compare cut
+FIXTURE_EDITABLE_ROW = "planted/editable.py"
 #: TOOL-dTotalRecall-53 S23: the fixture's `not-records` glob, its project registry's files, which
 #: `homeless-empty` takes out of git's index, so the homeless arm's population is empty
 FIXTURE_NOT_RECORDS = "memory/project/**"
@@ -2084,14 +2094,17 @@ FIXTURE_NEW = ["new", "widget", "--tag", "record.widget", "--writer", "hand", "-
 
 
 def write_kept_fixture(root, *rows) -> None:
-    """Write a fixture's CENSUS_KEPT_REGISTRY at `root` through the factory's `write_rows`, each of `rows` a
-    plain keep's `(census, path, reason)` (TOOL-dTotalRecall-68 S6): the writer both censuses' plants call."""
+    """Write a fixture's CENSUS_KEPT_REGISTRY under `root`'s memory root through the factory's `write_rows`, each
+    of `rows` a plain keep's `(census, path, reason)` (TOOL-dTotalRecall-68 S6), or a pinned writer's with its
+    `records` glob and disposition after them (TOOL-dTotalRecall-66 S36): the writer both censuses' plants call."""
     import legacy_ledger as ll
     from tree_lib import CENSUS_KEPT_REGISTRY, KEPT_FIELDS
     reg = ll.Registration(population="census-kept-paths", seed=(), key="key", fields=KEPT_FIELDS, drain="key",
-                          direction="shrink-only", home=f"memory/project/{CENSUS_KEPT_REGISTRY}", leg="record causes")
+                          direction="shrink-only", home=f"{read_memory_root(root)}/project/{CENSUS_KEPT_REGISTRY}",
+                          leg="record causes")
     pathlib.Path(root, reg.home).parent.mkdir(parents=True, exist_ok=True)
-    ll.write_rows(root, reg, {(*row, "-"): (1, (ll.NULL_SHA, "seeded")) for row in rows})
+    full = [row if len(row) > 3 else (*row, "-", "seeded") for row in rows]
+    ll.write_rows(root, reg, {row[:4]: (1, (ll.NULL_SHA, row[4])) for row in full})
 
 
 def build_fixture(tmp, plant: str | None = None):
@@ -2274,6 +2287,12 @@ def build_fixture(tmp, plant: str | None = None):
         write_kept_fixture(tmp, ("check_alias_compares", FIXTURE_KEPT_SCRIPT, "outside the write set"))
         write_fixture_file(FIXTURE_KEPT_SCRIPT, "# a kept script\n" * BIND_HEAD_LINES
                            + text.replace(":\n        return", f":  # census: kept {ALIAS_COMPARE_CENSUS} x\n        return", 1))
+    if plant == "alias-row-drained":   # TOOL-dTotalRecall-66 S4: the kept script, its raw compare cut
+        write_kept_fixture(tmp, ("check_alias_compares", FIXTURE_KEPT_SCRIPT, "outside the write set"))
+        write_fixture_file(FIXTURE_KEPT_SCRIPT, "# a kept script, its compare cut\n")
+    if plant == "alias-row-outside-domain":   # TOOL-dTotalRecall-66 S6: a row naming an editable file
+        row = f"{tool_rel}/{FIXTURE_EDITABLE_ROW}" if tool_rel else FIXTURE_EDITABLE_ROW
+        write_kept_fixture(tmp, ("check_alias_compares", row, "outside the write set"))
     fence =FIXTURE_FENCE.replace(*FIXTURE_STREAM_EDITS[plant], 1) if plant in FIXTURE_STREAM_EDITS else FIXTURE_FENCE
     if plant != "unarmed-reason":   # its stream-plan row carries the key and its home no plan
         write_fixture_file(FIXTURE_PLAN, f"**Serves:** stream-plan {unit} TOOL-{FIXTURE_BUILD}-2 TOOL-{FIXTURE_BUILD}-3\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
@@ -2417,6 +2436,8 @@ def run_selftest() -> int:
             "awk-regex-alias": ("alias-compare", f"{ALIAS_PLANTS['awk-regex-alias'][0]}:2"),
             "alias-constant": ("alias-compare", f"{ALIAS_PLANTS['alias-constant'][0]}:1"),
             "unkept-build-alias": ("alias-compare", f"{FIXTURE_BUILD_ALIAS}:{BIND_HEAD_LINES + 2}"),
+            "alias-row-drained": ("alias-compare", f"{FIXTURE_KEPT_SCRIPT}: holds no raw compare"),
+            "alias-row-outside-domain": ("alias-compare", f"{FIXTURE_EDITABLE_ROW}: is no file under"),
             "unarmed-on-disallowed-form": ("row stream-plan", f"`{UNARMED}` on a 'header' row"),
             "homeless-empty": (HOMELESS, "the arm selects nothing"),
             "unarmed-with-record": ("row stream-plan", f"`{UNARMED}`"), "unarmed-untyped": ("row research", f"`{UNARMED}`"),

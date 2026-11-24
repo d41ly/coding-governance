@@ -18,7 +18,6 @@ The module name follows the codebase-map kit's `map_lib.py` and the runlog kit's
 """
 from __future__ import annotations
 
-import fnmatch
 import itertools
 import json
 import os
@@ -399,6 +398,14 @@ def build_spec_path_re(memory_root: str):
     return re.compile(r"^" + re.escape(memory_root) + r"/builds/[^/]+/spec/")
 
 
+def build_kept_path_re(memory_root: str):
+    """The files a `census-kept-paths.txt` row may keep (TOOL-dTotalRecall-57 S1, TOOL-dTotalRecall-66 S11 S13
+    S37): the build folders' files no pass of a build may edit, matched segment by segment under `memory_root`;
+    every other file keeps its hit by the census marker on its line. A `..` segment, which a slug's place admits
+    here, is the reader's refusal (`read_kept_rows`)."""
+    return re.compile(r"^" + re.escape(memory_root) + r"/builds/[^/]+/build/[^/]+$")
+
+
 def parse_spec_h1(rel: str, text: str, memory_root: str, families) -> tuple[int, str] | None:
     """`(lineno, id)` of the H1 that DEFINES a unit id in a spec file, or None.
 
@@ -653,15 +660,13 @@ HEAD_EDGE_RE = re.compile(BIND_PREFIX + r"\*\*(?P<key>Made-by|Caused-by):\*\*[ \
 # TOOL-dTotalRecall-55 S1 S3: a census keeps a hit in a file no pass may edit by one path-keyed row held
 # outside the file's bytes, in the ledger factory's row grammar (TOOL-dTotalRecall-68 S2): the key fields
 # `KEPT_FIELDS`, then the count, the sha and the disposition. The census is named by its function, the path is one
-# tracked file, the reason is printed beside the hit, and `records` is `-` for a plain keep. The rows are the
+# tracked file, the reason is printed beside the hit, and `records` is `-` for a plain keep, or a pinned
+# writer's record glob (`record_causes.read_pinned_rows`, TOOL-dTotalRecall-66 S36). The rows are the
 # project's, in this registry under its memory root, and this kit ships none (TOOL-dTotalRecall-65 S1 S3). A file
 # a pass may edit keeps its hit by the census marker on its line instead (`id_grammar.read_kept_reason`,
 # TOOL-dTotalRecall-53 S34).
 CENSUS_KEPT_REGISTRY = "census-kept-paths.txt"
 KEPT_FIELDS = ("census", "path", "reason", "records")
-#: TOOL-dTotalRecall-57 S1: the files a row may keep, the build folders' files no pass of a build may edit;
-#: every other file keeps its hit by the census marker on its line
-KEPT_PATH_DOMAIN = "memory/builds/*/build/*"
 
 
 def read_kept_rows(census, root) -> dict:
@@ -669,7 +674,8 @@ def read_kept_rows(census, root) -> dict:
     its one reader (TOOL-dTotalRecall-55 S1, TOOL-dTotalRecall-65 S2), through the ledger factory's `read_rows`
     (TOOL-dTotalRecall-68 S3). A row is a mapping of `KEPT_FIELDS` and `count`, `sha` and `disposition`.
     ValueError naming the registry where any row of it, whatever census asked, is malformed, every refused line
-    named, or names a path outside `KEPT_PATH_DOMAIN` (TOOL-dTotalRecall-57 S1). It does not check that a row's
+    named, or names a path holding a `..` segment or outside `build_kept_path_re` over the conf's memory root
+    (TOOL-dTotalRecall-57 S1, TOOL-dTotalRecall-66 S11 S13). It does not check that a row's
     file exists, is tracked or is pinned, that a pair is unique, nor that a row is filed under the right census."""
     import legacy_ledger as ll   # noqa: E402  the ledger factory; at call time, as it imports this kit's engines
     from design_lib import read_design_conf   # noqa: E402  the conf's one reader; at call time, no cycle
@@ -682,9 +688,10 @@ def read_kept_rows(census, root) -> dict:
         raise ValueError(f"{CENSUS_KEPT_REGISTRY}: " + "; ".join(ll.render_malformed(b) for b in bad))
     kept = [dict(zip(KEPT_FIELDS, key), count=n, sha=sha, disposition=disposition)
             for key, (n, (sha, disposition), *_rest) in rows.items()]
+    domain = build_kept_path_re(memory)
     for row in kept:
-        if not fnmatch.fnmatchcase(row["path"], KEPT_PATH_DOMAIN):
-            raise ValueError(f"{CENSUS_KEPT_REGISTRY} row {row['path']}: is no file under {KEPT_PATH_DOMAIN}, and an editable "
+        if ".." in row["path"].split("/") or not domain.fullmatch(row["path"]):
+            raise ValueError(f"{CENSUS_KEPT_REGISTRY} row {row['path']}: is no file under {memory}/builds/*/build/*, and an editable "
                              "file is kept by its census marker: mark the kept line `# census: kept <census> <reason>`")
     return {row["path"]: row for row in kept if row["census"] == census}
 

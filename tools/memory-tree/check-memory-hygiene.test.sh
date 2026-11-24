@@ -3840,13 +3840,17 @@ hit "record causes: causes · $_scr.sh · names no Caused-by"; miss 'atlas.html'
 # --- and a no-id record, the last listed `not backfilled`; `--check` then names exactly that one and a second
 # --- run writes nothing. A typed `-deviation-1.md` record and one whose Serves line is the head window's last
 # --- line are refused, the fixture's status clean. Red on the verb writing a legacy record, on it writing a
-# --- typed record and on the `not markdown` refusal restored.
+# --- typed record and on the `not markdown` refusal restored. TOOL-dTotalRecall-66 AC18: a `.json` and a `.js`
+# --- record under `//` gain a `//` cause line, and a bare-headed `.html` record, never graded, is in no line. Red
+# --- on a lead of `# ` whatever the Serves line wears.
 _bfr='memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant backfill-selection 2>&1); _brc=$?   # AC1
 n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant backfill-selection exited $_brc, expected 0"; st=1; }
 hit "backfill 1 · record causes: backfilled · $_bfr-new.md · Caused-by TOOL-fRoot-1"
 hit "backfill 1 · record causes: backfilled · $_bfr-probe.sh · Caused-by TOOL-fRoot-1"
 hit "$_bfr-probe.sh"":2:# **Caused-by:** TOOL-fRoot-1"
+hit "$_bfr-json-prefixed.json"":2:// **Caused-by:** TOOL-fRoot-1"; hit "$_bfr-js-prefixed.js"":2:// **Caused-by:** TOOL-fRoot-1"
+miss 'html-bare'
 hit "backfill 1 · record causes: not backfilled · $_bfr-unbound.md · no id"
 hit 'backfill 2 · record causes: 0 backfilled'; hit 'record causes: fixture backfill-selection · PASS'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant backfill-refusals 2>&1); _brc=$?   # AC3
@@ -3860,12 +3864,21 @@ n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant o
 hit "backfill 1 · record causes: not backfilled · memory/builds/fClaim/build/2026-01-02-build-TOOL-fClaim-1-new.md · another build's record"
 hit "backfill 1 · record causes: backfilled · $_bfr-new.md · Caused-by TOOL-fRoot-1"
 hit 'record causes: fixture other-build-causeless · PASS'
-# --- TOOL-dTotalRecall-50 (AC2 AC3) — the pinned writer: a CAUSE_WRITER_PINNED row is red, named, once its
-# --- instrument spells the cause past its binding window and once its ask row leaves the backlog; a causeless
+# --- TOOL-dTotalRecall-66 AC19 — `--backfill --build` refuses a value that is no build slug whole, and one that
+# --- names no tracked build README, with exit 2 naming it, the fixture's status clean. Red on the slug test and on
+# --- the README test skipped.
+for _bsp in 'build-slug-traversal:--build .. is no build slug' 'build-slug-absent:--build absentBuild names no tracked build README'; do
+  out=$("$_PY" "$HERE/record_causes.py" --fixture --plant "${_bsp%%:*}" 2>&1); _brc=$?   # AC19
+  n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant ${_bsp%%:*} exited $_brc, expected 0"; st=1; }
+  hit "backfill 1 · record causes: refused · ${_bsp#*:}"; hit "record causes: fixture ${_bsp%%:*} · PASS"
+  miss "fixture ${_bsp%%:*} · status"
+done
+# --- TOOL-dTotalRecall-50 (AC2 AC3) — the pinned writer: a pinned row of the fixture's own
+# --- census-kept-paths.txt, TOOL-dTotalRecall-66 S36, is red, named, once its instrument spells the cause past its binding window and once its ask row leaves the backlog; a causeless
 # --- departures record its glob reads passes causes and orphans while the row stands, its cause its first Serves
 # --- unit, and is named once the row is cut. Red on the row's drain and filed-ask tests skipped and on S3's
 # --- interim read skipped.
-_pwr='CAUSE_WRITER_PINNED memory/builds/fRoot/build/2026-01-01-build-TOOL-fRoot-1-deviations.py (ask TOOL-fRoot-2)'
+_pwr='census-kept-paths.txt memory/builds/fRoot/build/2026-01-01-build-TOOL-fRoot-1-deviations.py (ask TOOL-fRoot-2)'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant pinned-writer-drained 2>&1); _brc=$?   # AC2
 n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant pinned-writer-drained exited $_brc, expected 0"; st=1; }
 hit "check 1 · record causes: RED cause-writer $_pwr: spells Caused-by past its binding window"
@@ -3882,6 +3895,17 @@ out=$("$_PY" "$HERE/record_causes.py" --fixture --plant pinned-ask-closed 2>&1);
 n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant pinned-ask-closed exited $_brc, expected 0"; st=1; }
 hit "check 1 · record causes: RED cause-writer $_pwr: names ask TOOL-fRoot-2, which is not live: it reads WONTDO at HEAD"
 hit 'record causes: fixture pinned-ask-closed · PASS'
+# --- TOOL-dTotalRecall-66 AC20 — a pinned row whose ask is an open spec's id is red naming the row and the id as no
+# --- filed ask. Red on the filed-ask test skipped, which reads the open spec as live and leaves the check green.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant pinned-ask-is-spec 2>&1); _brc=$?   # AC20
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant pinned-ask-is-spec exited $_brc, expected 0"; st=1; }
+hit "check 1 · record causes: RED cause-writer ${_pwr%(*}(ask TOOL-fRoot-1): names ask TOOL-fRoot-1, which is not a filed ask"
+hit 'record causes: fixture pinned-ask-is-spec · PASS'
+# --- TOOL-dTotalRecall-66 AC13 (TOOL-dTotalRecall-58 AC1) — a census marker in a build folder's script is red by
+# --- line, its pinned row standing. Red on `check_marker_domain` skipped, which leaves the check green.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant marker-in-build-script 2>&1); _brc=$?   # AC13
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant marker-in-build-script exited $_brc, expected 0"; st=1; }
+hit '-deviations.py'':13: carries the `cause-writer` census marker'; hit 'record causes: fixture marker-in-build-script · PASS'
 # --- TOOL-dTotalRecall-60 AC26 — the renderer's kept reason on two files that are not it, a tool-root writer's
 # --- marker and a build-folder script's keep row, is one red each while the renderer's own marker keeps it.
 # --- Red on the file test skipped, which exits the plant 0.
@@ -3908,6 +3932,26 @@ out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-row-editable 2>&1);
 n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL record_causes.py --fixture --plant kept-row-editable exited $_brc, expected 1"; st=1; }
 hit "record causes: RED cause-writer census-kept-paths.txt row "
 n=$((n+1)); [ "$(grep 'record causes: RED ' <<<"$out" | grep '/editable.py' | grep -c 'census: kept')" = 1 ] || { echo "FAIL kept-row-editable: want exactly one red naming the row and the marker"; st=1; }
+# --- TOOL-dTotalRecall-66 AC1 AC9 — a keep row is drained once its file is no hit, whatever the cause: a script
+# --- that spells its cause past the binding window, and one never added to git; and a row naming a path with a `..`
+# --- segment, or a file under a folder inside `build/`, is refused. Each is one red naming the registry and the
+# --- path, exit 1. Red on the hit test skipped and on the domain match skipped, which exit the plants 0 or name a drain.
+while IFS='|' read -r _krp _krs; do
+  out=$("$_PY" "$HERE/record_causes.py" --fixture --plant "$_krp" 2>&1); _brc=$?   # AC1 AC9
+  n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL record_causes.py --fixture --plant $_krp exited $_brc, expected 1"; st=1; }
+  hit "record causes: RED cause-writer census-kept-paths.txt $_krs"
+  n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = 1 ] || { echo "FAIL $_krp: want exactly one red"; st=1; }
+done <<KRP
+kept-row-caused|$_krd: spells Caused-by past its binding window
+kept-row-untracked|$_krd: is no file the build-folder walk reads
+kept-row-traversal|row memory/builds/../build/traversal.py: is no file under
+kept-row-nested|row memory/builds/fRoot/build/nested/nested.py: is no file under
+KRP
+# --- TOOL-dTotalRecall-66 AC7 — the row's domain is the conf's memory root: under `MEMORY_ROOT=docs/memory` a
+# --- build-folder row keeps its hit. Red on the literal `memory` root, which refuses the row.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-row-docs-root 2>&1); _brc=$?   # AC7
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant kept-row-docs-root exited $_brc, expected 0"; st=1; }
+hit "cause-writer · docs/$_krd"":13 · kept outside the write set"
 # --- TOOL-dTotalRecall-65 AC3 — the kit holds no keep row: in a fixture with no census-kept-paths.txt the check
 # --- is green naming no kept or drained row, and the reader answers none for either census. Red on one
 # --- engine-held row returned beside the registry's, which exits the plant 1.

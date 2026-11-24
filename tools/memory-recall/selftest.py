@@ -3432,6 +3432,7 @@ _PARSER_PROBE = (
     "    except ValueError as exc:\n"
     "        return 'ValueError' if ident in str(exc) else 'unnamed: ' + str(exc)\n"
     "out['parts'] = {i: read_parts(i) for i in sys.argv[3:]}\n"
+    "out['cached'] = len(G._token_cache)\n"
     "out['loaded'] = 'tree_lib' in sys.modules\n"
     "out['alt'] = read_parts('EXMP-aFoo-2', alt='EXMP|OTHR')\n"
     "try:\n"
@@ -3447,7 +3448,8 @@ _PARSER_PROBE = (
 
 @check("parse_id_parts splits an id by its tree's grammar, refuses every other shape, and loads tree_lib lazily")
 def test_id_parts_parse_under_each_tree_grammar():
-    """TOOL-dTotalRecall-54 AC1, AC2, AC3, AC5, AC6. A throwaway tree declaring a cited family `ZED`
+    """TOOL-dTotalRecall-54 AC1, AC2, AC3, AC5, AC6; TOOL-dTotalRecall-66 AC17, AC27: every id of one root
+    under one `alt` is matched by one compiled regex. A throwaway tree declaring a cited family `ZED`
     and the node class `a-f` parses with its own copy of the memory-tree kit's `id_grammar.py`; the
     copy `make_repo` copies FROM parses over that tree's root, where `TOOL-xFoo-3` is refused, and
     over a second throwaway root at the default class, where the same id parses, so the refusal is
@@ -3457,7 +3459,7 @@ def test_id_parts_parse_under_each_tree_grammar():
     good = {"TOOL-aFoo-2": ["TOOL", "aFoo", 2], "ZED-aFoo-2": ["ZED", "aFoo", 2],
             "TOOL-aDrainedSluice-9b": ["TOOL", "aDrainedSluice", 9]}
     bad = ("TOOL-001", "TOOL-d119", "ARCH-aFix-3", "TOOL-x", "TOOL-aFoo-2@rev-2", "TOOL-xFoo-3",
-           "EXMP-aFoo-2")
+           "EXMP-aFoo-2", "TOOL-x-3", "TOOL-9-3")
     root, _kitdir = make_repo(conf=CONF + 'RECALL_CITED_FAMILIES="ZED"\nRECALL_NODE_TAG_CLASS="a-f"\n')
     # A second root at the default a-z class, never the source copy's own tree: that tree's conf is
     # whatever the adopter running this suite declared.
@@ -3485,6 +3487,7 @@ def test_id_parts_parse_under_each_tree_grammar():
         f"tree_lib at import / after a call: {own['lazy']} / {own['loaded']}, wanted False / True")
     assert (own["id_re"], own["guards"]) == (0, 1), (
         f"ID_RE in the parser {own['id_re']}x, path guards in the module {own['guards']}x, wanted 0 and 1")
+    assert own["cached"] == 1, f"one root and alt compiled {own['cached']} token regexes, wanted 1"
     foreign, wide_parts = seen["foreign"]["parts"], seen["wide"]["parts"]
     assert foreign["ZED-aFoo-2"] == ["ZED", "aFoo", 2], f"the foreign root lost its cited family: {foreign}"
     assert foreign["TOOL-xFoo-3"] == "ValueError", f"the foreign root's a-f slug class was not bound: {foreign}"
@@ -3512,6 +3515,7 @@ _SPLIT_PLANTS = {
     "py-rsplit": ("plant/py_rsplit.py", 'seq = x.rsplit("-", 1)[1]\n'),
     "split-maxsplit-two": ("plant/split_maxsplit_two.py", 'slug = x.split("-", 2)[1]\n'),  # census: kept slug-grammar fixture text the arm plants
     "rsplit-bare": ("plant/rsplit_bare.py", 'slug = x.rsplit("-")[1]\n'),  # census: kept slug-grammar fixture text the arm plants
+    "rsplit-maxsplit-two": ("plant/rsplit_maxsplit_two.py", 'stem = x.rsplit("-", 2)[0]\n'),  # census: kept slug-grammar fixture text the arm plants
     "rsplit-head": ("plant/rsplit_head.py", 'stem = x.rsplit("-", 1)[0]\n'),
     "split-rest": ("plant/split_rest.py", 'rest = x.split("-", 1)[1]\n'),
     "split-maxsplit-head": ("plant/split_maxsplit_head.py", 'fam = x.split("-", 2)[0]\n'),
@@ -3520,7 +3524,7 @@ _SPLIT_PLANTS = {
     "new-marker": ("plant/new_marker.py", 'slug = x.split("-")[1]  # census: kept slug-grammar x\n'),  # census: kept slug-grammar fixture text the arm plants
 }
 _SPLIT_LISTED = {"py-split", "sh-cut", "sh-expansion", "py-unnamed", "py-node", "py-unpack", "split-maxsplit-two",
-                 "rsplit-bare", "old-marker"}
+                 "rsplit-bare", "rsplit-maxsplit-two", "old-marker"}
 # The re-pointed reader the clone reverts to its split, and the split it reverts to.
 _REPOINTED = ("        return backlog.load_id_grammar().parse_id_parts(ident, None, alt=backlog.ANY_FAMILY)[1]\n",
               '        return ident.split("-")[1]\n')  # census: kept slug-grammar fixture text the arm plants

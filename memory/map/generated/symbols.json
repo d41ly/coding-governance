@@ -3623,6 +3623,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "build_kept_path_re",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "build_key_text",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -25914,6 +25919,11 @@
     },
     {
       "id": "read_pinned_records",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
+      "id": "read_pinned_rows",
       "kind": "function",
       "file": "tools/memory-tree/record_causes.py"
     },

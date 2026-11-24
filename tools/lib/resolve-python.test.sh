@@ -1328,6 +1328,10 @@ for (const line of require("fs").readFileSync(0, "utf8").split("\n").filter(Bool
 # scripts/recall/kit.toml, outside the directory holding the other kit. Then AC7: one byte changed in a scratch copy of the gate-lint copy reads as drift through `blk`.
 # WHAT THIS DOES NOT CHECK: a ledger merge, merge-rows.test.sh's group 1l; and AC8, the two scanners'
 # own legs at the pass tip. A registration's `seed` argv is run by the seed cases at this part's end.
+# The caller's environment the part must not read, planted and then scrubbed as branch-reconcile's `seed_env`
+# scrubs it (TOOL-dTotalRecall-66 S22). RED against the scrub line cut.
+export GOV_REMOTE=nope GIT_DIR="$TMP/no-such-repository"
+unset GOV_REMOTE GOV_DEFAULT_BRANCH ${!GIT_@}
 T=$'\t'
 LL="$TMP/ll"; LLR="$LL/repo"; mkdir -p "$LL"
 build_ll_table() { # population key fields direction home [verbatim] -> one [[ledger]] table
@@ -1343,7 +1347,7 @@ run_ll() { # verb population [--measured path] -> the CLI's stdout and stderr, t
   echo "rc=${PIPESTATUS[0]}"
 }
 run_ll_reset() { git -C "$LLR" reset -q --hard && git -C "$LLR" clean -qfd; }
-git init -q --bare "$LL/remote.git"
+git init -q --bare -b main "$LL/remote.git"
 git init -q -b main "$LLR" && git -C "$LLR" config core.autocrlf false
 LL_DEPLOYER=govkit  # the deployer kit's directory name, spelled once
 LL_GATE_LINT=gate-lint  # the gate-lint kit's directory name, spelled once
