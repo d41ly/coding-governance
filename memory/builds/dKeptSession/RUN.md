@@ -19,19 +19,19 @@ hold-code: host-owner-action
 held-from: VERIFYING
 refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: d1c327383fc6fd1d29b169660f32882939a6d395
-phase: HELD
+witness: 5f32c80ff3a832ccff25c85338e2c4c04d5aa3d9
+phase: VERIFYING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dkeptsession-a0567a
 anchor-kind: default-branch
 cli-version: 2.1.326
-lease-utc: 2026-11-22T12:58:51Z
+lease-utc: 2026-11-24T02:15:00Z
 pid-image: claude.exe
-host: compeeto
-pid: 29104
-session: d5b6d4ab-72df-4e61-9a7c-05dde93b7f5b
-keepalive: 64fde974
+host: desktop-v6fbsjd
+pid: 4552
+session: 6ec40829-e8bb-473e-8d92-378a7dcabcbb
+keepalive: 996b51d4
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: c2a407b0390f3d57a118b58e376c326aeb207c13
 anchor-ref: refs/heads/main
@@ -402,3 +402,5 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T20:30:22Z dispatch · item 2beba7bf KICK-dKeptSession-80 · reason tools/govkit/registry.toml tools/lib/resolve-python.test.sh tools/policy/catalogue.toml tools/policy/check_policy.py .governance/policy.json help/reference/policy.md memory/map/generated/MAP.md memory/map/generated/symbols.json tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/dBoundRoles/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dCalibratedLens/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dConvergedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dDeclaredLoop/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dFairHearing/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dFurnishedOrders/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dGroundRules/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dIndexedDesign/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dLinkedLibrary/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dMindYourWords/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dOrderedCharter/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dRankedPlan/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dSafePassage/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dScopedBuild/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dShippedRelease/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dTendedCadence/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dTrueNorth/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dWellOiledMachine/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md memory/builds/dKeptSession/build/2026-11-23-build-KICK-dKeptSession-80-1-acceptance-ledger.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-80-1-acceptance-ledger.md
 
 2026-11-23T20:47:29Z hold · item host-owner-action · reason until owner · reaped 64fde974 · resume none(owner)
+
+2026-11-24T02:15:10Z resume · item dKeptSession · reason held · keepalive 996b51d4 · manual
