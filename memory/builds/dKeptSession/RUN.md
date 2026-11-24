@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes, 4 surfaced
+keepalive-reaped: yes
 hold-run: 
 hold-streak: 1 · at d1c32738
 resume-owed: none · owner
