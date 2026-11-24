@@ -12,10 +12,10 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 asks-at-landing: TOOL-dBoundRoles-27=DEFERRED TOOL-dBoundRoles-28=OPEN TOOL-dBoundRoles-29=DEFERRED TOOL-dBoundRoles-30=OPEN TOOL-dBoundRoles-31=OPEN TOOL-dBoundRoles-32=OPEN TOOL-dBoundRoles-33=DEFERRED TOOL-dBoundRoles-34=OPEN TOOL-dBoundRoles-35=OPEN TOOL-dBoundRoles-36=OPEN TOOL-dBoundRoles-70=OPEN TOOL-dBoundRoles-71=OPEN TOOL-dBoundRoles-72=OPEN TOOL-dBoundRoles-73=OPEN TOOL-dBoundRoles-74=OPEN TOOL-dBoundRoles-75=OPEN TOOL-dBoundRoles-76=OPEN TOOL-dBoundRoles-77=OPEN TOOL-dBoundRoles-78=OPEN TOOL-dBoundRoles-79=OPEN TOOL-dBoundRoles-80=OPEN
 units-at-landing: TOOL-dBoundRoles-14 TOOL-dBoundRoles-2 TOOL-dBoundRoles-1 TOOL-dBoundRoles-21 TOOL-dBoundRoles-37 TOOL-dBoundRoles-22 TOOL-dBoundRoles-49 TOOL-dBoundRoles-16 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-6 TOOL-dBoundRoles-13 TOOL-dBoundRoles-3 TOOL-dBoundRoles-38 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-48 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-7 TOOL-dBoundRoles-5 TOOL-dBoundRoles-10 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-4 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-12 TOOL-dBoundRoles-41 TOOL-dBoundRoles-11 TOOL-dBoundRoles-47 TOOL-dBoundRoles-26 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-20 TOOL-dBoundRoles-59 TOOL-dBoundRoles-19 TOOL-dBoundRoles-61 TOOL-dBoundRoles-18 TOOL-dBoundRoles-25 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69
 hold-run: 
-hold-streak: 1 · at 581c7336
+hold-streak: 1 · at ad9e194f
 resume-owed: none · owner
-held-at: 2026-11-24T11:41:00Z
-hold-reason: the closing review needs the gov-reviewer agent type, which this session, launched from a tree at main, does not register; the owner must launch a session from the run worktree, and must decide whether the one close runs with GATE_FULL=1 GATE_SELFTESTS=1
+held-at: 2026-11-24T23:11:55Z
+hold-reason: three owner decisions: nine Red-fix commits of the pushed history break the lane's limits, which the push boundary reads no waiver for; the reconcile merge of origin/main that push-main.sh --prepare asks for; and GATE_FULL=1 GATE_SELFTESTS=1 on the one --close. The brief 2026-11-25-prompt-TOOL-dBoundRoles-93-close-resume.md holds them and the bar's own reds
 hold-until: owner
 hold-code: host-owner-action
 held-from: VERIFYING
@@ -23,8 +23,8 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 3d6c1702afb6c2e86638785950d80657a187192c · park · 310 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: f5b1d8b588bbefaf605c1950c05f783c86872502
-phase: VERIFYING
+witness: ad9e194fe618a6d079db69ab3efa2aac10497c86
+phase: HELD
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
@@ -657,3 +657,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T23:07:22Z decision · item may the run merge origin/main into its branch for the reconcile --prepare asks for · reason options: yes, the lander's own next step; no, and the build is held. Refused: the owner's rule says never to merge main into this branch by hand
 
 2026-11-24T23:07:28Z decision · item does the one --close run with GATE_FULL=1 GATE_SELFTESTS=1 · reason options: yes, the owed flagged bar; no, the plain bar. Refused: the owner has not answered and the run never sets it on its own account
+
+2026-11-24T23:11:59Z hold · item host-owner-action · reason until owner · reaped efe49660 · resume none(owner)
