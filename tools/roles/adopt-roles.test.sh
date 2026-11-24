@@ -399,6 +399,8 @@ for name, tp, efforts in (("w1", tfam, verb("stage-efforts", "build", "--model",
 sys.stdout.buffer.write(("build: stage %s would run at " % sorted(roles)[0]).encode("utf-8"))
 (pathlib.Path(out).parent / "a6.harness").write_text(harness, encoding="utf-8")' \
     "$FXN" "$KREL" "$TMP_ROOT/a6" "$TRN/a6.tfam.jsonl" "$TRN/a6.other.jsonl" > "$TMP_ROOT/a6.stage" 2>"$TMP_ROOT/a6w.err"; _a6w=$?
+  # TOOL-dBoundRoles-20: the index lists only a harness the tree holds, so it is rendered again now it does.
+  (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1)
   # TOOL-dBoundRoles-25 S3: a declared harness is admitted only at its blob at the landed revision, which the
   # policy kit names, so the Workflow half runs a second copy of the pack beside a copy of the policy kit; the
   # fixture's harness is committed on its branch, which GOV_DEFAULT_BRANCH names as landed since it has no
@@ -1165,7 +1167,7 @@ for prompt in (lines, ""):
     except lib.RolesError as e:
         print("refused %d" % str(e).split("\n")[0].startswith("brief:prompt — "))
 ' "$FX" "$FX/$KREL" "$MR" 2>&1)
-A22=${A22//$'\r'/}
+A22=${A22//$'\r'/}; A22=$(grep -v '^roles: note — no policy kit' <<< "$A22")  # the fixture holds no policy kit, which the render notes
 check_arm "arm 22 the spec writer's handoff carries the brief's prompt verbatim" \
    "$([ "$_rc22" = 0 ] && [ "${A22%%$'\n'*}" = 'rendered 1' ] && echo 1 || echo 0)"
 check_arm "arm 22 an empty prompt refuses by name" \
@@ -1372,7 +1374,11 @@ print("outcome %d" % one(plant(role, lambda t: re.sub(r"(?m)^return: .*?(\r?)$",
                          "R2", "outcome"))
 got = plant(schema, lambda t: re.sub(r"\[\[field\]\]\r?\nkey = \"never\"\r?\n(?:[a-z]+ = .*\r?\n)*\r?\n", "", t, count=1))
 roles = len(list((kit / "agents").glob("*.agent.md")))
-print("schema %d" % int(roles > 0 and len(got) == roles and all("unknown front-matter key " + chr(39) + "never" + chr(39) in g for g in got)))
+# the repository-row schema names the same field, one line more (TOOL-dBoundRoles-20)
+row = [g for g in got if "role-row-schema.toml" in g]
+got = [g for g in got if g not in row]
+print("schema %d" % int(roles > 0 and len(row) == 1 and len(got) == roles
+                        and all("unknown front-matter key " + chr(39) + "never" + chr(39) in g for g in got)))
 ' "$FX" "$FX/$KREL" 2>&1)
 A27=${A27//$'\r'/}
 check_arm "arm 27 the fixture, holding its roles' enforcers, grades no R2, R5 or R13 line" \
@@ -1910,7 +1916,8 @@ _mt=memory-tree; [[ $FXK == */* ]] && _mt=${FXK%/*}/memory-tree
 A33P="$FX/$MR/builds/tFix/prompts"; A33B="$FX/$MR/builds/tFix/build"; A33R="$TMP_ROOT/a33.out"
 A33H="$FX/$MR/project/work-order-legacy.txt"
 _mtsrc="$HERE/../memory-tree"
-mkdir -p "$FX/$_mt" "$A33P" "$A33B" && cp "$_mtsrc/legacy_ledger.py" "$FX/$_mt"/
+# the ledger factory imports both siblings, so the fixture carries all three
+mkdir -p "$FX/$_mt" "$A33P" "$A33B" && cp "$_mtsrc/legacy_ledger.py" "$_mtsrc/backlog.py" "$_mtsrc/coverage_join.py" "$FX/$_mt"/
 (cd "$FX" && unset GIT_DIR GIT_WORK_TREE && git add -A && git -c user.name=fx -c user.email=fx@fx commit -qm fx) >/dev/null 2>&1
 run_adopter --scaffold > "$A33R"
 A33W=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build tFix --unit TOOL-tFix-1 \
@@ -2002,7 +2009,7 @@ got = json.loads(r.stdout) if r.returncode == 0 else []
 shaped = [f["name"] for f in got] == ["input:spec", "input:prompt"] and all(set(f) == {"name", "key", "class", "text"} for f in got)
 print("facts %d" % (shaped and fact is not None and got[0]["key"] == fact.group("key")))
 ' "$FX" "$FX/$KREL" "$MR" 2>&1)
-A34=${A34//$'\r'/}
+A34=${A34//$'\r'/}; A34=$(grep -v '^roles: note — no policy kit' <<< "$A34")  # as arm 22 drops it
 check_arm "arm 34 the spec writer's handoff hands its spec as content under a claimed record: fact line" \
    "$([ "$_rc34" = 0 ] && [ "${A34%%$'\n'*}" = 'render 1' ] && echo 1 || echo 0)"
 check_arm "arm 34 handoff.py facts cuts the same spec to the same key, beside its brief" \
