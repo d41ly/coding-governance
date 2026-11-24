@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.174 -->
+<!-- gov:kit memory-tree@2.180 -->
 [memory/HYGIENE.md · Level 3 · Read before writing any record, index or id under the memory root; yields to levels 0 to 2]
 # memory/ retention & hygiene
 
@@ -699,11 +699,13 @@ carry it too:
   its `Verdict` beside `Judged`, written by the loop kit's `probe.py`) · `stream-plan` (a build's
   units grouped into ordered streams, no field and one TOML fence of `[[stream]]` tables, written by
   dIndexedDesign's planner) · `shape-run` (one review exit's `review-shape` line as typed fields,
-  written by `gov_record.py new shape-run`, TOOL-dTotalRecall-11). The eighteen after `research`
-  are the typed kinds: each record is named
-  `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
-  joined both ways. An open kind field stops being groupable the first time two authors spell one
-  relation differently.
+  written by `gov_record.py new shape-run`, TOOL-dTotalRecall-11) · `mailbox-message` (one
+  mailbox message a build's transition disposed, fields `Id`, `From`, `To`, `Kind`, `Subject`,
+  `Answers`, `State`, `Reply` and `Ref` and its body in one `~~~~` fenced block, written by the loop
+  kit's transition writer). The typed kinds, `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py`, are
+  those after `research`: each record is named `<date>-build-<unit id>-<kind>-<n>.md` in a build's
+  `build/` folder, and the kind and that name are joined both ways. An open kind field stops being
+  groupable the first time two authors spell one relation differently.
 - `<id>` is family-qualified, so a record can name a spec in ANOTHER build — which real corpora need,
   because one closing review legitimately covers two builds. On a `spec-audit` record dated on or
   after `SPEC_AUDIT_PIN_CUTOFF`, or carrying no date, each id is written `<id>@rev-<N>`, N the
@@ -834,7 +836,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 
 <!-- gen:record-kinds -->
 
-51 kinds · 24 purposes pending
+54 kinds · 26 purposes pending
 
 | Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |
 |---|---|---|---|---|---|---|---|
@@ -864,6 +866,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 | `card` | `record.card` | `memory/builds/*/build/*-build-*-card-*.md` | `manifest-check.sh --card --follow` | — | — | `memory hygiene` | the build's orientation card at level 1, its stores and snapshot; its writer is `entry.orient`, which composes it |
 | `probe-trigger` | `record.probe-trigger` | `memory/builds/*/build/*-build-*-probe-trigger-*.md` | `probe.py trigger` | — | `item.probe.trigger` | `memory hygiene` | its writer is `probe.trigger`: why the probe opened, keyed by the boundary or the raising return, or by content for a |
 | `probe` | `record.probe` | `memory/builds/*/build/*-build-*-probe-*.md` | `probe.py pin` | — | `item.probe.pin`, `item.probe.run`, `item.probe.judge`, `item.probe.return` | `memory hygiene` | its writer is `probe.return`: one record per probe, its kind a verification, a reproduction or an experiment, an |
+| `mailbox-message` | `record.mailbox-message` | `memory/builds/*/build/*-build-*-mailbox-message-*.md` | `loop_transition.py record` | — | — | `memory hygiene` | one mailbox message a build's transition disposed, its fields and its body in one fenced block |
 | `view` | `record.view` | `memory/LIVE.md`, `memory/ledger/*.md`, `memory/map/generated/*` | `gen_build_index.py --write` | — | — | `memory hygiene` | a generated view: LIVE.md, the ledger, the ask views; re-rendered, never merged (the away pass); writer item not named |
 | `registry` | `record.registry` | `memory/project/*.txt`, `memory/project/*.toml` | `hand` | — | — | `ratchet (never gains)` | a gate's row registry under `memory/project/`, written by its gate's pin emitter (the away pass); writer item not named |
 | `archive` | `record.archive` | `memory/archive/**` | `hand` | — | — | `memory hygiene` | a rotated record under `memory/archive/`, written by rotation (the away pass); writer item not named |
@@ -875,12 +878,14 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 | `runlog-journal` | `record.runlog-journal` | `<git-common-dir>/runlog/*`, `<git-common-dir>/runlog-stamp-*` | `runlog.py` | — | — | `record-kinds` | — |
 | `drift-history` | `record.drift-history` | `<git-common-dir>/drift-history.tsv` | `drift_report.py` | — | — | `record-kinds` | — |
 | `gate-ledger` | `record.gate-ledger` | `<git-common-dir>/gate-*`, `<git-common-dir>/pre-push-*`, `<git-common-dir>/selftest-baseline` | `run-gates.sh` | — | — | `record-kinds` | — |
+| `history-verdicts` | `record.history-verdicts` | `<git-common-dir>/history-verdicts/*` | `history_store.py` | — | — | `record-kinds` | — |
 | `health-logs` | `record.health-logs` | `<git-common-dir>/health.log`, `<git-common-dir>/procmon-stamp` | `health-log.sh` | — | — | `record-kinds` | — |
 | `hook-state` | `record.hook-state` | `<git-common-dir>/agent-cap/*` | `agent-cap.js` | — | — | `record-kinds` | — |
 | `reuse-lookups` | `record.reuse-lookups` | `<git-common-dir>/codebase-map/*` | `reuse_lookup.py` | — | — | `record-kinds` | — |
 | `recall-cache` | `record.recall-cache` | `<git-common-dir>/recall/*` | `query.py` | — | — | `record-kinds` | — |
 | `review-lenses` | `record.review-lenses` | `<git-common-dir>/review-lenses/*` | `tier2-review.js` | — | — | `record-kinds` | — |
 | `transition-cache` | `record.transition-cache` | `<git-common-dir>/transition-audit-cache` | `transition_audit.py` | — | — | `record-kinds` | — |
+| `recovery-manifests` | `record.recovery-manifests` | `<git-common-dir>/recovery-manifests/*` | `branch_reconcile.py` | — | — | `record-kinds` | — |
 | `gov-index` | `record.gov-index` | `<git-common-dir>/gov/*` | `tag_index.py` | — | — | `record-kinds` | — |
 | `gov-feed` | `record.gov-feed` | `<git-common-dir>/gov-feed.*`, `<git-common-dir>/gov-last-fetch` | `gov-feed.sh` | — | — | `record-kinds` | — |
 | `handoff-calls` | `record.handoff-calls` | `<git-common-dir>/handoff-calls/*` | `handoff.py` | — | — | `record-kinds` | — |

@@ -223,7 +223,7 @@ either is absent, not a positive integer, or above the limit, naming the file, t
 numbers and the render command. A refused policy read refuses with its line.
 With no policy kit found it adds no rule; with one, a `cwd` in no checkout refuses, a settings file
 that does not parse refuses naming it, and a throw at any step refuses naming the step, since a rule
-that cannot finish does not admit (S38). After rule 7 only the pack's presence check below is left.
+that cannot finish does not admit (S38). After rule 7 come rule 9 and then the pack's presence check below.
 
 **What it does not see**: an environment override of the two variables, which the harness applies
 and no hook can read. That a session started before a lowering keeps its settings until it restarts
@@ -234,7 +234,7 @@ rule above ships at `<prefix>/workflows/tier2-review.js`.
 
 `TOOL-dFairHearing-22`. The hook carries no opt-in rule, only a presence check: whether a build
 declared `spec-audit:` is judged by the review kit's `spec-audit-optin.js` pack alone, the opt-in's
-one home. Last, after rules 6, 8 and 7, a `Workflow` call whose structured `args` carry
+one home. Last, after rules 6, 8, 7 and 9, a `Workflow` call whose structured `args` carry
 `kind: "spec-audit"` or a `specAudit` key, the pack's own trigger, is refused, exit 2, unless the
 pack is found by `resolveKitDir`, the hook's port of the sibling-kit resolver `resolve_kit_dir`, rung
 for rung (`TOOL-dFairHearing-32`): first a row of the install receipt, `.governance/install.json` at
@@ -676,6 +676,68 @@ alias, a `sleep` under 5 s in a `for` loop, a `sleep` under a shorter `timeout` 
 duration), a file named like a follow option without `--`, or PowerShell's own wait cmdlets; they do
 not read `run_in_background`, so a backgrounded poll is refused too. It stops forgetting, not evasion, and the push-boundary bar
 is still the guarantee. The main loop, which carries no `agent_type`, is never refused.
+
+## Rule 9 and scratch-guard's fifth check: `actions.free`
+
+Every write, spawn, commit or push belongs to the item in flight (`KICK-dKeptSession-8`). scratch-guard
+runs the check on an Edit, Write, MultiEdit or NotebookEdit once the write gate admits it, and on a
+Bash or PowerShell call once the role-gate arm admits it, before the item-boundary step; agent-cap
+runs it as rule 9 on every `Agent` and `Workflow` call, after rule 7, through scratch-guard's
+exported `checkFreeAction`. The item in flight is the `item —` line of the `## pointers` section of
+the card file `.claude/orientation-card.md` at the payload's checkout root, read by
+`readItemPointer` with no spawn. The check is armed when that section stands, the file's
+`card-owner —` line names the payload's session, and its route names a build. A role agent's
+payload carries the parent's session id, so its acts read the parent's pointer.
+
+The act class is `deriveActClass`'s, strongest first: `push` where the command matches
+`PUSH_SHAPED`, `commit` where it matches `COMMIT_SHAPED` (both built by `buildGitShaped`, one
+grammar), `write` for a write tool or a command naming a write target, `spawn` for an `Agent` or
+`Workflow` call, and `read` otherwise. With an instance key on the `item —` line every act is
+admitted. With `item — none` the policy key `actions.free` decides, read in process by
+`readPolicyValue`:
+
+| Pointer | Class | `read-only-probes` | `item-reads-only` | `recorded-anything` |
+|---|---|---|---|---|
+| an item | any | admit | admit | admit |
+| `none` | `read` | admit | refuse, unless a boundary command | admit |
+| `none` | `write`, `commit`, `push`, `spawn` | refuse | refuse | admit, one log line |
+
+A boundary command is a call each of whose simple commands has the head `position.py`, the loop
+kit's position engine, or `manifest-check.sh`, the kickoff checker (`BOUNDARY_HEADS`), so a strict
+session can always move to its next item. The log is `gov-free-actions.log` under the git common
+dir, one line per recorded act: `<iso> · <session> · <class> · <tool> · item none`. A value outside
+the three refuses, naming it. An absent policy kit, or a key read that refuses, reads the default
+`read-only-probes` and prints one `NOTE —` line saying which.
+
+The refusal, from scratch-guard; rule 9 prints the same two lines with
+`BLOCKED by agent-cap: rule 9 (KICK-dKeptSession-8) refused this <tool> call — ` in place of
+`BLOCKED by scratch-guard: `:
+
+```
+BLOCKED by scratch-guard: actions.free (item-reads-only) refuses this Bash read — the card of tFix reads item — none.
+Run the act inside the item that owns it, or file it as an intake.
+```
+
+No card file, or one with no `## pointers`, adds no check and prints nothing. A card that carries
+pointers and does not arm, owned by another session or routing no build, admits with one line:
+`scratch-guard: actions.free unarmed — <why>`, or `agent-cap: rule 9 unarmed — <why>`. An armed card
+whose `item —` line reads `skipped: <why> · at <sha8|unborn>`, the line the card engine prints when
+its position read does not answer, admits the same way, its why read whole to the line's last
+` · at` tail (`KICK-dKeptSession-43`):
+`scratch-guard: actions.free unarmed — item pointer skipped: <why>`, or
+`agent-cap: rule 9 unarmed — item pointer skipped: <why>`, so a missing loop kit never blocks the
+commit that installs it. Once armed, a missing `item —` line refuses, and so does any
+other line that is neither an instance key nor `none`, as `item pointer malformed: <line>`, and every
+throw: scratch-guard's `the actions.free arm threw`, and rule 9's `threw`. A card file that exists
+and cannot be read refuses too.
+
+**Its ceiling.** The class reads the command line as text, so a write, commit or push made through
+an interpreter, a script, an alias or the lander passes as a read, and the push-time leg keeps that
+guarantee. The `Read`, `Grep` and `Glob` tools never reach it. A hand-edited card file is read like
+the engine's. Between a commit and the boundary verb's rewrite the pointer still names the item just
+finished, so acts pass under it; a role agent still running when the pointer moves to `none` is
+refused under the default. A skipped `item —` line disarms the check for as long as the engine
+prints it, saying so on every call. It stops forgetting, not evasion.
 
 ## The authoring rule for kit files
 

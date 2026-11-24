@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.135 -->
+<!-- gov:kit unattended@1.138 -->
 [memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 
@@ -65,12 +65,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   Beneath `frontier:`, `--plan <slug>` prints the build's breakpoints, the loop kit's
   `breakpoints.py list` verbatim (`TOOL-dDeclaredLoop-19`): one
   `breakpoint: <name> · <before|at|after> <item tag> · <reviewer|owner> · <cause>[ · <release>]` line each,
-  the reviews `review.<stage>` places, the owner gates `autonomy` places, each `review.breakpoints`
+  the reviews `review.<stage>` places, the owner gates `autonomy` and `attendance` place, each `review.breakpoints`
   member, and under `decisions.major = "author-owner-ratifies"` the owner item at `item.build.ratify`
   where a tracked spec carries a fork resolved `(agent, <date>, delegated)`. An owner line's release is
   `authorization`, `held` or `released <record> <word>`, and `passed before placement` on each owner gate
   of a build whose README's first commit does not contain the loop kit's placement of the module
-  (`TOOL-dDeclaredLoop-53`), which no hold reads as `held`. Beside an owner gate reading `held` where no
+  (`TOOL-dDeclaredLoop-53`), which no hold reads as `held`. Under an `attendance` value that adds an
+  interaction, a `breakpoints: attendance · <value> · adds <members>` line follows the breakpoint lines, before
+  any `breakpoints: held` line, naming each interaction still a stand-in (`KICK-dKeptSession-17`); no hold
+  reads it. Beside an owner gate reading `held` where no
   commit adds the build's README under the memory root, a last `breakpoints: held · no commit adds <path> ·
   root from <conf>` line names the path looked for and the conf its root came from, `.unattended.conf`,
   `.memory-tree.conf` or `default` (`TOOL-dDeclaredLoop-64`, `TOOL-dDeclaredLoop-75`); no hold reads it. Fire a review line through `--trigger` with its
@@ -262,6 +265,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   reason and lands. It parses nothing beyond a substring test for the id, and it does not check that
   the id was ever this run's job. Where `RUN_CLAIMS` is `on` it writes `landed` into the run's claim
   once the record is staged; a claim it may not write is announced on one line and never fails it.
+  On both success exits, with `RUN_CLAIMS` `on`, it posts one `landed` message, subject `landing
+  <slug>` and the landed sha as its body, to each build the loop kit's `loop_transition.py dependents`
+  lists as naming the slug in `parents:`, printing each post's line; a failed post, or a dependents
+  read that does not answer (one `NOTE — no landed notice` line), never moves its exit
+  (KICK-dKeptSession-7).
 - `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add|defer`, the
   unit as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the
   first three acts; this verb is the record. `defer` sets a roster unit aside against an open ask so
@@ -563,7 +571,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `--lease status <kind> <name> [<sub>]` reads one lease and writes nothing: one TAB-separated line,
   `<tail> <fleet tag> <session> <status> <verdict> <epoch>`, or `lease — none · <tail>` (exit 0); a
   read that does not answer is `lease not written` (exit 2). `placement.py check` reads it, never
-  `--claims`, which names no session. An offer is refused `offered` over an offer still open, whoever
+  `--claims`, which names no session. `--lease show build <slug>` reads one build lease and writes
+  nothing: its `witness` alone, or `-` where it holds none or no lease exists (exit 0), `lease — off ·
+  <slug>/build` with `RUN_CLAIMS` off, `lease not written` for a read that does not answer or any
+  other shape (exit 2); a dependent build's engine reads its parent's witness with it
+  (KICK-dKeptSession-7). An offer is refused `offered` over an offer still open, whoever
   it names, and when `--to` names the caller's own tag or its own session on it, and `tombstone` over
   a build or unit tombstone, `terminal` kept for a cadence or legacy claim. A create whose feed commit
   git cannot read is refused `epoch-fence` for a build or unit lease and is a plain create at epoch 1
@@ -590,6 +602,134 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `register — not written · <why>`, `register — refused <subject|decision key> over <n> bytes
   encoded` or `register — off` (exit 2). Dark behind `RUN_CLAIMS` like every claim; no entry is
   ever deleted or rewritten. It takes no slug.
+- `--mail` — the mailbox per build, five verbs. `--mail post <slug> --to <recipient> --kind <kind>
+  --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>]
+  [--default <text>] <body file>` appends ONE message to this session's own ref,
+  `refs/gov/mail/<slug>/<fleet tag>/<session>`, the slug the sender's build, so writers never
+  contend: one commit per post on the
+  ref's previous tip under the `gov-claim` identity, a session's first post parentless, written by
+  compare-and-swap. The kind is one of the loop kit's closed `[mail]` set, `confirm-request`,
+  `confirmed`, `changed`, `overlap`, `takeover`, `landed`, `question`, `answer`, `ack`, `intake`,
+  `withdrawn` and `superseded`, as its `loop_lib.py --mail-kinds` prints them; the recipient is one
+  of four forms, `build:<slug>`, `unit:<id>`, `node:<fleet tag>` or the bare word `project`. A
+  post of kind `ack` or `answer` is refused, `mail — not written · --mail post takes no --kind <kind>:
+  post it with --mail <kind>, which reads the row it replies to` (exit 2), since `--mail ack` and
+  `--mail answer` post those kinds after reading the row they reply to (KICK-dKeptSession-44 S28). A
+  `confirmed` or `changed` post names the file of the interface it announces with `--interface`,
+  and no other kind names one. A `question` or a `confirm-request` declares the answer it takes if
+  nobody answers in time with `--default`; any other kind may, and records `ack` where it does not.
+  Every message records as its `deadline` the hours `flow.wait-ceiling` reads at the post, through
+  the driver's one policy reader, a refused read writing nothing. Each refusal exits 2 before the
+  remote is read. The id is `derive_message_id` called over eight fields in order: the build, the item's instance key, the
+  pass, the kind, the subject, the id it answers, the recipient and the content key, each absent one
+  `none`; no session and no time is a field, so a retried post carries the id of the post it retries
+  and is refused as a duplicate across the build's session refs. An act, once dWellOiledMachine's
+  Runtime mints one, joins as the ninth field, after the recipient and the content key. The record
+  is `gov-mail <slug>/<id>`, a blank line, the keys `id`, `build`, `from-tag`, `from-session`, `to`,
+  `kind`, `item`, `pass`, `subject`, `answers`, `seq`, `after`, `content-key`, `deadline` and
+  `default`, a blank line and the body; neither `deadline` nor `default` is a field of the id.
+  `seq` is the message's place on its session's ref, 1 for the first; `after`, on a
+  session's first message, the id of the newest tip of the build's other session refs by this
+  node's first sighting, so a take-over names the last message its predecessor wrote, and `none`
+  otherwise; `content-key` the 12 hex digits `derive_gov_id --file` prints over the interface file,
+  `none` on any other kind. The body is refused over
+  4096 bytes (PINNED) or carrying a NUL or a control byte other than tab and newline, or holding a
+  line the record factory would read as a field or its `~~~~` fence. It prints one outcome line:
+  `mail — posted <id> · <ref>` (exit 0), followed by one `ring —` line; `mail — duplicate <id> ·
+  <ref>` or `mail — lost <id> · <ref> · <why>` (exit 1); or `mail — not written · <why>`, `mail — not
+  written: no session id` or `mail — off` (exit 2). The ring comes only after the message is
+  written, so the mailbox is written first under every value of the `deps.messaging` policy key,
+  which picks the live channels it rings with the message's two fields, its mail ref and its id, and
+  nothing else: `live-and-mailbox` (the default) and `live-only` ring each live channel the harness
+  offers, none in this one, and print `ring — none · no live channel in this harness (stand-in
+  dWellOiledMachine)` until dWellOiledMachine's Runtime declares its doorbell point;
+  `mailbox-only` rings nothing and prints `ring — off (deps.messaging: mailbox-only)`. A
+  `deps.messaging` that does not read rings as `live-and-mailbox` under one `unattended: NOTE -`
+  line on stderr, and a ring never changes the post's exit. `--mail read <who> [--open] [--ids] [--local] [--sent]` reads a build's mailbox, `<who>` a slug, read
+  as `build:<slug>`, or one of the recipient forms: one bounded, pruned fetch of every build's mail
+  refs into this node's cache, then one TAB row per message addressed to `<who>`, a build reading
+  its units' messages too: `id`, `kind`, `to`, `state`, `first-seen`, `from-build`, `subject`,
+  `answers`, `ref`, `commit`, `reply`, `seq`, `after`, `content-key`, `deadline` and `default`, the
+  last five `-` on a record that carries none, one id held on two refs shown once at its earliest
+  sighting. A record whose `id` is not twelve lower-case hex digits, whose `kind` is none of the loop
+  kit's `[mail]` set or whose `build` is not the slug its ref names, and every record on a ref whose
+  build segment is no build's slug, is not read, so no reader of the rows sees it; a kind set that
+  does not read prints `mail — not read · <why>` (exit 2) before any fetch. A
+  dependent acts on the `confirmed` or `changed` row whose `content-key` equals the key it
+  recomputes from the interface's text, the lesser id where two do, never on arrival order, so a
+  lost or reordered relay costs latency and never correctness. The five states: `reply` for an `answer` or an `ack`, which never waits; `answered`
+  where an `answer` names the id; `acked` where an `ack` does and no `answer`; `expired` for an
+  `open` message this node first saw more than its `deadline` hours ago, by its own clock, its
+  `default` the answer, a message this node has not sighted never expiring; `open` otherwise;
+  `reply` names the message that decided the state. `--open` prints only the open rows and `--ids`
+  their ids on one line, or `none`. A failed fetch prints `mail — local copy: <why>` and reads the
+  cache (exit 0); `--local` reads the cache with no fetch and prints no cause; a refused read exits
+  2. `--sent` takes a build's slug alone and prints instead one row per message on that build's own
+  mail refs, `refs/gov/mail/<slug>/`, whoever it was addressed to, each state read as in the build's
+  own mailbox; a recipient form prints `mail — not read · --sent reads one build's own mail refs, and
+  '<who>' is no build's slug` (exit 2), and `post`, `ack`, `answer` and `notice` refuse the flag.
+  `--mail ack <slug> [<id> ...]` posts an `ack` from `<slug>`
+  answering each `<id>` to its sender's build, with its subject and an empty body, an id named twice
+  acked once, the first kept (KICK-dKeptSession-63). A list given empty exits 0 before anything is
+  read. The batch then reads the mailbox once with one bounded fetch of every mail ref, and a remote
+  that does not answer prints `mail — not read · <why>` and refuses the ack, exit 2, nothing built
+  (KICK-dKeptSession-65); then `<slug>`'s own sent messages once from the cache that fetch filled.
+  Per id, in order (KICK-dKeptSession-64): an `<id>` that is no row addressed to `<slug>` refuses the
+  batch, exit 2, before anything is written; an id an `ack` sent by `<slug>` already answers,
+  whatever its row's state, is skipped and named on stderr as `mail — already acked <id>`, never
+  reaching the duplicate check; and a list emptied by the skip exits 0 and writes nothing. Every ack
+  left is one message of one chain on the session's ref, each parented on the one
+  before, its `seq` one past the one before's, and the chain lands in one ref update, so every ack is
+  posted or none is, a duplicate, a refused record or a lost update leaving every row open
+  (KICK-dKeptSession-62), and a landed chain appends one feed line per ack, oldest first. One id
+  prints the post's lines, several one line per ack. The ack's exits: 0 every ack posted, or every
+  id skipped; 1 a lost write; 2 a refusal, an unreachable remote and a duplicate of an id no ack from
+  `<slug>` answers among them, the duplicate one `--mail post` exits 1 on. `--mail answer <slug> <question id> <body file>
+  [--cite <path>@<sha>]...` answers a `question` addressed to `<slug>`, the answering build, the loop
+  kit's item `item.entry.mailbox-answer` while no `next` dispatches it: each `--cite` splits at its
+  last `@` into a non-empty path and a sha of 7 to 40 lower-case hex digits before anything is read,
+  else `mail — not written · --cite takes <path>@<sha>, not <value>`; one mailbox read; an id naming
+  no `question` row addressed to `<slug>` is `mail — not written · <id> is no question addressed to
+  <slug>`; a question reading `answered`, `acked` or `expired` prints `answer — <id> · <state>` (exit
+  1); a cite `git cat-file -e <sha>:<path>` does not find is `mail — not written · the cite
+  <path>@<sha> names no file this clone holds at that commit`, and an unreadable body file `mail —
+  not written · the body file cannot be read: <file>`. Then it posts as an ack does, of kind `answer`
+  to the asker's build with the question's subject, its body the file and one `cites <path>@<sha>`
+  line per cite in flag order, so the post's lines and exits are the answer's. Each refusal exits 2
+  writing nothing. `--cite` with no value prints `mail — not written · --cite takes a value`, the
+  `post`, `read` and `ack` forms refuse it, and an `answer` with any other flag, or other than three
+  words, prints its form. `--mail notice <slug> [--item <instance key>] [--local] [--ring <ref>
+  <id>]` shows the build's unread mail as the `mailbox.notice` policy key says, the one reader of
+  that key and of `mailbox.fetch-seconds`, each read through the driver's policy reader, a refused
+  read taking its catalogue default, `every-item` and 60, under one `unattended: NOTE -` line naming
+  the key. Under `off` it fetches nothing, rewrites its stamp's first line alone and prints `mail —
+  notice off for <slug> (mailbox.notice: off)`. Otherwise it is one mailbox read, its one bounded
+  fetch, and ONE line over the `open` rows: `mail — <n> unread for <slug> · <id> <id> …` or `mail —
+  none for <slug>`, then ` · fetched`; or, where the fetch failed, its `mail — local copy: <why>`
+  passed through on stderr, ` · local copy <age>s old (<why>)`, the age its stamp's, ` · local copy
+  age unknown (<why>)` with no stamp; `--local` reads the cache with no fetch and ends ` · local copy
+  <age>s old (--local)`; `--item` appends ` · item <instance key>`. THE STAMP is
+  `<git-dir>/unattended/mail-notice.<slug>.log`, rewritten whole through a temp file renamed into place
+  after every notice that fetched, and after an `off` one: its first line `{"notice": <value>,
+  "fetch-seconds": <n>, "bash": <path>}`, the bash that ran the driver, then one `{"id": …, "kind": …,
+  "to": …}` line per unread row; its mtime is the local copy's age, and a failed or `--local` notice
+  leaves it untouched. The kit's `PostToolUse` hook `mail-notice.js` reads it at every tool call under
+  `every-tool-call`, the session's build the route's `- build:` of the tree's card file
+  `.claude/orientation-card.md` whose `card-owner —` line names the session, else its run lease's, and adds `mail — <n> unread for <slug> · <ids> · local copy <age>s old` to the
+  session's context, with no git, policy or network call; past `fetch-seconds` it creates
+  `<stamp>.fetching` exclusively and, only then, starts this verb detached with the stamp's bash. A
+  notice that fetched, an `off` notice and a `--local` notice remove the marker; a notice whose fetch
+  failed, the local copy or a refused read, keeps it, touched at its end, so the hook starts no fetch
+  until it is older than twice the interval, when it is replaced. `--ring <ref>
+  <id>`, the live channel's receiver, is held before any read to a ref of
+  `refs/gov/mail/<build>/<tag>/<segment>` as the post writes it and an id of twelve lower-case hex
+  digits, else `mail — not read · --ring takes a mail ref and a twelve-hex-digit id` (exit 2); then
+  the notice runs and reads the mailbox, never the ring. A refused read exits 2. Only `read` and
+  `notice` take `--local`, only `notice` takes `--ring`, and a notice with any other flag, or other
+  than one word, prints its form. A build's transition is refused while a
+  message addressed to it reads `open`, and the move disposes each answered, acknowledged or expired
+  message once (the loop kit's `loop_transition.py`). Dark behind `RUN_CLAIMS`: a post, an ack or an
+  answer prints `mail — off` and exits 2, a read or a notice prints it and exits 0.
 - `--card-ref` — `--card-ref write <slug> --message <file>`, the build card's ref on the remote,
   written for the kickoff engine's `remote-ref` card store, which calls it bounded with the commit
   message it rendered in the file (TOOL-dPlacedRequest-33). Dark behind `RUN_CLAIMS`: while the
@@ -699,7 +839,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   git cannot read.
 - `--beat` — `--beat <slug>`, the resume tick's heartbeat for a run `--liveness` reads `LIVE` on this
   host: it renews that run's own claim when due and prints exactly one `beat —` line, `renewed` or
-  `skipped: <why>`. It writes only a claim that is absent or the run's own, and refuses nothing but a
+  `skipped: <why>`; a renewal resting on an open `question` to the build, under `leases.renewal:
+  progress` where no transition differing from the record's `witness` is found, ends `renewed <utc>
+  · wait question <id>`. It writes only a claim that is absent or the run's own, and refuses nothing but a
   missing record; `RUN_CLAIMS` off is a skip naming the switch.
 - `--feed` — this node's change feed, `<git-common-dir>/gov-feed.log`: one line per governance ref
   write the node made or saw, six TAB fields, `seq`, ref, kind, the commit's tree (`-` on a

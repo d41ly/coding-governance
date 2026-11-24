@@ -1012,7 +1012,8 @@ def read_rows(con, kinds, tag=None, like=None):
     if like is not None:
         q += " AND p.tag LIKE ?"
         args.append(like)
-    return con.execute(q + " ORDER BY p.tag, p.path, p.line", args).fetchall()
+    # `+p.tag`: the sort may not pick path_row_tag, which walks every tree's rows on a shared index.
+    return con.execute(q + " ORDER BY +p.tag, p.path, p.line", args).fetchall()
 
 
 def read_text_of(con, blob, extractor, kind, line):
@@ -1057,7 +1058,7 @@ def read_population(con, ctx, namespaces=(), words=()) -> tuple[list, list]:
     con.execute("DELETE FROM want_tag")
     con.executemany("INSERT OR IGNORE INTO want_tag VALUES (?)", [(w,) for w in words])
     conds = " OR ".join(["p.tag IN (SELECT tag FROM want_tag)"] + ["p.tag LIKE ?"] * len(namespaces))
-    rows = con.execute(VIEW_ROWS + f" WHERE p.kind='span' AND ({conds}) ORDER BY p.tag, p.path, p.line",
+    rows = con.execute(VIEW_ROWS + f" WHERE p.kind='span' AND ({conds}) ORDER BY +p.tag, p.path, p.line",
                        [f"{ns}.%" for ns in namespaces]).fetchall()
     builds = ctx["memory_root"] + "/builds/"
     graded, records = [], []

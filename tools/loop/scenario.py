@@ -4,6 +4,7 @@ rows they activate, conflicts between them, and the switch at a step boundary (T
 
     python scenario.py select [--fact <name>=<value>]...
     python scenario.py check [--selftest]
+    python scenario.py slots --build <slug> --rev <rev>
     python scenario.py --fixture --plant <case>
 
 THE KIND. The kinds register's `kind.scenario` row names `factories.py scenario` as its factory,
@@ -37,14 +38,29 @@ build carries `scenario`, and otherwise the newest such move's, each whose `then
 state the move leaves giving way to the scenario that entry names (`derive_step_scenarios`). It answers
 `(scenario, settled)` joined by `+`, or None where the scenario composition at HEAD answers unarmed.
 
+THE SLOT (KICK-dKeptSession-20). A row's `preset`, a shipped preset's name, and `overrides`, a table
+from a dotted policy key to its value, scope policy to the builds placed under it, inherited through
+`extends` whole as every other field. `derive_slot_policy(placed, rows, mode)` composes the placed
+scenarios' slots in declared order by `derive_activated_rows`' rule: two naming two presets, or setting
+one override key to different values, raise `ScenarioConflict` under `refuse` and settle for the later
+under `declared-order`. `slots --build <slug> --rev <rev>` reads the build's moves by `read_transitions`,
+takes the scenarios the newest move carrying `scenario` names, reads the rows and `flow.scenario-conflict`
+at `<rev>`, and prints the composed slot as one JSON object, `{"preset": {"name", "from"} or null,
+"overrides": {<key>: {"value", "from"}}}`, or `null` for a build no move places or placed scenarios
+carrying no slot; the policy kit's `read_revision` runs it for a read naming a build. Exit 0; 1 printing
+`loop: refused · <why>` on a conflict under `refuse` or a refused read; 2 printing `loop: unarmed ·
+<why>` where a kit does not resolve. `check_scenario_policy(rows, root)` runs, for each row carrying a
+slot, the policy kit's `presets.py slot` and then `presets.py pairs` as subprocesses, so a slot setting
+a key presets never touch, or breaking a pair rule, is refused at `check`.
+
 `select` composes at HEAD and prints the placed tags on one line, space-separated, one `loop: settled ·
 <entry>` line per settlement and the facts it read. `check` holds every rule of `check_scenarios` over
 gov's pack as the working tree holds it and the repository's rows the composition answers at HEAD, then
-composes each kind a scenario activates with its rows; it prints each refusal as `loop: refused ·
-<scenario> · ...` and closes with `loop: scenarios composed · <n> scenario(s) · <m> repository`. Exit 0
-green; 1 a refusal, a conflict under `refuse` or a refused default; 2 printing `loop: unarmed · <why>`
-where the playbook or policy kit does not resolve, the kind is unregistered, its schema is absent or HEAD
-holds no pack, and on a usage error. `check --selftest` runs `check` and `select --fact entry=patch` over
+composes each kind a scenario activates with its rows and holds each slot to `check_scenario_policy`; it
+prints each refusal as `loop: refused · <scenario> · ...` and closes with `loop: scenarios composed · <n>
+scenario(s) · <m> repository`. Exit 0 green; 1 a refusal, a conflict under `refuse` or a refused default;
+2 printing `loop: unarmed · <why>` where the playbook or policy kit does not resolve, the kind is
+unregistered, its schema is absent or HEAD holds no pack, and on a usage error. `check --selftest` runs `check` and `select --fact entry=patch` over
 the tree, then every plant through `loop_lib.run_selftest_cases`.
 
 `--fixture --plant <case>` runs `then-cycle` and `extends-cycle` over rows in memory; every other plant
@@ -57,8 +73,10 @@ WHAT THIS DOES NOT CHECK: that a fact a repository predicate names is one placem
 first move's `to` is the placed scenarios' `entry`; that an activated row duplicates an overlay row's tag,
 which the composition admits as two own rows; and the kind checks beyond the composition, the item kind's
 `check_program` and the stage kind's `check_splices`, over a scenario's activated rows. A scenario no
-predicate ever admits passes; `select` prints the facts it read.
+predicate ever admits passes; `select` prints the facts it read. A slot is checked against the policy
+file the working tree holds, so a file committed later can still break a pair a slot assigns.
 """
+import json
 import pathlib
 import subprocess
 import sys
@@ -73,6 +91,7 @@ from loop_items import derive_definition_rel, derive_repo_item, read_composition
 from loop_lib import STEP_TAGS, LoopError, read_definition, resolve_kit_dir, run_selftest_cases, scan_cycles  # noqa: E402
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_table import ENTRY, read_transition_rows  # noqa: E402
+from loop_transition import read_transitions  # noqa: E402
 from loop_witness import read_clean_env, read_git, remove_tree, run_fixture_git, write_fixture_files  # noqa: E402
 
 SAY = "loop"
@@ -83,9 +102,11 @@ DEFAULT_KEY = "flow.scenario-default"
 CONFLICT_KEY = "flow.scenario-conflict"
 REFUSE = "refuse"
 #: The schema's fields, each a scalar, in the order a row is written.
-FIELDS = ("extends", "admits", "entry", "activates", "then")
+FIELDS = ("extends", "admits", "entry", "activates", "then", "preset", "overrides")
 #: The fields `extends` hands from a parent to a row that does not set them.
-INHERITED = ("admits", "entry", "activates", "then")
+INHERITED = ("admits", "entry", "activates", "then", "preset", "overrides")
+#: The slot's two fields (KICK-dKeptSession-20): a row setting either carries a slot.
+SLOT = ("preset", "overrides")
 OVERLAY = ".governance/instructions.toml"
 POLICY_FILE = ".governance/policy.toml"
 FX_BUILD_2 = "tFixTwo"
@@ -108,7 +129,14 @@ PLANTS = {
     "derived-field": "one move out of none with --field scenario=scenario.patch",
     "then-cycle": "two rows whose then names each other, in memory",
     "extends-cycle": "two rows whose extends names each other, in memory",
+    "slot-builds": "preset = standard; tFix under a strict slot, tFix2 under a velocity slot, each read by get "
+                   "--build, then the file setting hooks.bypass",
+    "slot-conflict": "slot-builds' two rows, tFix placed under both, under refuse, then declared-order",
+    "slot-refused": "one slot overriding runtime.agents-in-flight, one under velocity overriding "
+                    "review.design.round-count = 4, each refused by check",
 }
+STRICT_SLOT = "scenario.adopter.strict-slot"
+VELOCITY_SLOT = "scenario.adopter.velocity-slot"
 
 
 class ScenarioConflict(ValueError):
@@ -117,7 +145,7 @@ class ScenarioConflict(ValueError):
 
 # ------------------------------------------------------------------------------------------ the rows
 def derive_extended_rows(rows):
-    """`rows` in order, each a copy whose `admits`, `entry`, `activates` and `then` start from its parent's,
+    """`rows` in order, each a copy whose `INHERITED` fields start from its parent's,
     read through the parent's own chain; a key the row sets stands in place of the parent's whole. A parent
     no row holds, or a chain that cycles, hands nothing further: `check_scenarios` refuses both."""
     by_tag = {r.get("tag"): r for r in rows}
@@ -184,6 +212,34 @@ def derive_activated_rows(placed, rows, mode):
                     setter[(kind, tag)][field] = scen
                 held["source"] = scen
     return {k: list(v.values()) for k, v in merged.items()}, settled
+
+
+def derive_slot_policy(placed, rows, mode):
+    """`{"preset": {"name", "from"} or None, "overrides": {<key>: {"value", "from"}}}` of the placed
+    scenarios' slots, composed in declared order, each `from` the last scenario that set it; None where no
+    placed row carries a slot. Two naming two presets, or setting one override key to different values,
+    raise ScenarioConflict under `refuse`, naming both and the field; under `declared-order` the later wins,
+    the rule `derive_activated_rows` holds an activated row's fields to."""
+    by_tag = {r.get("tag"): r for r in rows}
+    preset, overrides, slotted = None, {}, False
+    for scen in placed:
+        row = by_tag.get(scen, {})
+        if not any(f in row for f in SLOT):
+            continue
+        slotted = True
+        name = row.get("preset")
+        if name is not None:
+            if preset is not None and preset["name"] != name and mode == REFUSE:
+                raise ScenarioConflict("%s and %s each set the slot's preset to different values, %s and %s, and %s "
+                                       "= refuse" % (preset["from"], scen, preset["name"], name, CONFLICT_KEY))
+            preset = {"name": name, "from": scen}
+        for key, value in (row.get("overrides") or {}).items() if isinstance(row.get("overrides"), dict) else ():
+            held = overrides.get(key)
+            if held is not None and held["value"] != value and mode == REFUSE:
+                raise ScenarioConflict("%s and %s each set the slot's override %s to different values, and %s = "
+                                       "refuse" % (held["from"], scen, key, CONFLICT_KEY))
+            overrides[key] = {"value": value, "from": scen}
+    return {"preset": preset, "overrides": overrides} if slotted else None
 
 
 def derive_step_scenarios(placed, step, rows):
@@ -310,6 +366,44 @@ def check_scenarios(rows, data, kinds):
     return out
 
 
+def run_presets_verb(script, argv, feed, root):
+    """`(exit, stdout, lines)` of the policy kit's `presets.py` at `script` run with `argv` in `root`, `feed`
+    on its stdin and the git variables `read_clean_env` drops unset."""
+    p = subprocess.run([sys.executable, str(script), *argv], input=feed, cwd=str(root), capture_output=True,
+                       text=True, encoding="utf-8", errors="replace", env=read_clean_env(PYTHONIOENCODING="utf-8"),
+                       timeout=600)
+    return p.returncode, p.stdout, [ln for ln in (p.stdout + p.stderr).replace("\r", "").splitlines() if ln.strip()]
+
+
+def check_scenario_policy(rows, root):
+    """One refusal per slot of `rows`, the extended scenario rows, that the policy kit refuses, each
+    `<scenario> · <key> · <why>`: the slot through `presets.py slot --repo <root>`, then the assignment it
+    prints through `presets.py pairs`, each a subprocess in `root`. A verb exiting other than 0 with no
+    refusal line is one refusal naming the verb and its first line, never a pass. A row carrying no slot
+    runs no verb; LookupError where the policy kit does not resolve for a row carrying one."""
+    out, script, said = [], None, "presets: refused · "
+    for row in rows:
+        if not any(f in row for f in SLOT):
+            continue
+        if script is None:
+            script = resolve_kit_dir("policy", "presets.py", KIT) / "presets.py"
+        feed = json.dumps({"scenario": row.get("tag"), "preset": row.get("preset"),
+                           "overrides": row.get("overrides", {})})
+        for argv in (["slot", "--repo", str(root)], ["pairs"]):
+            try:
+                rc, stdout, lines = run_presets_verb(script, argv, feed, root)
+            except (OSError, subprocess.TimeoutExpired) as exc:
+                rc, stdout, lines = -1, "", ["did not run: %s" % exc]
+            refused = [ln[len(said):] for ln in lines if ln.startswith(said)]
+            if rc == 0:
+                feed = stdout
+                continue
+            out += refused if rc == 1 and refused else ["%s · presets.py %s exited %d: %s" % (
+                row.get("tag"), argv[0], rc, lines[0] if lines else "(no output)")]
+            break
+    return out
+
+
 def read_activatable_kinds(root):
     """The kind tags a scenario may activate: every kind the register under `root` lists with a schema,
     `pins.read_row_kinds` of the playbook kit, but `kind.scenario`. LookupError where that kit does not
@@ -358,6 +452,11 @@ def run_check():
                 continue
             got, _p, said = read_composition(root, kind.partition(".")[2], [{**r, "source": row["tag"]} for r in krows])
             refusals += ["%s · %s · %s" % (row["tag"], kind, ln) for ln in (said if got != 0 else [])]
+    try:
+        refusals += check_scenario_policy(derive_extended_rows(rows), root)
+    except LookupError as e:
+        print("%s: unarmed · %s" % (SAY, e))
+        return 2
     for why in refusals:
         print("%s: refused · %s" % (SAY, why))
     print("%s: scenarios composed · %d scenario(s) · %d repository" % (SAY, len(rows), len(repo)))
@@ -384,6 +483,30 @@ def run_select(facts):
     for entry in settled:
         print("%s: settled · %s" % (SAY, entry))
     print("%s: facts · %s" % (SAY, " ".join("%s=%s" % kv for kv in sorted(facts.items())) or "none"))
+    return 0
+
+
+def run_slots(build, rev):
+    """`slots --build <build> --rev <rev>` over the repository at the working directory: the slot
+    `derive_slot_policy` composes for the scenarios the build's newest move carrying `scenario` names, the
+    rows and `flow.scenario-conflict` read at `rev`, printed as JSON, `null` where none: -> its exit."""
+    root = read_repo_root()
+    try:
+        held = next((m["scenario"] for m in read_transitions(build, root) if m.get("scenario")), None)
+        slot = None
+        if held is not None:
+            rows = read_scenario_rows(root, rev)
+            if rows is None:
+                print("%s: unarmed · the scenario composition at %s answers unarmed" % (SAY, rev))
+                return 2
+            slot = derive_slot_policy(held.split("+"), rows, read_scenario_policy(root, CONFLICT_KEY, rev))
+    except LookupError as e:
+        print("%s: unarmed · %s" % (SAY, e))
+        return 2
+    except (ValueError, OSError) as e:
+        print("%s: refused · %s" % (SAY, e))
+        return 1
+    print(json.dumps(slot, sort_keys=True))
     return 0
 
 
@@ -438,6 +561,8 @@ def write_scenario_plant(top, case, pins):
                                    {"kind.item": [derive_farm_row()]})
     pair = [derive_plant_scenario(n, {"entry": ["feature"]}, {"kind.item": [derive_farm_row("command:farm-%s" % n)]})
             for n in ("a", "b")]
+    slots = [dict(derive_plant_scenario("strict-slot", {"entry": ["feature"], "precision": ["high"]}), preset="strict"),
+             dict(derive_plant_scenario("velocity-slot", {"entry": ["feature"], "pace": ["fast"]}), preset="velocity")]
     overlay = {
         "two-builds": [mobile], "mid-step-switch": [mobile], "conflict": pair, "conflict-ordered": pair,
         "drops-stage": [derive_plant_scenario("drops", {"entry": ["never"]}, {"kind.item": [dict(
@@ -452,8 +577,14 @@ def write_scenario_plant(top, case, pins):
         "then": [derive_plant_scenario("a", {"entry": ["feature"]}, then=[{"at": "step.plan",
                                                                            "scenario": "scenario.adopter.b"}]),
                  derive_plant_scenario("b", {"entry": ["never"]})],
+        "slot-builds": slots, "slot-conflict": slots,
+        "slot-refused": [dict(derive_plant_scenario("never-key", {"entry": ["never"]}),
+                              overrides={"runtime.agents-in-flight": 9}),
+                         dict(derive_plant_scenario("pair-break", {"entry": ["never"]}), preset="velocity",
+                              overrides={"review.design.round-count": 4})],
     }.get(case)
-    policy = {"conflict-ordered": '[flow]\nscenario-conflict = "declared-order"\n',
+    policy = {"slot-builds": 'preset = "standard"\n',
+              "conflict-ordered": '[flow]\nscenario-conflict = "declared-order"\n',
               "bad-default": '[flow]\nscenario-default = "nowhere"\n',
               "default-excluded": '[flow]\nscenario-default = "patch"\n\n[instructions]\nexclude = ["scenario.patch"]\n'
               }.get(case)
@@ -574,6 +705,55 @@ def run_scenario_plant(case, base):
             rc, lines = write_move(FX_BUILD, OUT_OF_NONE, "entry=feature", fields=("scenario=scenario.patch",))
             line = read_line(lines, "derived")
             check_owed("record", rc == 2 and "--field scenario is derived" in line, "exit %d · %s" % (rc, line))
+        elif case in ("slot-builds", "slot-conflict"):
+            policy_py = str(resolve_kit_dir("policy", "policy.py", KIT) / "policy.py")
+
+            def read_policy_value(label, value, owed, key, *argv):
+                rc, lines = run_scratch_verb(top, policy_py, "get", key, *argv)
+                line = read_line(lines, "policy: ")
+                check_owed(label, (rc == 0 and value in lines and all(w in line for w in owed)) if value else
+                           (rc == 2 and all(w in line for w in owed)), "exit %d · %s" % (rc, " | ".join(lines)))
+
+            def write_policy_file(text):
+                write_fixture_files(top, {POLICY_FILE: text})
+                run_fixture_git(top, "add", "-A")
+                run_fixture_git(top, "commit", "-qm", "the policy file")
+
+            moves = ([(FX_BUILD, "precision=high"), (FX_BUILD_2, "pace=fast")] if case == "slot-builds" else
+                     [(FX_BUILD, "precision=high", "pace=fast")])
+            for build, *facts in moves:
+                rc, lines = write_move(build, OUT_OF_NONE, "entry=feature", *facts)
+                check_owed("record %s" % build, rc == 0, read_line(lines, "recorded"))
+            if case == "slot-builds":
+                read_policy_value("get --build %s" % FX_BUILD, "refused", ("· preset ·", STRICT_SLOT),
+                                  "hooks.bypass", "--build", FX_BUILD, "--explain")
+                read_policy_value("get --build %s" % FX_BUILD_2, "allowed", ("· preset ·", VELOCITY_SLOT),
+                                  "hooks.bypass", "--build", FX_BUILD_2, "--explain")
+                read_policy_value("review.max-rounds --build %s" % FX_BUILD_2, "2", (), "review.max-rounds",
+                                  "--build", FX_BUILD_2)
+                read_policy_value("get, no build", "allowed", ("· preset · preset standard",), "hooks.bypass",
+                                  "--explain")
+                read_policy_value("get --build tNone", "allowed", ("· preset · preset standard",), "hooks.bypass",
+                                  "--build", "tNone", "--explain")
+                write_policy_file('preset = "standard"\n\n[hooks]\nbypass = "allowed"\n')
+                read_policy_value("the file's own value", "allowed", ("· file ·",), "hooks.bypass", "--build",
+                                  FX_BUILD, "--explain")
+            else:
+                read_policy_value("under refuse", None, ("refused", STRICT_SLOT, VELOCITY_SLOT, "preset"),
+                                  "hooks.bypass", "--build", FX_BUILD)
+                write_policy_file('[flow]\nscenario-conflict = "declared-order"\n')
+                read_policy_value("under declared-order", "allowed", ("· preset ·", VELOCITY_SLOT), "hooks.bypass",
+                                  "--build", FX_BUILD, "--explain")
+        elif case == "slot-refused":
+            rc, lines = run_scratch_verb(top, "scenario.py", "check")
+            for label, owed in (("never", ("scenario.adopter.never-key", "runtime.agents-in-flight",
+                                           "a key presets never touch")),
+                                ("pair", ("scenario.adopter.pair-break", "review.max-rounds",
+                                          "review.design.round-count"))):
+                line = next((ln for ln in lines if ln.startswith("%s: refused" % SAY) and all(w in ln for w in owed)),
+                            None)
+                check_owed("check %s" % label, rc == 1 and line is not None,
+                           "exit %d · %s" % (rc, line or " | ".join(lines)[-400:]))
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError, ValueError, LookupError, KeyError) as exc:
         misses.append("the plant could not run: %s %s" % (exc, (getattr(exc, "stderr", "") or "").strip()[:300]))
     print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
@@ -606,12 +786,14 @@ def run_selftest():
 def main(argv):
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    usage = ("usage: python scenario.py select [--fact <name>=<value>]... | check [--selftest] | --fixture --plant "
-             "<%s>" % "|".join(PLANTS))
+    usage = ("usage: python scenario.py select [--fact <name>=<value>]... | check [--selftest] | slots --build "
+             "<slug> --rev <rev> | --fixture --plant <%s>" % "|".join(PLANTS))
     if argv == ["check", "--selftest"]:
         return run_selftest()
     if argv == ["check"]:
         return run_check()
+    if len(argv) == 5 and argv[0] == "slots" and argv[1] == "--build" and argv[3] == "--rev" and argv[2] and argv[4]:
+        return run_slots(argv[2], argv[4])
     if argv[:1] == ["select"] and len(argv) % 2 == 1 and all(f == "--fact" for f in argv[1::2]):
         facts = {}
         for text in argv[2::2]:

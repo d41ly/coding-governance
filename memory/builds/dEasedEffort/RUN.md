@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-by: attended
+landed-derived: 94f8bd4db2bd8b3af5cd550c30306312360df8a2 84acebdce50ade26723faef2805c4d61cf7e591f
 asks-at-landing: TOOL-dEasedEffort-3=OPEN
 units-at-landing: TOOL-dEasedEffort-1 TOOL-dEasedEffort-2
 hold-run: 
@@ -24,8 +26,8 @@ gates-run: unattended-1793576871074914266-1786 380196b7
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: a1e858ce4a99b58b85f1a3e2f2154b559898cec2
-phase: HELD
+witness: 94f8bd4db2bd8b3af5cd550c30306312360df8a2
+phase: LANDED
 may: none
 mode: prompt
 run-branch: refs/heads/branch/agent-effort-levels-062fb2

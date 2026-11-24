@@ -35,11 +35,11 @@ python <prefix>/playbook/core.py new policy-key <name> --allowed <toml> --defaul
 ```
 
 ## `kind.preset`
-<!-- usage: kind:kind.preset f85797c7 -->
-A named preset of policy values an adopter selects at once; dKeptSession lands its factory, with the preset store.
+<!-- usage: kind:kind.preset 3bfd7fac -->
+A named preset of policy values an adopter selects at once: one table of the policy kit's preset store assigning every presettable key, complete, inside each key's schema and inside the pair rules.
 
 ```text
-no factory has landed; dKeptSession lands it, and until then the kind has no member
+python <prefix>/playbook/core.py new preset <name> --from <preset>
 ```
 
 ## `kind.gate-leg`

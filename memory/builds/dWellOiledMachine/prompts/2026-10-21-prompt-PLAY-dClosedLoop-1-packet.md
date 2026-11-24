@@ -104,7 +104,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `e239d8161fb3a02a24f65039f3045947b0b382aa`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `d288dd51f0f60b400736e66b99d0a27b90913c1f`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -113,7 +113,8 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `b1b9c9b613365fa43ad0e9eb94db3b96a03eba6e`
+- repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `6184e5717b5909ebff84695a6d317548b6ab2ff5` at `ca1c5a7824d93143367edefa64f3d876dc03c080` by an owner at a console, over memory/builds/dKeptSession/RUN.md (phase HELD); memory/builds/dWitnessedBar/RUN.md (phase HELD)
+- rendered at: `3005434ee0ec728d0e444ea9b8d1bf7475d15577`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -337,67 +338,67 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dWellOile
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dWellOiledMachine-1` · README:66 | 1 | `TOOL-dWellOiledMachine-1` | `cl-dClosedLoop-0279@3b20f1d6` | the platform spike first: a role-typed Workflow agent run inside a headless act session |
-- unit id `TOOL-dWellOiledMachine-2` · README:67 | 2 | `TOOL-dWellOiledMachine-2` | `cl-dClosedLoop-0280@62ada92d` | the `next` verb over the loop kit's position function |
-- unit id `TOOL-dWellOiledMachine-3` · README:68 | 3 | `TOOL-dWellOiledMachine-3` | `cl-dClosedLoop-0281@b4f7b233` | the owner's pause |
-- unit id `TOOL-dWellOiledMachine-4` · README:69 | 4 | `TOOL-dWellOiledMachine-4` | `cl-dClosedLoop-0282@328da93b` | the prompt-submit hook writing each owner prompt verbatim to the session's intake log |
-- unit id `TOOL-dWellOiledMachine-5` · README:70 | 5 | `TOOL-dWellOiledMachine-5` | `cl-dClosedLoop-0283@b08404fd` | Plan's ratification and the placement dispositions re-pointed to the intake record where dRankedPlan has landed first |
-- unit id `TOOL-dWellOiledMachine-6` · README:71 | 6 | `TOOL-dWellOiledMachine-6` | `cl-dClosedLoop-0284@8ad94483` | the supervisor: `resume-tick.sh` grown |
-- unit id `TOOL-dWellOiledMachine-7` · README:72 | 7 | `TOOL-dWellOiledMachine-7` | `cl-dClosedLoop-0285@d2c4cd28` | act binding and the epoch check at the Workflow |
-- unit id `TOOL-dWellOiledMachine-8` · README:73 | 8 | `TOOL-dWellOiledMachine-8` | `cl-dClosedLoop-0286@459158b1` | the persisted-return store |
-- unit id `TOOL-dWellOiledMachine-9` · README:74 | 9 | `TOOL-dWellOiledMachine-9` | `cl-dClosedLoop-0287@1aa49fdd` | agent slots reserved under `runtime.agents-in-flight` |
-- unit id `TOOL-dWellOiledMachine-10` · README:75 | 10 | `TOOL-dWellOiledMachine-10` | `cl-dClosedLoop-0288@c845fe18` | the one enforcement surface: the kits' fragments as packs |
-- unit id `TOOL-dWellOiledMachine-11` · README:76 | 11 | `TOOL-dWellOiledMachine-11` | `cl-dClosedLoop-0289@dc7da053` | workspaces by `build.worktree` |
-- unit id `TOOL-dWellOiledMachine-12` · README:77 | 12 | `TOOL-dWellOiledMachine-12` | `cl-dClosedLoop-0290@b1905801` | sessions bound on every source |
-- unit id `TOOL-dWellOiledMachine-13` · README:78 | 13 | `TOOL-dWellOiledMachine-13` | `cl-dClosedLoop-0291@80055ca5` | the scheduler's host adapters and per-period cadence witnesses |
-- unit id `TOOL-dWellOiledMachine-14` · README:79 | 14 | `TOOL-dWellOiledMachine-14` | `cl-dClosedLoop-0292@7eaaf1a6` | harness adapters with capability tables |
-- unit id `TOOL-dWellOiledMachine-15` · README:80 | 15 | `TOOL-dWellOiledMachine-15` | `cl-dClosedLoop-0293@8132ebad` | the node registry's runtime facts |
-- unit id `TOOL-dWellOiledMachine-16` · README:81 | 16 | `TOOL-dWellOiledMachine-16` | `cl-dClosedLoop-0294@41b6d311` | the journal grammar moved into the core |
-- unit id `TOOL-dWellOiledMachine-17` · README:82 | 17 | `TOOL-dWellOiledMachine-17` | `cl-dClosedLoop-0295@2b8dd6cc` | the grant enforced on every adapter row |
-- unit id `TOOL-dWellOiledMachine-18` · README:83 | 18 | `TOOL-dWellOiledMachine-18` | `cl-dClosedLoop-0296@6f945b2c` | event waits woken by their record |
-- unit id `TOOL-dWellOiledMachine-19` · README:84 | 19 | `TOOL-dWellOiledMachine-19` | `cl-dClosedLoop-0297@c082d7d0` | act binding against the resolved shape's digest |
-- unit id `TOOL-dWellOiledMachine-20` · README:85 | 20 | `TOOL-dWellOiledMachine-20` | `cl-dClosedLoop-0298@0b701ed6` | the `hook` and `point` tag namespaces |
-- unit id `TOOL-dWellOiledMachine-21` · README:86 | 21 | `TOOL-dWellOiledMachine-21` | `cl-dClosedLoop-0299@1be73e25` | the hook-message and harness-prompt templates |
-- unit id `TOOL-dWellOiledMachine-22` · README:87 | 22 | `TOOL-dWellOiledMachine-22` | `cl-dClosedLoop-0300@8c17038e` | hook and point purposes |
-- unit id `TOOL-dWellOiledMachine-23` · README:88 | 23 | `TOOL-dWellOiledMachine-23` | `cl-dClosedLoop-0301@29109ea6` | the session-start hook loading the set `memory.default-load` names |
-- unit id `TOOL-dWellOiledMachine-24` · README:89 | 24 | `TOOL-dWellOiledMachine-24` | `cl-dClosedLoop-0302@0a747a85` | the journal's count of map reads outside a slice |
-- unit id `TOOL-dWellOiledMachine-25` · README:90 | 25 | `TOOL-dWellOiledMachine-25` | `cl-dClosedLoop-0303@b32fa809` | the supervisor the only driver in every mode |
-- unit id `TOOL-dWellOiledMachine-26` · README:91 | 26 | `TOOL-dWellOiledMachine-26` | `cl-dClosedLoop-0304@498bf1e8` | the `step —` announcement before each act while attended |
-- unit id `TOOL-dWellOiledMachine-27` · README:92 | 27 | `TOOL-dWellOiledMachine-27` | `cl-dClosedLoop-0305@f0329aee` | intake for a prompt that reaches no owner session |
-- unit id `TOOL-dWellOiledMachine-28` · README:93 | 28 | `TOOL-dWellOiledMachine-28` | `cl-dClosedLoop-0306@a3aa83b5` | the unattended kit dissolved into the loop kit and the runtime's own kit: its hooks repacked |
-- unit id `TOOL-dWellOiledMachine-29` · README:94 | 29 | `TOOL-dWellOiledMachine-29` | `cl-dClosedLoop-0307@7b420e28` | a measured `browser` row in each harness adapter's capability table |
-- unit id `TOOL-dWellOiledMachine-30` · README:95 | 30 | `TOOL-dWellOiledMachine-30` | `cl-dClosedLoop-0308@afc642fa` | act binding and shape-run rows for an experiment's acts (night pass |
-- unit id `TOOL-dWellOiledMachine-31` · README:96 | 31 | `TOOL-dWellOiledMachine-31` | `cl-dClosedLoop-0309@3da1a616` | a hook pack's refusal text |
-- unit id `TOOL-dWellOiledMachine-32` · README:97 | 32 | `TOOL-dWellOiledMachine-32` | `cl-dClosedLoop-0310@6e643d4a` | the act as the key: minted at launch with the harness session id |
-- unit id `TOOL-dWellOiledMachine-33` · README:98 | 33 | `TOOL-dWellOiledMachine-33` | `cl-dClosedLoop-0311@d9f33c79` | the commit queue writing the `Gov-*` trailers from the act binding |
-- unit id `TOOL-dWellOiledMachine-34` · README:99 | 34 | `TOOL-dWellOiledMachine-34` | `cl-dClosedLoop-0312@60d68fcb` | `gov trace <key>` and `gov why <key>` over the one index |
-- unit id `TOOL-dWellOiledMachine-35` · README:100 | 35 | `TOOL-dWellOiledMachine-35` | `cl-dClosedLoop-0313@ab83255b` | the session node derived from bindings |
-- unit id `TOOL-dWellOiledMachine-36` · README:101 | 36 | `TOOL-dWellOiledMachine-36` | `cl-dClosedLoop-0314@12a43ed3` | the harness conformance fixture: launch by a program |
-- unit id `TOOL-dWellOiledMachine-37` · README:102 | 37 | `TOOL-dWellOiledMachine-37` | `cl-dClosedLoop-0315@b5839378` | preflight refusing a launch that skips hooks or permissions |
-- unit id `TOOL-dWellOiledMachine-38` · README:103 | 38 | `TOOL-dWellOiledMachine-38` | `cl-dClosedLoop-0316@8f48a4b0` | the per-session orientation card retired into the session binding: the write gate's card and route reads |
-- unit id `TOOL-dWellOiledMachine-39` · README:104 | 39 | `TOOL-dWellOiledMachine-39` | `cl-dClosedLoop-0317@9d62f0b1` | every act's minimal binding record (act id |
-- unit id `TOOL-dWellOiledMachine-40` · README:105 | 40 | `TOOL-dWellOiledMachine-40` | `cl-dClosedLoop-0318@800a78ec` | the commit queue committing each role return into the build's trail at its item's witness and pushing the build's branch as `build.push` says |
-- unit id `TOOL-dWellOiledMachine-41` · README:106 | 41 | `TOOL-dWellOiledMachine-41` | `cl-dClosedLoop-0319@2ffabe1b` | a unit of a leased build offered at placement to another session or node as `build.unit-holders` says |
-- unit id `TOOL-dWellOiledMachine-42` · README:107 | 42 | `TOOL-dWellOiledMachine-42` | `cl-dClosedLoop-0320@2dda5d80` | `gov-session` retired with an upgrade step: a hand-off to another session becomes an `intake` message or a unit offered at placement |
-- unit id `TOOL-dWellOiledMachine-43` · README:108 | 43 | `TOOL-dWellOiledMachine-43` | `cl-dClosedLoop-0321@f02a952d` | the in-flight ledger: a hook pack claiming a slot keyed by agent id at SubagentStart and releasing it at SubagentStop |
-- unit id `TOOL-dWellOiledMachine-44` · README:109 | 44 | `TOOL-dWellOiledMachine-44` | `cl-dClosedLoop-0322@a00b6c23` | the memory-mirror point: an adapter registered there |
-- unit id `TOOL-dWellOiledMachine-45` · README:110 | 45 | `TOOL-dWellOiledMachine-45` | `cl-dClosedLoop-0323@eafe421b` | the admission queue: every agent spawn and Workflow call a driver |
-- unit id `TOOL-dWellOiledMachine-46` · README:111 | 46 | `TOOL-dWellOiledMachine-46` | `cl-dClosedLoop-0324@1b8963c8` | the progress ledger per item instance: each act recording a new witness |
-- unit id `TOOL-dWellOiledMachine-47` · README:112 | 47 | `TOOL-dWellOiledMachine-47` | `cl-dClosedLoop-0325@54802c5c` | every wait the supervisor holds given its deadline and outcome: the session-limit hold releasing every lease the supervisor holds for the build |
-- unit id `TOOL-dWellOiledMachine-48` · README:113 | 48 | `TOOL-dWellOiledMachine-48` | `cl-dClosedLoop-0326@9cee3bd1` | owner items |
-- unit id `TOOL-dWellOiledMachine-49` · README:114 | 49 | `TOOL-dWellOiledMachine-49` | `cl-dClosedLoop-0327@e342bb96` | the refusal breaker: every refusal journaled with its rule |
-- unit id `TOOL-dWellOiledMachine-50` · README:115 | 50 | `TOOL-dWellOiledMachine-50` | `cl-dClosedLoop-0328@ff7cfaee` | the wait graph across builds |
-- unit id `TOOL-dWellOiledMachine-51` · README:116 | 51 | `TOOL-dWellOiledMachine-51` | `cl-dClosedLoop-0329@4e8f519b` | each build's spend recorded from its `trace.cost` rows and trended |
-- unit id `TOOL-dWellOiledMachine-52` · README:117 | 52 | `TOOL-dWellOiledMachine-52` | `cl-dClosedLoop-0330@9b33b8bb` | the node beat: the supervisor's beat |
-- unit id `TOOL-dWellOiledMachine-53` · README:118 | 53 | `TOOL-dWellOiledMachine-53` | `cl-dClosedLoop-0331@df99638c` | admission under `runtime.admission-scope` |
-- unit id `TOOL-dWellOiledMachine-54` · README:119 | 54 | `TOOL-dWellOiledMachine-54` | `cl-dClosedLoop-0332@aef236e5` | discovery and the pick: one read giving a project's claimable ready set across its builds |
-- unit id `TOOL-dWellOiledMachine-55` · README:120 | 55 | `TOOL-dWellOiledMachine-55` | `cl-dClosedLoop-0333@dce4872c` | the transport points in Runtime's `[extend]`: a lease store |
-- unit id `TOOL-dWellOiledMachine-56` · README:121 | 56 | `TOOL-dWellOiledMachine-56` | `cl-dClosedLoop-0334@4fe16106` | `runtime.act-harness` and `runtime.act-auth` resolved per role through Roles' resolver |
-- unit id `TOOL-dWellOiledMachine-57` · README:122 | 57 | `TOOL-dWellOiledMachine-57` | `cl-dClosedLoop-0335@523e4c44` | the secret scan covering lease |
-- unit id `TOOL-dWellOiledMachine-58` · README:123 | 58 | `TOOL-dWellOiledMachine-58` | `cl-dClosedLoop-0505@d65ddfae` | the record door |
-- unit id `TOOL-dWellOiledMachine-59` · README:124 | 59 | `TOOL-dWellOiledMachine-59` | `cl-dClosedLoop-0336@cd3fcb78` | a cadence run |
-- unit id `TOOL-dWellOiledMachine-60` · README:125 | 60 | `TOOL-dWellOiledMachine-60` | `cl-dClosedLoop-0337@91e18a60` | the commit queue and the lander pushing through dPlacedRequest's fenced effect push |
-- unit id `TOOL-dWellOiledMachine-61` · README:126 | 61 | `TOOL-dWellOiledMachine-61` | `cl-dClosedLoop-0338@3c1ea0eb` | the node profile |
+- unit id `TOOL-dWellOiledMachine-1` · README:65 | 1 | `TOOL-dWellOiledMachine-1` | `cl-dClosedLoop-0279@3b20f1d6` | the platform spike first: a role-typed Workflow agent run inside a headless act session |
+- unit id `TOOL-dWellOiledMachine-2` · README:66 | 2 | `TOOL-dWellOiledMachine-2` | `cl-dClosedLoop-0280@62ada92d` | the `next` verb over the loop kit's position function |
+- unit id `TOOL-dWellOiledMachine-3` · README:67 | 3 | `TOOL-dWellOiledMachine-3` | `cl-dClosedLoop-0281@b4f7b233` | the owner's pause |
+- unit id `TOOL-dWellOiledMachine-4` · README:68 | 4 | `TOOL-dWellOiledMachine-4` | `cl-dClosedLoop-0282@328da93b` | the prompt-submit hook writing each owner prompt verbatim to the session's intake log |
+- unit id `TOOL-dWellOiledMachine-5` · README:69 | 5 | `TOOL-dWellOiledMachine-5` | `cl-dClosedLoop-0283@b08404fd` | Plan's ratification and the placement dispositions re-pointed to the intake record where dRankedPlan has landed first |
+- unit id `TOOL-dWellOiledMachine-6` · README:70 | 6 | `TOOL-dWellOiledMachine-6` | `cl-dClosedLoop-0284@8ad94483` | the supervisor: `resume-tick.sh` grown |
+- unit id `TOOL-dWellOiledMachine-7` · README:71 | 7 | `TOOL-dWellOiledMachine-7` | `cl-dClosedLoop-0285@d2c4cd28` | act binding and the epoch check at the Workflow |
+- unit id `TOOL-dWellOiledMachine-8` · README:72 | 8 | `TOOL-dWellOiledMachine-8` | `cl-dClosedLoop-0286@459158b1` | the persisted-return store |
+- unit id `TOOL-dWellOiledMachine-9` · README:73 | 9 | `TOOL-dWellOiledMachine-9` | `cl-dClosedLoop-0287@1aa49fdd` | agent slots reserved under `runtime.agents-in-flight` |
+- unit id `TOOL-dWellOiledMachine-10` · README:74 | 10 | `TOOL-dWellOiledMachine-10` | `cl-dClosedLoop-0288@c845fe18` | the one enforcement surface: the kits' fragments as packs |
+- unit id `TOOL-dWellOiledMachine-11` · README:75 | 11 | `TOOL-dWellOiledMachine-11` | `cl-dClosedLoop-0289@dc7da053` | workspaces by `build.worktree` |
+- unit id `TOOL-dWellOiledMachine-12` · README:76 | 12 | `TOOL-dWellOiledMachine-12` | `cl-dClosedLoop-0290@b1905801` | sessions bound on every source |
+- unit id `TOOL-dWellOiledMachine-13` · README:77 | 13 | `TOOL-dWellOiledMachine-13` | `cl-dClosedLoop-0291@80055ca5` | the scheduler's host adapters and per-period cadence witnesses |
+- unit id `TOOL-dWellOiledMachine-14` · README:78 | 14 | `TOOL-dWellOiledMachine-14` | `cl-dClosedLoop-0292@7eaaf1a6` | harness adapters with capability tables |
+- unit id `TOOL-dWellOiledMachine-15` · README:79 | 15 | `TOOL-dWellOiledMachine-15` | `cl-dClosedLoop-0293@8132ebad` | the node registry's runtime facts |
+- unit id `TOOL-dWellOiledMachine-16` · README:80 | 16 | `TOOL-dWellOiledMachine-16` | `cl-dClosedLoop-0294@41b6d311` | the journal grammar moved into the core |
+- unit id `TOOL-dWellOiledMachine-17` · README:81 | 17 | `TOOL-dWellOiledMachine-17` | `cl-dClosedLoop-0295@2b8dd6cc` | the grant enforced on every adapter row |
+- unit id `TOOL-dWellOiledMachine-18` · README:82 | 18 | `TOOL-dWellOiledMachine-18` | `cl-dClosedLoop-0296@6f945b2c` | event waits woken by their record |
+- unit id `TOOL-dWellOiledMachine-19` · README:83 | 19 | `TOOL-dWellOiledMachine-19` | `cl-dClosedLoop-0297@c082d7d0` | act binding against the resolved shape's digest |
+- unit id `TOOL-dWellOiledMachine-20` · README:84 | 20 | `TOOL-dWellOiledMachine-20` | `cl-dClosedLoop-0298@0b701ed6` | the `hook` and `point` tag namespaces |
+- unit id `TOOL-dWellOiledMachine-21` · README:85 | 21 | `TOOL-dWellOiledMachine-21` | `cl-dClosedLoop-0299@1be73e25` | the hook-message and harness-prompt templates |
+- unit id `TOOL-dWellOiledMachine-22` · README:86 | 22 | `TOOL-dWellOiledMachine-22` | `cl-dClosedLoop-0300@8c17038e` | hook and point purposes |
+- unit id `TOOL-dWellOiledMachine-23` · README:87 | 23 | `TOOL-dWellOiledMachine-23` | `cl-dClosedLoop-0301@29109ea6` | the session-start hook loading the set `memory.default-load` names |
+- unit id `TOOL-dWellOiledMachine-24` · README:88 | 24 | `TOOL-dWellOiledMachine-24` | `cl-dClosedLoop-0302@0a747a85` | the journal's count of map reads outside a slice |
+- unit id `TOOL-dWellOiledMachine-25` · README:89 | 25 | `TOOL-dWellOiledMachine-25` | `cl-dClosedLoop-0303@b32fa809` | the supervisor the only driver in every mode |
+- unit id `TOOL-dWellOiledMachine-26` · README:90 | 26 | `TOOL-dWellOiledMachine-26` | `cl-dClosedLoop-0304@498bf1e8` | the `step —` announcement before each act while attended |
+- unit id `TOOL-dWellOiledMachine-27` · README:91 | 27 | `TOOL-dWellOiledMachine-27` | `cl-dClosedLoop-0305@f0329aee` | intake for a prompt that reaches no owner session |
+- unit id `TOOL-dWellOiledMachine-28` · README:92 | 28 | `TOOL-dWellOiledMachine-28` | `cl-dClosedLoop-0306@a3aa83b5` | the unattended kit dissolved into the loop kit and the runtime's own kit: its hooks repacked |
+- unit id `TOOL-dWellOiledMachine-29` · README:93 | 29 | `TOOL-dWellOiledMachine-29` | `cl-dClosedLoop-0307@7b420e28` | a measured `browser` row in each harness adapter's capability table |
+- unit id `TOOL-dWellOiledMachine-30` · README:94 | 30 | `TOOL-dWellOiledMachine-30` | `cl-dClosedLoop-0308@afc642fa` | act binding and shape-run rows for an experiment's acts (night pass |
+- unit id `TOOL-dWellOiledMachine-31` · README:95 | 31 | `TOOL-dWellOiledMachine-31` | `cl-dClosedLoop-0309@3da1a616` | a hook pack's refusal text |
+- unit id `TOOL-dWellOiledMachine-32` · README:96 | 32 | `TOOL-dWellOiledMachine-32` | `cl-dClosedLoop-0310@6e643d4a` | the act as the key: minted at launch with the harness session id |
+- unit id `TOOL-dWellOiledMachine-33` · README:97 | 33 | `TOOL-dWellOiledMachine-33` | `cl-dClosedLoop-0311@d9f33c79` | the commit queue writing the `Gov-*` trailers from the act binding |
+- unit id `TOOL-dWellOiledMachine-34` · README:98 | 34 | `TOOL-dWellOiledMachine-34` | `cl-dClosedLoop-0312@60d68fcb` | `gov trace <key>` and `gov why <key>` over the one index |
+- unit id `TOOL-dWellOiledMachine-35` · README:99 | 35 | `TOOL-dWellOiledMachine-35` | `cl-dClosedLoop-0313@ab83255b` | the session node derived from bindings |
+- unit id `TOOL-dWellOiledMachine-36` · README:100 | 36 | `TOOL-dWellOiledMachine-36` | `cl-dClosedLoop-0314@12a43ed3` | the harness conformance fixture: launch by a program |
+- unit id `TOOL-dWellOiledMachine-37` · README:101 | 37 | `TOOL-dWellOiledMachine-37` | `cl-dClosedLoop-0315@b5839378` | preflight refusing a launch that skips hooks or permissions |
+- unit id `TOOL-dWellOiledMachine-38` · README:102 | 38 | `TOOL-dWellOiledMachine-38` | `cl-dClosedLoop-0316@8f48a4b0` | the per-session orientation card retired into the session binding: the write gate's card and route reads |
+- unit id `TOOL-dWellOiledMachine-39` · README:103 | 39 | `TOOL-dWellOiledMachine-39` | `cl-dClosedLoop-0317@9d62f0b1` | every act's minimal binding record (act id |
+- unit id `TOOL-dWellOiledMachine-40` · README:104 | 40 | `TOOL-dWellOiledMachine-40` | `cl-dClosedLoop-0318@800a78ec` | the commit queue committing each role return into the build's trail at its item's witness and pushing the build's branch as `build.push` says |
+- unit id `TOOL-dWellOiledMachine-41` · README:105 | 41 | `TOOL-dWellOiledMachine-41` | `cl-dClosedLoop-0319@2ffabe1b` | a unit of a leased build offered at placement to another session or node as `build.unit-holders` says |
+- unit id `TOOL-dWellOiledMachine-42` · README:106 | 42 | `TOOL-dWellOiledMachine-42` | `cl-dClosedLoop-0320@2dda5d80` | `gov-session` retired with an upgrade step: a hand-off to another session becomes an `intake` message or a unit offered at placement |
+- unit id `TOOL-dWellOiledMachine-43` · README:107 | 43 | `TOOL-dWellOiledMachine-43` | `cl-dClosedLoop-0321@f02a952d` | the in-flight ledger: a hook pack claiming a slot keyed by agent id at SubagentStart and releasing it at SubagentStop |
+- unit id `TOOL-dWellOiledMachine-44` · README:108 | 44 | `TOOL-dWellOiledMachine-44` | `cl-dClosedLoop-0322@a00b6c23` | the memory-mirror point: an adapter registered there |
+- unit id `TOOL-dWellOiledMachine-45` · README:109 | 45 | `TOOL-dWellOiledMachine-45` | `cl-dClosedLoop-0323@eafe421b` | the admission queue: every agent spawn and Workflow call a driver |
+- unit id `TOOL-dWellOiledMachine-46` · README:110 | 46 | `TOOL-dWellOiledMachine-46` | `cl-dClosedLoop-0324@1b8963c8` | the progress ledger per item instance: each act recording a new witness |
+- unit id `TOOL-dWellOiledMachine-47` · README:111 | 47 | `TOOL-dWellOiledMachine-47` | `cl-dClosedLoop-0325@54802c5c` | every wait the supervisor holds given its deadline and outcome: the session-limit hold releasing every lease the supervisor holds for the build |
+- unit id `TOOL-dWellOiledMachine-48` · README:112 | 48 | `TOOL-dWellOiledMachine-48` | `cl-dClosedLoop-0326@9cee3bd1` | owner items |
+- unit id `TOOL-dWellOiledMachine-49` · README:113 | 49 | `TOOL-dWellOiledMachine-49` | `cl-dClosedLoop-0327@e342bb96` | the refusal breaker: every refusal journaled with its rule |
+- unit id `TOOL-dWellOiledMachine-50` · README:114 | 50 | `TOOL-dWellOiledMachine-50` | `cl-dClosedLoop-0328@ff7cfaee` | the wait graph across builds |
+- unit id `TOOL-dWellOiledMachine-51` · README:115 | 51 | `TOOL-dWellOiledMachine-51` | `cl-dClosedLoop-0329@4e8f519b` | each build's spend recorded from its `trace.cost` rows and trended |
+- unit id `TOOL-dWellOiledMachine-52` · README:116 | 52 | `TOOL-dWellOiledMachine-52` | `cl-dClosedLoop-0330@9b33b8bb` | the node beat: the supervisor's beat |
+- unit id `TOOL-dWellOiledMachine-53` · README:117 | 53 | `TOOL-dWellOiledMachine-53` | `cl-dClosedLoop-0331@df99638c` | admission under `runtime.admission-scope` |
+- unit id `TOOL-dWellOiledMachine-54` · README:118 | 54 | `TOOL-dWellOiledMachine-54` | `cl-dClosedLoop-0332@aef236e5` | discovery and the pick: one read giving a project's claimable ready set across its builds |
+- unit id `TOOL-dWellOiledMachine-55` · README:119 | 55 | `TOOL-dWellOiledMachine-55` | `cl-dClosedLoop-0333@dce4872c` | the transport points in Runtime's `[extend]`: a lease store |
+- unit id `TOOL-dWellOiledMachine-56` · README:120 | 56 | `TOOL-dWellOiledMachine-56` | `cl-dClosedLoop-0334@4fe16106` | `runtime.act-harness` and `runtime.act-auth` resolved per role through Roles' resolver |
+- unit id `TOOL-dWellOiledMachine-57` · README:121 | 57 | `TOOL-dWellOiledMachine-57` | `cl-dClosedLoop-0335@523e4c44` | the secret scan covering lease |
+- unit id `TOOL-dWellOiledMachine-58` · README:122 | 58 | `TOOL-dWellOiledMachine-58` | `cl-dClosedLoop-0505@d65ddfae` | the record door |
+- unit id `TOOL-dWellOiledMachine-59` · README:123 | 59 | `TOOL-dWellOiledMachine-59` | `cl-dClosedLoop-0336@cd3fcb78` | a cadence run |
+- unit id `TOOL-dWellOiledMachine-60` · README:124 | 60 | `TOOL-dWellOiledMachine-60` | `cl-dClosedLoop-0337@91e18a60` | the commit queue and the lander pushing through dPlacedRequest's fenced effect push |
+- unit id `TOOL-dWellOiledMachine-61` · README:125 | 61 | `TOOL-dWellOiledMachine-61` | `cl-dClosedLoop-0338@3c1ea0eb` | the node profile |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 

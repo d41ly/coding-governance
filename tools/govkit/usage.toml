@@ -250,7 +250,7 @@ id = "script:{prefix}/policy/policy.py#get"
 shape = "verb"
 entry = "{prefix}/policy/policy.py"
 verb = "get"
-flags = ["--rev=", "--explain", "--json"]
+flags = ["--rev=", "--build=", "--explain", "--json"]
 
 [[usage]]
 id = "script:{prefix}/policy/policy.py#check"
@@ -281,6 +281,13 @@ verb = "settings"
 flags = ["--write", "--check"]
 
 [[usage]]
+id = "script:{prefix}/policy/policy.py#preset"
+shape = "verb"
+entry = "{prefix}/policy/policy.py"
+verb = "preset"
+flags = ["--diff", "--section", "--line", "--rev="]
+
+[[usage]]
 id = "script:{prefix}/policy/check_policy.py"
 shape = "verb"
 entry = "{prefix}/policy/check_policy.py"
@@ -290,13 +297,13 @@ flags = ["--repo=", "--fixture", "--strict-from=", "--live"]
 id = "script:{prefix}/policy/adopt-policy.sh"
 shape = "verb"
 entry = "{prefix}/policy/adopt-policy.sh"
-flags = ["--scaffold", "--check", "--target="]
+flags = ["--scaffold", "--check", "--target=", "--preset="]
 
 [[usage]]
 id = "script:{prefix}/loop/loop_lib.py"
 shape = "verb"
 entry = "{prefix}/loop/loop_lib.py"
-flags = ["--check", "--scopes", "--selftest", "--fixture", "--plant=", "--grade-site="]
+flags = ["--check", "--steps", "--scopes", "--selftest", "--fixture", "--plant=", "--grade-site="]
 
 [[usage]]
 id = "script:{prefix}/loop/loop_witness.py"
@@ -369,7 +376,7 @@ flags = []
 id = "script:{prefix}/loop/position.py"
 shape = "verb"
 entry = "{prefix}/loop/position.py"
-flags = ["--json", "--next-line", "--frontier", "--check-refusal=", "--fixture", "--plant=", "--selftest"]
+flags = ["--json", "--next-line", "--frontier", "--check-refusal=", "--mail-interrupts", "--local", "--fixture", "--plant=", "--selftest"]
 
 [[usage]]
 id = "script:{prefix}/loop/stage_coverage.py"
@@ -436,6 +443,20 @@ shape = "verb"
 entry = "{prefix}/loop/loop_transition.py"
 verb = "check"
 flags = ["--build=", "--root=", "--selftest"]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_transition.py#dependents"
+shape = "verb"
+entry = "{prefix}/loop/loop_transition.py"
+verb = "dependents"
+flags = ["--build=", "--root="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_transition.py#progress"
+shape = "verb"
+entry = "{prefix}/loop/loop_transition.py"
+verb = "progress"
+flags = ["--build=", "--event=", "--detail=", "--root="]
 
 [[usage]]
 id = "script:{prefix}/loop/policy_edit.py#set"
@@ -577,6 +598,13 @@ verb = "ending"
 flags = ["--build=", "--explain"]
 
 [[usage]]
+id = "script:{prefix}/loop/budget.py#state"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+verb = "state"
+flags = ["--build="]
+
+[[usage]]
 id = "script:{prefix}/loop/breakpoints.py"
 shape = "verb"
 entry = "{prefix}/loop/breakpoints.py"
@@ -678,6 +706,13 @@ verb = "policy-key"
 flags = ["--allowed=", "--default=", "--summary=", "--usage=", "--owner="]
 
 [[usage]]
+id = "script:{prefix}/loop/factories.py#preset"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "preset"
+flags = ["--from="]
+
+[[usage]]
 id = "script:{prefix}/loop/factories.py#hook"
 shape = "verb"
 entry = "{prefix}/loop/factories.py"
@@ -718,6 +753,20 @@ shape = "verb"
 entry = "{prefix}/policy/budgets.py"
 verb = "resolve"
 flags = ["--explain"]
+
+[[usage]]
+id = "script:{prefix}/policy/presets.py#check"
+shape = "verb"
+entry = "{prefix}/policy/presets.py"
+verb = "check"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/policy/presets.py#load"
+shape = "verb"
+entry = "{prefix}/policy/presets.py"
+verb = "load"
+flags = ["--repo="]
 
 [[usage]]
 id = "script:{prefix}/lib/python_floor.py#check"

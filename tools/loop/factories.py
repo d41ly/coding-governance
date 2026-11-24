@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""factories.py — the factories of six registered kinds and the command kind's gate (TOOL-dDeclaredLoop-6).
+"""factories.py — the factories of seven registered kinds and the command kind's gate (TOOL-dDeclaredLoop-6).
 
     python factories.py command <verb> --kit <id> --run <path>
+    python factories.py preset <name> --from <preset>
     python factories.py policy-key <name> --allowed <toml> --default <toml> --summary <text> --usage <text> --owner <build>
     python factories.py hook <name> --kit <id> --event <event> [--matcher <m>]
     python factories.py role <slot> --workflow <name> --writes <class> --description <text> --reads <keys>
@@ -13,8 +14,8 @@
     python factories.py --fixture --plant <case>
     python factories.py --selftest
 
-THE KINDS. The kinds register's `kind.command`, `kind.policy-key`, `kind.hook`, `kind.role` and
-`kind.workflow` rows each name one subcommand here as their `factory`, so `python <prefix>/playbook/core.py
+THE KINDS. The kinds register's `kind.command`, `kind.policy-key`, `kind.preset`, `kind.hook`, `kind.role`,
+`kind.workflow` and `kind.scenario` rows each name one subcommand here as their `factory`, so `python <prefix>/playbook/core.py
 new <kind> <name> ...` runs it with the name and the flags appended. Each writes an instance that already
 conforms, then runs the kind's gate over the whole population:
 
@@ -26,6 +27,10 @@ conforms, then runs the kind's gate over the whole population:
   arms of the policy kit's `check_policy.py` that read the working tree's catalogue, policy file and the
   kit's own list and never a render at a revision, run in process through its `run_arm`. It writes the
   catalogue, never the repository's policy file nor its mirror: the mirror is its caller's next commit.
+- `preset` appends one `[preset.<name>]` table to the policy kit's preset store, `presets.toml`, copying
+  the shipped preset `--from` names line for line, and adds the name to the catalogue's `preset` row's
+  `of` (KICK-dKeptSession-1 S6). Its gate is `arm_presets`, the policy kit's arm over the store, run in
+  process through `run_arm` as the policy key's four arms are.
 - `hook` writes `<name>.js` and `<name>.fragment.json` in the directory of the descriptor whose `id` is
   `--kit`, the fragment holding `name`, `event`, `matcher`, `marker` and `hook_path`, and appends a
   `[[files]]` row shipping each file to `{prefix}/<home>/<file>` where no `include` already matches it.
@@ -93,18 +98,165 @@ KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from loop_lib import SEG, resolve_kit_dir, run_selftest_cases  # noqa: E402
+import atexit
+import contextlib
+import shutil
+import tempfile
+import time
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
+# >>> owned_work_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# THE OWNED ROOT A PROCESS SITS IN: the nearest of `path` and its parents named `gate-work.*` and
+# holding an `owner` file, a bar's `$WORK` or a suite's own root (TOOL-dQuietDisk-9 S2).
+def resolve_owned_work(path):
+    """The owned `gate-work.*` directory at or above `path`, a pathlib.Path, or None."""
+    here = pathlib.Path(path).absolute()
+    for d in (here, *here.parents):
+        if d.name.startswith("gate-work.") and (d / "owner").is_file():
+            return d
+    return None
+# <<< owned_work_py
+
+# >>> owned_tempdir_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A PYTHON SUITE'S OWNED ROOT (TOOL-dQuietDisk-9 S2, S9). Nested in an owned root, a bar's or another
+# suite's, it takes that temp dir and makes nothing. Otherwise it sweeps each dead `py:` owner's root
+# of this repository, or of a common dir that names no directory, makes `gate-work.*` with an owner
+# line and `tmp`, points `tempfile` and the `TMPDIR`, `TEMP` and `TMP` its children read there, and
+# removes the whole root at exit. A kill leaves the root with its owner, for the next suite to sweep.
+def read_pid_alive(pid) -> bool:
+    """False only when `pid` is provably gone; any error reads as alive, so a sweep can only keep."""
+    if os.name == "nt":
+        # Never `os.kill` here: signal 0 on Windows is CTRL_C_EVENT, sent to the pid's console group.
+        try:
+            import ctypes
+            k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            k32.OpenProcess.restype = ctypes.c_void_p
+            handle = k32.OpenProcess(0x1000, False, int(pid))  # PROCESS_QUERY_LIMITED_INFORMATION
+            if not handle:
+                return ctypes.get_last_error() != 87  # ERROR_INVALID_PARAMETER: no such process
+            try:
+                code = ctypes.c_ulong()
+                if not k32.GetExitCodeProcess(ctypes.c_void_p(handle), ctypes.byref(code)):
+                    return True
+                return code.value == 259  # STILL_ACTIVE
+            finally:
+                k32.CloseHandle(ctypes.c_void_p(handle))
+        except (OSError, AttributeError, ValueError):
+            return True
+    try:
+        os.kill(int(pid), 0)
+    except ProcessLookupError:
+        return False
+    except (OSError, ValueError):
+        return True
+    return True
+
+
+def scan_dead_scratch(ambient, common) -> list:
+    """Removes each `gate-work.*` directly under `ambient` whose owner names a dead `py:` pid and
+    `common`, or an absolute common dir that names no directory; an empty `common` removes nothing.
+    Returns the roots removed, and says one stderr line per root it sweeps."""
+    removed = []
+    if not common:
+        return removed
+    try:
+        names = sorted(os.listdir(ambient))
+    except OSError:
+        return removed
+    for name in names:
+        root = os.path.join(ambient, name)
+        if not name.startswith("gate-work.") or not os.path.isdir(root):
+            continue
+        try:
+            with open(os.path.join(root, "owner"), encoding="utf-8") as fh:
+                fields = fh.readline().rstrip("\r\n").split("\t")
+        except (OSError, UnicodeDecodeError):
+            continue
+        pid = fields[0][3:] if fields[0].startswith("py:") else ""
+        if len(fields) < 2 or not (pid.isascii() and pid.isdigit()):
+            continue
+        if fields[1] != common and (not os.path.isabs(fields[1]) or os.path.isdir(fields[1])):
+            continue
+        if read_pid_alive(int(pid)):
+            continue
+        print(f"owned-scratch: sweeping the scratch of a dead suite (pid {pid}): {root}", file=sys.stderr)
+        if remove_tree(root):
+            removed.append(root)
+    return removed
+
+
+def init_owned_tempdir() -> str:
+    """The temp dir this process's scratch lands in, owned and removed at exit; see the block's head."""
+    ambient = tempfile.gettempdir()
+    if resolve_owned_work(ambient) is not None:
+        tempfile.tempdir = ambient
+        return ambient
+    try:
+        got = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                             capture_output=True, text=True, encoding="utf-8", errors="replace",
+                             check=False, stdin=subprocess.DEVNULL)
+        common = got.stdout.strip() if got.returncode == 0 else ""
+    except OSError:
+        common = ""
+    scan_dead_scratch(ambient, common)
+    root = tempfile.mkdtemp(prefix="gate-work.", dir=ambient)
+    atexit.register(remove_tree, root)
+    staged = os.path.join(root, f"owner.{os.getpid()}.tmp")
+    with open(staged, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(f"py:{os.getpid()}\t{common}\t{int(time.time())}\n")
+    os.replace(staged, os.path.join(root, "owner"))
+    tmp = os.path.join(root, "tmp")
+    os.mkdir(tmp)
+    tempfile.tempdir = tmp
+    for name in ("TMPDIR", "TEMP", "TMP"):
+        os.environ[name] = tmp
+    return tmp
+# <<< owned_tempdir_py
+
 
 SAY = "factories"
 #: A role slot, a hook or a workflow name: the shape the roles kit's slots and the hooks' file stems take.
 NAME_RE = re.compile(r"[a-z][a-z0-9-]*")
 EVENT_RE = re.compile(r"[A-Z][A-Za-z]*")
 #: The gate each kind's row names, as the factory prints it.
-GATES = {"command": "loop command conformance", "policy-key": "policy check",
+GATES = {"command": "loop command conformance", "policy-key": "policy check", "preset": "policy check",
          "hook": "hook destinations (every declared hook path ships)", "role": "roles catalogue",
          "workflow": "roles catalogue", "scenario": "loop scenario fixtures"}
 #: The policy key factory's gate: the arms of `check_policy.py` that read the working tree's catalogue, its
 #: policy file and the kit's own list, never a render at a revision (TOOL-dDeclaredLoop-6 F7).
 POLICY_KEY_ARMS = ("arm_schema", "arm_shape", "arm_summaries", "arm_direction")
+#: The preset factory's gate: the policy kit's arm over its preset store (KICK-dKeptSession-1 S6).
+PRESET_ARMS = ("arm_presets",)
 #: The tools and model a factory-made agent role carries until its author narrows them.
 ROLE_TOOLS, ROLE_MODEL = "Read, Grep, Glob, Bash", "inherit"
 PLANTS = {
@@ -124,6 +276,8 @@ PLANTS = {
     "scenario-hand": "a hand [[scenario]] row in gov's pack whose entry names no step",
     "factory-interrupt": "the role kind's writes in process, KeyboardInterrupt raised at the second held path's "
                          "rename, then a stray temp planted beside a held path",
+    "preset-new": "core.py new preset trial --from standard, its gate arm_presets, then core.py kinds",
+    "preset-from-unknown": "core.py new preset trial --from nope, refused before any write",
 }
 #: The register's factory verb each `-new` case and `factory-restores` runs, after `core.py new`.
 NEW_ARGV = {
@@ -141,6 +295,8 @@ NEW_ARGV = {
                          "A fixture knob.", "--usage", 'fixture.bad = "a"', "--owner", "dDeclaredLoop"],
     "scenario-new": ["scenario", "trial", "--extends", "scenario.feature", "--admit", "entry=trial", "--entry",
                      "step.plan"],
+    "preset-new": ["preset", "trial", "--from", "standard"],
+    "preset-from-unknown": ["preset", "trial", "--from", "nope"],
 }
 NEW_ARGV["factory-restores-create"] = NEW_ARGV["hook-new"]
 #: Each selftest case: the case, its owed exit, and the opening and needle of the line it owes.
@@ -159,7 +315,9 @@ CASES = (("check-commands", 0, "factories: check-commands", "descriptor(s)"),
          ("factory-restores-create", 1, "factories: fixture · factory-restores-create", "porcelain clean"),
          ("scenario-new", 0, "factories: fixture · scenario-new", "gate green"),
          ("scenario-hand", 1, "factories: gate", "step.nowhere"),
-         ("factory-interrupt", 0, "factories: fixture · factory-interrupt", "leftover named"))
+         ("factory-interrupt", 0, "factories: fixture · factory-interrupt", "leftover named"),
+         ("preset-new", 0, "factories: fixture · preset-new", "kind.preset off the pending list"),
+         ("preset-from-unknown", 2, "factories: fixture · preset-from-unknown", "porcelain clean"))
 
 
 class Refused(Exception):
@@ -295,9 +453,9 @@ def check_commands(top, kit_rel):
     return ["%s: check-commands · green · %d row(s) over %d descriptor(s)" % (SAY, n_rows, len(paths))], 0
 
 
-def run_policy_key_arms(top, kit_rel):
-    """-> (rc, lines): each of `POLICY_KEY_ARMS` run in process over the tree at `top` and its policy kit,
-    printed as `check_policy.py`'s own main prints an arm; any finding is the red."""
+def run_policy_key_arms(top, kit_rel, arms=POLICY_KEY_ARMS):
+    """-> (rc, lines): each of `arms`, `POLICY_KEY_ARMS` by default, run in process over the tree at `top`
+    and its policy kit, printed as `check_policy.py`'s own main prints an arm; any finding is the red."""
     try:
         from floor import read_policy_modules
         read_policy_modules()
@@ -306,7 +464,7 @@ def run_policy_key_arms(top, kit_rel):
         raise Refused(str(exc))
     import check_policy
     lines, red = [], 0
-    for name in POLICY_KEY_ARMS:
+    for name in arms:
         verdict, findings = check_policy.run_arm(check_policy.ARM[name], str(top), kit)
         lines.append("policy-check: %s · %s" % (name, verdict))
         lines += ["  %s: %s" % (key, why) for key, why in findings]
@@ -338,7 +496,7 @@ def run_hook_gate(argv, top, written):
                            env=env, stdin=subprocess.DEVNULL)
         return p.returncode, (p.stdout + p.stderr).splitlines()
     finally:
-        shutil.rmtree(scratch, ignore_errors=True)
+        remove_tree(scratch)
 
 
 def run_kind_gate(kind, top, kit_rel, render=False, written=()):
@@ -350,6 +508,8 @@ def run_kind_gate(kind, top, kit_rel, render=False, written=()):
         return rc, lines
     if kind == "policy-key":
         return run_policy_key_arms(top, kit_rel)
+    if kind == "preset":
+        return run_policy_key_arms(top, kit_rel, PRESET_ARMS)
     here = top / kit_rel
     try:
         if kind == "scenario":
@@ -455,6 +615,56 @@ def write_policy_key(top, kit_rel, name, allowed, default, summary, usage, owner
         json.dumps(name), allowed, default, *(json.dumps(t, ensure_ascii=False) for t in (summary, usage, owner)))
     return write_kind_instance("policy-key", name, top, kit_rel,
                                [(path, render_row_after(read_text_exact(path), "key", block))])
+
+
+def render_preset_of(text, name):
+    """The catalogue's `text` with `name` appended to the `preset` row's `of`, the one-line `allowed` of
+    that row's `[[key]]` block, in the file's own line ending."""
+    blocks = re.split(r"(?m)^(?=\[\[key\]\][ \t]*\r?$)", text)
+    for i, block in enumerate(blocks):
+        if not re.search(r'(?m)^name[ \t]*=[ \t]*"preset"[ \t]*\r?$', block):
+            continue
+        blocks[i], n = re.subn(r"(?m)^(allowed[ \t]*=.*?\bof[ \t]*=[ \t]*\[)([^\]\r\n]*)(\])",
+                               lambda m: m[1] + m[2] + (", " if m[2].strip() else "") + json.dumps(name) + m[3],
+                               block, count=1)
+        if n != 1:
+            raise Refused("the catalogue's preset row holds no one-line `of` list")
+        return "".join(blocks)
+    raise Refused("the catalogue holds no preset row")
+
+
+def write_preset(top, kit_rel, name, source):
+    """KICK-dKeptSession-1 S6: one `[preset.<name>]` table appended to the policy kit's preset store, the
+    shipped preset `source`'s lines copied, and `name` added to the catalogue's `preset` row's `of`, both
+    held through the guarded write, the gate `arm_presets`. A name that is no slot shape or one the store
+    holds, and a `--from` naming no preset of the store, are refused before any write."""
+    if not NAME_RE.fullmatch(name):
+        raise Refused("the preset name %r is not %s" % (name, NAME_RE.pattern))
+    check_one_line("--from", source)
+    try:
+        kit = resolve_kit_dir("policy", "presets.toml", top / kit_rel)
+    except LookupError as exc:
+        raise Refused(str(exc))
+    store, catalogue = kit / "presets.toml", kit / "catalogue.toml"
+    rel, text = store.relative_to(top).as_posix(), read_text_exact(store)
+    try:
+        tables = tomllib.loads(text).get("preset") or {}
+    except tomllib.TOMLDecodeError as exc:
+        raise Refused("%s does not parse: %s" % (rel, exc))
+    if source not in tables:
+        raise Refused("--from %r names no preset of %s, whose presets are %s" % (source, rel, ", ".join(tables)))
+    if name in tables:
+        raise Refused("%s already holds the preset %s; the factory writes a new preset" % (rel, name))
+    nl = "\r\n" if "\r\n" in text else "\n"
+    lines = text.replace("\r\n", "\n").split("\n")
+    if lines.count("[preset.%s]" % source) != 1:
+        raise Refused("%s spells no one `[preset.%s]` header line to copy" % (rel, source))
+    head = lines.index("[preset.%s]" % source)
+    end = next((j for j in range(head + 1, len(lines)) if lines[j].lstrip().startswith("[")), len(lines))
+    body = "\n".join(lines[head + 1:end]).strip("\n")
+    out = "\n".join(lines).rstrip("\n") + "\n\n[preset.%s]\n%s\n" % (name, body)
+    return write_kind_instance("preset", name, top, kit_rel, [
+        (store, out.replace("\n", nl)), (catalogue, render_preset_of(read_text_exact(catalogue), name))])
 
 
 def write_hook(top, kit_rel, name, kit, event, matcher):
@@ -679,6 +889,13 @@ def run_fixture(case, base, kit_rel):
         print("%s: fixture · %s · factory exit %d · %s" % (SAY, case, rc, "FAIL, " + why if why else
                                                            "no created file on disk · porcelain clean"))
         return rc if not why else 3
+    if case == "preset-from-unknown":
+        why = ("the factory exited %d, not 2" % rc if rc != 2 else
+               "porcelain holds %s" % "; ".join(dirty) if dirty else
+               "no line names nope" if not any("'nope'" in ln for ln in lines) else "")
+        print("%s: fixture · %s · factory exit %d · %s" % (SAY, case, rc, "FAIL, " + why if why else
+                                                           "refused naming nope · porcelain clean"))
+        return rc if not why else 3
     if case == "factory-restores":
         why = ("porcelain holds %s" % "; ".join(dirty) if dirty else
                "no arm_shape finding names fixture.bad" if not any("fixture.bad" in f for f in arms.get("arm_shape", ())) else
@@ -693,6 +910,8 @@ def run_fixture(case, base, kit_rel):
         cat = (resolve_kit_dir("policy", "catalogue.toml", clone / kit_rel) / "catalogue.toml").relative_to(clone).as_posix()
         why = ("the gate ran %s, not the four arms" % sorted(arms) if sorted(arms) != sorted(POLICY_KEY_ARMS) else
                "porcelain holds %s, not %s alone" % (dirty, cat) if dirty != [cat] else "")
+    elif case == "preset-new":
+        return check_preset_new(clone, kit_rel, dirty, arms)
     elif case == "scenario-new":
         rows = tomllib.loads((clone / kit_rel / "scenarios.toml").read_text(encoding="utf-8")).get("scenario", [])
         row = next((r for r in rows if r.get("tag") == "scenario.trial"), None)
@@ -706,6 +925,35 @@ def run_fixture(case, base, kit_rel):
         print("%s: fixture · %s · %s" % (SAY, case, "FAIL, " + why if why else "nothing staged · gate green"))
         return 3 if why else 0
     print("%s: fixture · %s · factory exit 0 · %s" % (SAY, case, "FAIL, " + why if why else "gate green"))
+    return 3 if why else 0
+
+
+def check_preset_new(clone, kit_rel, dirty, arms):
+    """`preset-new`'s outcome over the clone, the factory having exited 0: the store holds `[preset.trial]`
+    equal to `standard`'s, the `preset` row's `of` holds `trial`, the gate ran `arm_presets` alone, the
+    porcelain holds the two files alone, and `core.py kinds` exits 0 with `kind.preset` off the pending
+    list: -> 0 held, 3 missed."""
+    pk = resolve_kit_dir("policy", "presets.toml", clone / kit_rel)
+    tables = tomllib.loads((pk / "presets.toml").read_text(encoding="utf-8")).get("preset") or {}
+    rows = tomllib.loads((pk / "catalogue.toml").read_text(encoding="utf-8")).get("key") or []
+    of = next(((r.get("allowed") or {}).get("of") or [] for r in rows if r.get("name") == "preset"), [])
+    rels = sorted(p.relative_to(clone).as_posix() for p in (pk / "presets.toml", pk / "catalogue.toml"))
+    playbook = resolve_kit_dir("playbook", "core.py", clone / kit_rel)
+    p = subprocess.run([sys.executable, str(playbook / "core.py"), "kinds"], cwd=str(clone), capture_output=True,
+                       text=True, encoding="utf-8", errors="replace", env=read_clean_env(), stdin=subprocess.DEVNULL)
+    for line in (p.stdout + p.stderr).splitlines():
+        print("    " + line)
+    pending = any(ln.split("\t")[:2] == ["kind", "kind.preset"]
+                  for ln in (playbook / "core-pending.txt").read_text(encoding="utf-8").splitlines())
+    why = ("the store holds no [preset.trial]" if "trial" not in tables else
+           "[preset.trial] is not a copy of [preset.standard]" if tables["trial"] != tables.get("standard") else
+           "the preset row's of lacks trial" if "trial" not in of else
+           "the gate ran %s, not %s" % (sorted(arms), list(PRESET_ARMS)) if sorted(arms) != list(PRESET_ARMS) else
+           "porcelain holds %s, not %s" % (sorted(dirty), rels) if sorted(dirty) != rels else
+           "core.py kinds exited %d" % p.returncode if p.returncode else
+           "kind.preset is still on the pending list" if pending else "")
+    print("%s: fixture · preset-new · factory exit 0 · %s" % (SAY, "FAIL, " + why if why else
+                                                            "gate green · kind.preset off the pending list"))
     return 3 if why else 0
 
 
@@ -814,6 +1062,8 @@ def main(argv):
             lines, rc = check_commands(top, kit_rel)
             print("\n".join(lines))
             return rc
+        if argv[:1] in (["--selftest"], ["--fixture"]):
+            init_owned_tempdir()
         if argv == ["--selftest"]:
             return run_selftest(top, kit_rel)
         if len(argv) == 3 and argv[:2] == ["--fixture", "--plant"] and argv[2] in PLANTS:
@@ -833,6 +1083,7 @@ def main(argv):
         for kind, pos, flags in (
                 ("command", "verb", ("--kit", "--run")),
                 ("policy-key", "name", ("--allowed", "--default", "--summary", "--usage", "--owner")),
+                ("preset", "name", ("--from",)),
                 ("hook", "name", ("--kit", "--event")),
                 ("role", "slot", ("--workflow", "--writes", "--description", "--reads", "--returns", "--output")),
                 ("workflow", "name", ("--driver", "--harness", "--roles", "--enforced-by", "--trigger", "--step")),
@@ -854,6 +1105,8 @@ def main(argv):
             return write_command(top, kit_rel, a.verb, a.kit, a.run)
         if a.kind == "policy-key":
             return write_policy_key(top, kit_rel, a.name, a.allowed, a.default, a.summary, a.usage, a.owner)
+        if a.kind == "preset":
+            return write_preset(top, kit_rel, a.name, vars(a)["from"])
         if a.kind == "hook":
             return write_hook(top, kit_rel, a.name, a.kit, a.event, a.matcher)
         if a.kind == "scenario":

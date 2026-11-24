@@ -72,12 +72,10 @@ hook:scratch-guard	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 hook:scratch-guard-subagent	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 hook:stall-recorder	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 hook:stop-guard	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:actions.free	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:annotations.delivery	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:annotations.grammar	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:annotations.lookup	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:annotations.resolve-scope	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:attendance	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:attendance.scope	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:autonomy	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:build.closes	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
@@ -91,13 +89,10 @@ policy:build.unit-holders	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:build.worktree	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:builds.agent-root	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:card.follows	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:card.pointers	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:card.snapshot	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:card.store	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:commits.edge-check	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:commits.squash	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:context.on-full	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:context.threshold	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:currency.max-behind	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:currency.on-behind	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:decisions.major	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
@@ -108,7 +103,6 @@ policy:deploy.runs	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:deps.coordination	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:deps.early-build	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:deps.landing	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:deps.messaging	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:deps.on-parent-withdrawn	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:design.coverage	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:design.coverage.semantic	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
@@ -155,9 +149,6 @@ policy:lexicon.drift	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:lexicon.forced	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:lexicon.packs	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:lexicon.pin	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:mailbox.fetch-seconds	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:mailbox.notice	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:mailbox.reads	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:maintain.cadence	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:maintain.dead-after	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:maintain.events	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
@@ -188,7 +179,6 @@ policy:memory.project-map	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.superseded-slices	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:notices.record	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:notify.channel	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:notify.owner	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:notify.owner-items	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:observability.run-record	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:orient.budget	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

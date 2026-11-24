@@ -1,0 +1,7 @@
+{
+  "name": "mail-notice",
+  "event": "PostToolUse",
+  "matcher": "*",
+  "marker": "mail-notice.js",
+  "hook_path": "{kit}/unattended/mail-notice.js"
+}

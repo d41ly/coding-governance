@@ -27,16 +27,19 @@ role = "engine"
 # THE UNSCANNED-READERS LIST IS WITHHELD (TOOL-dLandedOwners-3): its rows name gov's own paths, which an
 # adopter's tree does not hold, and an absent list is no rows. Withheld by claiming the destination as
 # `project-owned`, the mechanism the runlog descriptor explains: govkit has no `exclude` key and `apply`
-# never writes a project-owned file. The legacy-home list is no file of this kit: it lives at its ledger
-# home under the memory root, registered in govkit's registry (TOOL-dWitnessedBar-20 S8).
+# never writes a project-owned file. The legacy-home, unnamed-keys and unpurposed-namespaces lists are
+# no files of this kit: each is a ledger at its home under the memory root, registered in govkit's
+# registry (TOOL-dWitnessedBar-20 S8, KICK-dKeptSession-69 S5).
 [[files]]
 include = ["unscanned-readers.txt"]
 role = "project-owned"
 
 # `--scaffold` writes the starter policy file only where none exists, and says "kept" otherwise, then
-# renders the harness's settings wherever HEAD resolves.
+# renders the harness's settings wherever HEAD resolves. `{preset}` is the posture the file names
+# first, an answer `intake` derives from this argv and records under `[answers]`, never defaulted
+# (KICK-dKeptSession-4 S1); over a kept file it is compared, never written.
 [adopt]
-argv = ["bash", "{kit}/adopt-policy.sh", "--scaffold"]
+argv = ["bash", "{kit}/adopt-policy.sh", "--scaffold", "--preset", "{preset}"]
 mutates_index = false
 
 # `--scaffold` IS the re-render: on every update, unless GOVKIT_RERENDER=0 is exported, it re-runs

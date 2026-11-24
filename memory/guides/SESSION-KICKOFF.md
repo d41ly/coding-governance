@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-24T11:35:22+02:00 @ b59778f81cc6693eea293a579a89bfd534ccee00
+last-audit: 2026-11-25T01:50:00+02:00 @ adb171bb06cd223b6070744cc43494f1ae898364
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: b59778f81cc6693eea293a579a89bfd534ccee00
+last-body-change: adb171bb06cd223b6070744cc43494f1ae898364
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -75,7 +75,7 @@ bash tools/unattended/run-unattended-gates.sh --pooled   # DoD for tools/unatten
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # bug-class checklist + by-design block for THIS diff; the review harness acquires it on the diff kind
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality?
 python tools/govkit/govkit.py epoch --base <base>   # a kit whose shipped bytes moved since <base> and whose version did not: run after a commit that touches a kit. TOOL-aRepatriatedFork-15
-python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3
+python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills ":!memory"   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3
 ```
 
 The repo HAS a codebase map (`memory/map/`), so the kickoff skill's map steps are live. No
@@ -122,10 +122,12 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   (its KF3: the run edited its own grader), so such a build cannot land itself and hands its landing to the
   owner; run its red legs on an `origin/main` worktree early to tell its own reds apart · prune when the
   attribution can grade a run that edits the runner.
-- 2026-11-10 · `unattended.sh --rescope --act defer` · a deferral releases neither the dispatch order gate nor a dispatched unit's
-  path reservation: move an independent later unit into the deferred unit's order group, and close a dispatched one's pass with a
-  commit under its own `Pass:` trailer (dOrderedCharter) · prune when the session "Make --dispatch refuse fast and honour deferrals"
-  lands its fix on main.
+- 2026-11-22 · `GATE_ATTRIBUTE=<rev>` over `pass-legs.sh` · it attributes no red there: every red reads `DEAD PROBE`, its
+  bound 0s (DERIVED: run-gates' `attributing red legs` line, the sum of the red legs' R ceilings), so a pass's red is told inherited only by running that leg at the pass base
+  by hand and comparing its findings (dKeptSession) · prune when a pass leg's red reads OWN or INHERITED under it.
+- 2026-11-23 · `unattended.sh --audit` over a harnessed unit · it reads the run tree's writes, so a builder
+  committing in its pass worktree reads STALLED while it works; read that worktree's log before stopping it
+  (dKeptSession) · prune when the audit reads the pass branch.
 
 
 ### Environment traps worth front-loading
@@ -197,8 +199,8 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
-- The bar owns its scratch (TOOL-dDerivedDocket-25): every leg's `TMPDIR` is the runner's own
-  `gate-work.*/tmp`, gone on exit; a SIGKILLed bar's is swept by the next once its pid is dead.
+- The bar owns its scratch (TOOL-dDerivedDocket-25): every leg's temp dirs are the runner's own
+  `gate-work.*/tmp`, gone on exit; a dead bar's is swept by the next, even if its repo is gone.
   `TMPDIR entries <n>` prints the ambient count, which now grows only from older bars or another
   repository's. The measured cost is in the run-gates kit README.
 - A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is

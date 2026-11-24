@@ -40,7 +40,13 @@ transition log already reads is witnessed and writes nothing. Under `patch.ratif
 owner item first, and `check_patch_ratified`, which `write_transition` calls before any move into
 `designing` of a build whose claim body reads `disposition: patch`, holds the record until the build's
 folder holds the owner's disposition record of `item.entry.claim` `ratified`, `rejected` holding it for
-good; the unit id that record carries is `<FAMILY>-<slug>-1`, the family the README's `roster` names.
+good; the unit id that record carries is `<FAMILY>-<slug>-1`, the family the README's `roster` names. An
+open message addressed to the build holds the first move too (KICK-dKeptSession-5 S9): `write_transition`'s
+mail guard raises `MailHeld`, caught before a row miss is, and RECORD prints `claim held — <slug> · mail
+open <id> …`, exit 1, until the message is answered, acknowledged or past its deadline (KICK-dKeptSession-24),
+or `claim held — <slug> · mail ack not posted: <id> · <the ack's first line>` where every row is held only
+because the ack the move owed it was refused, for no session id or an origin out of reach
+(KICK-dKeptSession-56 S32).
 
 Exit 0 written or witnessed · 1 refused, named · 2 not written: a usage error, a kit that does not resolve
 or a read that did not answer. `--fixture --plant <case>` runs one case of `PLANTS` in a throwaway
@@ -73,6 +79,7 @@ from loop_parents import read_policy_kit  # noqa: E402
 from loop_witness import FIXTURE_REMOTE, read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
 
 SAY = "claim"
+RATIFY_KEY = "patch.ratify"  # passed by name, so the policy check's reader scan sees the read
 #: The claims namespace on the remote, shared interface I23, and this node's cache of it, which
 #: `write_gov_ref` sets on every write and the driver's fetch fills.
 CLAIM_NS, CACHE_NS = "refs/gov/claims", "refs/gov/remote/claims"
@@ -209,7 +216,7 @@ def read_claim_policy(root, *keys):
 def check_patch_ratified(root, slug):
     """`auto` under `patch.ratify` = `auto`; under `owner`, `ratified` where the newest disposition record of
     `slug` naming `CLAIM_ITEM` disposes `ratified`, `rejected` where it disposes that, else `held`."""
-    if str(read_claim_policy(root, "patch.ratify")["patch.ratify"]) != "owner":
+    if str(read_claim_policy(root, RATIFY_KEY)[RATIFY_KEY]) != "owner":
         return "auto"
     from adapt import read_disposition_release
     found = read_disposition_release(root, slug, CLAIM_ITEM, set())
@@ -273,7 +280,7 @@ def write_first_transition(root, slug):
     """The build's first transition record from `none`, witnessed by HEAD: its lines. ClaimRefused where the
     claim body does not read, `write_transition` refuses, or `patch.ratify` holds it."""
     from loop_table import TransitionRefused
-    from loop_transition import read_transitions, write_transition
+    from loop_transition import MailHeld, read_transitions, write_transition
     body = read_claim_body(root, slug)
     disposition = body.get("disposition")
     if disposition not in FIRST_MOVES:
@@ -293,6 +300,8 @@ def write_first_transition(root, slug):
         move, commit, _wrote, line, lines = write_transition(root, slug, "none", item, outcome, "HEAD", facts, {})
     except PatchHeld as e:
         raise ClaimRefused("\n".join(said + ["claim held — %s · %s" % (slug, e)])) from None
+    except MailHeld as e:   # KICK-dKeptSession-5 S9: an open message to the build, never a row miss
+        raise ClaimRefused("\n".join(said + ["claim held — %s" % e])) from None
     except TransitionRefused as e:
         raise ClaimRefused("claim refused — %s · no build row holds the first move: %s" % (slug, e)) from None
     except ValueError as e:
@@ -395,7 +404,9 @@ PLANTS = {"patch-owner-unratified": "a patch under patch.ratify = owner: the own
           "overlap-warn": "an overlapping branch under leases warn: the claim proceeds with an overlap: key",
           "first-record": "a repeat's scaffold commit, then its transition into designing under scenario.playbook-run",
           "first-record-patch": "a patch under patch.ratify = auto recorded as item.plan.dedupe under stand-in "
-                                "dRankedPlan"}
+                                "dRankedPlan",
+          "mail-held": "a repeat whose build a question to build:<slug> on the remote holds: exit 1 naming the "
+                       "claim held and the open id, no transition recorded"}
 
 
 def write_claim_fixture(top, policy):
@@ -655,6 +666,18 @@ def check_claim_plant(case, top, seen, bad):
         log = read_remote_log(claim_ref)
         if not log or "overlap: " not in log[0][1]:
             bad.append("the claim body holds no overlap: key: %r" % (log[0][1][-200:] if log else ""))
+    elif case == "mail-held":   # KICK-dKeptSession-5 AC12: an open question holds the first move, named
+        from loop_transition import render_fixture_mail
+        from placement import write_fixture_gov_ref
+        mid = "a1b2c3d4e5f6"
+        write_fixture_gov_ref(root, "refs/gov/mail/fy/z/s-other",
+                              render_fixture_mail("fy", mid, "build:%s" % slug, "question", "a question before the claim"))
+        got = run_entry()
+        check("held", got, 1, "claim held — %s · mail open %s" % (slug, mid))
+        if "Gov-Transition" in run_fixture_git(root, "log", "-1", "--format=%B"):
+            bad.append("a claim an open message holds recorded a transition")
+        if "no build row holds the first move" in got[1]:
+            bad.append("the held claim named a row miss")
     elif case in ("first-record", "first-record-patch"):   # AC7
         got = run_entry()
         check("claim", got, 0, "scaffold committed", "recorded none -> designing")

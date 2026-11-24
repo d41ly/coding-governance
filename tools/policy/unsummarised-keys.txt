@@ -2,12 +2,10 @@
 # The catalogue rows with no `summary` or no `usage`, sorted. SHRINK-ONLY: `lists --check` reds a
 # row the catalogue no longer owes, a row the catalogue owes and this list lacks, and a row the
 # list at the compare base did not carry. Give a row both fields, then `lists --write`.
-actions.free
 annotations.delivery
 annotations.grammar
 annotations.lookup
 annotations.resolve-scope
-attendance
 attendance.scope
 autonomy
 budgets.*
@@ -22,13 +20,10 @@ build.unit-holders
 build.worktree
 builds.agent-root
 card.follows
-card.pointers
 card.snapshot
 card.store
 commits.edge-check
 commits.squash
-context.on-full
-context.threshold
 currency.max-behind
 currency.on-behind
 decisions.major
@@ -39,7 +34,6 @@ deploy.runs
 deps.coordination
 deps.early-build
 deps.landing
-deps.messaging
 deps.on-parent-withdrawn
 design.coverage
 design.coverage.semantic
@@ -86,9 +80,6 @@ lexicon.drift
 lexicon.forced
 lexicon.packs
 lexicon.pin
-mailbox.fetch-seconds
-mailbox.notice
-mailbox.reads
 maintain.cadence
 maintain.dead-after
 maintain.events
@@ -114,7 +105,6 @@ memory.mirror
 memory.project-map
 notices.record
 notify.channel
-notify.owner
 notify.owner-items
 observability.run-record
 orient.budget

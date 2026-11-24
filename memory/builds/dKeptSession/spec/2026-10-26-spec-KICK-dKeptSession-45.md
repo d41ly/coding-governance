@@ -1,6 +1,6 @@
 # KICK-dKeptSession-45 — the window scan's default root resolved by `resolve_projects_root`, never a literal profile path
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 14 · advances KICK-dKeptSession-29
+**Status:** CLOSED · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,8 +10,18 @@
 |---|---|---|
 | [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-build-KICK-dKeptSession-45-deviation-451.md](../build/2026-10-26-build-KICK-dKeptSession-45-deviation-451.md) | deviation | — |
+| [2026-11-21-build-KICK-dKeptSession-45-1-acceptance-ledger.md](../build/2026-11-21-build-KICK-dKeptSession-45-1-acceptance-ledger.md) | journal | — |
+| [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-36 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-1 |
+| [2026-11-24-build-KICK-dKeptSession-1-runlog-31fbb903.md](../build/2026-11-24-build-KICK-dKeptSession-1-runlog-31fbb903.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 KICK-dKeptSession-67 KICK-dKeptSession-69 KICK-dKeptSession-79 KICK-dKeptSession-80 KICK-dKeptSession-89 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-28-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-28-precheck-brief.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 |
+| [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-32 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-45-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-45-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-45-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-45-build-brief.md) | research | — |
+| [2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md) | research | KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
+| [2026-11-23-review-KICK-dKeptSession-69-closing-diff-review-round1.md](../reviews/2026-11-23-review-KICK-dKeptSession-69-closing-diff-review-round1.md) | diff-review | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 KICK-dKeptSession-67 KICK-dKeptSession-69 |
 
 <!-- /gen:spec-records -->
 
@@ -24,26 +34,35 @@ confirmed finding **id 28 at HIGH**, report item **H1**. Id 38 shares the item a
 `KICK-dKeptSession-56`, whose item observes this unit's fix.
 
 `KICK-dKeptSession-30` S1 defaults the window scan's `root` to the literal `~/.claude/projects`.
-`tools/runlog/extract.py:185` already resolves that root as `resolve_projects_root`, which honours an
-override and then `$CLAUDE_CONFIG_DIR/projects` before the profile's `.claude/projects`, and every
-`runlog.py` verb routes through it (`tools/runlog/runlog.py:246`, `:300`, `:324`, `:360`). On a node
-with `CLAUDE_CONFIG_DIR` set the literal scans an empty tree, finds no observation and reads the
-200000 rung, which is the defect unit 30 exists to repair. This unit makes the scan's default root
-that resolver's answer. It repairs `KICK-dKeptSession-30` and builds one step after it (order 14).
+`resolve_projects_root` (`tools/runlog/extract.py#resolve_projects_root`) already resolves that
+root, honouring an override and then `$CLAUDE_CONFIG_DIR/projects` before the profile's
+`.claude/projects`, and every `runlog.py` verb that reads transcripts routes through it
+(`tools/runlog/runlog.py#cmd_extract`, `tools/runlog/runlog.py#cmd_prose`,
+`tools/runlog/runlog.py#cmd_narration`, `tools/runlog/runlog.py#resolve_model_sources`). On a node
+with `CLAUDE_CONFIG_DIR` set the literal scans the profile's tree, which holds none of that node's
+transcripts, finds no observation and reads the 200000 rung, which is the defect unit 30 exists to
+repair. This unit makes the scan's default root that resolver's answer. It repairs
+`KICK-dKeptSession-30`, unbuilt at base `c2a407b0` and built at order 13, and builds one step after
+it (order 14).
 
 ## 2. Scope (IN)
 
-- **S1** — id 28. The default. `derive_context_window(model, root=None)` resolves a `None` root as
-  `resolve_projects_root()` (`tools/runlog/extract.py:185`), called with no argument so it reads the
-  process environment exactly as the `runlog.py` verbs do. No other spelling of the projects root is
-  written in the window code. Observed by AC1 and AC2.
+- **S1** — id 28. The default. `derive_context_window(model, root=None, held=None)`, as
+  `KICK-dKeptSession-30` S1 mints it, resolves a `None` root as `resolve_projects_root()`
+  (`tools/runlog/extract.py#resolve_projects_root`), called with no argument so it reads the process
+  environment exactly as the `runlog.py` verbs do; `held` is unchanged. No other spelling of the
+  projects root is written in the window code. Observed by AC1 and AC2.
 - **S2** — id 28. No root resolves. Where `resolve_projects_root()` raises its `ValueError` (both
   `CLAUDE_CONFIG_DIR` and the profile's home unset), the window reads the bottom rung with source
   `no root: <the error's text>`, the same direction as unit 30 S1's `no observation`. Observed by AC3.
 - **S3** — id 28. The sibling text superseded by name. `KICK-dKeptSession-30` S1's "`root` defaults
   to the harness's projects root, `~/.claude/projects`" and S2's "the default root" read as S1 here,
-  and unit 30's §10 gains `resolve_projects_root` as a reused seam. Each is answered in unit 30's
-  acceptance ledger. Observed by AC2.
+  and `resolve_projects_root` is a reused seam unit 30's Reuse audit does not name. Each is answered
+  in this unit's own acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-45-1-acceptance-ledger.md`,
+  which quotes S1's "defaults to the harness's projects root" and S2's "under the default root" and
+  names the seam. Unit 30 builds at order 13 and is CLOSED when this unit builds, so neither its spec
+  nor its ledger is written (F1). Observed by AC2 and AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -52,6 +71,8 @@ that resolver's answer. It repairs `KICK-dKeptSession-30` and builds one step af
   `KICK-dKeptSession-47` and `KICK-dKeptSession-48`.
 - The report's left-shift checklist entry, that a spec naming a filesystem root cites the module's
   resolver. No clause of this build names that checklist; AC2 is its arm here.
+- The window range's own `.claude` check in either quote style, and AC1's decoy of every other
+  `DECOY_VARS` member: `KICK-dKeptSession-62` S27, S28 and S30.
 
 ### Edges
 
@@ -64,11 +85,25 @@ that resolver's answer. It repairs `KICK-dKeptSession-30` and builds one step af
 ### Evidence
 
 - `resolve_projects_root(env=None, platform=None, override=None)` returns `override`, else
-  `$CLAUDE_CONFIG_DIR/projects`, else `<home>/.claude/projects`, and raises `ValueError` naming
-  `--transcripts` when no root resolves (`tools/runlog/extract.py:185-198`, read at base).
-- The runlog selftest aims `CLAUDE_CONFIG_DIR` at a decoy among its `DECOY_VARS`
-  (`tools/runlog/selftest.py:348-349`), so a literal profile path is the one root the suite's
-  isolation cannot reach.
+  `$CLAUDE_CONFIG_DIR/projects`, else `<home>/.claude/projects`, the home read from `USERPROFILE`
+  then `HOME` on Windows and from `HOME` elsewhere, and raises `ValueError` naming `--transcripts`
+  when no root resolves (`tools/runlog/extract.py#resolve_projects_root`, read at `c2a407b0`).
+- The runlog selftest's `main` aims every `DECOY_VARS` member at a decoy before any arm runs, and
+  `build_arm_env` aims each at the arm's own scratch (`tools/runlog/selftest.py#DECOY_VARS`,
+  `tools/runlog/selftest.py#build_arm_env`). `HOME` and `USERPROFILE` are decoyed beside
+  `CLAUDE_CONFIG_DIR`, so a literal profile path still lands in a decoy; what the literal misses is
+  `CLAUDE_CONFIG_DIR`, the decoy its home does not follow.
+- `grep -n '\.claude' extract.py` prints two lines, the resolver's docstring and its return, both
+  inside `resolve_projects_root` (DERIVED, 2026-11-21; `extract.py` unmoved since `c2a407b0`). A
+  `".claude"` count alone would miss the literal `"~/.claude/projects"` unit 30 S1 names.
+- The default's one caller before `KICK-dKeptSession-46` lands is `KICK-dKeptSession-9`'s
+  `derive_context_fill(ev)`; `measure_context_fill` passes its transcript's own root (unit 30 S2).
+  Under `build_arm_env` the literal lands in the arm's `HOME` decoy and the resolver in its
+  `CLAUDE_CONFIG_DIR` one, both empty, so unit 9's arm reads the same bottom rung either way.
+- No import is added: the `policy fixtures` leg's runlog-record plant imports `record.py`, which
+  imports `extract` at module level (`tools/runlog/record.py`), so a new import would reach it.
+- `derive_context_window` is not in the tree at `c2a407b0`: unit 30 mints it, so this unit edits
+  unit 30's landed function.
 
 ### The read
 
@@ -89,7 +124,12 @@ None: no stored state holds a window.
 ### Files touched (estimate)
 
 - `tools/runlog/extract.py`: S1 and S2 in `derive_context_window`
-- `tools/runlog/selftest.py`: the `CLAUDE_CONFIG_DIR` case
+- `tools/runlog/selftest.py`: the `CLAUDE_CONFIG_DIR` case, one `test_` function, and the
+  `ASSERTION_FLOOR` raise with its `RAISED` comment
+- `memory/map/generated/symbols.json`: the case's `test_` function, regenerated by `gen_map.py
+  --write`, which the bar's codebase-map leg grades
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-45-1-acceptance-ledger.md`:
+  S3's answers beside the criteria observed
 
 ### Alternatives rejected
 
@@ -100,57 +140,94 @@ None: no stored state holds a window.
 
 ## 5. Production-readiness checklist
 
-- security — the resolver reads two environment variables and writes nothing.
+- security — the resolver reads environment variables and writes nothing.
 - perf / scale — one resolver call per derivation, no file read.
 - error / empty / loading states — S2's `no root:` source, never a raise.
 - observability — `runlog.py context` already prints the window's source on stderr (unit 30 S2).
 - risks — none new: the resolver is the one every verb already trusts.
-- testing — the cases of §6 and the arm in §7.
+- testing — the cases of the Acceptance criteria and the arm on the Gates line.
 - migration — none.
 - user docs — none: `help/orientation-card.md`'s window paragraph (unit 30 S5) names no root.
 
 ## 6. Acceptance criteria
 
-The fixture is unit 30's `context-window-sibling` scenario written under a scratch config directory
-`<cfg>/projects/<project>/` beneath `%TEMP%`.
+The fixture is unit 30's `context-window-sibling` scenario written by `build_scenario`
+(`tools/runlog/selftest.py#build_scenario`) under a scratch config directory `<cfg>/projects/`
+beneath `%TEMP%`. Every probe runs with `CLAUDE_CODE_MAX_CONTEXT_TOKENS` removed, as the selftest's
+`main` pops it since unit 30 S4, so rung 1 decides nothing. Each probe's environment is
+`build_arm_env`'s with the roots each criterion names.
 
 - **AC1** — When a probe runs `python -c "import extract; print(extract.derive_context_window('fixture-model'))"`
-  in the runlog kit with `CLAUDE_CONFIG_DIR=<cfg>` and `HOME` aimed at an empty directory, it
-  prints `(1000000, 'observed 900000 on fixture-model')`.
+  in the runlog kit with `CLAUDE_CONFIG_DIR=<cfg>`, and `HOME` and `USERPROFILE` aimed at an empty
+  directory, it prints `(1000000, 'observed 900000 on fixture-model')`.
   Red when: a copy defaulting to the profile's `.claude/projects` prints `(200000, 'no observation')`.
 - **AC2** — When `grep -n "resolve_projects_root()" extract.py` runs in the runlog kit, it prints the
-  line inside `derive_context_window`, and `grep -c '".claude"' extract.py` prints the count it
-  printed at base.
-  Red when: the window code spells the profile path a second time.
+  line inside `derive_context_window`, and every line `grep -n '\.claude' extract.py` prints lies
+  inside `resolve_projects_root`, two at this tree (DERIVED, the Evidence's grep).
+  Red when: the window code spells the profile path a second time, `"~/.claude/projects"` included.
 - **AC3** — When the AC1 probe runs with `CLAUDE_CONFIG_DIR`, `HOME` and `USERPROFILE` all removed
   from its environment, it prints `(200000, 'no root: ...')` and exits 0.
   Red when: the derivation raises, so a fill read with no profile fails its caller.
+- **AC4** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c "defaults to
+  the harness's projects root"` prints `1`, and into `grep -c "under the default root"` prints `1`;
+  and `git diff --name-only <pass base> HEAD --` over unit 30's spec and its acceptance ledger prints
+  nothing.
+  Red when: S3's answers land in a record of unit 30, or this unit's ledger quotes neither passage.
 
 ## 7. Gates
 
-`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/runlog/selftest.py · covers AC1 AC3 · the scenario under a scratch `CLAUDE_CONFIG_DIR`, and every root variable removed, staged red by a copy of `extract.py` whose default root is the literal profile path · none
+New arm: tools/runlog/selftest.py · covers AC1 AC3 · the scenario under a scratch `CLAUDE_CONFIG_DIR`, and every root variable removed, staged red by a copy of `extract.py` whose default root is the literal profile path · `ASSERTION_FLOOR`, raised by the case's checks and its three decoy checks
 
 ## 8. Open questions
 
-none
+- **F1 — Where is S3's answer to unit 30's superseded wording recorded?** Unit 30 builds at order
+  13, one step before this unit, so it is CLOSED when this unit builds, and its ledger is in neither
+  this unit's Files touched nor its write set. (a) Unit 30's acceptance ledger, a record of a closed
+  unit written by a later one; (b) this unit's own acceptance ledger, quoting the unit 30 spec text
+  it supersedes. Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; a CLOSED
+  unit's records are never written by a later unit, as KICK-dKeptSession-49 rev-6 ruled. Rejected:
+  (a), writing the other unit's ledger. The main loop's ruling, in
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 promotions' audit, H1 (id 28).
 - rev-2 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-62` mirrored, the other ends of
   the edges the round-2 promotions' audit's disposal declared
+- rev-3 · 2026-11-21 · §1 · S1 · S3 · §3 · §4 · §5 · AC1 · AC2 · §7 · §10 · re-grounded on the run's
+  BASE `c2a407b0` under the brief `2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief`.
+  Every line-number citation re-cited by symbol; the Gates line names `policy fixtures`, which
+  `extract.py` trips; the Evidence's decoy bullet corrected, since the selftest decoys `HOME` and
+  `USERPROFILE` too; AC1 aims `USERPROFILE` beside `HOME`, the resolver's Windows home; AC2's base
+  count written as its figure; every probe drops the ambient window variable. Narrowed: §3 hands the
+  range check and the wider decoy to unit 62. No landed unit satisfies an item: unit 30 is unbuilt.
+- rev-4 · 2026-11-21 · S1 · §4 · §6 · AC2 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-28-precheck-brief`: S1 carries unit 30 rev-4's `held`
+  argument; AC2 greps `\.claude`, since a `".claude"` count misses the literal unit 30 names; the
+  default's one caller before unit 46 and the policy fixture's import of `extract` shown unbroken;
+  the resolver probed with no home set, raising as AC3 needs; the floor raise and `symbols.json`, with
+  the `recall floor` legs its path trips, added. No landed unit since base touched a cited symbol.
+- rev-5 · 2026-11-21 · S3 · §4 · AC4 · §8 · S3's answers to unit 30 move to this unit's own
+  acceptance ledger, which joins Files touched, F1 resolved (b) and AC4 observing the quoted
+  passages, under the brief `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`; the class
+  KICK-dKeptSession-49 rev-6 first resolved. Unit 30's Reuse audit is no longer said to gain the
+  seam, since that spec is not written. The ledger's path trips the two `recall floor` legs, already
+  on §7's leg line.
 
 ## 10. Reuse audit
 
-The seam reused is `resolve_projects_root` (`tools/runlog/extract.py:185`), the resolver every
-`runlog.py` verb calls; this unit adds no resolver and no path literal. `python
-tools/codebase-map/reuse_lookup.py "resolve the transcripts projects root honouring
-CLAUDE_CONFIG_DIR"` ranked `resolve` (`tools/memory-recall/recall_conf.py`), `repo_root` and
-`resolve_kit_dir` by name stem; none resolves a transcripts root, and the map's symbol tier did not
-surface `resolve_projects_root`, which the source read above found, so the probe and the source
-disagree and the source is the seam.
+The seam reused is `resolve_projects_root` (`tools/runlog/extract.py#resolve_projects_root`), the
+resolver every transcript-reading `runlog.py` verb calls; this unit adds no resolver and no path
+literal. Re-run at `c2a407b0`, `python tools/codebase-map/reuse_lookup.py "resolve the transcripts
+projects root honouring CLAUDE_CONFIG_DIR"` ranked `resolve` (`tools/memory-tree/id_grammar.py`,
+`tools/policy/policy.py`), `resolve_kit_dir`, `repo_root` and `resolve_memory_root` by name stem;
+none resolves a transcripts root, and the map's symbol tier did not surface `resolve_projects_root`,
+which the source read above found, so the probe and the source disagree and the source is the
+seam. The recall query below returned this build's own specs 45 and 46 and the round-1
+promotions' audit; no landed unit resolves the window's root.
 
 Recall terms used: `python tools/memory-recall/query.py "where does the runlog kit find the
 harness transcripts root" --terms "resolve_projects_root CLAUDE_CONFIG_DIR projects root transcripts

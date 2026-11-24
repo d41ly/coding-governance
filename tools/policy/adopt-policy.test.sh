@@ -31,16 +31,16 @@ want() { # label · exit wanted · text the output must carry · adopter args...
 
 # 1 — a .governance that is a file, not a directory: the directory cannot be made.
 mkrepo gov-file commit; printf 'not a directory\n' > "$R/.governance"
-want "--scaffold where .governance is a file refuses" 1 'policy: the directory .governance could not be made in ' --scaffold --target "$R"
+want "--scaffold where .governance is a file refuses" 1 'policy: the directory .governance could not be made in ' --scaffold --preset standard --target "$R"
 
 # 2 — the scaffold cannot be moved into place: an `mv` first on PATH that exits 1 stages it, since the
 # scaffold's temporary name is unpredictable and nothing can be planted at it (TOOL-dGroundRules-84).
 mkrepo no-mv commit; mkdir -p "$TMP/no-mv-bin"; printf '#!/bin/sh\nexit 1\n' > "$TMP/no-mv-bin/mv"; chmod +x "$TMP/no-mv-bin/mv"
-PATH="$TMP/no-mv-bin:$PATH" want "--scaffold where the scaffold cannot be written refuses" 1 'policy: the scaffold could not be written to ' --scaffold --target "$R"
+PATH="$TMP/no-mv-bin:$PATH" want "--scaffold where the scaffold cannot be written refuses" 1 'policy: the scaffold could not be written to ' --scaffold --preset standard --target "$R"
 
 # 3 — a settings file that is no JSON object: the render refuses, so --scaffold does.
 mkrepo bad-settings commit; mkdir -p "$R/.claude"; printf '{\n' > "$R/.claude/settings.json"
-want "--scaffold where the settings render fails refuses" 1 'policy: the harness settings could not be rendered in ' --scaffold --target "$R"
+want "--scaffold where the settings render fails refuses" 1 'policy: the harness settings could not be rendered in ' --scaffold --preset standard --target "$R"
 
 # 3b — a mirror refusal that is no `uncommitted changes` stands (TOOL-dGroundRules-31 S2): a scratch
 # copy of the adopter beside a policy.py staged to exit 2 on `mirror`, over a committed policy file.
@@ -65,14 +65,35 @@ else bad "--scaffold over an invalid policy file on install day refuses" "exit $
 # 4 — the outcomes beside the branches: a committed target is scaffolded and its settings rendered;
 # a re-run keeps the file and renders again; a target with no commit names the re-run.
 mkrepo fresh commit
-want "--scaffold over a committed target writes the file" 0 'wrote    ' --scaffold --target "$R"
+want "--scaffold over a committed target writes the file" 0 'wrote    ' --scaffold --preset standard --target "$R"
 want "--scaffold defers the mirror over the uncommitted file" 0 'adopt-policy: mirror deferred · .governance/policy.toml has uncommitted changes' --scaffold --target "$R"
 if [ -f "$R/.claude/settings.json" ] && grep -q CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS "$R/.claude/settings.json"; then
   ok "--scaffold rendered the harness settings"
 else bad "--scaffold rendered the harness settings" "no .claude/settings.json carrying the limit under $R"; fi
 want "--scaffold over a kept file renders again" 0 'kept     ' --scaffold --target "$R"
 mkrepo empty
-want "--scaffold with no commit names the re-run" 0 're-run --scaffold after the first commit' --scaffold --target "$R"
+want "--scaffold with no commit names the re-run" 0 're-run --scaffold after the first commit' --scaffold --preset standard --target "$R"
+
+# 4b — the preset (KICK-dKeptSession-4 S2): with no policy file, a --scaffold naming no preset refuses
+# before any write, and one naming a preset the catalogue does not hold writes nothing, the scaffold's
+# exit 2 and its refusal passed through (KICK-dKeptSession-44 S13).
+mkrepo no-preset commit
+want "--scaffold with no file and no --preset refuses" 2 'pass --preset <name>' --scaffold --target "$R"
+want "--scaffold --preset lax refuses with the scaffold's own line" 2 'policy: scaffold refused · preset · "lax" is not one of ["velocity", "standard", "strict", "guarded"]' --scaffold --preset lax --target "$R"
+if [ -e "$R/.governance/policy.toml" ]; then bad "no policy file after a refused scaffold" "$R/.governance/policy.toml exists"
+else ok "no policy file after a refused scaffold"; fi
+
+# 4c — a kept file (S3): its preset is compared with the answer, one line where they differ, and the
+# file is never rewritten.
+mkrepo kept commit; mkdir -p "$R/.governance"; printf 'preset = "standard"\n' > "$R/.governance/policy.toml"
+git -C "$R" add -A; git -C "$R" commit -qm policy
+before=$(cksum < "$R/.governance/policy.toml")
+want "--scaffold --preset strict over a kept standard file names both" 0 'keeps its preset "standard", not the answer "strict"' --scaffold --preset strict --target "$R"
+if [ "$(cksum < "$R/.governance/policy.toml")" = "$before" ]; then ok "the kept file's bytes are unchanged"
+else bad "the kept file's bytes are unchanged" "$R/.governance/policy.toml was rewritten"; fi
+out=$(bash "$TOOL" --scaffold --preset standard --target "$R" 2>&1); got=$?
+if [ "$got" = 0 ] && [[ "$out" != *"keeps its preset"* ]]; then ok "--scaffold --preset standard over a kept standard file says nothing of it (exit $got)"
+else bad "--scaffold --preset standard over a kept standard file says nothing of it" "exit $got, want 0 and no 'keeps its preset': $out"; fi
 
 # 5 — --check is check_policy.py --repo, whose exit it returns: a value its row refuses reds it.
 mkrepo zero commit; mkdir -p "$R/.governance"; printf '[runtime]\nagents-in-flight = 0\n' > "$R/.governance/policy.toml"

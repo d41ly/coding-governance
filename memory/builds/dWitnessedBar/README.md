@@ -205,7 +205,7 @@ ids TOOL-dWitnessedBar-1001
 | [TOOL-dWitnessedBar-110 — the closing review round 2's five minors batched: verify-peer's bar carries a fresh run id, an unarmed attribution check says so, a trailer's trailing whitespace reads as git's cleanup reads it, and two accepted shapes gain the arms that fail when they break](spec/2026-11-21-spec-TOOL-dWitnessedBar-110.md) | 51 | 2 | CLOSED | rev-1 | 2026-11-21 |
 <!-- /gen:build-units -->
 
-Records: 1015 bound to this build, across 4 record folder(s).
+Records: 1028 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -328,12 +328,12 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 | deviation | `2026-11-21-build-TOOL-dWitnessedBar-89-deviation-893.md`, `2026-11-21-build-TOOL-dWitnessedBar-71-deviation-712.md` and 147 more under build/ |
 | override | `2026-11-22-build-TOOL-dWitnessedBar-1-override-1.md` |
 | change | `2026-11-20-build-TOOL-dWitnessedBar-3-change-1.md` |
-| red-fix | `2026-11-22-build-TOOL-dWitnessedBar-9-red-fix-159.md`, `2026-11-22-build-TOOL-dWitnessedBar-51-red-fix-163.md` and 160 more under build/ |
-| widen | `2026-11-22-build-TOOL-dWitnessedBar-23-widen-33.md`, `2026-11-22-build-TOOL-dWitnessedBar-1-widen-37.md` and 35 more under build/ |
+| red-fix | `2026-11-22-build-TOOL-dWitnessedBar-9-red-fix-159.md`, `2026-11-22-build-TOOL-dWitnessedBar-6-red-fix-169.md` and 168 more under build/ |
+| widen | `2026-11-22-build-TOOL-dWitnessedBar-6-widen-41.md`, `2026-11-22-build-TOOL-dWitnessedBar-4-widen-40.md` and 39 more under build/ |
 | leg-tail | `2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-9.md`, `2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-8.md` and 16 more under build/ |
 | flake | `2026-11-21-build-TOOL-dWitnessedBar-1-flake-1.md` |
 | research | `2026-11-19-build-TOOL-dWitnessedBar-19-purpose-review.md`, `2026-11-19-build-TOOL-dWitnessedBar-11-enforces-review.md` and 26 more under build/ |
-| logs | `2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md`, `2026-11-20-build-TOOL-dWitnessedBar-18-list-conversion.md` and 188 more under build/ |
+| logs | `2026-11-22-build-TOOL-dWitnessedBar-1-replay.py`, `2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md` and 189 more under build/ |
 | open asks | `BACKLOG.md`, 15 open |
 | card ref | `refs/gov/builds/dWitnessedBar/card` |
 <!-- /gen:build-routes -->

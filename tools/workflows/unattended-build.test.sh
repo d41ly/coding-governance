@@ -1770,7 +1770,7 @@ has "P ...and the note says the list itself is missing" "$o" 'returned no `edges
 o=$(run_dispose "$(build_dispose "$PAIRED" '[{"unit":"A-tBFix-4","repairs":"A-tBFix-1","order":3}]')")
 has "P a repair appended PAST the roster end: the roster is EMPTY" "$o" '"roster":[]'
 has "P ...and the note names the unit, its order and its target" "$o" 'A-tBFix-4 at order 3 repairing "A-tBFix-1"'
-# SHARING the target's own order is not "after" it — units at one order are a parallel group.
+# SHARING the target's own order is not "after" it — units at one order are candidates for one parallel group.
 o=$(run_dispose "$(build_dispose "$PAIRED" '[{"unit":"A-tBFix-4","repairs":"A-tBFix-1","order":1}]')")
 has "P a repair sharing its target's order is REFUSED" "$o" 'not placed beside the unit it repairs'
 # `none` IS THE ONLY ROUTE PAST THE END, and it has to actually be past it.

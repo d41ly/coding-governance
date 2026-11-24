@@ -3,6 +3,7 @@
 
     python guard.py --staged                      # the pre-commit block's verdict, from the top level
     python guard.py --push-range <base>..<tip>    # the pre-push arm over a default-branch update
+    python guard.py --expansion                   # the expansion rule over <key>=<toml value> lines on stdin
     python guard.py --fixture --plant <case>
     python guard.py --selftest
 
@@ -80,6 +81,13 @@ rows of the playbook kit's `layers.toml` declare, lack it, `policy-file.on-missi
 `refuse` raises LoopError naming the key, the value and the point, `fallback-reported` prints one
 `loop-guard: fallback` line and returns the catalogue default. A row missing a string `key`, `value`
 or `point` is a LoopError naming it.
+
+THE EXPANSION VERB, `--expansion` (KICK-dKeptSession-1 S8, TOOL-dDeclaredLoop-2 S8): each non-blank
+`<key>=<toml value>` line on stdin judged by `check_expansion_value(key, value, read_core_points(), top)`,
+`top` the working directory's repository, so the policy kit's `presets.py` loads a preset by the one
+rule and copies none of it. A refused pair, or a line that is no such pair, prints `loop-guard: refused
+· stdin:<n> · <why>`, the refusal naming the key, the value and the point; the rule's `fallback` line
+passes through as no refusal. Exit 2 on any refusal or unreadable line, else 0.
 
 `--fixture --plant <case>` builds one scratch repository under the host temp directory, a branch
 `main` with no remote, a tracked `AGENTS.md` and a policy file setting its cap, the policy kit's list
@@ -216,6 +224,37 @@ def check_expansion_value(key, value, points, root="."):
     print("%s: fallback · %s · read as the catalogue default %s, as policy-file.on-missing-expansion = "
           "fallback-reported says" % (SAY, said, default))
     return default
+
+
+#: an `--expansion` line's key: dotted segments, as the catalogue spells a key
+EXPANSION_KEY = re.compile(r"[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*")
+
+
+def run_expansion(lines):
+    """`--expansion` over `lines`: each `<key>=<toml value>` judged by `check_expansion_value`, one
+    `refused` line per refused pair or unreadable line, numbered from 1 -> 2 on any, else 0."""
+    rc, out = read_git(".", "rev-parse", "--show-toplevel")
+    top = out if rc == 0 and out else "."
+    points, refused = read_core_points(), 0
+    for n, raw in enumerate(lines, 1):
+        line = raw.strip()
+        if not line:
+            continue
+        key, eq, rhs = line.partition("=")
+        try:
+            if not (eq and EXPANSION_KEY.fullmatch(key.strip())):
+                raise ValueError(line)
+            value = tomllib.loads("v = " + rhs.strip())["v"]  # tomllib.TOMLDecodeError is a ValueError
+        except ValueError:
+            print("%s: refused · stdin:%d · %s is not <key>=<toml value>" % (SAY, n, json.dumps(line, ensure_ascii=False)))
+            refused += 1
+            continue
+        try:
+            check_expansion_value(key.strip(), value, points, top)
+        except (LoopError, LookupError) as e:
+            print("%s: refused · stdin:%d · %s" % (SAY, n, e))
+            refused += 1
+    return 2 if refused else 0
 
 
 # ------------------------------------------------------------------------------------------ the verdict
@@ -1400,13 +1439,18 @@ def main(argv):
     ap = argparse.ArgumentParser(prog="guard.py", description=__doc__.split("\n\n")[0])
     ap.add_argument("--staged", action="store_true", help="judge the staged change of an agent's commit")
     ap.add_argument("--push-range", help="<base>..<tip>: grade each commit's Gov-Policy trailers and records")
+    ap.add_argument("--expansion", action="store_true", help="judge <key>=<toml value> lines on stdin by the expansion rule")
     ap.add_argument("--fixture", action="store_true", help="run one plant's scenarios in a scratch repository")
     ap.add_argument("--plant", choices=list(PLANTS))
     ap.add_argument("--selftest", action="store_true", help="run every plant")
     args = ap.parse_args(argv)
-    modes = [args.staged, args.push_range is not None, args.fixture, args.selftest]
+    modes = [args.staged, args.push_range is not None, args.expansion, args.fixture, args.selftest]
     if sum(modes) != 1 or args.fixture != bool(args.plant):
-        ap.error("one of --staged, --push-range <base>..<tip>, --fixture --plant <case> or --selftest")
+        ap.error("one of --staged, --push-range <base>..<tip>, --expansion, --fixture --plant <case> or --selftest")
+    if args.expansion:
+        if hasattr(sys.stdin, "reconfigure"):
+            sys.stdin.reconfigure(encoding="utf-8", errors="replace")
+        return run_expansion(sys.stdin)
     if args.selftest:
         return run_selftest()
     if args.fixture:

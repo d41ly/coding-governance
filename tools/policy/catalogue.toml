@@ -8,6 +8,11 @@
 #
 # A row with no `summary` or no `usage` is named on `unsummarised-keys.txt`, a shrink-only list:
 # write both fields on a row, then drain it with `python <this kit>/policy.py lists --write`.
+#
+# A policy namespace, the first segment of a dotted key name, declares its purpose in one
+# [[namespace]] row, `name` and `purpose`, after the last [[key]] row (KICK-dKeptSession-16). A
+# namespace with no row is held on `unpurposed-namespaces.txt`, a shrink-only list awaiting review,
+# and a new namespace that declares no purpose is refused: give it a row, then `lists --write`.
 
 [[key]]
 name = "preset"
@@ -71,6 +76,8 @@ owner = "dDeclaredLoop"
 name = "attendance"
 allowed = ["unattended", "announce", "confirm-steps", "confirm-acts"]
 default = "unattended"
+summary = "Whether the owner attends a run: the breakpoints placed for them and the questions asked live."
+usage = 'attendance = "confirm-steps"'
 owner = "dKeptSession"
 
 [[key]]
@@ -187,6 +194,8 @@ owner = "dKeptSession"
 name = "deps.messaging"
 allowed = { type = "enum", of = ["live-and-mailbox", "live-only", "mailbox-only"], registry = "a registered doorbell" }
 default = "live-and-mailbox"
+summary = "Which live channels a mail post rings once its message is written to the mailbox, read by the unattended driver's post, ack and answer: under live-and-mailbox and live-only each live channel the harness offers, none in this one until dWellOiledMachine's doorbell point, carrying only the message's mail ref and id; under mailbox-only none. The mailbox is written first under every value, live-only included."
+usage = 'deps.messaging = "mailbox-only"'
 owner = "dKeptSession"
 
 [[key]]
@@ -236,6 +245,8 @@ owner = "dPlacedRequest"
 name = "actions.free"
 allowed = ["read-only-probes", "item-reads-only", "recorded-anything"]
 default = "read-only-probes"
+summary = "What a tool call outside the item in flight may do: read-only probes, item reads only, or anything recorded."
+usage = 'actions.free = "item-reads-only"'
 owner = "dKeptSession"
 
 [[key]]
@@ -564,6 +575,8 @@ owner = "dWellOiledMachine"
 name = "notify.owner"
 allowed = ["turn-micro-formats", "park-and-landing", "every-transition", "park-only"]
 default = "turn-micro-formats"
+summary = "Which events report the build's progress to the owner as one progress line."
+usage = 'notify.owner = "park-and-landing"'
 owner = "dKeptSession"
 
 [[key]]
@@ -607,18 +620,24 @@ owner = "dShippedRelease"
 name = "mailbox.reads"
 allowed = ["every-item", "transitions-only", "every-item-amendments-at-transitions"]
 default = "every-item"
+summary = "When a build's open mail is listed to the session: at every item boundary, only at transitions, or at every item boundary with an intake amendment held to the next transition; the transition guard reads the mailbox under each."
+usage = 'mailbox.reads = "transitions-only"'
 owner = "dKeptSession"
 
 [[key]]
 name = "mailbox.notice"
 allowed = ["every-tool-call", "every-item", "off"]
 default = "every-item"
+summary = "When a session is shown the unread mail addressed to its build, read by the unattended driver's `--mail notice`: under every-item at each item boundary, after one bounded fetch of the mail refs, as a `notice —` line; under every-tool-call also at each tool call, listed by the unattended kit's hook from the node's local copy with no network call, a detached fetch started once the copy is older than mailbox.fetch-seconds; under off never. The item boundary's mailbox read, mailbox.reads, runs under each."
+usage = 'mailbox.notice = "every-tool-call"'
 owner = "dKeptSession"
 
 [[key]]
 name = "mailbox.fetch-seconds"
 allowed = { type = "seconds", min = 10 }
 default = 60
+summary = "Under mailbox.notice every-tool-call, the seconds the node's local copy of the mail refs may age before a tool call starts one detached fetch, read by the unattended driver's `--mail notice` and written into its stamp for the hook, so a message reaches the session within twice this."
+usage = 'mailbox.fetch-seconds = 30'
 owner = "dKeptSession"
 direction = "raise-loosens"
 
@@ -639,18 +658,24 @@ name = "context.on-full"
 allowed = ["compact-with-card", "fresh-at-boundary"]
 default = "fresh-at-boundary"
 owner = "dKeptSession"
+summary = "What a session does as its context window fills, measured from its transcript by the runlog kit's `runlog.py context`: under fresh-at-boundary, at the first item boundary at or past context.threshold the session is told to start fresh there and reorient from its card; under compact-with-card nothing is measured at a boundary, the harness compacts and the replay re-injects the card. The replay's `context —` line names the fill under both."
+usage = 'context.on-full = "compact-with-card"'
 
 [[key]]
 name = "context.threshold"
 allowed = { type = "pattern", regex = "(100|[1-9]?[0-9])%" }
 default = "60%"
 owner = "dKeptSession"
+summary = "The share of the context window, a whole percent, at or past which a session under context.on-full fresh-at-boundary is told to start fresh at its next item boundary: the last main request's tokens over the window the runlog kit derives per model from the node's observed usage, or CLAUDE_CODE_MAX_CONTEXT_TOKENS where set. Read only under fresh-at-boundary."
+usage = 'context.threshold = "75%"'
 
 [[key]]
 name = "card.pointers"
 allowed = ["every-item", "at-transitions"]
 default = "every-item"
 owner = "dKeptSession"
+summary = "When the build card's pointers section, its latest records, open forks and item in flight, is published: at every item boundary the session crosses, or only at a stage move, the session's own card still rewritten at each boundary."
+usage = 'card.pointers = "at-transitions"'
 
 [[key]]
 name = "notices.record"
@@ -1814,3 +1839,83 @@ name = "install.steps"
 allowed = ["offer", "attended"]
 default = "offer"
 owner = "dShippedRelease"
+
+[[key]]
+name = "install.baseline"
+allowed = ["reuse", "run"]
+default = "reuse"
+summary = "Whether govkit apply's two reads of your runner, before and after it writes, reuse each leg your runner's reuse cache holds green for unchanged inputs, or execute every leg as before; a runner with no observed_reused template reads as run."
+usage = 'install.baseline = "run"'
+owner = "dQuietDisk"
+
+[[key]]
+name = "tests.history-verdicts"
+allowed = ["stored", "regraded"]
+default = "stored"
+summary = "Whether a history leg keeps each item's verdict in a store under the git common dir, keyed by the commit and blob ids the item reads and by the grading code's bytes, so a run grades only what is new, or regrades all of history on every run."
+usage = 'tests.history-verdicts = "regraded"'
+owner = "dQuietDisk"
+
+[[key]]
+name = "tests.fixture-templates"
+allowed = ["shared", "per-case"]
+default = "shared"
+summary = "Whether a self-test that opts into the template cache builds each base repository once per run, keyed by its builder and its inputs, and gives each case a shared clone of it, or builds and copies a fixture per case as before the cache."
+usage = 'tests.fixture-templates = "per-case"'
+owner = "dQuietDisk"
+
+[[namespace]]
+name = "bar"
+purpose = "How the merge bar treats a red leg: whether a red bar or pass leg may be fixed inline with no spec, its record written after."
+
+[[namespace]]
+name = "budgets"
+purpose = "How the size caps are enforced: whether a cap's breach warns or refuses, and which caps refuse whatever that switch says."
+
+[[namespace]]
+name = "charter"
+purpose = "What the rendered charter carries, and which wins when a live instruction conflicts with it."
+
+[[namespace]]
+name = "core"
+purpose = "How the core checks hold: whether a permitted bypass skips them, and which exception records excuse a core red."
+
+[[namespace]]
+name = "help"
+purpose = "What the docs leg does with a stale help page, an undeclared verb or flag, a broken link or an undocumented member."
+
+[[namespace]]
+name = "install"
+purpose = "How install and update treat a moved or retired surface: a forwarder's deprecation window and its call, and an edited file gov no longer ships."
+
+[[namespace]]
+name = "instructions"
+purpose = "How instruction units are written, proved, excluded, pinned and rendered, and what a render does with a missing unit or a legacy file."
+
+[[namespace]]
+name = "memory"
+purpose = "How the memory tree's generated records are kept, such as whether the pre-commit hook renders and stages the build index."
+
+[[namespace]]
+name = "pass"
+purpose = "What runs after each unit pass, such as whether the declared fast gate legs run."
+
+[[namespace]]
+name = "platforms"
+purpose = "How the toolchain a platform needs is provisioned, such as what the Python resolver does below the interpreter floor."
+
+[[namespace]]
+name = "policy-file"
+purpose = "How the policy file itself reads, such as what a malformed file or a value outside its key's allowed set reads as."
+
+[[namespace]]
+name = "review"
+purpose = "How reviews run, such as how a spec audit disposes a confirmed finding and when its chain stops or holds for the owner."
+
+[[namespace]]
+name = "runtime"
+purpose = "How a session runs its agents, such as how many it may have in flight."
+
+[[namespace]]
+name = "tags"
+purpose = "What the `gov tag` commands do: how they show, check and bundle tags, and how they read a retired, positional or bare reference."

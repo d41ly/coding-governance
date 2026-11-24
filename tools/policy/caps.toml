@@ -19,7 +19,7 @@
 #             stays the one home of the value (PLAY-dOrderedCharter-27).
 #   family    true where the value is per subject: the enforcer asks only the mode, and the policy
 #             file may not set a value.
-#   research  the caps research's row number.
+#   research  the caps research's row number; 0 names a cap no row of the caps research measured.
 #   ships     optional, true when absent: `false` on a row whose enforcer is a `{prefix}` path the
 #             deployer's registry exempts, so no install holds it and an adopter's census arm
 #             announces the row rather than grading it (TOOL-dGroundRules-17). The `policy fixtures`
@@ -409,3 +409,14 @@ family = true
 research = 0
 kit = "memory-tree"
 installed = "{prefix}/memory-tree/record_find.py"
+
+[[cap]]
+name = "orient-calls"
+class = "switch"
+unit = "count"
+enforcer = "{prefix}/runlog/runlog.py"
+home = "constant:{prefix}/runlog/runlog.py:ORIENT_OWNER_CALLS"
+family = false
+research = 0
+kit = "runlog"
+installed = "{prefix}/runlog/runlog.py"

@@ -5,7 +5,7 @@ cap's breach warns or refuses. The policy kit's catalogue, `tools/policy/catalog
 repository, is the file's schema. It has one row per key, giving the values the key admits, its
 default, and the build that owns it. A key the file does not set takes its default.
 
-One reader reads the file: `python tools/policy/policy.py get <key>`, below. These keys have <!-- usage: script:tools/policy/policy.py#get af650e87 -->
+One reader reads the file: `python tools/policy/policy.py get <key>`, below. These keys have <!-- usage: script:tools/policy/policy.py#get f4d25789 -->
 consumers today, each family documented on its own page:
 
 - `runtime.agents-in-flight`, which `policy.py settings --write` renders into the harness's
@@ -64,6 +64,7 @@ allowed values and every check.
   you have not committed and pushed does not change what it prints, and once a gate reads its
   policy through it, an uncommitted edit cannot change what that gate enforces.
   - `--rev <rev>` reads the file at that commit instead, `--rev HEAD` for your last commit.
+  - `--build <slug>` reads the key as that build reads it, under its scenario's slot (below).
   - `--explain` adds one line on stderr naming where the value came from and the commit:
     `policy: budgets.enforce · file · set in .governance/policy.toml at 3708a705, <remote>/main, the landed revision`.
   - It refuses, exit 2 with one `policy: refused · <path>:<line> · <why>` line, a key no catalogue
@@ -74,15 +75,27 @@ allowed values and every check.
   - With no default branch named and no `main` it refuses naming the missing ref: `git remote set-head <remote> -a`, or `export GOV_DEFAULT_BRANCH=<branch>`, names one.
   - The file is parsed as TOML and never run, so a line in it cannot execute anything.
 - **Where a value comes from:** every key resolves in one order, `RESOLUTION_ORDER` in
-  `tools/policy/policy.py`: the value the file sets, else the catalogue default. `--explain` says
-  which, after the sha and how the revision was found:
+  `tools/policy/policy.py`, four sources: the file, then a build's scenario, then the preset, then the default.
+  That is the value the file sets, else, for a read naming a build, the slot of the scenarios that
+  build is placed under, else the value of the preset the file names, else the catalogue default.
+  `python tools/policy/policy.py get <key> --build <slug>` reads a key as that build reads it; a read
+  naming no build takes the repository's values alone. `--explain` says which, after the sha and how
+  the revision was found:
   - the file sets the key: `file · set in .governance/policy.toml at <sha>, <how>`;
-  - the file does not set it: `default · not set in .governance/policy.toml at <sha>, <how>; the catalogue default`;
+  - the build's scenario overrides the key: `preset · scenario <scenario> override at <sha>, <how>`;
+  - the build's scenario names a preset that sets the key: `preset · scenario <scenario> preset <name> at <sha>, <how>`;
+  - the file names a preset that sets the key: `preset · preset <name> at <sha>, <how>`;
+  - the file does not set it and names no preset, or its preset does not set the key: `default · not set in .governance/policy.toml at <sha>, <how>; the catalogue default`;
   - there is no file at that revision: `default · .governance/policy.toml is absent at <sha>, <how>; the catalogue default`.
 
-  A file that names a `preset` reads the catalogue default too, for now: the reason adds
-  `; the file names preset <name>, not applied until dKeptSession adds presets to this reader`.
-  A value you set in the file always wins over the default.
+  A value you set in the file always wins over a scenario's slot, the slot over the preset, and the
+  preset over the default. Two scenarios a build is placed under that name two presets, or set one
+  key to two values, settle as `flow.scenario-conflict` says: under `refuse`, the default, the read
+  is refused naming both. A build read that cannot reach the loop kit is refused, never read
+  without its scenario. A file
+  that names no preset reads the catalogue default, which is what `standard` sets anyway. Naming
+  `strict` or `guarded` refuses hook bypass, among other keys; until the reliability bar lands, a
+  repository naming one may stall on hook refusals, so try it on a branch first.
 - **When the file is invalid:** a file that is not TOML, sets a value outside its key's allowed
   values, or sets a key no catalogue row names is invalid, and an invalid file NEVER reads the
   catalogue defaults, because a default may be looser than what you chose. `policy-file.on-invalid` <!-- usage: policy:policy-file.on-invalid 89965eb1 -->
@@ -116,19 +129,147 @@ allowed values and every check.
   `summary` and a `usage`, then run `python tools/policy/policy.py lists --write` to drain it from the <!-- usage: script:tools/policy/policy.py#lists 54ff8bae -->
   list. `python tools/policy/policy.py lists --check` reds a list that grew past the one the default
   branch carries.
+- **See which keys no build has picked up:** a catalogue key that no clause on its owner build's row
+  of the design view names is listed in `memory/project/unnamed-keys.txt`. The list is a ledger, one
+  row per key with the commit it was recorded at, like `memory/project/legacy-homes.txt` below:
+  generated, coding-governance's own, and never installed into another repository; it may only
+  shrink. A key leaves unnamed-keys.txt one way: its owner build records a deviation that moves a
+  clause naming the key, in backticks, onto that build's row; then `python tools/policy/policy.py
+  lists --write` drains it. `lists --check` reds a listed key a clause now names (`stale`), a new key
+  no clause names, and a key the default branch's list did not carry. Where the design is not
+  declared, or in any other repository, the check prints `policy lists: unnamed-keys.txt · not
+  graded`.
 - **Know which keys are loop bounds or deadlines:** raising one loosens the policy, so its catalogue
   row says so with `direction = "raise-loosens"`. A row is one when its allowed values are a retry,
   round or route-back count, or a number of hours, days or seconds. The check reds such a row that
   says nothing, and any row with another `direction`. Adding a new key of one of those kinds? Give
   its row `direction = "raise-loosens"`.
 
+## What each policy namespace is for
+
+A policy namespace is the first word of a dotted key name: `runtime` for `runtime.agents-in-flight`,
+`review` for `review.<stage>`. A key with no dot, such as `preset`, is no namespace; its own
+`summary` says what it is for. Each namespace says what it is for in one `[[namespace]]` row of
+`tools/policy/catalogue.toml`, after the last `[[key]]` row:
+
+```toml
+[[namespace]]
+name = "runtime"
+purpose = "How a session runs its agents, such as how many it may have in flight."
+```
+
+- **The namespaces still awaiting review:** a namespace with no row is listed in
+  `memory/project/unpurposed-namespaces.txt`. The list is a ledger like unnamed-keys.txt above:
+  generated, coding-governance's own and never installed, and it may only shrink. Run
+  `python tools/policy/check_policy.py` and it prints them as one line,
+  `policy purposes: <n> awaiting review · <names>`; a listed namespace is not a failure. In any other
+  repository the list is not graded, and every namespace with no row prints on that line.
+- **Give a namespace its purpose:** add its `[[namespace]]` row, a `name` and a one-sentence
+  `purpose`, then run `python tools/policy/policy.py lists --write`, which drains it from
+  unpurposed-namespaces.txt and prints `drained 1: <name>`. `lists --check` reds a listed namespace
+  that now has a row (`stale`) until you do.
+- **Adding a key that opens a new namespace:** the check refuses it,
+  `<name>: a new policy namespace declares no purpose: add a [[namespace]] row`. The list never
+  gains a name, so write the row in the same change as the key. The check also refuses a row naming
+  no namespace, a namespace written twice, an empty `purpose` and any field but `name` and `purpose`.
+- **The `memory.map-purpose` key:** it says how a namespace with no purpose is handled, and its
+  default, `review`, is the rule above: old namespaces wait on the list for review, and a new one must
+  declare its purpose. Its other values, `ledger`, `derive` and `refuse`, are not built yet; until the
+  build that owns the key lands them, every value is graded as `review`, and the check prints
+  `policy purposes: memory.map-purpose <value> is dTotalRecall's to arm; graded as review until it lands`.
+  The value is read from the policy file at the landed revision. Where it cannot be read there, before
+  a repository's first landing say, the check prints one `NOTE` line and grades as `review`.
+
+## Presets
+
+A preset is a named, complete set of values for the policy keys, so a repository can pick a posture
+with one key, `preset`. Four ship in `tools/policy/presets.toml`: `velocity`, `standard`, `strict`
+and `guarded`. `standard` sets every key to its catalogue default. Name one with `preset =
+"strict"` and every key your file does not set reads that preset's value, `get --explain` printing
+`preset · preset strict at <sha>, <how>`; a key you set yourself still wins. A preset of your own,
+a `[presets.<name>]` table with `extends` naming a shipped one, reads its base's values with its
+own keys on top.
+
+Some keys stay out of every preset: the file's `never` list names the keys presets never touch, such
+as `floor`, `preset` itself and `policy-file.guard`, because loosening the guard or switching an
+invariant off stays the owner's own choice. Every other key with a literal default has a value in
+every preset, and so do `maintain.fixes` and the six review stage keys, `review.plan` to
+`review.maintain`, though their defaults are derived: the store's `literal` list names those two
+rows. Every other key with a derived default, such as `budgets.*`, `roles.effort.<role>` and
+`review.<stage>.effort`, has a value in no preset, and a preset of yours may not set one either.
+
+The store also holds pairs of keys where one must be at least the other, such as `review.max-rounds`
+over `review.design.round-count`. Each pair rule is checked over the four presets only. Your own
+policy file may set a round count above its ceiling and still read valid; the review loop refuses
+that count when it runs, as it did before presets existed.
+
+- **Check the presets:** `python tools/policy/presets.py check` prints each preset with how many keys <!-- usage: script:tools/policy/presets.py#check daa13502 -->
+  it sets, then one `unassigned` line naming the derived-default keys no preset sets, and exits 1
+  naming the preset and the key for a missing key, a value the key's row refuses, a derived
+  default's text used as a value, a review stage key one preset sets and another lacks, a
+  `standard` value off its default, or a broken pair.
+- **Declare your own preset:** add a `[presets.<name>]` table to `.governance/policy.toml` with
+  `extends` naming a shipped preset and the keys you change, then set `preset = "<name>"`:
+
+  ```toml
+  preset = "ours"
+
+  [presets.ours]
+  extends = "strict"
+  "leases.expiry-hours" = 12
+  ```
+
+  `python tools/policy/policy.py check` refuses an `extends` naming no shipped preset, a key
+  presets may not set, and a table named after a shipped preset, such as `[presets.strict]`, at
+  its line, so your preset never shadows one.
+- **The charter's preset section:** `python tools/policy/policy.py preset --diff` prints the preset <!-- usage: script:tools/policy/policy.py#preset 657bb54f -->
+  your file names, `standard (the default)` when it names none, then one line per key whose value
+  is not that preset's, such as `hooks.bypass` set to `allowed` under `strict`, or `- no key differs`. A
+  key your file leaves alone reads the preset's value, so only the keys you moved are listed. It
+  reads the committed file at the landed revision, as `get` does; `--rev <rev>` reads another
+  commit. Its `--section` form is what the charter's `## Policy preset — the posture and its
+  exceptions` section shows wherever the policy kit is installed: at most 12 key lines, then one
+  `- … (+<k>)` line pointing back at this verb. Its `--line` form is the last line of the charter's
+  instruction map. A charter rendered before you changed the file shows the old keys, and the
+  render's `--check` reds it until you render it again. Where the verb refuses, exit 2 with its
+  `policy: refused` line, the charter render refuses too, naming `PRESET_SECTION`.
+- **Load a preset:** `python tools/policy/presets.py load strict --repo .` judges each of the <!-- usage: script:tools/policy/presets.py#load 8cba698f -->
+  preset's values by the loop kit's expansion rule, the same rule the loop guard applies, and exits 2
+  naming each value it refuses. On a core-only install `strict` and `guarded` still load, because the
+  release slot `build.closes = "after-release-verifies"` needs is a core point; refusing them there
+  waits on the loop kit's ask TOOL-dDeclaredLoop-101.
+- **Add a preset to the shipped store:** the kinds register's one verb copies a shipped preset into a
+  new table and adds its name to the `preset` key's values, then checks the store, putting both files
+  back when the check is red:
+
+  ```text
+  python <prefix>/playbook/core.py new preset <name> --from <preset>
+  ```
+
 ## Install
 
-`bash tools/policy/adopt-policy.sh --scaffold --target <repo>` starts the policy file in another <!-- usage: script:tools/policy/adopt-policy.sh f6cd6f1b -->
-repository. It writes the starter file only where none exists, then renders the harness settings
-from the agent limit and the policy mirror wherever the repository has a commit, so the first agent
-spawn passes and the merge bar finds the mirror fresh. `--check --target <repo>` checks that
-repository.
+`bash tools/policy/adopt-policy.sh --scaffold --preset <name> --target <repo>` starts the policy file in another <!-- usage: script:tools/policy/adopt-policy.sh dfdfbe12 -->
+repository. It writes the starter file only where none exists, its first key `preset = "<name>"`,
+then renders the harness settings from the agent limit and the policy mirror wherever the repository
+has a commit, so the first agent spawn passes and the merge bar finds the mirror fresh.
+`--check --target <repo>` checks that repository.
+
+The preset is the repository's posture, one of `velocity`, `standard`, `strict` and `guarded`, and
+nobody picks it for you. When the deployer installs the policy kit, `govkit intake` asks for it and
+refuses to go on without it; answer it on the intake line as `--answer preset=<name>`, which records
+`preset = "<name>"` under `[answers]` in `.governance/deploy.toml`. Answer `standard` for the
+catalogue's default. `strict` and `guarded` refuse hook bypass from the repository's first commit.
+With no policy file and no `--preset`, `--scaffold` writes nothing and exits 2 naming the flag; a
+name that is not a preset writes nothing either.
+
+A policy file that already exists is kept as it is. When its preset, `standard` where it names none,
+is not the answer, `--scaffold` prints one line naming both and still exits 0:
+`policy: <file> keeps its preset "<its preset>", not the answer "<name>": …`. To move a kept file to
+another preset, change its `preset` key as a policy change.
+
+A `.governance/deploy.toml` written before intake asked for the preset has no answer, and a re-run
+`apply` refuses at the policy adopter. Add one line under its `[answers]` table, `preset = "<name>"`,
+then run `apply` again.
 
 The mirror renders a commit, so on install day, while the install and the policy file are not
 committed yet, `--scaffold` prints
@@ -306,7 +447,8 @@ with one line saying so, as `policy-file.on-missing-expansion` says.
   key, a raise missing its `RAISED` line or its decision row, another line of the file changed, and
   any change to the instruction manifest or the deployer's answers. A mirror staged beside a change
   to any file it is rendered from, the policy file, the catalogue or a key of the mirror's
-  `legacy_blobs` record (today `.agent-cap.conf` alone), is refused
+  `legacy_blobs` record (its three inputs: the policy kit's `presets.toml`, the fanout conf
+  `.agent-cap.conf` and the instruction overlay `.governance/instructions.toml`), is refused
   with `the mirror renders HEAD and its input <path> is staged changed: commit <path> first, then
   regenerate`; one that is
   not its render, a hand edit say, with `differs from its render at HEAD`. Unstage it with

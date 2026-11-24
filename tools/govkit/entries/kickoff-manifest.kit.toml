@@ -15,6 +15,7 @@ requires = []
 # part is the repo path itself, this entry's home being spelled from the repo root.
 optional = [
   { part = "skills/session-kickoff/manifest-check.test.sh", point = "point.memory.consult", fallback = "the hidden-reader arm skips, said" },
+  { part = "skills/session-kickoff/manifest-check.sh", point = "point.runtime.reading", fallback = "the context line reads skipped, naming the runlog kit that did not resolve" },
 ]
 
 [[files]]

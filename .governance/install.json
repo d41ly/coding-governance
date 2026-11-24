@@ -377,6 +377,12 @@
       "source": "tools/memory-tree/gotchas.py"
     },
     {
+      "path": "tools/memory-tree/history_store.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/history_store.py"
+    },
+    {
       "path": "tools/memory-tree/id_grammar.py",
       "kit": "memory-tree",
       "role": "engine",
@@ -1757,6 +1763,12 @@
       "source": "tools/unattended/gate-guard.js"
     },
     {
+      "path": "tools/unattended/history_store.py",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/history_store.py"
+    },
+    {
       "path": "tools/unattended/kit.toml",
       "kit": "unattended",
       "role": "engine",
@@ -1767,6 +1779,18 @@
       "kit": "unattended",
       "role": "engine",
       "source": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "path": "tools/unattended/mail-notice.fragment.json",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/mail-notice.fragment.json"
+    },
+    {
+      "path": "tools/unattended/mail-notice.js",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/mail-notice.js"
     },
     {
       "path": "tools/unattended/pass-tree.sh",

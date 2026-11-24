@@ -57,9 +57,9 @@ from extract_code import (DEFINITION_CARRYING_EXTS, _DATA_EXTS, _IDENT_TOKEN_RE,
                           _LEX_PROFILES, _PROFILE_C, _PROFILE_PY, _PROFILE_SH, _PY_PREFIX_CHARS,
                           _TRIPLE_QUOTES, _identifier_tokens)
 
-#: gov:kit codebase-map@1.37 — engine identity. Bump on any engine/render change; mirrored into the
+#: gov:kit codebase-map@1.38 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.37"
+KIT_CODEBASE_MAP_VERSION = "1.38"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where

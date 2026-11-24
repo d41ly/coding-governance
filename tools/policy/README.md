@@ -1,4 +1,4 @@
-<!-- gov:kit policy@1.14 -->
+<!-- gov:kit policy@1.18 -->
 # policy — one file for a repository's policy, and the catalogue that is its schema
 
 A repository's policy lives in ONE file, `.governance/policy.toml`, TOML 1.0, read through `tomllib`
@@ -19,10 +19,10 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 
 | File | What it is |
 |---|---|
-| `catalogue.toml` | the schema: one row per key |
+| `catalogue.toml` | the schema: one `[[key]]` row per key, then one `[[namespace]]` row, `name` and `purpose`, per policy namespace that declares its purpose (KICK-dKeptSession-16) |
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
 | `unscanned-readers.txt` | AUTHORED: one row `<key> <path> <reason>` per catalogue key whose consumer sits outside the code reader coverage scans, printed on every run and never counted as read (TOOL-dLandedOwners-3); gov's own, withheld from installs by a `project-owned` rule in `kit.toml` |
-| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, the inlined `resolve_compare_base`, `resolve_kit_dir` and `GIT_ENV_LEAKS`, the one blob reader `read_blob_at`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes`, `check_legacy_homes` and `write_legacy_homes`, the ledger factory's loader `load_ledger` and the list's registration reader `read_legacy_registration`, the census tree's `derive_census_tree` over the registry search `derive_registry_tree`, and the legacy list's one grading rule `check_legacy_graded`, and the `lists` (`cmd_lists`, and `cmd_derive_list` for `--derive` and `--marks`), `scaffold`, `get`, `check`, `mirror` and `settings` verbs |
+| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, the namespaces' `load_namespaces`, `derive_policy_namespaces`, `check_namespaces`, `derive_unpurposed` and `check_unpurposed_list`, the reader join's `load_design`, `derive_unnamed_keys` and `check_unnamed_list`, the inlined `resolve_compare_base`, `resolve_kit_dir` and `GIT_ENV_LEAKS`, the one blob reader `read_blob_at`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes`, `check_legacy_homes` and `write_legacy_homes`, the ledger factory's loader `load_ledger` and the lists' registration reader `read_legacy_registration`, the plain-name populations' grade `check_shrink_list` and drain `write_shrink_list` (KICK-dKeptSession-69), the census tree's `derive_census_tree` over the registry search `derive_registry_tree`, and the ledger lists' one grading rule `check_legacy_graded`, and the `lists` (`cmd_lists`, and `cmd_derive_list` for `--derive` and `--marks`), `scaffold`, `get`, `check`, `mirror` and `settings` verbs |
 | `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI, and `readLandedRevision(top)`, the landed revision's full sha as the shim's `landed` prints it |
 | `policy-shim.sh` | the helper's shell half: the landed revision, and the reader under a resolved launcher |
 | `guard.py` | the minimal guard: `guard.py --staged`, the verdict over an agent's staged change to a guarded path |
@@ -30,7 +30,9 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `check_policy.py` | the arms' home: `ARMS` over a repository, and `--fixture`, which runs `CASES` |
 | `caps.toml` | the cap census: one `[[cap]]` row per size cap, its class, unit, enforcer, legacy home and family flag (TOOL-dGroundRules-9), and `ships = false` where the deployer's registry exempts the enforcer (TOOL-dGroundRules-17), else the registry entry that installs it, `kit`, and its `{prefix}`-spelled destination, `installed` (TOOL-dGroundRules-22) |
 | `budgets.py` | the size caps' half of the reader: `read_cap_census`, `resolve_caps` with the switch and the two-homes rule, `check_cap`, `render_warn_marker`, the runner's `gate-warn<TAB>size<TAB><subject><TAB><detail>` line every size warning prints after its own (TOOL-dWitnessedBar-29), the `[budgets]` schema rule `check_budgets` that `validate` calls, and the `resolve` and `check` verbs, `check` printing the marker after a warned verdict |
-| `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
+| `presets.toml` | the named presets (KICK-dKeptSession-1): one `[preset.<name>]` table per shipped preset, `velocity`, `standard`, `strict` and `guarded`, each assigning every presettable key by a quoted dotted key; the `never` list, the keys presets never touch; the `literal` list, `maintain.fixes` and `review.<stage>`, the derived-default rows the presets assign literal values while every other derived row reads unassigned (KICK-dKeptSession-33); and the `pairs` list of `[<higher>, <lower>]` keys. Its one writer is the preset kind's factory, `core.py new preset <name> --from <preset>` |
+| `presets.py` | the presets' module: `load_presets`, `derive_preset_assignment`, `derive_declared_presets`, which the reader's preset step passes it, the store's check `check_presets` and its `check` verb, the repository side `check_repo_presets` that `validate` calls only for a file holding a `presets` table, and the core-only load `load_preset` and its `load` verb, through the loop kit's `guard.py --expansion`, and a scenario's slot, `check_slot` and `derive_slot_assignment` behind the `slot` and `pairs` verbs the loop kit's `scenario.py check` runs (KICK-dKeptSession-20) |
+| `adopt-policy.sh` | the adopter: `--scaffold --preset <name>` and `--check` |
 | `adopt-policy.test.sh` | the adopter's sibling suite, arming each of its refusal branches; the case `adopter-suite` runs it (TOOL-dGroundRules-21 S4) |
 
 ## A catalogue row
@@ -140,6 +142,20 @@ owner-silence rule that declines a raise is a later build's reader.
   through the baseline ledger factory, whose `compare_to_base` reads the same merge-bar base
   (TOOL-dWitnessedBar-20). It grades that list only where `check_legacy_graded` answers true, and
   otherwise prints `policy lists: legacy-homes.txt · not graded · <why>` (TOOL-dGroundRules-76).
+  It grades the two ledger populations of plain names the same way, each at its home under the
+  memory tree and each only where `check_legacy_graded` answers true for it, through
+  `check_shrink_list` (KICK-dKeptSession-69): `unnamed-keys`, at `memory/project/unnamed-keys.txt`,
+  the catalogue keys no clause on their owner build's row of the design view names
+  (KICK-dKeptSession-19), the design read once by `load_design` through the memory-tree kit's
+  `design_lib`, and `unpurposed-namespaces`, at `memory/project/unpurposed-namespaces.txt`, the
+  policy namespaces, the first segments of the dotted key names, that no `[[namespace]]` row of the
+  catalogue purposes (KICK-dKeptSession-16). Each prints `policy lists: <file> · <note>`, its note
+  the factory's `compare_to_base` reason, or `policy lists: <file> · not graded · <why>` where the
+  rule does not hold, no memory-tree kit is found or every `DESIGN_*` key is blank; any other
+  refusal of the design is printed, exit 2. A derived name the list lacks is `unnamed and not
+  listed` or `a new policy namespace declares no purpose: add a [[namespace]] row`, a listed name
+  no longer derived is stale, and a listed name the list at the base lacks with no `widened`
+  disposition is `added to a shrink-only list above the base`.
   Exit 0 green, 1 red, 2 usage or a refused read.
 - `python <prefix>/policy/policy.py lists --write` — drain the list: it keeps the rows the catalogue
   still owes and never adds one. An absent list is seeded with every owed row. It drains the legacy
@@ -147,11 +163,16 @@ owner-silence rule that declines a raise is a later build's reader.
   a row no home yields leaves and every other row keeps its count, sha and disposition. It writes
   neither list, exit 1, while the legacy list holds a derived key it lacks, a row the list at the base
   lacks with no `widened` disposition, or a malformed row.
-- `python <prefix>/policy/policy.py lists --derive legacy-homes` — print one `<conf> TAB <key> TAB 1`
+  It drains the two plain-name populations through `write_shrink_list`, each where its rule holds:
+  every listed name still derived keeps its count, sha and disposition, and the rest leave,
+  printing `policy lists: wrote <file> · drained <n>: <names>`; neither is ever created by it.
+- `python <prefix>/policy/policy.py lists --derive <population>` — for `legacy-homes`, print one `<conf> TAB <key> TAB 1`
   line per row `derive_legacy_homes` yields, sorted, its notes on stderr: the seed argv of the list's
   `[[ledger]]` registration. `lists --marks legacy-homes` prints `<conf> TAB <key> TAB <mark>`
   instead, the mark read from `GATE_ENV_MARKS` and the home's kind, never stored in the list. Any
-  other list name exits 2.
+  other list name exits 2. For `unnamed-keys` and `unpurposed-namespaces` it prints one `<name> TAB
+  1` line per derived name, the seed argv of each population's registration; a design that does not
+  read exits 2 with its reason, so a seed over it is left unarmed. `--marks` names `legacy-homes` alone.
 
 ## The legacy policy homes
 
@@ -209,12 +230,35 @@ S11); gov's source-mode receipt reads as no receipt does (TOOL-dSafePassage-103)
 and `lists --write` writes the summary list alone, printing `legacy-homes.txt · not written`: it
 updates the legacy list where the predicate holds and never creates it. On gov's tree the case
 `legacy-homes-present` reds a list deleted or unregistered.
-- `python <prefix>/policy/policy.py scaffold` — print the starter policy file: each row this kit's
-  build owns that has a literal default, one table per first segment, written as UTF-8 bytes with LF
-  line ends on every platform, so it equals the blob git stores (TOOL-dGroundRules-21 S1).
-- `python <prefix>/policy/policy.py get <key> [--rev <rev>] [--explain] [--json]` — run in the repository to
+
+THE TWO PLAIN-NAME LISTS ARE LEDGER POPULATIONS TOO (KICK-dKeptSession-69).
+`memory/project/unnamed-keys.txt` holds the population `unnamed-keys` and
+`memory/project/unpurposed-namespaces.txt` the population `unpurposed-namespaces`, each registered
+by one `[[ledger]]` table in gov's govkit registry beside `legacy-homes`: key kind `key`, one field,
+`name` and `namespace`, drain `key`, direction `shrink-only`, its seed argv `lists --derive
+<population>` and its leg `policy check`. Each row is the name, the count `1`, the sha it was seeded
+at and its disposition, under the factory's header. They are gov's own for the legacy list's reason:
+the unnamed keys derive from gov's design view, which no adopter declares, and both derive from
+gov's catalogue, so no kit ships either and an install never grades one. `check_shrink_list` grades
+a population and `write_shrink_list` drains it, through the factory's `read_ledger`,
+`compare_counts`, `compare_to_base` and `write_rows`, each where `check_legacy_graded` holds for
+that population. A name enters a list only by the factory's `seed` at an absent home or its widen
+route; `lists --write` adds none. `.gitattributes` routes each home to `merge=rows`.
+- `python <prefix>/policy/policy.py scaffold --preset <name> [--kept <file>]` — print the starter policy
+  file: `preset = "<name>"` as its first key, then each row this kit's build owns that has a literal
+  default, one table per first segment, written as UTF-8 bytes with LF line ends on every platform, so
+  it equals the blob git stores (TOOL-dGroundRules-21 S1, KICK-dKeptSession-4 S2). A row the named
+  preset assigns is written as a comment, `# <key> = <value> (preset <name>)` with the preset's value,
+  never as a literal that would beat the preset (KICK-dKeptSession-32). A call naming no
+  preset is the usage line, and a name the catalogue's `preset` row refuses is that row's reason on
+  stderr, exit 2, nothing on stdout, as is `presets.py` not importing or the preset store not reading. `--kept <file>` writes nothing: where the file's preset, the
+  default `standard` where it names none, is not `<name>`, it prints the kept-file line
+  `policy: <file> keeps its preset "<its>", not the answer "<name>": …`, exit 0; a file that does not
+  decode or parse prints nothing (S3).
+- `python <prefix>/policy/policy.py get <key> [--rev <rev>] [--build <slug>] [--explain] [--json]` — run in the repository to
   read: the key's value on stdout, a string as itself, a number or a boolean in TOML's spelling, a
-  list one member per line, LF-ended. `--json` prints one JSON object of `reason`, `source` and
+  list one member per line, LF-ended. `--build` reads it as that build reads it, under the slot of
+  the scenarios it is placed under (KICK-dKeptSession-20). `--json` prints one JSON object of `reason`, `source` and
   `value` instead, the form the mirror helper reads. `--explain` adds `policy: <key> · <source> · <reason>` on
   stderr, the reason naming the sha8 and how the revision was found. Exit 0, or 2 with one
   `policy: refused · <path>:<line> · <why>` line and nothing on stdout.
@@ -237,7 +281,7 @@ updates the legacy list where the predicate holds and never creates it. On gov's
 
 ## The reader
 
-`resolve(key, repo=".", rev=None)` is the one reader every consumer calls, `get` its CLI. It carries
+`resolve(key, repo=".", rev=None, build=None)` is the one reader every consumer calls, `get` its CLI. It carries
 `read_policy_key`'s contract (the unattended kit, `THE POLICY IS READ AT R AND NEVER FROM THE TREE`)
 to TOML: the file as committed at a revision, read with `git show`, parsed with `tomllib`, never
 sourced and never opened from the working tree. The shell parser and its copies stay as they are
@@ -257,13 +301,32 @@ symbol, never by line, so no later edit strands the citation (TOOL-dGroundRules-
   `<key> = 0`, so `budgets."CLAUDE.md"` is two segments. `read_catalogue_row` finds its row by the
   name rule above; no row refuses, naming the catalogue.
 - **The value.** `parse_policy` maps each leaf's segment tuple to its value; a table is never a
-  value. `resolve` runs `RESOLUTION_ORDER`, the one order, and the first step to answer wins; each
-  step takes `(path, row, table, rev_phrase)`, `table` None for an absent file, and names the
-  revision read only through `rev_phrase`, the read's `<sha8>, <how>`. `read_file_value`
-  answers `Resolution(value, "file", reason)` where the file sets the key; `read_default_value`
-  answers the row's `default` with source `default` and a reason naming the case, absent or not
-  set, and any `preset` the file names, which no step applies until dKeptSession adds its step
-  between the two. A row with no `default` refuses, naming it in the catalogue.
+  value. `resolve` runs `RESOLUTION_ORDER`, the one order of four sources, the file, the build's
+  scenario, the file's preset and the default, and the first step to answer wins; each step takes
+  `(path, row, table, rev_phrase)` and the keyword `build`, `table` None for an absent file and
+  `build` None for a read naming no build, and names the revision read only through `rev_phrase`,
+  the read's `<sha8>, <how>`. `read_file_value`
+  answers `Resolution(value, "file", reason)` where the file sets the key; `read_scenario_value`
+  (KICK-dKeptSession-20), for a read naming a build, answers from the slot of the scenarios the build
+  is placed under: an override the slot sets, `scenario <scenario> override at <rev_phrase>`, else
+  the slot's shipped preset's value, `scenario <scenario> preset <name> at <rev_phrase>`, each with
+  source `preset`; it answers None with no build, a `null` slot, before importing `presets.py`, and a
+  `never` key. The slot is `read["build"]`, `{"slug", "slot"}`, which `read_revision(repo, rev, rows,
+  build)` reads once per read by running the loop kit's `scenario.py slots --build <slug> --rev
+  <sha>`, found through the inlined `resolve_kit_dir`; the loop kit not found, and the verb exiting
+  non-zero, a conflict between two placed scenarios under `flow.scenario-conflict = "refuse"` among
+  them, are each a Refusal, so a build's posture that cannot be read is never read unscoped.
+  `get <key> --build <slug>` names the build. `read_preset_value`
+  (KICK-dKeptSession-2), where the file names a `preset`, answers that preset's value with source
+  `preset` and the reason `preset <name> at <rev_phrase>`, looked up by exact path in
+  `read_preset_assignment`, `presets.derive_preset_assignment` over the store `read_kit_presets`
+  parses once per process and the file's `[presets]` table that `presets.derive_declared_presets`
+  rebuilds from the flattened leaves, each kept in a one-slot cache; it answers None for an absent
+  file, a file naming no preset, before importing `presets.py`, and a key the assignment lacks, a
+  `never` key among them. A `presets.py` that does not import, an absent or unparsable store and a
+  name no preset holds are each a Refusal `get` prints. `read_default_value` answers the row's
+  `default` with source `default` and a reason naming the case, absent or not set. A row with no
+  `default` refuses, naming it in the catalogue.
 - **An invalid file** (TOOL-dGroundRules-4). `validate(text)` is the file's one judge, and
   `arm_schema` grades through it: a list of `Problem(line, key, why)`, empty for a valid file. Text
   that is not TOML is one problem at the decoder's line, key `""`; text that parses has one per leaf
@@ -309,7 +372,8 @@ pinned LF in `.gitattributes`. `render_mirror(repo, rev)` renders it for one rev
   "catalogue_blob": "<blob id of this kit's catalogue at the revision>",
   "keys": {"budgets.enforce": {"reason": "...", "source": "file", "value": "warn"}},
   "legacy_blobs": {".agent-cap.conf": "<its blob id at the revision, or null when absent>",
-                   ".governance/instructions.toml": "<the same>"},
+                   ".governance/instructions.toml": "<the same>",
+                   "<this kit's path>/presets.toml": "<the same>"},
   "policy_blob": "<blob id of .governance/policy.toml at the revision, or null when absent>"
 }
 ```
@@ -317,11 +381,21 @@ pinned LF in `.gitattributes`. `render_mirror(repo, rev)` renders it for one rev
 **Every input the resolution reads is pinned** (TOOL-dGroundRules-21 S17). `legacy_blobs` maps each
 legacy input `resolve_read` reads, `LEGACY_INPUTS` in `policy.py`, today `.agent-cap.conf`, whose
 `FANOUT_CAP` lowers the agent limit, and the instruction overlay `.governance/instructions.toml`, whose
-`[[policy]]` rows are the rows of the repository's own `adopter.` keys (PLAY-dOrderedCharter-32), to its
-blob id at the rendered revision or null, and the helper
-reads a mirror whose recorded id differs at L, or that carries no `legacy_blobs`, as STALE, so a
-landing that changes the conf alone is never read through a mirror holding the old limit. THE RULE: a
-unit adding a resolution input adds its path to `LEGACY_INPUTS`, so its blob joins this map.
+`[[policy]]` rows are the rows of the repository's own `adopter.` keys (PLAY-dOrderedCharter-32), and
+then this kit's preset store `presets.toml`, which the preset step reads (KICK-dKeptSession-40), by
+the kit's prefix in its repository as the catalogue is, `derive_mirror_inputs` in `policy.py`, each
+to its blob id at the rendered revision or null. The helper takes the inputs it compares from its
+own code (KICK-dKeptSession-49): beside the policy file and the catalogue, every name of
+`MIRROR_KIT_INPUTS` in `policy-mirror.js` by the kit's prefix, then every path of its
+`MIRROR_LEGACY_INPUTS`, a copy of `LEGACY_INPUTS` (KICK-dKeptSession-62), never the keys the mirror
+records, and reads STALE a mirror whose recorded id differs at L, that lacks an expected key, a
+legacy input's included, or that carries no `legacy_blobs`, so a landing that changes the conf alone
+is never read through a mirror holding the old limit, and a mirror rendered before the store joined
+reads stale. THE RULE: a unit adding a repository-relative resolution input adds its path to
+`LEGACY_INPUTS`, so its blob joins this map, and to `MIRROR_LEGACY_INPUTS` in `policy-mirror.js`; a
+unit adding a kit-relative input adds its name to `derive_mirror_inputs` in `policy.py` and to
+`MIRROR_KIT_INPUTS` in `policy-mirror.js`; and `python check_policy.py --fixture mirror-input-parity`
+(KICK-dKeptSession-59, KICK-dKeptSession-62) reds either pair of lists apart.
 
 `keys` holds every catalogue name with no `*` or `<...>` segment, and every key the file sets that a
 pattern row matches, each with its `Resolution`. The bytes are sorted, two-space indented, ASCII and
@@ -341,7 +415,10 @@ render byte-identical mirrors, so the mirror the lander renders into a merge sta
 and `mirror --check`, so the run-gates kit's `regen.py --write` renders it into each landing the
 lander makes, and the bar's preflight runs the check. A branch carrying a policy change carries a
 stale mirror until it lands or until a commit of its own carries the regenerated one, which the
-guard admits (below).
+guard admits (below). A mirror rendered before `presets.toml` became an input is re-rendered at the
+next landing by the `[[generated]]` row here, and in an adopter by the `[[regenerate]]` row on every
+update unless `GOVKIT_RERENDER=0` is exported; with it exported the mirror stays as it was,
+`adopt-policy.sh --check` refuses it, and the hooks read it stale (KICK-dKeptSession-49).
 
 **Read from the landed blob only.** `policy-mirror.js`'s `readPolicy(key, { repo })` finds the
 landed revision L through `policy-shim.sh landed`, reads the mirror's blob at L and the two blob ids
@@ -479,8 +556,11 @@ branch with a live phase all pass it, and the push-time bar does not re-judge au
 | `arm_mirror_readers` | the tracked `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*` outside this kit, the memory root, `help/` and the self-tests | a file READING `policy.json`: a line, not a comment or a Python docstring, spelling `readFileSync`, `open(`, `cat` or `git show` followed on the line by the name, `arm_single_reader`'s row for the mirror (TOOL-dGroundRules-21 S18, S20) |
 | `arm_legacy_homes` | the kit confs, the gate file and the house file, the `legacy-homes` ledger row at `memory/project/legacy-homes.txt` its govkit registration names, the list at the compare base | each `lists --check` report on the legacy homes, graded by the ledger factory; a refused read or registration. Where `check_legacy_graded` answers false, the census not `source`, no registration or no file at its home, it is not graded and says so |
 | `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision and, for an owner whose specs are not all terminal, its run records, their bases and the landing merges, read with the memory-tree kit's `tree_lib`, `gen_build_index`, `backlog` and `row_grammar` (`derive_landed_builds`), the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker (`derive_scanned_files`), and `unscanned-readers.txt` with `git ls-files` over its paths | each key whose owner build has landed that no call reads and no row of the list declares; a declared row the tree no longer supports, and a list line that is not a row, names no catalogue key or repeats one (TOOL-dLandedOwners-3); a refused landed revision, or a memory-tree kit that does not resolve, naming where the resolver looked (TOOL-dGroundRules-21 S26); a git read of reader coverage that fails, a Refusal naming the read (TOOL-dLandedOwners-4) |
+| `arm_reader_join` | the catalogue's `owner` fields, the design view `load_design` reads from the repository's `DESIGN_*` keys, the `unnamed-keys` population at `memory/project/unnamed-keys.txt`, the list at the compare base | each `lists --check` finding on the population; a memory-tree kit that does not resolve, or a design refusal other than every `DESIGN_*` key blank. With every key blank, or where `check_legacy_graded` does not hold for the population, it is not graded and says so (KICK-dKeptSession-19, KICK-dKeptSession-69) |
 | `arm_limits_readers` | the same tracked code files outside this kit, the memory root, `help/` and the self-tests | a file READING the template-size limits file by the same read shape, or naming `LIMITS_NAME`, `arm_single_reader`'s row for that file: `budgets.py` is its one reader (TOOL-dGroundRules-21 S20, S29) |
 | `arm_cap_census` | `caps.toml`, each row's enforcer, the requests the same tracked code makes, the limits file in the tree | a row whose enforcer is absent where it is graded (its `enforcer` path on the source tree, which holds the deployer's registry, its `installed` path in an adopter whose receipt names its `kit`, and nowhere in a tree holding neither, which announces it), asks the policy kit nothing, or never names it (a `limits:` row names it by subject), an outside row its enforcer requests a mode for, a row with no `budgets-cap-` case or a case with no row, a request naming no row, a limits row no census row names |
+| `arm_purposes` | the catalogue's `[[key]]` and `[[namespace]]` rows, the `unpurposed-namespaces` population at `memory/project/unpurposed-namespaces.txt`, the list at the compare base, and `memory.map-purpose` through `resolve` at the landed revision | each `check_namespaces` finding: a `[[namespace]]` row naming no policy namespace, a name written twice, an empty or absent `purpose`, an unknown field; each `lists --check` finding on the population, so a new namespace that declares no purpose reds. The listed namespaces print as `policy purposes: <a> awaiting review · <names>`, no finding; where `check_legacy_graded` does not hold for the population it prints `policy purposes: unpurposed-namespaces.txt · not graded · <why>` and every unpurposed namespace awaits review (KICK-dKeptSession-69); any `memory.map-purpose` value but `review` prints that it is dTotalRecall's to arm and is graded as `review`, and a refused read prints a NOTE line and takes the catalogue default (KICK-dKeptSession-16) |
+| `arm_presets` | `presets.toml` beside this kit, the catalogue, the loop kit's `loop.toml` `[[selects]]` rows and its `guard.py --expansion` | each `check_presets` finding, `preset.<name> · <key>`: a presettable key a shipped preset lacks, a key no presettable row matches or `never` names, a value its row refuses, a value equal to, or holding as a member, its row's derived default text, a review stage key one preset assigns and another lacks, a `standard` value off its row's default, a table the `preset` row's `of` lacks or a name with no table, a `never` entry naming no row, a `literal` that is not an array of strings or an entry naming no derived row `never` lacks (KICK-dKeptSession-33), a broken pair; then, per preset, the by-key half, a load refusal whose key and value no `[[selects]]` row names, and the row-named half, a row-named pair the expansion rule refuses and the load admits. A row-named pair the rule admits prints `presets-core-only · not graded · TOOL-dDeclaredLoop-2 S8 admits <value>`, no finding, until TOOL-dDeclaredLoop-101 (KICK-dKeptSession-1 S5) |
 
 ## The size caps
 
@@ -595,9 +675,17 @@ and a backticked `touch`, which must read its value; the marker must not exist a
 `resolution-order` reads one repository per scenario at `--rev HEAD`: a file setting
 `budgets.enforce = "refuse"` must read `refuse` from `file` and `runtime.agents-in-flight` its
 default `6` as `not set in`; a commit with no file must read `warn` as `is absent at`; a file setting
-only `preset = "strict"` must read `warn` with the unapplied preset in its reason, and `refuse` once
-it sets the key too; and a copy of this kit whose `budgets.enforce` row carries no `default` must
-refuse, naming `catalogue.toml` and the row. `on-invalid-classes` plants each failure class of the
+only `preset = "strict"` must read `hooks.bypass` as `refused` from `preset`, the reason naming
+`strict`, in `get` and as `preset strict at {rev}` in `mirror --print`, and `allowed` from `file`
+once it sets `[hooks]` `bypass = "allowed"` too; a file declaring `[presets.ours]` extending
+`strict` with `"hooks.bypass" = "allowed"` and naming `ours` must read that `allowed` and `strict`'s
+`leases` `refuse`, each from `preset` naming `ours`; and a copy of this kit carrying `presets.py` and
+no `presets.toml` must refuse the `strict` file's read with one line naming `presets.toml`, and,
+its `budgets.enforce` row carrying no `default`, refuse that key, naming `catalogue.toml` and the
+row. `preset-every-key` (KICK-dKeptSession-2) reads, per shipped preset, a repository whose file
+sets only `preset = "<name>"` and one with no file, in process: every key the preset assigns must
+read its value from `preset`, and every `never` key but `preset` as the absent file reads it, a
+placeholder segment read at `fixture`. `on-invalid-classes` plants each failure class of the
 invalid-file branch in its own repository, V a valid revision and C the one after it: an absent
 file reads defaults; a malformed C after V reads V with source `last-valid` and `check` names the
 fallback; a malformed revision with nothing before it refuses `get` and `check` naming its line,
@@ -874,14 +962,23 @@ and the case reds a row whose opening word differs from it (TOOL-dGroundRules-25
 | `arm_mirror_readers` | the target's tracked code outside the installed kit, its memory root, `help/` and the self-tests, for a read of the mirror | announce: a target with no tracked code is a population of 0, a legal state, so it prints `not graded` (TOOL-dGroundRules-21 S5) |
 | `arm_legacy_homes` | nothing: `legacy-homes.txt` is gov's own list, a ledger row under gov's memory tree that gov's govkit registry registers and no descriptor ships (TOOL-dWitnessedBar-20) | finding: a list that derives no row is a zero population; with no list at its home, no registration, or wherever the tree holds an adopter's install receipt, any but gov's source-mode one (TOOL-dSafePassage-103), a receipt `derive_census_tree` answers `invalid` included (TOOL-dGroundRules-32 S11), it is announced: `policy-check: arm_legacy_homes · not graded · the list is gov's own and is withheld from installs; …`, and `lists --write` never creates it. `govkit plan` shows no row for the list, and the list is not the adopter's to author (TOOL-dGroundRules-25 S11) |
 | `arm_reader_coverage` | each installed catalogue key whose owner build has landed in the target, against the target's tracked code | announce: before any owner build lands it grades 0 keys and prints `not graded` (TOOL-dGroundRules-21 S5), and a landed revision that does not resolve is announced too (TOOL-dGroundRules-25 S26); a memory-tree kit that does not resolve is a finding naming why |
+| `arm_reader_join` | nothing: the `unnamed-keys` population, the catalogue keys no clause on their owner build's row of the design view names (KICK-dKeptSession-19), is gov's own ledger, which no kit ships, and an adopter's conf leaves every `DESIGN_*` key blank | announce: with every `DESIGN_*` key blank, or in any tree but gov's source tree, it prints `policy-check: arm_reader_join · not graded · <why>`. In gov's tree it grades the population as `policy.py lists --check` does and prints `<n> of <m> catalogue key(s) named on their owner's row · population unnamed-keys · <note>` |
 | `arm_limits_readers` | the target's tracked code outside the installed kit, its memory root, `help/` and the self-tests, for a second reader of the template-size limits file | announce: a target with no tracked code is a population of 0, a legal state, so it prints `not graded` (TOOL-dGroundRules-25 S26) |
 | `arm_cap_census` | the installed cap census against the target, by one of four answers (TOOL-dGroundRules-29, TOOL-dGroundRules-32 S11): the target's `.governance/install.json` makes it an adopter, and each shipped row whose `kit` its `kits` names is graded at its `installed` path, `{prefix}` read as its `prefix`; a source-mode receipt, gov's own, its top-level `mode` being `source`, reads as no receipt does, and with no registry beside it is the one finding, naming the receipt (TOOL-dSafePassage-103); with no receipt, exactly one `<tool-root>/govkit/registry.toml` with the tool root 0 to 2 deep makes it gov's source tree, each row graded at its `enforcer`, `{prefix}` read as that tool root, since no install carries the deployer's registry; neither receipt nor registry makes it unadopted, every row announced and none graded; a receipt whose `kits` is not a list of strings, or whose `prefix` opens with `/` or `\`, names a drive or holds a `..` segment, makes it `invalid`, no row graded; the requests its tracked code makes, and the limits file's rows | finding: a census that reads no row is a zero population; two or more `<tool-root>/govkit/registry.toml` with no receipt is a finding naming each, never a guessed root; the rows are graded by what ships (TOOL-dGroundRules-17, TOOL-dGroundRules-22): a `ships = false` row is announced, `cap census: <name> · enforcer not shipped`; a row whose `kit` the receipt's `kits` lacks, or any shipped row of an unadopted tree, is announced, `cap census: <name> · kit <kit> not installed`; an installed kit's enforcer absent at `installed` is a finding naming that path; a receipt that does not parse is a finding naming it; under `invalid` the one finding is `.governance/install.json: its <field> is not of the shape the deployer writes` |
+| `arm_purposes` | the installed catalogue's `[[namespace]]` rows against the namespaces its dotted keys derive | finding: the catalogue ships in the kit, so its dotted keys always derive a namespace; the `unpurposed-namespaces` population is gov's own ledger, which no kit ships, so the arm prints `policy purposes: unpurposed-namespaces.txt · not graded · <why>` and every unpurposed namespace prints `awaiting review` (KICK-dKeptSession-69), and `memory.map-purpose` reads as `review` until dTotalRecall lands it (KICK-dKeptSession-16) |
+| `arm_presets` | the installed kit's `presets.toml` against the installed catalogue, then each preset's load through the installed loop kit's `guard.py --expansion` | finding: the presets ship in the kit, so a store holding no preset is a zero population and one that does not read or parse reds; where the loop kit does not resolve, as in a target installing none, both load halves print `not graded · the loop kit does not resolve` and neither is a finding (KICK-dKeptSession-1 §8 F7) |
 
 ## The adopter
 
-`bash <prefix>/policy/adopt-policy.sh --scaffold [--target <repo>]` writes `.governance/policy.toml`
-from the scaffold only where no file exists, and says "kept" otherwise: the file is the
-repository's own from its first write. Kept or written, it then renders the harness's settings,
+`bash <prefix>/policy/adopt-policy.sh --scaffold --preset <name> [--target <repo>]` writes
+`.governance/policy.toml` from `policy.py scaffold --preset <name>` only where no file exists, and
+says "kept" otherwise: the file is the repository's own from its first write. `kit.toml`'s `[adopt]`
+argv passes `--preset {preset}`, so `govkit intake` asks for the preset and records it under the
+target's `[answers]` (KICK-dKeptSession-4 S1). With no file and no `--preset` it refuses, exit 2,
+before any write. Over a kept file, `--preset` runs `policy.py scaffold --preset <name> --kept
+<file>`, which prints the kept-file line where the file's preset is not the answer and rewrites
+nothing; its exit 2, an unknown or unresolved name, ends the adopter before any render (S3). Kept or
+written, it then renders the harness's settings,
 `policy.py settings --write`, and then the JSON mirror, `policy.py mirror --write`
 (TOOL-dGroundRules-25 S7), wherever HEAD resolves, so an adopter's first spawn passes rule 7 without a
 render by hand and its bar's preflight finds the mirror; with no commit yet it prints one line naming

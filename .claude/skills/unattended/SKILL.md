@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.135 -->
+<!-- gov:kit unattended@1.138 -->
 [.claude/skills/unattended/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
 # Unattended runs
@@ -121,6 +121,7 @@ unattended.sh --status <slug>
 unattended.sh --claims  # RUN_CLAIMS on
 unattended.sh --lease acquire build <slug>
 unattended.sh --register problem <subject> <item> <file>
+unattended.sh --mail read <slug> --open
 unattended.sh --card-ref write <slug> --message <file>
 unattended.sh --request <file>
 unattended.sh --request-draw <key> --cause <c> --item <i>

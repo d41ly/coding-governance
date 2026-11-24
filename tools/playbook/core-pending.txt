@@ -121,5 +121,4 @@ leg	roles adopter self-test	dWitnessedBar
 leg	positional (the citation check alone)	dWitnessedBar
 leg	receipt sync (installed files match the receipt)	dWitnessedBar
 kind	kind.tool-kit	dShippedRelease
-kind	kind.preset	dKeptSession
 kind	kind.lens	dCalibratedLens

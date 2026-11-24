@@ -43,7 +43,7 @@ CLASS_EXTENSIONS = ("sh", "py", "js", "json", "toml")
 
 #: The executed-assertion floor for `--selftest`, compared against the count it prints. Raise it with
 #: the arms; it may never be lowered to fit a regression.
-FLOOR_ASSERTIONS = 8
+FLOOR_ASSERTIONS = 9
 
 
 def run_git(root: pathlib.Path, args: list[str], stdin: bytes | None = None) -> bytes:
@@ -68,7 +68,9 @@ def read_index_eol(root: pathlib.Path) -> dict[str, str]:
 
 
 def read_shebang_members(root: pathlib.Path, paths: list[str]) -> list[str]:
-    """The extensionless `paths` whose INDEX blob opens with `#!`, read through one `cat-file --batch`."""
+    """The extensionless `paths` whose INDEX blob opens with `#!`, read through one `cat-file --batch`.
+    A gitlink (mode 160000, a submodule) names a commit of another repository, which this object store
+    need not hold, so it is no file and never a member (TOOL-aFlattenedSeed-1 S2)."""
     if not paths:
         return []
     stage = run_git(root, ["ls-files", "-s", "-z", "--", *paths])
@@ -76,7 +78,11 @@ def read_shebang_members(root: pathlib.Path, paths: list[str]) -> list[str]:
     for rec in stage.split(b"\0"):
         if rec:
             meta, _tab, path = rec.partition(b"\t")
-            blobs[path.decode("utf-8", "surrogateescape")] = meta.split()[1].decode("ascii")
+            mode, sha = meta.split()[:2]
+            if mode != b"160000":
+                blobs[path.decode("utf-8", "surrogateescape")] = sha.decode("ascii")
+    if not blobs:
+        return []
     order = sorted(blobs)
     data = run_git(root, ["cat-file", "--batch"], ("\n".join(blobs[p] for p in order) + "\n").encode("ascii"))
     members, at = [], 0
@@ -169,7 +175,10 @@ def run_selftest() -> int:
         check("a CRLF blob in the index is red although its attribute reads lf",
               [f.split(":")[0] for f in found], ["b.json"])
         check("the index finding names the renormalize remedy", "renormalize" in (found or [""])[0], True)
-        empty = pathlib.Path(scratch, "empty")
+        run_git(repo, ["update-index", "--add", "--cacheinfo", "160000," + "1" * 40 + ",vendor"])
+        check("a gitlink whose commit this store lacks is no member, and the scan does not crash",
+              check_eol(repo)[1], graded)
+        empty =pathlib.Path(scratch, "empty")
         empty.mkdir()
         run_git(empty, ["init", "-q"])
         check("an empty population grades zero members", check_eol(empty), ([], 0))

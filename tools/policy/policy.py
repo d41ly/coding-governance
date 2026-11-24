@@ -7,17 +7,25 @@ shrink-only list of the legacy policy homes, derived from the files they guard (
 gov's own and never installed, a ledger population keyed by conf and key that gov's govkit registry
 registers and the baseline ledger factory grades and writes (TOOL-dWitnessedBar-20), so `lists
 --write` never creates it. The size caps' half, the census, the switch and the `[budgets]` table's
-schema rule `validate` calls, is `budgets.py` beside this file (TOOL-dGroundRules-9).
+schema rule `validate` calls, is `budgets.py` beside this file (TOOL-dGroundRules-9). The named
+presets' store, its check and the repository-preset rule `validate` calls for a file holding a
+`presets` table, `check_repo_presets`, are `presets.py` (KICK-dKeptSession-1). Two more shrink-only
+lists are ledger populations of plain names on that factory, gov's own and never installed as the
+legacy list is (KICK-dKeptSession-69): `unnamed-keys`, the catalogue keys no clause on their owner
+build's row of the design view names (KICK-dKeptSession-19), and `unpurposed-namespaces`, the policy
+namespaces no `[[namespace]]` row of the catalogue gives a purpose (KICK-dKeptSession-16).
 
-    python <this kit>/policy.py lists --check   # both lists against their derivations and baselines
-    python <this kit>/policy.py lists --write   # drain both lists; neither ever gains a row
-    python <this kit>/policy.py lists --derive legacy-homes   # the legacy list's seed: <conf> TAB <key> TAB 1
+    python <this kit>/policy.py lists --check   # the four lists against their derivations and baselines
+    python <this kit>/policy.py lists --write   # drain the four lists; none ever gains a row
+    python <this kit>/policy.py lists --derive <population>   # a ledger list's seed: its key fields TAB 1
     python <this kit>/policy.py lists --marks legacy-homes    # each derived key's mark: <conf> TAB <key> TAB <mark>
-    python <this kit>/policy.py scaffold        # print the starter .governance/policy.toml
-    python <this kit>/policy.py get <key> [--rev <rev>] [--explain] [--json]   # one key's value
+    python <this kit>/policy.py scaffold --preset <name>   # print the starter .governance/policy.toml
+    python <this kit>/policy.py scaffold --preset <name> --kept <file>   # one line where <file>'s preset differs
+    python <this kit>/policy.py get <key> [--rev <rev>] [--build <slug>] [--explain] [--json]   # one key's value
     python <this kit>/policy.py check [--rev <rev>]   # the file at a revision, HEAD by default
     python <this kit>/policy.py mirror --write | --check | --print   # .governance/policy.json, rendered at HEAD
     python <this kit>/policy.py settings [--write|--check] [<file>]  # the harness's two concurrency settings
+    python <this kit>/policy.py preset --diff [--section | --line] [--rev <rev>]   # the preset and the keys off it
 
 The catalogue, `catalogue.toml` beside this file, is the schema: one row per policy key. A file key
 is matched to a row as a tuple of SEGMENTS, never as a joined string, because a quoted TOML segment
@@ -32,7 +40,10 @@ working tree, and parses it with tomllib, never by sourcing it: `read_policy_key
 unattended kit, carried to TOML. The landed revision is the remote tip the remote ladder names, or
 with no remote at all the local default branch, and every reason names its sha through the read's
 one `rev_phrase`, which the mirror's render spells `{rev}` (TOOL-dGroundRules-65). A key resolves in
-RESOLUTION_ORDER, spelled once: the file's value, then the catalogue default with its reason. A
+RESOLUTION_ORDER, spelled once: the file's value, then for a read naming a build the slot of the
+scenarios that build is placed under, read through the loop kit's `scenario.py slots`
+(KICK-dKeptSession-20), then the value of the preset the file names, from `presets.py`'s one
+assignment (KICK-dKeptSession-2), then the catalogue default with its reason. A
 file `validate` refuses never reads a default: the whole file falls back to its last valid revision
 on the first-parent history, or refuses at a line, as that revision's `policy-file.on-invalid` says.
 
@@ -41,6 +52,11 @@ THE MIRROR, `.governance/policy.json`, is the copy JavaScript reads, since a hoo
 catalogue there; `mirror --write` writes it at HEAD, which every landing runs through this kit's
 `[[generated]]` row; `policy-mirror.js` beside this file is its one reader, and takes a key from
 the landed revision's mirror only while both ids match the blobs there.
+
+THE PRESET DIFF, `preset --diff` (KICK-dKeptSession-3), prints the preset the file names, `standard (the
+default)` where it names none, then each key its assignment holds whose value `resolve_read` answers
+otherwise, over one `read_revision` read: the charter's preset section (`--section`, bounded by
+PRESET_DIFF_LINES and PRESET_DIFF_LINE_CHARS) and the instruction map's one line (`--line`).
 
 THE AGENT LIMIT, `runtime.agents-in-flight` (TOOL-dGroundRules-10), is lowered by `resolve_read` to a
 `FANOUT_CAP` line `.agent-cap.conf` holds at the revision read, its legacy home, and never raised by
@@ -63,10 +79,11 @@ import tomllib
 from collections import namedtuple
 from pathlib import Path
 
-KIT_POLICY_VERSION = "1.14"
+KIT_POLICY_VERSION = "1.18"
 KIT = Path(__file__).resolve().parent
 CATALOGUE = "catalogue.toml"
 POLICY_REL = ".governance/policy.toml"
+PRESETS_TABLE = "presets"                       # a policy file's table of repository presets (KICK-dKeptSession-1)
 OVERLAY_REL = ".governance/instructions.toml"   # the instruction overlay, whose `[[policy]]` rows join the catalogue's
 ADOPTER = "adopter"                             # the one top segment a repository's own key sits under
 REPOSITORY_OWNER = "repository"
@@ -127,6 +144,14 @@ def load_catalogue(kit):
     message names the line."""
     doc = tomllib.loads((Path(kit) / CATALOGUE).read_text(encoding="utf-8"))
     return doc.get("key", [])
+
+
+def load_namespaces(kit):
+    """The catalogue's `[[namespace]]` rows in file order, each a policy namespace's `name` and its
+    one-sentence `purpose` (KICK-dKeptSession-16 S1). `load_catalogue` reads `[[key]]` alone, so no
+    key reader sees these rows. A file that does not parse raises tomllib's error."""
+    doc = tomllib.loads((Path(kit) / CATALOGUE).read_text(encoding="utf-8"))
+    return doc.get("namespace", [])
 
 
 def render_json(v):
@@ -253,8 +278,11 @@ def read_catalogue_row(path, catalogue):
 
 def scan_keys(doc, rows, prefix=()):
     """Yield (segments, row or None, value) for each key of a parsed policy document. A table is
-    descended into unless a map-valued row names it, so a table's leaves are the keys graded."""
+    descended into unless a map-valued row names it, so a table's leaves are the keys graded. The
+    top-level `presets` table, a repository's declared presets, is `presets.check_repo_presets`'s."""
     for k, v in doc.items():
+        if not prefix and k == PRESETS_TABLE:
+            continue
         segs = prefix + (k,)
         try:
             row = read_catalogue_row(segs, rows)
@@ -592,21 +620,37 @@ def validate(text, rows=None, census=None):
     the decoder's line, key "". Text that parses yields one per leaf its catalogue row refuses, by
     `check_value`, and one per leaf no row matches, each at the line `derive_key_line` finds, then the
     `[budgets]` table's own rule, `budgets.check_budgets` over the cap census `census`, the working
-    directory's by default (TOOL-dGroundRules-9). `rows` is `load_catalogue`'s, this kit's by default.
-    The module's one judge of a policy file."""
+    directory's by default (TOOL-dGroundRules-9). Only for a file holding a top-level `presets` table,
+    a repository's declared presets, the presets' rule follows, `presets.check_repo_presets`, which
+    then judges the `preset` leaf too, admitting a declared name; a file without the table is judged as
+    before it, and one holding it where `presets.py` does not import is one problem naming that module
+    (KICK-dKeptSession-1 S3, §8 F9). No pair rule runs here (§8 F10). `rows` is `load_catalogue`'s,
+    this kit's by default. The module's one judge of a policy file."""
     text = derive_bomless_text(text)
     try:
         doc = tomllib.loads(text)
     except tomllib.TOMLDecodeError as exc:
         at = re.search(r"at line (\d+)", str(exc))  # Python 3.14 carries `lineno`; 3.11 to 3.13 the message
         return [Problem(getattr(exc, "lineno", None) or (int(at[1]) if at else 0), "", str(exc))]
-    out = []
-    for segs, row, value in scan_keys(doc, load_catalogue(KIT) if rows is None else rows):
+    out, rows, declares = [], load_catalogue(KIT) if rows is None else rows, PRESETS_TABLE in doc
+    for segs, row, value in scan_keys(doc, rows):
+        if declares and segs == ("preset",):
+            continue  # a file declaring presets may name one, so its `preset` is the presets' rule's to admit
         why = "no catalogue row matches this key" if row is None else check_value(row, value)
         if why:
             out.append(Problem(derive_key_line(text, segs), render_dotted(segs), why))
     import budgets  # the caps module beside this file; it imports this one, so never at the top
-    return out + budgets.check_budgets(doc, text, census)
+    out += budgets.check_budgets(doc, text, census)
+    if not declares:
+        return out
+    try:
+        import presets  # the presets' module beside this file, imported alike, and only for a file declaring one
+    except ImportError as exc:
+        first = next(iter(doc[PRESETS_TABLE]), None) if isinstance(doc[PRESETS_TABLE], dict) else None
+        at = derive_key_line(text, (PRESETS_TABLE,) + ((first,) if first is not None else ()))
+        return out + [Problem(at, PRESETS_TABLE, f"the file declares presets and presets.py, their rule, does not "
+                                                 f"import beside {(KIT / 'policy.py').as_posix()}: {exc}")]
+    return out + presets.check_repo_presets(doc, text, rows)
 
 
 def parse_overlay_policies(text):
@@ -697,11 +741,12 @@ def read_last_valid_value(path, row, read):
     at = f"{valid[:8]}, walked back from {read['rev_phrase']}"
     if "on_invalid" not in read:
         on_path = parse_key("policy-file.on-invalid")
-        read["on_invalid"] = read_ordered_value(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), table, at).value
+        read["on_invalid"] = read_ordered_value(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), table, at,
+                                              build=read["build"]).value
     on = read["on_invalid"]
     if on != "last-valid":  # deny by default: only the one fallback value falls back
         raise Refusal(POLICY_REL, first.line, f"{what}; policy-file.on-invalid is {on} at {valid[:8]}")
-    hit = read_ordered_value(path, row, table, at)
+    hit = read_ordered_value(path, row, table, at, build=read["build"])
     # ponytail: the opening names the revision read without its how-phrase, so it takes the phrase's
     # head before ", ": a sha8 holds no comma and the render's `{rev}` none, so the head is one or the other.
     named = read["rev_phrase"].split(", ", 1)[0]
@@ -723,20 +768,105 @@ def check_revision(repo, rev):
     return f"policy: check · every key falls back to the last valid revision · policy-file.on-invalid is {hit.value}: {hit.reason}"
 
 
-def read_file_value(path, row, table, rev_phrase):
-    """Resolution(value, "file", reason) when the parsed `table` sets `path`, else None. `row` is
-    unread: every step of the resolution order shares this signature, `rev_phrase` the read's."""
+def read_file_value(path, row, table, rev_phrase, *, build=None):
+    """Resolution(value, "file", reason) when the parsed `table` sets `path`, else None. `row` and
+    `build` are unread: every step of the resolution order shares this signature, `rev_phrase` the read's."""
     if table is None or path not in table:
         return None
     return Resolution(table[path], "file", f"set in {POLICY_REL} at {rev_phrase}")
 
 
-def read_default_value(path, row, table, rev_phrase):
+# The preset step's two one-slot caches (KICK-dKeptSession-2 S5, §8 F2): the store, parsed once per
+# process, and the last assignment derived, keyed by the preset's name and the declared table's JSON.
+PRESET_STORE_SLOT = []
+PRESET_ASSIGNMENT_SLOT = []
+
+
+def read_kit_presets():
+    """The preset store beside this kit, `presets.load_presets(KIT)`, parsed once per process. A
+    `presets.py` that does not import is a Refusal naming it, as `validate` names it; an absent or
+    unparsable store is the store's own Refusal, re-raised as this module's, since `presets.py`
+    imports this file as `policy`, a second module object when it runs as `__main__`."""
+    if not PRESET_STORE_SLOT:
+        try:
+            import presets  # the presets' module beside this file; it imports this one, so never at the top
+        except ImportError as exc:
+            raise Refusal((KIT / "presets.py").as_posix(), 0, f"presets.py, the named presets' module, does "
+                          f"not import beside {(KIT / 'policy.py').as_posix()}: {exc}") from None
+        try:
+            PRESET_STORE_SLOT.append(presets.load_presets(KIT))
+        except presets.policy.Refusal as exc:
+            raise Refusal(exc.path, exc.line, exc.why) from None
+    return PRESET_STORE_SLOT[0]
+
+
+def read_preset_assignment(name, declared):
+    """{key path: value} for the preset `name`, `presets.derive_preset_assignment` over the store
+    `read_kit_presets` reads and `declared`, the policy file's `[presets]` table nested, kept for the
+    last (name, declared) pair. A name neither the store nor `declared` holds is that function's
+    Refusal, re-raised as this module's."""
+    store = read_kit_presets()
+    import presets  # read_kit_presets imported it, or refused
+    key = (name, render_json(declared))
+    if not PRESET_ASSIGNMENT_SLOT or PRESET_ASSIGNMENT_SLOT[0][0] != key:
+        try:
+            assignment = presets.derive_preset_assignment(name, store, declared)
+        except presets.policy.Refusal as exc:
+            raise Refusal(exc.path, exc.line, exc.why) from None
+        PRESET_ASSIGNMENT_SLOT[:] = [(key, assignment)]
+    return PRESET_ASSIGNMENT_SLOT[0][1]
+
+
+def read_scenario_value(path, row, table, rev_phrase, *, build=None):
+    """Resolution(value, "preset", reason) from the slot of the scenarios the read's build is placed
+    under (KICK-dKeptSession-20 S5), `build` the read's `{"slug", "slot"}`: the override whose key
+    `parse_key` reads as `path`, else the slot's preset's value at the exact path, a shipped preset's
+    through `read_preset_assignment` (§8 F2); else None. No build and a `null` slot answer None before
+    any import, so a kit copy without `presets.py` reads as before, and so does a row `never` names.
+    `table` is unread: the file's own values answer before this step (§8 F1)."""
+    slot = None if build is None else build.get("slot")
+    if slot is None:
+        return None
+    store = read_kit_presets()  # imports presets.py beside this file, or refuses naming it
+    import presets
+    if row.get("name") in presets.derive_never(store):
+        return None
+    for key, held in (slot.get("overrides") or {}).items():
+        if parse_key(key) == path:
+            return Resolution(held["value"], "preset", f"scenario {held['from']} override at {rev_phrase}")
+    named = slot.get("preset")
+    if named:
+        assignment = read_preset_assignment(named["name"], {})
+        if path in assignment:
+            return Resolution(assignment[path], "preset",
+                              f"scenario {named['from']} preset {named['name']} at {rev_phrase}")
+    return None
+
+
+def read_preset_value(path, row, table, rev_phrase, *, build=None):
+    """Resolution(value, "preset", reason) where the parsed `table` names a `preset` whose assignment
+    holds `path`, looked up by exact path alone, else None (KICK-dKeptSession-2 S1). An absent file
+    (`table` None) and a file naming no preset answer None before any import, so a kit copy without
+    `presets.py` reads such a file as before. The assignment is `read_preset_assignment` over the
+    file's declared presets, `presets.derive_declared_presets`; a `never` key is in none, so it
+    misses. `row` is unread; the reason names the revision only through `rev_phrase`."""
+    if table is None or ("preset",) not in table:
+        return None
+    name = table[("preset",)]
+    read_kit_presets()  # imports presets.py beside this file, or refuses naming it
+    import presets
+    assignment = read_preset_assignment(name, presets.derive_declared_presets(table))
+    if path not in assignment:
+        return None
+    return Resolution(assignment[path], "preset", f"preset {name} at {rev_phrase}")
+
+
+def read_default_value(path, row, table, rev_phrase, *, build=None):
     """Resolution(the row's default, "default", reason), the reason naming the revision by
-    `rev_phrase` and the case: the file absent (`table` None) or present and not setting `path`, then
-    any `preset` the file names, which is not applied. A row with no `default` is a Refusal naming
-    it, never an invented value, and so is a row whose default is `{ derived = "..." }`: its prose is
-    no value, and a table read as one would be (TOOL-dGroundRules-21 S12)."""
+    `rev_phrase` and the case: the file absent (`table` None) or present and not setting `path`. A
+    row with no `default` is a Refusal naming it, never an invented value, and so is a row whose
+    default is `{ derived = "..." }`: its prose is no value, and a table read as one would be
+    (TOOL-dGroundRules-21 S12)."""
     if "default" not in row:
         raise Refusal((KIT / CATALOGUE).as_posix(), 0,
                       f"the row {row.get('name')} carries no default, so {render_dotted(path)} has no value to read")
@@ -745,43 +875,70 @@ def read_default_value(path, row, table, rev_phrase):
                       f"so {render_dotted(path)} has no value to read until the file sets it")
     at = f"at {rev_phrase}; the catalogue default"
     reason = f"{POLICY_REL} is absent {at}" if table is None else f"not set in {POLICY_REL} {at}"
-    if table is not None and ("preset",) in table:
-        p = table[("preset",)]
-        reason += (f"; the file names preset {p if isinstance(p, str) else render_json(p)}, "
-                   "not applied until dKeptSession adds presets to this reader")
     return Resolution(row["default"], "default", reason)
 
 
 # The one order a key resolves in (TOOL-dGroundRules-3): `resolve` calls each step with (path, row,
-# table, rev_phrase) and the first Resolution answers. dKeptSession adds its preset step between the two.
-RESOLUTION_ORDER = (read_file_value, read_default_value)
+# table, rev_phrase) and the keyword `build`, and the first Resolution answers: the file, the slot of
+# the scenarios the read's build is placed under (KICK-dKeptSession-20), the preset the file names
+# (KICK-dKeptSession-2), the catalogue default.
+RESOLUTION_ORDER = (read_file_value, read_scenario_value, read_preset_value, read_default_value)
 
 
-def read_ordered_value(path, row, table, rev_phrase):
+def read_ordered_value(path, row, table, rev_phrase, *, build=None):
     """The first Resolution RESOLUTION_ORDER answers for `path` over a parsed `table`, None for an
-    absent file, each reason naming the revision by `rev_phrase`."""
+    absent file, each reason naming the revision by `rev_phrase`; `build` the read's `{"slug", "slot"}`,
+    None for a read naming no build, handed to every step."""
     for step in RESOLUTION_ORDER:
-        hit = step(path, row, table, rev_phrase)
+        hit = step(path, row, table, rev_phrase, build=build)
         if hit is not None:
             return hit
     # Unreachable while the default step stands, which answers or refuses: deny, never a None value.
     raise Refusal(POLICY_REL, 0, f"no step of the resolution order answers {render_dotted(path)} at {rev_phrase}")
 
 
-def read_revision(repo, rev=None, rows=None):
+def read_build_slot(repo, slug, sha):
+    """The slot the build `slug` reads at `sha`: what the loop kit's `scenario.py slots --build <slug>
+    --rev <sha>` prints, parsed, run once with cwd `repo` and `GIT_ENV_LEAKS` unset, as
+    `presets.run_expansion_verb` runs its verb. The loop kit not found is a Refusal carrying the
+    lookup's reason, and the verb exiting non-zero one carrying its first line (KICK-dKeptSession-20 §8
+    F4): a build's posture that cannot be read is refused, never read unscoped."""
+    try:
+        script = resolve_kit_dir("loop", "scenario.py", KIT) / "scenario.py"
+    except LookupError as exc:
+        raise Refusal((KIT / "policy.py").as_posix(), 0, f"--build {slug} reads the loop kit's scenario.py "
+                      f"slots, and {exc}") from None
+    env = {k: v for k, v in os.environ.items() if k not in GIT_ENV_LEAKS}
+    try:
+        p = subprocess.run([sys.executable, str(script), "slots", "--build", slug, "--rev", sha], cwd=str(repo),
+                           env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    except OSError as exc:
+        raise Refusal(script.as_posix(), 0, f"slots did not run: {exc}") from None
+    lines = [ln for ln in (p.stdout + p.stderr).replace("\r", "").splitlines() if ln.strip()]
+    if p.returncode != 0:
+        raise Refusal(script.as_posix(), 0, lines[0] if lines else f"slots exited {p.returncode}")
+    try:
+        return json.loads(p.stdout)
+    except ValueError:
+        raise Refusal(script.as_posix(), 0, f"slots printed no JSON: {lines[0] if lines else '(no output)'}") from None
+
+
+def read_revision(repo, rev=None, rows=None, build=None):
     """The per-revision read `resolve_read` answers from (TOOL-dGroundRules-5): the revision, `rev`
     resolved to a full sha, else the landed one, and how it was found; the policy text there;
     `validate`'s problems; and the parsed table, None for an absent or invalid file. The last valid
     revision, its `policy-file.on-invalid` and the agent limit's `FANOUT_CAP` line join it on first
     need. A dict, so a render reads git once for every key. `rev_phrase`, `<sha8>, <how>`, is the one
     spelling of the revision read that every reason names (TOOL-dGroundRules-65); `render_mirror` sets
-    it to `{rev}`."""
+    it to `{rev}`. `build` is None on a read naming no build, else `{"slug": build, "slot":
+    read_build_slot(...)}`, the verb run once per read at the read's sha (KICK-dKeptSession-20 S3)."""
     sha, how = derive_landed_revision(repo) if rev is None else (resolve_commit(repo, rev), f"--rev {rev}")
     rows = (load_catalogue(KIT) if rows is None else list(rows)) + read_overlay_policies(repo, sha)
     text, problems = read_checked_text(repo, sha, rows)
     table = None if text is None or problems else parse_policy(text)
+    scoped = None if build is None else {"slug": build, "slot": read_build_slot(repo, build, sha)}
     return {"repo": repo, "sha": sha, "how": how, "rev_phrase": f"{sha[:8]}, {how}", "text": text,
-            "problems": problems, "table": table, "rows": rows}
+            "problems": problems, "table": table, "rows": rows, "build": scoped}
 
 
 def resolve_read(path, row, read):
@@ -793,15 +950,16 @@ def resolve_read(path, row, read):
     if read["problems"]:
         hit = read_last_valid_value(path, row, read)
     else:
-        hit = read_ordered_value(path, row, read["table"], read["rev_phrase"])
+        hit = read_ordered_value(path, row, read["table"], read["rev_phrase"], build=read["build"])
     return derive_lowered_limit(hit, read) if path == AGENTS_PATH else hit
 
 
-def resolve(key, repo=".", rev=None):
+def resolve(key, repo=".", rev=None, build=None):
     """-> Resolution for `key`: its path and catalogue row, then `resolve_read` over the revision's
-    read, `rev` resolved to a full sha, else the landed revision."""
+    read, `rev` resolved to a full sha, else the landed revision; `build` a build's slug, whose
+    scenarios' slot the read takes, None for the repository's values alone."""
     path = parse_key(key)
-    read = read_revision(repo, rev)
+    read = read_revision(repo, rev, build=build)
     return resolve_read(path, read_catalogue_row(path, read["rows"]), read)
 
 
@@ -855,10 +1013,12 @@ def derive_lowered_limit(hit, read):
 # ---- the JSON mirror (TOOL-dGroundRules-5) -----------------------------------------------------
 
 MIRROR_REL = ".governance/policy.json"
-# Each legacy input the resolution reads, by its path at the revision read: the mirror records its
-# blob id under `legacy_blobs`, and the helper reads a mirror whose ids differ at L as STALE. A unit
-# adding a resolution input adds its path here (TOOL-dGroundRules-21 S17). The instruction overlay is
-# one: its `[[policy]]` rows are the `adopter.` keys' rows (PLAY-dOrderedCharter-32 S7).
+# Each repository-relative input the resolution reads, by its path at the revision read: the mirror
+# records its blob id under `legacy_blobs`, and the helper reads a mirror whose ids differ at L as
+# STALE (TOOL-dGroundRules-21 S17). The instruction overlay is one: its `[[policy]]` rows are the
+# `adopter.` keys' rows (PLAY-dOrderedCharter-32 S7).
+# The rule for adding one is THE RULE in this kit's `README.md`, "The mirror" (KICK-dKeptSession-60),
+# and the tuple's JS copy is `MIRROR_LEGACY_INPUTS` in policy-mirror.js (KICK-dKeptSession-63 S5).
 LEGACY_INPUTS = (LEGACY_FANOUT, OVERLAY_REL)
 
 
@@ -872,14 +1032,27 @@ def check_json_value(key, value):
     return value
 
 
-def derive_catalogue_rel():
-    """This kit's catalogue as a path from the top of the kit's repository, git's own spelling, or
-    a Refusal where the kit is in no repository. A repository the kit is copied into at its own
-    path, as the fixture does, holds the catalogue at the same path."""
+def derive_kit_rel(name):
+    """The kit's file `name` as a path from the top of the kit's repository, git's own spelling, or
+    a Refusal naming the file where the kit is in no repository. A repository the kit is copied into
+    at its own path, as the fixture does, holds the file at the same path (KICK-dKeptSession-40 S1)."""
     prefix = run_git(KIT, "rev-parse", "--show-prefix")
     if prefix is None:
-        raise Refusal((KIT / CATALOGUE).as_posix(), 0, "the policy kit is in no git repository, so its catalogue has no blob")
-    return prefix.strip() + CATALOGUE
+        raise Refusal((KIT / name).as_posix(), 0, f"the policy kit is in no git repository, so its {name} has no blob")
+    return prefix.strip() + name
+
+
+def derive_catalogue_rel():
+    """This kit's catalogue as a path from the top of the kit's repository: `derive_kit_rel`'s."""
+    return derive_kit_rel(CATALOGUE)
+
+
+def derive_mirror_inputs():
+    """The files the mirror records under `legacy_blobs`, each by its path at the revision read:
+    every LEGACY_INPUTS path, then this kit's preset store, the preset step's input
+    (KICK-dKeptSession-40 S2). The store's path is the kit's prefix, known only once the kit's
+    repository is, so it is no LEGACY_INPUTS literal."""
+    return (*LEGACY_INPUTS, derive_kit_rel("presets.toml"))
 
 
 def check_pattern_name(name):
@@ -928,7 +1101,7 @@ def render_mirror(repo, rev="HEAD"):
     def read_blob(rel):
         return (run_git(repo, "rev-parse", "--verify", "-q", f"{read['sha']}:{rel}") or "").strip() or None
     doc = {"catalogue_blob": read_blob(derive_catalogue_rel()), "keys": keys,
-           "legacy_blobs": {rel: read_blob(rel) for rel in LEGACY_INPUTS}, "policy_blob": read_blob(POLICY_REL)}
+           "legacy_blobs": {rel: read_blob(rel) for rel in derive_mirror_inputs()}, "policy_blob": read_blob(POLICY_REL)}
     return (json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii")
 
 
@@ -1077,6 +1250,120 @@ def write_list(kit):
     return removed
 
 
+# ---- the catalogue's reader join (KICK-dKeptSession-19 S3, S4) ----------------------------------
+
+UNNAMED_LIST = "unnamed-keys.txt"  # the list's file name, for the lines that name it; its home is its registration's
+UNNAMED_POPULATION = "unnamed-keys"  # its population in gov's govkit registry (KICK-dKeptSession-69 S5)
+UNNAMED_WHY = "unnamed and not listed"
+
+
+def load_design_lib(kit):
+    """The memory-tree kit's `design_lib`, its directory found by `resolve_kit_dir` from `kit`, as
+    `check_policy.load_tree_lib` finds `tree_lib` -> the module; LookupError where no memory-tree kit
+    is found or its module does not import."""
+    lib = str(resolve_kit_dir("memory-tree", "design_lib.py", kit))
+    if lib not in sys.path:
+        sys.path.insert(0, lib)
+    try:
+        import design_lib
+    except ImportError as exc:
+        raise LookupError(f"the memory-tree kit at {Path(lib).as_posix()} does not import: {exc}") from None
+    return design_lib
+
+
+def load_design(kit, root):
+    """The design view of the repository at `root`, read once by memory-tree's `read_design` over that
+    repository's conf as `read_design_conf` reads it. LookupError where no memory-tree kit is found
+    from `kit`; `read_design`'s DesignRefusal goes through, its `blank` holding every DESIGN_* key
+    where none is set."""
+    lib = load_design_lib(kit)
+    return lib.read_design(root, lib.read_design_conf(root))
+
+
+def check_design_blank(exc):
+    """True where `exc` is the DesignRefusal of a conf leaving every DESIGN_* key blank, the off
+    state; False for any other DesignRefusal. Anything else is raised again."""
+    blank = getattr(exc, "blank", None)
+    if blank is None:
+        raise exc
+    return set(blank) == set(load_design_lib(KIT).DESIGN_KEYS)
+
+
+def derive_unnamed_keys(rows, design):
+    """The sorted names of the catalogue `rows` whose `name` is among no clause's backticked names,
+    memory-tree's `extract_clause_tokens`, on the row's `owner` build in `design`, the shape
+    `read_design` returns. A placeholder name is matched as spelled, and a row whose owner is no
+    build of the view is unnamed."""
+    tokens = load_design_lib(KIT).extract_clause_tokens
+    named = {b: {t for text, *_rest in clauses.values() for t in tokens(text)}
+             for b, clauses in design["builds"].items()}
+    return sorted(str(r["name"]) for r in rows
+                  if r.get("name") and str(r["name"]) not in named.get(r.get("owner"), ()))
+
+
+def check_unnamed_list(repo, kit, design):
+    """-> ((name, why) findings, note) for the `unnamed-keys` population at `repo` against `kit`'s
+    catalogue joined to `design`, through `check_shrink_list`: the one grade `lists --check` and the
+    gate arm both call (KICK-dKeptSession-69 S6)."""
+    return check_shrink_list(repo, kit, UNNAMED_POPULATION, derive_unnamed_keys(load_catalogue(Path(kit)), design),
+                             UNNAMED_WHY)
+
+
+# ---- the policy namespaces' purposes (KICK-dKeptSession-16) -------------------------------------
+# A policy namespace is the first segment of a dotted key name, and its purpose is a `[[namespace]]`
+# row of the catalogue. The namespaces no row purposes are held on a shrink-only ledger population
+# awaiting review, as `memory.map-purpose`'s default, `review`, says, so a new namespace that declares
+# none reds (KICK-dKeptSession-69 S5).
+
+UNPURPOSED_LIST = "unpurposed-namespaces.txt"  # the list's file name, for the lines that name it
+UNPURPOSED_POPULATION = "unpurposed-namespaces"  # its population in gov's govkit registry (KICK-dKeptSession-69 S5)
+UNPURPOSED_WHY = "a new policy namespace declares no purpose: add a [[namespace]] row"
+
+
+def derive_policy_namespaces(rows):
+    """The sorted distinct first segments of the `[[key]]` `rows` whose `name` carries a dot, a
+    placeholder name's literal first segment included (`review.<stage>` is `review`). A dotless name
+    forms no namespace: its own row's `summary` is its purpose."""
+    return sorted({n.split(".", 1)[0] for n in (r.get("name") for r in rows) if isinstance(n, str) and "." in n})
+
+
+def check_namespaces(rows, namespaces):
+    """(name, why) for each `[[namespace]]` row of `rows` the shape refuses, against the derived
+    `namespaces`: a name that is no derived namespace, a name written twice, an empty or absent
+    `purpose`, and a field other than `name` and `purpose`. A row with no name is named by its place."""
+    out, seen, known = [], set(), set(namespaces)
+    for i, row in enumerate(rows):
+        name = row.get("name")
+        key = name if isinstance(name, str) and name else f"namespace row {i + 1}"
+        if key != name:
+            out.append((key, "lacks the required field `name`"))
+        elif name not in known:
+            out.append((key, "names no policy namespace: no dotted [[key]] name opens with it"))
+        elif name in seen:
+            out.append((key, "is written twice"))
+        seen.add(name)
+        purpose = row.get("purpose")
+        if not isinstance(purpose, str) or not purpose.strip():
+            out.append((key, "declares an empty or absent `purpose`"))
+        out += [(key, f"carries the unknown field `{f}`") for f in row if f not in ("name", "purpose")]
+    return out
+
+
+def derive_unpurposed(rows, namespaces):
+    """The sorted derived `namespaces` no `[[namespace]]` row of `rows` covers: a row covers its
+    `name` where its `purpose` is a non-blank string."""
+    covered = {r.get("name") for r in rows if isinstance(r.get("purpose"), str) and r["purpose"].strip()}
+    return sorted(n for n in namespaces if n not in covered)
+
+
+def check_unpurposed_list(repo, kit):
+    """-> ((name, why) findings, note) for the `unpurposed-namespaces` population at `repo` against
+    `kit`'s catalogue's derived namespaces less its `[[namespace]]` rows, through `check_shrink_list`:
+    the one grade `lists --check` and the gate arm both call (KICK-dKeptSession-69 S6)."""
+    names = derive_unpurposed(load_namespaces(kit), derive_policy_namespaces(load_catalogue(Path(kit))))
+    return check_shrink_list(repo, kit, UNPURPOSED_POPULATION, names, UNPURPOSED_WHY)
+
+
 # ---- the legacy policy homes (TOOL-dGroundRules-7) ----------------------------------------------
 
 LEGACY_LIST = "legacy-homes.txt"  # the list's file name, for the lines that name it; its home is its registration's
@@ -1161,35 +1448,115 @@ def load_ledger(kit=KIT):
     return legacy_ledger
 
 
-def read_legacy_registration(repo, kit=KIT):
-    """-> (the factory, the `[[ledger]]` registration whose `population` is LEGACY_POPULATION at
-    `repo`), read by the factory's `read_registrations` over the tracked descriptors and govkit
-    registry, or None where none names it. This module never spells the list's path: its home is the
-    registration's. A refused registration, or a factory that does not load, is a Refusal."""
+def read_legacy_registration(repo, kit=KIT, population=LEGACY_POPULATION):
+    """-> (the factory, the `[[ledger]]` registration whose `population` is `population` at `repo`,
+    LEGACY_POPULATION unless a caller names one of the plain-name populations), read by the factory's
+    `read_registrations` over the tracked descriptors and govkit registry, or None where none names
+    it. This module never spells a list's path: its home is the registration's. A refused
+    registration, or a factory that does not load, is a Refusal."""
     try:
         ll = load_ledger(kit)
     except (LookupError, ImportError) as exc:
-        raise Refusal(LEGACY_LIST, 0, f"the baseline ledger factory does not load, so the list cannot be read: {exc}") from None
+        raise Refusal(LEGACY_LIST if population == LEGACY_POPULATION else population, 0,
+                      f"the baseline ledger factory does not load, so the list cannot be read: {exc}") from None
     try:
         regs = ll.read_registrations(repo)
     except ValueError as exc:
-        raise Refusal(LEGACY_POPULATION, 0, f"a [[ledger]] registration is refused: {exc}") from None
-    reg = next((r for r in regs if r.population == LEGACY_POPULATION), None)
+        raise Refusal(population, 0, f"a [[ledger]] registration is refused: {exc}") from None
+    reg = next((r for r in regs if r.population == population), None)
     return None if reg is None else (ll, reg)
 
 
-def check_legacy_graded(repo, kit):
-    """True where the legacy list is graded over the tree at `repo`: `derive_census_tree` answers
-    `source`, a `legacy-homes` registration is read there through `read_legacy_registration`, from
-    `kit`'s memory-tree kit, and its home is a file (TOOL-dWitnessedBar-20 §4 "Reaching the factory").
-    The census is asked first, so an install, whose census answers `adopter`, never loads the factory.
-    The one rule `cmd_lists`, the gate's `arm_legacy_homes` and the `census-source-receipt` case ask.
+def check_legacy_graded(repo, kit, population=LEGACY_POPULATION):
+    """True where the list of `population`, the legacy list unless a caller names another, is graded
+    over the tree at `repo`: `derive_census_tree` answers `source`, a registration of that population
+    is read there through `read_legacy_registration`, from `kit`'s memory-tree kit, and its home is a
+    file (TOOL-dWitnessedBar-20 §4 "Reaching the factory"). The census is asked first, so an install,
+    whose census answers `adopter`, never loads the factory. The one rule `cmd_lists`, the gate's
+    `arm_legacy_homes`, `arm_reader_join` and `arm_purposes`, and the `census-source-receipt` case ask.
     A Refusal from the derivation or the registration is the caller's to report."""
     tree, _held = derive_census_tree(repo)
     if tree != "source":
         return False
-    found = read_legacy_registration(repo, kit)
+    found = read_legacy_registration(repo, kit, population)
     return found is not None and Path(repo, found[1].home).is_file()
+
+
+def read_shrink_base(repo, ll, reg):
+    """The base compare of the ledger population the registration `reg` names, through the factory
+    `ll`'s `compare_to_base` -> its `(findings, why)` unchanged, `findings` None where nothing is
+    compared. Its ValueError is a Refusal at the registration's home."""
+    try:
+        return ll.compare_to_base(repo, reg)
+    except ValueError as exc:  # its rename read, a git that did not answer
+        raise Refusal(reg.home, 0, f"the base compare did not run: {exc}") from None
+
+
+def check_shrink_list(repo, kit, population, derived, unlisted):
+    """-> ((name, why) findings, note) for the plain-name ledger `population` at `repo` against the
+    `derived` names, through the baseline ledger factory's calls for its registration
+    (KICK-dKeptSession-69 S6). The home's first line
+    where it is not the header `render_header` renders, and each row `read_ledger` refuses, as `(the
+    row, its render)`; both ways through `compare_counts`, each derived name at count 1, a derived name
+    the list lacks as `(name, unlisted)` and a listed name no longer derived as stale; under the
+    registration's direction through `compare_to_base`, a listed name the list at the base lacks with
+    no `widened` disposition as added above the base. `note` carries the `compare_to_base` reason,
+    and where it answers no findings it says only the derivation is compared."""
+    found = read_legacy_registration(repo, kit, population)
+    if found is None:
+        raise Refusal(population, 0, f"no [[ledger]] registration names {population}, so the list has no home")
+    ll, reg = found
+    try:
+        first = Path(repo, reg.home).read_bytes().decode("utf-8").split("\n", 1)[0].rstrip("\r")
+        declared, malformed = ll.read_ledger(repo, reg)
+    except (OSError, UnicodeDecodeError) as exc:
+        raise Refusal(reg.home, 0, f"does not read: {exc}") from None
+    header = ll.render_header(reg)
+    out = [] if first == header else [(reg.home, f"opens {first!r}, not its registration's header {header!r}")]
+    out += [(m[2], ll.render_malformed(m)) for m in malformed]
+    measured = {(n,): 1 for n in derived}
+    for finding, key, have, want in ll.compare_counts(measured, {k: v[0] for k, v in declared.items()}, reg.direction):
+        if finding == "undeclared site":
+            out.append((key[0], unlisted))
+        elif finding == "unmeasured row":
+            out.append((key[0], "stale: drain it with `lists --write`"))
+        else:
+            out.append((key[0], f"{finding}: measured {have}, the list holds {want}"))
+    findings, why = read_shrink_base(repo, ll, reg)
+    if findings is None:
+        return out, f"no base compare: {why}; only the derivation is compared"
+    for name, key in findings:
+        out.append((key[0], "added to a shrink-only list above the base" if name == "gained"
+                    else f"{name} against the list at the base"))
+    return out, f"{len(declared)} row(s) at {reg.home}, graded against the base ({why})"
+
+
+def write_shrink_file(repo, ll, reg, declared, keep):
+    """Rewrite the home of the plain-name ledger population the registration `reg` names, through the
+    factory `ll`'s `write_rows`: the rows of `declared` whose name is in `keep`, sorted by key, each
+    row's value as read."""
+    ll.write_rows(repo, reg, {k: declared[k] for k in sorted(declared) if k[0] in keep})
+
+
+def write_shrink_list(repo, kit, population, derived):
+    """Drain the plain-name ledger `population` at `repo` onto the `derived` names through the
+    factory's `write_rows`: each listed name still derived keeps its count, sha and disposition, and
+    the rest leave, so the list shrinks by this verb and grows by none (KICK-dKeptSession-69 S6). It
+    creates no home, only the factory's seed does, and a home holding a malformed row is a Refusal,
+    since a rewrite would drop that row. -> the names drained, sorted."""
+    found = read_legacy_registration(repo, kit, population)
+    if found is None:
+        raise Refusal(population, 0, f"no [[ledger]] registration names {population}, so the list has no home")
+    ll, reg = found
+    try:
+        declared, malformed = ll.read_ledger(repo, reg)
+    except (OSError, UnicodeDecodeError) as exc:
+        raise Refusal(reg.home, 0, f"does not read: {exc}") from None
+    if malformed:
+        raise Refusal(reg.home, 0, f"{ll.render_malformed(malformed[0])}; a rewrite would drop it, so nothing is written")
+    keep = set(derived)
+    write_shrink_file(repo, ll, reg, declared, keep)
+    return sorted(k[0] for k in declared if k[0] not in keep)
 
 
 Row = namedtuple("Row", "home key mark")
@@ -1363,10 +1730,7 @@ def check_legacy_homes(repo, kit):
             refused.append(f"undeclared site {' '.join(key)}: a home holds it and the list lacks it, which no write adds")
         else:
             reports.append(f"{finding} {' '.join(key)}: measured {have}, the list holds {want}")
-    try:
-        findings, why = ll.compare_to_base(repo, reg)
-    except ValueError as exc:  # its rename read, a git that did not answer
-        raise Refusal(reg.home, 0, f"the base compare did not run: {exc}") from None
+    findings, why = read_shrink_base(repo, ll, reg)
     if findings is None:
         notes.append(f"no base compare: {why}; only the derivation is compared")
     else:
@@ -1401,13 +1765,30 @@ def cmd_derive_list(flag, name):
     yields over the tree this kit sits in, sorted, the seed the ledger factory reads; `lists --marks
     legacy-homes` prints `<conf> TAB <key> TAB <mark>` instead, the mark read from GATE_ENV_MARKS and
     the home's kind, never from the list (S3, S6). Notes go to stderr, so stdout holds rows alone.
-    Any other list name exits 2."""
+    `lists --derive unnamed-keys` prints `<name> TAB 1` per name `derive_unnamed_keys` yields over the
+    design `load_design` reads from that tree, and `lists --derive unpurposed-namespaces` per name
+    `derive_unpurposed` yields over this kit's catalogue (KICK-dKeptSession-69 S6); a design that does
+    not read, blank included, exits 2 with its reason, so a seed over it is left unarmed. `--marks`
+    names `legacy-homes` alone. Any other list name exits 2."""
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8", newline="\n")  # a seed reading the rows gets no CR
-    if name != LEGACY_POPULATION:
-        print(f"policy: lists {flag} names {name!r}; the one list it derives is {LEGACY_POPULATION}", file=sys.stderr)
+    named = (LEGACY_POPULATION,) if flag == "--marks" else (LEGACY_POPULATION, UNNAMED_POPULATION, UNPURPOSED_POPULATION)
+    if name not in named:
+        print(f"policy: lists {flag} names {name!r}; the lists it derives are {', '.join(named)}", file=sys.stderr)
         return 2
     top = (run_git(KIT, "rev-parse", "--show-toplevel") or "").strip()
+    if name != LEGACY_POPULATION:
+        try:
+            if not top:
+                raise Refusal(name, 0, "the policy kit is in no git repository, so no design can be read")
+            names = (derive_unnamed_keys(load_catalogue(KIT), load_design(KIT, top)) if name == UNNAMED_POPULATION
+                     else derive_unpurposed(load_namespaces(KIT), derive_policy_namespaces(load_catalogue(KIT))))
+        except (Refusal, LookupError, ValueError) as exc:  # a DesignRefusal is a ValueError
+            print(f"policy: lists {flag} {name} · {exc}", file=sys.stderr)
+            return 2
+        for n in names:
+            print(f"{n}\t1")
+        return 0
     notes = []
     try:
         if not top:
@@ -1435,43 +1816,190 @@ def render_toml_value(v):
     raise ValueError(f"no TOML spelling for {v!r}")
 
 
-def render_scaffold(rows):
+def render_scaffold(rows, preset):
     """The starter policy file: each literal-defaulted row this kit's build owns, one table per first
-    segment, tables sorted, keys in catalogue order."""
+    segment, tables sorted, keys in catalogue order. A `preset` name is written as the file's first
+    key, `preset = "<name>"`, the line after SCAFFOLD_HEADER and above the tables, and a row whose
+    exact path the preset's assignment, `read_preset_assignment(preset, {})`, holds is written as the
+    comment `# <key> = <value> (preset <name>)` instead of its literal, so the file's own values never
+    beat the preset it names (KICK-dKeptSession-32 S1). None writes no such key and every literal
+    row, the bytes the callers that name no preset read (KICK-dKeptSession-4 S2). `preset` takes no
+    default, so a call naming none is a TypeError; the assignment's read refuses as that seam does."""
+    assignment = {} if preset is None else read_preset_assignment(preset, {})
     tables = {}
     for r in rows:
         if r.get("owner") == SCAFFOLD_OWNER and "default" in r and not check_derived(r["default"]):
             segs = str(r["name"]).split(".")
-            tables.setdefault(segs[0], []).append((".".join(segs[1:]), r["default"]))
-    out = SCAFFOLD_HEADER
+            key, path = ".".join(segs[1:]), parse_key(r["name"])
+            line = (f"# {key} = {render_toml_value(assignment[path])} (preset {preset})\n" if path in assignment
+                    else f"{key} = {render_toml_value(r['default'])}\n")
+            tables.setdefault(segs[0], []).append(line)
+    out = SCAFFOLD_HEADER + ("" if preset is None else f"preset = {render_toml_value(preset)}\n")
     for t in sorted(tables):
-        out += f"\n[{t}]\n" + "".join(f"{k} = {render_toml_value(v)}\n" for k, v in tables[t])
+        out += f"\n[{t}]\n" + "".join(tables[t])
     return out
 
 
-USAGE = ("usage: python policy.py lists --check | lists --write | lists --derive legacy-homes | lists --marks legacy-homes"
-         " | scaffold | get <key> [--rev <rev>] [--explain] [--json]"
+# ---- the preset diff (KICK-dKeptSession-3) ------------------------------------------------------
+
+# The `--section` form's bounds: at most PRESET_DIFF_LINES key lines, then one line counting the keys
+# cut, and each line at most PRESET_DIFF_LINE_CHARS characters, under the charter's one-line rule cap
+# (the playbook kit's ONE_LINE_MAX, which this kit cannot import). PINNED 2026-11-21, chosen, not measured.
+PRESET_DIFF_LINES = 12
+PRESET_DIFF_LINE_CHARS = 160
+PRESET_DIFF_VERB = "policy.py preset --diff"
+
+
+def render_preset_diff(read, form=None):
+    """The `preset --diff` lines over one `read_revision` read: `- preset — <name>`, the `preset` key
+    as `resolve_read` answers it, `standard (the default)` where the file names none; then, sorted by
+    key, one `` - `<key>` — <value> (<name>: <preset value>) `` line per key the preset's assignment
+    holds whose resolved value is not the assignment's by `presets.check_same_value`, each value
+    spelled as `get` prints it, a list joined by `, `; `- no key differs` where none does. The
+    assignment is `read_preset_assignment` over `presets.derive_declared_presets` of the read's table,
+    the last valid revision's for an invalid file, as unit 2's step takes it; a key is looked up by
+    exact path alone, so a `never` key or an unassigned derived row is never listed, and a key the
+    file leaves alone whose default is derived, read where the file names no preset, is left alone
+    too: it reads the default `standard` equals. `form` `--section` bounds the lines by
+    PRESET_DIFF_LINES, a last `- … (+<k>)` line naming the verb, and cuts each at
+    PRESET_DIFF_LINE_CHARS with a trailing `…`; `--line` is the map's one line, cut alike. The seam's
+    refusals, `presets.py` not importing, the store not reading and a name no preset holds, and the
+    read's own, are Refusals."""
+    rows = read["rows"]
+    named = resolve_read(("preset",), read_catalogue_row(("preset",), rows), read)
+    name = named.value
+    label = f"{name} (the default)" if named.source == "default" else str(name)
+    table = (read.get("last_valid") or (None, None))[1] if read["problems"] else read["table"]
+    read_kit_presets()  # imports presets.py beside this file, or refuses naming it
+    import presets
+    assignment = read_preset_assignment(name, presets.derive_declared_presets(table))
+
+    def render_value(v):
+        if isinstance(v, list):
+            return ", ".join(render_value(m) for m in v)
+        if isinstance(v, dict):
+            return render_json(v)
+        return v if isinstance(v, str) else render_toml_value(v)
+
+    differ = []
+    for path in sorted(assignment, key=render_dotted):
+        try:
+            hit = resolve_read(path, read_catalogue_row(path, rows), read)
+        except DerivedDefault:
+            continue  # the file leaves it alone and names no preset: it reads the default the preset equals
+        if not presets.check_same_value(hit.value, assignment[path]):
+            differ.append(f"- `{render_dotted(path)}` — {render_value(hit.value)} ({name}: {render_value(assignment[path])})")
+    if form == "--line":
+        lines = [f"preset — {label} · {len(differ)} key(s) differ: {PRESET_DIFF_VERB}"]
+    else:
+        lines = [f"- preset — {label}"] + (differ or ["- no key differs"])
+        if form == "--section" and len(differ) > PRESET_DIFF_LINES:
+            lines = lines[:1 + PRESET_DIFF_LINES] + [f"- … (+{len(differ) - PRESET_DIFF_LINES}) — `{PRESET_DIFF_VERB}`"]
+    if form in ("--section", "--line"):
+        lines = [ln if len(ln) <= PRESET_DIFF_LINE_CHARS else ln[:PRESET_DIFF_LINE_CHARS - 1] + "…" for ln in lines]
+    return lines
+
+
+def cmd_preset(argv):
+    """`preset --diff [--section | --line] [--rev <rev>]`, run in the repository to read: the
+    `render_preset_diff` lines over one `read_revision` read of `rev`, else the landed revision. Exit
+    0; a Refusal prints its `policy: refused` line on stderr and nothing on stdout, exit 2."""
+    import argparse
+    ap = argparse.ArgumentParser(prog="policy.py preset")
+    ap.add_argument("--diff", action="store_true", required=True)
+    form = ap.add_mutually_exclusive_group()
+    form.add_argument("--section", action="store_true")
+    form.add_argument("--line", action="store_true")
+    ap.add_argument("--rev")
+    args = ap.parse_args(argv)
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8", newline="\n")
+    try:
+        lines = render_preset_diff(read_revision(".", args.rev),
+                                   "--section" if args.section else "--line" if args.line else None)
+    except Refusal as exc:
+        print(exc, file=sys.stderr)
+        return 2
+    for ln in lines:
+        print(ln)
+    return 0
+
+
+def cmd_scaffold(argv):
+    """`scaffold --preset <name> [--kept <file>]` (KICK-dKeptSession-4 S2, S3). The name is checked
+    by `check_value` on the catalogue's `preset` row, the reason on stderr and nothing on stdout, exit
+    2, as is a call naming no preset. With no `--kept`, `render_scaffold` with that preset on stdout,
+    LF bytes; a Refusal of the preset's assignment, `presets.py` not importing or the store not
+    reading, prints its line on stderr and nothing on stdout, exit 2 (KICK-dKeptSession-32 S2). With `--kept <file>`, nothing is written: the file's top-level `preset`, through
+    `parse_policy`, the row's default where it names none, and where that is not the name one stdout
+    line naming the file, its preset and the name; a file that does not read, decode or parse prints
+    nothing, its invalidity the mirror step's to report. Exit 0."""
+    flags = {}
+    while argv[:1] in (["--preset"], ["--kept"]) and len(argv) >= 2 and argv[0] not in flags:
+        flags[argv[0]] = argv[1]
+        argv = argv[2:]
+    if argv or "--preset" not in flags:
+        print(USAGE, file=sys.stderr)
+        return 2
+    name, kept = flags["--preset"], flags.get("--kept")
+    rows = load_catalogue(KIT)
+    try:
+        row = read_catalogue_row(("preset",), rows)
+    except Refusal as exc:
+        print(exc, file=sys.stderr)
+        return 2
+    why = check_value(row, name)
+    if why is not None:
+        print(f"policy: scaffold refused · preset · {why}", file=sys.stderr)
+        return 2
+    if kept is None:
+        try:  # the preset's assignment: presets.py not importing or the store not reading refuses
+            text = render_scaffold(rows, name)
+        except Refusal as exc:  # whole or nothing, so the adopter never writes a partial file
+            print(exc, file=sys.stderr)
+            return 2
+        # The bytes, LF, never the text layer's newline translation: one output on every platform,
+        # equal to the blob git stores for a scaffolded file (TOOL-dGroundRules-21 S1).
+        sys.stdout.buffer.write(text.encode("utf-8"))
+        return 0
+    try:
+        named = parse_policy(Path(kept).read_bytes().decode("utf-8")).get(("preset",))
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError):
+        return 0
+    have = row.get("default") if named is None else named
+    if have != name:
+        sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+        print(f"policy: {kept} keeps its preset {render_json(have)}{' (the default)' if named is None else ''}, "
+              f"not the answer {render_json(name)}: the file is the repository's own, so its preset "
+              f"changes by a policy change")
+    return 0
+
+
+USAGE = ("usage: python policy.py lists --check | lists --write | lists --derive <population> | lists --marks legacy-homes"
+         " | scaffold --preset <name> [--kept <file>] | get <key> [--rev <rev>] [--build <slug>] [--explain] [--json]"
          " | check [--rev <rev>] | mirror --write | mirror --check | mirror --print"
-         " | settings [--write|--check] [<settings-file>]")
+         " | settings [--write|--check] [<settings-file>] | preset --diff [--section | --line] [--rev <rev>]")
 
 
 def cmd_get(argv):
-    """`get <key> [--rev <rev>] [--explain] [--json]`, run in the repository to read: the value on
-    stdout, a string as itself, a number or a boolean in TOML's spelling, a list one member per line;
-    under `--json` one JSON object of the Resolution's three fields instead, the form the mirror
-    helper reads through its shim. `--explain` adds `policy: <key> · <source> · <reason>` on stderr.
-    A Refusal prints its line there, nothing on stdout, exit 2."""
+    """`get <key> [--rev <rev>] [--build <slug>] [--explain] [--json]`, run in the repository to read:
+    the value on stdout, a string as itself, a number or a boolean in TOML's spelling, a list one member
+    per line; under `--json` one JSON object of the Resolution's three fields instead, the form the
+    mirror helper reads through its shim. `--build` reads the key as that build reads it, under the
+    slot of the scenarios it is placed under (KICK-dKeptSession-20). `--explain` adds `policy: <key> ·
+    <source> · <reason>` on stderr. A Refusal prints its line there, nothing on stdout, exit 2."""
     import argparse
     ap = argparse.ArgumentParser(prog="policy.py get")
     ap.add_argument("key")
     ap.add_argument("--rev")
+    ap.add_argument("--build")
     ap.add_argument("--explain", action="store_true")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8", newline="\n")  # a shell reading the value gets no CR
     try:
-        hit = resolve(args.key, ".", args.rev)
+        hit = resolve(args.key, ".", args.rev, build=args.build)
         if args.json:
             check_json_value(args.key, hit.value)
     except Refusal as exc:
@@ -1523,7 +2051,7 @@ def cmd_mirror(argv):
         if not top:
             raise Refusal(MIRROR_REL, 0, "the working directory is in no git repository")
         cat = derive_catalogue_rel()
-        for rel in (POLICY_REL, cat, *LEGACY_INPUTS):
+        for rel in (POLICY_REL, cat, *derive_mirror_inputs()):
             here = (run_git(top, "hash-object", "--", rel) or "").strip()
             if here != (run_git(top, "rev-parse", "--verify", "-q", f"HEAD:{rel}") or "").strip():
                 raise Refusal(rel, 0, "uncommitted changes; the mirror renders a revision, commit first")
@@ -1553,23 +2081,30 @@ def cmd_mirror(argv):
 
 
 def cmd_lists(argv):
-    """`lists --check | --write`: both shrink-only lists, the summary list and the legacy-home list.
-    The summary list is read against ONE compare base, `resolve_compare_base` read once here
-    (TOOL-dGroundRules-21 S23), so a branch opened before the default branch dropped a key is never
-    read as adding it; the legacy list's base is the factory's `compare_to_base`, the same merge-bar
-    rule (TOOL-dWitnessedBar-20 S5). `--write` writes neither list where the legacy list refuses."""
+    """`lists --check | --write`: the four shrink-only lists, the summary list, the unnamed-keys list,
+    the legacy-home list and the unpurposed-namespaces list. The summary list is read against ONE
+    compare base, `resolve_compare_base` read once here (TOOL-dGroundRules-21 S23), so a branch opened
+    before the default branch dropped a key is never read as adding it; the other three are ledger
+    populations, whose base is the factory's `compare_to_base`, the same merge-bar rule
+    (TOOL-dWitnessedBar-20 S5). Each population is graded and drained only where `check_legacy_graded`
+    holds for it, and says `not graded` elsewhere (KICK-dKeptSession-69 S6). The unnamed-keys list is
+    graded over the design `load_design` reads once (KICK-dKeptSession-19 S4): where no memory-tree kit
+    is found or every DESIGN_* key is blank, both verbs say it is not graded and touch nothing; any
+    other DesignRefusal is printed, exit 2. `--write` writes no list where the legacy list refuses."""
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8", newline="\n")
     top = (run_git(KIT, "rev-parse", "--show-toplevel") or "").strip()
     with run_without_git_env():  # the block is canonical and inherits this process's environment
         compare = resolve_compare_base(KIT)
-    # The legacy list is gov's own and never installed (TOOL-dWitnessedBar-20 §8 F7): both verbs ask
-    # the gate arm's rule, so an absent list or any tree but gov's source tree grades and writes nothing.
+    # The three ledger lists are gov's own and never installed (TOOL-dWitnessedBar-20 §8 F7,
+    # KICK-dKeptSession-69 §8 F2): both verbs ask the gate arms' rule, so an absent list or any tree
+    # but gov's source tree grades and writes nothing.
     reports, notes, rows, refused = [], [], [], []
     try:
         if not top:
             raise Refusal(LEGACY_LIST, 0, "the policy kit is in no git repository, so no legacy home can be read")
         held = check_legacy_graded(top, KIT)  # the arm's rule (TOOL-dGroundRules-76)
+        graded = {p: check_legacy_graded(top, KIT, p) for p in (UNNAMED_POPULATION, UNPURPOSED_POPULATION)}
         if held and argv == ["--check"]:
             reports, notes, rows, refused = check_legacy_homes(top, KIT)
         elif held:
@@ -1580,17 +2115,48 @@ def cmd_lists(argv):
     except ValueError as exc:  # the factory's row writer refusing its home
         print(f"policy: refused · {LEGACY_LIST} · {exc}", file=sys.stderr)
         return 2
+    design, unnamed_why = None, LEGACY_WITHHELD
+    if graded[UNNAMED_POPULATION]:
+        try:
+            design = load_design(KIT, top)
+        except LookupError as exc:  # a kit copy with no memory-tree kit beside it keeps its other lists
+            unnamed_why = str(exc)
+        except ValueError as exc:
+            if not check_design_blank(exc):
+                print(exc, file=sys.stderr)
+                return 2
+            unnamed_why = str(exc)
     if argv == ["--check"]:
         findings, note = check_list(KIT, compare)
         print(f"policy lists: {LIST} · {note}")
         for n, why in findings:
             print(f"  {n}: {why}")
-        print(f"policy lists: {LEGACY_LIST} · " + (f"{len(rows)} row(s) derived from the legacy homes"
-                                                   if held else f"not graded · {LEGACY_WITHHELD}"))
-        for ln in notes:
-            print(f"legacy homes: {ln}")
-        for r in reports:
-            print(f"  legacy homes: {r}")
+        try:
+            if design is None:
+                print(f"policy lists: {UNNAMED_LIST} · not graded · {unnamed_why}")
+            else:
+                more, note = check_unnamed_list(top, KIT, design)
+                print(f"policy lists: {UNNAMED_LIST} · {note}")
+                for n, why in more:
+                    print(f"  {n}: {why}")
+                findings = findings + more
+            print(f"policy lists: {LEGACY_LIST} · " + (f"{len(rows)} row(s) derived from the legacy homes"
+                                                       if held else f"not graded · {LEGACY_WITHHELD}"))
+            for ln in notes:
+                print(f"legacy homes: {ln}")
+            for r in reports:
+                print(f"  legacy homes: {r}")
+            if graded[UNPURPOSED_POPULATION]:
+                more, note = check_unpurposed_list(top, KIT)
+                print(f"policy lists: {UNPURPOSED_LIST} · {note}")
+                for n, why in more:
+                    print(f"  {n}: {why}")
+                findings = findings + more
+            else:
+                print(f"policy lists: {UNPURPOSED_LIST} · not graded · {LEGACY_WITHHELD}")
+        except Refusal as exc:
+            print(exc, file=sys.stderr)
+            return 2
         n = len(findings) + len(reports)
         print(f"policy lists: {'RED' if n else 'green'} · {n} finding(s)")
         return 1 if n else 0
@@ -1603,10 +2169,28 @@ def cmd_lists(argv):
         return 1
     removed = write_list(KIT)
     print(f"policy lists: wrote {LIST} · drained {len(removed)}: {', '.join(removed) or 'none'}")
-    if held:
-        print(f"policy lists: wrote {LEGACY_LIST} · {len(rows)} row(s)")
-    else:
-        print(f"policy lists: {LEGACY_LIST} · not written · {LEGACY_WITHHELD}")
+    try:
+        if design is None:
+            print(f"policy lists: {UNNAMED_LIST} · not graded · {unnamed_why}")
+        else:
+            removed = write_shrink_list(top, KIT, UNNAMED_POPULATION, derive_unnamed_keys(load_catalogue(KIT), design))
+            print(f"policy lists: wrote {UNNAMED_LIST} · drained {len(removed)}: {', '.join(removed) or 'none'}")
+        if held:
+            print(f"policy lists: wrote {LEGACY_LIST} · {len(rows)} row(s)")
+        else:
+            print(f"policy lists: {LEGACY_LIST} · not written · {LEGACY_WITHHELD}")
+        if graded[UNPURPOSED_POPULATION]:
+            removed = write_shrink_list(top, KIT, UNPURPOSED_POPULATION,
+                                        derive_unpurposed(load_namespaces(KIT), derive_policy_namespaces(load_catalogue(KIT))))
+            print(f"policy lists: wrote {UNPURPOSED_LIST} · drained {len(removed)}: {', '.join(removed) or 'none'}")
+        else:
+            print(f"policy lists: {UNPURPOSED_LIST} · not graded · {LEGACY_WITHHELD}")
+    except Refusal as exc:
+        print(exc, file=sys.stderr)
+        return 2
+    except ValueError as exc:  # the factory's row writer refusing its home
+        print(f"policy: refused · {exc}", file=sys.stderr)
+        return 2
     return 0
 
 
@@ -1619,11 +2203,10 @@ def main(argv):
         return cmd_mirror(argv[1:])
     if argv[:1] == ["settings"]:
         return cmd_settings(argv[1:])
-    if argv == ["scaffold"]:
-        # The bytes, LF, never the text layer's newline translation: one output on every platform,
-        # equal to the blob git stores for a scaffolded file (TOOL-dGroundRules-21 S1).
-        sys.stdout.buffer.write(render_scaffold(load_catalogue(KIT)).encode("utf-8"))
-        return 0
+    if argv[:1] == ["preset"]:
+        return cmd_preset(argv[1:])
+    if argv[:1] == ["scaffold"]:
+        return cmd_scaffold(argv[1:])
     if argv[:1] == ["lists"] and argv[1:] in (["--check"], ["--write"]):
         return cmd_lists(argv[1:])
     if argv[:1] == ["lists"] and len(argv) == 3 and argv[1] in ("--derive", "--marks"):

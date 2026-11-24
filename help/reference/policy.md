@@ -29,6 +29,9 @@ Which exception records excuse a core red: any well-formed record a session wrot
 core.exceptions = "owner-only-expiring"
 ```
 
+## `attendance`
+Documented on [help/loop.md](../loop.md).
+
 ## `policy-file.on-invalid`
 Documented on [help/policy.md](../policy.md).
 
@@ -40,40 +43,40 @@ Whether a hook bypass is only recorded or also refused. Under both values each o
 hooks.bypass = "refused"
 ```
 
-## `asks.acceptance`
-<!-- usage: policy:asks.acceptance 4225e190 -->
-Whether the record door files an ask whose clauses state no acceptance, neither an accept clause nor a seen clause with a run command: refuse it unwritten, or file it and report it not ready, the memory hygiene check grading it after.
+## `deps.messaging`
+Documented on [help/loop.md](../loop.md).
 
-```text
-asks.acceptance = "grade"
-```
-
-## `builds.slug-words`
-<!-- usage: policy:builds.slug-words 849f618e -->
-How many capitalised words a new build slug carries after its node letter, as lo-hi; a changed range binds new mints only, and every slug minted before it still reads.
-
-```text
-builds.slug-words = "2-2"
-```
-
-## `builds.slug-style`
-<!-- usage: policy:builds.slug-style b3a295eb -->
-Where a new build slug's words come from, a humorous pick or a description of the build; the style is recorded with the slug and never changes its shape.
-
-```text
-builds.slug-style = "descriptive"
-```
-
-## `builds.slug-date`
-<!-- usage: policy:builds.slug-date 643d0750 -->
-Whether a build's opened date is left out, shown beside its slug in the generated views, or written into a new slug after the node letter, as eight digits or a hyphenated date.
-
-```text
-builds.slug-date = "shown"
-```
+## `actions.free`
+Documented on [help/orientation-card.md](../orientation-card.md).
 
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
+
+## `notify.owner`
+<!-- usage: policy:notify.owner 42cdf26c -->
+Which events report the build's progress to the owner as one progress line.
+
+```text
+notify.owner = "park-and-landing"
+```
+
+## `mailbox.reads`
+Documented on [help/loop.md](../loop.md).
+
+## `mailbox.notice`
+Documented on [help/loop.md](../loop.md).
+
+## `mailbox.fetch-seconds`
+Documented on [help/loop.md](../loop.md).
+
+## `context.on-full`
+Documented on [help/orientation-card.md](../orientation-card.md).
+
+## `context.threshold`
+Documented on [help/orientation-card.md](../orientation-card.md).
+
+## `card.pointers`
+Documented on [help/orientation-card.md](../orientation-card.md).
 
 ## `instructions.checks`
 <!-- usage: policy:instructions.checks 24ae9920 -->
@@ -303,14 +306,6 @@ What the render gate does with the list of instruction files not yet rendered fr
 instructions.legacy = "refuse"
 ```
 
-## `memory.map-purpose`
-<!-- usage: policy:memory.map-purpose be71b553 -->
-How a record kind with no declared purpose is graded: review, each derived with its source or put to the owner in one ask per namespace; ledger, listed on the purpose-pending ledger; derive, derived with no ask; or refuse, record-kinds red while any lacks one.
-
-```text
-memory.map-purpose = "review"
-```
-
 ## `trace.leg-output`
 <!-- usage: policy:trace.leg-output b5f47620 -->
 Where a failing leg's output tail lives: kept by its hash in the common dir and named in the verdict under either value, and under `tail-by-hash` also committed as a `leg-tail` record by the run-gates kit's `keep_tails.py`.
@@ -331,12 +326,35 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (221)
+## `install.baseline`
+<!-- usage: policy:install.baseline aefb04bc -->
+Whether govkit apply's two reads of your runner, before and after it writes, reuse each leg your runner's reuse cache holds green for unchanged inputs, or execute every leg as before; a runner with no observed_reused template reads as run.
+
+```text
+install.baseline = "run"
+```
+
+## `tests.history-verdicts`
+<!-- usage: policy:tests.history-verdicts 67c74b61 -->
+Whether a history leg keeps each item's verdict in a store under the git common dir, keyed by the commit and blob ids the item reads and by the grading code's bytes, so a run grades only what is new, or regrades all of history on every run.
+
+```text
+tests.history-verdicts = "regraded"
+```
+
+## `tests.fixture-templates`
+<!-- usage: policy:tests.fixture-templates 5d36c962 -->
+Whether a self-test that opts into the template cache builds each base repository once per run, keyed by its builder and its inputs, and gives each case a shared clone of it, or builds and copies a fixture per case as before the cache.
+
+```text
+tests.fixture-templates = "per-case"
+```
+
+## Not yet summarised (216)
 - `preset`
 - `design.forks`
 - `design.reentry`
 - `autonomy`
-- `attendance`
 - `attendance.scope`
 - `policy-file.guard`
 - `policy-file.proof`
@@ -352,7 +370,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `leases.offer-seconds`
 - `deps.coordination`
 - `deps.early-build`
-- `deps.messaging`
 - `landing.order`
 - `card.follows`
 - `placement`
@@ -360,7 +377,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `kickoff.runs`
 - `card.store`
 - `card.snapshot`
-- `actions.free`
 - `resume.partial`
 - `resume.context`
 - `orient.budget`
@@ -382,7 +398,11 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `reuse.propose`
 - `annotations.grammar`
 - `builds.agent-root`
+- `asks.acceptance`
 - `decisions.major`
+- `builds.slug-words`
+- `builds.slug-style`
+- `builds.slug-date`
 - `lexicon.pin`
 - `lexicon.forced`
 - `lexicon.at-commit`
@@ -406,21 +426,14 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `runtime.secret-scan`
 - `plan.ratification`
 - `run.host`
-- `notify.owner`
 - `notify.channel`
 - `notify.owner-items`
 - `run.owner-deadline`
 - `run.on-owner-silence`
 - `run.on-owner-question`
 - `deps.landing`
-- `mailbox.reads`
-- `mailbox.notice`
-- `mailbox.fetch-seconds`
 - `review.follow-up`
 - `prompts.batch`
-- `context.on-full`
-- `context.threshold`
-- `card.pointers`
 - `notices.record`
 - `review.breakpoints`
 - `probe.points`
@@ -528,6 +541,7 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `memory.map-budget`
 - `memory.map-overflow`
 - `memory.map-unfold`
+- `memory.map-purpose`
 - `memory.legacy-anchors`
 - `memory.superseded-slices`
 - `retrofit.drain`

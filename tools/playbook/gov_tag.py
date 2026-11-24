@@ -45,6 +45,39 @@ sys.path.insert(0, str(KIT_DIR))
 import instruction_units  # noqa: E402  PLAY-dOrderedCharter-72: the fixture's kit at this install's layout
 import tag_index as ti  # noqa: E402
 from policy_value import PolicyRefused, read_policy_value  # noqa: E402
+import contextlib
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
 
 POSITIONAL_RE = re.compile(r"\b(BUILD-METHOD)(?:\.md)?`? (M\d+)\b|\b(HYGIENE)(?:\.md)?`? (check \d+)\b")
 
@@ -421,7 +454,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "retired-section-aliased", "retired-section-reminted", "reference-row", "reference-no-h1",
           "foreign-native", "held-native", "positional-no-tree", "positional-absent", "dirty-revert",
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
-          "positional-spec-revbump", "positional-bulk-move", "queued-writers",
+          "positional-spec-revbump", "positional-bulk-move", "positional-archived", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
           "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "repeat-heading", "memory-records")
 #: TOOL-dTotalRecall-9's `memory-records`: a build record whose untagged `## Findings` repeats, a legacy spec, a class
@@ -742,10 +775,7 @@ def run_fixture(plant: str, sets: dict) -> int:
             root = build_tags_fixture(top, plant)
             return run_plant(root, top, plant, sets)
     finally:
-        def remove_readonly(fn, path, _exc):
-            os.chmod(path, stat.S_IWRITE)
-            fn(path)
-        shutil.rmtree(top, onerror=remove_readonly)
+        remove_tree(top)
 
 
 def read_dump(root) -> list[str]:
@@ -1446,6 +1476,9 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         spec = "memory/builds/x/spec/spec.md"
         write_forked_record(root, kit, {spec: cite.format(1)})
         write_commit(root, {spec: cite.format(1) + cite.format(3)}, "the spec's rev bump cites a line")
+        return check()
+    if plant == "positional-archived":  # TOOL-aFlattenedSeed-4: archive/ is frozen as builds/ is
+        write_forked_record(root, kit, {"memory/archive/x/record.md": cite.format(1)})
         return check()
     if plant == "positional-bulk-move":  # PLAY-dOrderedCharter-55 S25: three records moved, a line edited in each
         filler = "".join(f"a line of record {{n}} that the move keeps, the {w}\n" for w in

@@ -430,6 +430,21 @@ check = "memory hygiene"
 purpose = { text = "its writer is `probe.return`: one record per probe, its kind a verification, a reproduction or an experiment, an", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:471" }
 
 [[record-kind]]
+name = "mailbox-message"
+tag = "record.mailbox-message"
+layer = "layer.flow"
+home = "memory/builds/*/build/*-build-*-mailbox-message-*.md"
+id-rule = "<date>-build-<unit id>-mailbox-message-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.mailbox-message.required", fields = ["Id", "From", "To", "Kind", "Subject", "Answers", "State", "Reply", "Ref"] }
+writer = "loop_transition.py record"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "one mailbox message a build's transition disposed, its fields and its body in one fenced block", source = "owner" }
+unarmed = "its writer is the loop kit's transition writer, loop_transition.py"
+
+[[record-kind]]
 name = "view"
 tag = "record.view"
 layer = "layer.memory"
@@ -584,6 +599,20 @@ check = "record-kinds"
 purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
+name = "history-verdicts"
+tag = "record.history-verdicts"
+layer = "layer.flow"
+home = ["<git-common-dir>/history-verdicts/*"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "history_store.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
 name = "health-logs"
 tag = "record.health-logs"
 layer = "layer.runtime"
@@ -661,6 +690,20 @@ home = ["<git-common-dir>/transition-audit-cache"]
 id-rule = ""
 schema = { form = "generated", fields = [] }
 writer = "transition_audit.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "recovery-manifests"
+tag = "record.recovery-manifests"
+layer = "layer.observability"
+home = ["<git-common-dir>/recovery-manifests/*"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "branch_reconcile.py"
 readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "out"

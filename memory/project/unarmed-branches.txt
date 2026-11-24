@@ -165,11 +165,11 @@ skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED l
 skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb A — session A names neither	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb B — the session in a tree with no card file did not print ok	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/lib/refuse-wrong-shell.sh	exit	exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt, so no unbound record was graded	1	b9fecf589fddded92e6eec659d2f63d3cda9a815	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-3-builder-return.md
-tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt the ledger factory refuses or whose count is not 1	1	b9fecf589fddded92e6eec659d2f63d3cda9a815	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-3-builder-return.md
-tools/push-main.sh	exit	branch=$(check_run_branch) || exit 1	1	ee3fb94feaba1bc9205daf3efa7e4d9b3de12128	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md
-tools/push-main.sh	exit	write_prepared_merge "$branch" "$R" >&2 || exit 1	1	ee3fb94feaba1bc9205daf3efa7e4d9b3de12128	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md
-tools/push-main.sh	exit	check_landing_verdict "$(git rev-parse --verify HEAD)" || exit 1	1	0b7e0fceb2fb91cda124074148a284281a387499	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-6-1-builder-return.md
-tools/push-main.sh	exit	check_landing_verdict "$(git rev-parse --verify "refs/heads/$def")" || exit 1	1	0b7e0fceb2fb91cda124074148a284281a387499	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-6-1-builder-return.md
+tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt, so no unbound record was graded	1	b9fecf589fddded92e6eec659d2f63d3cda9a815	widened:2026-11-22-build-TOOL-dWitnessedBar-17-widen-39
+tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt the ledger factory refuses or whose count is not 1	1	b9fecf589fddded92e6eec659d2f63d3cda9a815	widened:2026-11-22-build-TOOL-dWitnessedBar-17-widen-39
+tools/push-main.sh	exit	branch=$(check_run_branch) || exit 1	1	ee3fb94feaba1bc9205daf3efa7e4d9b3de12128	widened:2026-11-22-build-TOOL-dWitnessedBar-4-widen-40
+tools/push-main.sh	exit	write_prepared_merge "$branch" "$R" >&2 || exit 1	1	ee3fb94feaba1bc9205daf3efa7e4d9b3de12128	widened:2026-11-22-build-TOOL-dWitnessedBar-4-widen-40
+tools/push-main.sh	exit	check_landing_verdict "$(git rev-parse --verify HEAD)" || exit 1	1	0b7e0fceb2fb91cda124074148a284281a387499	widened:2026-11-22-build-TOOL-dWitnessedBar-6-widen-41
+tools/push-main.sh	exit	check_landing_verdict "$(git rev-parse --verify "refs/heads/$def")" || exit 1	1	0b7e0fceb2fb91cda124074148a284281a387499	widened:2026-11-22-build-TOOL-dWitnessedBar-6-widen-41
 tools/push-main.sh	exit	push-main: could not stage gov's receipt of the upgrade steps. Aborted (no push).	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 tools/push-main.sh	exit	push-main: could not stage the minted versions. Aborted (no push).	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded

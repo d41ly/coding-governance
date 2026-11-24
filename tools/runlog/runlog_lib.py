@@ -96,7 +96,7 @@ def derive_slug_pattern(build, flags=0):
         return re.compile(build(SLUG_LEGACY % "a-z"), flags)
     return _SLUG_GRAMMAR.SlugPattern(lambda g: build(g.slug_class), flags)
 
-KIT_RUNLOG_VERSION = "1.18"  # gov:kit runlog@1.18
+KIT_RUNLOG_VERSION = "1.19"  # gov:kit runlog@1.19
 
 # The grammar versions this reader knows. A set, so a v2 reader can keep reading v1 lines.
 GRAMMAR_VERSIONS = frozenset({"1"})

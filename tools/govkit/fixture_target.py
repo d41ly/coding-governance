@@ -14,6 +14,41 @@ from __future__ import annotations
 import os
 import pathlib
 import subprocess
+import contextlib
+import shutil
+import tempfile
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
 
 # A calling hook's location variables would point every fixture git call at another repository.
 GIT_LOCATION_VARS = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
@@ -59,12 +94,9 @@ def build_scratch_gov(g: pathlib.Path) -> pathlib.Path:
     return g
 
 
-def build_target(tmp: pathlib.Path, deploy: str | None, name: str = "target",
-                 files: dict | None = None) -> pathlib.Path:
-    """`tmp/<name>`, a repository holding `README.md`, the `deploy` text at
-    `.governance/deploy.toml` where given, and `files` ({path: text or bytes}), committed once as
-    `base`."""
-    t = build_scratch_gov(tmp / name)
+def write_target_files(t: pathlib.Path, deploy: str | None, files: dict | None) -> None:
+    """`t` made a scratch gov holding `README.md`, the `deploy` text and `files`, nothing committed."""
+    build_scratch_gov(t)
     (t / "README.md").write_text("target\n", encoding="utf-8")
     if deploy is not None:
         gov = t / ".governance"
@@ -73,16 +105,36 @@ def build_target(tmp: pathlib.Path, deploy: str | None, name: str = "target",
     for rel, body in (files or {}).items():
         (t / rel).parent.mkdir(parents=True, exist_ok=True)
         (t / rel).write_bytes(body if isinstance(body, bytes) else body.encode("utf-8"))
+
+
+def build_target(tmp: pathlib.Path, deploy: str | None, name: str = "target",
+                 files: dict | None = None, template=None) -> pathlib.Path:
+    """`tmp/<name>`, a repository holding `README.md`, the `deploy` text at
+    `.governance/deploy.toml` where given, and `files` ({path: text or bytes}), committed once as
+    `base`. Given `template`, a `TemplateCache` (TOOL-dQuietDisk-7 S8) whose switch reads `shared`,
+    the base is built once per cache root, keyed by those inputs and this module's own bytes as the
+    builder's definition, and `tmp/<name>` is its `--shared` clone with no remote: three git
+    processes for a cached call, against the eight of a build."""
+    if template is not None and template.mode == "shared":
+        inputs = {"README.md": "target\n", "deploy": deploy,
+                  "definition": pathlib.Path(__file__).read_bytes()}
+        inputs.update({"files/" + rel: body for rel, body in (files or {}).items()})
+        base = template.resolve_template("fixture_target.build_target", inputs,
+                                         lambda repo: write_target_files(repo, deploy, files))
+        return template.build_clone(base, tmp / name)
+    t = tmp / name
+    write_target_files(t, deploy, files)
     run_git(t, "add", "-A")
     run_git(t, "commit", "-qm", "base")
     return t
 
 
-#: The five answers shapes 6 and 7 fix over the stubs (PLAY-dOrderedCharter-80 S7), one constant so the
+#: The six answers shapes 6 and 7 fix over the stubs (PLAY-dOrderedCharter-80 S7), one constant so the
 #: default install and the aged one cannot drift apart. Moved here from `matrix.py` with the two
 #: functions below at their second consumer, the deployer suite's recall closure (TOOL-dTotalRecall-21 S11).
 INSTALL_ANSWERS = {"memory_root": "memory", "playbook_path": "docs/PARALLEL.md", "playbook_dir": "docs",
-                   "manifest_path": "docs/SESSION-KICKOFF.md", "user_skills": "~/.claude/skills"}
+                   "manifest_path": "docs/SESSION-KICKOFF.md", "user_skills": "~/.claude/skills",
+                   "preset": "standard"}
 
 
 def derive_bullet_placeholders() -> set[str]:
@@ -176,7 +228,7 @@ def check_inherited_config() -> int:
         p = run_env_git(ctl, "-c", "commit.gpgsign=false", "commit", "--allow-empty", "-qm", "c")
         add_result(p.returncode == 0, "liveness: the control's commit with commit.gpgsign=false exits 0 "
              f"(exit {p.returncode})", True)
-        shutil.rmtree(canary, ignore_errors=True)
+        remove_tree(canary)
 
         try:
             t = build_target(d, None)

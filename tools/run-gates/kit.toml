@@ -18,6 +18,10 @@ requires_if = [{ kit = "memory-tree", why = "TOOL-dTotalRecall-5 S8: run-gates.s
 # PLAY-dOrderedCharter-17: the selection's govkit read is a declared slot with its fallback.
 optional = [
   { part = "run-gates.sh", point = "point.flow.version", fallback = "the owner and epoch columns read unreachable" },
+  { part = "keep_tails.py", point = "point.memory.record-home", fallback = "with no run log's secret scanner the tail is refused, and none is committed unscanned" },
+  { part = "leg_factory.py", point = "point.flow.leg-pack", fallback = "with no deployer kit --write, --check, --list and new exit 2 naming the places looked" },
+  { part = "product_tests.py", point = "point.flow.leg-pack", fallback = "its gov-only fixture refuses where the guardrails kit does not resolve" },
+  { part = "verdict_flow.py", point = "point.runtime.reading", fallback = "with no drift kit the flakes line reads gate-health and names the absence, never a refusal" },
 ]
 
 [[files]]

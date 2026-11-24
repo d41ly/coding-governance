@@ -25,6 +25,7 @@ memory/builds/aDistilledCharter/README.md	1	94e17798f6864c5eeca6201efc5ab643c93a
 memory/builds/aDrainedSluice/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/aEvidencedLens/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/aFerriedDossier/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
+memory/builds/aFlattenedSeed/README.md	1	3d6c1702afb6c2e86638785950d80657a187192c	seeded
 memory/builds/aFoldedQuarry/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/aFrugalTurnstile/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/aFusedCharter/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
@@ -128,6 +129,7 @@ memory/builds/aWindowedPass/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0
 memory/builds/aWireWarden/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/aWitnessedCrash/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/aWokenSentinel/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
+memory/builds/aWrappedRoster/README.md	1	3d6c1702afb6c2e86638785950d80657a187192c	seeded
 memory/builds/aWrittenMethod/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/bConvergentLodestar/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/bTamedTempest/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
@@ -191,6 +193,7 @@ memory/builds/dPinnedHandoff/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee
 memory/builds/dPlacedRequest/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/dPolishedVitrine/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/dPromptedSeam/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
+memory/builds/dQuietDisk/README.md	1	3d6c1702afb6c2e86638785950d80657a187192c	seeded
 memory/builds/dRankedPlan/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/dRatifiedSeam/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded
 memory/builds/dRedressedBar/README.md	1	94e17798f6864c5eeca6201efc5ab643c93abee0	seeded

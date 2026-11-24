@@ -937,5 +937,75 @@ has   "range prebuilt: the unit is named built before its run" "$o" "ARCH-tBR-1 
 hasnt "range prebuilt: the repair is not reported as a briefless build" "$o" "ARCH-tBR-1 — BUILT at"
 rm -rf "$T"
 
+# ---- TOOL-dQuietDisk-3 AC2 AC3 AC8: THE HISTORY VERDICT STORE serves an outcome only while its key
+# ---- holds. A warm store gains a commit naming an unbuilt unit, a commit moving a finished build's
+# ---- claim, and a commit adding a retired record that makes the claim again; each reads as a cold leg
+# ---- would. Items cut one byte short regrade, so the output equals the run with no store at all.
+# ---- Every commit carries its own committer second, since candidates sharing one are never stored.
+# ---- Staged red by serving the stored outcome without the key: drop the candidates, HEAD's claim and
+# ---- the retired records from the unit item's fields.
+T=$(mktemp -d) || exit 2
+( cd "$T" || exit 2
+  git init -q . && git checkout -q -b main
+  git config user.email t@t; git config user.name t; git config commit.gpgsign false; git config core.autocrlf false
+  bq=1780000000
+  mkdir -p ${PFX}${KIT_NAME} memory/builds/tQ/prompts memory/builds/tP
+  cp "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$KIT/check-brief-recorded.sh" "$KIT/commit_trailers.py" \
+     "$KIT/history_store.py" ${PFX}${KIT_NAME}/
+  printf 'MEMORY_ROOT=memory\nBRIEF_RECORDED_CUTOFF="2026-01-01"\nSHARED_RECORDS="memory/DECISIONS.md memory/backlog"\n' > .unattended.conf
+  for s in tQ tP; do
+    { printf -- '---\nslug: %s\nnode: t\nopened: 2026-06-01\nstreams: tooling\nroster: ARCH\nids: ARCH-%s-1\n---\n# %s\n' "$s" "$s" "$s"
+      printf '<!-- gen:build-index -->\n<!-- gen:build-units -->\n| Unit | Order | Tier | Status | Rev | Last change |\n|---|---|---|---|---|---|\n'
+      for u in 1 2; do [ "$s$u" = tP2 ] || printf '| [ARCH-%s-%s — unit](spec/s%s.md) | %s | 2 | CLOSED | rev-1 | 2026-06-01 |\n' "$s" "$u" "$u" "$u"; done
+      printf '<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n'; } > memory/builds/$s/README.md
+  done
+  git add -A >/dev/null; bq=$((bq+60)); GIT_COMMITTER_DATE="@$bq +0000" git commit -q -m "fixture base" --no-verify
+  B=$(git rev-parse HEAD)
+  printf '# tQ\n## Run facts\nbase: %s\nphase: BUILDING\nwitness: %s\n## Parked\n' "$B" "$B" > memory/builds/tQ/RUN.md
+  printf '# tP\n## Run facts\nbase: %s\nphase: LANDED\nwitness: %s\n## Parked\n' "$B" "$B" > memory/builds/tP/RUN.md
+  git add -A >/dev/null; bq=$((bq+60)); GIT_COMMITTER_DATE="@$bq +0000" git commit -q -m "run state" --no-verify
+  printf 'the brief\n' > memory/builds/tQ/prompts/b1.md
+  printf '\n2026-06-02T00:00:00Z brief · item ARCH-tQ-1 · reason %s memory/builds/tQ/prompts/b1.md\n' \
+    "$(git hash-object memory/builds/tQ/prompts/b1.md | cut -c1-12)" >> memory/builds/tQ/RUN.md
+  printf 'q1\n' > ${PFX}q1.sh; git add -A >/dev/null; bq=$((bq+60)); GIT_COMMITTER_DATE="@$bq +0000" git commit -q -m "ARCH-tQ-1: build the thing" --no-verify
+  printf 'p1\n' > ${PFX}p1.sh; git add -A >/dev/null; bq=$((bq+60)); GIT_COMMITTER_DATE="@$bq +0000" git commit -q -m "ARCH-tP-1: built by hand after the run" --no-verify
+) >/dev/null 2>&1
+HS_DIR="$T/.git/history-verdicts/v1/brief-recorded"
+( cd "$T" && bash "$LEG" ) >/dev/null 2>&1; o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "store warm: a conforming history stays green, exit code" "$rc" "0"
+has   "store warm: the post-run unit is announced from the store" "$o" "NOT GRADED — ARCH-tP-1"
+q_n=$(find "$HS_DIR/items" -type f 2>/dev/null | grep -c .)
+same  "store warm: the cold run wrote unit items" "$([ "$q_n" -gt 0 ] && echo some)" "some"
+# AC3 - one unit's candidates move: the unbuilt unit gains a briefless product commit
+( cd "$T" && printf 'q2\n' > ${PFX}q2.sh && git add -A >/dev/null \
+  && GIT_COMMITTER_DATE="@1790000000 +0000" git commit -q -m "ARCH-tQ-2: build the thing" --no-verify ) >/dev/null 2>&1
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "store moved candidates: the unit is regraded and reds, exit code" "$rc" "1"
+has   "store moved candidates: the briefless unit is named" "$o" "ARCH-tQ-2 — BUILT at"
+hasnt "store moved candidates: the unit whose key held is not named" "$o" "ARCH-tQ-1 — BUILT at"
+# AC3 - the finished build's claim moves at HEAD, so its unit is graded anyway and reds
+( cd "$T" && sed -i 's/^phase: LANDED$/phase: BUILDING/' memory/builds/tP/RUN.md && git add -A >/dev/null \
+  && GIT_COMMITTER_DATE="@1790000100 +0000" git commit -q -m "records(tP): live again" --no-verify ) >/dev/null 2>&1
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "store moved claim: exit code" "$rc" "1"
+has   "store moved claim: the unit is graded anyway" "$o" "GRADED ANYWAY — ARCH-tP-1"
+has   "store moved claim: and redded for the missing row" "$o" "ARCH-tP-1 — BUILT at"
+# AC3 - a retired record makes the original claim again, so the unit is built after its run once more
+( cd "$T" && B=$(sed -n 's/^base: //p' memory/builds/tP/RUN.md) \
+  && printf '# tP\n## Run facts\nbase: %s\nphase: LANDED\nwitness: %s\n## Parked\n' "$B" "$B" > memory/builds/tP/RUN.LANDED.0123abcd.md \
+  && git add -A >/dev/null && GIT_COMMITTER_DATE="@1790000200 +0000" git commit -q -m "records(tP): a retired record" --no-verify ) >/dev/null 2>&1
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+has   "store moved retired records: the unit is not graded" "$o" "NOT GRADED — ARCH-tP-1"
+has   "store moved retired records: the retired record makes the claim" "$o" "RUN.LANDED.0123abcd.md still makes that claim at HEAD"
+hasnt "store moved retired records: the unit is no violation" "$o" "ARCH-tP-1 — BUILT at"
+# AC8 - every item cut one byte short regrades: the output equals a run with no store at all
+o=$(cd "$T" && bash "$LEG" 2>&1)
+for f in $(find "$HS_DIR/items" -type f 2>/dev/null); do truncate -s -1 "$f"; done
+o2=$(cd "$T" && bash "$LEG" 2>&1)
+rm -rf "$HS_DIR"; o3=$(cd "$T" && bash "$LEG" 2>&1)
+same  "store torn: items cut short read as a regrade" "$o2" "$o3"
+same  "store torn: the warm output equals the storeless one" "$o" "$o3"
+rm -rf "$T"
+
 echo "--- $n arms, exit $st"
 exit $st

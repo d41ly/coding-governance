@@ -25,7 +25,7 @@ gotcha-classes = ["nt-against-a-missing-file-is-true.md",
   "trapped-signal-waits-for-the-foreground-child.md", "fixed-sleep-does-not-place-a-signal.md",
   "staged-break-runs-stale-bytecode.md", "withheld-value-recovered-from-a-derived-one.md",
   "join-key-widened-by-a-shared-location.md",
-  "retirement-inventory-misses-readers-by-value.md"]
+  "retirement-inventory-misses-readers-by-value.md", "docstring-misnames-a-returned-value.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

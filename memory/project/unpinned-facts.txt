@@ -11355,7 +11355,6 @@ memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-1-reground-r
 memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-a.md	267 rows	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-64-promoted-fix-return.md	3 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	15 calls	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	64 specs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-6-spec-reviewer.md	10 specs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-6-spec-reviewer.md	26 specs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-7-spec-writer.md	49152 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -11395,37 +11394,14 @@ memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-57-spec-a
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	48KiB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	5 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-12.md	1800 seconds	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-13.md	122 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-13.md	541 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-14.md	117 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-14.md	200000 tokens	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-15.md	10s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-21.md	20 seconds	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-21.md	23 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-24.md	4096 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-24.md	60 seconds	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-24.md	7200 seconds	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-3.md	160 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	150000 tokens	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	210 MB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	900000 tokens	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	967091 tokens	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-38.md	37 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	10 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	12 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	30 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	60 seconds	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-47.md	4 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-47.md	50000 tokens	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-5.md	6 commits	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-53.md	27 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-53.md	3 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	22 rows	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	4 citations	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-59.md	4 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-6.md	0 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-6.md	103 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	12 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	22 rows	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	5 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	30 calls	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12603,6 +12579,10 @@ memory/builds/dPromptedSeam/reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-3-d
 memory/builds/dPromptedSeam/reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-2.md	10s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPromptedSeam/reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-2.md	8s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPromptedSeam/spec/2026-08-25-spec-dPromptedSeam-3.md	5 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	11,442 files	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	120 s	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	1557 lines	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	60 s	1	9e390ac1dcdf18ef1259be76d7c9df9d87648a13	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
 memory/builds/dRankedPlan/RUN.md	390s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dRankedPlan/build/2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md	16 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dRankedPlan/build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md	122 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -15128,3 +15108,4 @@ memory/map/features/row-grammar.md	137 rows	1	9e21ac760dc0a43d6ed007396922722cce
 memory/map/features/runlog.md	100,000 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/features/unattended-mandate.md	2 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/generated/CARDS.md	1024 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	69 specs	1	271522b238d91bd98e8a5dbc39dd717d759dc1b2	widened:2026-11-24-build-KICK-dKeptSession-89-widen-10

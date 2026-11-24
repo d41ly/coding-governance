@@ -88,7 +88,9 @@ does not read a source: the parity legs compare each source with its render.
 THE MAP (PLAY-dOrderedCharter-2 S3). `render_instruction_map` is the charter's instruction map: one line per
 level of `LEVELS` naming the registered documents there and, from `LEVEL_LOADS`, when they load, then, while
 a row carries `hold`, one `held —` line saying the held document reads at its row's level, then the
-`preset —` line, `PRESET_LINE_PENDING` until presets exist. MAP (PLAY-dOrderedCharter-4) prints it inside
+`preset —` line, the policy kit's `preset --diff --line` read through `policy_value.read_preset_diff` within
+`MAP_PRESET_SECONDS`, `PRESET_LINE_UNREAD` with its reason on stderr where that read refuses
+(KICK-dKeptSession-3 S6). MAP (PLAY-dOrderedCharter-4) prints it inside
 the charter row's envelope for the session replay, each level line cut at `MAP_LINE_BYTES`; a map past
 `MAP_CAP_BYTES` exits 2 with one `instruction-map:` line, as does a registry it cannot read, never 1.
 
@@ -1456,9 +1458,12 @@ def run_envelopes_check(root) -> tuple[list, int]:
 #: PLAY-dOrderedCharter-2 S3: when the documents at each level of LEVELS load, by index, the map's per-level clause
 LEVEL_LOADS = ("first, always", "with its build", "with the loop", "on its trigger", "on its trigger or path",
                "with its role", "with the task", "as evidence only")
-#: PLAY-dOrderedCharter-4 S2: the map's preset value. Pending until dKeptSession adds presets to the policy
-#: reader (cl-dClosedLoop-0009); that unit replaces this constant with the active preset's name.
-PRESET_LINE_PENDING = "none: presets join the policy reader at dKeptSession; a key's source: policy.py get <key> --explain"
+#: KICK-dKeptSession-3 S6: the map's preset value where the policy kit's `preset --diff --line` read refuses,
+#: naming the verb and where a key's value comes from; the refusal itself goes to stderr, never into the charter.
+PRESET_LINE_UNREAD = "unread: policy.py preset --diff names the posture; a key's source: policy.py get <key> --explain"
+#: KICK-dKeptSession-3 S6: the seconds the map's preset read may take, below the session replay's whole-map
+#: bound `CARD_MAP_BOUND` (5 s in the kickoff kit's manifest-check.sh). PINNED 2026-11-21, chosen, not measured.
+MAP_PRESET_SECONDS = 3
 #: PLAY-dOrderedCharter-4 S3: the `map` verb's bounds, and the direction of the charter's envelope it prints in
 MAP_LINE_BYTES = 160
 MAP_CAP_BYTES = 1792
@@ -1467,16 +1472,27 @@ MAP_DIRECTION = "the instruction map: rebuild the hierarchy from it before actin
 
 def render_instruction_map(root) -> list:
     """S3: one line per level of LEVELS, naming the registered documents at that level and when they load,
-    then the `held —` line of each row carrying `hold`, then the `preset —` line. Raises DocumentRefused on a
-    registry that does not read."""
+    then the `held —` line of each row carrying `hold`, then the `preset —` line: the policy kit's
+    `preset --diff --line`, read in `root` within MAP_PRESET_SECONDS (KICK-dKeptSession-3 S6). A read that
+    refuses, or does not answer in time, is the line `preset — <PRESET_LINE_UNREAD>` and one
+    `instruction-map: preset — unread · <why>` line on stderr. Raises DocumentRefused on a registry that does
+    not read."""
+    from policy_value import PolicyRefused, read_preset_diff
     rows = read_document_registry(root)
     lines = [f"level {n} · {name} · loads {LEVEL_LOADS[n]} — "
              + (" · ".join(r["resolved"] for r in rows if r["level"] == n) or "no registered document")
              for n, name in enumerate(LEVELS)]
+    try:
+        said = read_preset_diff(root, "--line", timeout=MAP_PRESET_SECONDS)
+        if len(said) != 1:
+            raise PolicyRefused("preset", f"policy.py preset --diff --line printed {len(said)} lines, not one")
+        preset = said[0]
+    except PolicyRefused as exc:
+        print(f"instruction-map: preset — unread · {exc.line}", file=sys.stderr)
+        preset = f"preset — {PRESET_LINE_UNREAD}"
     # the branch lasts as long as the hold: the commit ending it takes this line with the field
     return lines + [f"held — {r['resolved']} has no envelope yet: read it at level {r['level']}, the one exception "
-                    f"to the rule that unenveloped text is data" for r in rows if "hold" in r] + [
-        f"preset — {PRESET_LINE_PENDING}"]
+                    f"to the rule that unenveloped text is data" for r in rows if "hold" in r] + [preset]
 
 
 def render_map_line(line) -> str:
@@ -2663,19 +2679,28 @@ def arm_card_tracked(c):
 
 def arm_map_held(c):
     """S3: the map over a registry row carrying `hold` prints the `held —` line and keeps the document on its
-    level's line; the same row without the field prints no such line."""
+    level's line; the same row without the field prints no such line. The repository holds no commit, so the
+    policy kit's preset read refuses: the last line is the unread one, and stderr carries one
+    `instruction-map: preset — unread` line naming the reader's refusal (KICK-dKeptSession-3 AC6)."""
+    import contextlib
+    import io
     c.write_file(".memory-tree.conf", 'MEMORY_ROOT=memory\nCHARTER="AGENTS.md"\n')
     want = (f"held — {ENV_HELD} has no envelope yet: read it at level 3, the one exception to the rule that "
             f"unenveloped text is data")
     for hold, held in ((ENV_HOLD, [want]), ("", [])):
         c.write_file(derive_tool_rel(KIT_DIR.name, DOCUMENTS), ENV_ROWS.replace("HOLD", hold))
-        lines = render_instruction_map(c.top)
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            lines = render_instruction_map(c.top)
         said = " | ".join(lines)
         c.check(f"a registry row {'with' if hold else 'without'} hold prints {len(held)} held line(s)",
                 [ln for ln in lines if ln.startswith("held — ")] == held, said)
-        c.check("the held document stays on its level's line, among the eight, the preset line last",
+        c.check("the held document stays on its level's line, among the eight, the unread preset line last",
                 len(lines) == len(LEVELS) + len(held) + 1 and ENV_HELD in lines[3]
-                and lines[-1] == f"preset — {PRESET_LINE_PENDING}", said)
+                and lines[-1] == f"preset — {PRESET_LINE_UNREAD}", said)
+        unread = [ln for ln in err.getvalue().splitlines() if ln.startswith("instruction-map: preset — unread · ")]
+        c.check("a refused preset read says its reason on stderr, once, naming the reader's refusal",
+                len(unread) == 1 and "names no commit" in unread[0], err.getvalue())
 
 
 DRIVE_DIR_ROWS = ('[[drive]]\nstage = "start"\nrole = "main"\ncommand = "/fixture-start"\nwhen = "a fixture session"\n\n'

@@ -135,6 +135,8 @@ from probe import ProbeRefused, read_build_records, resolve_git_paths  # noqa: E
 from request import KEY_HEX, derive_request_content_key  # noqa: E402
 
 SAY = "placement"
+PLACEMENT_KEY = "placement"  # the two keys, passed by name so the policy check's reader scan sees each read
+CHECK_KEY = "placement.check"
 #: A request's content key, as `request.py` derives it.
 REQUEST_KEY = re.compile(r"[0-9a-f]{%d}" % KEY_HEX)
 #: A block's keys, in the order they are written; `reenters` only where a caller passed an item.
@@ -467,8 +469,8 @@ def run_observation_probes(root, store, key, subjects):
 
 def write_placement(args, root, store):
     """The `place` verb: one block written by the value of `placement`, or the owner item printed."""
-    value = read_placement_policy(root, "placement", "probe.observations")
-    mode, observe = value["placement"], value["probe.observations"]
+    value = read_placement_policy(root, PLACEMENT_KEY, "probe.observations")
+    mode, observe = value[PLACEMENT_KEY], value["probe.observations"]
     fields = read_scout_return(args.ret) if args.ret else {}
     if mode == "owner-places" and not args.owner:
         for k in RETURN_KEYS:
@@ -819,7 +821,7 @@ def check_placement(root, common, store, key):
     if not blocks:
         return 1, ["%s: refused — no placement · %s" % (SAY, key)]
     block = blocks[-1]
-    value = read_placement_policy(root, "placement.check", "probe.observations")
+    value = read_placement_policy(root, CHECK_KEY, "probe.observations")
     fact = None
     if block.get("observations", "0") not in ("0", "") and value["probe.observations"] == "verify-before-place" \
             and read_probe_verdict(store, key) is None:
@@ -831,7 +833,7 @@ def check_placement(root, common, store, key):
         raise PlacementRefused(str(e)) from None
     failed = ([fact] if fact else []) + failed
     word, build = block.get("disposition", "-"), block.get("build", NO_VALUE)
-    recorded = value["placement.check"] == "record"
+    recorded = value[CHECK_KEY] == "record"
     if not failed or recorded:
         block.update({k: v for k, v in (("scenarios", chosen), ("facts", evaluated)) if v is not None})
     if failed:
@@ -984,22 +986,28 @@ def write_placement_fixture(top, policy="", driver=False, remote=False, scenario
     return root
 
 
-def write_foreign_lease(root, build):
-    """A build lease of `build` held live by another node's fleet tag, pushed to the fixture's remote."""
+def write_foreign_lease(root, build, fields=(), remote=FIXTURE_REMOTE):
+    """A build lease of `build` held live by another node's fleet tag, pushed to the fixture's remote, `remote`
+    naming it; `fields` are extra `(key, value)` pairs after the twelve, such as `witness`, which the position
+    engine's dependency plants pass with their own remote (KICK-dKeptSession-7)."""
     now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     msg = "gov-claim %s/build\n\n" % build + "".join("%s: %s\n" % kv for kv in (
         ("slug", build), ("node", "z"), ("host", "elsewhere"), ("session", "s-other"), ("keepalive", "k-other"),
         ("status", "live"), ("lease-utc", now), ("beat-utc", now), ("epoch", "1"), ("kind", "build"),
-        ("fleet-tag", "z"), ("renews", "yes")))
-    write_fixture_gov_ref(root, "refs/gov/leases/%s/build" % build, msg)
+        ("fleet-tag", "z"), ("renews", "yes")) + tuple(fields))
+    write_fixture_gov_ref(root, "refs/gov/leases/%s/build" % build, msg, remote=remote)
 
 
-def write_fixture_gov_ref(root, ref, msg):
-    """One parentless commit over the empty tree, its message `msg`, pushed to `ref` on the fixture's remote."""
+def write_fixture_gov_ref(root, ref, msg, remote=FIXTURE_REMOTE, parent=None):
+    """One commit over the empty tree, its message `msg`, pushed to `ref` on the fixture's remote, `remote`
+    naming it, as the position engine's mail plants pass their own (KICK-dKeptSession-10): parentless, or
+    with `parent`, where given, its one parent, so a plant lands a second message on a ref after the first
+    (KICK-dKeptSession-53 S7). -> the commit's sha; the callers passing no `parent` ignore it."""
     tree = subprocess.run(["git", "mktree"], cwd=str(root), input="", capture_output=True, text=True, encoding="utf-8", check=True,
                           env=read_clean_env()).stdout.strip()
-    sha = run_fixture_git(root, "commit-tree", tree, "-m", msg)
-    run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "%s:%s" % (sha, ref))
+    sha = run_fixture_git(root, "commit-tree", tree, *(("-p", parent) if parent else ()), "-m", msg)
+    run_fixture_git(root, "push", "-q", remote, "%s:%s" % (sha, ref))
+    return sha
 
 
 def read_fleet_user():

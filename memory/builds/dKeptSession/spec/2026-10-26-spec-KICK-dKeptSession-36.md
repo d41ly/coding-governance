@@ -1,6 +1,6 @@
 # KICK-dKeptSession-36 — the transition guard runs the driver through a bash that shares this filesystem, never the bare name, and an unresolved shell refuses
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** CLOSED · rev-7 · 2026-11-23 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,10 +12,21 @@
 | [2026-10-26-build-KICK-dKeptSession-30-promoted-fix-return.md](../build/2026-10-26-build-KICK-dKeptSession-30-promoted-fix-return.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-30 |
 | [2026-10-26-build-KICK-dKeptSession-36-deviation-361.md](../build/2026-10-26-build-KICK-dKeptSession-36-deviation-361.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-36-deviation-362.md](../build/2026-10-26-build-KICK-dKeptSession-36-deviation-362.md) | deviation | — |
+| [2026-11-21-build-KICK-dKeptSession-36-1-acceptance-ledger.md](../build/2026-11-21-build-KICK-dKeptSession-36-1-acceptance-ledger.md) | journal | — |
+| [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-1 |
+| [2026-11-24-build-KICK-dKeptSession-1-runlog-31fbb903.md](../build/2026-11-24-build-KICK-dKeptSession-1-runlog-31fbb903.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 KICK-dKeptSession-67 KICK-dKeptSession-69 KICK-dKeptSession-79 KICK-dKeptSession-80 KICK-dKeptSession-89 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-30 |
+| [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md) | research | KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 |
+| [2026-11-21-prompt-KICK-dKeptSession-36-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-36-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-36-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-36-build-brief.md) | research | — |
+| [2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md) | research | KICK-dKeptSession-27 KICK-dKeptSession-24 |
+| [2026-11-22-prompt-KICK-dKeptSession-36-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-36-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-KICK-dKeptSession-36-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-36-reground-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
+| [2026-11-23-review-KICK-dKeptSession-69-closing-diff-review-round1.md](../reviews/2026-11-23-review-KICK-dKeptSession-69-closing-diff-review-round1.md) | diff-review | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 KICK-dKeptSession-67 KICK-dKeptSession-69 |
 
 <!-- /gen:spec-records -->
 
@@ -25,52 +36,103 @@ The round-1 spec audit of this build's spec set
 (`memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md`)
 confirmed finding **id 22 at HIGH**, report item **H4**, which no other id shares.
 
-`KICK-dKeptSession-5` S9 has `write_transition`, a Windows python, run bare `bash
+`KICK-dKeptSession-5` S9 had `write_transition`, a Windows python, run bare `bash
 <prefix>/unattended/unattended.sh --mail read`. On this node the bare name reaches the WSL launcher,
-which sees another filesystem, so the driver path does not resolve and S9 passes "an absent driver"
-with a NOTE: the guard passes with open mail and certifies a check it never ran. The class is
-recorded in `memory/gotchas/subprocess-resolves-a-different-shell.md`. This unit gives the loop kit
-one resolver that runs each candidate, routes the guard through it, and makes "absent driver" a
-Python file test rather than a shell's failure. It repairs `KICK-dKeptSession-5` and builds one step
-after it (order 17).
+which sees another filesystem, so the driver path does not resolve and S9 passed "an absent driver"
+with a NOTE: the guard passed with open mail and certified a check it never ran. The class is
+recorded in `memory/gotchas/subprocess-resolves-a-different-shell.md`. The loop kit now carries the
+one resolver that runs each candidate, and unit 5's rev-12 S9 launches the guard through it and the
+kit's one locator. This unit holds what that launch leaves to it: the missing-shell refusal's words,
+the plants that observe the launch, the absent pass and the refusal, and the user texts' sentences.
+It builds one step after `KICK-dKeptSession-5` (order 17).
 
 ## 2. Scope (IN)
 
-- **S1** — id 22. The resolver, `resolve_bash()` in `tools/loop/loop_lib.py`, the contract of
-  `tools/govkit/govkit.py:1144` carried inline because the loop kit is copy-installed: `GOV_BASH`
-  first, a set but unusable value raising `LoopError` by name; then the candidates, the
-  `C:/Windows/System32` and `WindowsApps` launchers refused; a candidate accepted only once
-  `<cand> -c :` exits 0 and, on a Windows host, `uname -s` answers `MINGW` or `MSYS`. No candidate
-  raises `LoopError`, never a fall-back to the bare name. Observed by AC1 and AC2.
-- **S2** — id 22. The guard's argv. `KICK-dKeptSession-5` S9's step runs `[resolve_bash(), <driver>,
-  "--mail", "read", <slug>, "--open"]`, `<driver>` being `resolve_kit_dir("unattended", "unattended.sh",
-  here) / "unattended.sh"`, found through `loop_lib.py`'s one inline `resolve_kit_dir` block
-  (TOOL-dDeclaredLoop-12 S4), the locator TOOL-dDeclaredLoop-52 S3 reads the same driver through: a kit
-  imports no sibling kit, and the block returns an absolute directory. Observed by AC3.
-- **S3** — id 22. Absent is the locator's refusal, tested in Python before any spawn. The guard passes
-  as "an absent driver" only when `resolve_kit_dir` raises its `LookupError`
-  (`tools/lib/resolve_kit_dir.py:23,49`), the NOTE carrying that error's text, which names the kit and
-  the three places looked; `os.path.isfile` is applied only to the resolved path, a resolved directory
-  whose `unattended.sh` is gone refusing as below rather than passing. A present driver with no
-  usable shell refuses with exit 2, `refused — <slug> · mail unknown: <the LoopError's why>`, and
-  writes nothing. Observed by AC4.
-- **S4** — id 22. `KICK-dKeptSession-5` S9's bare `bash` is superseded by name here, and that unit's
-  acceptance ledger answers its AC5 and AC6 through AC3's argv. Observed by AC3.
+- **S1** — id 22. The resolver, already landed: `tools/loop/loop_witness.py#resolve_bash`, the
+  adapter that answers `None` for a refusal of the loop kit's inline `resolve_bash_py` block,
+  `tools/loop/loop_witness.py#scan_bash`, a copy of the canonical `tools/lib/resolve_bash.py#scan_bash`
+  (TOOL-dGroundRules-25 S28, rewritten by TOOL-dWitnessedBar-26), held byte-identical by the
+  `resolve_bash_py` row of `tools/lib/resolve-python.test.sh`. `scan_bash(script)` runs `GOV_BASH`
+  first and, when it is set, nothing after it, refusing it where it cannot see `script`; else Git's
+  own `bash.exe` in its `bin` directory, under the third parent of `git --exec-path`, then each PATH
+  directory's `bash.exe` and `bash`, a System32 or WindowsApps launcher reported and never run. A
+  candidate passes when one run
+  prints `uname -s`, starting `MINGW` or `MSYS` on Windows, and `test -f <script>` exits 0. This unit
+  mints no resolver and edits none; it observes the landed one on this node. Observed by AC1 and AC2.
+- **S2** — id 22. The guard's argv, observed. `KICK-dKeptSession-5` S9's `read_mail_rows(root,
+  build)` in `tools/loop/loop_transition.py` runs `[<bash>, <driver>, "--mail", "read", <slug>]`,
+  `<driver>` being `resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"` through
+  `tools/loop/loop_lib.py#resolve_kit_dir`, and `<bash>` being `resolve_bash(<driver>)`, both
+  imported inside the function, as `tools/loop/loop_transition.py#resolve_kickoff_engine` imports the
+  first and `tools/loop/loop_transition.py#write_card_follow` the second.
+  The read is unfiltered, with no `--open`: it is the one read the guard and the disposal share
+  (spec-5 F9). This unit adds nothing to that launch; where unit 5 landed another, it sets the launch
+  to this one. Observed by AC3.
+- **S3** — id 22. Absent is the locator's refusal, tested in Python before any spawn. The guard
+  passes as "an absent driver" only when `resolve_kit_dir` raises its `LookupError`, which names the
+  kit and the three places looked (`tools/lib/resolve_kit_dir.py#resolve_kit_dir`), unit 5's
+  `loop: mail · unarmed · <why>` line carrying that error's text. A located driver for which
+  `resolve_bash` returns `None`, a set `GOV_BASH` that cannot see it among them (S1), raises unit
+  5's `ValueError`, whose words unit 5 S9 already spells from this item, `mail unknown: no bash that
+  can see <driver>`, and unit 5's AC12 probes; `record` prints it after `loop: unanswered · ` and
+  exits 2 on (`tools/loop/loop_transition.py#main`), writing nothing. This unit observes those words
+  through a plant, and sets them to these only where unit 5 landed others. Observed by AC4.
+- **S4** — The plants, in `tools/loop/loop_transition.py`'s fixture: `mail-argv` wraps
+  `subprocess.run`, the spawn unit 5's `read_mail_rows` makes as `write_card_follow` does, recording
+  the one call whose argv carries `--mail` and answering it zero rows, and passing every other call,
+  the resolver's `test -f` probes, git and the card follow among them, through; `mail-no-driver`
+  calls the real `resolve_kit_dir` with an empty scratch directory as `here`; `mail-no-bash` has
+  `resolve_bash` answer `None`. Each rebinds the name the guard imports inside its function, on
+  `loop_lib`, `loop_witness` or `subprocess`, and restores it after the run, so the guard carries no
+  test hook. Each first writes the driver's conf with `RUN_CLAIMS` on into the fixture root through
+  the seeding unit 5's `mail-` plants use (spec-5 AC6), since unit 5's guard passes a root with no
+  `.unattended.conf`, launching nothing (spec-5 S9), which would pass all three plants for the wrong
+  reason; none needs unit 5's bare remote, since no plant's read reaches the driver. `mail-no-bash`
+  counts the fixture's commits before and after the move and prints `loop: fixture · commits
+  unchanged` or `changed`, as `no-row` does; `mail-argv` answers the recorded call exit 0 with no
+  output, and prints `loop: fixture · mail-argv · held`, or `MISSED` with the argv it recorded, as
+  `descope-spent` prints its verdict; and `run_selftest`'s case table gains one row per line AC3 and
+  AC4 read. The plants are branches of `run_transition_fixture` and their wrappers nested functions,
+  so no module-level symbol is added and `memory/map/generated/symbols.json` does not move, as it
+  lists none of that function's nested `run_verb`, `read_count` or `read_folder` today. The three
+  join `PLANTS`, so the `loop transition record` row of `tools/run-gates/selftest-budgets.txt`
+  carries `plants=18` where unit 5 leaves `plants=15` (DERIVED, `len(PLANTS)` 13 at `c9e89a057`
+  plus unit 5's two, 2026-11-22), its reading re-priced by direct CLI over the three as unit 5
+  re-prices its two, which `tools/run-gates/run-selftests.sh#check_plant_tokens` holds equal to
+  `len(PLANTS)` once the module is imported. No bare `bash` launch is left to supersede: unit 5's
+  S9 already launches through `loop_witness.resolve_bash`, so the supersession rev-3's S4 named is
+  void and this item holds only the plants. Observed by AC3, AC4, AC6.
+- **S5** — The user texts. `help/loop.md`'s guard paragraph under "Recording a build's move"
+  (`KICK-dKeptSession-5` S14) gains one sentence: the driver runs under the bash that can see it,
+  `GOV_BASH`, when set, the only one tried, and a node where none can refuses the transition as
+  `mail unknown`. The fixture-cases sentence of the same section, after "The cases are", and its
+  twin in `tools/loop/README.md`'s `loop_transition.py` section, after "`--fixture --plant <case>`
+  runs both over a scratch repository", each name every key of `PLANTS` the module holds at build
+  time: the three plants, and `descope-spent`, `mail-open` and `mail-disposed`, which both omit at
+  `c9e89a057` and unit 5's text does not add. The page's
+  `<!-- usage: script:tools/loop/loop_transition.py ... -->` anchor stays: its row in
+  `tools/govkit/usage.toml` fingerprints the flags `--fixture` and `--plant=`, not the plant names,
+  so a plant moves no field it hashes: `python tools/govkit/docs_leg.py --fingerprints` prints
+  `930359dc` for it (PINNED, 2026-11-22), and the builder re-reads it at build time and re-stamps
+  the anchor only if it moved. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
+- No resolver of the loop kit's own: the canonical block and its inline copy are
+  TOOL-dGroundRules-25's, and a change to their contract is an ask to that block's owner.
+- No launch, bound or guard of its own: `read_mail_rows`, `MAIL_GUARD_SECONDS` and every pass and
+  refusal of the guard but S3's words are `KICK-dKeptSession-5`'s.
 - The guard's other exits, a non-zero read with no rows among them: id 59, item M26, batched into
   `KICK-dKeptSession-44`.
 - The position engine's own reads, `--claims` and `--mail read`: ids 23 and 24, items M13 and M14,
-  batched into `KICK-dKeptSession-44`, which call this resolver.
-- One resolver in `tools/lib` for every kit, `cl-dClosedLoop-0364`'s: another build's clause. This
-  copy keeps govkit's contract so that extraction replaces it unchanged.
+  batched into `KICK-dKeptSession-44`.
+- A factory for the locate-then-resolve pair the loop kit spells at each driver call (§8 F2).
 - The report's left-shift lint over `subprocess` argv. No clause of this build names it.
 
 ### Edges
 
-- **consumes-from** `KICK-dKeptSession-5` — S9's transition guard in `write_transition`, whose bare `bash` launch this unit replaces (id 22)
-- **hands-off** `KICK-dKeptSession-44` — `resolve_bash` in `loop_lib.py`, which the position engine's mail and claims reads take for ids 23 and 24
+- **consumes-from** `KICK-dKeptSession-5` — S9's transition guard, `read_mail_rows` in `write_transition`, whose launch this unit observes and whose missing-shell refusal it words (id 22)
+- **hands-off** `KICK-dKeptSession-44` — the guard's launch through `resolve_bash` in `loop_witness.py`, which the position engine's mail and claims reads take for ids 23 and 24
 - **hands-off** `KICK-dKeptSession-42` — `resolve_bash`, through which the consuming step posts its `--mail ack`
 - **hands-off** `KICK-dKeptSession-56` — `resolve_bash`, its override and §3's parity claim, and §7's legs, the batch's S3 to S6, S27, S44 and S42 (ids 5, 6, 23, 52, 36, 53, 41)
 
@@ -80,23 +142,56 @@ after it (order 17).
 
 - The audit's probe from Windows python: `subprocess.run(['bash','-c','uname -a; pwd'])` printed
   `microsoft-standard-WSL2` and `/mnt/c/projects/...`, while `shutil.which('bash')` named git-bash
-  and `C:/Windows/System32/bash.exe` exists.
-- `govkit.py:1144-1160` records the same measured failure and accepts a candidate only once it runs;
-  the gotcha `memory/gotchas/subprocess-resolves-a-different-shell.md` names the remedy.
-- Eight kits already carry a `resolve_bash` (`git grep -n "def resolve_bash" -- tools`): govkit,
-  corpus_ids, handoff, profile_bar, regen and three selftests, with a nested
-  one in `tools/settings-merge.py`.
-- `KICK-dKeptSession-5` S9: "`mail — off`, an absent driver and zero rows each pass" (spec-5 S9).
-- The loop kit reaches a sibling only by subprocess through its one inline `resolve_kit_dir` block
-  (TOOL-dDeclaredLoop-12 S4), and TOOL-dDeclaredLoop-52 S3 finds this driver with
-  `resolve_kit_dir("unattended", "unattended.sh", here)`, printing `unarmed` where it does not resolve;
-  the block refuses with `LookupError` and never guesses a prefix (`tools/lib/resolve_kit_dir.py:23,49`).
+  and the System32 launcher exists.
+- Re-probed at this rev, `c9e89a057`: `loop_witness.resolve_bash` over the driver's absolute `C:/`
+  path answered the `bash.exe` in Git for Windows' `bin` directory; with `GOV_BASH` naming the
+  System32 `bash.exe`, the WSL launcher, it answered `None`, `scan_bash`'s refusal reading "GOV_BASH
+  is set to '<the launcher>' and answered Linux, so nothing after it is tried".
+- The loop kit already spells this launch at each driver call: `resolve_item_seed` locates the
+  driver, runs `resolve_bash(driver)`, and answers `unarmed` where either fails
+  (`tools/loop/loop_lib.py#resolve_item_seed`); `write_card_follow` does the same for the kickoff
+  engine and prints `card — skipped` where no bash resolves
+  (`tools/loop/loop_transition.py#write_card_follow`); `read_handover` and `run_driver` raise
+  `LookupError` (`tools/loop/position.py#read_handover`, `tools/loop/position.py#run_driver`).
+- `KICK-dKeptSession-5` rev-12 S9: `mail — off`, the locator's `LookupError`, a `root` with no
+  `.unattended.conf` and zero rows each pass, and "a driver no bash sees" is a `ValueError`, exit 2,
+  "unknown and never none" (spec-5 S9).
+- `record` prints a `LookupError` after `loop: unarmed` and a `ValueError` after
+  `loop: unanswered`, each exit 2 (`tools/loop/loop_transition.py#main`).
+
+### The guard's launch, in order
+
+1. `resolve_kit_dir("unattended", "unattended.sh", KIT)`; its `LookupError` passes with unit 5's
+   `unarmed` line carrying the error's text, and nothing is spawned.
+2. `resolve_bash(<driver>)`; `None` raises S3's `ValueError`, exit 2, and nothing is spawned.
+3. The spawn of S2's argv in the repository, under unit 5's bound and exits.
+
+Steps 1 to 3 are unit 5's code; this unit's diff is step 2's words, the plants and the texts.
+
+### Shipped texts
+
+| Text | Names |
+|---|---|
+| `help/loop.md`, "Recording a build's move": the guard paragraph; the fixture-cases sentence | the shell rule; every plant (S5) |
+| `tools/loop/README.md`, the `loop_transition.py` section's `--fixture --plant <case>` sentence | every plant (S5) |
+| `tools/run-gates/selftest-budgets.txt`, the `loop transition record` row's note | `plants=18` and its reading (S4) |
+
+Left true: `tools/loop/loop_transition.py`'s module docstring, whose `--fixture` paragraph describes
+`field`, `backward-rows` and `skip-backward` as examples and lists no complete set, and whose exit
+paragraph unit 5 rewrites for the guard (spec-5 §4 Shipped texts); `run_selftest`'s docstring, which
+names no plant; `memory/gotchas/subprocess-resolves-a-different-shell.md`, which states the class
+and names no guard; `tools/loop/README.md`'s `loop_witness.py` paragraphs, which already say the
+normaliser and the computed witnesses run through the inline `resolve_bash`. No
+`tools/policy/catalogue.toml` summary names the guard or its shell, so `.governance/policy.json`
+stays. This unit edits no `tools/unattended/unattended.sh`, so its refusal sites at the
+harness-arms ceiling do not move, and it adds no suite floor: its arm is three plants in the
+`loop transition record` leg's `PLANTS`, re-pricing that one budget row (S4).
 
 ### Inventory
 
 | Minted | Kind | Lexicon cell |
 |---|---|---|
-| `resolve_bash` | function, `tools/loop/loop_lib.py` | `py.function`, `resolve`, OK |
+| `mail-argv`, `mail-no-driver`, `mail-no-bash` | plants of `loop_transition.py --fixture` | none |
 
 ### Migration
 
@@ -104,57 +199,91 @@ None: the guard is new in `KICK-dKeptSession-5`.
 
 ### Files touched (estimate)
 
-- `tools/loop/loop_lib.py`: `resolve_bash`
-- `tools/loop/loop_transition.py`: S2 and S3 in the guard
-- `tools/loop/selftest.py`: the cases of §6
+- `tools/loop/loop_transition.py`: S4's three plants with their cases, and S3's words in
+  `read_mail_rows` only where unit 5 landed others
+- `tools/run-gates/selftest-budgets.txt`: the `loop transition record` row's `plants=<n>` token and
+  its re-priced reading (S4)
+- `help/loop.md`: S5's sentence and the fixture-cases sentence
+- `tools/loop/README.md`: S5's fixture-cases sentence
 
 ### Alternatives rejected
 
 - **`shutil.which("bash")`.** It names a path that exists, which is not evidence it runs on this
-  filesystem; govkit's docstring records the same mistake for the python stub.
-- **Importing govkit's resolver.** govkit is copy-installed as a standalone directory, and the loop
-  kit cannot reach it.
+  filesystem; the canonical block's docstring records the same mistake.
+- **A loop-kit resolver of its own in `loop_lib.py`.** It would be a second spelling of the
+  canonical block the parity table holds, and its `LoopError` and `uname` test would answer no case
+  the landed `test -f` probe does not.
 
 ## 5. Production-readiness checklist
 
-- security — the shell is chosen by running it, and `GOV_BASH` is honoured only when it runs.
-- perf / scale — one or two short probe spawns per process, cached in a module global.
+- security — the shell is chosen by running it over the very driver it will run.
+- perf / scale — one probe spawn per candidate tried, at most one guard per transition.
 - error / empty / loading states — no usable shell refuses the transition as unknown, never as none.
-- observability — the refusal names the `GOV_BASH` value or the candidates tried.
+- observability — the refusal names the driver no bash can see; the absent line names the three
+  places looked.
 - risks — a host with only a WSL bash cannot transition; that is the intended refusal.
-- testing — the cases of §6 and the arm in §7.
+- testing — the plants of §6 and the arm in §7.
 - migration — none.
-- user docs — `help/loop.md`'s guard paragraph (`KICK-dKeptSession-5` S14) names `GOV_BASH`.
+- user docs — `help/loop.md` and `tools/loop/README.md`, S5.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python -c "import loop_lib; print(loop_lib.resolve_bash())"` runs in the loop kit on
-  this node, it prints an absolute path whose `uname -s` answers `MINGW` or `MSYS`, and never the
-  Windows `System32` bash, the WSL launcher.
+- **AC1** — When `python -c "import sys, pathlib; sys.path.insert(0, 'tools/loop'); import
+  loop_witness as w; print(w.resolve_bash(pathlib.Path('tools/unattended/unattended.sh').absolute().as_posix()))"`
+  runs on this node, it prints the `bash.exe` in Git for Windows' `bin` directory, as it
+  did on 2026-11-22 (PINNED), and never the System32 WSL launcher.
   Red when: the resolver returns the bare name or the WSL launcher.
-- **AC2** — When `GOV_BASH` is set to the Windows `System32` bash, the WSL launcher, for that probe,
-  it raises `LoopError` naming `GOV_BASH`.
-  Red when: an unusable override falls through to another candidate.
-- **AC3** — When the selftest records the guard's subprocess argv over a fixture build, `argv[0]` is
-  `resolve_bash()`'s path and `argv[1]` the absolute path `resolve_kit_dir("unattended",
-  "unattended.sh", here)` resolved, joined with `unattended.sh`.
-  Red when: `argv[0]` is `bash`, as a copy of the base guard shows.
-- **AC4** — When the selftest runs the guard with the unattended kit removed from every place
-  `resolve_kit_dir` searches (the receipt row, `<here>/unattended/` and `<here>/../unattended/`), it
-  passes with the NOTE naming the kit;
-  with the driver present and `GOV_BASH` planted unusable, it exits 2 printing `mail unknown` and
-  writes no transition.
-  Red when: a present driver with no usable shell passes as absent.
+- **AC2** — When the same probe runs with `GOV_BASH` naming the System32 `bash.exe`, the WSL
+  launcher, it prints `None`, and `w.scan_bash(<that path>)[2]` names `GOV_BASH` and `answered Linux`, so the guard over it
+  raises S3's `mail unknown`.
+  Red when: an override that cannot see the driver is returned, or the scan falls through it to
+  another bash.
+- **AC3** — When `python tools/loop/loop_transition.py --fixture --plant mail-argv` records the
+  guard's spawn argv over a fixture build, `argv[0]` equals `resolve_bash(argv[1])`, `argv[1]` equals
+  the absolute path `resolve_kit_dir("unattended", "unattended.sh", KIT)` resolved, joined with
+  `unattended.sh`, and the rest reads `--mail read <slug>`, the run printing
+  `loop: fixture · mail-argv · held`.
+  Red when: `argv[0]` is `bash`, as a scratch copy of the guard launching the bare name shows, or
+  no call is recorded, as the plant over a root with no `.unattended.conf` shows.
+- **AC4** — When `--plant mail-no-driver` runs, the move records and prints `loop: mail · unarmed`
+  with the error `no unattended kit holding unattended.sh in this install`; when `--plant
+  mail-no-bash` runs, the move exits 2 printing `loop: unanswered · mail unknown: no bash that can
+  see`, and `loop: fixture · commits unchanged`.
+  Red when: a located driver with no usable shell passes as absent, as a scratch copy reading a
+  `None` bash as the locator's refusal shows.
+- **AC5** — When `grep -n "GOV_BASH" help/loop.md` runs, the guard paragraph names `GOV_BASH` and
+  `mail unknown`; and `grep -c "mail-no-bash" help/loop.md tools/loop/README.md` counts at least one
+  in each, each fixture-cases sentence naming every key of `PLANTS`.
+  Red when: the page is silent on which shell runs the driver, or a cases sentence omits a plant.
+- **AC6** — When `python -c "import sys; sys.path.insert(0, 'tools/loop'); import loop_transition as
+  t; print(len(t.PLANTS))"` runs, it prints 18 (DERIVED, S4's sum), the `plants=<n>` token of the
+  `loop transition record` row in `tools/run-gates/selftest-budgets.txt`, and `mail-argv`,
+  `mail-no-driver` and `mail-no-bash` are among the plants.
+  Red when: the row still carries the count from before the three plants.
 
 ## 7. Gates
 
-`python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop transition record` · `policy fixtures` · `python resolver (behaviour + inline parity + idiom ban)` · `docs` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/selftest.py · covers AC2 AC3 AC4 · the guard's recorded argv, the driver removed and an unusable `GOV_BASH`, staged red by a copy of the guard launching bare `bash` · none
+New arm: tools/loop/loop_transition.py · covers AC3 AC4 · the `mail-argv`, `mail-no-driver` and `mail-no-bash` plants, staged red by a scratch copy of `read_mail_rows` launching bare `bash` and reading a `None` bash as absent · the `loop transition record` row's `plants=<n>` token rises by three
 
 ## 8. Open questions
 
-none
+- **F1 — Does the guard take the landed resolver, or mint the loop kit's own?** The rev-3 text
+  minted `resolve_bash()` in `loop_lib.py` with a `LoopError` on an unusable `GOV_BASH` and a `uname`
+  test. Since then TOOL-dGroundRules-25 S28 landed the canonical block and its loop-kit copy in
+  `loop_witness.py`, which keeps a candidate only when it can see the script. Options: (a) take the
+  landed copy, its refusal of a set override that cannot see the script included (TOOL-dWitnessedBar-26
+  replaced the fall-through rev-4 read); (b) mint the rev-3 resolver beside it.
+  RESOLVED (agent, 2026-11-21, delegated): (a), rung 3; the charter's `[reuse]` rule, and the
+  landed probe already refuses the WSL launcher over a `C:/` path, so id 22 closes with no second
+  spelling. widens: none · relaxes: none
+- **F2 — Does this unit extract a factory for locate-then-resolve?** Options: (a) the guard spells
+  the two calls, as each driver call of the loop kit does; (b) this unit extracts one and moves
+  every such call. RESOLVED (agent, 2026-11-21, delegated): (a), rung 3; the two primitives are the
+  shared factories, each gated inline, and each caller answers their failure differently, an
+  `unarmed` string, a skip line, a `LookupError` or here a pass and a refusal. widens: none ·
+  relaxes: none
 
 ## 9. Revision log
 
@@ -165,16 +294,51 @@ none
   `2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck`, row 100: `<driver>` is found through
   `loop_lib.py`'s inline `resolve_kit_dir`, an absent driver is its `LookupError`, and AC4's plant
   removes the kit from every place the block searches.
+- rev-4 · 2026-11-21 · §1 · S1 · S2 · S3 · S4 · S5 · §3 · §4 · AC1 to AC5 · §7 · §8 F1 · F2 · §10 ·
+  re-grounded on the landed tree at `c2a407b0` and on `KICK-dKeptSession-5` rev-9 by
+  `2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief`: narrowed S1 to an
+  observation of the landed `loop_witness.py#resolve_bash`, no resolver minted in `loop_lib.py`
+  (F1), so AC2's `LoopError` became the override's fall-through; narrowed S2 to an observation of
+  unit 5's `read_mail_rows` launch and S3 to the refusal's words; the old S4's supersession is void,
+  since unit 5 no longer launches the bare name, and S4 now holds the plants; the arm moved from the
+  absent `tools/loop/selftest.py` to `loop_transition.py` under `loop transition record`; S5 and
+  AC5 added for `help/loop.md`; every line-number citation replaced by a `path#symbol` one.
+- rev-5 · 2026-11-21 · S2 · S4 · folded `KICK-dKeptSession-5` rev-9 under
+  `2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief`: S2 names the guard's read as
+  the one unfiltered read, with no `--open`, that the guard and the disposal share (spec-5 F9); S4
+  states that no bare `bash` launch is left to supersede, since unit 5's S9 already launches through
+  `loop_witness.resolve_bash`; no other section moved.
+- rev-6 · 2026-11-21 · S3 · S4 · §4 · AC3 · AC6 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief`: the plants write the driver's conf with
+  `RUN_CLAIMS` on, since unit 5's guard passes a root with no `.unattended.conf` before it locates or
+  resolves anything; `mail-argv` records only the `--mail` spawn and passes the resolver's probes
+  through; each plant prints the line its selftest case reads; the three plants move the
+  `plants=<n>` token `check_plant_tokens` holds, so `tools/run-gates/selftest-budgets.txt` joins
+  Files touched and AC6 observes it; S3's words are unit 5 S9's, reduced to their observation;
+  `policy fixtures`, whose guard holds `tools/loop/` and `tools/run-gates/`, joins the leg line.
+- rev-7 · 2026-11-22 · §1 · S1 · S2 · S3 · S4 · S5 · §4 · §5 · AC1 · AC2 · AC4 · AC5 · AC6 · §7 · §8
+  F1 · §10 · re-grounded at `c9e89a057` by `2026-11-22-prompt-KICK-dKeptSession-36-reground-brief`,
+  unit 5 rev-12 read as landed: S1 states the resolver as TOOL-dWitnessedBar-26 rewrote it, an
+  adapter over the inline `scan_bash` that refuses a set `GOV_BASH` rather than falling through, so
+  AC2 now reads `None` and F1's option (a) is reworded; S2 cites the two import sites; S4 pins
+  `plants=15` to `18` and drops the bare remote; S5 and Shipped texts add the fixture-cases sentences
+  of `help/loop.md` and `tools/loop/README.md` and keep the usage anchor; `docs` joins the leg line.
 
 ## 10. Reuse audit
 
-The seam is govkit's `resolve_bash` (`tools/govkit/govkit.py:1144`), whose contract this unit copies
-into the loop kit because copy-installed kits carry shared primitives inline (the charter's Kinds
-fact). `python tools/codebase-map/reuse_lookup.py "resolve the bash that shares this filesystem by
-running each candidate"` ranked `resolve_bash` across eight files, `resolve_kit_dir` and
-`resolve_python`; `resolve_bash` is the seam named, and `tools/lib` holds no bash resolver at this
-base for the kit to inline instead.
+The seam is the loop kit's landed `tools/loop/loop_witness.py#resolve_bash`, the adapter over its
+inline copy of `tools/lib/resolve_bash.py#scan_bash` that the parity table holds, taken with
+`tools/loop/loop_lib.py#resolve_kit_dir` in the pair `tools/loop/loop_lib.py#resolve_item_seed`
+already spells and unit 5's `read_mail_rows` takes. `python tools/codebase-map/reuse_lookup.py
+"resolve the bash that shares this filesystem by running each candidate"`, re-run 2026-11-22,
+ranked `resolve_kit_dir`, `resolve_bash`, across twelve files (DERIVED, that run) with
+`tools/loop/loop_witness.py` among them, and `scan_bash`, with `tools/lib/resolve_bash.py` among its
+files; `resolve_bash` is the seam named, and the rev-3 premise that `tools/lib` held no bash
+resolver no longer holds. The recall
+query returned TOOL-aMendedFleet-98, a suite's `bash` resolved to Git-Bash, and scout C's row of
+dWitnessedBar naming the `tools/lib/resolve_bash.py` dGroundRules landed; neither disagrees with
+source.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a Windows python run bash without
-reaching WSL" --terms "resolve_bash GOV_BASH WSL System32 bash.exe git-bash candidate runs uname
-transition guard subprocess"`
+reaching WSL" --terms "resolve_bash GOV_BASH WSL System32 bash.exe git-bash candidate transition
+guard subprocess"`

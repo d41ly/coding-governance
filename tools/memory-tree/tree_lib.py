@@ -151,14 +151,17 @@ def scan_bash(script="", host=""):
 
 def parse_leg_names(text: str) -> set:
     """The leg names a leg manifest's text declares: the `name` of each `{name: ...}` row of its
-    top-level list. ValueError when the text is not JSON or its top level is not a list. The kit's
-    one manifest parser (TOOL-aNimbleMend-8): `gotchas.py#load_leg_names` reads a working-tree
-    manifest through it and the commit grader a blob at a commit."""
+    top-level list, or of the list under a top-level object's `legs` key, the shape an adopter's
+    documented manifest takes (TOOL-aWrappedRoster-1). ValueError when the text is not JSON or holds
+    neither shape. The kit's one manifest parser (TOOL-aNimbleMend-8): `gotchas.py#load_leg_names`
+    reads a working-tree manifest through it and the commit grader a blob at a commit."""
     import json
 
     rows = json.loads(text)
+    if isinstance(rows, dict):
+        rows = rows.get("legs")
     if not isinstance(rows, list):
-        raise ValueError("the top level is not a list of leg rows")
+        raise ValueError("the top level is neither a list of leg rows nor an object whose `legs` is one")
     return {r["name"] for r in rows if isinstance(r, dict) and isinstance(r.get("name"), str)}
 
 
@@ -630,9 +633,12 @@ BIND_HEAD_LINES = 12
 # no field, graded by `record_kinds.check_stream_plan`, written by dIndexedDesign's planner, no door.
 # `shape-run` (TOOL-dTotalRecall-11) is one review exit's `review-shape` line as typed fields, written by
 # `gov_record.py new shape-run` from the review record and compared back to that line by `shape_run.py --check`.
+# `mailbox-message` (KICK-dKeptSession-5 S12) is one mailbox message a build's transition disposed, its
+# fields and its body in one fenced block, written by the loop kit's transition writer through
+# `write_record`, no door.
 TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition", "acceptance",
                       "transition", "recommendation", "widen", "leg-tail", "flake", "gate-health", "card",
-                      "probe-trigger", "probe", "stream-plan", "shape-run")
+                      "probe-trigger", "probe", "stream-plan", "shape-run", "mailbox-message")
 RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "log", "research") + TYPED_RECORD_KINDS
 # TOOL-dTotalRecall-18 S7: `journal` was the evidence kind's name until the kind became `log`. The old
 # token is a READ-ONLY alias: a record written under it is bound as written, so no records region

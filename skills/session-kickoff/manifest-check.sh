@@ -30,7 +30,17 @@
 #                                         # re-published at a stage move, as card.follows says
 #   manifest-check.sh --card --lookup --build <slug> --session <sid>    # the build card read back from
 #                                         # its first store that answers, re-keyed into the session's card
-#   manifest-check.sh --brief-skeleton    # the brief record's skeleton and the card's `## route`
+#   manifest-check.sh --card --pointers --build <slug> [--session <sid>]   # the `## pointers` section
+#                                         # published to each store card.store selects, and with
+#                                         # --session written into that session's card too
+#   manifest-check.sh --card --boundary --build <slug> --session <sid> [--transcript <path>] [--out <file>]
+#                                         # the item boundary, I12: the card's `item —` line moved to
+#                                         # HEAD, and a crossing written and published as card.pointers says,
+#                                         # the notice as a `notice —` line, as mailbox.notice says,
+#                                         # and the build's open mail as `interrupt — mailbox` lines, as mailbox.reads says
+#   manifest-check.sh --card --fixture-run <scratch-dir>   # run card-compaction.fixture.sh there and
+#                                         # record its verdict in <git-common-dir>/orientation/card-fixture.verdict
+#   manifest-check.sh --brief-skeleton   # the brief record's skeleton and the card's `## route`
 #                                         # skeleton; like --task-skeleton, it needs no repository
 #     A body carrying `## route` is held to the route rules beside `check_card_route`: every unit,
 #     its spec and the brief must RESOLVE, or nothing is appended (KICK-aRoutedQuill-1).
@@ -52,7 +62,7 @@
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.39"   # gov:kit kickoff-manifest@1.39 — the registry id
+KIT_MANIFEST_VERSION="1.40"   # gov:kit kickoff-manifest@1.40 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -193,34 +203,57 @@ done
 # through to that catch-all exactly as they did before this block existed.
 # The build card's verbs (TOOL-dPlacedRequest-2) take `--build <slug>`, and the follow `--to <state>`
 # and `--terminal`; each value is held to its grammar here, before it is joined into a ref or a path.
-CARD=""; CARD_VERB=""; CARD_SID=""; CARD_BUILD=""; CARD_STEP=""; CARD_TERMINAL=0; _rest=(); _want=""
+CARD=""; CARD_VERB=""; CARD_SID=""; CARD_BUILD=""; CARD_STEP=""; CARD_TERMINAL=0; CARD_FIXTURE_DIR=""; _rest=(); _want=""
+CARD_TX_ARG=""; CARD_OUT=""
 for _a in "$@"; do [ "$_a" = --card ] && CARD=1; done
 for _a in "$@"; do
   case "$_want" in
     sid) CARD_SID="$_a"; _want=""; continue ;;
     build) CARD_BUILD="$_a"; _want=""; continue ;;
     to) CARD_STEP="$_a"; _want=""; continue ;;
+    fixture) CARD_FIXTURE_DIR="$_a"; _want=""; continue ;;
+    tx) CARD_TX_ARG="$_a"; _want=""; continue ;;
+    out) CARD_OUT="$_a"; _want=""; continue ;;
   esac
   case "$CARD$_a" in
     1--card) ;;
-    1--write|1--replay|1--path|1--append|1--check|1--publish|1--follow|1--lookup) CARD_VERB="${_a#--}" ;;
+    1--write|1--replay|1--path|1--append|1--check|1--publish|1--follow|1--lookup|1--pointers|1--boundary) CARD_VERB="${_a#--}" ;;
+    1--fixture-run) CARD_VERB=fixture-run; _want=fixture ;;
     1--session) _want=sid ;;
     1--session=*) CARD_SID="${_a#--session=}" ;;
     1--build) _want=build ;;
     1--to) _want=to ;;
     1--terminal) CARD_TERMINAL=1 ;;
+    1--transcript) _want=tx ;;
+    1--out) _want=out ;;
     *) _rest+=("$_a") ;;
   esac
 done
 set -- ${_rest[@]+"${_rest[@]}"}
 if [ -n "$CARD" ] && [ -z "$CARD_VERB" ]; then
-  echo "MANIFEST env ERROR — --card needs one of --write, --replay, --path, --append, --check, --publish, --follow or --lookup"; exit 2
+  echo "MANIFEST env ERROR — --card needs one of --write, --replay, --path, --append, --check, --publish, --follow, --lookup, --pointers, --boundary or --fixture-run"; exit 2
 fi
+# The session the caller named, before a follow's or a pointers publish's default fills CARD_SID below:
+# `--card --pointers` writes a session card only when one was named (KICK-dKeptSession-13 S4).
+CARD_SID_GIVEN=${CARD_SID:+1}
 if [ -n "$CARD" ]; then
   case "$CARD_VERB:${CARD_BUILD:+b}" in
-    publish:|follow:|lookup:) echo "MANIFEST env ERROR — --card --$CARD_VERB needs --build <slug>"; exit 2 ;;
-    write:b|replay:b|append:b|check:b) echo "MANIFEST env ERROR — --build is the build card's flag, and --card --$CARD_VERB takes none"; exit 2 ;;
+    publish:|follow:|lookup:|pointers:|boundary:) echo "MANIFEST env ERROR — --card --$CARD_VERB needs --build <slug>"; exit 2 ;;
+    write:b|replay:b|append:b|check:b|fixture-run:b) echo "MANIFEST env ERROR — --build is the build card's flag, and --card --$CARD_VERB takes none"; exit 2 ;;
   esac
+  # The boundary verb's flags (KICK-dKeptSession-13 S6): it reads one named session's card, and its `--out`
+  # file is written through a temp beside it, so a directory that does not exist is refused here.
+  if [ "$CARD_VERB" = boundary ]; then
+    [ -n "$CARD_SID" ] || { echo "MANIFEST env ERROR — --card --boundary needs --session <sid>, the session whose card holds the item"; exit 2; }
+    if [ -n "$CARD_OUT" ]; then
+      case "$CARD_OUT" in /*|[A-Za-z]:*) ;; *) CARD_OUT="$PWD/$CARD_OUT" ;; esac
+      [ -d "${CARD_OUT%/*}" ] || { echo "MANIFEST env ERROR — --out $CARD_OUT names a file in a directory that does not exist, so nothing ran"; exit 2; }
+    fi
+  elif [ -n "$CARD_TX_ARG" ] || [ -n "$CARD_OUT" ]; then
+    echo "MANIFEST env ERROR — --transcript and --out are --card --boundary's flags"; exit 2
+  fi
+  [ "$CARD_VERB" != fixture-run ] || [ -n "$CARD_FIXTURE_DIR" ] \
+    || { echo "MANIFEST env ERROR — --card --fixture-run needs <scratch-dir>, the directory the card-import fixture builds under"; exit 2; }
   [ -z "$CARD_BUILD" ] || [[ $CARD_BUILD =~ ^[A-Za-z0-9]+$ ]] \
     || { echo "MANIFEST env ERROR — --build '$CARD_BUILD' is not a build slug, [A-Za-z0-9]+, and is not joined into a ref or a path"; exit 2; }
   if [ "$CARD_VERB" = follow ]; then
@@ -245,6 +278,11 @@ cd "$ROOT" || exit 2
 # instruction from nobody. The cap is one constant; the append verb of the next unit refuses against
 # the same one. The env override exists for the self-test's over-cap arm and is not an adopter knob.
 CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
+# The card-import fixture `--card --fixture-run` runs and `read_card_fixture_verdict` hashes, the kickoff
+# engine's sibling (KICK-dKeptSession-12 S1). The env override exists for the self-test's stub fixture,
+# as CARD_CAP_BYTES's does, and is not an adopter knob.
+CARD_FIXTURE=${CARD_FIXTURE:-$MC_DIR/card-compaction.fixture.sh}
+CARD_FIXTURE_VERDICT=card-fixture.verdict
 # The `overlaps —` cell's two constants (KICK-aMendedFleet-2): the read's bound in seconds and the
 # row cap. The bound's env override exists for the self-test's slow-driver arm, as CARD_CAP_BYTES's
 # does; neither is an adopter knob.
@@ -262,6 +300,25 @@ CARD_CLI_BOUND=${CARD_CLI_BOUND:-5}
 # The `memory —` cell's bound on the playbook kit's index measure, in seconds (PLAY-dOrderedCharter-14);
 # the env override exists for the self-test's slow-stub arm and is not an adopter knob.
 CARD_MEMORY_BOUND=${CARD_MEMORY_BOUND:-5}
+# The `## pointers` section's two bounds, in seconds (KICK-dKeptSession-13): the loop kit's item boundary,
+# `position.py --boundary`, PINNED 2026-11-21 at KICK-dKeptSession-15's figure for the same read, above the
+# 7.3 s measured over dKeptSession; and the records reader, `gen_build_index.py --latest-records`. The env
+# overrides exist for the self-test's slow-stub arms, as CARD_CLI_BOUND's does; neither is an adopter knob.
+CARD_POSITION_BOUND=${CARD_POSITION_BOUND:-10}
+CARD_RECORDS_BOUND=${CARD_RECORDS_BOUND:-5}
+# The `budget —` line's bound on the loop kit's `budget.py state`, in seconds (KICK-dKeptSession-26),
+# PINNED 2026-11-21: the module reads the build's homes with no remote call, and its `ending` verb, the
+# same read and more, took 1.1 s over dKeptSession. The env override exists for the self-test's stub
+# fixture, as CARD_CLI_BOUND's does, and is not an adopter knob.
+CARD_BUDGET_BOUND=${CARD_BUDGET_BOUND:-10}
+# The `context —` line's bound on the runlog kit's `runlog.py context <transcript>`, in seconds
+# (KICK-dKeptSession-14 S5), the map's own figure, above the 1.5 s a main-file parse of a 232 MB
+# transcript took, PINNED 2026-11-21 by that unit. The env override exists for the self-test's slow-stub
+# plant, as CARD_MAP_BOUND's does, and is not an adopter knob.
+CARD_CONTEXT_BOUND=${CARD_CONTEXT_BOUND:-5}
+# The lines a stored `## pointers` section holds, the one list `check_card_pointers` reads: each later
+# session unit appends its own word (KICK-dKeptSession-26 `budget`, KICK-dKeptSession-5 `mail`).
+POINTER_LINES="records forks item budget mail"
 # The `claims —` cell's three constants (TOOL-aGraftedHelix-2): the read's bound in seconds, the
 # second clock's hide age, and the row cap. The bound's env override exists for the self-test's
 # slow-driver arm, as CARD_CAP_BYTES's does; none of the three is an adopter knob.
@@ -357,6 +414,122 @@ read_session_id() {
   CARD_SID="$sid"
 }
 
+# The session's Claude Code version, read from `AI_AGENT` by the unattended driver's rule, spelled again
+# here because this kit names no file of another: a `claude-code_` prefix, the field before the next
+# `_`, dashes as dots, two to four integers. ONE READER (KICK-dKeptSession-12 S1): the `cli —` cell and
+# the card-import fixture's verdict both ask it. It assigns the variable its argument names by `printf
+# -v`, as `getval` does, so no caller forks a subshell to read it (KICK-dKeptSession-69 S8); that name
+# is never `_rv`, the one local here, which `printf -v` would write instead.
+read_session_cli_version() { # VAR -> VAR set to the version; 1 and VAR empty when AI_AGENT names none
+  local _rv=""
+  printf -v "$1" '%s' ''
+  case "${AI_AGENT:-}" in claude-code_*) _rv=${AI_AGENT#claude-code_}; _rv=${_rv%%_*}; _rv=${_rv//-/.} ;; esac
+  [[ $_rv =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || return 1
+  printf -v "$1" '%s' "$_rv"
+}
+
+# PATH's `claude` version, ONE READ (KICK-dKeptSession-37 S1): the `cli —` cell and the card-import
+# fixture's verdict both ask it, so the bound and the parse live once. Bounded by CARD_CLI_BOUND and
+# landed in a scratch file under the card dir, never a `$( )` capture a grandchild could hold open;
+# the first token of two to four integers on the first line it prints.
+read_claude_version() { # -> the version, 0; or `unknown: <why>`, 1
+  local p="" t sf rc
+  local -a toks
+  command -v claude >/dev/null 2>&1 || { printf 'unknown: no claude on PATH\n'; return 1; }
+  sf="$CARD_DIR/.cli.$$"
+  mkdir -p "$CARD_DIR" 2>/dev/null
+  timeout -k 2 "$CARD_CLI_BOUND" claude --version </dev/null >"$sf" 2>/dev/null; rc=$?
+  [ -f "$sf" ] && read -r -a toks < "$sf"
+  rm -f "$sf" 2>/dev/null
+  case "$rc" in 124|137) printf 'unknown: claude --version did not answer within %ss\n' "$CARD_CLI_BOUND"; return 1 ;; esac
+  for t in ${toks[@]+"${toks[@]}"}; do
+    t=${t%$'\r'}
+    [[ $t =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] && { p=$t; break; }
+  done
+  [ -n "$p" ] || { printf 'unknown: claude --version printed no version\n'; return 1; }
+  printf '%s\n' "$p"
+}
+
+# THE CARD-IMPORT FIXTURE'S VERDICT (KICK-dKeptSession-12 S1, S2): one line in the card directory,
+# `card-fixture — <verdict> · fixture <blob8> · cli <version> · <iso>`, node-local because the harness
+# that compacts is the node's, and overwritten by every `--card --fixture-run`. The verdict is `pass`
+# for the fixture's exit 0, `red <limb>` for exit 1 with the limb its last line names after `FAILED
+# limb`, `absent` for its could-not-run exit 2, and `red exit <rc>` otherwise; the blob is `git
+# hash-object` over the fixture, the version `read_claude_version`'s, read just before the fixture runs,
+# so it names the binary the fixture's `claude -p` resolves and never the session's (KICK-dKeptSession-37
+# S2), else `unknown`. The writer writes nothing outside the scratch directory but this file and the
+# version read's scratch file, which it removes; the fixture's harness keeps its own
+# transcripts, the one write it names. WHAT THIS DOES NOT CHECK: that the fixture judged anything — a
+# stub under CARD_FIXTURE records a pass as readily as the real one, and the blob is what tells them apart.
+write_card_fixture_verdict() { # scratch dir -> the line it wrote; 2 with nothing written when no fixture runs
+  local dir=$1 out rc verdict blob ver at line re_limb='FAILED limb ([A-Za-z0-9]+)'
+  [ -f "$CARD_FIXTURE" ] || { echo "MANIFEST env ERROR — no card-import fixture at $CARD_FIXTURE, so nothing ran and no verdict was written"; return 2; }
+  blob=$(git hash-object -- "$CARD_FIXTURE" 2>/dev/null) && [ -n "$blob" ] \
+    || { echo "MANIFEST env ERROR — git hash-object could not read $CARD_FIXTURE, so nothing ran and no verdict was written"; return 2; }
+  case "$dir" in /*|[A-Za-z]:*) ;; *) dir="$CALLER_PWD/$dir" ;; esac
+  ver=$(read_claude_version) || ver=unknown
+  out=$(bash "$CARD_FIXTURE" "$dir" </dev/null 2>&1); rc=$?
+  out=${out//$'\r'/}
+  case "$rc" in
+    0) verdict=pass ;;
+    1) verdict="red exit 1"; [[ ${out##*$'\n'} =~ $re_limb ]] && verdict="red ${BASH_REMATCH[1]}" ;;
+    2) verdict=absent ;;
+    *) verdict="red exit $rc" ;;
+  esac
+  printf -v at '%(%Y-%m-%dT%H:%M:%S%z)T' -1
+  line="card-fixture — $verdict · fixture ${blob:0:8} · cli $ver · $at"
+  { mkdir -p "$CARD_DIR" && printf '%s\n' "$line" > "$CARD_DIR/$CARD_FIXTURE_VERDICT"; } 2>/dev/null \
+    || { echo "MANIFEST env ERROR — cannot write $CARD_DIR/$CARD_FIXTURE_VERDICT, so the fixture's $verdict is unrecorded"; return 2; }
+  printf '%s\n' "$line"
+}
+
+# Two dotted versions compared field by field as integers, a missing field read as 0
+# (KICK-dKeptSession-56 S22): the one compare `derive_cli_line` and `read_card_fixture_verdict` ask, so
+# a recorded `cli 2.1` and a session's `2.1.0` are one version (S37). It assigns the variable its third
+# argument names by `printf -v`, as `read_session_cli_version` does, so no caller forks a subshell; that
+# name is never one of the locals here, which `printf -v` would write instead. Both versions are the
+# readers' own, two to four integers each, so no field is anything but digits.
+derive_version_order() { # a · b · VAR -> VAR set to -1 (a older than b), 0 (equal) or 1 (a newer)
+  local _vo=0 _vi
+  local -a _va _vb
+  _va=(${1//./ }); _vb=(${2//./ })
+  for _vi in 0 1 2 3; do
+    (( 10#${_va[_vi]:-0} == 10#${_vb[_vi]:-0} )) && continue
+    if (( 10#${_va[_vi]:-0} < 10#${_vb[_vi]:-0} )); then _vo=-1; else _vo=1; fi
+    break
+  done
+  printf -v "$3" '%s' "$_vo"
+}
+
+# The verdict's reader, which `derive_resume_lines`' `always-resume` arm asks: `pass` only while the
+# recorded verdict is `pass`, its blob is the installed fixture's now, and its version is both PATH's
+# `claude`'s now, `read_claude_version`'s, and the session's now, `read_session_cli_version`'s
+# (KICK-dKeptSession-38 S1), each equality `derive_version_order`'s `0`, the field-wise compare, so a
+# recorded `cli 2.1` equals a `2.1.0` (KICK-dKeptSession-56 S22, S37); otherwise one `red: <why>` line. The tests run in that order and the first
+# that fails answers, so a recorded red keeps its own reason and a verdict that is no pass spawns no
+# `claude --version`. An unknown version on any side is red, never an equality (S2). A line off the
+# writer's grammar reads as no run, so the override can only fail towards recommending a fresh session.
+read_card_fixture_verdict() { # -> pass, or red: <why>; one line on stdout, 0 always
+  local l="" v old8 oldv blob p="" s="" c=0
+  local re='^card-fixture — (pass|absent|red [A-Za-z0-9 ]+) · fixture ([0-9a-f]{8}) · cli ([0-9]+(\.[0-9]+){1,3}|unknown) · [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[+-][0-9]{4}$'
+  [ -f "$CARD_FIXTURE" ] || { echo "red: no fixture installed"; return 0; }
+  [ -f "$CARD_DIR/$CARD_FIXTURE_VERDICT" ] && IFS= read -r l < "$CARD_DIR/$CARD_FIXTURE_VERDICT"
+  l=${l%$'\r'}
+  [[ $l =~ $re ]] || { echo "red: no recorded run"; return 0; }
+  v=${BASH_REMATCH[1]}; old8=${BASH_REMATCH[2]}; oldv=${BASH_REMATCH[3]}
+  [ "$v" = pass ] || { echo "red: $v"; return 0; }
+  blob=$(git hash-object -- "$CARD_FIXTURE" 2>/dev/null); blob=${blob:-unhashed}
+  [ "${blob:0:8}" = "$old8" ] || { echo "red: recorded for fixture $old8, now ${blob:0:8}"; return 0; }
+  [ "$oldv" != unknown ] || { echo "red: cli version unknown · recorded"; return 0; }
+  p=$(read_claude_version) || { echo "red: cli version unknown · PATH"; return 0; }
+  read_session_cli_version s || { echo "red: cli version unknown · session"; return 0; }
+  derive_version_order "$p" "$oldv" c
+  [ "$c" = 0 ] || { echo "red: recorded under cli $oldv, PATH now $p"; return 0; }
+  derive_version_order "$s" "$oldv" c
+  [ "$c" = 0 ] || { echo "red: fixture ran cli $oldv, this session runs $s"; return 0; }
+  echo pass
+}
+
 # `--path` answers here, before the manifest resolves: it needs the repository (for the common dir)
 # and the id, and nothing else. Print-only, exit 0, no `fail` branch — the `--locations` shape.
 if [ -n "$CARD" ]; then
@@ -365,10 +538,17 @@ if [ -n "$CARD" ]; then
   CARD_DIR="$CARD_DIR/orientation"
   # The build card's cache path is keyed by the build, so it needs no session (TOOL-dPlacedRequest-2 S10).
   [ "$CARD_VERB:${CARD_BUILD:+b}" = path:b ] && { printf '%s/%s.md\n' "$CARD_DIR" "$CARD_BUILD"; exit 0; }
+  # The fixture's run judges the node's harness, not a session's, so it takes no session and reads no
+  # stdin, and answers before `read_session_id`, which would refuse it or wait on stdin (KICK-dKeptSession-12 S1).
+  [ "$CARD_VERB" != fixture-run ] || { write_card_fixture_verdict "$CARD_FIXTURE_DIR"; exit $?; }
   # A follow runs from the loop kit's transition writer, which holds no session: the card names the
   # harness's session where one is in the environment, else `none`.
   [ "$CARD_VERB" != follow ] || [ -n "$CARD_SID" ] || CARD_SID=${CLAUDE_CODE_SESSION_ID:-none}
+  # A pointers publish with no session names a build card alone, and is by that session or `none` alike.
+  [ "$CARD_VERB" != pointers ] || [ -n "$CARD_SID" ] || CARD_SID=${CLAUDE_CODE_SESSION_ID:-none}
   read_session_id
+  # The boundary verb's transcript, for the card file's owner line (KICK-dKeptSession-13 S6).
+  [ -z "$CARD_TX_ARG" ] || CARD_TRANSCRIPT=$CARD_TX_ARG
   CARD_FILE="$CARD_DIR/$CARD_SID.md"
   [ "$CARD_VERB" = path ] && { printf '%s\n' "$CARD_FILE"; exit 0; }
   # The session's own tree, resolved once: the payload's `cwd` when git places it in a repository.
@@ -474,34 +654,15 @@ derive_node_tag() {
 }
 
 # The `cli —` cell (KICK-aMendedFleet-4): PATH's `claude --version` against the running session's
-# version. The session's is read from `AI_AGENT` by the unattended driver's rule, spelled again here
-# because this kit names no file of another: a `claude-code_` prefix, the field before the next `_`,
-# dashes as dots, two to four integers. The PATH read is bounded and lands in a scratch file under
-# the card dir, never a `$( )` capture a grandchild could hold open. Fields compare as integers, a
-# missing one as 0; every failure is its own `skipped:` line, and none moves the card's exit.
+# version. The session's is `read_session_cli_version`'s, the one reader of `AI_AGENT`, and PATH's
+# `read_claude_version`'s, the one read of that binary, whose `unknown:` reason is the `skipped:` line.
+# The two compare through `derive_version_order`, field by field as integers, a missing one as 0
+# (KICK-dKeptSession-56 S22); every failure is its own `skipped:` line, and none moves the card's exit.
 derive_cli_line() {
-  local s="" p="" t sf rc c=0 i
-  local -a toks a b
-  case "${AI_AGENT:-}" in claude-code_*) s=${AI_AGENT#claude-code_}; s=${s%%_*}; s=${s//-/.} ;; esac
-  [[ $s =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || { printf 'cli — skipped: AI_AGENT names no Claude Code version\n'; return 0; }
-  command -v claude >/dev/null 2>&1 || { printf 'cli — skipped: no claude on PATH\n'; return 0; }
-  sf="$CARD_DIR/.cli.$$"
-  mkdir -p "$CARD_DIR" 2>/dev/null
-  timeout -k 2 "$CARD_CLI_BOUND" claude --version </dev/null >"$sf" 2>/dev/null; rc=$?
-  [ -f "$sf" ] && read -r -a toks < "$sf"
-  rm -f "$sf" 2>/dev/null
-  case "$rc" in 124|137) printf 'cli — skipped: claude --version did not answer within %ss\n' "$CARD_CLI_BOUND"; return 0 ;; esac
-  for t in ${toks[@]+"${toks[@]}"}; do
-    t=${t%$'\r'}
-    [[ $t =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] && { p=$t; break; }
-  done
-  [ -n "$p" ] || { printf 'cli — skipped: claude --version printed no version\n'; return 0; }
-  a=(${p//./ }); b=(${s//./ })
-  for i in 0 1 2 3; do
-    (( 10#${a[i]:-0} == 10#${b[i]:-0} )) && continue
-    if (( 10#${a[i]:-0} < 10#${b[i]:-0} )); then c=-1; else c=1; fi
-    break
-  done
+  local s="" p="" c=0
+  read_session_cli_version s || { printf 'cli — skipped: AI_AGENT names no Claude Code version\n'; return 0; }
+  p=$(read_claude_version) || { printf 'cli — skipped: %s\n' "${p#unknown: }"; return 0; }
+  derive_version_order "$p" "$s" c
   case "$c" in
     0) printf 'cli — %s · PATH claude matches this session\n' "$s" ;;
     -1) printf "cli — NOTE: PATH claude %s is older than this session's %s, so a session started from PATH runs the older CLI\n" "$p" "$s" ;;
@@ -964,6 +1125,11 @@ derive_pockets_block() {
 REPLAY_KEYS=""
 print_replay() {
   local build="" said="" keep
+  # I10, THE REPLAY ORDER, stated here alone and fixed by the order of these calls (KICK-dKeptSession-12
+  # S5): the map block, the stored card re-keyed, its `card —` line, then `derive_resume_lines`' `route —`,
+  # `resume —` and `partial —` lines, then the computed lines the session units add after `partial —` —
+  # `position —` and, after a compaction, its `lead —` notice (KICK-dKeptSession-15), then `context —`
+  # (KICK-dKeptSession-14) — and the one `now —` line last.
   derive_map_block
   if [ -f "$CARD_FILE" ]; then
     build=$(read_card_build "$CARD_FILE")
@@ -977,6 +1143,9 @@ print_replay() {
     REPLAY_KEYS=$(awk '{ sub(/\r$/, "") } sub(/^keys — skipped: /, "keys skipped: ") { print; exit }
       /^keys — view / { print "keys view fresh · remote evidence"; exit }' "$CARD_FILE")
   fi
+  render_position_line "$build"
+  render_lead_notice
+  render_context_line
   derive_head_state
   printf 'now — HEAD %s · %s · %s · %s · %s\n' "$HEAD_SHA" "$HEAD_BRANCH" "$HEAD_DIRTY" "$TOPLEVEL" "$REPLAY_KEYS"
 }
@@ -1781,7 +1950,7 @@ add_card_body() {
 # numbers still address the rows they belong to): a commit subject naming a since-removed path is
 # not a citation (the aReplayedCard closing review, F9).
 check_card() {
-  local real
+  local real lacks
   [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE; write one with --card --write --session $CARD_SID"; exit 2; }
   real=$(grep "$CARD_READY_RE" "$CARD_FILE" | grep -vc "${CARD_READY_RE}none yet"); real=${real:-0}
   if [ "$real" -gt 0 ] && ! grep -q '^## task' "$CARD_FILE"; then
@@ -1793,11 +1962,24 @@ check_card() {
        { inlog=0; print ln }' "$CARD_FILE" > "$CARD_TMP/checked"
   check_card_citations "$CARD_TMP/checked"
   [ "$CARD_TOKENS" -gt 0 ] || { echo "MANIFEST env ERROR — DEAD PROBE: nothing to check — $CARD_FILE carries no path-shaped and no id-shaped token"; exit 1; }
-  if [ -s "$CARD_TMP/misses" ]; then
+  lacks=$(check_card_pointers "$CARD_FILE")
+  if [ -s "$CARD_TMP/misses" ] || [ -n "$lacks" ]; then
     awk -F '\t' '{print $2 " · line " $1}' "$CARD_TMP/misses"
+    for real in $lacks; do printf "POINTERS — the '## pointers' section has no '%s —' line, which POINTER_LINES lists; --card --pointers --build <slug> --session %s renders it\n" "$real" "$CARD_SID"; done
     exit 1
   fi
   exit 0
+}
+
+# The `## pointers` section's required lines (KICK-dKeptSession-13 S2): each POINTER_LINES word the
+# section of the card at `$1` carries no `<word> —` line for, one per line. A card with no section
+# prints nothing, so a card written before the section landed checks as it did.
+check_card_pointers() { # card file -> each missing word on stdout; 0 always
+  LC_ALL=C awk -v want="$POINTER_LINES" '{ sub(/\r$/, "") }
+    /^## pointers[[:space:]]*$/ { inp = 1; seen = 1; next }
+    inp && (/^## / || /^(- )?READY — /) { inp = 0 }
+    inp { split($0, w, " "); if (w[2] == "—") has[w[1]] = 1 }
+    END { if (!seen) exit; n = split(want, k, " "); for (i = 1; i <= n; i++) if (!(k[i] in has)) print k[i] }' "$1"
 }
 
 # ---- the build card (TOOL-dPlacedRequest-2) ------------------------------------------------------
@@ -1824,8 +2006,10 @@ check_card() {
 # fetches from the remote it resolves into the cache ref, writing no `FETCH_HEAD`, and sights the feed,
 # so this engine carries no feed block and no writer. A lost compare-and-swap re-reads the tip, re-renders once on it and writes
 # again. Every store's failure is its own `card —` line and never changes the caller's exit.
-# THE FIVE POLICY KEYS are read by `read_card_policy`, one literal `get` line per key, the shape the
-# policy kit's reader coverage counts (as `read_spec_audit_switch` in the unattended driver does).
+# THE POLICY KEYS this engine reads, `card.follows`, `card.store`, `card.snapshot`, `card.pointers`,
+# `resume.context`, `resume.partial`, `context.on-full` and `context.threshold`, are read by
+# `read_card_policy`, one literal `get` line per key, the shape the policy kit's reader coverage counts
+# (as `read_spec_audit_switch` in the unattended driver does).
 # WHAT THIS DOES NOT CHECK: that the card's text is true, which its cells derive; who may publish a build's
 # card, which the lease and the claim decide.
 # THE LOOKUP BOUND (TOOL-dPlacedRequest-49 S2): a reader's bound sits inside the claims cell's, so
@@ -1841,15 +2025,18 @@ CARD_PUBLISH_BOUND=${CARD_PUBLISH_BOUND:-140}   # seconds the driver's write of 
 RESUME_IDLE_S=300
 CARD_REF_TIP=""; CARD_REF_WHY=""; CARD_DRV=""; CARD_STORED_STEP=""; CARD_STORED_FROM=""; CARD_REC=""; CARD_REC_STEP=""
 
-read_card_policy() { # card.follows|card.store|card.snapshot|resume.context|resume.partial -> its value on stdout, a set's members one per line; 1 and the refusal on stdout
+read_card_policy() { # card.follows|card.store|card.snapshot|card.pointers|resume.context|resume.partial|context.on-full|context.threshold -> its value on stdout, a set's members one per line; 1 and the refusal on stdout
   local def pk d py out v n=0
   case "${1:-}" in
     card.follows) def=re-render-at-transition ;;
     card.store) def="remote-ref build-folder local-clone" ;;
     card.snapshot) def=terminal-only ;;
+    card.pointers) def=every-item ;;
     resume.context) def=fresh-when-idle ;;
     resume.partial) def=continue-item ;;
-    *) printf "read_card_policy reads card.follows, card.store, card.snapshot, resume.context or resume.partial, and was asked for '%s'\n" "${1:-}"
+    context.on-full) def=fresh-at-boundary ;;
+    context.threshold) def=60% ;;
+    *) printf "read_card_policy reads card.follows, card.store, card.snapshot, card.pointers, resume.context, resume.partial, context.on-full or context.threshold, and was asked for '%s'\n" "${1:-}"
        return 1 ;;
   esac
   pk=$(resolve_kit_file policy policy.py)
@@ -1863,8 +2050,11 @@ read_card_policy() { # card.follows|card.store|card.snapshot|resume.context|resu
     card.follows) out=$("$py" "$d/policy.py" get card.follows 2>&1) ;;
     card.store) out=$("$py" "$d/policy.py" get card.store 2>&1) ;;
     card.snapshot) out=$("$py" "$d/policy.py" get card.snapshot 2>&1) ;;
+    card.pointers) out=$("$py" "$d/policy.py" get card.pointers 2>&1) ;;
     resume.context) out=$("$py" "$d/policy.py" get resume.context 2>&1) ;;
     resume.partial) out=$("$py" "$d/policy.py" get resume.partial 2>&1) ;;
+    context.on-full) out=$("$py" "$d/policy.py" get context.on-full 2>&1) ;;
+    context.threshold) out=$("$py" "$d/policy.py" get context.threshold 2>&1) ;;
   esac || { printf '%s\n' "${out:-policy.py get $1 exited non-zero}"; return 1; }
   out=${out//$'\r'/}
   for v in $out; do
@@ -1873,8 +2063,13 @@ read_card_policy() { # card.follows|card.store|card.snapshot|resume.context|resu
       card.follows:re-render-at-transition|card.follows:card-per-step|card.follows:fixed-at-start) ;;
       card.store:remote-ref|card.store:build-folder|card.store:local-clone) ;;
       card.snapshot:terminal-only|card.snapshot:every-transition) ;;
+      card.pointers:every-item|card.pointers:at-transitions) ;;
       resume.context:fresh-when-idle|resume.context:always-resume|resume.context:always-fresh) ;;
       resume.partial:continue-item|resume.partial:restart-item|resume.partial:ask-owner) ;;
+      context.on-full:compact-with-card|context.on-full:fresh-at-boundary) ;;
+      context.threshold:*)
+        [[ $v =~ ^(100|[1-9]?[0-9])%$ ]] \
+          || { printf "%s answered '%s', which is outside the row's pattern (100|[1-9]?[0-9])%%\n" "$1" "$v"; return 1; } ;;
       *) printf "%s answered '%s', which is outside the closed set this engine branches on\n" "$1" "$v"; return 1 ;;
     esac
   done
@@ -2036,7 +2231,7 @@ render_build_card() { # slug · step · tail file · writer verb -> the card on 
 # the stored card's, else `unrecorded`. Snapshot 1 writes the `card` record where build-folder is selected.
 write_build_card() { # slug · step or empty · session|stored|none · writer verb · snapshot 0|1 · terminal 0|1 -> its card — lines; 0 always
   local slug=$1 step=$2 mode=$3 verb=$4 snap=$5 term=$6 stores ref="refs/gov/remote/builds/$1/card" card="$CARD_TMP/bc.card"
-  local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark="" a from=""
+  local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark="" a from="" bytes sb
   [ "$term" != 1 ] || mark=" · terminal"
   stores=$(read_card_policy card.store) || { printf 'card — skipped: card.store refused: %s\n' "${stores%%$'\n'*}"; return 0; }
   stores=" ${stores//$'\n'/ } "
@@ -2057,11 +2252,24 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
               else printf 'READY — none yet\n' > "$tail"; fi ;;
       none) printf 'READY — none yet\n' > "$tail" ;;
     esac
+    # Every tail carries a fresh `## pointers` section, so every publish and every follow does, under
+    # both values of card.pointers (KICK-dKeptSession-13 S4, S8).
+    write_pointers "$tail" "$slug"
     if [ -z "$2" ]; then
       step=unrecorded
       ! read_card_stored "$slug" "$CARD_TMP/bc.stored" "$stores" || [ -z "$CARD_STORED_STEP" ] || step=$CARD_STORED_STEP
     fi
-    render_build_card "$slug" "$step" "$tail" "$verb" > "$card" || { cat "$card"; return 0; }
+    if ! render_build_card "$slug" "$step" "$tail" "$verb" > "$card"; then
+      # A card the section alone pushes past the cap is named as the section's refusal (S4).
+      bytes=$(wc -c < "$CARD_TMP/bc.render" | tr -d '[:space:]')
+      sb=$(wc -c < "$CARD_TMP/pointers.sec" 2>/dev/null | tr -d '[:space:]')
+      if [ -n "$sb" ] && [ $((bytes - sb)) -le "$CARD_CAP_BYTES" ]; then
+        printf 'card — pointers not written: %s bytes over the cap\n' "$((bytes - CARD_CAP_BYTES))"
+      else
+        cat "$card"
+      fi
+      return 0
+    fi
     [ "$remote" = 1 ] || break
     printf -v msg 'gov-card %s\n\nstep: %s%s\nsession: %s\n\n%s' "$slug" "$step" "$mark" "$CARD_SID" "$(<"$card")"
     printf '%s' "$msg" > "$CARD_TMP/bc.msg" || { printf 'card — remote-ref not written: cannot write the message to %s\n' "$CARD_TMP/bc.msg"; remote=2; break; }
@@ -2188,6 +2396,239 @@ write_card_follow() { # slug · state · terminal 0|1 -> its card — lines; 0 a
   write_build_card "$1" "$2" "$mode" follow "$snap" "$3"
 }
 
+# ---- the card's pointers (KICK-dKeptSession-13) ---------------------------------------------------
+# THE SECTION, I11: `## pointers` and its lines, in each tail `write_build_card` builds and in a session's
+# card, directly above the READY line, which stays last:
+#   records — <kind> <path> · …      the build's newest bound record of each base kind, `gen_build_index.py
+#                                     --latest-records`, under CARD_RECORDS_BOUND; a typed kind is never
+#                                     named, so the line cannot grow with them (KICK-dKeptSession-44 S22)
+#   forks — <spec path> §8 · …       each unit the item boundary's derivation grades FORKED, by its tracked
+#                                     spec under the build's `spec/`; the `§8` a word apart, so the path is
+#                                     one token `extract_card_tokens` finds tracked
+#   item — <instance key|none> · at <sha8>   the boundary's answer and the HEAD it was derived at
+#   budget — <answer>                the build's rework budget, the loop kit's `budget.py state --build
+#                                     <slug>` line as it prints it, under CARD_BUDGET_BOUND (KICK-dKeptSession-26)
+#   mail — <id> <id> …|none          the build's open mail, the unattended driver's `--mail read <slug> --open
+#                                     --ids`, under CARD_CLAIMS_BOUND (KICK-dKeptSession-5 S13)
+# A source that does not resolve is its line's `<word> — skipped: <why>`, the `item —` line still ending
+# ` · at <sha8>`. THE ITEM BOUNDARY, I12, is the loop kit's `position.py <slug> --boundary <pointer>`, run by
+# `run_item_boundary` under CARD_POSITION_BOUND, once per process: its file is kept for every later write.
+# `card.pointers` decides what a crossing publishes: `every-item` the build card, `at-transitions`
+# nothing, a follow re-rendering the section under both. WHAT THIS DOES NOT CHECK: that a record's text or
+# a fork is current between two boundaries; the section is as fresh as its last write.
+run_item_boundary() { # slug · pointer · file -> 0 with the boundary's two lines in the file, 1 with one why line in it
+  local pos py rc
+  pos=$(resolve_kit_file loop position.py)
+  [ -n "$pos" ] || { printf 'no loop kit position.py resolves in this tree\n' > "$3"; return 1; }
+  py=$(resolve_python 2>/dev/null) || { printf 'no Python resolves on this node\n' > "$3"; return 1; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'this node has no working timeout -k, so the read would be unbounded and none ran\n' > "$3"; return 1; }
+  timeout -k 2 "$CARD_POSITION_BOUND" "$py" "$pos" "$1" --boundary "$2" </dev/null > "$3.raw" 2>&1; rc=$?
+  if { [ "$rc" = 0 ] || [ "$rc" = 2 ]; } && tr -d '\r' < "$3.raw" | head -n 1 | grep -q '^boundary — '; then
+    tr -d '\r' < "$3.raw" > "$3"; rm -f "$3.raw"; return 0
+  fi
+  case "$rc" in
+    124|137) printf 'the position read did not answer within %ss\n' "$CARD_POSITION_BOUND" > "$3" ;;
+    *) LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+         NF && f == "" { f = $0 }
+         END { if (f == "") f = "position.py --boundary exited " rc " and printed nothing"
+               if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+               print f }' "$3.raw" > "$3" ;;
+  esac
+  rm -f "$3.raw"
+  return 1
+}
+
+# The section over one boundary file, `run_item_boundary`'s: its key the crossing's target, or the
+# pointer it kept; the `at` HEAD now, read in the same process that derived it.
+render_pointers() { # slug · boundary file -> the section on stdout; 0 always
+  local at gbi py rc recs b item ids id spec forks="" memroot
+  at=$(git rev-parse --short=8 HEAD 2>/dev/null | tr -d '\r'); at=${at:-unborn}
+  printf '## pointers\n'
+  gbi=$(resolve_kit_file memory-tree gen_build_index.py)
+  if [ -z "$gbi" ]; then
+    printf 'records — skipped: no memory-tree gen_build_index.py resolves in this tree\n'
+  elif ! py=$(resolve_python 2>/dev/null); then
+    printf 'records — skipped: no Python resolves on this node\n'
+  else
+    timeout -k 2 "$CARD_RECORDS_BOUND" "$py" "$gbi" --latest-records "$1" </dev/null > "$CARD_TMP/pointers.recs" 2>&1; rc=$?
+    case "$rc" in
+      0) recs=$(LC_ALL=C awk '{ sub(/\r$/, "") } NF { printf "%s%s", (n++ ? " · " : ""), $0 }' "$CARD_TMP/pointers.recs")
+         printf 'records — %s\n' "${recs:-none}" ;;
+      124|137) printf 'records — skipped: the records read did not answer within %ss\n' "$CARD_RECORDS_BOUND" ;;
+      *) LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") } NF && f == "" { f = $0 }
+           END { if (f == "") f = "gen_build_index.py --latest-records exited " rc " and printed nothing"
+                 if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+                 print "records — skipped: " f }' "$CARD_TMP/pointers.recs" ;;
+    esac
+  fi
+  b=$(sed -n '1p' "$2" 2>/dev/null)
+  case "$b" in
+    "boundary — none crossed · item "*) item=${b#boundary — none crossed · item }; item=${item%% · *} ;;
+    "boundary — "*" → "*) item=${b##* → } ;;
+    *) printf 'forks — skipped: %s\n' "${b:-no boundary was read}"
+       printf 'item — skipped: %s · at %s\n' "${b:-no boundary was read}" "$at"; render_budget_line "$1"; render_mail_line "$1"; return 0 ;;
+  esac
+  ids=$(sed -n 's/^forked — //p' "$2" | head -n 1)
+  memroot=$(read_memory_root) || memroot=""
+  if [ -z "$memroot" ]; then
+    printf 'forks — skipped: no MEMORY_ROOT names the build folder\n'
+  else
+    for id in ${ids// · / }; do
+      [[ $id =~ ^[A-Za-z]+-[A-Za-z0-9]+-[0-9]+$ ]] || continue
+      spec=$(git ls-files -- "$memroot/builds/$1/spec/*-spec-$id.md" 2>/dev/null | head -n 1)
+      [ -z "$spec" ] || forks="${forks:+$forks · }$spec §8"
+    done
+    printf 'forks — %s\n' "${forks:-none}"
+  fi
+  printf 'item — %s · at %s\n' "$item" "$at"
+  render_budget_line "$1"
+  render_mail_line "$1"
+}
+
+# The section's `mail —` line (KICK-dKeptSession-5 S13): the build's open messages, the unattended driver's
+# `--mail read <slug> --open --ids` run through `run_driver_bounded` under CARD_CLAIMS_BOUND, its one line
+# read: `mail — <id> <id> …` or `mail — none`; `mail — skipped: RUN_CLAIMS is off` where the driver
+# answers `mail — off`; `mail — skipped: <why>` for no driver, the bound passed or a non-zero exit. No
+# replay line is added: the line prints inside the stored card. WHAT THIS DOES NOT CHECK: a message
+# posted after the render; the line is as fresh as the section's last write.
+render_mail_line() { # slug -> one mail — line on stdout; 0 always
+  local o="$CARD_TMP/pointers.mail" rc a
+  run_driver_bounded "$CARD_CLAIMS_BOUND" "$o" /dev/null --mail read "$1" --open --ids; rc=$?
+  if [ "$rc" = 125 ] && [ -n "$CARD_REF_WHY" ]; then printf 'mail — skipped: %s\n' "$CARD_REF_WHY"; return 0; fi
+  a=$(tr -d '\r' < "$o" 2>/dev/null | LC_ALL=C awk 'NF { print; exit }')
+  rm -f "$o" 2>/dev/null
+  case "$rc:$a" in
+    124:*|137:*) printf 'mail — skipped: --mail read did not answer within %ss\n' "$CARD_CLAIMS_BOUND" ;;
+    "0:mail — off") printf 'mail — skipped: RUN_CLAIMS is off\n' ;;
+    0:mail\ —\ *|0:) printf 'mail — skipped: --mail read printed no ids: %s\n' "${a:0:160}" ;;
+    0:*) printf 'mail — %s\n' "${a:0:160}" ;;
+    *) printf 'mail — skipped: --mail read exited %s: %s\n' "$rc" "${a:0:160}" ;;
+  esac
+  return 0
+}
+
+# The section's `budget —` line (KICK-dKeptSession-26 S1): the one line the loop kit's `budget.py state
+# --build <slug>` prints, `open <spent>/<total>`, `spent` or `unfrozen <spent>/<total>`, never re-derived
+# here. Run in `$ROOT`, whose build the module reads under the working directory, stdin closed, into a
+# scratch file under CARD_BUDGET_BOUND, as `derive_map_block` bounds the map; the answer held to one line
+# of printable text. Every failure is one `budget — skipped:` line, and the section is still written.
+# WHAT THIS DOES NOT CHECK: that the answer is current past this render; a draw shows at the next one.
+render_budget_line() { # slug -> one budget — line on stdout; 0 always
+  local bk py rc sf="$CARD_TMP/pointers.budget" line
+  bk=$(resolve_kit_file loop budget.py)
+  [ -n "$bk" ] || { printf 'budget — skipped: no loop kit\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'budget — skipped: no Python resolves on this node\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'budget — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  (cd "$ROOT" && timeout -k 2 "$CARD_BUDGET_BOUND" "$py" "$bk" state --build "$1" </dev/null > "$sf" 2>/dev/null); rc=$?
+  case "$rc" in
+    0) line=$(LC_ALL=C awk '{ sub(/\r$/, ""); gsub(/[[:cntrl:]]/, "") }
+         NF { f = $0; if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }; print f; exit }' "$sf")
+       if [ -n "$line" ]; then printf 'budget — %s\n' "$line"
+       else printf 'budget — skipped: budget.py state exited 0 and printed nothing\n'; fi ;;
+    124|137) printf 'budget — skipped: budget.py state did not answer within %ss\n' "$CARD_BUDGET_BOUND" ;;
+    *) printf 'budget — skipped: budget.py state exited %s\n' "$rc" ;;
+  esac
+  rm -f "$sf" 2>/dev/null
+  return 0
+}
+
+# The `item —` line's key in a card or a tail, `none` where the section, the line or a key is absent.
+read_card_item_key() { # card or tail file -> the key on stdout; 0 always
+  local k
+  k=$(LC_ALL=C awk '{ sub(/\r$/, "") } /^## pointers[[:space:]]*$/ { inp = 1; next } inp && (/^## / || /^(- )?READY — /) { inp = 0 }
+    inp && /^item — [^ ]+ · at / { split($0, w, " "); print w[3]; exit }' "$1")
+  case "$k" in ""|skipped:) k=none ;; esac
+  printf '%s\n' "$k"
+}
+
+# S4: the tail's `## pointers` section replaced, its heading to the line before the next `## ` heading or
+# READY line, or inserted directly before the READY line. The boundary is read once per process, at the
+# tail's own `item —` key; the section written is kept in `$CARD_TMP/pointers.sec` for the cap's refusal.
+write_pointers() { # tail file · slug -> 0 always
+  local bf="$CARD_TMP/pointers.boundary" sec="$CARD_TMP/pointers.sec"
+  [ -f "$bf" ] || run_item_boundary "$2" "$(read_card_item_key "$1")" "$bf"
+  render_pointers "$2" "$bf" > "$sec"
+  PT_SEC="$sec" LC_ALL=C awk 'BEGIN { while ((getline l < ENVIRON["PT_SEC"]) > 0) s = s l "\n" }
+    { sub(/\r$/, "") }
+    /^## pointers[[:space:]]*$/ { skip = 1; next }
+    skip && (/^## / || /^(- )?READY — /) { skip = 0 }
+    skip { next }
+    !done && /^(- )?READY — / { printf "%s", s; done = 1 }
+    { print }
+    END { if (!done) printf "%s", s }' "$1" > "$1.p" && mv -f "$1.p" "$1"
+  return 0
+}
+
+# The session's card rewritten from `$CARD_TMP/startup` and the tail file, its `## pockets` section refitted
+# to the room, then re-rendered into the card file; refused past CARD_CAP_BYTES with the card left as it was.
+write_card_parts() { # tail file -> 0 written, 1 not, its card — line printed
+  local new="$CARD_TMP/parts.new" bytes
+  cat "$CARD_TMP/startup" "$1" | derive_pockets_block > "$new"
+  bytes=$(wc -c < "$new" | tr -d '[:space:]')
+  if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
+    printf 'card — pointers not written: %s bytes over the cap\n' "$((bytes - CARD_CAP_BYTES))"; return 1
+  fi
+  cat "$new" > "$CARD_FILE" 2>/dev/null || { printf 'card — pointers not written: cannot write %s\n' "$CARD_FILE"; return 1; }
+  write_card_file
+  return 0
+}
+
+# The section written into the session's card (S4's `--session`, S6's crossing).
+write_card_pointers() { # slug -> 0 always
+  extract_card_parts "$CARD_FILE"
+  write_pointers "$CARD_TMP/tail" "$1"
+  write_card_parts "$CARD_TMP/tail"
+  return 0
+}
+
+# S6, the one item-boundary point. First the session card's `item —` line moves to HEAD, a section holding
+# `item — none · at <sha8>` written where the card has none, so the hook starts no second verb at this
+# HEAD; then the boundary is read once at the line's old key. A crossing rewrites the session card's
+# section and, under `every-item`, publishes the build card in `stored` mode; with none crossed nothing is
+# published, and the section is rewritten only where it lacks a POINTER_LINES line, so a card the first
+# step gave a section passes `--card --check`. Every later item-boundary reader runs here, after S1:
+# `context.on-full` (KICK-dKeptSession-14), `mailbox.reads` (KICK-dKeptSession-10) and `mailbox.notice`
+# (KICK-dKeptSession-21); `actions.free` (KICK-dKeptSession-8) reads the `item —` line this leaves.
+run_card_boundary() { # slug -> the verb's lines on stdout; 0, or 2 with no session card
+  local slug=$1 old at b mode bf="$CARD_TMP/pointers.boundary"
+  [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE, so it holds no item"; return 2; }
+  old=$(read_card_item_key "$CARD_FILE")
+  at=$(git rev-parse --short=8 HEAD 2>/dev/null | tr -d '\r'); at=${at:-unborn}
+  extract_card_parts "$CARD_FILE"
+  LC_ALL=C awk -v at="$at" '{ sub(/\r$/, "") }
+    /^## pointers[[:space:]]*$/ { inp = 1; seen = 1; print; next }
+    inp && (/^## / || /^(- )?READY — /) { if (!item) print "item — none · at " at; inp = 0; item = 1 }
+    inp && /^item — / { sub(/ · at [^ ]*$/, ""); print $0 " · at " at; item = 1; next }
+    !seen && /^(- )?READY — / { print "## pointers"; print "item — none · at " at; seen = 1; item = 1 }
+    { print }
+    END { if (inp && !item) print "item — none · at " at; if (!seen) { print "## pointers"; print "item — none · at " at } }' \
+    "$CARD_TMP/tail" > "$CARD_TMP/tail.at" && write_card_parts "$CARD_TMP/tail.at"
+  run_item_boundary "$slug" "$old" "$bf"
+  b=$(sed -n '1p' "$bf")
+  case "$b" in
+    "boundary — none crossed"*)
+      printf '%s\n' "$b"
+      [ -z "$(check_card_pointers "$CARD_FILE")" ] || write_card_pointers "$slug" ;;
+    "boundary — "*" → "*)
+      printf '%s\n' "$b"
+      write_card_pointers "$slug"
+      if mode=$(read_card_policy card.pointers); then
+        [ "$mode" != every-item ] || write_build_card "$slug" "" stored boundary 0 0
+      else
+        printf 'card — skipped: card.pointers refused: %s\n' "${mode%%$'\n'*}"
+      fi
+      run_context_boundary
+      if run_mail_notice "$slug" "${b##* → }"; then run_mail_interrupts "$slug" --local
+      else run_mail_interrupts "$slug"; fi ;;
+    *)
+      printf 'boundary — skipped: %s\n' "$b"
+      write_card_pointers "$slug" ;;
+  esac
+  return 0
+}
+
 # The verdict on a cached card against the ref (TOOL-dDeclaredLoop-8 S3's words), the loop kit's
 # `claims.py verdict`: `evidence` with no ref read, `fresh` when the cache's `# card-ref` equals the
 # ref's commit, `re-derived` when it does not. Where that reader does not resolve the cache is never
@@ -2265,14 +2706,23 @@ read_card_build() { # file -> the slug, or nothing
     inr && /^- build: [A-Za-z0-9]+$/ { print substr($0, 10); exit }' "$1"
 }
 
+# The publisher's tree (KICK-dKeptSession-12 S4): the `tree —` cell's first field, up to ` · `, of the
+# build card `resolve_build_card` stored in `$CARD_TMP/bc.found` before its re-key, since the re-key
+# re-renders that cell in the replaying session's own tree. Nothing when no card was found.
+read_stored_tree_cell() { # -> the path, or nothing; 0 always
+  [ -f "$CARD_TMP/bc.found" ] || return 0
+  awk '{ sub(/\r$/, "") } /^tree — / { sub(/^tree — /, ""); i = index($0, " · "); print (i ? substr($0, 1, i - 1) : $0); exit }' "$CARD_TMP/bc.found"
+}
+
 # The resume (S7), after the replay's lookup: the route re-checked over the re-keyed card, then the
 # `resume —` line under resume.context and the `partial —` line under resume.partial. `always-resume`
-# holds only while the card-import fixture's recorded verdict, KICK-dKeptSession-12's
-# `read_card_fixture_verdict`, answers `pass`; while no such reader is defined it reads `red: no recorded
-# run`, that unit's own reason. The entry file is not consulted. The `partial —` line names the act the
-# kickoff skill's resume paragraph states; the replay performs none of them.
+# holds only while the card-import fixture's recorded verdict, `read_card_fixture_verdict`, answers
+# `pass`. The entry file is not consulted. Every line recommending fresh names the tree to start it in
+# (KICK-dKeptSession-12 S4): the stored build card's `tree —` path where `git worktree list` lists it
+# byte for byte, else a new worktree of the build. The `partial —` line names the act the kickoff
+# skill's resume paragraph states; the replay performs none of them.
 derive_resume_lines() { # slug -> the route —, resume — and partial — lines; 0 always
-  local out rc rule ctx rec part act v mtime idle n tx=$CARD_TRANSCRIPT
+  local out rc rule ctx rec part act v mtime idle n tx=$CARD_TRANSCRIPT tree wl where
   out=$( CARD_TMP="$CARD_TMP/rc" && mkdir -p "$CARD_TMP" && check_card_citations "$CARD_FILE" >/dev/null 2>&1 \
          && extract_card_parts "$CARD_FILE" && check_card_route "$CARD_FILE" 1 2>&1 ); rc=$?
   rule=ok
@@ -2282,20 +2732,22 @@ derive_resume_lines() { # slug -> the route —, resume — and partial — line
   fi
   printf 'route — re-checked · %s\n' "${rule:-unchecked: the check exited $rc}"
   if ctx=$(read_card_policy resume.context); then
-    rec="fresh recommended: transcript absent"
+    tree=$(read_stored_tree_cell); where="a new worktree of $1"
+    if [ -n "$tree" ] && wl=$(git worktree list --porcelain 2>/dev/null); then
+      wl=${wl//$'\r'/}
+      [[ $'\n'$wl$'\n' == *$'\n'"worktree $tree"$'\n'* ]] && where=$tree
+    fi
+    rec="fresh recommended: transcript absent · in $where"
     if [ -n "$tx" ] && [ -f "$tx" ] && mtime=$(stat -c %Y -- "$tx" 2>/dev/null) && [[ $mtime =~ ^[0-9]+$ ]]; then
       idle=$(( EPOCHSECONDS - mtime ))
-      if [ "$idle" -gt "$RESUME_IDLE_S" ]; then rec="fresh recommended: idle ${idle}s past ${RESUME_IDLE_S}s"
+      if [ "$idle" -gt "$RESUME_IDLE_S" ]; then rec="fresh recommended: idle ${idle}s past ${RESUME_IDLE_S}s · in $where"
       else rec="resume recommended: idle ${idle}s within ${RESUME_IDLE_S}s"; fi
     fi
     case "$ctx" in
-      always-fresh) printf 'resume — fresh recommended (resume.context: always-fresh)\n' ;;
+      always-fresh) printf 'resume — fresh recommended · in %s (resume.context: always-fresh)\n' "$where" ;;
       fresh-when-idle) printf 'resume — %s (resume.context: fresh-when-idle)\n' "$rec" ;;
       always-resume)
-        v="red: no recorded run"
-        if declare -F read_card_fixture_verdict >/dev/null; then
-          v=$(read_card_fixture_verdict 2>/dev/null | head -n 1 | tr -d '\r'); v=${v:-red: the reader printed nothing}
-        fi
+        v=$(read_card_fixture_verdict); v=${v:-red: the reader printed nothing}
         if [ "$v" = pass ]; then printf 'resume — resume recommended (resume.context: always-resume)\n'
         else printf 'resume — %s (resume.context: always-resume read as fresh-when-idle · card-import fixture red: %s)\n' "$rec" "${v#red: }"; fi ;;
     esac
@@ -2316,9 +2768,180 @@ derive_resume_lines() { # slug -> the route —, resume — and partial — line
   return 0
 }
 
+# The replay's `position —` line (KICK-dKeptSession-15 S1, S2, S4): the build's position as the loop kit's
+# engine re-derives it from witnesses, `position.py <slug> --json`, and never the card's stored `item —`
+# pointer. The engine is found by `resolve_kit_file` and run in the session's own tree, CARD_TREE, entered
+# by a `cd` in the call's subshell, since it takes no root and reads the toplevel of its working directory;
+# stdin closed, into a scratch file under CARD_POSITION_BOUND, as `derive_map_block` bounds the map. An exit
+# 0, or 2, which the engine answers on `invalid-input` and argparse on a refused command line, is read by
+# one `[[ =~ ]]` over the output: `answer` held to the engine's ANSWERS (the loop kit's `position.py#ANSWERS`,
+# spelled again here because this kit names no file of another), and `next.item`, anchored on `next` since
+# `frontier` and `refusals` rows carry an `item` too, held to [A-Za-z0-9._-]+ and named only for `act`.
+# Every failure is one `position — skipped:` line. WHAT THIS DOES NOT CHECK: that the answer is still
+# current when the session reads it, or any field of the JSON past those two.
+render_position_line() { # slug -> one position — line on stdout; 0 always
+  local pos py sf rc out="" ans="" item=none
+  local re_ans='"answer": "([a-z-]+)"' re_item='"next": [{]"item": "([A-Za-z0-9._-]+)"'
+  [ -n "$1" ] || { printf 'position — skipped: the card routes no build\n'; return 0; }
+  pos=$(resolve_kit_file loop position.py)
+  [ -n "$pos" ] || { printf 'position — skipped: no loop kit\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'position — skipped: no Python resolves on this node\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'position — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.position.XXXXXX") \
+    || { printf 'position — skipped: no scratch file under %s to capture the answer in\n' "$CARD_DIR"; return 0; }
+  (cd "$CARD_TREE" && timeout -k 2 "$CARD_POSITION_BOUND" "$py" "$pos" "$1" --json </dev/null >"$sf" 2>/dev/null); rc=$?
+  case "$rc" in 0|2) out=$(<"$sf") ;; esac
+  rm -f "$sf" 2>/dev/null
+  case "$rc" in 124|137) printf 'position — skipped: position.py did not answer within %ss\n' "$CARD_POSITION_BOUND"; return 0 ;; esac
+  [[ $out =~ $re_ans ]] && ans=${BASH_REMATCH[1]}
+  case "$ans" in act|awaiting|blocked|terminal|stuck|invalid-input|stale-remote) ;; *) ans="" ;; esac
+  if [ "$ans" = act ]; then
+    if [[ $out =~ $re_item ]]; then item=${BASH_REMATCH[1]}; else ans=""; fi
+  fi
+  [ -n "$ans" ] || { printf 'position — skipped: position.py printed no answer this replay reads\n'; return 0; }
+  printf 'position — %s · next %s\n' "$ans" "$item"
+}
+
+# The replay's `lead —` notice (KICK-dKeptSession-15 S3), after a compaction alone: the payload's `source`,
+# which `read_session_id` keeps in CARD_SOURCE, reads `compact`. A resume restores the transcript and
+# carries no summary, and a replay run with `--session` or stdin closed reads no payload, so neither prints it.
+render_lead_notice() { # -> the lead — line on stdout after a compaction, else nothing; 0 always
+  [ "$CARD_SOURCE" = compact ] || return 0
+  printf '%s\n' "lead — the compaction summary is a lead, never a source: check it against the position above and the card's pointers"
+}
+
+# The `context —` line (KICK-dKeptSession-14 S3, S4): how full the owner session's window is, the runlog
+# kit's `runlog.py context <transcript>` over CARD_TRANSCRIPT, the payload's `transcript_path` at a replay
+# and the boundary verb's `--transcript`, found by `resolve_kit_file` and run as `derive_map_block` runs the
+# map: under CARD_CONTEXT_BOUND, stdin closed, into a scratch file under the card dir. Its answer is held
+# to `<digits>%` or `none` before any comparison. `context.on-full` decides the line and, under
+# `fresh-at-boundary` alone, `context.threshold`, each read once per verb by `read_card_policy`. At a
+# replay every outcome is one line, a failure `context — skipped: <why>`. At a boundary, `boundary`, the
+# one line is the fresh-now line at or past the threshold; anything else, a skip or a refusal included,
+# prints nothing, since a line at every boundary that changes no act teaches the session to skip it, and
+# under `compact-with-card` nothing is measured. WHAT THIS DOES NOT CHECK: that the window is the model's
+# real one, since the runlog kit derives it, CLAUDE_CODE_MAX_CONTEXT_TOKENS where set, else the node's
+# observed usage rounded up to a rung, and nothing checks either; or that the session acts on the line.
+render_context_line() { # [boundary] -> one context — line on stdout at a replay; at a boundary the fresh-now line or nothing; 0 always
+  local at=${1:-replay} mode thr="" t rl py sf rc out="" n="" why=""
+  if ! mode=$(read_card_policy context.on-full); then
+    [ "$at" = boundary ] || printf 'context — skipped: context.on-full refused: %s\n' "${mode%%$'\n'*}"
+    return 0
+  fi
+  [ "$at" != boundary ] || [ "$mode" = fresh-at-boundary ] || return 0
+  if [ "$mode" = fresh-at-boundary ] && ! thr=$(read_card_policy context.threshold); then
+    [ "$at" = boundary ] || printf 'context — skipped: context.threshold refused: %s\n' "${thr%%$'\n'*}"
+    return 0
+  fi
+  if [ -z "$CARD_TRANSCRIPT" ]; then why='no transcript path names the session'
+  elif [ ! -f "$CARD_TRANSCRIPT" ]; then why='the transcript path names no file'
+  elif rl=$(resolve_kit_file runlog runlog.py); [ -z "$rl" ]; then why='no runlog kit'
+  elif ! py=$(resolve_python 2>/dev/null); then why='no Python resolves on this node'
+  elif ! timeout -k 1 5 true </dev/null >/dev/null 2>&1; then
+    why='this node has no working timeout -k, so the read would be unbounded and none ran'
+  elif ! sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.context.XXXXXX"); then
+    why="no scratch file under $CARD_DIR to capture the share in"
+  else
+    timeout -k 2 "$CARD_CONTEXT_BOUND" "$py" "$rl" context "$CARD_TRANSCRIPT" </dev/null >"$sf" 2>&1; rc=$?
+    case "$rc" in
+      0) out=$(LC_ALL=C awk '{ sub(/\r$/, "") } /^([0-9]+%|none)$/ { a = $0 } END { print a }' "$sf")
+         case "$out" in
+           none) why='no main usage in the transcript' ;;
+           "") why='runlog.py printed no share this replay reads' ;;
+           *) n=${out%\%} ;;
+         esac ;;
+      124|137) why="runlog.py did not answer within ${CARD_CONTEXT_BOUND}s" ;;
+      *) why=$(LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+           NF && f == "" { f = $0 }
+           END { if (f == "") f = "runlog.py context exited " rc " and printed nothing"
+                 if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+                 print f }' "$sf") ;;
+    esac
+    rm -f "$sf" 2>/dev/null
+  fi
+  if [ -n "$why" ]; then
+    [ "$at" = boundary ] || printf 'context — skipped: %s\n' "$why"
+    return 0
+  fi
+  t=${thr%\%}
+  case "$at:$mode" in
+    boundary:*)
+      [ "$n" -lt "$t" ] \
+        || printf 'context — %s%% of window · past %s · fresh now, at this item boundary (context.on-full: fresh-at-boundary)\n' "$n" "$thr" ;;
+    *:compact-with-card) printf 'context — %s%% of window (context.on-full: compact-with-card)\n' "$n" ;;
+    *)
+      if [ "$n" -ge "$t" ]; then
+        printf 'context — %s%% of window · past %s · fresh at next item boundary (context.on-full: fresh-at-boundary)\n' "$n" "$thr"
+      else
+        printf 'context — %s%% of window · under %s\n' "$n" "$thr"
+      fi ;;
+  esac
+  return 0
+}
+
+# S3's act, the boundary verb's step after a crossing: the fresh-now line, written with the verb's other
+# lines to its `--out` file, which the hook hands the session at its next shell call.
+run_context_boundary() { # -> the fresh-now line or nothing on stdout; 0 always
+  render_context_line boundary
+}
+
+# The boundary verb's notice step after a crossing (KICK-dKeptSession-21 S4): the unattended driver's
+# `--mail notice <slug> --item <key>`, the key the crossing's target, run through `run_driver_bounded` under
+# CARD_CLAIMS_BOUND as `render_mail_line` runs its read. Its first line prints as `notice — <line>`, CRs
+# stripped and cut to 160 bytes as `run_item_boundary` cuts; nothing for `mail — off` or an `off` notice;
+# `notice — skipped: <why>` for a driver that does not resolve, the bound passed or a non-zero exit. It
+# returns 0 only when the line says ` · fetched`, so the step after it reads the cache with `--local` and
+# the boundary makes one fetch (its section 8 F4); after an `off` line or a skip that step fetches itself.
+run_mail_notice() { # slug · key -> the notice — line or nothing on stdout; 0 fetched, 1 not
+  local o="$CARD_TMP/mail.notice" rc a
+  run_driver_bounded "$CARD_CLAIMS_BOUND" "$o" /dev/null --mail notice "$1" --item "$2"; rc=$?
+  if [ "$rc" = 125 ] && [ -n "$CARD_REF_WHY" ]; then printf 'notice — skipped: %s\n' "$CARD_REF_WHY"; return 1; fi
+  a=$(tr -d '\r' < "$o" 2>/dev/null | LC_ALL=C awk 'NF { f = $0; d = (f ~ / · fetched$/ || f ~ / · fetched · item /) ? 1 : 0
+      if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+      print d f; exit }')
+  rm -f "$o" 2>/dev/null
+  case "$rc:${a:1}" in
+    124:*|137:*) printf 'notice — skipped: --mail notice did not answer within %ss\n' "$CARD_CLAIMS_BOUND" ;;
+    "0:mail — off"|"0:mail — notice off "*) ;;
+    0:mail\ —\ *) printf 'notice — %s\n' "${a:1}"; [ "${a:0:1}" = 1 ] && return 0 ;;
+    *) printf 'notice — skipped: --mail notice exited %s: %s\n' "$rc" "${a:1}" ;;
+  esac
+  return 1
+}
+
+# The boundary verb's step after a crossing (KICK-dKeptSession-10 S1): the loop kit's `position.py <slug>
+# --mail-interrupts [--local]`, which reads `mailbox.reads` and the build's open mail, run with stdin closed
+# under CARD_CLAIMS_BOUND, the bound `render_mail_line` gives the same driver read. On exit 0 each line
+# opening `interrupt — mailbox · ` is printed, CRs stripped, and no other; every failure is one
+# `interrupt — mailbox · unarmed · <why>` line: an engine, a Python or a `timeout -k` that does not resolve,
+# the bound passed, or another exit with the read's first non-empty line, cut to 160 bytes as
+# `run_item_boundary` cuts. `--local` reads the node's cache with no fetch. WHAT THIS DOES NOT CHECK: a
+# message posted after the read; the lines are as fresh as the crossing that ran it.
+run_mail_interrupts() { # slug · [--local] -> the interrupt — mailbox lines on stdout; 0 always
+  local pos py rc f="$CARD_TMP/mail.interrupts"
+  pos=$(resolve_kit_file loop position.py)
+  [ -n "$pos" ] || { printf 'interrupt — mailbox · unarmed · no loop kit position.py resolves in this tree\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'interrupt — mailbox · unarmed · no Python resolves on this node\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'interrupt — mailbox · unarmed · this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  timeout -k 2 "$CARD_CLAIMS_BOUND" "$py" "$pos" "$1" --mail-interrupts ${2:+"$2"} </dev/null > "$f" 2>&1; rc=$?
+  case "$rc" in
+    0) tr -d '\r' < "$f" | grep '^interrupt — mailbox · ' ;;
+    124|137) printf 'interrupt — mailbox · unarmed · the read passed its %ss bound\n' "$CARD_CLAIMS_BOUND" ;;
+    *) LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+         NF && f == "" { f = $0 }
+         END { if (f == "") f = "printed nothing"
+               if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+               print "interrupt — mailbox · unarmed · position.py --mail-interrupts exited " rc ": " f }' "$f" ;;
+  esac
+  rm -f "$f"
+  return 0
+}
+
 if [ -n "$CARD" ]; then
   case "$CARD_VERB" in
-    replay|publish|follow|lookup)
+    replay|publish|follow|lookup|pointers|boundary)
       CARD_TMP=$(mktemp -d "${TMPDIR:-/tmp}/mfcard.XXXXXX") || { echo "MANIFEST env ERROR — cannot create a scratch dir under ${TMPDIR:-/tmp}"; exit 2; }
       trap 'rm -rf "$CARD_TMP"' EXIT ;;
   esac
@@ -2340,6 +2963,19 @@ if [ -n "$CARD" ]; then
       write_card_publish "$CARD_BUILD" publish ;;
     follow) write_card_follow "$CARD_BUILD" "$CARD_STEP" "$CARD_TERMINAL" ;;
     lookup) resolve_build_card "$CARD_BUILD"; write_card_file ;;
+    # S4: the build card in `stored` mode, its section fresh; with a named session, that card's too.
+    pointers)
+      [ -z "$CARD_SID_GIVEN" ] || [ -f "$CARD_FILE" ] \
+        || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE, so there is no card to write the pointers into"; exit 2; }
+      write_build_card "$CARD_BUILD" "" stored pointers 0 0
+      [ -z "$CARD_SID_GIVEN" ] || write_card_pointers "$CARD_BUILD" ;;
+    # S6: every line to stdout, or with `--out` to that file through a temp beside it and a rename.
+    boundary)
+      if [ -z "$CARD_OUT" ]; then run_card_boundary "$CARD_BUILD"; exit $?; fi
+      _bt=$(mktemp "$CARD_OUT.XXXXXX" 2>/dev/null) || { echo "MANIFEST env ERROR — no temp beside $CARD_OUT, so nothing ran"; exit 2; }
+      run_card_boundary "$CARD_BUILD" > "$_bt" 2>&1; _brc=$?
+      mv -f "$_bt" "$CARD_OUT" 2>/dev/null || { rm -f "$_bt"; echo "MANIFEST env ERROR — cannot rename the verb's lines into $CARD_OUT"; exit 2; }
+      exit "$_brc" ;;
   esac
   exit 0
 fi

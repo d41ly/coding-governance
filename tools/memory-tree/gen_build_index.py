@@ -9,6 +9,7 @@
     python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
     python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
     python <prefix>/memory-tree/gen_build_index.py --doctor <slug> # every failing rule for one build folder
+    python <prefix>/memory-tree/gen_build_index.py --latest-records <slug>  # the newest bound record of each base kind
     python <prefix>/memory-tree/gen_build_index.py --new-spec <ID> --tier <1|2>  # forwarded to `gov_record.py new spec`
     python <prefix>/memory-tree/gen_build_index.py --print-relations  # every README relation edge and its state
     python <prefix>/memory-tree/gen_build_index.py --print-front-matter-findings  # each README key the schema refuses
@@ -205,6 +206,148 @@ from tree_lib import (  # noqa: E402  the kit's shared helpers
     read_text, record_paths, scan_missing_citations, unfenced, unfenced_lines,
     add_leg_counts, read_rows_at, render_leg_line,
 )
+import atexit
+import time
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
+# >>> owned_work_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# THE OWNED ROOT A PROCESS SITS IN: the nearest of `path` and its parents named `gate-work.*` and
+# holding an `owner` file, a bar's `$WORK` or a suite's own root (TOOL-dQuietDisk-9 S2).
+def resolve_owned_work(path):
+    """The owned `gate-work.*` directory at or above `path`, a pathlib.Path, or None."""
+    here = pathlib.Path(path).absolute()
+    for d in (here, *here.parents):
+        if d.name.startswith("gate-work.") and (d / "owner").is_file():
+            return d
+    return None
+# <<< owned_work_py
+
+# >>> owned_tempdir_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A PYTHON SUITE'S OWNED ROOT (TOOL-dQuietDisk-9 S2, S9). Nested in an owned root, a bar's or another
+# suite's, it takes that temp dir and makes nothing. Otherwise it sweeps each dead `py:` owner's root
+# of this repository, or of a common dir that names no directory, makes `gate-work.*` with an owner
+# line and `tmp`, points `tempfile` and the `TMPDIR`, `TEMP` and `TMP` its children read there, and
+# removes the whole root at exit. A kill leaves the root with its owner, for the next suite to sweep.
+def read_pid_alive(pid) -> bool:
+    """False only when `pid` is provably gone; any error reads as alive, so a sweep can only keep."""
+    if os.name == "nt":
+        # Never `os.kill` here: signal 0 on Windows is CTRL_C_EVENT, sent to the pid's console group.
+        try:
+            import ctypes
+            k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            k32.OpenProcess.restype = ctypes.c_void_p
+            handle = k32.OpenProcess(0x1000, False, int(pid))  # PROCESS_QUERY_LIMITED_INFORMATION
+            if not handle:
+                return ctypes.get_last_error() != 87  # ERROR_INVALID_PARAMETER: no such process
+            try:
+                code = ctypes.c_ulong()
+                if not k32.GetExitCodeProcess(ctypes.c_void_p(handle), ctypes.byref(code)):
+                    return True
+                return code.value == 259  # STILL_ACTIVE
+            finally:
+                k32.CloseHandle(ctypes.c_void_p(handle))
+        except (OSError, AttributeError, ValueError):
+            return True
+    try:
+        os.kill(int(pid), 0)
+    except ProcessLookupError:
+        return False
+    except (OSError, ValueError):
+        return True
+    return True
+
+
+def scan_dead_scratch(ambient, common) -> list:
+    """Removes each `gate-work.*` directly under `ambient` whose owner names a dead `py:` pid and
+    `common`, or an absolute common dir that names no directory; an empty `common` removes nothing.
+    Returns the roots removed, and says one stderr line per root it sweeps."""
+    removed = []
+    if not common:
+        return removed
+    try:
+        names = sorted(os.listdir(ambient))
+    except OSError:
+        return removed
+    for name in names:
+        root = os.path.join(ambient, name)
+        if not name.startswith("gate-work.") or not os.path.isdir(root):
+            continue
+        try:
+            with open(os.path.join(root, "owner"), encoding="utf-8") as fh:
+                fields = fh.readline().rstrip("\r\n").split("\t")
+        except (OSError, UnicodeDecodeError):
+            continue
+        pid = fields[0][3:] if fields[0].startswith("py:") else ""
+        if len(fields) < 2 or not (pid.isascii() and pid.isdigit()):
+            continue
+        if fields[1] != common and (not os.path.isabs(fields[1]) or os.path.isdir(fields[1])):
+            continue
+        if read_pid_alive(int(pid)):
+            continue
+        print(f"owned-scratch: sweeping the scratch of a dead suite (pid {pid}): {root}", file=sys.stderr)
+        if remove_tree(root):
+            removed.append(root)
+    return removed
+
+
+def init_owned_tempdir() -> str:
+    """The temp dir this process's scratch lands in, owned and removed at exit; see the block's head."""
+    ambient = tempfile.gettempdir()
+    if resolve_owned_work(ambient) is not None:
+        tempfile.tempdir = ambient
+        return ambient
+    try:
+        got = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                             capture_output=True, text=True, encoding="utf-8", errors="replace",
+                             check=False, stdin=subprocess.DEVNULL)
+        common = got.stdout.strip() if got.returncode == 0 else ""
+    except OSError:
+        common = ""
+    scan_dead_scratch(ambient, common)
+    root = tempfile.mkdtemp(prefix="gate-work.", dir=ambient)
+    atexit.register(remove_tree, root)
+    staged = os.path.join(root, f"owner.{os.getpid()}.tmp")
+    with open(staged, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(f"py:{os.getpid()}\t{common}\t{int(time.time())}\n")
+    os.replace(staged, os.path.join(root, "owner"))
+    tmp = os.path.join(root, "tmp")
+    os.mkdir(tmp)
+    tempfile.tempdir = tmp
+    for name in ("TMPDIR", "TEMP", "TMP"):
+        os.environ[name] = tmp
+    return tmp
+# <<< owned_tempdir_py
+
 
 #: TOOL-dTotalRecall-23 S6: `{reader: counts}` summed over every leg read of this run, `read_bindings`' and
 #: `collect`'s spec heads, printed one line per reader on stderr by `print_leg_lines` at a `--check` or a
@@ -221,8 +364,9 @@ PRECEDENCE = ("INPROGRESS", "BLOCKED", "OPEN", "SPECCED", "DEFERRED")
 
 H1_RE = re.compile(r"^#\s+(?P<id>[A-Za-z0-9][A-Za-z0-9-]*)\s+—\s+(?P<title>.+?)\s*$")
 # The build-order verb, appended after `base` in a spec's status header. Units sharing a value are
-# the parallel group; the owner resolved against a second `group` verb, which would have needed its
-# own contradiction refusals to render an identical region.
+# one step, whose Parallel cell `derive_parallel_step` derives, as `render_order` reads
+# (KICK-dKeptSession-63 S24); the owner resolved against a second `group` verb, which would have
+# needed its own contradiction refusals to render an identical region.
 # TOOL-dFramedEntrypoint-4 S2 — ANCHORED on both sides. The shipped form ended `(?![0-9])`, which
 # rejects a longer number and nothing else: `order 0x2` matched `0` and rendered as step 0, and
 # `order 2x` matched `2` and rendered as step 2 — both probed on the shipped regex before this change.
@@ -855,6 +999,31 @@ def derive_audit_writers(root: str, memory_root: str, rels, resolve=None) -> set
     older = {sha for sha in shas if blobs.get((sha, harness)) is not None
              and AUDIT_WRITER_MARK not in blobs[(sha, harness)]}
     return {rel for rel, sha in added.items() if sha in older}
+
+
+def cmd_latest_records(root: str, conf: dict, slug: str) -> int:
+    """READ-ONLY (KICK-dKeptSession-13 S3): one `<kind> <path>` line for each base kind the build's bound
+    records carry, `RECORD_KIND_TOKENS` less `TYPED_RECORD_KINDS`, the newest of that kind by filename,
+    sorted by kind. `read_bindings` runs over the build folder's tracked paths alone, and a typed kind is
+    never printed, so a kind `TYPED_RECORD_KINDS` gains never lengthens the card's `records —` line
+    (KICK-dKeptSession-44 S22). Exit 0, a build with no bound record printing nothing; 2 on a slug that
+    is not one. WHAT THIS DOES NOT CHECK: that a record's content is current; the newest name is the
+    newest date."""
+    if not re.fullmatch(r"[A-Za-z0-9]+", slug or ""):
+        print(f"build-index: --latest-records takes a build slug, [A-Za-z0-9]+, and was given {slug!r}",
+              file=sys.stderr)
+        return 2
+    folder = f"{conf['MEMORY_ROOT']}/builds/{slug}/"
+    tracked = [p for p in run("git", "ls-files", "--", folder, cwd=root).split("\n") if p]
+    newest: dict = {}
+    base = set(RECORD_KIND_TOKENS) - set(TYPED_RECORD_KINDS)
+    for rel, rec in read_bindings(root, tracked, conf).items():
+        kind = rec["kind"] if rec["state"] == "bound" and rec["kind"] in base else None
+        if kind and (kind not in newest or os.path.basename(rel) > os.path.basename(newest[kind])):
+            newest[kind] = rel
+    for kind in sorted(newest):
+        print(f"{kind} {newest[kind]}")
+    return 0
 
 
 def cmd_print_bindings(root: str, conf: dict, resolve=None) -> int:
@@ -5603,7 +5772,7 @@ def _build_backlog_fixture(tmp: str, files: dict, *, mode: str = "builds", cutof
     """
     if not os.path.isdir(os.path.join(tmp, ".git")):
         run("git", "init", "-q", "--template=", ".", cwd=tmp)
-    shutil.rmtree(os.path.join(tmp, "memory"), ignore_errors=True)
+    remove_tree(os.path.join(tmp, "memory"))
     write_text(os.path.join(tmp, ".memory-tree.conf"), _render_backlog_conf(mode, cutoff, excerpt))
     write_text(os.path.join(tmp, "memory", STALE_HEADER_WAIVER), "# empty\n")
     for rel, text in files.items():
@@ -11211,6 +11380,7 @@ def main(argv: list) -> int:
     global _COVERAGE_MEMO
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
+        init_owned_tempdir()
         # TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git the
         # selftest runs, in place of two to four `git config` processes per fixture repository.
         os.environ.update(GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t.test", GIT_COMMITTER_NAME="t",
@@ -11221,14 +11391,15 @@ def main(argv: list) -> int:
                     "--check-asbuilt",
                     "--report", "--bump", "--asks", "--new-build", "--placed-build", "--new-spec", "--doctor",
                     "--check-coverage", "--print-front-matter", "--print-typed-derived", "--print-relations",
-                    "--print-front-matter-findings"):
+                    "--print-front-matter-findings", "--latest-records"):
         print("usage: gen_build_index.py "
               "[--check [--staged|--with-verdicts]|--write|--write-staged|--check-coverage [--staged]|"
               "--check-asbuilt [--staged]|"
               "--check-format|--survey|--report|--bump|"
               "--print-bindings|--print-front-matter <slug>|--print-typed-derived|--print-relations|"
               "--print-front-matter-findings|"
-              "--asks|--new-build|--placed-build|--new-spec|--doctor|--selftest]")
+              "--asks|--new-build|--placed-build|--new-spec|--doctor|--latest-records <slug>|"
+              "--selftest]")
         return 2
     # TOOL-dTrueNorth-27 S4: `--with-verdicts` is `--check`'s alone, and never beside `--staged`, whose
     # skip would print no verdict while a full run's checks 29 and 30 read them from these lines.
@@ -11275,6 +11446,17 @@ def main(argv: list) -> int:
         for key, value in derived.items():
             print(f"{key}: {value}")
         return 0
+    # `--latest-records` (KICK-dKeptSession-13 S3): its stdout is the card's `records —` line's source,
+    # so a refusal goes to stderr, as `--asks` puts its own.
+    if mode == "--latest-records":
+        if len(argv) != 3:
+            print("usage: gen_build_index.py --latest-records <slug>", file=sys.stderr)
+            return 2
+        try:
+            return cmd_latest_records(root, conf, argv[2])
+        except Problem as exc:
+            print(f"build-index: {exc}", file=sys.stderr)
+            return 2
     # `--asks` IS DISPATCHED OUTSIDE THE HANDLER BELOW, which prints its message to stdout. That is
     # right for every other mode and wrong for this one, whose stdout is a value a program parses:
     # a refusal printed there is a decode error rather than a refusal. `cmd_asks` owns all of its

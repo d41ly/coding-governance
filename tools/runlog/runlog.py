@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""runlog.py — the runlog kit's command line. gov:kit runlog@1.18
+"""runlog.py — the runlog kit's command line. gov:kit runlog@1.19
 
     python <this kit>/runlog.py journal --producer driver|gates|pushes
     python <this kit>/runlog.py journal --producer gates --by-leg [--legs <gate-leg manifest>]
@@ -7,8 +7,10 @@
                                         [--transcripts <projects dir>]
     python <this kit>/runlog.py extract --measure <projects dir>
     python <this kit>/runlog.py extract --ready <projects dir>
+    python <this kit>/runlog.py extract --orient <projects dir> --slug <slug> [--repo <dir>]
     python <this kit>/runlog.py narration --session <sid> --from <t> --to <t> [--transcripts <dir>]
     python <this kit>/runlog.py prose --session <sid> | --transcript <file> [--transcripts <dir>] [--charter <file>]
+    python <this kit>/runlog.py context <transcript>
     python <this kit>/runlog.py model <slug> [--run <n>] [--json] [--journals <dir>] [--transcripts <dir>]
     python <this kit>/runlog.py record <slug> [--run <n>] [--write] [--journals <dir>] [--transcripts <dir>]
     python <this kit>/runlog.py verify <record> [--journals <dir>]
@@ -35,8 +37,16 @@ is no verdict, 2 a refused argument. It prints counts only and writes nothing; `
 states what it counts and what it does not check.
 
 `extract` writes one structural extract per session to the user-profile store and prints one JSON
-object per session on stdout; `--measure` and `--ready` write nothing and print a report. `narration` prints a
+object per session on stdout; `--measure`, `--ready` and `--orient` write nothing and print a report. `--orient`
+prints what each session of one build spent before its first item action, per stage, held as
+`orient.budget` says (KICK-dKeptSession-9): it exits 0, or 1 where the owner's cap refuses a row, and 2
+on a projects dir holding no session of the slug. `narration` prints a
 window of redacted text framed as data and writes nothing. The extractor's rules are the kit README's.
+`context` prints how full one transcript's main context window is (KICK-dKeptSession-14): `<n>%`, the
+share of the window `extract.derive_context_window` derives for its model (KICK-dKeptSession-30) that
+its last main `usage` event read, times 100 rounded down, with `context: window <tokens> · <source>` on
+stderr; or `none` with no main usage in it, and nothing on stderr. It parses the main file alone,
+writes nothing and exits 0, or 2 when the path names no file.
 `model` joins one run's sources into the run model and prints it, the whole JSON with `--json`, and
 writes a local copy beside the extracts; it exits 2 when the build has no committed run-state file or
 the run number names no run, and a store that does not resolve costs the copy, never the print.
@@ -94,6 +104,9 @@ NARRATION_GUTTER = "  | "
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f\u2028\u2029]")
 # A gates line's named failure, `fail.1` .. `fail.<cap>`; the rest are counted into `fail_more`.
 FAIL_KEY_RE = re.compile(r"fail\.[0-9]+")
+# The code home of the owner's orientation cap, `budgets.orient-calls` in the cap census
+# (KICK-dKeptSession-9 S6): handed to the budgets reader as its default, and 0 is no owner number.
+ORIENT_OWNER_CALLS = 0
 
 
 def build_leg_yield(lines, legs=None) -> tuple:
@@ -232,7 +245,7 @@ def print_ready(root) -> int:
         f"{k}={report[k]}" for k in ("sessions", "ready", "card", "text")))
     rows = report["rows"]
     for label, values in (
-            ("spent_tokens", [r["in"] + r["out"] + r["cache_read"] + r["cache_write"] for r in rows]),
+            ("spent_tokens", [ex.derive_spent_tokens(r) for r in rows]),
             ("context_growth", [r["context_ready"] - r["context_first"] for r in rows
                                 if r["context_first"] is not None]),
             ("minutes", [r["minutes"] for r in rows])):
@@ -242,11 +255,90 @@ def print_ready(root) -> int:
     return 0
 
 
+def print_orient(root, slug, repo) -> int:
+    """`extract --orient` (KICK-dKeptSession-9 S4): `extract.measure_orient_tree`'s rows, per stage the
+    quartiles of `calls` over the rows with an action and its evidence ceiling or its count under the
+    floor, held as `orient.budget` says, read once through the policy kit's reader run in `repo`, the
+    catalogue default `record-only` with one NOTE where the reader refuses or is absent.
+    `warn-at-evidence-ceiling` prints one `orient WARN` per row past its stage's ceiling;
+    `owner-ceiling` resolves `budgets.orient-calls` and judges each row with an action by the budgets
+    kit's `check`, printing `orient WARN`, or `orient REFUSED` where it refuses, then that kit's own
+    verdict lines; a resolved 0 is no owner number, one NOTE, and reads as `record-only`. Exit 0, 1 on a
+    refused row, 2 on no session."""
+    report = ex.measure_orient_tree(root, repo, slug)
+    if report["sessions"] == 0:
+        print(f"runlog: orient DEAD PROBE — no session of {slug} under {root}")
+        return 2
+    notes = list(report["notes"])
+    rc, out, why = ex.run_kit_verb("policy", "policy.py", ["get", "orient.budget"], repo)
+    value = out.strip() if rc == 0 else ""
+    if not value:
+        value = "record-only"  # the catalogue's default for orient.budget
+        notes.append(f"orient.budget did not read ({why or 'exit %s' % rc}), so its default record-only holds")
+    request = f"orient-calls=default:{ORIENT_OWNER_CALLS}"
+    owner = None
+    if value == "owner-ceiling":
+        rc, out, why = ex.run_kit_verb("policy", "budgets.py", ["resolve", request], repo)
+        held = out.strip().split("\t")
+        if rc == 0 and len(held) == 4 and held[1].isdigit() and int(held[1]) > 0:
+            owner = int(held[1])
+        else:
+            said = f"resolved {held[1]}" if rc == 0 and len(held) == 4 else why or f"exit {rc}"
+            notes.append(f"budgets.orient-calls holds no owner number ({said}), so owner-ceiling reads as "
+                         "record-only")
+    rows = report["rows"]
+    print(f"runlog: orient (report-only) slug={slug} sessions={report['sessions']} rows={len(rows)} "
+          f"orient.budget={value}")
+    for note in notes:
+        print(f"runlog: orient NOTE {note}")
+    acted = [r for r in rows if r["action"] != "none"]
+    ceilings = {}
+    for stage in sorted({r["stage"] for r in acted}):
+        calls = [r["calls"] for r in acted if r["stage"] == stage]
+        ceilings[stage] = (ex.derive_orient_ceiling(calls), len(calls))
+        line = f"runlog: orient stage {stage} n={len(calls)} calls {_derive_quartiles(calls)}"
+        if ceilings[stage][0] is None:
+            print(line)
+            print(f"runlog: orient — no ceiling · {stage} · n={len(calls)} under "
+                  f"{ex.ORIENT_CEILING_FLOOR}")
+        else:
+            print(f"{line} ceiling p90={ceilings[stage][0]}")
+    for r in rows:
+        context = "n/a" if r["context"] is None else f"{int(round(r['context'] * 100, 9))}%"
+        print(f"runlog: orient row sid={r['sid']} attribution={r['attribution']} source={r['source']} "
+              f"stage={r['stage']} action={r['action']} calls={r['calls']} tokens={r['tokens']} context={context}")
+    refused = False
+    for r in acted:
+        who = f"sid={r['sid']} source={r['source']} stage={r['stage']}"
+        ceiling, n = ceilings[r["stage"]]
+        if value == "warn-at-evidence-ceiling" and ceiling is not None and r["calls"] > ceiling:
+            print(f"runlog: orient WARN {who} calls {r['calls']} past the evidence ceiling {ceiling} "
+                  f"(p90 of n={n})")
+        if owner is None:
+            continue
+        rc, out, why = ex.run_kit_verb("policy", "budgets.py", ["check", request, str(r["calls"])], repo)
+        if rc == 1:
+            refused = True
+            print(f"runlog: orient REFUSED {who} calls {r['calls']} past the owner ceiling {owner}")
+        elif "BUDGET WARN" in out:
+            print(f"runlog: orient WARN {who} calls {r['calls']} past the owner ceiling {owner}")
+        elif rc != 0:
+            print(f"runlog: orient NOTE the budgets check of {r['sid']} did not answer ({why or 'exit %s' % rc})")
+            continue
+        else:
+            continue
+        sys.stdout.write(out)
+    sys.stdout.flush()
+    return 1 if refused else 0
+
+
 def cmd_extract(args) -> int:
     if args.measure:
         return print_measure(args.measure)
     if args.ready:
         return print_ready(args.ready)
+    if args.orient:
+        return print_orient(args.orient, args.slug, args.repo or ".")
     # The store resolves FIRST: a machine with no store refuses before a single transcript is read.
     # One named session that cannot be read is the whole request, so it exits 2; among several, a
     # session refused for its shape or its location is counted and the rest are still extracted.
@@ -321,6 +413,21 @@ def cmd_prose(args) -> int:
     fig = pr.measure_prose(pr.scan_turns(tree), shapes)
     sys.stdout.write("\n".join(pr.render_prose_report(tree.sid, fig, error)) + "\n")
     sys.stdout.flush()
+    return 0
+
+
+def cmd_context(args) -> int:
+    path = pathlib.Path(args.transcript)
+    if not path.is_file():
+        print(f"runlog: context {path.as_posix()} names no file", file=sys.stderr)
+        return 2
+    fill, window, source = ex.measure_context_fill(path)
+    if fill is None:
+        print("none")
+        return 0
+    # Rounded to nine places before the floor, so a share of exactly 0.6 reads 60, never 59.
+    print(f"{int(round(fill * 100, 9))}%")
+    print(f"context: window {window} · {source}", file=sys.stderr)
     return 0
 
 
@@ -558,6 +665,10 @@ def main(argv=None) -> int:
                     "dir; writes nothing")
     pe.add_argument("--ready", metavar="DIR", help="report what each session under a projects dir "
                     "spent before READY; writes nothing")
+    pe.add_argument("--orient", metavar="DIR", help="with --slug: report what each of the build's sessions "
+                    "under a projects dir spent before its first item action, per stage; writes nothing")
+    pe.add_argument("--repo", metavar="DIR", help="with --orient: the repository whose policy and stage "
+                    "transitions are read; default the working directory")
     pe.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
     pn = sub.add_parser("narration", help="print a window of redacted narration; writes nothing")
     pn.add_argument("--session", required=True)
@@ -572,6 +683,9 @@ def main(argv=None) -> int:
     pp.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
     pp.add_argument("--charter", help="the charter whose microformats fence defines the pair; default "
                     "AGENTS.md at the toplevel of the current directory")
+    pc = sub.add_parser("context", help="print how full one transcript's main context window is, "
+                        "<n>%% or none; writes nothing")
+    pc.add_argument("transcript", help="one session's main transcript .jsonl")
     pm = sub.add_parser("model", help="join one run's sources into the run model and print it")
     pm.add_argument("slug")
     pm.add_argument("--run", type=int, help="the 1-up run of the build, oldest first; default the last")
@@ -617,17 +731,24 @@ def main(argv=None) -> int:
     if args.cmd == "verify":
         return cmd_verify(args)
     if args.cmd == "extract":
-        modes = sum((bool(args.session), args.discover, bool(args.measure), bool(args.ready)))
+        modes = sum((bool(args.session), args.discover, bool(args.measure), bool(args.ready),
+                     bool(args.orient)))
         if modes > 1 or (args.slug and (args.session or args.measure or args.ready)):
-            ap.error("extract takes ONE of --slug, --session, --discover, --measure and --ready; "
-                     "only --discover combines with --slug")
+            ap.error("extract takes ONE of --slug, --session, --discover, --measure, --ready and --orient; "
+                     "only --discover and --orient combine with --slug")
         if modes == 0 and not args.slug:
-            ap.error("extract needs --slug, --session, --discover, --measure or --ready")
+            ap.error("extract needs --slug, --session, --discover, --measure, --ready or --orient")
+        if args.orient and not args.slug:
+            ap.error("extract --orient needs --slug, the build whose sessions it reports")
+        if args.repo and not args.orient:
+            ap.error("extract --repo is read only by --orient")
         return cmd_extract(args)
     if args.cmd == "narration":
         return cmd_narration(args)
     if args.cmd == "prose":
         return cmd_prose(args)
+    if args.cmd == "context":
+        return cmd_context(args)
     if args.legs and not args.by_leg:
         ap.error("journal --legs is read only by --by-leg")
     if args.by_leg and args.producer != "gates":
