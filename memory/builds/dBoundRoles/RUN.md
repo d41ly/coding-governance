@@ -532,3 +532,11 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T20:40:25Z hold · item host-owner-action · reason until owner · reaped 675b83bc · resume none(owner)
 
 2026-11-24T02:12:47Z resume · item dBoundRoles · reason held · keepalive 32792f1d · manual
+
+2026-11-24T02:21:14Z dispatch · item 697153e2 TOOL-dBoundRoles-56 · reason tools/memory-tree/tree_lib.py skills/session-kickoff/manifest-check.sh tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh memory/guides/SESSION-KICKOFF.md tools/run-gates/selftest-budgets.txt memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-56-deviation-562.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-56-1-acceptance-ledger.md
+
+2026-11-24T02:28:14Z dispatch · item 697153e2 TOOL-dBoundRoles-57 · reason tools/memory-recall/selftest.py tools/memory-recall/README.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-57-deviation-572.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-57-1-acceptance-ledger.md
+
+2026-11-24T02:28:17Z brief · item TOOL-dBoundRoles-56 · reason 85ed6738c8a3 memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-56-build-brief.md
+
+2026-11-24T02:28:19Z brief · item TOOL-dBoundRoles-57 · reason 4267c8aaccc3 memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-57-build-brief.md
