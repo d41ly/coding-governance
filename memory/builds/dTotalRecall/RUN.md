@@ -511,3 +511,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T20:53:05Z hold · item host-owner-action · reason until owner · reaped 5a8cd3c4 · resume none(owner)
 
 2026-11-24T02:14:14Z resume · item dTotalRecall · reason held · keepalive 3c88023a · manual
+
+2026-11-24T02:33:32Z brief · item TOOL-dTotalRecall-58 · reason 8d79cf948685 memory/builds/dTotalRecall/prompts/2026-11-24-prompt-TOOL-dTotalRecall-58-build-brief.md
+
+2026-11-24T02:38:38Z dispatch · item fa67a561 TOOL-dTotalRecall-58 · reason tools/memory-tree/id_grammar.py tools/memory-tree/record_causes.py tools/memory-tree/record_kinds.py tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-58.md memory/builds/dTotalRecall/build/2026-11-24-build-TOOL-dTotalRecall-58-1-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md

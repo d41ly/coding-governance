@@ -158,7 +158,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113
 | [TOOL-dTotalRecall-55 — the cause census keeps the build folders' scripts by a path-keyed row held outside their bytes](spec/2026-10-26-spec-TOOL-dTotalRecall-55.md) | 30 | 2 | CLOSED | rev-5 | 2026-11-23 |
 | [TOOL-dTotalRecall-56 — the alias census keeps the pinned departures instrument's `journal` compare by its path-keyed row, never by a marker in its bytes](spec/2026-10-26-spec-TOOL-dTotalRecall-56.md) | 30 | 2 | CLOSED | rev-6 | 2026-11-23 |
 | [TOOL-dTotalRecall-57 — a path-keyed keep row is admitted only for a file no pass may edit, so every editable file is kept by the one marker](spec/2026-10-26-spec-TOOL-dTotalRecall-57.md) | 30 | 2 | CLOSED | rev-6 | 2026-11-23 |
-| [TOOL-dTotalRecall-58 — the census keep marker is honoured only under the tool root, so no pass writes it into a pinned instrument](spec/2026-10-26-spec-TOOL-dTotalRecall-58.md) | 30 | 2 | INPROGRESS | rev-3 | 2026-11-23 |
+| [TOOL-dTotalRecall-58 — the census keep marker is honoured only under the tool root, so no pass writes it into a pinned instrument](spec/2026-10-26-spec-TOOL-dTotalRecall-58.md) | 30 | 2 | INPROGRESS | rev-4 | 2026-11-24 |
 | [TOOL-dTotalRecall-60 — the round-1 spec audit of units 44 to 53: its 35 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-60.md) | 31 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-65 — the census keep rows live in a project registry, so the memory-tree engine ships no path of this repository](spec/2026-10-26-spec-TOOL-dTotalRecall-65.md) | 31 | 2 | DEFERRED | rev-4 | 2026-10-26 |
 | [TOOL-dTotalRecall-66 — the round-1 spec audit of units 54 to 60: its 40 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-66.md) | 32 | 2 | DEFERRED | rev-4 | 2026-10-26 |
@@ -193,7 +193,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 730 bound to this build, across 4 record folder(s).
+Records: 735 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -301,13 +301,13 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-24-prompt-TOOL-dTotalRecall-58-build-brief.md`, `2026-11-23-prompt-TOOL-dTotalRecall-59-reground-spec-writer.md` and 310 more under prompts/ |
+| briefs | `2026-11-24-prompt-TOOL-dTotalRecall-58-divergence-fold-spec-writer.md`, `2026-11-24-prompt-TOOL-dTotalRecall-58-divergence-fold-brief.md` and 313 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-23-build-TOOL-dTotalRecall-9-deviation-1006.md`, `2026-11-23-build-TOOL-dTotalRecall-48-deviation-1005.md` and 146 more under build/ |
 | red-fix | `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-19.md` and 23 more under build/ |
 | widen | `2026-11-23-build-TOOL-dTotalRecall-9-widen-10.md`, `2026-11-23-build-TOOL-dTotalRecall-51-widen-7.md` and 13 more under build/ |
-| research | `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md`, `2026-11-23-build-TOOL-dTotalRecall-52-divergence-fold-return.md` and 111 more under build/ |
-| logs | `2026-11-23-build-TOOL-dTotalRecall-59-1-builder-return.md`, `2026-11-23-build-TOOL-dTotalRecall-59-1-acceptance-ledger.md` and 106 more under build/ |
+| research | `2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md`, `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md` and 112 more under build/ |
+| logs | `2026-11-24-build-TOOL-dTotalRecall-58-1-builder-return.md`, `2026-11-23-build-TOOL-dTotalRecall-59-1-builder-return.md` and 107 more under build/ |
 | open asks | `BACKLOG.md`, 16 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->

@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-58 — the census keep marker is honoured only under the tool root, so no pass writes it into a pinned instrument
 
-**Status:** INPROGRESS · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-4 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,11 +10,16 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-58-deviation-581.md](../build/2026-10-26-build-TOOL-dTotalRecall-58-deviation-581.md) | deviation | — |
+| [2026-11-24-build-TOOL-dTotalRecall-58-1-builder-return.md](../build/2026-11-24-build-TOOL-dTotalRecall-58-1-builder-return.md) | journal | — |
+| [2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md](../build/2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md) | research | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-session.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-session.md) | log | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-58-reground-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-58-reground-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-58-reground-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-58-reground-spec-writer.md) | log | — |
+| [2026-11-24-prompt-TOOL-dTotalRecall-58-build-2-brief.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-58-build-2-brief.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dTotalRecall-58-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-58-build-brief.md) | journal | — |
+| [2026-11-24-prompt-TOOL-dTotalRecall-58-divergence-fold-brief.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-58-divergence-fold-brief.md) | journal | — |
+| [2026-11-24-prompt-TOOL-dTotalRecall-58-divergence-fold-spec-writer.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-58-divergence-fold-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-54 TOOL-dTotalRecall-59 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-60 |
 
 <!-- /gen:spec-records -->
@@ -41,9 +46,9 @@ there, and observes that no instrument blob moved. It repairs `TOOL-dTotalRecall
   reads the marker only in its tool-root walk at HEAD, through `record_causes.py#read_open_literals`.
   Its build-folder walk, over `record_causes.py#read_build_code_paths`' files, keeps a file only by its
   repository path. That walk now reds every line of each file that carries the `cause-writer` marker
-  (`id_grammar.py#read_kept_reason`), before its keep test, so a file kept by `CAUSE_WRITER_KEPT`, by
-  the path-keyed row unit 55 moves it to, or by a `CAUSE_WRITER_PINNED` row is red too. The finding
-  names the file, the line and the remedy `the marker is the tool root's; a build folder's script is kept
+  (`id_grammar.py#read_kept_reason`), before its keep test, so a file kept by its
+  `tree_lib.py#CENSUS_KEPT_PATHS` row, read through `read_kept_path`, or by a `CAUSE_WRITER_PINNED` row
+  is red too. The finding names the file, the line and the remedy `the marker is the tool root's; a build folder's script is kept
   by its path-keyed row, since its bytes are not this build's`. Observed by AC1.
 - **S2** — The instruments' bytes held. No dTotalRecall commit since base `462d20f3` changes a tracked
   code file under `memory/builds/*/build/`, and `packet.py --check dTotalRecall` exits 0, so S34, S22,
@@ -52,13 +57,15 @@ there, and observes that no instrument blob moved. It repairs `TOOL-dTotalRecall
   `git hash-object` over the `instrument:` paths of the Pins list). Observed by AC2.
 - **S3** — The alias census refuses its marker in a build folder. `record_kinds.py#check_alias_compares`
   reads the marker only in its tool-root walk at HEAD. Its build-folder walk, each tracked
-  `<memory root>/builds/*/build/*.py`, keeps a hit only by `ALIAS_COMPARE_KEPT`, or by unit 56's row
-  after it. That walk now reds every line of each script carrying the `alias-compare` marker, before
+  `<memory root>/builds/*/build/*.py`, keeps a hit only by its file's `tree_lib.py#CENSUS_KEPT_PATHS`
+  row, read through `read_kept_path`. That walk now reds every line of each script carrying the `alias-compare` marker, before
   its keep test, with S1's finding and remedy. Observed by AC3.
-- **S4** — The bound holds at HEAD. `read_kept_reason` has three callers (DERIVED 2026-11-23,
+- **S4** — The bound holds at HEAD. Before the pass `read_kept_reason` has three callers (DERIVED 2026-11-24,
   `git grep -n "read_kept_reason(" -- tools`): `id_grammar.py#scan_readers`,
   `record_causes.py#read_open_literals` and `record_kinds.py#check_alias_compares`. The alias and cause
-  censuses call it on tool-root files alone. No tracked code file under `memory/builds/*/build/`
+  censuses call it on tool-root files alone. The pass adds `id_grammar.py#check_marker_domain` as the
+  next caller, in this tree the only one that reads build-folder lines, and it reads them to refuse
+  them; the caller list in the reader's docstring gains it. No tracked code file under `memory/builds/*/build/`
   carries a marker (DERIVED 2026-11-23, AC4's `git grep`), so S1 and S3 red nothing on the real tree.
   Observed by AC4.
 
@@ -66,7 +73,7 @@ there, and observes that no instrument blob moved. It repairs `TOOL-dTotalRecall
 
 - The keep table and its rows: units 55, 56 and 57.
 - The marker's grammar and its reader, `id_grammar.py#read_kept_reason`: `TOOL-dTotalRecall-53` S34's,
-  which this unit calls and leaves as it is.
+  which this unit calls and leaves as it is, but for its docstring's caller list (S4).
 - The slug census's marker. `id_grammar.py#scan_readers` reads the tool root, `skills/` and
   `.githooks/`, and no build folder. Two of its kept lines sit outside the tool root (DERIVED
   2026-11-23, `git grep -lE "(#|//) census: kept (slug-grammar|alias-compare|cause-writer) " -- .githooks skills`):
@@ -89,9 +96,12 @@ and takes no path, and its slug caller honours markers outside the tool root on 
 the two censuses already walks the build folders apart from the tool root. So each build-folder walk
 calls one new function, `check_marker_domain(path, text, census)` in `id_grammar.py`, on each whole
 file, binding head included, before the walk skips a file with no hit and before its keep test. It
-returns one red finding per line of `text` that `read_kept_reason` reads for
-`census`, naming `path`, the line and S1's remedy. The census lists each as
-`<census> · <path>:<n> · red · marker in a build folder`. A keep by row never clears that finding.
+returns a list of `(line number, finding)` pairs, one per line of `text` that `read_kept_reason` reads
+for `census`, the finding naming `census`, `path`, the line and S1's remedy. The census prints each as
+`<census> · <path>:<n> · red · marker in a build folder` and adds the finding to its reds. A keep by
+row never clears that finding. Marker reds stay outside each build-folder count line's `N red`, as the
+drained-row red of `record_causes.py#check_cause_writers` does: that line counts census files there and
+hits in `record_kinds.py#check_alias_compares`, and a marker's file or hit is counted as it is at HEAD.
 
 A flat install, whose tool root is the repository root, puts the build folders in the tool-root walk
 too, where the marker reads as a keep. The build-folder walk still reds it, so the census exits 1.
@@ -160,8 +170,9 @@ sequences the passes.
   path and line, and the fixture exits 0. Red when: the row or the marker keeps the line.
 - **AC4** — When `git grep -c "census: kept" -- 'memory/builds/*/build/*.py' 'memory/builds/*/build/*.sh'
   'memory/builds/*/build/*.js'` runs at the pass tip it prints nothing, and `git grep -n
-  "read_kept_reason(" -- tools` lists the definition and the three callers S4 names.
-  Red when: a build-folder script carries a marker, or a fourth caller reads one.
+  "read_kept_reason(" -- tools` lists the definition, the three callers S4 names and
+  `id_grammar.py#check_marker_domain`. Red when: a build-folder script carries a marker, or a caller
+  beyond those reads one.
 
 ## 7. Gates
 
@@ -191,6 +202,10 @@ New arm: tools/memory-tree/record_kinds.py · covers AC3 · the plant `marker-in
   non-goal; `packet.py` is pinned at `cab3bff1`; AC2 reads dTotalRecall's commits, since other builds
   moved build-folder scripts after base; AC1 names the census `cause-writer`; S4 and AC4 observe HEAD;
   `tree_lib.py` leaves Files touched.
+- rev-4 · 2026-11-24 · S1 S3 S4 §3 §4 AC4 · the first build pass's divergence folded per
+  `2026-11-24-prompt-TOOL-dTotalRecall-58-divergence-fold-brief`: AC4 and S4 admit `check_marker_domain`
+  as a caller, and the reader's docstring lists it; S1 and S3 name `CENSUS_KEPT_PATHS` for the retired
+  keeps; §4 states the pairs `check_marker_domain` returns and that marker reds stay outside `N red`.
 
 ## 10. Reuse audit
 
