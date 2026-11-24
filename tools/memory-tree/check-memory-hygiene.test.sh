@@ -3928,7 +3928,7 @@ hit "record causes: RED cause-writer census-kept-paths.txt $_krd: spells no Serv
 n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = 1 ] || { echo "FAIL kept-row-drained: want exactly one red"; st=1; }
 # --- TOOL-dTotalRecall-76 AC5 — a caller's exported remote moves no census plant: under `GOV_REMOTE` and
 # --- `GOV_DEFAULT_BRANCH` naming no remote of the fixture, each plant prints its one red. Red on the two names out
-# --- of either `run_fixture`'s held tuple, which refuses its plant, exit 2.
+# --- of those `set_fixture_env` holds aside, which refuses each plant, exit 2.
 out=$(GOV_REMOTE=nope GOV_DEFAULT_BRANCH=nope "$_PY" "$HERE/record_causes.py" --fixture --plant kept-row-drained 2>&1); _brc=$?   # AC5
 n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL kept-row-drained under an exported GOV_REMOTE exited $_brc, expected 1"; st=1; }
 hit "record causes: RED cause-writer census-kept-paths.txt $_krd: spells no Serves line past its binding window"
@@ -3937,6 +3937,17 @@ out=$(GOV_REMOTE=nope GOV_DEFAULT_BRANCH=nope "$_PY" "$HERE/record_kinds.py" --f
 n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL alias-row-drained under an exported GOV_REMOTE exited $_brc, expected 1"; st=1; }
 hit "record-kinds: RED alias-compare census-kept-paths.txt memory/builds/bFix/build/2026-01-08-build-TOOL-bFix-1-kept.py: holds no raw compare"
 n=$((n+1)); [ "$(grep -c 'record-kinds: RED ' <<<"$out")" = 1 ] || { echo "FAIL alias-row-drained under an exported GOV_REMOTE: want exactly one red"; st=1; }
+# --- TOOL-dTotalRecall-88 AC6 — nothing of a caller's git environment moves a census plant: under a `GIT_AUTHOR_DATE`
+# --- that is no date, each plant prints its one red. Red on either `run_fixture` entering `set_env_aside` over the
+# --- git location names and the two remote names instead of `set_fixture_env`, which refuses its plant, exit 2.
+out=$(GIT_AUTHOR_DATE=nope "$_PY" "$HERE/record_causes.py" --fixture --plant kept-row-drained 2>&1); _brc=$?   # AC6
+n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL kept-row-drained under an exported GIT_AUTHOR_DATE exited $_brc, expected 1"; st=1; }
+hit "record causes: RED cause-writer census-kept-paths.txt $_krd: spells no Serves line past its binding window"
+n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = 1 ] || { echo "FAIL kept-row-drained under an exported GIT_AUTHOR_DATE: want exactly one red"; st=1; }
+out=$(GIT_AUTHOR_DATE=nope "$_PY" "$HERE/record_kinds.py" --fixture --plant alias-row-drained 2>&1); _brc=$?   # AC6
+n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL alias-row-drained under an exported GIT_AUTHOR_DATE exited $_brc, expected 1"; st=1; }
+hit "record-kinds: RED alias-compare census-kept-paths.txt memory/builds/bFix/build/2026-01-08-build-TOOL-bFix-1-kept.py: holds no raw compare"
+n=$((n+1)); [ "$(grep -c 'record-kinds: RED ' <<<"$out")" = 1 ] || { echo "FAIL alias-row-drained under an exported GIT_AUTHOR_DATE: want exactly one red"; st=1; }
 # --- TOOL-dTotalRecall-57 AC1 — a keep row may name only a build folder's file: a registry whose one row names a
 # --- Python file in the `planted` folder under the fixture's tool root is one red naming that path and the
 # --- census marker, and the run exits 1. Red on the domain match skipped, which reads the row as a keep and

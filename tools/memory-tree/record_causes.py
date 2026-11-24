@@ -1368,11 +1368,11 @@ def run_fixture(plant) -> tuple:
     and exit 0 where that exits 0 naming no kept or drained row and the reader answers `{}` for both censuses."""
     if plant not in PLANTS:
         return [f"{SAY}: refused · no plant {plant!r}: the plants are {', '.join(PLANTS)}"], 2
-    from deviation_join import remove_tree, set_env_aside   # noqa: E402  the kit's fixture helpers
+    from deviation_join import remove_tree, set_fixture_env   # noqa: E402  the kit's fixture helpers
     top = pathlib.Path(tempfile.mkdtemp(prefix="rc-"))
     try:
-        # TOOL-dTotalRecall-76 S10: a caller's exported remote names none of the fixture's, so it is held out too
-        with set_env_aside((*tree_lib.GIT_ENV_LEAKS, "GOV_REMOTE", "GOV_DEFAULT_BRANCH")):
+        # TOOL-dTotalRecall-88 S9: a fixture reads nothing of the caller's git environment, config or remote
+        with set_fixture_env():
             memory = FIXTURE_MEMORY_ROOTS.get(plant, "memory")
             root = write_fixture(top, plant, memory)
             home = root / memory / "project" / f"{POPULATION}.txt"

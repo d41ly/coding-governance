@@ -199,6 +199,20 @@ def set_env_aside(names=(), **put):
         os.environ.update(held)
 
 
+@contextlib.contextmanager
+def set_fixture_env():
+    """A fixture's environment for the block, reading nothing of the caller's (TOOL-dTotalRecall-88 S9, the
+    contract of branch-reconcile's `seed_env`)."""
+    with tempfile.TemporaryDirectory(prefix="fe-", ignore_cleanup_errors=True) as d:
+        conf = pathlib.Path(d, "gitconfig")
+        conf.write_bytes(b"[user]\n\tname = fx\n\temail = fx@example.invalid\n[init]\n\tdefaultBranch = main\n"
+                         b"[core]\n\tautocrlf = false\n")
+        names = [k for k in os.environ if k.startswith("GIT_")] + ["GOV_REMOTE", "GOV_DEFAULT_BRANCH"]
+        with set_env_aside(names, GIT_CONFIG_GLOBAL=str(conf), GIT_CONFIG_NOSYSTEM="1",
+                           GIT_CEILING_DIRECTORIES=str(pathlib.Path(d).parent)):
+            yield
+
+
 def read_join_state(root, conf):
     """`(armed, why)` by the key rule, `design_lib.read_design_keys` (TOOL-dTrueNorth-16 S5): off, with no
     git call, when all four `DESIGN_*` keys are blank; armed when all four are set and the pin names a

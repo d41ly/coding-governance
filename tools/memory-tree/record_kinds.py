@@ -2334,11 +2334,10 @@ def run_fixture(plant: str | None) -> tuple[list[str], int]:
     if plant is not None and plant not in PLANTS:
         return [f"{SAY}: refused · no plant {plant!r}: the plants are {', '.join(PLANTS)}"], 2
     from contextlib import ExitStack
-    from deviation_join import set_env_aside   # noqa: E402  the kit's fixture helper
-    from tree_lib import GIT_ENV_LEAKS
+    from deviation_join import set_fixture_env   # noqa: E402  the kit's fixture helper
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="rk-"))
-    # TOOL-dTotalRecall-76 S10: a caller's exported remote names none of the fixture's, so it is held out
-    with set_env_aside((*GIT_ENV_LEAKS, "GOV_REMOTE", "GOV_DEFAULT_BRANCH")), ExitStack() as done:
+    # TOOL-dTotalRecall-88 S9: a fixture reads nothing of the caller's git environment, config or remote
+    with set_fixture_env(), ExitStack() as done:
         done.callback(remove_tree, tmp)
         typed = build_fixture(tmp, plant)
         head = [f"{SAY}: fixture {plant or 'green'}"]
