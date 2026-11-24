@@ -2519,7 +2519,9 @@
       "{prefix}/hooks/kit.toml",
       "{prefix}/settings-merge.py",
       "{prefix}/codebase-map/kit.toml",
-      "{prefix}/process-monitor/census.py"
+      "{prefix}/process-monitor/census.py",
+      "{prefix}/roles/",
+      "{prefix}/policy/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3107,7 +3109,8 @@
       "{prefix}/roles/handoff.py",
       "{prefix}/roles/roles_lib.py",
       "{prefix}/policy/",
-      "{prefix}/workflows/spec-audit-optin.js",
+      "{prefix}/workflows/",
+      ".claude/roles.json",
       "{prefix}/lib/"
     ],
     "chunk": "selftests",

@@ -808,6 +808,8 @@ guard = [
   "{prefix}/settings-merge.py",
   "{prefix}/codebase-map/kit.toml",
   "{prefix}/process-monitor/census.py",
+  "{prefix}/roles/",
+  "{prefix}/policy/",
 ]
 chunk = "selftests"
 subject = "kit"
@@ -1223,7 +1225,7 @@ tag = "leg.gov.spawn-guard-self-test"
 tests = ["feature.roles"]
 purpose = "tests the spawn guard on Workflow and Agent tool calls"
 argv = ["bash", "{prefix}/roles/spawn-guard.test.sh"]
-guard = ["{prefix}/roles/spawn-guard.js", "{prefix}/roles/spawn-guard.fragment.json", "{prefix}/roles/spawn-guard.test.sh", "{prefix}/hooks/scratch-guard.js", "{prefix}/roles/handoff.py", "{prefix}/roles/roles_lib.py", "{prefix}/policy/", "{prefix}/workflows/spec-audit-optin.js", "{prefix}/lib/"]
+guard = ["{prefix}/roles/spawn-guard.js", "{prefix}/roles/spawn-guard.fragment.json", "{prefix}/roles/spawn-guard.test.sh", "{prefix}/hooks/scratch-guard.js", "{prefix}/roles/handoff.py", "{prefix}/roles/roles_lib.py", "{prefix}/policy/", "{prefix}/workflows/", ".claude/roles.json", "{prefix}/lib/"]
 chunk = "selftests"
 subject = "kit"
 ceiling = 1800

@@ -38023,6 +38023,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "scanScriptBlocks",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "scanSegments",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
