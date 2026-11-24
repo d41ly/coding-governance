@@ -89,7 +89,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 64 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 71 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
@@ -165,13 +165,21 @@ ids TOOL-dBoundRoles-86 TOOL-dBoundRoles-87 TOOL-dBoundRoles-88 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-67 — unit 65's leftover sweep also selects the observation's worktrees by what they checked out, so a leftover at an unnamed `%TEMP%` path is found](spec/2026-10-26-spec-TOOL-dBoundRoles-67.md) | 38 | 2 | CLOSED | rev-2 | 2026-11-24 |
 | [TOOL-dBoundRoles-68 — unit 65's AC4 says it is green by construction over `dbr63obs` alone, and a positive control proves the signature selection sees a leftover outside that root](spec/2026-10-26-spec-TOOL-dBoundRoles-68.md) | 38 | 2 | CLOSED | rev-2 | 2026-11-24 |
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | CLOSED | rev-3 | 2026-11-24 |
+| [TOOL-dBoundRoles-86 — the shell-write arm reads operands and redirects per simple command](spec/2026-11-24-spec-TOOL-dBoundRoles-86.md) | 40 | 2 | OPEN | rev-1 | 2026-11-24 |
+| [TOOL-dBoundRoles-87 — an in-place write behind a shell reserved word yields its target](spec/2026-11-24-spec-TOOL-dBoundRoles-87.md) | 41 | 2 | OPEN | rev-1 | 2026-11-24 |
+| [TOOL-dBoundRoles-88 — harness admission holds every nested harness a landed harness calls to its landed blob](spec/2026-11-24-spec-TOOL-dBoundRoles-88.md) | 42 | 2 | OPEN | rev-1 | 2026-11-24 |
+| [TOOL-dBoundRoles-89 — a sent-back orientation return is one shape that the return check and `place` both take](spec/2026-11-24-spec-TOOL-dBoundRoles-89.md) | 43 | 2 | OPEN | rev-1 | 2026-11-24 |
+| [TOOL-dBoundRoles-90 — a harness stage whose effect may already have landed is spawned once](spec/2026-11-24-spec-TOOL-dBoundRoles-90.md) | 44 | 2 | OPEN | rev-1 | 2026-11-24 |
+| [TOOL-dBoundRoles-91 — the declaration verb cuts a work order from the composed item kind](spec/2026-11-24-spec-TOOL-dBoundRoles-91.md) | 45 | 2 | OPEN | rev-1 | 2026-11-24 |
+| [TOOL-dBoundRoles-92 — the closing review's round-1 minors folded, and the reviewers step row declares the atomic resume unit 43 owed](spec/2026-11-24-spec-TOOL-dBoundRoles-92.md) | 46 | 2 | OPEN | rev-1 | 2026-11-24 |
 <!-- /gen:build-units -->
 
 Records: 567 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 TOOL-dBoundRoles-81 TOOL-dBoundRoles-82 TOOL-dBoundRoles-83 TOOL-dBoundRoles-84 TOOL-dBoundRoles-85.
+Ids no `spec-audit` record has ever named: TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 TOOL-dBoundRoles-81 TOOL-dBoundRoles-82 TOOL-dBoundRoles-83 TOOL-dBoundRoles-84 TOOL-dBoundRoles-85 TOOL-dBoundRoles-86 TOOL-dBoundRoles-87 TOOL-dBoundRoles-88 TOOL-dBoundRoles-89
+TOOL-dBoundRoles-90 TOOL-dBoundRoles-91 TOOL-dBoundRoles-92.
 
 Ids whose spec moved past its audited revision: TOOL-dBoundRoles-1@rev-1 TOOL-dBoundRoles-10@rev-1 TOOL-dBoundRoles-11@rev-1 TOOL-dBoundRoles-12@rev-1 TOOL-dBoundRoles-13@rev-1 TOOL-dBoundRoles-14@rev-1 TOOL-dBoundRoles-15@rev-1 TOOL-dBoundRoles-16@rev-1 TOOL-dBoundRoles-17@rev-1
 TOOL-dBoundRoles-18@rev-1 TOOL-dBoundRoles-19@rev-1 TOOL-dBoundRoles-2@rev-1 TOOL-dBoundRoles-20@rev-1 TOOL-dBoundRoles-21@rev-1 TOOL-dBoundRoles-22@rev-1 TOOL-dBoundRoles-23@rev-1 TOOL-dBoundRoles-24@rev-1 TOOL-dBoundRoles-25@rev-1 TOOL-dBoundRoles-26@rev-1 TOOL-dBoundRoles-3@rev-1
@@ -183,7 +191,7 @@ TOOL-dBoundRoles-64@rev-1 TOOL-dBoundRoles-65@rev-1 TOOL-dBoundRoles-66@rev-1.
 
 <!-- gen:build-coverage -->
 
-Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 64 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 71 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 26
 - carried in parts: 0 (none)
@@ -201,7 +209,9 @@ Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 64 spec(s) at 
   `spec/2026-10-26-spec-TOOL-dBoundRoles-60.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-61.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-62.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-63.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-26-spec-TOOL-dBoundRoles-64.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-65.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-66.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-67.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-26-spec-TOOL-dBoundRoles-68.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-69.md` (PLAY-dClosedLoop-2), `spec/2026-11-23-spec-TOOL-dBoundRoles-81.md` (PLAY-dClosedLoop-2), `spec/2026-11-23-spec-TOOL-dBoundRoles-82.md` (PLAY-dClosedLoop-2),
-  `spec/2026-11-23-spec-TOOL-dBoundRoles-83.md` (PLAY-dClosedLoop-2), `spec/2026-11-23-spec-TOOL-dBoundRoles-84.md` (PLAY-dClosedLoop-2), `spec/2026-11-23-spec-TOOL-dBoundRoles-85.md` (PLAY-dClosedLoop-2)
+  `spec/2026-11-23-spec-TOOL-dBoundRoles-83.md` (PLAY-dClosedLoop-2), `spec/2026-11-23-spec-TOOL-dBoundRoles-84.md` (PLAY-dClosedLoop-2), `spec/2026-11-23-spec-TOOL-dBoundRoles-85.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-86.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-24-spec-TOOL-dBoundRoles-87.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-88.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-89.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-90.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-24-spec-TOOL-dBoundRoles-91.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-92.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0166, cl-dClosedLoop-0167, cl-dClosedLoop-0168, cl-dClosedLoop-0173, cl-dClosedLoop-0178, cl-dClosedLoop-0187, cl-dClosedLoop-0189
 <!-- /gen:build-coverage -->
 
@@ -248,6 +258,13 @@ Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 64 spec(s) at 
 | 37 | `TOOL-dBoundRoles-65`, `TOOL-dBoundRoles-66` | yes |
 | 38 | `TOOL-dBoundRoles-67`, `TOOL-dBoundRoles-68` | yes |
 | 39 | `TOOL-dBoundRoles-69` | no |
+| 40 | `TOOL-dBoundRoles-86` | no |
+| 41 | `TOOL-dBoundRoles-87` | no |
+| 42 | `TOOL-dBoundRoles-88` | no |
+| 43 | `TOOL-dBoundRoles-89` | no |
+| 44 | `TOOL-dBoundRoles-90` | no |
+| 45 | `TOOL-dBoundRoles-91` | no |
+| 46 | `TOOL-dBoundRoles-92` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
