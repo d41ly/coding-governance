@@ -23,19 +23,19 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 581c7336f6a2a64799fa7b89d2e9a084f66ede64
-phase: HELD
+witness: 4848506d10b951a1813d558e659d793bd6649ecb
+phase: VERIFYING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
 anchor-kind: default-branch
 cli-version: 2.1.326
-lease-utc: 2026-11-24T02:12:39Z
+lease-utc: 2026-11-24T12:24:20Z
 pid-image: claude.exe
 host: desktop-v6fbsjd
-pid: 17368
-session: e3282daf-390c-439b-a9f4-1bf8f9ed9630
-keepalive: 32792f1d
+pid: 1216
+session: 30cf69e5-1246-4fdf-9d3d-870e0bba5f60
+keepalive: efe49660
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 anchor-ref: refs/heads/main
@@ -588,3 +588,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T09:19:07Z dispatch · item f6e7ae14 TOOL-dBoundRoles-69 · reason tools/roles/adopt-roles.test.sh tools/roles/spawn-guard.test.sh tools/run-gates/selftest-budgets.txt memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-60-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-63-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-64-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-65-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-66-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-69-deviation-692.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-69-1-acceptance-ledger.md memory/builds/dBoundRoles/BACKLOG.md memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-69.md
 
 2026-11-24T11:41:03Z hold · item host-owner-action · reason until owner · reaped 32792f1d · resume none(owner)
+
+2026-11-24T12:24:32Z resume · item dBoundRoles · reason held · keepalive efe49660 · manual
