@@ -414,3 +414,5 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-24T05:08:01Z draw · re-dispatch · KICK-dKeptSession-69 · 23/132 · 20261124T050801Z-7df8e6
 
 2026-11-24T05:08:01Z dispatch · item 17ada699 KICK-dKeptSession-69 · reason memory/builds/dKeptSession/spec/2026-11-22-spec-KICK-dKeptSession-69.md memory/builds/dKeptSession/build/2026-11-22-build-KICK-dKeptSession-69-1-acceptance-ledger.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md
+
+2026-11-24T07:39:27Z rescope · item add KICK-dKeptSession-89 · reason push-main.sh --prepare refused the landing: merge-losses reads four definitions of tools/policy/policy.py lost by the first reconcile ad02f1a6a, check_shrink_list, read_shrink_base, write_shrink_file and write_shrink_list, whose deletion KICK-dKeptSession-69 S5 made on purpose; the merge's message is published and cannot carry a superseded line, so the tip takes the names back, TOOL-aTrimmedWait-19's route; a blocker between the run and its own landing is a discovery adopted now
