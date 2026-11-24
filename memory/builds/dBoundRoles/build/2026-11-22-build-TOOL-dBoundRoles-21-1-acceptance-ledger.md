@@ -18,3 +18,4 @@ owed to the main loop at the close.
 - AC8 — `effort: medium` — at the repository's top, the criterion's `python -c "... f.write_role(clone, rel, 'gov-probe', ...) ..."` printed `0 1`: `factories: new role gov-probe · gate roles catalogue green`, the scratch clone of the working tree grading 14 roles with 0 defects (DERIVED from that run), and the role declaring `effort: medium` once.
 
 The render's wall, `python tools/roles/render_agents.py --check` at the repository's top: 1.46 s at the base, 9.88 s after, one `policy.py get` process per distinct key, 38 keys over 232 reads (DERIVED by a probe counting `read_policy_setting` calls over one `run_mode` check).
+- seen-red — `roles adopter self-test` — red `3c9b6ad0e` — green `3c9b6ad0e` — the reserved default slot admitted, arm 29 red

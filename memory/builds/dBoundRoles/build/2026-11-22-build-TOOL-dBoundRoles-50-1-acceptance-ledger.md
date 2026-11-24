@@ -79,3 +79,6 @@ unit whose disposition answers it:
 - AC23 — `handed content is fenced` — `grep -n` printed one line in `tools/roles/README.md@39b2320f:209` and one in `tools/hooks/README.md@d813c3e0:323`, the rule-6 README.
 - AC24 — `grades a direct spawn` — `grep -n 'grades a direct spawn' tools/roles/README.md` printed one line, on the `check-return` paragraph at `tools/roles/README.md@39b2320f:457`, written by `TOOL-dBoundRoles-39` and held here.
 - seen-red — `roles render selftest` — red `da8a257f` — green `da8a257f` — both `agent_type` exits of unit 5 S2 taken out, arm 22 red on the two marked stops
+- seen-red — `scratch-guard self-test` — red `3c9b6ad0e` — green `3c9b6ad0e` — the fence walker closing on a run of three, BR50-AC9 and BR50-AC16 red
+- seen-red — `roles adopter self-test` — red `3c9b6ad0e` — green `3c9b6ad0e` — a stand-in marker read by a bare search, arm 49 AC11 red
+- seen-red — `govkit selftest` — red `a6f9ddc6b` — green `a6f9ddc6b` — an explicit agent true predicate: check_agent_default reads a failure

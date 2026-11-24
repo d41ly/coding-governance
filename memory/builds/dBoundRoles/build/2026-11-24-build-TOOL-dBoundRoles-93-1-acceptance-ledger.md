@@ -22,3 +22,4 @@ section 7, are owed to the main loop at the close.
 - AC11 — `.claude/roles.json` — `spawn-guard self-test` stood under it, under each path its `harnesses` list names, and under `tools/workflows/spec-audit-optin.js`.
 - AC12 — `FLOOR_ASSERTIONS` — its rise equals the assertions the added lines execute, read off the diff, and the `scratch-guard self-test` and `loop item kind` rows moved (DERIVED). OWED at the close: the executed count.
 - AC13 — `grep -n "foreach" tools/hooks/README.md help/roles.md` — each file carries its line, and `declaration-root` stands in `help/loop.md`.
+- seen-red — `scratch-guard self-test` — red `a6f9ddc6b` — green `a6f9ddc6b` — the block scan and the substitution push cut: BR93-AC1, BR93-AC2 and the four BR86 substitution rows red

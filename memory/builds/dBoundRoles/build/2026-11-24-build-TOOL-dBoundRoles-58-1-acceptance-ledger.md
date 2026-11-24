@@ -77,3 +77,5 @@ nothing is parked and no row is owed.
 - AC33 — `grep -n 'typed input' help/roles.md` — printed the renderer step's refusal and the two bullets under "What the hooks refuse"; `docs_leg.py --fingerprints` printed every stamp the page carries unchanged.
 - AC34 — `git ls-files '*SKILL.md' '*SKILL.template.md' | xargs grep -nwE 'Grep|Glob'` — the list holds `skills/deploy-governance/SKILL.md`, and a word search for either name over every file of it printed nothing.
 - AC35 — `INPUT_NAMES` — with a scratch `handoff.py` adding `extra` to it, the case's functions printed `the typed input extra maps to a role that reads it: no role is mapped` as a failure. OWED: arm 42's staged case at the close.
+- seen-red — `roles adopter self-test` — red `3c9b6ad0e` — green `3c9b6ad0e` — check_block_fences answering an empty list, arm 38 BR58 AC7 red
+- seen-red — `spawn-guard self-test` — red `a6f9ddc6b` — green `a6f9ddc6b` — both typed-block checks and the block-fence check cut, BR58 AC12 and AC25 red

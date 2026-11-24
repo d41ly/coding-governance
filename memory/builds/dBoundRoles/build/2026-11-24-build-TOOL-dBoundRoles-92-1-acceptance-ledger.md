@@ -35,3 +35,7 @@ at base `d0f4c6560` and added the engine-span arm's placeholder fill (deviation 
 - AC21 — `route-refusal` — Stage 1 of the template and of the render each carry it, and the orient step of the help page does.
 - AC22 — `check_frozen` — over a scratch clone holding the pass commit the problem list was empty from `origin/main` and from the base named the row's `resume`, and `read_steps` read `atomic`.
 - AC23 — `git diff -U0` — each pin's rise equals the assertions its added lines execute, read off the diff, and each suite's budget row moved (DERIVED). OWED at the close: the executed counts.
+- seen-red — `spawn-guard self-test` — red `a6f9ddc6b` — green `a6f9ddc6b` — the framing check and the fact re-cut cut, every BR92 AC14 and AC15 row red
+- seen-red — `loop position fixtures` — red `a6f9ddc6b` — green `a6f9ddc6b` — a refusal tail pattern that never matches: refusal-typed MISSED
+- seen-red — `policy fixtures` — red `a6f9ddc6b` — green `a6f9ddc6b` — the catalogue maximum raised to 5: retries-attempts-join reads two wrong
+- seen-red — `unattended-build self-test` — red `a6f9ddc6b` — green `a6f9ddc6b` — the handed blocks emptied in the unit harness, DBR92 AC5 red

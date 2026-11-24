@@ -22,3 +22,4 @@ name joins the copied `check_roles.py#WORKFLOW_NAMES`, a `[[workflow]]` row join
 - AC5 — `judge` — in the fixture with no policy kit, `judge` at `cap = 7` exited 0 with no R9 line and the note `the stage cap arm is unarmed`; with `tools/policy/` copied and `runtime.agents-in-flight = 6` committed on `main`, it exited 1 with one R9 line, `entry 13 (scratch) stage judge caps 7 agents, above runtime.agents-in-flight 6`; at `cap = 6` it exited 0, the summary reading `15 stage rows against runtime.agents-in-flight 6` (DERIVED from that run); with 5 committed, `judge` at 6 and gov's `specWriter` at 6 were the two R9 cap lines, so the limit is the policy key's and no literal. OWED: arm 30's `ac5a` to `ac5d` at the close.
 
 Gov's own table in that fixture graded 13 stage rows with no R9 line, exit 0 (DERIVED from that run).
+- seen-red — `roles adopter self-test` — red `3c9b6ad0e` — green `3c9b6ad0e` — the row cap compare cut, arm 30 red on both caps

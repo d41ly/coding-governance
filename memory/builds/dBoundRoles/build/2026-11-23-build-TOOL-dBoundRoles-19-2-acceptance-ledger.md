@@ -31,3 +31,5 @@ so the answer stands under this heading rather than in the block above.
 OBSERVED: `grep -n 'derive_overlay_expected' tools/govkit/selftest.py` printed nothing over the file as this unit's
 pass commit `bfccd9126` leaves it and over the tree at `ae8fc1f65`, and printed the definition, its call, the comment
 and the docstring at the pass commit's parent `7dae6faf2`.
+- seen-red — `roles adopter self-test` — red `3c9b6ad0e` — green `3c9b6ad0e` — the R10 unknown-role test cut, arm 47 ac4-nobody red
+- seen-red — `govkit selftest` — red `a6f9ddc6b` — green `a6f9ddc6b` — the before-image write skipped: check_house_step reads a failure
