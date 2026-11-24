@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once
 
-**Status:** DEFERRED · rev-2 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 41 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-2 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 41 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-26-build-TOOL-dTotalRecall-100-deviation-1001.md](../build/2026-10-26-build-TOOL-dTotalRecall-100-deviation-1001.md) | deviation | — |
 | [2026-11-24-prompt-TOOL-dTotalRecall-100-reground-brief.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-100-reground-brief.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dTotalRecall-100-reground-spec-writer.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-100-reground-spec-writer.md) | log | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-100-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-100-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
