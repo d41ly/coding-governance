@@ -1223,7 +1223,7 @@ tag = "leg.gov.spawn-guard-self-test"
 tests = ["feature.roles"]
 purpose = "tests the spawn guard on Workflow and Agent tool calls"
 argv = ["bash", "{prefix}/roles/spawn-guard.test.sh"]
-guard = ["{prefix}/roles/spawn-guard.js", "{prefix}/roles/spawn-guard.fragment.json", "{prefix}/roles/spawn-guard.test.sh", "{prefix}/hooks/scratch-guard.js"]
+guard = ["{prefix}/roles/spawn-guard.js", "{prefix}/roles/spawn-guard.fragment.json", "{prefix}/roles/spawn-guard.test.sh", "{prefix}/hooks/scratch-guard.js", "{prefix}/roles/handoff.py", "{prefix}/roles/roles_lib.py", "{prefix}/policy/", "{prefix}/workflows/spec-audit-optin.js", "{prefix}/lib/"]
 chunk = "selftests"
 subject = "kit"
 ceiling = 1800
@@ -1312,7 +1312,7 @@ tag = "leg.gov.memory-hygiene-self-test"
 tests = ["feature.memory-tree-hygiene"]
 purpose = "fixture-tests the memory hygiene checks and empty guard"
 argv = ["bash", "{prefix}/memory-tree/check-memory-hygiene.test.sh"]
-guard = ["{prefix}/lib/", "{prefix}/memory-tree/", "{prefix}/check-spec-tokens.py"]
+guard = ["{prefix}/lib/", "{prefix}/memory-tree/", "{prefix}/check-spec-tokens.py", "{prefix}/playbook/principles.toml"]
 chunk = "selftests"
 subject = "kit"
 ceiling = 4800
@@ -1555,7 +1555,7 @@ tag = "leg.gov.unattended-build-self-test"
 tests = ["feature.review-harnesses"]
 purpose = "arms the unattended build harness"
 argv = ["bash", "{prefix}/workflows/unattended-build.test.sh"]
-guard = ["{prefix}/workflows/"]
+guard = ["{prefix}/workflows/", "{prefix}/roles/handoff.py", "{prefix}/roles/roles_lib.py", "{prefix}/hooks/scratch-guard.js"]
 chunk = "selftests"
 subject = "kit"
 ceiling = 700
@@ -1694,6 +1694,8 @@ guard = [
   "{prefix}/govkit/registry.toml",
   "{prefix}/govkit/selftest.py",
   "{prefix}/workflows/unattended-build.template.js",
+  "{prefix}/workflows/tier2-review.template.js",
+  "{prefix}/workflows/unattended-unit.js",
   "{prefix}/workflows/check-review-join.js",
   "{prefix}/workflows/check-verifier-fanout.js",
   "{prefix}/lib/",

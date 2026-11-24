@@ -173,6 +173,11 @@ SCOUT_ROLE = "gov-orienter"
 TYPED_RETURN_KEYS = ("outcome", "answers")
 PLACED_OUTCOME = "placed"
 OUTCOME_REFUSED = "the return's outcome is %s, not %s, so it carries no placement"
+#: The outcome of a typed refusal, and what `place` says of one (TOOL-dBoundRoles-92 S18): the roles kit's verb
+#: routes it to the actor it names, and no placement key of it is read.
+REFUSED_OUTCOME = "refused"
+RETURN_REFUSED = ("the return's outcome is refused (rule %s · actor %s), so it carries no placement: route it with "
+                  "handoff.py route-refusal --return %s")
 #: Shared interface I20: the `entry` fact each disposition that selects scenarios derives; the rest select none.
 ENTRY_FACTS = {"new": "feature", "amend": "amendment", "patch": "patch", "repeat": "playbook-run"}
 #: The mark a selection carries where no scenario admits the request and the default places it.
@@ -251,6 +256,9 @@ PLANTS = {"each-disposition": "one request placed per member of the set, each wi
           "return-json": "a fenced JSON return naming build checked and placed, its block the lines' block; a whole-text "
                          "object and one with every key placed; a line break, a card key and an oriented outcome "
                          "refused, no block written; the return line's fields equal to RETURN_KEYS",
+          "return-refused": "a refused return in key: value lines, then one as a fenced JSON block, each refused naming "
+                            "route-refusal, its rule and its actor; a malformed refusal refused by its own defect "
+                            "line; no block written",
           "return-sent-back": "a key: value return lacking outcome refused naming it, then the fenced JSON block the "
                               "send-back orders placed"}
 #: The fixture's session, whose `.typed` line a breakpoint plant writes as the owner's own words.
@@ -505,14 +513,25 @@ def check_agent_return(root, path, agent_id):
                                "that agent wrote" % (path, agent_id))
 
 
+def check_refused_return(path, said):
+    """PlacementRefused where the return's fields `said` carry the outcome `refused` (TOOL-dBoundRoles-92 S18),
+    by a text of its own naming its rule, its actor and `route-refusal` over the return at `path`."""
+    if said.get("outcome") == REFUSED_OUTCOME:
+        rule, actor = (" ".join(str(said.get(k) or NO_VALUE).split()) for k in ("rule", "actor"))
+        why = RETURN_REFUSED % (rule, actor, path)
+        raise PlacementRefused(why, line="%s: refused — return — %s" % (SAY, why))
+
+
 def read_scout_return(path, graded=None):
     """`{key: value}` of the scout's return, its keys among `RETURN_KEYS`: the JSON object `graded`,
     `check_scout_return`'s answer (TOOL-dBoundRoles-89 S4), or, where it is None, the `key: value` lines of the
     file at `path`. The typed channel's two fields, `TYPED_RETURN_KEYS`, are admitted once each and left out of
-    the result, `outcome` only where it reads `placed` (TOOL-dBoundRoles-12 §8 F5). PlacementRefused for another
+    the result, `outcome` only where it reads `placed` (TOOL-dBoundRoles-12 §8 F5). PlacementRefused by
+    `check_refused_return` for a refusal, in either shape, before any key is compared; for another
     `outcome` or a key outside them; for a JSON value that is no string on one line; and for an unreadable file,
     a line that is no `key: value` or a key given twice."""
     if graded is not None:
+        check_refused_return(path, graded)
         why = OUTCOME_REFUSED % (graded["outcome"], PLACED_OUTCOME) \
             if graded.get("outcome", PLACED_OUTCOME) != PLACED_OUTCOME else None
         for key, value in graded.items():
@@ -527,6 +546,12 @@ def read_scout_return(path, graded=None):
         text = pathlib.Path(path).read_bytes().decode("utf-8-sig").replace("\r\n", "\n")
     except (OSError, UnicodeDecodeError) as e:
         raise PlacementRefused("the return %s cannot be read: %s" % (path, e)) from None
+    said = {}
+    for line in text.split("\n"):
+        key, sep, value = line.partition(":")
+        if sep:
+            said.setdefault(key.strip(), value.strip())
+    check_refused_return(path, said)
     fields, typed = {}, {}
     for n, line in enumerate(text.split("\n"), 1):
         if not line.strip():
@@ -1739,6 +1764,24 @@ def check_placement_plant(case, top, seen, bad):
         got = parse_placement_blocks(store / ("%s.placement" % FX_KEY))
         if len(got) != 1 or "outcome" in got[0] or "answers" in got[0]:
             bad.append("the typed return wrote %d block(s), owed one holding no typed field: %s" % (len(got), got))
+    elif case == "return-refused":   # TOOL-dBoundRoles-92 AC20
+        refusal = {"rule": "practice.yagni", "remedy": "ask for less", "actor": "driver"}
+        lines = render_fixture_return(refusal, REFUSED_OUTCOME)
+        shapes = {"lines": lines, "malformed": render_fixture_return(dict(refusal, actor="nobody"), REFUSED_OUTCOME),
+                  "json": "The refusal:\n\n```json\n%s\n```\n" % json.dumps(
+                      dict(ln.split(": ", 1) for ln in lines.splitlines()), indent=1)}
+        for what, text in shapes.items():
+            ret = rets / ("refused-%s.md" % what)
+            ret.write_text(text, encoding="utf-8", newline="\n")
+            got = run_placement_command(root, "place", "--request", FX_KEY, "--return", str(ret))
+            if what == "malformed":
+                check_case(what, got, 1, "placement: refused — return — actor — ")
+                continue
+            check_case(what, got, 1, "placement: refused — return — the return's outcome is refused (rule practice.yagni · "
+                       "actor driver), so it carries no placement: route it with handoff.py route-refusal --return ",
+                       ret.name)
+        if (store / ("%s.placement" % FX_KEY)).exists():
+            bad.append("a refused return wrote a block")
     elif case in ("return-json", "return-sent-back"):   # TOOL-dBoundRoles-89 AC1, AC2, AC4, AC5
         fields = {"disposition": "new", "build": FX_NEW, "reason": "the scout read it as new"}
         typed = dict(ln.split(": ", 1) for ln in render_fixture_return(fields).splitlines())

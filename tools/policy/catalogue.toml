@@ -270,7 +270,7 @@ owner = "dBoundRoles"
 
 [[key]]
 name = "roles.retries"
-allowed = { type = "retry-count", min = 0 }
+allowed = { type = "retry-count", min = 0, max = 4 }
 default = 3
 owner = "dBoundRoles"
 direction = "raise-loosens"

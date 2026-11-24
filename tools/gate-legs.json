@@ -3103,7 +3103,12 @@
       "{prefix}/roles/spawn-guard.js",
       "{prefix}/roles/spawn-guard.fragment.json",
       "{prefix}/roles/spawn-guard.test.sh",
-      "{prefix}/hooks/scratch-guard.js"
+      "{prefix}/hooks/scratch-guard.js",
+      "{prefix}/roles/handoff.py",
+      "{prefix}/roles/roles_lib.py",
+      "{prefix}/policy/",
+      "{prefix}/workflows/spec-audit-optin.js",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3248,7 +3253,8 @@
     "guard": [
       "{prefix}/lib/",
       "{prefix}/memory-tree/",
-      "{prefix}/check-spec-tokens.py"
+      "{prefix}/check-spec-tokens.py",
+      "{prefix}/playbook/principles.toml"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3633,7 +3639,10 @@
       "{prefix}/workflows/unattended-build.test.sh"
     ],
     "guard": [
-      "{prefix}/workflows/"
+      "{prefix}/workflows/",
+      "{prefix}/roles/handoff.py",
+      "{prefix}/roles/roles_lib.py",
+      "{prefix}/hooks/scratch-guard.js"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3854,6 +3863,8 @@
       "{prefix}/govkit/registry.toml",
       "{prefix}/govkit/selftest.py",
       "{prefix}/workflows/unattended-build.template.js",
+      "{prefix}/workflows/tier2-review.template.js",
+      "{prefix}/workflows/unattended-unit.js",
       "{prefix}/workflows/check-review-join.js",
       "{prefix}/workflows/check-verifier-fanout.js",
       "{prefix}/lib/",

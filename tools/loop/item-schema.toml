@@ -47,7 +47,8 @@ fixed-by = ["principle=principle.p24"]
 
 # actor (TOOL-dBoundRoles-84): open on the scalar direction `changes`, under which any other value widens,
 # so a patch of a gov item's actor passes the row checks and reaches the item kind's check, whose seat
-# `check_actor_patches` in loop_items.py refuses it until the roles kit's actor-patch check answers there;
+# `check_actor_patches` in loop_items.py has a patch naming a repository role, `role:adopter.<name>`, judged by
+# the roles kit's `check_roles.py --check-actor-patch` and refuses any other value (TOOL-dBoundRoles-92);
 # `ref = "actor"` declares the field's ref role, which the exclusion walk of row_checks.py reads.
 [[field]]
 name = "actor"

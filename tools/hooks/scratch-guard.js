@@ -586,28 +586,37 @@ function scanInterpreterWrites(body) {
   return out
 }
 
+/** The perl short switches whose value is the rest of their word, per perlrun. */
+const PERL_VALUE_SWITCHES = 'MmIFCDxV'
 /**
  * The file operands of a `sed` or `perl` simple command's <argv> that edits in place, or [] when it
  * carries no in-place option. In a short cluster `i` takes the rest as its backup suffix, so `-Ei`
  * is in place and `-ie` is in place with suffix `e`, as GNU sed reads them; `--in-place[=<suffix>]`
  * is sed's long form. The script is the first operand unless an `-e` or `-f` (perl `-e` or `-E`)
- * named it; an empty word, BSD sed's `-i ''` suffix, is no operand.
+ * named it; an empty word, BSD sed's `-i ''` suffix, is no operand. A switch of PERL_VALUE_SWITCHES ends
+ * a perl cluster, and a bare `-I` takes the next word, so `-MList::Util` is not in place. A `--` ends
+ * the options and no more: the first word after it is still the script while none was named.
  */
 function scanInPlaceOperands(argv) {
   const perl = buildBaseName(argv[0]) === 'perl'
   let inPlace = false
   let script = false
+  let ended = false
   const files = []
   for (let k = 1; k < argv.length; k++) {
     const w = argv[k]
     if (w === '') continue
-    if (w === '--') { files.push(...argv.slice(k + 1).filter((x) => x !== '')); break }
-    if (!perl && /^--in-place(?:=|$)/.test(w)) { inPlace = true; continue }
-    if (!perl && /^--(?:expression|file)$/.test(w)) { script = true; k++; continue }
-    if (/^--/.test(w)) { if (/^--(?:expression|file)=/.test(w)) script = true; else if (w === '--line-length') k++; continue }
-    if (/^-[A-Za-z0-9]/.test(w)) {
+    if (!ended && w === '--') { ended = true; continue }
+    if (!ended && !perl && /^--in-place(?:=|$)/.test(w)) { inPlace = true; continue }
+    if (!ended && !perl && /^--(?:expression|file)$/.test(w)) { script = true; k++; continue }
+    if (!ended && /^--/.test(w)) { if (/^--(?:expression|file)=/.test(w)) script = true; else if (w === '--line-length') k++; continue }
+    if (!ended && /^-[A-Za-z0-9]/.test(w)) {
       for (let i = 1; i < w.length; i++) {
         const ch = w[i]
+        if (perl && PERL_VALUE_SWITCHES.includes(ch)) {
+          if (ch === 'I' && i === w.length - 1) k++
+          break
+        }
         if (ch === 'i') { inPlace = true; break }
         if ((perl ? 'eE' : 'ef').includes(ch) || (!perl && ch === 'l')) {
           if (ch !== 'l') script = true

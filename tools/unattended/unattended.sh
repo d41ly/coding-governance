@@ -16861,6 +16861,17 @@ PROPOSED
   return 0
 }
 
+# TOOL-dBoundRoles-92 S15 - THE EXACT LINE COMPARE, verb_propose's, read in this shell: the timestamp is a
+# row's first token and the reason is line-final, so a row whose reason merely STARTS with this one is not it.
+check_row_recorded() { # run-state path · the row's text after its timestamp -> 0 where the row stands
+  local pl
+  while IFS= read -r pl || [ -n "$pl" ]; do
+    pl=${pl%$'\r'}
+    [ "${pl#* }" = "$2" ] && return 0
+  done < "$1"
+  return 1
+}
+
 # TOOL-dDeclaredLoop-14 - THE DEFAULT FAILURE ROUTE'S RECORD. A refused item was a `fail N` line and a
 # number in the machine-local run log, routed nowhere. `--refused` writes it where history reads it, a
 # `refusal` row through park() with the item's instance key in the step field, and `--plan` then
@@ -16875,8 +16886,11 @@ PROPOSED
 # refusal below: a partial set, a rule or remedy spelling the separator that split reads at, and an actor
 # outside the five forms the roles kit's refusal arm declares in its role-schema.toml (spelled here again,
 # since a kit imports no sibling kit). The newline and bypass guards then read the composed reason.
+# TOOL-dBoundRoles-92 S6 - AN UNTYPED REASON SPELLING THAT TAIL is the same refusal: it would read back as a
+# typed one whose actor nothing checked. The glob is a superset of the loop kit's `REFUSAL_TAIL_RE`, so every
+# reason that splits is refused, and so is one whose actor holds a space, which does not.
 write_refusal() { # slug · item tag · instance key · reason · rule · remedy · actor
-  local slug="$1" item="$2" key="$3" reason="$4" rule="${5:-}" remedy="${6:-}" actor="${7:-}" rel want pl _out _rc _why _tw=""
+  local slug="$1" item="$2" key="$3" reason="$4" rule="${5:-}" remedy="${6:-}" actor="${7:-}" rel _out _rc _why _tw=""
   check_slug "$slug" || return 1
   runmd_of "$slug" >/dev/null; rel=$_runmd
   check_run_state "$rel" "run to record a refusal against" || return 1
@@ -16891,21 +16905,19 @@ write_refusal() { # slug · item tag · instance key · reason · rule · remedy
     esac
     [ -n "$rule" ] && [ -n "$remedy" ] || _tw="--rule, --remedy and --actor go together, each non-empty${_tw:+; $_tw}"
     case "$rule|$remedy" in *" · "*) _tw="a rule or remedy spells the record's own field separator ' · '${_tw:+; $_tw}" ;; esac
-    if [ -n "$_tw" ]; then
-      fail 48 "the typed refusal is malformed, so nothing is recorded and the run-state file is unchanged: $_tw"; return 1
-    fi
-    reason="$reason · rule $rule · remedy $remedy · actor $actor"
+  else
+    case "$reason" in *" · rule "*" · remedy "*" · actor "*) _tw="a reason with no --rule, --remedy and --actor spells the typed tail ' · rule … · remedy … · actor …', so it would read back typed" ;; esac
   fi
+  if [ -n "$_tw" ]; then
+    fail 48 "the typed refusal is malformed, so nothing is recorded and the run-state file is unchanged: $_tw"; return 1
+  fi
+  [ -z "$rule" ] || reason="$reason · rule $rule · remedy $remedy · actor $actor"
   check_step_fields "$item" "$key" "$reason" || return 1
   refuse_if_terminal "$rel" --refused || return 1
-  # EXACT LINE COMPARE, verb_propose's, read in this shell: the timestamp is the first token.
-  want="refusal · item $item · step $key · reason $reason"
-  while IFS= read -r pl || [ -n "$pl" ]; do
-    pl=${pl%$'\r'}
-    [ "${pl#* }" = "$want" ] || continue
+  if check_row_recorded "$rel" "refusal · item $item · step $key · reason $reason"; then
     echo "unattended: refusal already recorded, unchanged — $item at $key"
     return 0
-  done < "$rel"
+  fi
   _why="the loop kit's position engine does not resolve beside this kit"
   if resolve_position_engine; then
     _out=$("$PE_PY" "$PE_PATH" --check-refusal "$item" "$key" 2>&1); _rc=$?
@@ -18572,9 +18584,10 @@ verb_dispatch() { # slug · unit · writes...
   # `check_unit_spec` graded, with the fork record past its cutoff, so the hold sees what check 12 sees.
   # Here and not in `check_unit_spec` (§8 F7): `park-item` and `park-build` write the run-state file,
   # which `--check-specs` runs without. The owner question is asked once per dispatch, as kind `fork`,
-  # never attended: a dispatch has a run-state file. Every answer refuses, through this one check 49.
+  # never attended: a dispatch has a run-state file. Every answer refuses, through this one check 49. A park
+  # the run-state file already holds appends no second row (TOOL-dBoundRoles-92 S15) and still refuses.
   if [ "$_cu_state" = FORKED ]; then
-    local _fk_ids _fk_list _fk_why _fk_id _fk_sp _fk_all=""
+    local _fk_ids _fk_list _fk_why _fk_id _fk_sp _fk_row _fk_all=""
     _fk_ids=$(plan_state "$_d_spec" "$FORK_CUTOFF" open "$FORK_RECORD_CUTOFF")
     _fk_list=${_fk_ids// /, }; [ -n "$_fk_list" ] || _fk_list="section 8 as a whole"
     if ! read_owner_question fork; then
@@ -18584,8 +18597,11 @@ verb_dispatch() { # slug · unit · writes...
         resolve)
           _fk_why="run.on-owner-question answers resolve: resolve each open F-item by principle.p18, the most feature-rich and then the most expandable option the core admits, and write its record in its span, options: <o1> > <o2> · pick: <o1> · admitted-by: principle.<tag>, then dispatch again; $unit ($_d_spec) holds $_fk_list" ;;
         park-item)
-          park "$rel" decision "$unit" "open fork $_fk_list held by run.on-owner-question" || return 1
-          stage_or_fail "$rel" || return 1
+          _fk_row="open fork $_fk_list held by run.on-owner-question"
+          if ! check_row_recorded "$rel" "decision · item $unit · reason $_fk_row"; then
+            park "$rel" decision "$unit" "$_fk_row" || return 1
+            stage_or_fail "$rel" || return 1
+          fi
           _fk_why="run.on-owner-question answers park-item, so $unit is parked as a decision row naming $_fk_list, for the owner at the close" ;;
         park-build)
           # every tracked spec of the build `load_spec_facts` loaded above, by its unit id, in id order
@@ -18597,8 +18613,11 @@ verb_dispatch() { # slug · unit · writes...
             _fk_ids=${_fk_ids// /, }
             _fk_all="${_fk_all:+$_fk_all, }$_fk_id (${_fk_ids:-section 8 as a whole})"
           done
-          park "$rel" decision "$slug" "open forks in $_fk_all held by run.on-owner-question" || return 1
-          stage_or_fail "$rel" || return 1
+          _fk_row="open forks in $_fk_all held by run.on-owner-question"
+          if ! check_row_recorded "$rel" "decision · item $slug · reason $_fk_row"; then
+            park "$rel" decision "$slug" "$_fk_row" || return 1
+            stage_or_fail "$rel" || return 1
+          fi
           _fk_why="run.on-owner-question answers park-build, so build $slug is parked as one decision row naming every FORKED unit: $_fk_all" ;;
         stop-run)
           _fk_why="run.on-owner-question answers stop-run, so the run stops here: the next verb is --abort $slug, and $unit holds $_fk_list" ;;

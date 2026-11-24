@@ -941,9 +941,10 @@ the engine holds the tag as one your composition declares and the key as that ta
 To record a typed refusal, add `--rule <the rule that refused> --remedy <one line> --actor <who can
 perform it>`, all three together: the row's reason then ends ` · rule <r> · remedy <m> · actor <a>`.
 The actor is one of `self`, `producer`, `driver`, `owner` or `build:<slug>`; any other actor, a
-missing one of the three, or a rule or remedy holding ` · ` is refused and nothing is written. The
-position engine reads the three back beside the reason, and its `refusal —` line still prints the
-reason alone. The roles page says where each actor's refusal goes.
+missing one of the three, or a rule or remedy holding ` · ` is refused and nothing is written, and so
+is an untyped reason that itself spells ` · rule … · remedy … · actor …`, which would read back
+typed. The position engine reads the three back beside the reason, and its `refusal —` line prints
+them after it. The roles page says where each actor's refusal goes.
 
 The unattended driver's `--plan` prints the engine's answer as its `next:` line, in the same five
 shapes it always printed, and beneath it a `frontier:` line naming the frontier's tags, or
@@ -952,7 +953,7 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
 - **Read a build's position:** `python tools/loop/position.py <slug>` prints a `position —` line with <!-- usage: script:tools/loop/position.py 8d078234 -->
   the state, the step, the answer and its reason, one `unit —` line per unit, the `next —` item with
   its actor and its instance key, a `frontier —` line, one `refusal —` line per refusal the run
-  recorded with its item, key and reason, each `interrupt —`, then every file and ref it read as
+  recorded with its item, key and reason and a typed one's rule, remedy and actor, each `interrupt —`, then every file and ref it read as
   `read —` lines and every claim it used with its key and verdict as `claim —` lines. Where the runlog
   kit is not installed it prints `refusal — unarmed` with the reason and still prints the frontier.
   `--json` prints the same fields as one object, each unit carrying `acceptance_armed`, false exactly
@@ -971,7 +972,8 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   `fresh-clone` (a clone read from clone), `quiet-remote` (a fetch from a linked worktree after the
   aged reflog, read from `FETCH_HEAD`), `offline-stale` (a clone's `FETCH_HEAD` dated past the bound), `failed-fetch` (the
   aged reflog, then a fetch from a path that does not exist, its empty `FETCH_HEAD` skipped), `bad-transition`, `deadlock`, `bar-wait`, `frontier-chain`, `frontier-parallel`,
-  `frontier-refused`, `frontier-bad-key`, `frontier-none`, `plan-frontier`, `built-unarmed` (one unit
+  `frontier-refused`, `frontier-bad-key`, `refusal-typed` (a refusal recorded with its rule, remedy and
+  actor, read back and printed), `frontier-none`, `plan-frontier`, `built-unarmed` (one unit
   tested and one built with no acceptance record under the stand-in writer, which `--json` reads
   `acceptance_armed` false and the driver's `--status` names as the next unit),
   `built-unheld`, `built-armed`, `fetch-other-branch` (the aged reflog, then a fetch of another
@@ -981,7 +983,7 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   read from `FETCH_HEAD`), `url-forms` (a fetch failing at connect from a URL carrying a password,
   which no line prints, then one row per configured and written URL pair, `equal` or `unequal`),
   `plan-line` and `status-line`; `frontier-refused`,
-  `frontier-bad-key`, `plan-frontier`, `built-unarmed` and the last two run the unattended driver. Every
+  `frontier-bad-key`, `refusal-typed`, `plan-frontier`, `built-unarmed` and the last two run the unattended driver. Every
   case runs with an empty global and system git config, so no setting of your machine's reaches it. `--selftest` runs every case, and gov's own `loop position fixtures` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->

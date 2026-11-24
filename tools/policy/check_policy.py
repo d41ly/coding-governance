@@ -5263,6 +5263,48 @@ def run_census_source_receipt(name):
     return print_checks(name, checks)
 
 
+# ---- the retry bound against the harnesses that refuse above it (TOOL-dBoundRoles-92 S4) ----------------
+
+RETRIES_KEY = "roles.retries"
+#: each harness source of the workflows kit, and whether it must declare the literal the join reads
+RETRIES_SOURCES = {"unattended-build.template.js": True, "tier2-review.template.js": True, "unattended-unit.js": False}
+ATTEMPTS_RE = re.compile(r"^const ATTEMPTS = \[([^\]\n]*)\]", re.M)
+
+
+def derive_retries_join(maximum, sources):
+    """[(source, ok, seen)] of the join: each `const ATTEMPTS = [...]` literal of a source's text spawns a stage
+    once more than the retries it admits, so its length less one is `maximum`, the row's `max`; a source of
+    RETRIES_SOURCES that must declare one and declares none is wrong, and any other is named."""
+    out = []
+    for source, text in sources.items():
+        admits = [len([v for v in m.split(",") if v.strip()]) - 1 for m in ATTEMPTS_RE.findall(text)]
+        out += [(source, n == maximum, f"admits {n} retries, {RETRIES_KEY} declares max {maximum}") for n in admits]
+        if not admits:
+            out.append((source, not RETRIES_SOURCES[source], "declares no ATTEMPTS literal"))
+    return out
+
+
+def run_retries_join(name):
+    """The `max` of the RETRIES_KEY row joined to every ATTEMPTS literal of the workflows kit's harness sources,
+    each of which throws on a larger value; then the same join over planted copies, each of which must red
+    naming what moved: a literal one longer and one shorter in each declaring source, every literal gone, and
+    a row with no maximum. WHAT IT DOES NOT CHECK: that a harness compares its argument with the literal."""
+    maximum = next(r for r in policy.load_catalogue(KIT) if r["name"] == RETRIES_KEY)["allowed"].get("max")
+    texts = {s: (resolve_kit_dir("workflows", s, KIT) / s).read_text(encoding="utf-8") for s in RETRIES_SOURCES}
+    checks = [("live", source, ok, seen) for source, ok, seen in derive_retries_join(maximum, texts)]
+
+    def check_plant(what, top, sources, *named):
+        red = [s for s, ok, _seen in derive_retries_join(top, sources) if not ok]
+        checks.append(("planted", what, red == list(named), f"red on {', '.join(red) or 'nothing'}"))
+    declared = [s for s, must in RETRIES_SOURCES.items() if must]
+    for source in declared:
+        for what, value in (("gains an element", "[0, 1, 2, 3, 4, 5]"), ("loses one", "[0, 1, 2, 3]")):
+            check_plant(f"{source} {what}", 4, {**texts, source: ATTEMPTS_RE.sub("const ATTEMPTS = " + value, texts[source])}, source)
+    check_plant("no literal left", 4, {s: ATTEMPTS_RE.sub("", text) for s, text in texts.items()}, *declared)
+    check_plant("a row with no maximum", None, texts, *declared)
+    return print_checks(name, checks)
+
+
 # ---- the live observation (TOOL-dGroundRules-10 S9) ------------------------------------------------
 
 LIVE_LIMIT = 2
@@ -5760,6 +5802,7 @@ CASES = [
     ("census-source-receipt", None, run_census_source_receipt),  # gov's source-mode receipt read as no receipt is
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
     *((c, None, run_pass_lane_case) for c in PASS_LANE_CASES),  # a pass-leg run and an inline red fix, end to end
+    ("retries-attempts-join", None, run_retries_join),  # the retry key's maximum against the harnesses' own bound
 ]
 
 

@@ -761,7 +761,8 @@ def derive_input_facts(root, inputs):
 
 def print_input_facts(root, memory_root, slug, inputs):
     """S5 of TOOL-dBoundRoles-13: one line of JSON, the list `[{name, key, class, text}]` of each `--input` as
-    `render_handoff` hands it, the text with its blank edges trimmed as a block's is; the build folder that does
+    `render_handoff` hands it, the text with its blank edges trimmed and fenced by `lib.render_handed_fence` as a
+    block's is, so no line of it is read as a heading or a marker (TOOL-dBoundRoles-92); the build folder that does
     not exist, an input naming no file and an empty or placeholder value refuse as the render refuses."""
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
@@ -772,7 +773,7 @@ def print_input_facts(root, memory_root, slug, inputs):
         if check_placeholder(text):
             raise lib.RolesError("%s — not supplied; pass --input %s=<value>" % (name, name[6:]))
         line = lib.FACT_RE.match(lib.render_fact_line(key, root))
-        facts.append({"name": name, "key": key, "class": line.group("class"), "text": text})
+        facts.append({"name": name, "key": key, "class": line.group("class"), "text": lib.render_handed_fence(text)})
     write_json_line(facts)
 
 

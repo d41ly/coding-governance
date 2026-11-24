@@ -230,6 +230,7 @@ id = "roles/reviewers-to-gov-reviewer"
 up = ["python", "{gov}/govkit/steps/reviewer_merge.py", "up", "{target}", "{prefix}"]
 down = ["python", "{gov}/govkit/steps/reviewer_merge.py", "down", "{target}", "{prefix}"]
 witness = ["python", "{gov}/govkit/steps/reviewer_merge.py", "witness", "{target}", "{prefix}"]
+resume = "atomic"
 surfaces = ["agent:gov-spec-reviewer", "agent:gov-diff-reviewer",
             "installable:{prefix}/roles/agents/gov-spec-reviewer.agent.md",
             "installable:{prefix}/roles/agents/gov-diff-reviewer.agent.md"]

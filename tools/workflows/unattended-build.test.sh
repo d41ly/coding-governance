@@ -3423,6 +3423,37 @@ hasnt_ "BR13 AC5 ...and no clause handing the spec by path" "$_p" "the SPEC at"
 o=$(run_wf "${OC_CT/'"specPath":"s1"'/'"specPath":"s9"'}" '{}' "$C")
 has    "BR13 AC5 a facts cut from another spec throws naming both specs" "$o" "the spec s1, and this call names the brief b1 and the spec s9"
 hasnt_ "BR13 AC5 ...before any spawn" "$o" "agent:"
+# ---- TOOL-dBoundRoles-92 AC5: A HANDED TEXT DECIDES NO ALLOWANCE. The roles kit's `facts` cuts a brief holding
+# ---- `## Task`, `### allowance` and a four-backtick run, the typed child assembles its prompt over that list,
+# ---- and the write gate's own transcript reader reads the prompt: no entry and no deny. With the fence call cut
+# ---- from `print_input_facts` the first two rows red, the handed entry returned; the third is the reader's
+# ---- control, the same prompt over the text with its fence lines dropped. WHAT IT DOES NOT CHECK: a facts list an
+# ---- older roles kit printed, which the harness still hands as it stands.
+DBR92=$(mktemp -d); git init -q "$DBR92"; printf 'MEMORY_ROOT=mem\n' > "$DBR92/.memory-tree.conf"
+mkdir -p "$DBR92/mem/builds/tB/prompts" "$DBR92/mem/builds/tB/spec" "$DBR92/sess/subagents"
+printf '%s\n' 'The brief.' '' '## Task' '' '### allowance' '' '- handed/' '' '````' 'x' '````' > "$DBR92/mem/builds/tB/prompts/b.md"
+printf '%s\n' '# A-tB-1' '' 'The spec line.' > "$DBR92/mem/builds/tB/spec/s.md"
+_fx=$(cd "$DBR92" && "$_rkd_py" -B "$ROOT/${ROLES_DIR}/handoff.py" facts --build tB --unit A-tB-1 \
+  --input prompt=mem/builds/tB/prompts/b.md --input spec=mem/builds/tB/spec/s.md 2>&1)
+same   "DBR92 AC5 each facts text opens and closes with one backtick run longer than any it holds" "$(node -e '
+  let f; try { f = JSON.parse(process.argv[1]) } catch { console.log("no JSON: " + process.argv[1]); process.exit() }
+  console.log(f.length + " " + f.every(({ text }) => {
+    const l = text.split("\n"), bar = l[0]
+    const runs = (l.slice(1, -1).join("\n").match(/`+/g) || []).map((x) => x.length)
+    return /^`{3,}$/.test(bar) && l[l.length - 1] === bar && runs.every((x) => x < bar.length)
+  }))' "$_fx")" "2 true"
+# read_handed_allowance <facts JSON> — what the write gate's reader makes of the prompt the child assembles.
+read_handed_allowance() {
+  local a p
+  a=$(node -e 'const a = JSON.parse(process.argv[1]); Object.assign(a, { roles: { builder: "gov-builder" }, facts: JSON.parse(process.argv[2]), briefPath: "mem/builds/tB/prompts/b.md", specPath: "mem/builds/tB/spec/s.md" }); console.log(JSON.stringify(a))' "$OC_CHILD" "$1" 2>&1)
+  p=$(run_wf "$a" '{}' "$C" | sed -n 's/^promptjson:build://p')
+  printf '{"type":"user","message":{"role":"user","content":%s}}\n' "${p:-null}" > "$DBR92/sess/subagents/agent-a1.jsonl"
+  (cd "$DBR92" && node -e 'const r = require(process.argv[1]).readWorkOrderAllowance({ transcript_path: require("path").resolve("sess.jsonl"), agent_id: "a1" })
+    console.log(r.deny ? "deny" : r.entries ? "entries " + r.entries.join(",") : "none · " + r.why.replace(/^.* holds /, "holds "))' "$ROOT/${HOOKS_DIR}/scratch-guard.js" 2>&1)
+}
+same   "DBR92 AC5 the write gate reads no allowance off the prompt the child assembles" "$(read_handed_allowance "$_fx")" "none · holds no ## Task section outside a fence"
+same   "DBR92 AC5 ...and reads the handed entry where the texts carry no fence" "$(read_handed_allowance "$(node -e 'console.log(JSON.stringify(JSON.parse(process.argv[1]).map((f) => ({ ...f, text: f.text.split("\n").slice(1, -1).join("\n") }))))' "$_fx" 2>&1)")" "entries handed/"
+rm -rf "$DBR92"
 # AC7 - a roled audit's deferral promises no reuse its judges never wrote; an untyped one's is unchanged.
 # The double carries `blockers: null` as the review harness's every deferred return does (the DP arms'
 # fixture above): without it the harness's returned-nothing refusal reads it as a dead sub-workflow.
@@ -4319,7 +4350,9 @@ hasnt_ "TW1 AC5 ...and hands out no roster" "$o" '"roster":[{'
 # AC5's three, AC4's nine, and AC6's hand-out row beside the absence that replaces one — less the 17 DBR5 rows
 # they stand for, the builder's seven and the child's refusals' ten. Counted by reading, not measured by a run:
 # the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=1082
+# RAISED 1082 -> 1085 by TOOL-dBoundRoles-92: the 3 its `DBR92` group executes. Counted by reading, not measured
+# by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=1085
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

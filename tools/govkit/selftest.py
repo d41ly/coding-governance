@@ -3063,8 +3063,10 @@ def check_roles_default() -> None:
     check("OC8 AC2 LIVENESS ...and an unmoved default gains nothing", _same == ([], ""), str(_same))
     # ---- TOOL-dDeclaredLoop-57: `update` refuses a CLAIMED kit whose `requires` it leaves unmet.
     # AC2 and AC3 call the function; AC1 and AC4 run the verb over a committed hand-written receipt.
-    # TOOL-dDeclaredLoop-79 S4: run-gates claimed too, since the loop kit requires it, so each arm grades its pair
-    _dl_claim = ["kickoff-manifest", "memory-tree", "roles", "run-gates"]
+    # TOOL-dDeclaredLoop-79 S4: run-gates claimed too, since the loop kit requires it, so each arm grades its pair.
+    # TOOL-dBoundRoles-92: agent-cap and policy too, which the roles kit requires beside loop since TOOL-dBoundRoles-25,
+    # and settings-merge, which agent-cap requires
+    _dl_claim = ["agent-cap", "kickoff-manifest", "memory-tree", "policy", "roles", "run-gates", "settings-merge"]
 
     def derive_claim_refusal(claimed, gained, dd, why):
         try:
@@ -3216,6 +3218,7 @@ def derive_seed_expected(target: pathlib.Path, descs: dict, selection: list[str]
 #: TOOL-dBoundRoles-40 §4 Inventory: the recorded harness stage's run id and agent id, and the bound
 #: each replayed `SubagentStop` command runs under.
 STOP_RUN_ID, STOP_AGENT_ID, STOP_REPLAY_TIMEOUT = "wf_fixture-1", "afixture000001", 30
+STOP_DIRECT_ID = "afixture000002"
 
 
 def check_stop_replay(t: pathlib.Path) -> None:
@@ -3229,9 +3232,14 @@ def check_stop_replay(t: pathlib.Path) -> None:
     `STOP_REPLAY_TIMEOUT` seconds: red on a non-zero exit, any stdout byte, a timeout, or a new path under
     `t`'s `<git common dir>/return-check/`, the label naming the command, the payload and what it printed.
     A staged command sleeping ten seconds past that bound is read red, naming it (TOOL-dBoundRoles-50 AC18).
+    Then the positive control (TOOL-dBoundRoles-92 S5): a direct spawn's stop, its first `user` record opening
+    with a `gov:handoff` marker and its return no return object, through every command again under
+    `GOV_DEFAULT_BRANCH` naming `t`'s branch. Exactly one exits 0 printing a `decision: block` object and leaves
+    the agent's record, and every other prints nothing; so an installed shim that ends in `exit 0`, or spells
+    another verb, is red.
     WHAT THIS DOES NOT CHECK: `SubagentStart` hooks (§3), stderr, which reaches no agent on exit 0, a
-    hook wired by hand outside every kit's fragment, or a direct spawn's stop, which the return check's
-    own plants grade."""
+    hook wired by hand outside every kit's fragment, or the defects a direct spawn's block names, which the
+    return check's own plants grade."""
     sdir = t / "fixture-sessions" / "fixture-session"
     agent = sdir / "subagents" / "workflows" / STOP_RUN_ID / ("agent-%s.jsonl" % STOP_AGENT_ID)
     agent.parent.mkdir(parents=True, exist_ok=True)
@@ -3271,13 +3279,12 @@ def check_stop_replay(t: pathlib.Path) -> None:
                             text=True, encoding="utf-8", env=env).stdout.strip()
     records_dir = (t / common if common else t / ".git") / "return-check"
 
-    def run_stop_command(cmd, name, payload):
-        """`(red, label, stderr)` of one command over one payload, run through the resolved bash with
-        `CLAUDE_PROJECT_DIR` exported under `STOP_REPLAY_TIMEOUT` seconds (TOOL-dBoundRoles-50 S18): red on a
-        non-zero exit, a timeout, any stdout byte or a new return-check record, the label naming the command."""
+    def run_stop_hook(cmd, payload, extra=None):
+        """`(rc, stdout, stderr, new return-check paths)` of one command over one payload, run through the
+        resolved bash with `CLAUDE_PROJECT_DIR` and `extra` exported under `STOP_REPLAY_TIMEOUT` seconds."""
         held = set(records_dir.rglob("*")) if records_dir.is_dir() else set()
         try:
-            p = subprocess.run([govkit_module().resolve_bash(), "-c", cmd], cwd=str(t), env=env,
+            p = subprocess.run([govkit_module().resolve_bash(), "-c", cmd], cwd=str(t), env={**env, **(extra or {})},
                                input=json.dumps(payload, ensure_ascii=False), capture_output=True, text=True,
                                encoding="utf-8", errors="replace", timeout=STOP_REPLAY_TIMEOUT)
             rc, out, err = p.returncode, p.stdout, p.stderr
@@ -3287,6 +3294,13 @@ def check_stop_replay(t: pathlib.Path) -> None:
                         for x in (e.stdout, e.stderr))
         left = sorted(x.relative_to(records_dir).as_posix() for x in
                       (set(records_dir.rglob("*")) if records_dir.is_dir() else set()) - held)
+        return rc, out, err, left
+
+    def run_stop_command(cmd, name, payload):
+        """`(red, label, stderr)` of one command over one payload through `run_stop_hook` (TOOL-dBoundRoles-50
+        S18): red on a non-zero exit, a timeout, any stdout byte or a new return-check record, the label naming
+        the command."""
+        rc, out, err, left = run_stop_hook(cmd, payload)
         red = rc != 0 or bool(out) or bool(left)
         said = " — it exited %s, printed %r and left %s" % (rc, out[:600], left or "nothing") if red else ""
         return red, ("SubagentStop command %s over the %s payload exits 0, prints nothing on stdout and leaves no "
@@ -3303,6 +3317,30 @@ def check_stop_replay(t: pathlib.Path) -> None:
     check("[dBR-50 AC18] a SubagentStop command that sleeps %ds is red under the %ds bound, naming it"
           % (STOP_REPLAY_TIMEOUT + 10, STOP_REPLAY_TIMEOUT),
           red and hung in label and "a timeout after %ds" % STOP_REPLAY_TIMEOUT in label, label)
+    # TOOL-dBoundRoles-92 S5: the positive control, without which a shim that grades nothing replays green
+    direct = sdir / "subagents" / ("agent-%s.jsonl" % STOP_DIRECT_ID)
+    sha12 = "0" * 12
+    direct.write_text(json.dumps({"type": "user", "isSidechain": True, "agentId": STOP_DIRECT_ID, "message": {
+        "role": "user", "content": "<!-- gov:handoff role=gov-builder build=fixture unit=TOOL-fixture-1 path=p.md "
+                                   "role-sha=%s task-sha=%s -->\n\nBuild one unit." % (sha12, sha12)}}) + "\n",
+                      encoding="utf-8", newline="\n")
+    branch = subprocess.run(["git", "-C", str(t), "symbolic-ref", "--short", "HEAD"], capture_output=True,
+                            text=True, encoding="utf-8", env=env).stdout.strip()
+    stops = [run_stop_hook(cmd, {**base, "agent_id": STOP_DIRECT_ID, "agent_transcript_path": str(direct)},
+                           {"GOV_DEFAULT_BRANCH": branch}) for cmd in commands]
+
+    def check_block(out):
+        try:
+            said = json.loads(out)
+        except ValueError:
+            return False
+        return isinstance(said, dict) and said.get("decision") == "block"
+    blocked = [s for s in stops if s[0] == 0 and check_block(s[1]) and s[3] == ["%s.json" % STOP_DIRECT_ID]]
+    silent = [s for s in stops if s[0] == 0 and not s[1] and not s[3]]
+    check("[dBR-92 S5] one installed SubagentStop command blocks a marked direct spawn's malformed return at exit "
+          "0 and leaves its record, every other printing nothing", len(blocked) == 1 and
+          len(silent) == len(stops) - 1, "\n".join("exit %s · %r · %s · left %s" % (rc, out[:300], err[-300:], left)
+                                                   for rc, out, err, left in stops) or "no command ran")
 
 
 def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = False) -> None:
@@ -20194,7 +20232,7 @@ user_skills = "/tmp/gk-fake-skills"
         # `[[exempt_leg]]`, never in the descriptor.
         _qreg = (pathlib.Path(__file__).resolve().parent / "registry.toml").read_text(
             encoding="utf-8")
-        for _qn in ("agent-cap self-test", "scratch-guard self-test"):
+        for _qn in ("spawn-guard self-test", "scratch-guard self-test"):
             check(f"aQuenchedHarness-3 AC2b: '{_qn}' is declared [[exempt_leg]] in registry.toml, "
                   "so no descriptor claims a leg the target cannot carry",
                   f'name = "{_qn}"' in _qreg, "")

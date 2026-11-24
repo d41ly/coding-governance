@@ -6810,6 +6810,31 @@ out=$(run --refused tRun --item item.build.base --key "$_rf_key" --reason y --ru
 hit "$out" "the typed refusal is malformed, so nothing is recorded and the run-state file is unchanged: the actor nobody is none of self, producer, driver, owner, build:<slug>"
 same "an actor outside the five forms exits non-zero" "$([ "$_rc" -ne 0 ] && echo 1 || echo 0)" "1"
 same "an actor outside the five forms wrote nothing" "$(sum)" "$before"
+# ---- TOOL-dBoundRoles-92 AC10 AC11: every other line of the typed refusal's check, each reached with the rest
+# ---- valid, so cutting one line reds its own arm: a partial set under a valid actor, no actor, the separator in
+# ---- the rule and in the remedy, a `build:` of no slug shape, and an untyped reason spelling the tail, which
+# ---- would read back typed. `build:dX` and an untyped reason short of the tail are recorded.
+check_typed_refused() { # label · the words · argv... -> three assertions: the words, a non-zero exit, unchanged bytes
+  local _tr_o _tr_rc _tr_b; _tr_b=$(sum)
+  _tr_o=$(run --refused tRun --item item.build.base --key "$_rf_key" "${@:3}"); _tr_rc=$?
+  hit "$_tr_o" "the typed refusal is malformed, so nothing is recorded and the run-state file is unchanged: $2"
+  same "$1 exits non-zero" "$([ "$_tr_rc" -ne 0 ] && echo 1 || echo 0)" "1"
+  same "$1 wrote nothing" "$(sum)" "$_tr_b"
+}
+_tr_set="--rule, --remedy and --actor go together, each non-empty"
+_tr_sep="a rule or remedy spells the record's own field separator ' · '"
+check_typed_refused "a rule and an actor with no remedy" "$_tr_set" --reason y --rule r1 --actor driver
+check_typed_refused "a remedy and an actor with no rule" "$_tr_set" --reason y --remedy m1 --actor driver
+check_typed_refused "a rule and a remedy with no actor" "the actor (none) is none of self" --reason y --rule r1 --remedy m1
+check_typed_refused "a separator in the rule" "$_tr_sep" --reason y --rule "r1 · actor owner" --remedy m1 --actor driver
+check_typed_refused "a separator in the remedy" "$_tr_sep" --reason y --rule r1 --remedy "m1 · actor owner" --actor driver
+check_typed_refused "a build: actor with no slug" "the actor build: is none of self" --reason y --rule r1 --remedy m1 --actor build:
+check_typed_refused "a build: actor with a slash" "the actor build:a/b is none of self" --reason y --rule r1 --remedy m1 --actor build:a/b
+check_typed_refused "an untyped reason spelling the typed tail" "a reason with no --rule, --remedy and --actor spells the typed tail" \
+  --reason "x · rule r · remedy m · actor owner"
+hit "$(run --refused tRun --item item.build.base --key "$_rf_key" --reason "x · rule r · remedy m")" "refusal recorded against $_rf_key"
+hit "$(run --refused tRun --item item.build.base --key "$_rf_key" --reason z --rule r1 --remedy m1 --actor build:dX)" "refusal recorded against $_rf_key"
+same "a build: actor of slug shape is recorded" "$(grep -c ' · reason z · rule r1 · remedy m1 · actor build:dX$' memory/builds/tRun/RUN.md)" "1"
 
 # ---- TOOL-dDeclaredLoop-28: `--rescope --flow`, a build's own flow change proposed through the loop
 # ---- kit's `adapt.py propose`. Its ONE refusal relays the verb's first line: an `add` over a row whose
@@ -9115,9 +9140,13 @@ write_tracking_policy() { # the policy file's text -> refs/remotes/origin/main a
 # ---- owner-question`, landed on the clone's tracking ref with the review bounds the base holds: the
 # ---- default names the record owed and parks nothing, `park-item` parks one decision row naming the
 # ---- unit and F1, `stop-run` names `--abort` and parks nothing, `park-build` parks one row naming the
-# ---- build and every FORKED unit. The passing case: the first option picked, the hold does not fire.
-# ---- The failing case, owed at the close: the FORKED case removed from `verb_dispatch`, under which the
-# ---- unit is admitted. WHAT IT DOES NOT CHECK: a reader refusal, or no roles kit beside the driver.
+# ---- build and every FORKED unit, two of them here. A park dispatched again adds no row and still refuses.
+# ---- Then the driver copied beside a stub of the reader (TOOL-dBoundRoles-92 AC12 AC13): one that refuses, one
+# ---- answering outside the closed set and one answering `owner`, which the real reader never answers a fork
+# ---- raised away from the owner; and beside no roles kit, the NOTE and the `resolve` answer. The passing case:
+# ---- the first option picked, the pass is declared. The failing case, owed at the close: the FORKED case
+# ---- removed from `verb_dispatch`, under which the unit is admitted; and the reader's refusal read as admit,
+# ---- the `park-build` loop stopped at its first unit, and the row compare cut, each of which reds its arm.
 reset_tree
 add_facts memory/builds/tRun/RUN.md "base: $(git rev-parse HEAD)"
 mkdir -p memory/builds/tRun/spec
@@ -9141,20 +9170,55 @@ hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
 hit "$o" "run.on-owner-question answers park-item, so ARCH-tRun-1 is parked as a decision row naming F1, for the owner at the close"
 same "fork hold: park-item parks one decision row" "$(measure_decision_rows)" "$((_fk0 + 1))"
 hit "$(tail -n 1 memory/builds/tRun/RUN.md)" " decision · item ARCH-tRun-1 · reason open fork F1 held by run.on-owner-question"
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh); _rc=$?
+hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
+same "fork hold: park-item dispatched again exits non-zero" "$([ "$_rc" -ne 0 ] && echo 1 || echo 0)" "1"
+same "fork hold: park-item dispatched again adds no row" "$(measure_decision_rows)" "$((_fk0 + 1))"
 write_tracking_policy "run.on-owner-question = \"stop-run\"\n$FK_BOUNDS"
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
 hit "$o" "run.on-owner-question answers stop-run, so the run stops here: the next verb is --abort tRun"
 same "fork hold: stop-run parks nothing" "$(measure_decision_rows)" "$((_fk0 + 1))"
 write_tracking_policy "run.on-owner-question = \"park-build\"\n$FK_BOUNDS"
+FK_SPEC2=${FK_SPEC/ARCH-tRun-1/ARCH-tRun-2}
+sed 's/ARCH-tRun-1/ARCH-tRun-2/' "$FK_SPEC" > "$FK_SPEC2"; git add "$FK_SPEC2" >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
-hit "$o" "run.on-owner-question answers park-build, so build tRun is parked as one decision row naming every FORKED unit: ARCH-tRun-1 (F1)"
-hit "$(tail -n 1 memory/builds/tRun/RUN.md)" " decision · item tRun · reason open forks in ARCH-tRun-1 (F1) held by run.on-owner-question"
+hit "$o" "run.on-owner-question answers park-build, so build tRun is parked as one decision row naming every FORKED unit: ARCH-tRun-1 (F1), ARCH-tRun-2 (F1)"
+hit "$(tail -n 1 memory/builds/tRun/RUN.md)" " decision · item tRun · reason open forks in ARCH-tRun-1 (F1), ARCH-tRun-2 (F1) held by run.on-owner-question"
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh); _rc=$?
+hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
+same "fork hold: park-build dispatched again exits non-zero" "$([ "$_rc" -ne 0 ] && echo 1 || echo 0)" "1"
+same "fork hold: park-build dispatched again adds no row" "$(measure_decision_rows)" "$((_fk0 + 2))"
+git rm -qf "$FK_SPEC2"
 git update-ref refs/remotes/origin/main "$BASE"
+# The copy sits in a repository of its own, which its resolver reads, and finds its roles kit at the home beside
+# it, held once so no line spells a kit path.
+_fk_home=roles; _fk_c=$(mktemp -d); git init -q "$_fk_c"; mkdir -p "$_fk_c/u" "$_fk_c/$_fk_home"
+cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$_fk_c/u/"
+run_stub_dispatch() { # the stub reader's one line of Python, or nothing for no roles kit -> the copy's output
+  if [ -n "${1:-}" ]; then printf '%s\n' "$1" > "$_fk_c/$_fk_home/handoff.py"; else rm -f "$_fk_c/$_fk_home/handoff.py"; fi
+  run_main_at_head bash "$_fk_c/u/unattended.sh" --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh 2>&1
+}
+o=$(run_stub_dispatch 'import sys; sys.exit("stub: the reader is away")')
+hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
+hit "$o" "the reader of run.on-owner-question refused, so nothing answers for the owner: stub: the reader is away"
+miss "$o" "dispatch declared"
+o=$(run_stub_dispatch 'print("perhaps")')
+hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
+hit "$o" "handoff.py owner-question printed no answer in its closed set: perhaps"
+o=$(run_stub_dispatch 'print("owner")')
+hit "$o" "UNATTENDED check 49 FAILED — $FK_HOLD"
+hit "$o" "run.on-owner-question answers owner, so the owner decides ARCH-tRun-1's F1"
+o=$(run_stub_dispatch)
+hit "$o" "unattended: NOTE - no roles kit resolves beside this kit, so run.on-owner-question takes its catalogue default"
+hit "$o" "run.on-owner-question answers resolve: resolve each open F-item by principle.p18"
+same "fork hold: no stubbed answer parked a row" "$(measure_decision_rows)" "$((_fk0 + 2))"
+rm -rf "$_fk_c"
 sed -i 's/delegated): (b)\./delegated): (a)./; s/pick: (b)/pick: (a)/' "$FK_SPEC"
 git add "$FK_SPEC" >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 miss "$o" "grades FORKED"
+hit "$o" "dispatch declared"
 reset_tree
 
 # ---- THE SUBJECT IS NOT A REGEX, and CEILING is terminal. Interpolated into an ERE, a subject
@@ -24056,7 +24120,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4067 -> 4072 by TOOL-dBoundRoles-26 on 2026-11-23: its AC4 arm's 5 region-three assertions, 2 `hit`
 # and 3 `same` off the block's own lines, no loop and no skip branch, so FLOOR_SHARD_3 carries the same +5.
 # No suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=4072
+# RAISED 4072 -> 4116 by TOOL-dBoundRoles-92 on 2026-11-24: 27 region-three typed-refusal assertions, eight
+# `check_typed_refused` calls of three and 2 `hit` and 1 `same` beside them, so FLOOR_SHARD_3 carries the same +27;
+# and 17 region-four FORKED-hold assertions, 11 `hit`, 1 `miss` and 5 `same`, so FLOOR_SHARD_4 carries the same
+# +17. COUNTED off the blocks' own lines, no skip branch; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=4116
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24279,7 +24347,8 @@ FLOOR_SHARD_2=229
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 445, plus main's 6, plus this branch's 18 = 469.
 # RAISED 469 -> 471 by TOOL-dWitnessedBar-56 on 2026-11-20: TOOL-dWitnessedBar-51's AC16 AC31 arm, two `hit`s in region three, see FLOOR_ASSERTIONS.
 # RAISED 471 -> 476 by TOOL-dBoundRoles-26 on 2026-11-23: its AC4 arm, 5 region-three assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=476
+# RAISED 476 -> 503 by TOOL-dBoundRoles-92 on 2026-11-24: the same 27 region-three assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=503
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
 # RAISED 383 -> 386 by TOOL-aSmoothedDispatch-1 on 2026-11-10: the same net 3 region-four --writes split assertions, see FLOOR_ASSERTIONS.
@@ -24295,7 +24364,8 @@ FLOOR_SHARD_3=476
 # RAISED 415 -> 418 by TOOL-aTrimmedWait-5's fix pass: the same 3 region-four empty-batch assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 410, plus main's 13, plus this branch's 8 = 431.
 # MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: shard 4 the base 423, plus main's 8, plus this branch's 5 = 436; shard 5 this branch's 293, main having moved none.
-FLOOR_SHARD_4=436
+# RAISED 436 -> 453 by TOOL-dBoundRoles-92 on 2026-11-24: the same 17 region-four assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=453
 FLOOR_SHARD_5=293
 # RAISED 127 -> 130 by TOOL-dPlacedRequest-16: the same 3 region-six settle-over-a-tombstone assertions, see FLOOR_ASSERTIONS.
 FLOOR_SHARD_6=130

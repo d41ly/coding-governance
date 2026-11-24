@@ -4684,8 +4684,10 @@ grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape ar
 # ---- (F5), a well-shaped tag the registry lacks (F6), a one-option record that holds (F7, silent) and a
 # ---- record in backticks (F8, no record). The control re-grades the same bytes with FORK_RECORD_CUTOFF
 # ---- blank. The failing case, owed at the close: the record predicate removed from check 12, under which
-# ---- F1, F2, F4, F5, F6 and F8 draw no line. WHAT IT DOES NOT CHECK: the absent-registry note, since the
-# ---- engine under test resolves the playbook kit beside it; where none resolves, F6 reads that note.
+# ---- F1, F2, F4, F5, F6 and F8 draw no line. TOOL-dBoundRoles-92: this suite resolves the playbook kit's
+# ---- principles.toml itself, so where it stands F6 owes the refusal line and the absent-registry note reds it,
+# ---- and where it does not F6 owes the note. The engine prints that note on ANY failure of its reader, so an
+# ---- engine whose tag regex is renamed reds here. WHAT IT DOES NOT CHECK: the note in a tree resolving the kit.
 FR=$TMP/frecord
 mkdir -p "$FR/memory/builds/tRec/spec"
 good10 | sed 's/^\*\*Status:\*\* SPECCED/**Status:** CLOSED/; s/2026-08-10/2026-09-20/g; /^## 8\. Open questions$/,/^## 9\./{/^none$/d}' \
@@ -4721,9 +4723,15 @@ n=$((n+1)); grep -qF "${FR_AT}F2 carries an agent mark and no fork record" <<<"$
 n=$((n+1)); grep -qF "${FR_AT}F3 " <<<"$out_fr" && { echo "FAIL [fork-record AC3] an owner mark with no record was graded"; st=1; }
 n=$((n+1)); grep -qF "${FR_AT}F5 fork record, at/after FORK_RECORD_CUTOFF 2026-09-15): admitted-by practice.small is not a principle.<seg> tag" <<<"$out_fr" \
   || { echo "FAIL [fork-record AC3] an admitted-by of another shape drew no line naming the tag"; st=1; }
-n=$((n+1)); grep -qF "${FR_AT}F6 fork record, at/after FORK_RECORD_CUTOFF 2026-09-15): admitted-by principle.p0 is no tag the principle registry holds" <<<"$out_fr" \
-  || grep -qF 'because no principle registry was read' <<<"$out_fr" \
-  || { echo "FAIL [fork-record S2] a tag the registry lacks drew neither its line nor the absent-registry note"; st=1; }
+n=$((n+1)); FR_NOTE='because no principle registry was read'
+if resolve_kit_dir "$_PY" playbook principles.toml "$HERE" >/dev/null 2>&1; then
+  grep -qF "${FR_AT}F6 fork record, at/after FORK_RECORD_CUTOFF 2026-09-15): admitted-by principle.p0 is no tag the principle registry holds" <<<"$out_fr" \
+    && ! grep -qF "$FR_NOTE" <<<"$out_fr" \
+    || { echo "FAIL [fork-record S2] a tag the registry lacks drew no line, or the engine read no registry though principles.toml resolves"; st=1; }
+else
+  grep -qF "$FR_NOTE" <<<"$out_fr" \
+    || { echo "FAIL [fork-record S2] no principles.toml resolves and the engine did not say it read no registry"; st=1; }
+fi
 n=$((n+1)); grep -qF "${FR_AT}F7 " <<<"$out_fr" && { echo "FAIL [fork-record AC1] a one-option record whose pick is its first drew a line"; st=1; }
 n=$((n+1)); grep -qF "${FR_AT}F8 carries an agent mark and no fork record" <<<"$out_fr" \
   || { echo "FAIL [fork-record S1] a record quoted in backticks recorded something"; st=1; }

@@ -2361,6 +2361,18 @@ if [ -n "$ROLES_DIR" ]; then
         | grep -cF "${KP}$RL/adopt-roles.sh --scaffold")" = 1 ] && echo 1 || echo 0)"
   ck "OC15 AC6 ...and no ok roles line" "$(printf '%s' "$out" | grep -q '^ok       roles' && echo 0 || echo 1)"
   mv .claude/roles.json.good .claude/roles.json
+  # TOOL-dBoundRoles-92 AC17 - the return check's fragment, graded by the arm's last branch. With that branch cut,
+  # or its fragment filter misspelled, both rows red: neither line is printed.
+  cp "$REPO/$ROLES_DIR/return-check.fragment.json" "$REPO/$ROLES_DIR/return-check.sh" "./${KP}$RL/"
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null); rc=$?
+  ck "BR92 AC17 the return check present with no SubagentStop entry -> UNWIRED roles naming its fragment, exit 1" \
+     "$([ "$rc" = 1 ] && printf '%s\n' "$out" | grep '^UNWIRED  roles ' | grep -qF "${KP}$RL/return-check.fragment.json" && echo 1 || echo 0)"
+  printf '{"hooks": {"SubagentStop": [{"matcher": "*", "hooks": [{"type": "command", "command": "bash \\"${CLAUDE_PROJECT_DIR}/%s\\""}]}]}}\n' \
+    "${KP}$RL/return-check.sh" > .claude/settings.json
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null); rc=$?
+  ck "BR92 AC17 ...and ok naming the entry once the settings hold it" \
+     "$([ "$rc" = 0 ] && printf '%s' "$out" | grep -q '^ok       roles .*SubagentStop entry wired' && echo 1 || echo 0)"
+  rm -f .claude/settings.json "./${KP}$RL/return-check.fragment.json" "./${KP}$RL/return-check.sh"
   printf '.claude/agents/*.md eol=lf\n.claude/roles.json eol=lf\n' > .gitattributes
   git add -A; git commit -q -m rendered
   for _a in .claude/agents/*.md; do break; done
