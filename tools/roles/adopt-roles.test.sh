@@ -123,7 +123,7 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +4 for arm 23 (TOOL-dDeclaredLoop-29).
 # +1 for arm 24 (TOOL-dDeclaredLoop-56).
 # +8 for arm 25 (TOOL-aTrimmedWait-7).
-# merged at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c: 61 shared, +6 this branch's, +8 main's = 75.
+# merged at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c: 61 shared, 6 this branch's and 8 main's, 75 in all.
 # +4 for arm 26 (TOOL-dBoundRoles-14).
 # +6 for arm 27 (TOOL-dBoundRoles-2).
 # +3 for arm 28 (TOOL-dBoundRoles-1).
