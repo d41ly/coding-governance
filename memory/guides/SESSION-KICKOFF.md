@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-24T04:23:00+02:00 @ 9ab869b7da52d47708620cdde24dfaf5949df18f
+last-audit: 2026-11-24T06:45:00+02:00 @ b85f66b7ef8bc55d0ea40f0560ce92e0c3720282
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 95a4a1188a65ed95efba0d40c5624b38b8e2b3c1
+last-body-change: b85f66b7ef8bc55d0ea40f0560ce92e0c3720282
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -126,6 +126,9 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 - 2026-11-23 · `unattended.sh --audit` over a harnessed unit · it reads the run tree's writes, so a builder
   committing in its pass worktree reads STALLED while it works; read that worktree's log before stopping it
   (dKeptSession) · prune when the audit reads the pass branch.
+- 2026-11-24 · the `tags (the resolver's checks)` leg on node `a` · outside a bar, beside light work, it takes most of its ceiling
+  (404 s of 420 s at `525f3ab97`, PINNED 2026-11-24), so a full bar times it out beside its neighbours; run its argv
+  alone before reading that red as a finding (dKeptSession) · prune when its ceiling or its cost moves.
 
 
 ### Environment traps worth front-loading
