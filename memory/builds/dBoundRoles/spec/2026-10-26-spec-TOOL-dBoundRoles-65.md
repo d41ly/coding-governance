@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-65 — the observation worktree's cleanup check compares normalised paths under a named root, and a positive control proves it sees a leftover
 
-**Status:** INPROGRESS · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dBoundRoles-27
+**Status:** CLOSED · rev-3 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-26-build-TOOL-dBoundRoles-65-deviation-651.md](../build/2026-10-26-build-TOOL-dBoundRoles-65-deviation-651.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-65-round7-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-65-round7-fix-return.md) | research | TOOL-dBoundRoles-66 |
 | [2026-11-24-build-TOOL-dBoundRoles-58-1-main-loop-decision.md](../build/2026-11-24-build-TOOL-dBoundRoles-58-1-main-loop-decision.md) | journal | TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
+| [2026-11-24-build-TOOL-dBoundRoles-65-1-acceptance-ledger.md](../build/2026-11-24-build-TOOL-dBoundRoles-65-1-acceptance-ledger.md) | journal | — |
+| [2026-11-24-build-TOOL-dBoundRoles-65-deviation-652.md](../build/2026-11-24-build-TOOL-dBoundRoles-65-deviation-652.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-65-round7-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-65-round7-fix-brief.md) | research | TOOL-dBoundRoles-66 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-65-reground-q-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-65-reground-q-brief.md) | journal | TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-65-reground-q-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-65-reground-q-spec-writer.md) | journal | — |
