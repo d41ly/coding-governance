@@ -494,7 +494,11 @@ the return names a work order in its `answers` field, that file reads under the 
 `MARKER_RE` line outside a fence carries `role=<slot>`. A return naming none, a file that does not read or
 carries no marker, and one answering another role's work order each print one `answers — ` line, so neither
 another role's return nor text a driver typed passes as the slot's. Exit 0 printing nothing, 1 with a line
-per defect, 2 on a slot the catalogue lacks or outside a repository. WHAT IT DOES NOT CHECK: that the
+per defect, 2 on a slot the catalogue lacks or outside a repository. A return is `key: value` lines or one JSON
+object, fenced or the whole text, and a sent-back return is the JSON: with `--object` (TOOL-dBoundRoles-89), exit
+0 prints the object it graded on one line where the return is JSON and nothing where it is lines, and
+`placement.py place` passes the flag and reads that object, so both kits hold one answer to which shape a
+return is; an object holding a lone surrogate exits 2. WHAT IT DOES NOT CHECK: that the
 return's `task-sha` is the answered marker's, or that the agent which wrote the file was spawned from that
 work order, since a file carries no transcript.
 
@@ -927,7 +931,7 @@ key holds.
 |---|---|---|---|---|---|---|
 | `gov-architect` | design | records | field.input.question, field.input.spec?, field.brief.goal?, field.brief.non-goals?, field.task.reuse? | yagni, reuse, core, derive, verify, small, memory | true | outcome:inventoried\|decomposed\|fact-fork\|goal-fork\|probe, record:path?, reason:text |
 | `gov-builder` | build | product | field.input.spec, field.card.route?, field.brief.non-goals? | yagni, reuse, core, derive, verify, gate, docs, security, portable, tools | true | outcome:committed\|returned, commit:sha?, why:text?, checks:list |
-| `gov-orienter` | orient | none | field.input.question, field.input.prompt? | small, ids, memory, tokens, tools | true | outcome:oriented\|placed, card:text?, disposition:text?, reason:text?, evidence:text?, observations:text?, scenarios:text?, facts:text? |
+| `gov-orienter` | orient | none | field.input.question, field.input.prompt? | small, ids, memory, tokens, tools | true | outcome:oriented\|placed, card:text?, disposition:text?, build:text?, breakpoint:text?, playbook:text?, reason:text?, evidence:text?, observations:text?, scenarios:text?, facts:text? |
 | `gov-planner` | plan | records | field.input.question, field.brief.goal?, field.brief.non-goals?, field.card.route? | yagni, reuse, derive, verify, memory | true | outcome:select\|defer\|retire\|refuse\|drafted\|research\|owner-question\|review\|no-review\|grouped\|probe, record:path?, reason:text |
 | `gov-prompt-writer` | handoff | none | field.input.question, field.input.work-order | small, ids, tokens | true | outcome:framed, job:text?, population:text?, added:text?, nostop:text? |
 | `gov-researcher` | research | none | field.input.question, field.brief.goal?, field.brief.non-goals? | reuse, verify, class, memory | true | outcome:picked\|none, candidates:list, pick:text?, reason:text |

@@ -1689,7 +1689,9 @@ Who places is the key `placement` in `.governance/policy.toml`:
 - `agent-places`, the default: the orientation scout's return is the placement, given as
   `placement.py place --request <key> --return <file>`, a file of `disposition`, `build`, `playbook`,
   `reason`, `evidence`, `observations`, `scenarios` and `facts` lines, the fields of the scout's
-  `return:` template under its `placed` outcome, and `breakpoint` for a `breakpoint` disposition.
+  `return:` template under its `placed` outcome, and `breakpoint` for a `breakpoint` disposition. The
+  file is those lines or one JSON object of the same fields, fenced or the whole text, each value a
+  string on one line; a return the return check sent back is the JSON.
 - `declared-checked`: the request's own declaration is, `placement.py place --request <key> --declared
   <word> [<build>]`, and the scout's return is evidence only.
 - `owner-places`: `place` writes no disposition and prints the scout's return as evidence and

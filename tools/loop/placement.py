@@ -37,13 +37,16 @@ record naming `item.entry.place-owner` is the placement. Where the return names 
 added to the evidence instead.
 
 THE TYPED CHANNEL (TOOL-dBoundRoles-12). Before it reads a key of any `--return`, `place` runs the roles kit's
-`handoff.py check-return-file --role gov-orienter --file <file>`, found by `resolve_kit_dir` and run as a
-subprocess: the return must pass the orientation scout's typed `return` template, a closed `outcome` among it,
+`handoff.py check-return-file --role gov-orienter --file <file> --object`, found by `resolve_kit_dir` and run as
+a subprocess: the return must pass the orientation scout's typed `return` template, a closed `outcome` among it,
 and its `answers` line must name a work order whose marker carries `role=gov-orienter`. Each line it prints is
 `placement: refused — return — <line>`, exit 1, and no block is written; any other exit is refused naming it and
 the verb's first stderr line, and a roles kit that does not resolve exits 2 naming the three places looked, so
-no return is ever read unchecked. The return's `outcome` line, which must read `placed`, and its `answers` line
-are then admitted beside its block keys and written to no block.
+no return is ever read unchecked. A return is `key: value` lines or one JSON object, and one sent back by the
+return check is the JSON (TOOL-dBoundRoles-89): where it is JSON the verb prints the object it graded, the one
+`place` reads, each value a string on one line, and where it is lines it prints nothing and `place` reads them.
+The return's `outcome`, which must read `placed`, and its `answers` are then admitted beside its block keys and
+written to no block.
 
 THE AGENT BINDING (TOOL-dBoundRoles-43 S43). `--agent <agent id>` binds the `--return` file to the scout that
 wrote it: before the typed channel, `place` runs the roles kit's `handoff.py agent-return --agent <id>`, found
@@ -169,6 +172,7 @@ RETURN_KEYS = ("disposition", "build", "breakpoint", "playbook", "reason", "evid
 SCOUT_ROLE = "gov-orienter"
 TYPED_RETURN_KEYS = ("outcome", "answers")
 PLACED_OUTCOME = "placed"
+OUTCOME_REFUSED = "the return's outcome is %s, not %s, so it carries no placement"
 #: Shared interface I20: the `entry` fact each disposition that selects scenarios derives; the rest select none.
 ENTRY_FACTS = {"new": "feature", "amend": "amendment", "patch": "patch", "repeat": "playbook-run"}
 #: The mark a selection carries where no scenario admits the request and the default places it.
@@ -243,7 +247,12 @@ PLANTS = {"each-disposition": "one request placed per member of the set, each wi
                             "reading oriented refused, no block written; with outcome placed one block appended",
           "return-wrong-role": "a typed return answering a gov-researcher work order refused naming gov-researcher, "
                                "then one answering a file with no marker and one naming no work order, no block "
-                               "written; re-pointed at a gov-orienter work order one block appended"}
+                               "written; re-pointed at a gov-orienter work order one block appended",
+          "return-json": "a fenced JSON return naming build checked and placed, its block the lines' block; a whole-text "
+                         "object and one with every key placed; a line break, a card key and an oriented outcome "
+                         "refused, no block written; the return line's fields equal to RETURN_KEYS",
+          "return-sent-back": "a key: value return lacking outcome refused naming it, then the fenced JSON block the "
+                              "send-back orders placed"}
 #: The fixture's session, whose `.typed` line a breakpoint plant writes as the owner's own words.
 FX_SESSION = "s-fx"
 #: The fixture's rendered work orders (TOOL-dBoundRoles-12): the orientation scout's, whose return `place`
@@ -423,18 +432,29 @@ def check_scout_return(root, path):
     `resolve_kit_dir` and run as a subprocess in `root`, since a kit imports no sibling kit. PlacementRefused
     whose line is one `placement: refused — return — <line>` per line the verb prints on its exit 1, or one
     naming the exit and the verb's first stderr line on any other exit but 0; LookupError naming the three
-    places looked where the roles kit does not resolve, so no return is read unchecked."""
+    places looked where the roles kit does not resolve, so no return is read unchecked. -> the JSON object the
+    verb graded, which it prints for a JSON return, or None for `key: value` lines, where it prints nothing
+    (TOOL-dBoundRoles-89 S4); PlacementRefused where what it printed is no JSON object."""
     handoff = resolve_kit_dir("roles", "handoff.py", KIT) / "handoff.py"
     try:
         p = subprocess.run([sys.executable, str(handoff), "check-return-file", "--role", SCOUT_ROLE, "--file",
-                            str(pathlib.Path(path).absolute())], cwd=str(root), capture_output=True, text=True,
-                           encoding="utf-8", errors="replace", env=read_clean_env(PYTHONIOENCODING="utf-8"),
-                           timeout=VERB_BOUND)
+                            str(pathlib.Path(path).absolute()), "--object"], cwd=str(root), capture_output=True,
+                           text=True, encoding="utf-8", errors="replace",
+                           env=read_clean_env(PYTHONIOENCODING="utf-8"), timeout=VERB_BOUND)
         rc, out, err = p.returncode, p.stdout, p.stderr
     except subprocess.TimeoutExpired:
         rc, out, err = None, "", "it did not answer within %ds" % VERB_BOUND
     if rc == 0:
-        return
+        if not out.strip():
+            return None
+        try:
+            graded = json.loads(out)
+        except ValueError:
+            graded = None
+        if not isinstance(graded, dict):
+            why = "check-return-file --object printed no JSON object: %s" % out.strip().split("\n")[0][:80]
+            raise PlacementRefused(why, line="%s: refused — return — %s" % (SAY, why))
+        return graded
     lines = [ln.strip() for ln in out.splitlines() if ln.strip()] if rc == 1 else []
     if not lines:
         lines = ["check-return-file exited %s: %s" % (rc, next((ln.strip() for ln in err.splitlines() if ln.strip()),
@@ -485,11 +505,24 @@ def check_agent_return(root, path, agent_id):
                                "that agent wrote" % (path, agent_id))
 
 
-def read_scout_return(path):
-    """`{key: value}` of the scout's return at `path`, its keys among `RETURN_KEYS`. The typed channel's two
-    fields, `TYPED_RETURN_KEYS`, are admitted once each and left out of the result, `outcome` only where it
-    reads `placed` (TOOL-dBoundRoles-12 §8 F5). PlacementRefused for an unreadable file, a line that is no
-    `key: value`, a key outside them, one given twice or another `outcome`."""
+def read_scout_return(path, graded=None):
+    """`{key: value}` of the scout's return, its keys among `RETURN_KEYS`: the JSON object `graded`,
+    `check_scout_return`'s answer (TOOL-dBoundRoles-89 S4), or, where it is None, the `key: value` lines of the
+    file at `path`. The typed channel's two fields, `TYPED_RETURN_KEYS`, are admitted once each and left out of
+    the result, `outcome` only where it reads `placed` (TOOL-dBoundRoles-12 §8 F5). PlacementRefused for another
+    `outcome` or a key outside them; for a JSON value that is no string on one line; and for an unreadable file,
+    a line that is no `key: value` or a key given twice."""
+    if graded is not None:
+        why = OUTCOME_REFUSED % (graded["outcome"], PLACED_OUTCOME) \
+            if graded.get("outcome", PLACED_OUTCOME) != PLACED_OUTCOME else None
+        for key, value in graded.items():
+            if why is None and key not in RETURN_KEYS + TYPED_RETURN_KEYS:
+                why = "the return's key %s is none of %s" % (key, " ".join(RETURN_KEYS + TYPED_RETURN_KEYS))
+            if why is None and (not isinstance(value, str) or "\n" in value or "\r" in value):
+                why = "the return's %s is not one line of text" % key
+        if why is not None:
+            raise PlacementRefused(why, line="%s: refused — return — %s" % (SAY, why))
+        return {k: v.strip() for k, v in graded.items() if k in RETURN_KEYS}
     try:
         text = pathlib.Path(path).read_bytes().decode("utf-8-sig").replace("\r\n", "\n")
     except (OSError, UnicodeDecodeError) as e:
@@ -508,8 +541,7 @@ def read_scout_return(path):
             raise PlacementRefused("the return gives %s twice" % key)
         held[key] = value.strip()
     if typed.get("outcome", PLACED_OUTCOME) != PLACED_OUTCOME:
-        raise PlacementRefused("the return's outcome is %s, not %s, so it carries no placement"
-                               % (typed["outcome"], PLACED_OUTCOME))
+        raise PlacementRefused(OUTCOME_REFUSED % (typed["outcome"], PLACED_OUTCOME))
     return fields
 
 
@@ -579,9 +611,7 @@ def write_placement(args, root, store):
         raise PlacementRefused("--agent binds a --return file to the agent that wrote it, and no --return is given", 2)
     if args.ret and args.agent:
         check_agent_return(root, args.ret, args.agent)
-    if args.ret:
-        check_scout_return(root, args.ret)
-    fields = read_scout_return(args.ret) if args.ret else {}
+    fields = read_scout_return(args.ret, check_scout_return(root, args.ret)) if args.ret else {}
     if mode == "owner-places" and not args.owner:
         for k in RETURN_KEYS:
             if k in fields:
@@ -1709,6 +1739,52 @@ def check_placement_plant(case, top, seen, bad):
         got = parse_placement_blocks(store / ("%s.placement" % FX_KEY))
         if len(got) != 1 or "outcome" in got[0] or "answers" in got[0]:
             bad.append("the typed return wrote %d block(s), owed one holding no typed field: %s" % (len(got), got))
+    elif case in ("return-json", "return-sent-back"):   # TOOL-dBoundRoles-89 AC1, AC2, AC4, AC5
+        fields = {"disposition": "new", "build": FX_NEW, "reason": "the scout read it as new"}
+        typed = dict(ln.split(": ", 1) for ln in render_fixture_return(fields).splitlines())
+        fenced = "The placement:\n\n```json\n%s\n```\n"
+        ret = rets / "sent.md"
+
+        def run_json_return(key, shape, **more):
+            ret.write_text(shape % json.dumps(dict(typed, **more), indent=1), encoding="utf-8", newline="\n")
+            return run_placement_command(root, "place", "--request", key, "--return", str(ret))
+        if case == "return-sent-back":
+            check_case("first", run_placed_return(outcome=None, **fields), 1,
+                       "placement: refused — return — outcome — a required field is absent")
+            if (store / ("%s.placement" % FX_KEY)).exists():
+                bad.append("the return lacking outcome wrote a block")
+            check_case("sent back", run_json_return(FX_KEY, fenced), 0, "placement: placed — new")
+            return
+        kit = resolve_kit_dir("roles", "handoff.py", KIT)
+        ret.write_text(fenced % json.dumps(typed), encoding="utf-8", newline="\n")
+        p = subprocess.run([sys.executable, str(kit / "handoff.py"), "check-return-file", "--role", SCOUT_ROLE, "--file",
+                            str(ret)], cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", env=read_clean_env(PYTHONIOENCODING="utf-8"))
+        check_case("checked", (p.returncode, p.stdout + p.stderr), 0)
+        check_case("fenced", run_json_return("%012x" % 0xd00, fenced), 0, "placement: placed — new")
+        check_case("lines", run_placed_return("%012x" % 0xd01, **fields), 0, "placement: placed — new")
+        blocks = [dict(read_newest_block("%012x" % n), **{"placed-utc": ""}) for n in (0xd00, 0xd01)]
+        if blocks[0] != blocks[1]:
+            bad.append("the JSON return's block %s is not the lines' block %s" % tuple(blocks))
+        check_case("whole", run_json_return("%012x" % 0xd02, "%s\n"), 0, "placement: placed — new")
+        owed = {"disposition": "breakpoint", "build": FX_LIVE, "breakpoint": "spec audit", "playbook": "pb/one.md"}
+        check_case("every key", run_json_return("%012x" % 0xd03, fenced, **owed), 0, "placement: placed — breakpoint")
+        got = read_newest_block("%012x" % 0xd03)
+        if {k: got.get(k) for k in owed} != owed:
+            bad.append("the return's %s were written as %s" % (owed, got))
+        for n, (what, more, said) in enumerate((
+                ("line break", {"reason": "a reason\ncheck: pass"}, "the return's reason is not one line of text"),
+                ("card", {"card": "the card"}, "the return's key card is none of"),
+                ("oriented", {"outcome": "oriented"}, "the return's outcome is oriented, not placed"))):
+            key = "%012x" % (0xe00 + n)
+            check_case(what, run_json_return(key, fenced, **more), 1, said)
+            if (store / ("%s.placement" % key)).exists():
+                bad.append("the %s return wrote a block" % what)
+        line = next(ln for ln in (kit / "agents" / ("%s.agent.md" % SCOUT_ROLE)).read_text(encoding="utf-8").splitlines()
+                    if ln.startswith("return: "))
+        names = [f.split(":")[0].strip() for f in line.partition(":")[2].split(",")]
+        if sorted(n for n in names if n not in ("outcome", "card")) != sorted(RETURN_KEYS):
+            bad.append("the return line's fields %s, less outcome and card, are not %s" % (names, list(RETURN_KEYS)))
 
 
 def main(argv):

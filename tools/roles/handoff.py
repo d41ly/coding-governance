@@ -15,7 +15,7 @@
     python handoff.py roster
     python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]
     python handoff.py check-return < <SubagentStop hook payload>
-    python handoff.py check-return-file --role <slot> --file <return file>
+    python handoff.py check-return-file --role <slot> --file <return file> [--object]
     python handoff.py owner-question --kind <fork|owner-gate|ratification|owner-write|refusal> [--attended]
     python handoff.py route-refusal --return <return file> [--budget-spent]
     python handoff.py agent-return --agent <agent id> [--session <file>]
@@ -198,7 +198,11 @@ work order, an answered file that does not read or carries no marker, and one an
 order each print one `answers — ` line naming what was found, so no other role's return and no text a driver
 typed passes as the slot's. A relative `--file` is read from the repository root. Exit 0 printing nothing
 for a return passing both, 1 with a line per defect, an unreadable return file one, and 2 on a slot the
-catalogue lacks or outside a repository.
+catalogue lacks or outside a repository. A return is `key: value` lines or one JSON object, fenced or the whole
+text, and a sent-back one is the JSON: with `--object` (TOOL-dBoundRoles-89 S3), exit 0 prints that object on one
+line where the return is JSON and nothing where it is lines, the object `roles_lib.extract_return_object`'s over
+the very text graded, so a caller reads the shape the check read; an object holding text UTF-8 cannot write, a
+lone surrogate, exits 2.
 
 `route-refusal` is the driver's door to the outcome table (TOOL-dBoundRoles-26 S3, S4). It reads the return in
 `--return`'s file, a relative path read from the repository root, as a refusal: its `outcome` the refusal arm's,
@@ -1941,8 +1945,9 @@ def check_return_file(root, slot, path):
     """`check-return-file`'s defect lines for the return in the file `path`, read from `root` when relative
     (TOOL-dBoundRoles-12 S2, S3): each line `lib.check_return(slot, text, root, work_order)` gives, `work_order`
     the pair a well-formed `answers` value names and else None, then the answered work order's, as the module
-    doc states; `[]` for a return passing both. RolesError on a slot the catalogue lacks or a role file that
-    does not parse."""
+    doc states; `[]` for a return passing both. With them the text graded, None where the file does not read,
+    so a caller reads the same bytes: `(defects, text)`. RolesError on a slot the catalogue lacks or a role
+    file that does not parse."""
     root = pathlib.Path(root)
     roles = lib.load_roles(KIT_DIR)
     if slot not in roles:
@@ -1953,7 +1958,8 @@ def check_return_file(root, slot, path):
     try:
         text = p.read_bytes().decode("utf-8-sig").replace("\r\n", "\n")
     except (OSError, UnicodeDecodeError) as e:
-        return ["return object — %s cannot be read as UTF-8: %s" % (p.as_posix(), getattr(e, "strerror", None) or e)]
+        return ["return object — %s cannot be read as UTF-8: %s"
+                % (p.as_posix(), getattr(e, "strerror", None) or e)], None
     # the `answers` field is read off the same return object `check_return` grades, whichever shape it took; a
     # well-formed one is the work order `check_return` is handed, so a JSON return may carry it beside the template
     obj, _why = lib.extract_return_object(text, [t for t in template if t[0] != "answers"]
@@ -1964,14 +1970,14 @@ def check_return_file(root, slot, path):
     if said is None:
         return defects + ["answers — the return names no work order it answers, so no %s work order stands "
                           "behind it; the agent answers the marker's path and task-sha of the work order it "
-                          "was handed" % slot]
+                          "was handed" % slot], text
     rel, _order, marker, why = lib.read_answered_work_order(root, said)
     if why:
-        return defects + [why]
+        return defects + [why], text
     if marker.group("role") != slot:
         return defects + ["answers — the return answers a %s work order, %s, not a %s one"
-                          % (marker.group("role"), rel, slot)]
-    return defects
+                          % (marker.group("role"), rel, slot)], text
+    return defects, text
 
 
 def print_refusal_route(root, path, budget_spent=False):
@@ -2300,6 +2306,7 @@ def main(argv):
     cf = sub.add_parser("check-return-file")
     cf.add_argument("--role", required=True)
     cf.add_argument("--file", required=True)
+    cf.add_argument("--object", action="store_true")
     oq = sub.add_parser("owner-question")
     oq.add_argument("--kind", required=True)
     oq.add_argument("--attended", action="store_true")
@@ -2374,12 +2381,15 @@ def main(argv):
         return 0 if ok else 1
     if a.verb == "check-return-file":
         try:
-            lines = check_return_file(root, a.role, a.file)
-        except lib.RolesError as e:
+            lines, text = check_return_file(root, a.role, a.file)
+            # TOOL-dBoundRoles-89 S3: an empty template names no field, so only a JSON return reads as an object
+            obj = lib.extract_return_object(text, [])[0] if a.object and not lines else None
+            shown = "\n".join(lines) if obj is None else json.dumps(obj, ensure_ascii=False)
+            shown = (shown + "\n").encode("utf-8") if shown else b""
+        except (lib.RolesError, UnicodeEncodeError) as e:
             print("\n".join("handoff: " + ln for ln in str(e).split("\n")), file=sys.stderr)
             return 2
-        if lines:
-            sys.stdout.buffer.write(("\n".join(lines) + "\n").encode("utf-8"))
+        sys.stdout.buffer.write(shown)
         return 1 if lines else 0
     if a.verb == "agent-return":
         # TOOL-dBoundRoles-43 S56: one agent's last text and type, for a caller binding a file to the agent
