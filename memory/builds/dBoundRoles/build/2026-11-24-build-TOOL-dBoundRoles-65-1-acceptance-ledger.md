@@ -29,3 +29,18 @@ or bar ran in the pass: this unit adds no arm, and the legs its gate line lists 
 - AC3 — `startswith` — the three readings of the section above: one path, nothing, and nothing after `git worktree remove --force`. The raw test's empty reading over the standing leftover is the failing case the comparison replaces.
 - AC4 — `git worktree list --porcelain -z` — AMENDED by `TOOL-dBoundRoles-67`, its text restated in `memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-67-deviation-672.md`: both operands of S5 print nothing over that list. Recorded before any take-away: the signature sha is `7dae6faf2537917a56de07ad1c44b261bdae19e2`, the parent of `bfccd9126`; S1's comparison against S2's root `dbr63obs` selected no entry; the signature selection selected no entry, the list's detached entries being at other heads (DERIVED at `d5467686f`), so nothing was taken away, left in place or parked. As this unit's pass read it: S1's comparison over it against S2's root printed nothing on the built tree (DERIVED at `421ae3894`), and printed entries against the bare temp folder.
 - AC5 — `**Evidences:**` — AMENDED by the main loop's decision, items 3 and 4: one line of unit 64's block answers AC13 and one line of unit 63's answers AC11, each reading AMENDED and naming `TOOL-dBoundRoles-65` and record 652 in place of the revision `LEDGER` would match.
+
+## The positive control's criterion, AC6, added on top by TOOL-dBoundRoles-68
+
+`TOOL-dBoundRoles-68` S4 gives this unit the signature selection's positive control, and its deviation record
+`memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-68-deviation-682.md` holds the text, with the S7 that
+says what AC4 does not see. This unit's spec is CLOSED and frozen and numbers no AC6, and the acceptance-ledger check
+refuses a label its spec does not number, so the answer stands under this heading rather than in the block above.
+
+OBSERVED, over the `git worktree list --porcelain -z` of the scratch repository `C:\Temp\dbr68c\r`, at `cf4f54abd`:
+
+- The signature selection printed `C:/Temp/dbr68c/o/1` alone, a detached worktree outside any `dbr63obs` root; it left
+  out `o/2`, detached at the other commit, and `o/3`, on a branch at the signature.
+- S1's comparison against the empty `C:\Temp\dbr68c\dbr63obs` printed nothing over the same list.
+- After `git worktree remove --force` took `o/1` away the selection printed nothing.
+- With the token `dbr68none` the selection exited 1 naming the empty signature and printed no entry.
