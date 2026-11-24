@@ -25,11 +25,11 @@ stale and a planted name unlisted.
 - AC4 — observed: the `read_shrink_base` probe exited 1, its last stderr line opening `policy.Refusal: ` and carrying `the base compare did not run`.
 - AC5 — observed by the main loop over the staged tree: `python tools/policy/check_policy.py` exited 0, and its `reader-join`, `purposes-drain`, `purposes-new` and `legacy-homes` fixtures each exited 0 and printed `0 wrong`.
 - AC6 — observed: `python tools/codebase-map/gen_map.py --check` exited 0 after the write, which moved `memory/map/generated/symbols.json` alone; over it `grep -c name_ledger` printed `0` and the ids' `grep -cE` printed `4`.
-- AC7 — not observed in this pass, the main loop's, at the pass commit: `python tools/lexicon/lexicon.py --merge-losses "origin/main..HEAD"`, whose summary is to carry `losses=0` and `restored=4`.
+- AC7 — observed by the main loop at the pass commit `a13de3de8`: `python tools/lexicon/lexicon.py --merge-losses "origin/main..HEAD"` exited 0, printed no `merge-losses: LOSS` line, and its summary carried `losses=0` and `restored=4`.
 
 ## Owed to the close
 
-AC5, AC7 and every leg the spec's section 6 names. The unit mints no arm, so no RED-first observation is
+Every leg the spec's section 6 names. The unit mints no arm, so no RED-first observation is
 owed. The `policy.py` anchors `help/policy.md` and `help/agent-limit.md` carry equal the fingerprints the
 code derives (`python tools/govkit/docs_leg.py --fingerprints`), so no help page moves.
 
