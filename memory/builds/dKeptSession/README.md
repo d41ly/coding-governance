@@ -170,7 +170,7 @@ ids KICK-dKeptSession-85 KICK-dKeptSession-86 KICK-dKeptSession-87 KICK-dKeptSes
 | [KICK-dKeptSession-89 — the four names the first reconcile dropped from policy.py defined again at the tip, so the landing's merge-loss check clears](spec/2026-11-24-spec-KICK-dKeptSession-89.md) | 39 | 1 | CLOSED | rev-1 | 2026-11-24 |
 <!-- /gen:build-units -->
 
-Records: 547 bound to this build, across 4 record folder(s).
+Records: 548 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

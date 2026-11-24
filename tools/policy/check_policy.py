@@ -672,6 +672,9 @@ READER_SHAPES = (
     # str(policy), "get", KEY], as history_store.py and template_cache.py read theirs (KICK-dKeptSession-80)
     ((".py",),
      re.compile(r"[\"']get[\"'][ \t]*,[ \t]*(?P<args>[A-Za-z_]\w*)")),
+    # the same argv list with the key a string literal: ["get", "orient.budget"], as runlog.py reads it
+    ((".py",),
+     re.compile(r"[\"']get[\"'][ \t]*,[ \t]*(['\"])((?:(?!\1)[^\n\\])*)\1")),
 )
 # a module constant: a column-0 line binding one name to one string literal, `KEY = "flow.adapt"`, an
 # optional comment after it; group 1 the name, group 3 the literal's text (TOOL-dLandedOwners-2)
@@ -4032,6 +4035,10 @@ RC_CASES = {
     "argv-unbound": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED",
                      {"consumer.py": 'def read_value(policy, key):\n    return run([PY, str(policy), "get", key])\n',
                       "other.py": 'KEY = "fixture.planted"\n'}, RC_KEY, 1),
+    # the argv list with the key a literal
+    "reader-argv-literal": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED",
+                            {"consumer.py": 'got = run_kit_verb("policy", "policy.py", ["get", "fixture.planted"], repo)\n'},
+                            None, 1),
 }
 
 

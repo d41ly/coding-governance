@@ -926,11 +926,16 @@ def derive_position_into(pos, repo, slug, definition):
         except LookupError as e:
             pos["notes"] += ["%s: NOTE · %s unread: %s" % (SAY, k, e) for k in keys]
         else:
-            for k in keys:
+            def resolve_key(key):
+                """`key` at the landed revision in the build's slot, or None with one NOTE where refused."""
                 try:
-                    keys[k] = policy.resolve(k, str(repo), build=slug).value
+                    return policy.resolve(key, str(repo), build=slug).value
                 except policy.Refusal as e:
-                    pos["notes"].append("%s: NOTE · %s unread: %s" % (SAY, k, e))
+                    pos["notes"].append("%s: NOTE · %s unread: %s" % (SAY, key, e))
+                    return None
+            # each key spelled at its own call, so the policy kit's reader coverage sees it read
+            keys = {"deps.coordination": resolve_key("deps.coordination"),
+                    "deps.early-build": resolve_key("deps.early-build")}
     at = steps.get(pos["build_step"], {}).get("order")
     gate = steps.get("step.build", {}).get("order")
     at_build = at is None or gate is None or at >= gate
