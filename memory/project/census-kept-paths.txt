@@ -1,14 +1,10 @@
-# census-kept-paths.txt — a census hit kept by path, for a file no pass of this repository may edit.
-# One row per line, TAB-separated: the census by its function, one tracked file under a build's `build/` folder,
-# and the reason printed beside the hit. `tree_lib.py#read_kept_rows` is the one reader (TOOL-dTotalRecall-65);
-# a file a pass may edit keeps its hit by the census marker on its line instead.
-check_cause_writers	memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py	pinned instrument
-check_cause_writers	memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py	pinned instrument
-check_cause_writers	memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py	outside the write set
-check_cause_writers	memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-fold-inventory.py	outside the write set
-check_cause_writers	memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-walk-seed.py	outside the write set
-check_cause_writers	memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-73-harness.py	outside the write set
-check_cause_writers	memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-93-ab.py	outside the write set
-check_cause_writers	memory/builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signer.py	outside the write set
-# TOOL-dTotalRecall-56 S2: the departures instrument's `journal` compare, drained by ask PLAY-dClosedLoop-1003
-check_alias_compares	memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py	pinned instrument
+# ledger · census-kept-paths · key key census,path,reason,records · direction shrink-only · drain key
+check_cause_writers	memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py	pinned instrument	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py	pinned instrument	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-fold-inventory.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-walk-seed.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-73-harness.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-93-ab.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signer.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_alias_compares	memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py	pinned instrument	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded

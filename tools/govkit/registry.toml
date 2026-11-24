@@ -2796,6 +2796,23 @@ drain = "key"
 direction = "shrink-only"
 home = "memory/project/build-readme-typed-derived.txt"
 
+# The census hits kept by path (TOOL-dTotalRecall-68 S1): gov's own, so it owes no step and an adopter holds
+# none. One row per build script no pass of this repository may edit, the census named by its function;
+# `tree_lib.py`'s `read_kept_rows` is the one reader, and a file a pass may edit keeps its hit by the census
+# marker on its line instead. `records` is `-` for a plain keep. The alias row keeps the departures
+# instrument's `journal` compare (TOOL-dTotalRecall-56 S2), drained by ask PLAY-dClosedLoop-1003. The reason is
+# a key field, so a reworded keep is a new key; a keep added later goes through `ratchet.py widen`. The leg
+# reads the `check_cause_writers` rows; the `record-kinds` leg reads the alias row.
+[[ledger]]
+population = "census-kept-paths"
+leg = "record causes (causes and orphans over the legacy population)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "census-kept-paths"]
+key = "key"
+fields = ["census", "path", "reason", "records"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/census-kept-paths.txt"
+
 [[exempt_leg]]
 name = "record-kinds"
 tag = "leg.gov.record-kinds"

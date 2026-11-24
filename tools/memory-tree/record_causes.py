@@ -754,14 +754,15 @@ def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED) -> tuple:
         if path not in serving or any(CAUSE_LITERAL in ln for ln in past):
             continue
         n = next(i for i, ln in enumerate(past, tree_lib.BIND_HEAD_LINES + 1) if SERVES_LITERAL in ln)
-        reason = tree_lib.read_kept_path("check_cause_writers", path, root) if admitted else None
+        row = tree_lib.read_kept_path("check_cause_writers", path, root) if admitted else None
+        reason = row["reason"] if row else None
         if path in rows:
             b_pinned += 1
             lines.append(f"cause-writer · {path}:{n} · pinned CAUSE_WRITER_PINNED · ask {rows[path][0]}")
         elif reason == KEPT_INSTRUMENT:   # TOOL-dTotalRecall-60 S26: its row's red, below, names it
             b_red += 1
             lines.append(f"cause-writer · {path}:{n} · red · kept {reason}, which {not_renderer}")
-        elif reason is not None:
+        elif reason:   # the factory admits an empty key field, and an empty reason keeps nothing
             b_kept += 1
             lines.append(f"cause-writer · {path}:{n} · kept {reason}")
         else:
@@ -771,7 +772,8 @@ def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED) -> tuple:
                         f"write the cause line under its Serves line, key the file in {tree_lib.CENSUS_KEPT_REGISTRY} "
                         f"with its reason, or declare its CAUSE_WRITER_PINNED row")
     walked = set(build_paths)
-    for path, reason in kept.items():   # S4: a row cannot outlive its hit
+    for path, row in kept.items():   # S4: a row cannot outlive its hit
+        reason = row["reason"]
         if reason == KEPT_INSTRUMENT:   # TOOL-dTotalRecall-60 S26: a build folder's file is never the renderer
             reds.append(f"cause-writer {tree_lib.CENSUS_KEPT_REGISTRY} {path}: kept because it {reason}, a reason that "
                         f"{not_renderer}; give the row a reason of its own")
@@ -886,15 +888,16 @@ PINNED_BACKLOG = "memory/builds/fRoot/BACKLOG.md"
 #: TOOL-dTotalRecall-55 AC2: the drained plant's build-folder script, a one-line docstring spelling no Serves
 #: literal, and the one `check_cause_writers` row keeping it, which S4 reds as a row with no hit behind it
 KEPT_SCRIPT = f"memory/builds/fRoot/build/2026-01-01-build-{FIXTURE_UNIT}-kept.py"
-FIXTURE_KEPT = f"check_cause_writers\t{KEPT_SCRIPT}\toutside the write set\n"
+FIXTURE_KEPT = ("check_cause_writers", KEPT_SCRIPT, "outside the write set")
 #: TOOL-dTotalRecall-60 AC26: the renderer's kept reason on two files that are not it, a tool-root writer whose
 #: marker gives it and KEPT_SCRIPT spelling a Serves literal past its binding window under a row giving it
 REASON_WRITER_PLANT = "planted/reason.py"
-FIXTURE_REASON_KEPT = f"check_cause_writers\t{KEPT_SCRIPT}\t{KEPT_INSTRUMENT}\n"
+FIXTURE_REASON_KEPT = ("check_cause_writers", KEPT_SCRIPT, KEPT_INSTRUMENT)
 #: TOOL-dTotalRecall-57 AC1: the editable plant's one `check_cause_writers` row, a Python file in the `planted`
 #: folder under the fixture's tool root, which S1 reds as a row outside `tree_lib.KEPT_PATH_DOMAIN`
 EDITABLE_KEPT_PLANT = "planted/editable.py"
-#: TOOL-dTotalRecall-65 S4: the fixture's own registry, where each of those plants writes its row
+#: TOOL-dTotalRecall-65 S4: the fixture's own registry, where each of those plants writes its row, through
+#: `record_kinds.write_kept_fixture` (TOOL-dTotalRecall-68 S6)
 FIXTURE_REGISTRY = f"memory/project/{tree_lib.CENSUS_KEPT_REGISTRY}"
 
 
@@ -1028,10 +1031,10 @@ def write_fixture(top, plant) -> pathlib.Path:
                    f'"""A record writer."""\nHEAD = "{SERVES_LITERAL}log {FIXTURE_UNIT}\\n"\n')
     if plant == "kept-row-drained":   # TOOL-dTotalRecall-55 AC2: a kept script whose hit is gone
         write_file(KEPT_SCRIPT, '"""A script its row keeps, spelling no record head."""\n')
-        write_file(FIXTURE_REGISTRY, FIXTURE_KEPT)
+        record_kinds.write_kept_fixture(root, FIXTURE_KEPT)
     if plant == "kept-row-editable":   # TOOL-dTotalRecall-57 AC1: a row naming an editable file
         row = f"{tool_rel}/{EDITABLE_KEPT_PLANT}" if tool_rel else EDITABLE_KEPT_PLANT
-        write_file(FIXTURE_REGISTRY, f"check_cause_writers\t{row}\toutside the write set\n")
+        record_kinds.write_kept_fixture(root, ("check_cause_writers", row, "outside the write set"))
     if plant in view_plants:   # the four design keys set over the view, its `-` row cut
         pin = run_git(root, "rev-parse", "HEAD").stdout.strip()
         home = root / reg.home
@@ -1049,7 +1052,7 @@ def write_fixture(top, plant) -> pathlib.Path:
                    f'# census: kept {CAUSE_WRITER_CENSUS} {KEPT_INSTRUMENT}\n')
         write_file(KEPT_SCRIPT, "# a line of the head\n" * tree_lib.BIND_HEAD_LINES
                    + f'HEAD = "{SERVES_LITERAL}log {FIXTURE_UNIT}"\n')
-        write_file(FIXTURE_REGISTRY, FIXTURE_REASON_KEPT)
+        record_kinds.write_kept_fixture(root, FIXTURE_REASON_KEPT)
     if plant in CENSUS_PLANTS:   # TOOL-dTotalRecall-53 AC9 AC34: literals graded by line, a marker kept by line
         rel, text, _red = CENSUS_PLANTS[plant]
         write_file(f"{tool_rel}/{rel}" if tool_rel else rel,

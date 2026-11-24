@@ -1305,7 +1305,8 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
         for n, ln in enumerate(text.splitlines()[BIND_HEAD_LINES:], BIND_HEAD_LINES + 1):
             if not derive_alias_hit(ln, False, constant=False):   # a script's word list is no alias table
                 continue
-            reason = read_kept_path("check_alias_compares", path, root) if admitted else None
+            row = read_kept_path("check_alias_compares", path, root) if admitted else None
+            reason = row["reason"] if row else None
             if reason:
                 b_kept += 1
                 lines.append(f"alias-compare · {path}:{n} · kept {reason}")
@@ -2082,6 +2083,17 @@ FIXTURE_NEW = ["new", "widget", "--tag", "record.widget", "--writer", "hand", "-
                "append-only", "--purpose", "a planted kind", "--reader", "input:spec"]
 
 
+def write_kept_fixture(root, *rows) -> None:
+    """Write a fixture's CENSUS_KEPT_REGISTRY at `root` through the factory's `write_rows`, each of `rows` a
+    plain keep's `(census, path, reason)` (TOOL-dTotalRecall-68 S6): the writer both censuses' plants call."""
+    import legacy_ledger as ll
+    from tree_lib import CENSUS_KEPT_REGISTRY, KEPT_FIELDS
+    reg = ll.Registration(population="census-kept-paths", seed=(), key="key", fields=KEPT_FIELDS, drain="key",
+                          direction="shrink-only", home=f"memory/project/{CENSUS_KEPT_REGISTRY}", leg="record causes")
+    pathlib.Path(root, reg.home).parent.mkdir(parents=True, exist_ok=True)
+    ll.write_rows(root, reg, {(*row, "-"): (1, (ll.NULL_SHA, "seeded")) for row in rows})
+
+
 def build_fixture(tmp, plant: str | None = None):
     """A throwaway repository at `tmp` laid out as this kit's own tree: a five-row registry, a two-leg
     manifest, a govkit registry holding the legacy ledger's table, its home, a gap register and records,
@@ -2257,10 +2269,9 @@ def build_fixture(tmp, plant: str | None = None):
         write_fixture_file(FIXTURE_BUILD_ALIAS, "# a build folder's probe\n" * BIND_HEAD_LINES
                            + ALIAS_PLANTS["raw-alias-compare"][1].format(a=sorted(KIND_ALIASES)[0]))
     if plant == "marker-in-kept-script":   # TOOL-dTotalRecall-58 S3: the same, marked, at a path kept by row
-        from tree_lib import BIND_HEAD_LINES, CENSUS_KEPT_REGISTRY, KIND_ALIASES
+        from tree_lib import BIND_HEAD_LINES, KIND_ALIASES
         text = ALIAS_PLANTS["raw-alias-compare"][1].format(a=sorted(KIND_ALIASES)[0])
-        write_fixture_file(f"memory/project/{CENSUS_KEPT_REGISTRY}",
-                           f"check_alias_compares\t{FIXTURE_KEPT_SCRIPT}\toutside the write set\n")
+        write_kept_fixture(tmp, ("check_alias_compares", FIXTURE_KEPT_SCRIPT, "outside the write set"))
         write_fixture_file(FIXTURE_KEPT_SCRIPT, "# a kept script\n" * BIND_HEAD_LINES
                            + text.replace(":\n        return", f":  # census: kept {ALIAS_COMPARE_CENSUS} x\n        return", 1))
     fence =FIXTURE_FENCE.replace(*FIXTURE_STREAM_EDITS[plant], 1) if plant in FIXTURE_STREAM_EDITS else FIXTURE_FENCE

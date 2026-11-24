@@ -44728,6 +44728,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "write_kept_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "write_kind_instance",
       "kind": "function",
       "file": "tools/loop/factories.py"
