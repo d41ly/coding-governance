@@ -3846,7 +3846,7 @@ out=$("$_PY" "$HERE/record_causes.py" --fixture --plant backfill-selection 2>&1)
 n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant backfill-selection exited $_brc, expected 0"; st=1; }
 hit "backfill 1 · record causes: backfilled · $_bfr-new.md · Caused-by TOOL-fRoot-1"
 hit "backfill 1 · record causes: backfilled · $_bfr-probe.sh · Caused-by TOOL-fRoot-1"
-hit "$_bfr-probe.sh:2:# **Caused-by:** TOOL-fRoot-1"
+hit "$_bfr-probe.sh"":2:# **Caused-by:** TOOL-fRoot-1"
 hit "backfill 1 · record causes: not backfilled · $_bfr-unbound.md · no id"
 hit 'backfill 2 · record causes: 0 backfilled'; hit 'record causes: fixture backfill-selection · PASS'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant backfill-refusals 2>&1); _brc=$?   # AC3
@@ -3887,7 +3887,7 @@ hit 'record causes: fixture pinned-ask-closed · PASS'
 # --- Red on the file test skipped, which exits the plant 0.
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant reason-on-other-file 2>&1); _brc=$?   # AC26
 n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL record_causes.py --fixture --plant reason-on-other-file exited $_brc, expected 1"; st=1; }
-hit '/reason.py:2: kept because it renders a pinned instrument'
+hit '/reason.py'':2: kept because it renders a pinned instrument'
 hit 'RED cause-writer CENSUS_KEPT_PATHS memory/builds/fRoot/build/2026-01-01-build-TOOL-fRoot-1-kept.py: kept because it renders'
 hit '/asbuilt_view.py:2 · kept renders a pinned instrument'
 n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = 2 ] || { echo "FAIL reason-on-other-file: want exactly two reds"; st=1; }
