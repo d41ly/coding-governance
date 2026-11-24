@@ -88,8 +88,8 @@ recorded only.
 | 46 | 64 | `This unit's pass builds no body and observes that one` | 1 | 1 | 0, 1 |
 | 46 | 64 | `whose body unit 54 builds and this unit's criteria observe` | 1 | 1 | 0, 1 |
 | 46 | 64 | `whose body this unit rebuilds` | 0 | 0 | 1, 2 |
-| 55 | 61 | ``` The eight rows move out of `CAUSE_WRITER_KEPT` ``` | 1 | 1 | 0, 1 |
-| 56 | 61 | ``` The row moves out of `ALIAS_COMPARE_KEPT` ``` | 1 | 1 | 0, 1 |
+| 55 | 61 | `` The eight rows move out of `CAUSE_WRITER_KEPT` `` | 1 | 1 | 0, 1 |
+| 56 | 61 | `` The row moves out of `ALIAS_COMPARE_KEPT` `` | 1 | 1 | 0, 1 |
 | 57 | 61 | `this one follows units 55 and 56` | 1 | 1 | 0, 1 |
 | 46 | 64 | `rebuilds the parser on that regex` | none | 0 | 1, 0 |
 
