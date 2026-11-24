@@ -173,7 +173,7 @@ rev-1 printed `scan ok 0 0` there.
 
 PINNED, measured 2026-11-24 at `67ffd1289` on node a over `memory/builds/dTotalRecall/build`:
 `tip_check` printed `records 150`, `live 147`, 120 `by` lines, three `quoted` lines (PINNED 2026-11-24),
-no other scan line, and `scan ok 150 147`, and returned 0 in 4 s. Units 59, 74 and 92 each had one
+no other scan line, and `scan ok 150 147`, and returned 0 in 4 s (PINNED 2026-11-24). Units 59, 74 and 92 each had one
 `by` line, of count 1, caused by `PLAY-dClosedLoop-2`: their roster records (PINNED 2026-11-24).
 
 ### The reds

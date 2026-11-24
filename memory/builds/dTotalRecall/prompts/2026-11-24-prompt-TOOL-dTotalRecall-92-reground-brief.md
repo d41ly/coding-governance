@@ -60,7 +60,7 @@ From the earlier writers, each to verify before folding. Order 39 is unit 92 alo
   name; the docstring wording is this unit's.
 - S6, S12, S19 to S21 and AC20 expect spec 88 rev-3 facts: a compare line, "the fixture base S15 built", a
   `TemporaryDirectory` call in `record_causes.py`, mid-line fence counts of 5 and 1 over specs 74 and 76 (now 0 and 1).
-  Read spec 88 rev-4, and spec 86's section 4 rows re-spelled with two backticks on 2026-11-24.
+  Read spec 88 rev-4, and spec 86's table rows in its fourth section re-spelled with two backticks on 2026-11-24.
 - It consumes `mc77`, `mc78` and `mc80` paths: unit 77 rev-4 makes no worktree; units 78 rev-3 and 80 rev-4 use
   `gate-mc78` and `gate-mc80`. S9's completion sweep is largely met by unit 78; its span script should accept a
   `gate-mc78 red orphan` line as not a unit and take unit 79's history order. S4's `sep` line is already in unit 79's

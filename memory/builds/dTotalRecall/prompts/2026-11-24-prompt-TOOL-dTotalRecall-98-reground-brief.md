@@ -57,7 +57,7 @@ From the earlier writers, each to verify before folding. Order 40 is units 98 an
 - S4 calls `has_deviation` with no edge to unit 93; AC3 admits it through unit 92, which this unit consumes. Where a
   direct edge is wanted, its `consumes-from` and unit 93's `hands-off` must land together: name it in your return.
 - `deviation_join._ID` is a lazy `SlugPattern`: read `_ID.pattern`. On Windows Python's output lines end in a carriage
-  return: strip it before a `read -r`. One probe call takes about 3 s, so a census runs in the background.
+  return: strip it before a `read -r`. One probe call takes about 3 s (DERIVED 2026-11-24, unit 93), so a census runs in the background.
 
 `packet.py --check dTotalRecall` runs past ten minutes on node a: spell `python tools/chain-packet.py --check
 dTotalRecall`, the instrument's own `main` and bytes (TOOL-aBatchedPacket-1), where a criterion needs it. A role agent

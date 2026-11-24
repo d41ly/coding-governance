@@ -266,7 +266,7 @@ SCAN
 ```
 
 Only `by` and `quoted` lines print on a clean folder. PINNED, measured 2026-11-24 at `67ffd1289`: over
-the folder's 150 records, 147 of them live, it printed 120 `by` lines, three `quoted` lines, the
+the folder's 150 records (PINNED 2026-11-24), 147 of them live, it printed 120 `by` lines, three `quoted` lines, the
 ledgers of units 2, 71 and 82, and no other line (PINNED 2026-11-24).
 
 Over a scratch folder of two records of unit 59, copies of `2026-10-26-build-TOOL-dTotalRecall-2-deviation-21`
