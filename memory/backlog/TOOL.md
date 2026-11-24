@@ -436,6 +436,7 @@ Cite ids, never line numbers.
 | [TOOL-dBoundRoles-72](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | MED | TOOL-dFurnishedOrders-16 | 2026-10-26 | THE OWNER-QUESTION READER TAKES ATTENDANCE FROM ITS CALLER.… |
 | [TOOL-dBoundRoles-73](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dFurnishedOrders-19 | 2026-10-26 | THE PER-ORDER RETURN SCHEMA IS HANDED IN A CIRCLE. TOOL-dBoundRoles-5… |
 | [TOOL-dBoundRoles-75](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | MED | TOOL-dWellOiledMachine-49 | 2026-10-26 | THE BREAKER'S BUDGET DRAW HAS NO DRAWER. cl-dClosedLoop-0327 has an act… |
+| [TOOL-dBoundRoles-94](../builds/dBoundRoles/BACKLOG.md) | OPEN | HIGH | — | 2026-11-24 | THE SHELL-WRITE SCAN PAIRS QUOTES BEFORE IT BLANKS COMMENTS.… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | DEFERRED | MED | TOOL-dCalibratedLens-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |

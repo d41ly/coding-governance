@@ -14,6 +14,7 @@
 | [2026-11-24-build-TOOL-dBoundRoles-86-widen-17.md](../build/2026-11-24-build-TOOL-dBoundRoles-86-widen-17.md) | widen | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-86-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-86-build-brief.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-86-spec-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-86-spec-brief.md) | journal | — |
+| [2026-11-24-review-TOOL-dBoundRoles-86-closing-diff-review-round2.md](../reviews/2026-11-24-review-TOOL-dBoundRoles-86-closing-diff-review-round2.md) | diff-review | TOOL-dBoundRoles-87 TOOL-dBoundRoles-88 TOOL-dBoundRoles-89 TOOL-dBoundRoles-90 TOOL-dBoundRoles-91 TOOL-dBoundRoles-92 |
 
 <!-- /gen:spec-records -->
 

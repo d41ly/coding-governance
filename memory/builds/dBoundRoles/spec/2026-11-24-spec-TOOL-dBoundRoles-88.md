@@ -13,6 +13,7 @@
 | [2026-11-24-build-TOOL-dBoundRoles-88-deviation-881.md](../build/2026-11-24-build-TOOL-dBoundRoles-88-deviation-881.md) | deviation | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-88-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-88-build-brief.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-88-spec-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-88-spec-brief.md) | journal | — |
+| [2026-11-24-review-TOOL-dBoundRoles-86-closing-diff-review-round2.md](../reviews/2026-11-24-review-TOOL-dBoundRoles-86-closing-diff-review-round2.md) | diff-review | TOOL-dBoundRoles-86 TOOL-dBoundRoles-87 TOOL-dBoundRoles-89 TOOL-dBoundRoles-90 TOOL-dBoundRoles-91 TOOL-dBoundRoles-92 |
 
 <!-- /gen:spec-records -->
 
