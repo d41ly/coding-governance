@@ -7428,6 +7428,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_kept_home",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "check_kept_instrument",
       "kind": "function",
       "file": "tools/memory-tree/record_causes.py"
@@ -32741,6 +32746,11 @@
       "id": "resolve_journal_root",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
+    },
+    {
+      "id": "resolve_kept_home",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "resolve_kept_tip",

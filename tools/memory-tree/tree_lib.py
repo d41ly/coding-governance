@@ -670,8 +670,16 @@ KEPT_FIELDS = ("census", "path", "reason", "records")
 KEPT_CENSUSES = ("check_cause_writers", "check_alias_compares")   # the column's domain (TOOL-dTotalRecall-70 S11)
 
 
+def resolve_kept_home(root) -> str:
+    """The keep registry's one path, repo-relative under `root`'s memory root (TOOL-dTotalRecall-73 S1). It reads
+    no registration: `record_causes.check_kept_home` joins those to it."""
+    from design_lib import read_design_conf   # noqa: E402  the conf's one reader; at call time, no cycle
+    memory = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/") or "memory"
+    return f"{memory}/project/{CENSUS_KEPT_REGISTRY}"
+
+
 def read_kept_rows(census, root) -> dict:
-    """`{path: row}`: the rows of `root`'s CENSUS_KEPT_REGISTRY naming `census`, `{}` where the file is absent;
+    """`{path: row}`: the rows of `root`'s `resolve_kept_home` file naming `census`, `{}` where it is absent;
     its one reader (TOOL-dTotalRecall-55 S1, TOOL-dTotalRecall-65 S2), through the ledger factory's `read_rows`
     (TOOL-dTotalRecall-68 S3). A row is a mapping of `KEPT_FIELDS` and `count`, `sha` and `disposition`.
     ValueError naming the registry where any row of it, whatever census asked, is malformed, every refused line
@@ -681,9 +689,9 @@ def read_kept_rows(census, root) -> dict:
     (TOOL-dTotalRecall-57 S1, TOOL-dTotalRecall-66 S11 S13). It does not check that a row's
     file exists, is tracked or is pinned, nor that a row is filed under the right census of the two."""
     import legacy_ledger as ll   # noqa: E402  the ledger factory; at call time, as it imports this kit's engines
-    from design_lib import read_design_conf   # noqa: E402  the conf's one reader; at call time, no cycle
-    memory = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/") or "memory"
-    registry = pathlib.Path(root, memory, "project", CENSUS_KEPT_REGISTRY)
+    home = resolve_kept_home(root)
+    memory = str(pathlib.PurePosixPath(home).parents[1])   # TOOL-dTotalRecall-73 S2: the domain's root is the home's
+    registry = pathlib.Path(root, home)
     if not registry.is_file():
         return {}
     rows, bad = ll.read_rows(registry, len(KEPT_FIELDS))

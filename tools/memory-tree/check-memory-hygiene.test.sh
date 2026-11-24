@@ -3975,6 +3975,15 @@ hit "; line 3: not the key's fields"
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-row-docs-root 2>&1); _brc=$?   # AC7
 n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant kept-row-docs-root exited $_brc, expected 0"; st=1; }
 hit "cause-writer · docs/$_krd"":13 · kept outside the write set"
+# --- TOOL-dTotalRecall-73 AC2 — the keep registry has one home, under the conf's memory root: under
+# --- `MEMORY_ROOT=docs/memory` a registration at the literal home under `memory/` is one red naming both homes, and
+# --- each line names its own. Red on the comparison skipped in `check_kept_home`, which exits the plant 0.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-home-rooted 2>&1); _brc=$?   # AC2
+n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL record_causes.py --fixture --plant kept-home-rooted exited $_brc, expected 1"; st=1; }
+hit 'cause-writer · keep registry · read at docs/memory/project/census-kept-paths.txt'
+hit 'cause-writer · keep registry · registered at memory/project/census-kept-paths.txt in '
+n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = 1 ] || { echo "FAIL kept-home-rooted: want exactly one red"; st=1; }
+n=$((n+1)); [ "$(grep 'record causes: RED ' <<<"$out" | grep 'the censuses read docs/memory/project/census-kept-paths.txt and' | grep -c 'registers memory/project/census-kept-paths.txt,')" = 1 ] || { echo "FAIL kept-home-rooted: want its red naming both homes"; st=1; }
 # --- TOOL-dTotalRecall-65 AC3 — the kit holds no keep row: in a fixture with no census-kept-paths.txt the check
 # --- is green naming no kept or drained row, and the reader answers none for either census. Red on one
 # --- engine-held row returned beside the registry's, which exits the plant 1.

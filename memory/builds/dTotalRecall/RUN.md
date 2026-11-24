@@ -555,3 +555,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T06:54:17Z draw · re-dispatch · TOOL-dTotalRecall-70 · 74/186 · 20261124T065417Z-bacbba
 
 2026-11-24T06:54:17Z dispatch · item ee8def54 TOOL-dTotalRecall-70 · reason memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-38.md
+
+2026-11-24T07:13:22Z brief · item TOOL-dTotalRecall-73 · reason d4162e80ecf6 memory/builds/dTotalRecall/prompts/2026-11-24-prompt-TOOL-dTotalRecall-73-build-brief.md
+
+2026-11-24T07:20:23Z dispatch · item aec37866 TOOL-dTotalRecall-73 · reason tools/memory-tree/tree_lib.py tools/memory-tree/record_causes.py tools/memory-tree/check-memory-hygiene.test.sh memory/map/generated tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-73.md memory/builds/dTotalRecall/build/2026-11-24-build-TOOL-dTotalRecall-73-1-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md
