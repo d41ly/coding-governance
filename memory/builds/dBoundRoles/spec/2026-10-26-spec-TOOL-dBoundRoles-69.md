@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered
 
-**Status:** DEFERRED · rev-2 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 39 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 39 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -362,10 +362,10 @@ Live at landing, at order 39, after units 67 and 68 at order 38. No other unit s
 
 ## 7. Gates
 
-`roles adopter self-test` · `agent-cap self-test` · `testsuite counts (every bar self-test prints one)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles adopter self-test` · `spawn-guard self-test` · `testsuite counts (every bar self-test prints one)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-`agent-cap self-test` stands for the spawn guard's suite; unit 25's pass renames it on every live §7 line
-when it renames the leg. No arm moves here: a floor correction is re-observed by spec 64's two
+The spawn-guard leg runs the spawn guard's suite, and is named here by the name unit 25's pass gave it at
+`00a96bb43`. No arm moves here: a floor correction is re-observed by spec 64's two
 `New arm:` lines, with the bound unit 66's S5 adds.
 
 ## 8. Open questions
@@ -408,6 +408,9 @@ when it renames the leg. No arm moves here: a floor correction is re-observed by
   slashes, the `TEMP%` readers and the floor phrases by label and blob-pinned line, `LEDGER` by
   symbol. Specs 65 and 66 are checked at their rev-3 text in this batch, and spec 64's S12 and table
   row at `29acd2d77`, not at any later unit's pass.
+- rev-3 · 2026-11-24 · §7, no id moved · by `2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief`. The
+  leg TOOL-dBoundRoles-25 renamed at `00a96bb43` is named `spawn-guard self-test`, as
+  `tools/gate-legs.json` names it, and the sentence that awaited the rename states it as past.
 
 ## 10. Reuse audit
 

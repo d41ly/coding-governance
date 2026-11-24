@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-63 — the round-1 audit of units 59 and 60, its 19 minors: a floor sum that counts its base, criteria that can fail on the text they retire, observations on a tree that imports, and write sets that name every file
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -310,10 +310,10 @@ order 35.
 
 ## 7. Gates
 
-`roles adopter self-test` · `agent-cap self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles adopter self-test` · `spawn-guard self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-`agent-cap self-test` stands for the spawn guard's suite; unit 25's pass renames it on every live §7
-line when it renames the leg. This unit adds no arm: each criterion is a grep or a probe.
+`spawn-guard self-test` runs the spawn guard's suite; unit 25's pass renamed that leg at `00a96bb43`.
+This unit adds no arm: each criterion is a grep or a probe.
 
 ## 8. Open questions
 
@@ -358,6 +358,9 @@ line when it renames the leg. This unit adds no arm: each criterion is a grep or
   that reds S1's sum on a correct tree; F4 resolves it, and "How an item closes" states the rewrite.
   Specs 52, 53, 54 and 55 were read at HEAD, and units 19, 49, 59, 60, 61 and 62 were checked against
   their specs, not HEAD.
+- rev-6 · 2026-11-24 · §7 · the leg line and the sentence below it name the spawn guard's leg as
+  `tools/gate-legs.json` holds it, unit 25's pass having renamed it at `00a96bb43`, by
+  `2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief`; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-62 — the spawn guard's suite carries the floor unit 60's AC15 checks, and AC15 refuses a suite with no floor and names its units suite by suite
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -175,10 +175,9 @@ Live at landing, at order 34, after unit 60 at order 33. No other unit holds ord
 
 ## 7. Gates
 
-`agent-cap self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`spawn-guard self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-`agent-cap self-test` stands for the spawn guard's suite; unit 25's pass renames it on every live §7
-line when it renames the leg.
+`spawn-guard self-test` runs the spawn guard's suite; unit 25's pass renamed that leg at `00a96bb43`.
 
 New arm: tools/roles/spawn-guard.test.sh · covers AC1 · the floor comparison, staged by a floor one above the executed count · `FLOOR_ASSERTIONS` kept or minted, its comment carrying the base and unit 58's term
 
@@ -205,6 +204,9 @@ New arm: tools/roles/spawn-guard.test.sh · covers AC1 · the floor comparison, 
   suite still holds no floor and ends its pass-and-fail line at line 954, and the scratch-guard floor's
   shape now runs to line 1906 at 401. Unit 25's move of the suite, unit 43's S27 and AC27 and its arm
   line, unit 58's arm line and unit 60's S24 and AC15 were checked against their specs, not HEAD.
+- rev-5 · 2026-11-24 · §7 · the leg line and the sentence below it name the spawn guard's leg as
+  `tools/gate-legs.json` holds it, unit 25's pass having renamed it at `00a96bb43`, by
+  `2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief`; nothing else moved.
 
 ## 10. Reuse audit
 

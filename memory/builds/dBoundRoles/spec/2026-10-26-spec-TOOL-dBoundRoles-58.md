@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-58 — the 35 minors of auditing units 45 to 51: criteria passable on a correct build, one typed set and one block reader at spawn, one extents record at render, the H1 parity's consumers, and AMENDED answers naming a revision
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 32 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-7 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 32 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -429,10 +429,7 @@ The ledgers below are read block-scoped, as S23 states: from the unit's `**Evide
 
 ## 7. Gates
 
-`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `agent-cap self-test` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `build-index selftest` · `memory-recall kit selftest` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
-
-`agent-cap self-test` stands for the spawn guard's suite; unit 25's pass renames it on every live §7
-line when it renames the leg.
+`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `spawn-guard self-test` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `build-index selftest` · `memory-recall kit selftest` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC4 AC7 AC21 AC22 AC28 AC35 · the diff render, the read check, the control render, the balanced flip, the CR and comment cases and the typed-set loop, staged by a fenced typed value, an end-only fence check and an unmapped typed name · none
 New arm: tools/roles/spawn-guard.test.sh · covers AC10 AC12 AC16 AC25 · the entry guard, the derived exemption, the one block reader and the check order, staged by a literal exemption and a marker count moved first · none
@@ -473,6 +470,9 @@ New arm: tools/govkit/selftest.py · covers AC31 · the shared seed predicate, s
   `render_agents.py`, unit 25's move and leg rename, unit 46's `TYPED_INPUTS`, unit 50's
   `resolve_subagent_dir`, unit 43 S56's `resolve_agent_transcript` and unit 51's AC8 population were
   checked against their specs, not HEAD; 58 AC18's spec-scope is unit 60's S1 to S3.
+- rev-7 · 2026-11-24 · §7 · by `2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief`: the leg line names
+  `spawn-guard self-test`, the name TOOL-dBoundRoles-25 gave `agent-cap self-test` at `00a96bb43`, and
+  the sentence saying unit 25's pass will rename it goes; nothing else moved.
 
 ## 10. Reuse audit
 

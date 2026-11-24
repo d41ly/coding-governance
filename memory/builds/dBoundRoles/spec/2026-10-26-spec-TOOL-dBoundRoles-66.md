@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-66 — the round-1 audit of unit 64, its 23 minors: skip lines by a pinned predicate, loops swept by class, unit terms tied to their arms, absence checks on joined prose, and the observation's failure path staged
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -434,10 +434,10 @@ Files touched names specs 63 and 64 and their ledgers too. The declared write se
 
 ## 7. Gates
 
-`roles adopter self-test` · `agent-cap self-test` · `testsuite counts (every bar self-test prints one)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles adopter self-test` · `spawn-guard self-test` · `testsuite counts (every bar self-test prints one)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-`agent-cap self-test` stands for the spawn guard's suite; unit 25's pass renames it on every live §7 line
-when it renames the leg. No arm moves here: the floor and comment corrections are re-observed by spec 64's
+`spawn-guard self-test` is the spawn guard's suite, the leg unit 25's pass renamed at `00a96bb43`. No arm
+moves here: the floor and comment corrections are re-observed by spec 64's
 two `New arm:` lines, carrying the bound S5 adds.
 
 ## 8. Open questions
@@ -493,6 +493,9 @@ two `New arm:` lines, carrying the bound S5 adds.
   `@1bae0749:1859-1905`, and the backlog row at `@558bbfee:71`. `tools/roles/spawn-guard.test.sh`, its
   floor and its `# out of the floor:` lines are units 25's and 64's, checked against spec 25's S5 and
   spec 64's S12 and S33, not HEAD; sibling-spec clauses are cited by label.
+- rev-4 · 2026-11-24 · §7 · the leg line and the sentence below it name `spawn-guard self-test`, as
+  `tools/gate-legs.json` does since TOOL-dBoundRoles-25's `00a96bb43`, by
+  `2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief`; no scope item or criterion moved.
 
 ## 10. Reuse audit
 

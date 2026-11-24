@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-60 — the round-1 audit of units 52 to 58, its 37 minors: criteria that can fail and can pass, arms observed where their code lives, one read-key parse, floors moved with their arms, and write sets that name every file a pass writes
 
-**Status:** DEFERRED · rev-8 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-9 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -41,7 +41,7 @@ merged several into one item. Id 10 was refuted by the audit and id 21 is unit 5
 | M2 | 2, 16 | unit 53 S2, AC3, §7 | S4, S5 |
 | M3 | 3 | unit 46 AC3, unit 58 S9 | S6 |
 | M4 | 4, 14, 27 | units 52 and 53 §4 Rollout | S7, S8, S9 |
-| M5 | 5, 13 | unit 54 AC3 | S10, S11 |
+| M5 | 5, 13 | unit 54 S3, AC3 and deviation record 543, as built | S10, S11 |
 | M6 | 7, 36 | unit 55 AC1, §7 | S12, S13 |
 | M7 | 9, 29 | unit 58 AC30 | S14, S15 |
 | M8 | 15 | unit 58 S5, §4, AC5 | S16 |
@@ -89,11 +89,13 @@ merged several into one item. Id 10 was refuted by the audit and id 21 is unit 5
   ledger shows the three order-22 pass commits never open together. Observed by AC4.
 - **S9** — id 27. 53 §4 Rollout names unit 26 the same way, and neither spec gains an edge to 26, by §8
   F2. Observed by AC4.
-- **S10** — id 5. 54 AC3 requires `derive_overlay_expected` or "role slot" inside 49's S3 and AC2
-  bullets, a phrase those bullets lack at base. Observed by AC5.
-- **S11** — id 13. 54 AC3 also requires a §9 line in spec 49 above rev-2 naming `TOOL-dBoundRoles-54`
-  with `S3` or `AC2`. Where unit 54's pass left 49 unrestated, this pass makes 54 S3's bump. Observed by
-  AC5.
+- **S10** — id 5. 54 AC3 is red on a tree where 54 S3 was skipped, as unit 54 built it. Its §8 F3 keeps
+  unit 49's CLOSED spec frozen, deviation record 543
+  (`memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-deviation-543.md`) carries the
+  restatement of 49's AC2, and 54 AC3 reads that record, which a tree without S3 does not hold. This
+  pass records that end state and changes nothing for it. Observed by AC5.
+- **S11** — id 13. 54 AC3 also reads an untouched spec 49, so no revision line of that spec stands in
+  for the restatement. This pass records that too, and edits no line of spec 49. Observed by AC5.
 - **S12** — id 7. 55 AC1's fixture is empty on both sides: a scratch kit with no `agents/*.agent.md` and no
   `house/*.md` include in its `kit.toml`, the failure naming the kit path. Observed by AC6.
 - **S13** — id 36. 55's arm states that removing S1's length test turns that fixture green. Observed by
@@ -193,7 +195,7 @@ merged several into one item. Id 10 was refuted by the audit and id 21 is unit 5
 - **consumes-from** `TOOL-dBoundRoles-46` — AC3, which S6 re-points at the moved guard (id 3)
 - **consumes-from** `TOOL-dBoundRoles-52` — S1, AC3, §3, §4 Rollout and §7, which S7, S8, S24, S25 and S33 restate (ids 4, 6, 14, 23, 37)
 - **consumes-from** `TOOL-dBoundRoles-53` — S2, AC3, §4, §5 and §7, which S4, S5, S9, S24, S32 and S35 restate (ids 2, 16, 20, 27, 32, 37)
-- **consumes-from** `TOOL-dBoundRoles-54` — S1, S2, AC1 to AC3, §4 and §7, which S10, S11, S19, S23, S34 and S35 restate (ids 5, 13, 26, 28, 32, 35)
+- **consumes-from** `TOOL-dBoundRoles-54` — S1, S2, AC1, AC2, §4 and §7, which S19, S23, S34 and S35 restate, and S3, AC3 and deviation record 543, whose end state S10 and S11 record (ids 5, 13, 26, 28, 32, 35)
 - **consumes-from** `TOOL-dBoundRoles-55` — AC1, AC2 and §7, which S12, S13, S19 and S27 restate (ids 7, 8, 28, 36)
 - **consumes-from** `TOOL-dBoundRoles-56` — S2, S3, S5, §3, §4, §5 and §7, which S18, S20 and S28 to S32 restate (ids 11, 17, 18, 20, 25, 30, 31)
 - **consumes-from** `TOOL-dBoundRoles-57` — S1, S3 and AC1, which S21, S22 and S37 restate (ids 33, 34, 39)
@@ -282,7 +284,7 @@ Live at landing, at order 33, after every unit it repairs and after unit 59.
 - `tools/gate-legs.json`, rendered
 - `memory/guides/SESSION-KICKOFF.md`
 - `memory/map/generated/symbols.json`
-- the specs of units 14, 19, 46, 47, 49, 52, 53, 54, 55, 56, 57 and 58, rev bumps, and the ledgers the
+- the specs of units 14, 19, 46, 47, 52, 53, 54, 55, 56, 57 and 58, rev bumps, and the ledgers the
   AMENDED answers and S27 write, named here for the dispatch write set
 
 ### Alternatives rejected
@@ -320,10 +322,19 @@ Live at landing, at order 33, after every unit it repairs and after unit 59.
 - **AC4** — When `grep -n 'TOOL-dBoundRoles-26'` runs over specs 52 and 53, each prints its §4 Rollout
   naming the suite and `--dispatch`, and the ledger lists the three order-22 pass commits in sequence.
   Red when: a Rollout asserts a disjointness the Files touched contradict.
-- **AC5** — When a `python -c` probe extracts 49's S3 and AC2 bullets, each holds
-  `derive_overlay_expected` or "role slot", and 49's §9 holds a line above rev-2 naming
-  `TOOL-dBoundRoles-54` with `S3` or `AC2`.
-  Red when: 54 AC3 is green on a tree where S3 was skipped.
+- **AC5** — When `python tools/memory-tree/build_records.py read memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-deviation-543.md`
+  runs, it exits 0 with no `malformed` row and prints a Departs from row naming
+  `TOOL-dBoundRoles-49@rev-5`, an Approver row naming `author-recorded` and an After row naming
+  `TOOL-dBoundRoles-54`'s AC2. When
+  `git diff --name-only d173e8ced ff44a3ec1 -- memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-deviation-543.md memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-49.md`
+  runs over unit 54's pass commit, it prints the record's path alone, so the spec-49 half prints nothing
+  over a range that is not empty. When
+  `git diff -U0 ff44a3ec1 -- memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-49.md`
+  runs on the built tree, every line it adds or removes is a row of the generated records table, opening
+  `| [`.
+  Red when: the record is missing (the read exits 2) or malformed (it exits 1), so 54 S3 was skipped; or
+  spec 49 was edited, by unit 54's pass or after it.
+  figure: both shas PINNED on 2026-11-24, unit 54's pass commit `ff44a3ec1` and its parent.
 - **AC6** — When the archived tree's compare runs on a scratch kit with no role file and no `house/*.md`
   include, it fails naming the kit path; with S1's length test taken out of the archived copy, it passes.
   Red when: the fixture reds for a reason S1 does not own.
@@ -390,10 +401,7 @@ Live at landing, at order 33, after every unit it repairs and after unit 59.
 
 ## 7. Gates
 
-`roles adopter self-test` · `roles catalogue` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `memory-recall kit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
-
-`agent-cap self-test` stands for the spawn guard's suite; unit 25's pass renames it on every live §7
-line when it renames the leg.
+`roles adopter self-test` · `roles catalogue` · `spawn-guard self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `memory-recall kit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC24 · the four CR shapes, staged by a carriage-return strip on the marker branch only, and the raised floor, staged by an early return before unit 58's cases · `FLOOR_ASSERTIONS` raised by the floored assertions S24 counts and S36 adds
 New arm: tools/memory-recall/selftest.py · covers AC13 · the whole-text no-search-tool half, staged by restoring "fall back to `Grep`" in the template body · none
@@ -449,6 +457,14 @@ S20's guard is not an arm: AC12 observes it directly, red before the edit and gr
   it. Its last bullet states the base term, which the base blob bears out, and the HEAD comment's
   running-total line. Unit 25's move, unit 57's token loop and unit 58's S8 were checked against their
   specs, not HEAD; the first bullet's spec-grep reading stays for unit 63's S17.
+- rev-9 · 2026-11-24 · §1 · §3 · §4 Files touched · §7 · S10 · S11 · AC5 · by
+  `2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief`. S10, S11 and AC5 asked unit 54's criterion to
+  grep unit 49's bullets and revision log, and asked this pass to bump unit 49's spec; unit 54's rev-6
+  took the route of its §8 F3 instead, deviation record 543 over a frozen spec 49. So ids 5 and 13 are
+  closed as built, S10 and S11 state that end state, AC5 observes the record and the untouched spec, and
+  the table row, the edge to TOOL-dBoundRoles-54 and Files touched follow, spec 49 leaving the list. The
+  leg line names `spawn-guard self-test`, the name TOOL-dBoundRoles-25 gave `agent-cap self-test` at
+  `00a96bb43`, and the sentence saying unit 25's pass will rename it goes. Nothing else moved.
 
 ## 10. Reuse audit
 

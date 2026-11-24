@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-64 — the round-1 audit of units 61 to 63, its 32 minors: floors at the executed count naming every unit, a negative case inverting its verdict, criteria failing on the text they retire, no stray worktree, and an edge per bumped spec
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -492,10 +492,10 @@ Live at landing, at order 36, after every unit it repairs. No other unit holds o
 
 ## 7. Gates
 
-`roles adopter self-test` · `agent-cap self-test` · `testsuite counts (every bar self-test prints one)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms`
+`roles adopter self-test` · `spawn-guard self-test` · `testsuite counts (every bar self-test prints one)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms`
 
-`agent-cap self-test` stands for the spawn guard's suite; unit 25's pass renames it on every live §7 line
-when it renames the leg. The two recall legs are owed by the waiver file's guard.
+`spawn-guard self-test` is the spawn guard's suite, the leg unit 25's pass renamed at `00a96bb43`. The two
+recall legs are owed by the waiver file's guard.
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC6 AC7 · the two inverted negative cases, staged by the helper reading stdout alone, and the floor at the executed count, staged by an early exit before unit 61's cases · `FLOOR_ASSERTIONS` set to the executed count, with terms naming units 60 and 61 and this unit's term for the arms that moved no floor
 
@@ -549,6 +549,9 @@ New arm: tools/roles/spawn-guard.test.sh · covers AC2 AC7 AC8 · the floor comp
   citations spec 62's rev-4 writes, and AC18 names spec 52's citation, which the grep no longer prints.
   Units 25, 43, 50, 58 and 61 to 63 and the floors their passes leave were checked against their specs,
   not HEAD.
+- rev-5 · 2026-11-24 · §7 · the leg line and the sentence below it name `spawn-guard self-test`, as
+  `tools/gate-legs.json` does since TOOL-dBoundRoles-25's `00a96bb43`, by
+  `2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief`; no scope item or criterion moved.
 
 ## 10. Reuse audit
 
