@@ -875,13 +875,17 @@ _READER_SLUG_SHAPE = re.compile(r"\w*(?:SLUG|[Ss]lug)\w*\s*=\s*(?:re\.compile\(\
                                 r"(?:[rRbBfF]{0,2}(['\"])[^'\"\n]*\[|/[^/\n]*\[)")
 _READER_BLOCK = re.compile(r"^(?:# |// )(>>>|<<<) slug_legacy_")
 # The split shapes (TOOL-dTotalRecall-38 S2, keyed on the shape by TOOL-dTotalRecall-44): Python's
-# `.split("-")` with no maxsplit, blanks inside its parentheses allowed, unless it is indexed `[0]` at
-# once, since the family before the first hyphen is the one segment a hyphen in a slug cannot move; a
-# shell `${name%-*}`, `${name%%-*}`, `${name#*-}` or `${name##*-}`, `cut -d-`, `cut -d '-'`,
-# `cut -d "-"` or `IFS=-`. No value's NAME is read, so a reader of an id named `i` or `a` is listed;
-# `.rsplit("-", 1)`, which reads the sequence after the last hyphen, and `.partition` are outside it.
+# `.split("-")` and `.rsplit("-")` at any maxsplit, except the shapes a hyphen in a slug cannot move
+# (TOOL-dTotalRecall-60 S24): `.split` indexed `[0]` at once, the family before the first hyphen;
+# `.split("-", 1)` indexed `[1]`, all that follows it; `.rsplit("-")` indexed `[0]`, the whole value cut
+# at every hyphen, so its family too; and `.rsplit("-", 1)`, which cuts at the last hyphen, indexed `[0]`,
+# `[1]` or `[-1]`. A call naming `sep=` first is not read; one naming `maxsplit=`, or closing on a later
+# line, is listed or not read. Then a shell `${name%-*}`, `${name%%-*}`, `${name#*-}` or `${name##*-}`,
+# `cut -d-`, `cut -d '-'`, `cut -d "-"` or `IFS=-`. No value's NAME is read, so a reader of an id named
+# `i` or `a` is listed; `.partition` is outside it.
 _READER_SPLIT_SHAPE = re.compile(
-    r"\.split\(\s*([\"'])-\1\s*\)(?!\[0\])"
+    r"\.split\(\s*([\"'])-\1\s*(?!,\s*1\s*\)\[1\])[^)]*\)(?!\[0\])"
+    r"|\.rsplit\(\s*([\"'])-\2\s*(?!,\s*1\s*\)\[(?:0|1|-1)\])(?!\)\[0\])[^)]*\)"
     r"|\bcut\s+-d\s*(?:-|'-'|\"-\")(?=\s|$)|\bIFS=-(?=\s|;|$)"
     r"|\$\{[A-Za-z_]+(?:%%?-\*|##?\*-)\}")
 

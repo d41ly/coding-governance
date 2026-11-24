@@ -406,9 +406,10 @@ python <this kit>/runlog.py verify <record> [--journals <dir>]
 where the key is the first 8 hex of the commit that started the run, read from the model and never
 re-derived. A re-render finds the run's existing file by that key, whatever its date, so a run has one
 record. The head is `**Serves:** log <ids>`: the units the run dispatched, or closed with a commit
-naming them, among those a spec in the build defines, in ranges where contiguous. A run that served no
-such unit gets a `no spec-defined unit` line and no file, because an unbound record moves a pin. A
-committed record headed `journal`, the kind's name before it became `log`, still binds:
+naming them, among those a spec in the build defines, in ranges where contiguous. Its optional fourth
+line is a cause line, `**Caused-by:** <target>`, graded for shape and never for absence. A run that
+served no such unit gets a `no spec-defined unit` line and no file, because an unbound record moves a
+pin. A committed record headed `journal`, the kind's name before it became `log`, still binds:
 `SERVES_ALIASES` beside `SERVES_KIND` in `record.py` admits it read-only, and the memory-tree kit's
 `record_kinds.py --check` holds that tuple to its own alias table, read by `ast`.
 
@@ -554,7 +555,8 @@ The record's second enforcement point, `TOOL-dLoggedFlight-10`, on the bar as `r
 renderer that honours the schema proves nothing about a record edited afterwards, so this reads every
 tracked `<memory root>/builds/*/build/*-runlog-*.md` from the INDEX and grades its bytes against
 `RECORD_SCHEMA`, compiling the schema's data itself rather than calling the renderer. It checks the fixed
-head and its `**Serves:**` ids, the eight headings in order, each section's declared facts against
+head and its `**Serves:**` ids, its optional fourth line, a cause line `**Caused-by:** <target>` graded
+for shape and never for absence, the eight headings in order, each section's declared facts against
 their templates, its declared tables against their column classes, and the Data twin's keys and
 values. A row that renders a time AND states its own source is held to `sources` under the `source`
 rule: a row a journal timed is refused for naming that journal, not for a layout somebody could

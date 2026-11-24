@@ -4107,7 +4107,7 @@ def derive_hygiene_plant(cap):
     v, extra = read_source_number(rel, cap.home.rpartition(":")[2]), ""
     if v == 0:
         v, extra = 10, f'"{cap.name}" = 10\n'
-    kind, axis = cap.name.rsplit("-", 1)
+    kind, axis = cap.name.rsplit("-", 1)  # census: kept slug-grammar a cap's name, not an id
     files = {".memory-tree.conf": HYGIENE_CONF, "memory/backlog/ARCH.md": "# ARCH\n"}
     path, head, width = {"guide": ("memory/guides/g.md", "", 199), "index": ("memory/backlog/ARCH.md", "# ARCH\n", 250),
                          "entry": ("memory/backlog/ARCH.md", "# ARCH\n", 0), "dossier": ("memory/map/features/d.md", "", 120),

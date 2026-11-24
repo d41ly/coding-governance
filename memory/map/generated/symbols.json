@@ -5648,6 +5648,11 @@
       "file": "tools/memory-tree/record_causes.py"
     },
     {
+      "id": "check_ask_live",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "check_ask_mandate",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"

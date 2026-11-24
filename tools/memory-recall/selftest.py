@@ -3498,6 +3498,8 @@ def test_id_parts_parse_under_each_tree_grammar():
 # One plant per split shape the census reads, and a control that takes index 0. TOOL-dTotalRecall-44
 # S3 keys the census on the shape: three plants whose value is named for no id, or whose index or
 # unpacking reads past the family, are listed; an index-0 split and an `rsplit` sequence read are not.
+# TOOL-dTotalRecall-60 S3 S24: a larger maxsplit and a bare `rsplit` are listed, the safe index of each is
+# not, and a line keeps its hit by the one census marker, never by the spelling before it.
 _SPLIT_PLANTS = {
     "py-split": ("plant/py_split.py", 'slug = unit_id.split("-")[1]\n'),  # census: kept slug-grammar fixture text the arm plants
     "sh-cut": ("plant/sh_cut.sh", "slug=$(printf '%s' \"$unit_id\" | cut -d- -f2)\n"),  # census: kept slug-grammar fixture text the arm plants
@@ -3508,8 +3510,17 @@ _SPLIT_PLANTS = {
     "py-unpack": ("plant/py_unpack.py", 'fam, slug, seq = x.split("-")\n'),  # census: kept slug-grammar fixture text the arm plants
     "py-head": ("plant/py_head.py", 'fam = x.split("-")[0]\n'),
     "py-rsplit": ("plant/py_rsplit.py", 'seq = x.rsplit("-", 1)[1]\n'),
+    "split-maxsplit-two": ("plant/split_maxsplit_two.py", 'slug = x.split("-", 2)[1]\n'),  # census: kept slug-grammar fixture text the arm plants
+    "rsplit-bare": ("plant/rsplit_bare.py", 'slug = x.rsplit("-")[1]\n'),  # census: kept slug-grammar fixture text the arm plants
+    "rsplit-head": ("plant/rsplit_head.py", 'stem = x.rsplit("-", 1)[0]\n'),
+    "split-rest": ("plant/split_rest.py", 'rest = x.split("-", 1)[1]\n'),
+    "split-maxsplit-head": ("plant/split_maxsplit_head.py", 'fam = x.split("-", 2)[0]\n'),
+    # the old spelling is split, so no line of this file spells it whole
+    "old-marker": ("plant/old_marker.py", 'slug = x.split("-")[1]  # slug-' + "grammar: kept x\n"),  # census: kept slug-grammar fixture text the arm plants
+    "new-marker": ("plant/new_marker.py", 'slug = x.split("-")[1]  # census: kept slug-grammar x\n'),  # census: kept slug-grammar fixture text the arm plants
 }
-_SPLIT_LISTED = {"py-split", "sh-cut", "sh-expansion", "py-unnamed", "py-node", "py-unpack"}
+_SPLIT_LISTED = {"py-split", "sh-cut", "sh-expansion", "py-unnamed", "py-node", "py-unpack", "split-maxsplit-two",
+                 "rsplit-bare", "old-marker"}
 # The re-pointed reader the clone reverts to its split, and the split it reverts to.
 _REPOINTED = ("        return backlog.load_id_grammar().parse_id_parts(ident, None, alt=backlog.ANY_FAMILY)[1]\n",
               '        return ident.split("-")[1]\n')  # census: kept slug-grammar fixture text the arm plants
@@ -3519,7 +3530,7 @@ _REPOINTED = ("        return backlog.load_id_grammar().parse_id_parts(ident, No
 def test_split_census_and_the_flip_probe_census_check():
     """TOOL-dTotalRecall-38 AC2, AC4 and TOOL-dTotalRecall-44 AC1. In `make_repo`'s throwaway tree,
     which carries every memory-tree `*.py`, that tree's own `id_grammar.py --readers` lists the
-    `_SPLIT_LISTED` plants and neither the control, `py-head` nor `py-rsplit`. Its `--flip-probe` over a clone of that tree names no
+    `_SPLIT_LISTED` plants and no other, TOOL-dTotalRecall-60 AC3 and AC24's among them. Its `--flip-probe` over a clone of that tree names no
     census failure, and over the clone with `migrate_backlog.read_slug` reverted to its split and
     committed, every flip names the reverted line and the probe exits 1. The throwaway carries no
     policy kit, so its flips' other checks are not read here."""

@@ -3835,22 +3835,31 @@ hit "record causes: causes · $_scr.sh · its header is refused: $_scr.sh: Cause
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant script-causeless 2>&1)   # AC3
 hit "record causes: causes · $_scr.sh · names no Caused-by"; miss 'atlas.html'
 # --- TOOL-dTotalRecall-47 (AC1 AC3) — the cause backfill, `record_causes.py --backfill`: over a seeded legacy
-# --- population it writes the cause line into the causeless new record only, leaving the legacy records, the
-# --- root kind's record, a `.sh` record and a no-id record, the last two listed `not backfilled`; `--check`
-# --- then names exactly those two and a second run writes nothing. A typed `-deviation-1.md` record and one
-# --- whose Serves line is the head window's last line are refused, the fixture's status clean. Red on the
-# --- verb writing a legacy record and on it writing a typed record.
+# --- population it writes the cause line into the causeless new records only, a `.sh` record's behind its
+# --- Serves line's prefix (TOOL-dTotalRecall-60 AC11 AC20), leaving the legacy records, the root kind's record
+# --- and a no-id record, the last listed `not backfilled`; `--check` then names exactly that one and a second
+# --- run writes nothing. A typed `-deviation-1.md` record and one whose Serves line is the head window's last
+# --- line are refused, the fixture's status clean. Red on the verb writing a legacy record, on it writing a
+# --- typed record and on the `not markdown` refusal restored.
 _bfr='memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant backfill-selection 2>&1); _brc=$?   # AC1
 n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant backfill-selection exited $_brc, expected 0"; st=1; }
 hit "backfill 1 · record causes: backfilled · $_bfr-new.md · Caused-by TOOL-fRoot-1"
-hit "backfill 1 · record causes: not backfilled · $_bfr-probe.sh · not markdown"
+hit "backfill 1 · record causes: backfilled · $_bfr-probe.sh · Caused-by TOOL-fRoot-1"
+hit "$_bfr-probe.sh:2:# **Caused-by:** TOOL-fRoot-1"
 hit "backfill 1 · record causes: not backfilled · $_bfr-unbound.md · no id"
 hit 'backfill 2 · record causes: 0 backfilled'; hit 'record causes: fixture backfill-selection · PASS'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant backfill-refusals 2>&1); _brc=$?   # AC3
 n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant backfill-refusals exited $_brc, expected 0"; st=1; }
 hit "not backfilled · $_bfr-deviation-1.md · typed kind"; hit "not backfilled · $_bfr-late.md · head window"
 miss 'fixture backfill-refusals · status'; hit 'record causes: fixture backfill-refusals · PASS'
+# --- TOOL-dTotalRecall-60 AC13 — `--backfill --build fRoot` writes fRoot's causeless record and lists fClaim's
+# --- `not backfilled`, the fixture's status naming the first alone. Red on the folder test skipped.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant other-build-causeless 2>&1); _brc=$?   # AC13
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant other-build-causeless exited $_brc, expected 0"; st=1; }
+hit "backfill 1 · record causes: not backfilled · memory/builds/fClaim/build/2026-01-02-build-TOOL-fClaim-1-new.md · another build's record"
+hit "backfill 1 · record causes: backfilled · $_bfr-new.md · Caused-by TOOL-fRoot-1"
+hit 'record causes: fixture other-build-causeless · PASS'
 # --- TOOL-dTotalRecall-50 (AC2 AC3) — the pinned writer: a CAUSE_WRITER_PINNED row is red, named, once its
 # --- instrument spells the cause past its binding window and once its ask row leaves the backlog; a causeless
 # --- departures record its glob reads passes causes and orphans while the row stands, its cause its first Serves
@@ -3867,6 +3876,21 @@ n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant d
 hit 'check 1 · record causes: 0 causeless · 0 orphan(s)'
 hit 'check 2 · record causes: causes · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-departures-build.md · names no Caused-by'
 hit 'check 1 exit 0 · check 2 exit 1'; hit 'record causes: fixture departures-pinned · PASS'
+# --- TOOL-dTotalRecall-60 AC19 — a pinned row whose ask is still filed but reads WONTDO at HEAD is red naming
+# --- the row and its ask. Red on the liveness test skipped, which leaves the check green.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant pinned-ask-closed 2>&1); _brc=$?   # AC19
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant pinned-ask-closed exited $_brc, expected 0"; st=1; }
+hit "check 1 · record causes: RED cause-writer $_pwr: names ask TOOL-fRoot-2, which is not live: it reads WONTDO at HEAD"
+hit 'record causes: fixture pinned-ask-closed · PASS'
+# --- TOOL-dTotalRecall-60 AC26 — the renderer's kept reason on two files that are not it, a tool-root writer's
+# --- marker and a build-folder script's keep row, is one red each while the renderer's own marker keeps it.
+# --- Red on the file test skipped, which exits the plant 0.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant reason-on-other-file 2>&1); _brc=$?   # AC26
+n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL record_causes.py --fixture --plant reason-on-other-file exited $_brc, expected 1"; st=1; }
+hit '/reason.py:2: kept because it renders a pinned instrument'
+hit 'RED cause-writer CENSUS_KEPT_PATHS memory/builds/fRoot/build/2026-01-01-build-TOOL-fRoot-1-kept.py: kept because it renders'
+hit '/asbuilt_view.py:2 · kept renders a pinned instrument'
+n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = 2 ] || { echo "FAIL reason-on-other-file: want exactly two reds"; st=1; }
 # --- TOOL-dTotalRecall-55 AC2 — a census keep row cannot outlive its hit: a build-folder script kept by a
 # --- FIXTURE_KEPT row while it spells no Serves literal past its binding window is one red naming
 # --- CENSUS_KEPT_PATHS and its path, and the run exits 1. Red on S4's drain test skipped, which exits the plant 0.

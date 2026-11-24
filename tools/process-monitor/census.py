@@ -231,7 +231,7 @@ def parse_cpu_clock(token):
     """`ps` TIME, as `[[DD-]HH:]MM:SS`, to seconds. None when it is not that shape."""
     days = 0
     if "-" in token:
-        head, token = token.split("-", 1)
+        head, token = token.split("-", 1)  # census: kept slug-grammar a clock value, not an id
         if not head.isdigit():
             return None
         days = int(head)

@@ -151,9 +151,6 @@ RECORD_NAME_RE = rl.derive_slug_pattern(lambda c: r"[0-9]{4}-[0-9]{2}-[0-9]{2}-b
                                         + RECORD_TAG + r"-([0-9a-f]{8})\.md")
 UNIT_ID_RE = rl.derive_slug_pattern(lambda c: r"([A-Z]+)-((?:" + c + r"))-([0-9]+)")
 UNIT_RANGE_RE = rl.derive_slug_pattern(lambda c: r"([A-Z]+)-((?:" + c + r"))-([0-9]+)(?:\.\.([0-9]+))?")
-# The run record's cause line (TOOL-dTotalRecall-36 S4), one shape for the head that admits it and the
-# check that grades its target (TOOL-dTotalRecall-48 S1, S2).
-CAUSE_LINE_RE = re.compile(r"\*\*Caused-by:\*\* (\S+)")
 PLACEHOLDER_RE = re.compile(r"\{([a-z-]+)\}")
 COMMITMENT_RE = re.compile(r"sha256 ([0-9a-f]{64}) · lines ([0-9]+)")
 # EVERY SUMMARY FACT WHOSE RENDERED VALUE A PARSER IN THIS KIT READS BACK, mapped to that parser
@@ -193,6 +190,8 @@ RECORD_SCHEMA = {
     "cap_bytes": RECORD_CAP_BYTES,
     "title": TITLE,
     "serves_kind": SERVES_KIND,
+    # The head's optional fourth line, its one spelling (TOOL-dTotalRecall-60 S31): `CAUSE_LINE_RE` below.
+    "cause_line": r"\*\*Caused-by:\*\* (\S+)",
     "intro": INTRO,
     "none": NONE,
     # THE CLASSES THAT CARRY A TIME (spec S1 of TOOL-dLoggedFlight-20). `sources` below declares
@@ -429,6 +428,9 @@ RECORD_SCHEMA = {
         "uuid": r"[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}",
     },
 }
+# The run record's cause line (TOOL-dTotalRecall-36 S4), one shape for the head that admits it and the
+# check that grades its target (TOOL-dTotalRecall-48 S1, S2), compiled from the schema's `cause_line`.
+CAUSE_LINE_RE = re.compile(RECORD_SCHEMA["cause_line"])
 
 # ---------------------------------------------------------------------------------- small helpers
 
