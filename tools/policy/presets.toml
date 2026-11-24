@@ -271,6 +271,9 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "install.on-shim-call" = "warn"
 "install.retired-edits" = "order"
 "install.steps" = "offer"
+"install.baseline" = "reuse"
+"tests.history-verdicts" = "stored"
+"tests.fixture-templates" = "shared"
 
 [preset.standard]
 "charter.override" = "explicit-override"
@@ -519,6 +522,9 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "install.on-shim-call" = "warn"
 "install.retired-edits" = "order"
 "install.steps" = "offer"
+"install.baseline" = "reuse"
+"tests.history-verdicts" = "stored"
+"tests.fixture-templates" = "shared"
 
 [preset.strict]
 "charter.override" = "absolute"
@@ -767,6 +773,9 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "install.on-shim-call" = "journal"
 "install.retired-edits" = "order"
 "install.steps" = "attended"
+"install.baseline" = "reuse"
+"tests.history-verdicts" = "stored"
+"tests.fixture-templates" = "shared"
 
 [preset.guarded]
 "charter.override" = "explicit-override"
@@ -1015,3 +1024,6 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "install.on-shim-call" = "warn"
 "install.retired-edits" = "order"
 "install.steps" = "offer"
+"install.baseline" = "reuse"
+"tests.history-verdicts" = "stored"
+"tests.fixture-templates" = "shared"
