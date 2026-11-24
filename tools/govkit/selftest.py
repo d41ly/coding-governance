@@ -4377,8 +4377,9 @@ def check_reviewer_merge(tmp: pathlib.Path) -> None:
                        encoding="utf-8", errors="replace")
     ids = [ln.split(" · ")[1] for ln in p.stdout.splitlines()
            if ln.startswith("upgrade-steps: ") and ln.split(" · ")[-1].endswith(rk_name + "/kit.toml")]
-    check("reviewer-merge-AC9 upgrade_steps.py list orders roles/reviewers-to-gov-reviewer after every other row of "
-          "the roles descriptor", p.returncode == 0 and ids[-1:] == ["roles/reviewers-to-gov-reviewer"],
+    check("reviewer-merge-AC9 upgrade_steps.py list orders roles/reviewers-to-gov-reviewer after every roles row "
+          "but TOOL-dBoundRoles-19's, declared after it", p.returncode == 0
+          and ids[-2:] == ["roles/reviewers-to-gov-reviewer", "roles/house-overlays-to-instructions"],
           p.stdout[-1500:] + p.stderr)
 
     # ---- AC2: every finder stage keeps its level, measured in the kit before the update and after the up.
