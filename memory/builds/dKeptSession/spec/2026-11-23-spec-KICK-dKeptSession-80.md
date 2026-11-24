@@ -22,6 +22,10 @@
 | [2026-11-24-build-KICK-dKeptSession-80-red-fix-27.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-27.md) | red-fix | — |
 | [2026-11-24-build-KICK-dKeptSession-80-red-fix-28.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-28.md) | red-fix | — |
 | [2026-11-24-build-KICK-dKeptSession-80-widen-5.md](../build/2026-11-24-build-KICK-dKeptSession-80-widen-5.md) | widen | — |
+| [2026-11-24-build-KICK-dKeptSession-80-widen-6.md](../build/2026-11-24-build-KICK-dKeptSession-80-widen-6.md) | widen | — |
+| [2026-11-24-build-KICK-dKeptSession-80-widen-7.md](../build/2026-11-24-build-KICK-dKeptSession-80-widen-7.md) | widen | — |
+| [2026-11-24-build-KICK-dKeptSession-80-widen-8.md](../build/2026-11-24-build-KICK-dKeptSession-80-widen-8.md) | widen | — |
+| [2026-11-24-build-KICK-dKeptSession-80-widen-9.md](../build/2026-11-24-build-KICK-dKeptSession-80-widen-9.md) | widen | — |
 | [2026-11-21-prompt-KICK-dKeptSession-80-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-80-build-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-80-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-80-1-spec-writer.md) | journal | — |
 | [2026-11-23-prompt-KICK-dKeptSession-80-2-builder.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-80-2-builder.md) | journal | — |

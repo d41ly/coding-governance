@@ -28,7 +28,9 @@ Hold the documented tuple against the `return` statement and against each caller
 three side by side, whenever a function's return changes or its docstring is written. Search the
 kit's README and every other text for the old spelling before closing. The nearest class is
 `doc-names-an-argument-the-code-never-reads`, which is the same drift on an argument rather than on
-a returned value.
+a returned value. `retirement-inventory-misses-readers-by-value` is a different class: there a value is
+retired and a reader nobody listed keeps it, and here nothing is retired and the text was wrong from
+the start.
 
 ## The gate
 
