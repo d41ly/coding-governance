@@ -169,7 +169,7 @@ ids KICK-dKeptSession-85 KICK-dKeptSession-86 KICK-dKeptSession-87 KICK-dKeptSes
 | [KICK-dKeptSession-80 — the run branch reconciled with origin/main at 525f3ab97 in one merge commit, each conflict resolved by its kind](spec/2026-11-23-spec-KICK-dKeptSession-80.md) | 38 | 2 | CLOSED | rev-2 | 2026-11-24 |
 <!-- /gen:build-units -->
 
-Records: 538 bound to this build, across 4 record folder(s).
+Records: 539 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
