@@ -1701,6 +1701,22 @@ def test_crlf_working_copy_is_not_drift():
         cleanup(root)
 
 
+def check_skill_description(text):
+    """The Skill AUGMENTS shell `grep` and `git grep`, never replaces or intercepts them. Not
+    editorial: this is what keeps the skill off ordinary code search, which they already do
+    correctly. `text` is a whole Skill. No search tool is named anywhere in it, the body's fallback
+    included, so the skill steers no session to one; the tokens are the description's alone
+    (TOOL-dBoundRoles-60 S21). Undecorated, and importing inside the body, so a probe loads this one
+    function by `ast` with no import of the module and no suite run (S22)."""
+    import re  # noqa: PLC0415 — the function is loaded alone, so the module's import is out of reach
+    parts = text.split("---")
+    assert len(parts) >= 3, "no YAML frontmatter in the rendered skill"
+    named = sorted(set(re.findall(r"\b(?:Grep|Glob)\b", text)))
+    assert not named, f"the description names a search tool: {named}"
+    for token in ("git grep", "ordinary code search", "ADDS retrieval"):
+        assert token in parts[1], f"the description dropped {token!r}"
+
+
 @check("the rendered Skill augments grep, prints only real flags, and claims no kickoff step")
 def test_skill_description_invariants():
     """AC18's three invariants, all of one class: the description is the whole trigger mechanism.
@@ -1717,17 +1733,10 @@ def test_skill_description_invariants():
         copy_extra(kitdir, *SURFACE)
         assert adopt(root, kitdir, "--scaffold").returncode == 0
         text = (root / SKILL_REL).read_text(encoding="utf-8")
-        parts = text.split("---")
-        assert len(parts) >= 3, "no YAML frontmatter in the rendered skill"
-        desc = parts[1]
 
-        # 1. AUGMENTS shell `grep` and `git grep`, never replaces or intercepts them. Not
-        #    editorial: this is what keeps the skill off ordinary code search, which they already
-        #    do correctly. Neither search tool is named, so the skill steers no session to one.
-        named = sorted(set(re.findall(r"\b(?:Grep|Glob)\b", desc)))
-        assert not named, f"the description names a search tool: {named}"
-        for token in ("git grep", "ordinary code search", "ADDS retrieval"):
-            assert token in desc, f"the description dropped {token!r}"
+        # 1. AUGMENTS shell `grep` and `git grep`, and names neither search tool.
+        check_skill_description(text)
+        desc = text.split("---")[1]
 
         # 2. Every flag printed beside an invocation is one query.py parses.
         bad = sorted({

@@ -89,7 +89,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 64 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 64 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
@@ -155,7 +155,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-56 — the three readers of a spec's H1 share one fence rule: `parse_spec_h1` and KICK R4 move with `checkBuildable` onto the length rule, and one fixture set sees one id from all three](spec/2026-10-26-spec-TOOL-dBoundRoles-56.md) | 31 | 2 | CLOSED | rev-3 | 2026-11-24 |
 | [TOOL-dBoundRoles-57 — the memory-recall kit's description invariant follows the Skill off the refused tools: augments shell `grep` and `git grep`, and names neither search tool](spec/2026-10-26-spec-TOOL-dBoundRoles-57.md) | 31 | 2 | CLOSED | rev-3 | 2026-11-24 |
 | [TOOL-dBoundRoles-58 — the 35 minors of auditing units 45 to 51: criteria passable on a correct build, one typed set and one block reader at spawn, one extents record at render, the H1 parity's consumers, and AMENDED answers naming a revision](spec/2026-10-26-spec-TOOL-dBoundRoles-58.md) | 32 | 2 | CLOSED | rev-7 | 2026-11-24 |
-| [TOOL-dBoundRoles-60 — the round-1 audit of units 52 to 58, its 37 minors: criteria that can fail and can pass, arms observed where their code lives, one read-key parse, floors moved with their arms, and write sets that name every file a pass writes](spec/2026-10-26-spec-TOOL-dBoundRoles-60.md) | 33 | 2 | INPROGRESS | rev-9 | 2026-11-24 |
+| [TOOL-dBoundRoles-60 — the round-1 audit of units 52 to 58, its 37 minors: criteria that can fail and can pass, arms observed where their code lives, one read-key parse, floors moved with their arms, and write sets that name every file a pass writes](spec/2026-10-26-spec-TOOL-dBoundRoles-60.md) | 33 | 2 | CLOSED | rev-9 | 2026-11-24 |
 | [TOOL-dBoundRoles-62 — the spawn guard's suite carries the floor unit 60's AC15 checks, and AC15 refuses a suite with no floor and names its units suite by suite](spec/2026-10-26-spec-TOOL-dBoundRoles-62.md) | 34 | 2 | DEFERRED | rev-5 | 2026-11-24 |
 | [TOOL-dBoundRoles-63 — the round-1 audit of units 59 and 60, its 19 minors: a floor sum that counts its base, criteria that can fail on the text they retire, observations on a tree that imports, and write sets that name every file](spec/2026-10-26-spec-TOOL-dBoundRoles-63.md) | 35 | 2 | DEFERRED | rev-6 | 2026-11-24 |
 | [TOOL-dBoundRoles-64 — the round-1 audit of units 61 to 63, its 32 minors: floors at the executed count naming every unit, a negative case inverting its verdict, criteria failing on the text they retire, no stray worktree, and an edge per bumped spec](spec/2026-10-26-spec-TOOL-dBoundRoles-64.md) | 36 | 2 | DEFERRED | rev-5 | 2026-11-24 |
@@ -166,7 +166,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-3 | 2026-11-24 |
 <!-- /gen:build-units -->
 
-Records: 528 bound to this build, across 4 record folder(s).
+Records: 530 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

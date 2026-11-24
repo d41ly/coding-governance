@@ -3046,7 +3046,8 @@
       "{prefix}/lib/",
       "{prefix}/unattended/unattended.sh",
       "skills/session-kickoff/",
-      "{prefix}/policy/"
+      "{prefix}/policy/",
+      "{prefix}/memory-tree/tree_lib.py"
     ],
     "chunk": "selftests",
     "subject": "kit",

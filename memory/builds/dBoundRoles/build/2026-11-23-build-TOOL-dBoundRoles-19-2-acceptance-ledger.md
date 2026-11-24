@@ -20,3 +20,14 @@ on its staged break, and the legs section 7 lists are owed to the main loop at t
 - AC4 — `role.gov-nobody` — the new arm's program printed `ac4-clean 1`, then `ac4-nobody 1` and `ac4-heading 1`: `check_roles.py` over a fixture commit whose overlay holds a level-5 unit selecting `role.gov-nobody`, and over one whose unit text carries a `## ` line, each exited 1 with an R10 line naming the unit's tag. OWED: arm 47's `ac4-` lines and the `roles catalogue` leg over gov's tree at the close.
 - AC5 — `spec-write` — `grep -n "house/" kit.toml` in `tools/roles/` prints `house/policy.toml` as the only include under a seed rule, the rest the step row's comment and `surfaces`; `python tools/roles/handoff.py stage-efforts spec-write` printed the same levels over the base clone and over this worktree. OWED: the `policy fixtures` leg at the close.
 - AC6 — `instructions.toml` — `grep -n "roles/house/<" help/roles.md` prints nothing, and `grep -n "instructions.toml" help/roles.md` names the "Change how a role behaves" entry saying a role's project rules are a level-5 overlay unit selecting it. OWED: nothing beyond the legs section 7 lists at the close.
+
+## The deletion's criterion, AC7, added on top by TOOL-dBoundRoles-60
+
+`TOOL-dBoundRoles-60` S27 gives this unit the criterion unit 55's AC2 names as its after half, and its deviation record
+`memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-60-deviation-604.md` holds the text. This unit's
+spec is CLOSED and frozen and numbers no AC7, and the acceptance-ledger check refuses a label its spec does not number,
+so the answer stands under this heading rather than in the block above.
+
+OBSERVED: `grep -n 'derive_overlay_expected' tools/govkit/selftest.py` printed nothing over the file as this unit's
+pass commit `bfccd9126` leaves it and over the tree at `ae8fc1f65`, and printed the definition, its call, the comment
+and the docstring at the pass commit's parent `7dae6faf2`.

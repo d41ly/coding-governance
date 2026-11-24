@@ -236,15 +236,17 @@ opens with `blob:`, `record:` or `cmd:`, and a well-formed anchor is the whole k
 fact this work order hands``, each span once in first-seen order, and writes nothing. `render_handoff` calls it over
 the graded text, after the fence check and before the marker is hashed, `handed` the keys of the facts that work
 order hands, so a planted anchor to nothing refuses the render with exit 1, naming every such anchor, and no file is
-written; the key refusals raise first, before the section is assembled. The graded text is the `## Task` section
-composed a second time from the same parts the render appended (TOOL-dBoundRoles-41), never cut from the composed
-bytes: the authored text is graded, the opening, every `### framing:` block, the upstream rows block, the item's
+written; the key refusals raise first, before the section is assembled. The graded text is the composed
+`## Task` section with the content of every handed block left out, cut by `roles_lib.render_graded_section` over the
+one extents record `handoff.derive_block_extents` builds and `check_block_fences` reads too (TOOL-dBoundRoles-41,
+TOOL-dBoundRoles-58): the authored text is graded, the opening, every `### framing:` block, the upstream rows
+block, the item's
 blocks around their inputs, and the value of every typed `--input`, so a grammar span quoted in a typed value such as
 `--input diff=` is graded and refuses, since that value is authored for the order; its remedy is to hand the file as
 `input:spec` or to fence the quotation. The handed content is left out of the graded text, each handed block keeping
 its `### <key>` heading and its fact line: the content of a path input (`spec`, `prompt`, `code`), of a card `task:`
 or `card:` value, of a `brief:` section, of every excerpt an item's `### inputs` block holds, of `input:work-order`,
-and the practices and card blocks that lead the task, each kept as its heading alone. A handed spec quoting the key
+and the practices and card blocks that lead the task, each kept as its first line alone. A handed spec quoting the key
 grammar in its prose therefore renders, whether or not its fence parses. The marker still hashes the whole section.
 A handed block's own fact line is no backticked span, so a correct order refuses nothing. WHAT THIS DOES NOT SEE: a
 reference without the key shape, such as "see the spec's §4", which is prose; whether the fact behind a resolving
@@ -457,7 +459,8 @@ The hook is `return-check.sh`, wired by `return-check.fragment.json` (event `Sub
 check-return` with the payload on stdin. `check-return` grades a direct spawn's return only
 (TOOL-dBoundRoles-39), by two tests run first, before the role is loaded or any record is read:
 a direct spawn's `agent_transcript_path`, separators folded to `/`, holds no `/subagents/workflows/` pair,
-the harness folder `handoff.resolve_subagent_dir` spells, the file's one spelling of the session layout,
+the harness folder under which `handoff.resolve_agent_transcript` places a run's agent, the file's one spelling of
+the session layout,
 and a direct spawn's first `user` record opens with a marker line `roles_lib.extract_prompt_marker` parses.
 A harness stage's return is graded by its stage schema instead: its stop, and any stop failing either test,
 one with no transcript path or an unreadable first record included, exits 0 printing nothing, writes no
