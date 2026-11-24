@@ -1082,7 +1082,10 @@ version, so after a bump an input still pinned at the old version is refused unt
   `patch-actor-repo`, `patch-actor-gov`, `patch-allowance`, `supersede-floor`, `supersede-exit`, `exclude-needed`, `exclude-breakpoint`, `patch-remove-need`,
   `patch-add-need`, `patch-routes`, `amended-cycle` (an `amends` whose added need closes a cycle the
   overlay text does not hold), `exit-unfixed`, `schema-absent` and `definition-uncommitted` (a
-  first install's state, where the render composes no item and refuses nothing).
+  first install's state, where the render composes no item and refuses nothing). The rest run the
+  `declaration` command below in place of `check` and exit 0 when each run answers as owed:
+  `declaration-repo`, `declaration-inputs`, `declaration-actor`, `declaration-join` (a declaration for
+  every composed item, the two counts printed), `declaration-refused` and `declaration-unarmed`.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
   ```bash
@@ -1129,9 +1132,14 @@ and `seed-scope` show a refusal and each source.
 **Read one item's declaration:** `python tools/loop/loop_lib.py declaration --item item.build.unit-pass --json` <!-- usage: script:tools/loop/loop_lib.py#declaration f5755a0f -->
 prints that item as one line of JSON: its `tag`, `actor`, `step`, `outcomes` (the disposition set
 where the row names it), `witness`, and its `inputs`, `allowance` and `returns`, a role item's
-absent ones taken from its role, with `source` saying where each came from. The roles kit's handoff
-renderer runs it to cut a work order for one item. An item no row declares exits 1 naming the tag,
-and so does a definition that does not read; both print on stderr.
+absent ones taken from its role, with `source` saying where each came from. The row and the role are
+the composed ones of your repository at its last commit: an item your overlay adds, a patch it makes to
+one of gov's, and a role it declares all count, and an actor `role:adopter.<name>` takes its fields from
+your role `<name>`. Where the item kind does not compose at all, gov's own rows answer. A `--root`
+directory names the repository, which is otherwise the one the working directory sits in. The roles
+kit's handoff renderer runs it to cut a work order for one item. It exits 1 with one line on stderr for an
+item no composed row declares, naming the tag; a definition that does not read; a composition that refuses;
+an `adopter.` actor whose name a gov role holds; and a directory in no git work tree.
 
 **The one path-token rule.** Both sources read paths through the unattended driver, so one rule decides <!-- usage: verb:unattended.sh:--path-tokens ee31c658 -->
 what a path is: `bash tools/unattended/unattended.sh --path-tokens` prints each backticked span of the

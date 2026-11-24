@@ -94,7 +94,7 @@ gives its absent `inputs` the role's `reads` split on commas, its absent `allowa
 naming each field's source. The catalogue is
 `read_role_defaults(kit_dir)`: the roles kit found by `resolve_kit_dir` from this directory, its
 `roles_lib` imported inside the function and `load_roles` of that directory returned, or None and
-why. A role item's explicit field equal to its role's is refused as a copy, and its explicit
+why; handed a repository's root it returns that repository's composed roles instead. A role item's explicit field equal to its role's is refused as a copy, and its explicit
 `allowance` may only be `none`, a narrowing: the role item's write set is its role's or nothing. A
 slot the catalogue lacks prints `pending`; where the roles kit does not resolve, every role item
 prints `unarmed`. Neither is a refusal, neither is green, and both are counted. The descriptor
@@ -863,7 +863,8 @@ python <prefix>/loop/factories.py --selftest
 | `check_program(data, where, layers)` | `{step tag: [item tags in needs order]}` once the item rows hold as each step's program |
 | `read_layer_tags(kit_dir)` | the playbook kit's layer tags; `LookupError` where that kit does not resolve |
 | `read_items(kit_dir)` | the `[[item]]` rows in file order, once `check_loop` and `check_program` hold |
-| `read_role_defaults(kit_dir)` | `(roles, "")`, the roles kit's catalogue as its `load_roles` reads it, or `(None, why)` where that kit does not resolve or read |
+| `read_role_defaults(kit_dir, root=None)` | `(roles, "")`, the roles kit's catalogue as its `load_roles` reads it, or, with `root`, the roles composed in the repository there, or `(None, why)` where that kit does not resolve or read; `LoopError` where that composition refuses |
+| `derive_composed_declaration(row, roles, members, where)` | the object the `declaration` verb prints for one composed item row, its role actor read at the slot it names; `LoopError` for an `adopter.` actor at a slot another tag holds |
 | `resolve_item_declaration(item, roles)` | `{inputs, allowance, returns, source}` of one item row, a role item's absent fields its role's, `source` per field `item`, `role:<slot>`, `pending` or `unarmed` |
 | `check_item_declarations(items, roles, why)` | `(lines, refusals)`: one `loop: item` line per item and the count line, and a refusal per actor, missing field, copy or widened allowance |
 | `derive_item_scope(kit_dir, root, tags, units=None)` | one `loop: scope` line per item, its load set as `load_sets.py derive` lists it, or `unarmed` |
@@ -976,13 +977,18 @@ drive rows by `order` and pick each role's practices by its reach word.
   Exit 0, 1 on a refusal, 2 on usage or a site outside `DECLARATION_SITES`. It reads the list in this
   directory and runs no git. The unattended kit's check 53 calls it, which is why that kit requires
   this one.
-- `python loop_lib.py declaration --item <item tag> --json` prints one item's declaration as one line of
-  sorted JSON (TOOL-dBoundRoles-3 §8 F5, F6): `resolve_item_declaration`'s `inputs`, `allowance`,
-  `returns` and `source` for the row, a role item's absent fields its role's through `read_role_defaults`,
-  beside the row's `tag`, `actor`, `step`, `outcomes` as `read_outcome_set` resolves them, and `witness`.
-  The rows are read through `read_items`, so the definition is checked first. Exit 0; 1 on stderr naming
-  the tag for an item no row declares, or on a definition that does not hold; 2 on usage. The roles kit's
-  `handoff.py render --item` runs it as a subprocess to cut one item's work order.
+- `python loop_lib.py declaration --item <item tag> --json [--root <dir>]` prints one composed item's
+  declaration as one line of sorted JSON (TOOL-dBoundRoles-3 §8 F5, F6; TOOL-dBoundRoles-91):
+  `resolve_item_declaration`'s `inputs`, `allowance`, `returns` and `source` for the row, a role item's absent
+  fields its role's through `read_role_defaults`, beside the row's `tag`, `actor`, `step`, `outcomes` as
+  `derive_outcome_set` derives them, and `witness`. Gov's definition is checked through `read_items` first; the
+  row is then the composed one `read_composed_items` answers for the git work tree holding `--root`, the working
+  directory where absent, at its HEAD, so an item, a patch or a role of the repository's overlay counts, and gov's
+  row where the composition is unarmed. An actor `role:adopter.<name>` takes the fields of the composed role whose
+  slot is `<name>`, its `source` naming that slot. Exit 0; 1 on stderr naming the tag for an item no composed row
+  declares, or on a definition or a composition that does not hold, an `adopter.` actor at a slot another role's
+  tag holds, or a directory in no git work tree; 2 on usage. The roles kit's `handoff.py render --item` runs it as a
+  subprocess to cut one item's work order. `loop_items.py`'s `declaration-` plants show each answer.
 - `bash adopt-loop.sh --check` runs the first through the resolved python. The kit renders
   nothing, so its adopter has no `--scaffold`.
 

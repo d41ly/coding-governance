@@ -73,9 +73,10 @@ tag in the `item.<step>.<name>` shape or `-` without it, a malformed tag refused
 the shape is checked first. A marker written before `item=` still parses, every reader taking its fields
 by group name.
 THE WORK ORDER PER ITEM (TOOL-dBoundRoles-3): with `--item`, the render reads the item's declaration from the
-loop kit, its `loop_lib.py declaration --item <tag> --json` run in a subprocess under a bound, the kit found
-by `resolve_kit_dir`, and refuses with exit 1, writing nothing, an item the loop does not declare, one whose
-actor is not `role:<the --role slot>`, and no loop kit. The task then closes, after the `reads` blocks, with
+loop kit, its `loop_lib.py declaration --item <tag> --json --root <the repository>` run in a subprocess under a
+bound, the kit found by `resolve_kit_dir`, so the item is the repository's composed one (TOOL-dBoundRoles-91), and
+refuses with exit 1, writing nothing, an item no composed row declares, a composition that refuses, one whose actor
+names another slot than `--role`'s, `role:adopter.<name>` naming the slot `<name>`, and no loop kit. The task then closes, after the `reads` blocks, with
 five blocks, `roles_lib.WORK_ORDER_BLOCKS`: `### item`, the tag, its step and its outcome set; `### inputs`,
 each of the item's inputs handed as content under its own `### <field tag>` heading, its fact line two below
 and its content fenced after it, an optional one the render cannot resolve named on the `Not supplied` line; `### allowance`, the path
@@ -775,19 +776,20 @@ def print_input_facts(root, memory_root, slug, inputs):
     write_json_line(facts)
 
 
-def read_item_declaration(item, role):
-    """The declaration of the item `item` as the loop kit's `loop_lib.py declaration --item <tag> --json` prints it,
-    run in a subprocess with stdin closed under `DECLARATION_BOUND_S`, the kit found by
-    `resolve_kit_dir("loop", "loop_lib.py", KIT_DIR)` (TOOL-dBoundRoles-3 S1, §8 F5, F6). RolesError naming the
-    loop kit where none resolves or its verb does not answer, the tag with the verb's first line where it exits
-    non-zero, and the item's actor where it is not `role:<role>`."""
+def read_item_declaration(item, role, root):
+    """The declaration of the item `item` as the loop kit's `loop_lib.py declaration --item <tag> --json --root <root>`
+    prints it, the item as the repository at `root` composes it (TOOL-dBoundRoles-91 S5), run in a subprocess with
+    stdin closed under `DECLARATION_BOUND_S`, the kit found by `resolve_kit_dir("loop", "loop_lib.py", KIT_DIR)`
+    (TOOL-dBoundRoles-3 S1, §8 F5, F6). RolesError naming the loop kit where none resolves or its verb does not
+    answer, the tag with the verb's first line where it exits non-zero, and the item's actor where the slot
+    `lib.derive_repository_slot` derives from it is not `role`, so `role:adopter.<name>` is the role `<name>`'s."""
     try:
         script = lib.resolve_kit_dir("loop", "loop_lib.py", KIT_DIR) / "loop_lib.py"
     except LookupError as e:
         raise lib.RolesError("--item %s: no loop kit declares the item — %s" % (item, e))
     try:
-        r = subprocess.run([sys.executable, str(script), "declaration", "--item", item, "--json"],
-                           stdin=subprocess.DEVNULL, capture_output=True, encoding="utf-8", errors="replace",
+        r = subprocess.run([sys.executable, str(script), "declaration", "--item", item, "--json",
+                            "--root", str(root)], stdin=subprocess.DEVNULL, capture_output=True, encoding="utf-8", errors="replace",
                            timeout=DECLARATION_BOUND_S, env=dict(os.environ, PYTHONIOENCODING="utf-8"))
     except (OSError, subprocess.TimeoutExpired) as e:
         raise lib.RolesError("--item %s: the loop kit's %s declaration did not answer: %s" % (item, script.as_posix(), e))
@@ -798,9 +800,10 @@ def read_item_declaration(item, role):
         declaration, said = None, "its output is no JSON"
     if not isinstance(declaration, dict):
         raise lib.RolesError("--item %s: the loop kit's declaration verb exited %d: %s" % (item, r.returncode, said))
-    if declaration.get("actor") != "role:" + role:
+    actor = str(declaration.get("actor"))
+    if not actor.startswith("role:") or lib.derive_repository_slot("role." + actor[len("role:"):]) != role:
         raise lib.RolesError("--item %s is the item of %s, not role:%s: a work order is cut only for the role its "
-                             "item names" % (item, declaration.get("actor"), role))
+                             "item names" % (item, actor, role))
     return declaration
 
 
@@ -1059,7 +1062,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     # under `--for` both are the destination's, read by its own render
     declaration = prefixes = None
     if item is not None and for_role is None:
-        declaration = read_item_declaration(item, role)
+        declaration = read_item_declaration(item, role, root)
         conf = root / ".memory-tree.conf"
         prefixes = lib.derive_allowance(declaration, slug, allowance, memory_root,
                                         lib.read_conf_key(conf, "ROUTED_PATHS") if conf.is_file() else None)

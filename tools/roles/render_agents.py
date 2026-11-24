@@ -975,7 +975,7 @@ def check_frame_arm(state):
         saved = (handoff.KIT_DIR, handoff.WORK_ORDER, handoff.read_item_declaration, os.getcwd(),
                  {k: os.environ.get(k) for k in ("CLAUDE_CONFIG_DIR", "CLAUDE_CODE_SESSION_ID")})
         handoff.KIT_DIR, handoff.WORK_ORDER = kit, KIT_DIR / lib.WORK_ORDER_REL
-        handoff.read_item_declaration = lambda item, role: dict(declaration)
+        handoff.read_item_declaration = lambda item, role, root: dict(declaration)
         item = ("--role", "gov-builder", "--input", "spec=spec.md", "--item", "item.build.unit")
         try:
             os.chdir(root)

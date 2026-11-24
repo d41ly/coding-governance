@@ -49,7 +49,10 @@ write. The register's factory verb runs it: `python <prefix>/playbook/core.py ne
 the kits the check reaches from this working tree, loop, playbook, memory-tree, policy and roles, at
 their places under the tool root, committed, so a plant reads this tree's code and not HEAD's; it writes
 the plant, commits it, runs `check` there as a subprocess and relays its output and its exit, 1 where a
-step the plant owes beside `check` does not answer as owed. The cases are `PLANTS`.
+step the plant owes beside `check` does not answer as owed. The cases are `PLANTS`. A `declaration-` plant
+(TOOL-dBoundRoles-91) runs `loop_lib.py declaration` there in place of `check`, one `loop: fixture · declaration`
+line per run, and exits 0 where every run answers as owed, whatever the scratch's `check` would answer;
+`declaration-join` resolves every composed row instead, and counts the rows resolved beside the rows composed.
 
 `read_composed_items` is the composition's rows as `position.py` and `upstream.py` read them: gov's own
 rows where the composition is unarmed, ValueError where it refuses; given a revision, it reads the
@@ -130,6 +133,13 @@ PLANTS = {
     "role-layer": "gov items acting as role:gov-deployer and role:gov-prompt-writer, and the repository item "
                   "item.build.adopter.ship acting as role:gov-deployer",
     "role-core": "the same three items, each acting as role:gov-builder",
+    "declaration-repo": "the declaration of the repository item item.build.adopter.ship, acting as role:gov-builder",
+    "declaration-inputs": "the declaration of item.test.select under an amends adding one input",
+    "declaration-actor": "the declaration of item.build.unit-pass, its actor patched to role:adopter.triager beside "
+                         "that role's row, then of an item acting as role:adopter.gov-builder, which is refused",
+    "declaration-join": "those overlays at once, a declaration resolved for every composed item",
+    "declaration-refused": "the declaration of an item while item.test.select, which item.test.verdict needs, is excluded",
+    "declaration-unarmed": "the declaration of gov's item.test.select and of a repository item, the schema removed",
 }
 #: Each selftest case: the case, its owed exit, and the opening and needle of the line it owes.
 CASES = (("check", 0, "loop: items composed", "row(s)"),
@@ -158,7 +168,14 @@ CASES = (("check", 0, "loop: items composed", "row(s)"),
          ("schema-absent", 2, "loop: fixture · compose", "unarmed"),
          ("definition-uncommitted", 2, "loop: fixture · render after the commit", "gov:item"),
          ("role-layer", 1, "loop: refused", "layer.distribution"),
-         ("role-core", 0, "loop: item roles", "role item(s) graded"))
+         ("role-core", 0, "loop: item roles", "role item(s) graded"),
+         ("declaration-repo", 0, "loop: fixture · declaration · exit 0",
+          "item.build.adopter.ship · role:gov-builder · allowance product from role:gov-builder · outcomes done"),
+         ("declaration-inputs", 0, "loop: fixture · declaration · exit 0", "layer.flow:the fixture's added input"),
+         ("declaration-actor", 0, "loop: fixture · declaration · exit 1", "role.gov-builder holds"),
+         ("declaration-join", 0, "loop: fixture · declaration · exit 0", "declaration(s) resolved"),
+         ("declaration-refused", 0, "loop: fixture · declaration · exit 1", "the item composition does not read"),
+         ("declaration-unarmed", 0, "loop: fixture · declaration · exit 1", "no [[item]] row declares"))
 #: The render probe a plant runs in its scratch: the item rows `read_kind_rows` composes, or the `gov:item`
 #: lines of `render_delta_report`, argv[1] the scratch's playbook kit.
 RENDER_PROBE = """import pathlib, sys
@@ -173,6 +190,31 @@ else:
         print("refused: %s" % exc)
         sys.exit(1)
     print(sum(1 for ln in lines if "[gov:item " in ln))
+"""
+#: What the `declaration-` plants of TOOL-dBoundRoles-91 write: the repository item, the item whose actor the
+#: composed catalogue holds under gov's tag, the input an amends adds, and the repository role an actor patch names.
+SHIP_ITEM, CLASH_ITEM = "item.build.%s.ship" % ADOPTER, "item.build.%s.clash" % ADOPTER
+ADDED_INPUT = "layer.flow:the fixture's added input"
+TRIAGER = {"tag": "role.%s.triager" % ADOPTER, "name": "triager", "description": "Triages a request.",
+           "tools": ["Read"], "model": "inherit", "workflow": "triage", "layer": "layer.roles", "acts-as": "item",
+           "shapes": ["single"], "reads": ["field.input.spec"], "writes": ["none"], "rules": ["verify"],
+           "mandatory": "no", "output": "a triage line in its return", "agent": "true", "effort": "medium",
+           "budget": "4000", "return": "outcome:done|returned, why:text?",
+           "never": ["edits a file \u2014 unenforced \u2014 the role writes nothing"]}
+#: The join probe `declaration-join` runs in its scratch, argv[1] the scratch's loop kit: the tag of each composed
+#: row `derive_composed_declaration`, the verb's own resolution, gives a non-empty outcome set.
+DECLARATION_PROBE = """import pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import loop_lib
+from loop_items import read_composed_items
+kit, root = pathlib.Path(sys.argv[1]), pathlib.Path.cwd()
+data, where = loop_lib.read_definition(kit)
+members = loop_lib.check_loop(data, where)["dispositions"]
+roles, _why = loop_lib.read_role_defaults(kit, root)
+for row in read_composed_items(root):
+    got = loop_lib.derive_composed_declaration(row, roles, members, where)
+    if got["outcomes"]:
+        print(got["tag"])
 """
 
 
@@ -718,6 +760,66 @@ def derive_role_item(tag, actor):
             "routes": {"done": "item.build.exit"}}
 
 
+def run_scratch_declaration(top, argv):
+    """`(exit, stdout, stderr)` of the scratch's own loop kit in `top`, with the memory-tree kit's git leaks unset:
+    `loop_lib.py declaration --item <tag> --json --root <top>` where `argv` is a tag, else `DECLARATION_PROBE`."""
+    from loop_witness import read_clean_env
+    kit = top / pathlib.Path(derive_definition_rel()).parent
+    argv = (["-c", DECLARATION_PROBE, str(kit)] if argv is None else
+            [str(kit / "loop_lib.py"), "declaration", "--item", argv, "--json", "--root", str(top)])
+    p = subprocess.run([sys.executable, "-B", *argv], cwd=str(top), capture_output=True, text=True, encoding="utf-8",
+                       errors="replace", env=read_clean_env(PYTHONIOENCODING="utf-8"), timeout=300)
+    return p.returncode, p.stdout.strip(), p.stderr.strip()
+
+
+def run_declaration_plant(top, case):
+    """The runs of one `declaration-` plant over the scratch `top` (TOOL-dBoundRoles-91 S6), each printing its
+    `loop: fixture · declaration · exit <n> · <what it read>` line: -> what did not answer as owed."""
+    bad, gov = [], {r["tag"]: r for r in tomllib.loads((top / derive_definition_rel()).read_text(
+        encoding="utf-8"))["item"]}
+
+    def check_declared(tag, owed, *needles):
+        rc, out, err = run_scratch_declaration(top, tag)
+        got = json.loads(out) if rc == 0 else {}
+        source = got.get("source") or {}
+        line = err.split("\n")[0] if rc else "%s · %s · allowance %s from %s · outcomes %s · inputs %s from %s · " \
+            "returns %s from %s" % (got.get("tag"), got.get("actor"), got.get("allowance"), source.get("allowance"),
+                                    " ".join(got.get("outcomes") or ()), " | ".join(got.get("inputs") or ()),
+                                    source.get("inputs"), got.get("returns"), source.get("returns"))
+        print("%s: fixture · declaration · exit %d · %s" % (SAY, rc, line))
+        if rc != owed or (rc and out) or not all(n in line for n in needles):
+            bad.append("the declaration of %s exited %d, owed %d, no JSON beside a refusal and a line naming %s" % (
+                tag, rc, owed, " and ".join(map(repr, needles))))
+
+    if case == "declaration-repo":
+        check_declared(SHIP_ITEM, 0, SHIP_ITEM + " · role:gov-builder · allowance product from role:gov-builder · "
+                       "outcomes done ·")
+    elif case == "declaration-inputs":
+        check_declared("item.test.select", 0, ADDED_INPUT, *gov["item.test.select"]["inputs"])
+    elif case == "declaration-actor":
+        slot = TRIAGER["name"]
+        check_declared("item.build.unit-pass", 0, " · %s%s · allowance %s from role:%s · " % (
+            REPO_ROLE, slot, TRIAGER["writes"][0], slot), "inputs %s from role:%s" % (TRIAGER["reads"][0], slot),
+            "returns %s from role:%s" % (TRIAGER["return"], slot))
+        check_declared(CLASH_ITEM, 1, REPO_ROLE + "gov-builder", "role.gov-builder holds")
+    elif case == "declaration-refused":
+        check_declared("item.test.verdict", 1, "the item composition does not read")
+    elif case == "declaration-unarmed":
+        check_declared("item.test.select", 0, "item.test.select · %s · " % gov["item.test.select"]["actor"],
+                       *gov["item.test.select"]["inputs"])
+        check_declared(SHIP_ITEM, 1, "no [[item]] row declares %s" % SHIP_ITEM)
+    else:
+        rc, out, err = run_scratch_declaration(top, None)
+        code, payload, said = run_scratch_check(top, compose=True)
+        composed, resolved = sorted(r["tag"] for r in payload["rows"]) if code == 0 else [], sorted(out.split())
+        print("%s: fixture · declaration · exit %d · %d row(s) composed · %d declaration(s) resolved%s" % (
+            SAY, rc, len(composed), len(resolved), " · %s" % err.split("\n")[-1] if rc else ""))
+        if rc or code or resolved != composed or SHIP_ITEM not in composed:
+            bad.append("the join exited %d over a composition exiting %d %s, and resolved no declaration for: %s" % (
+                rc, code, " | ".join(said if code else ())[:200], " ".join(sorted(set(composed) - set(resolved))) or "none named"))
+    return bad
+
+
 def write_fixture_plant(top, case, pins, bad):
     """Write `case`'s plant in the scratch `top` and commit it, `pins` gov's item pins at the base; a step
     the plant owes beside `check` and does not answer as owed appends to `bad`."""
@@ -777,9 +879,21 @@ def write_fixture_plant(top, case, pins, bad):
         "patch-routes": render_patch_row("select-routed", "amends", "item.test.select", routes={"selected": "item.test.merge"}),
         "amended-cycle": render_patch_row("merge-after-verdict", "amends", "item.test.merge", add={"needs": [FLOOR_ITEM]}),
     }.get(case)
+    declared = {
+        "declaration-repo": ("ship",), "declaration-unarmed": ("ship",), "declaration-inputs": ("inputs",),
+        "declaration-actor": ("ship", "actor", "clash"), "declaration-join": ("ship", "inputs", "actor")}.get(case, ())
+    parts = {
+        "ship": lambda: render_item_row(derive_role_item(SHIP_ITEM, "role:gov-builder")),
+        "clash": lambda: render_item_row(derive_role_item(CLASH_ITEM, REPO_ROLE + "gov-builder")),
+        "inputs": lambda: render_patch_row("select-fed", "amends", "item.test.select", add={"inputs": [ADDED_INPUT]}),
+        "actor": lambda: render_item_row({
+            "tag": "item.build.%s.pass-triaged" % ADOPTER, "actor": REPO_ROLE + TRIAGER["name"],
+            "edges": "amends=item.build.unit-pass@%s" % pins["item.build.unit-pass"]})
+        + "\n" + render_item_row(TRIAGER).replace("[[item]]", "[[role]]", 1)}
+    text = text or "\n".join(parts[name]() for name in declared)
     if text:
         write_fixture_files(top, {OVERLAY: text})
-    if case == "exclude-needed":
+    if case in ("exclude-needed", "declaration-refused"):
         write_fixture_files(top, {POLICY_FILE: '[instructions]\nexclude = ["item.test.select"]\n'})
     elif case == "exclude-breakpoint":
         write_fixture_files(top, {POLICY_FILE: '[instructions]\nexclude = ["item.test.flakes"]\n\n'
@@ -792,7 +906,7 @@ def write_fixture_plant(top, case, pins, bad):
         if block not in body:
             raise ValueError("the schema holds no [[fixed-row]] block for item.build.exit as %r" % block)
         (top / schema).write_text(body.replace(block, ""), encoding="utf-8", newline="")
-    elif case == "schema-absent":
+    elif case in ("schema-absent", "declaration-unarmed"):
         (top / schema).unlink()
     elif case in ("role-layer", "role-core"):
         # TOOL-dBoundRoles-1 AC6: two gov items in the scratch definition and one repository item in its overlay.
@@ -832,6 +946,11 @@ def run_fixture(case, base):
         print("%s: fixture · FAIL · the plant %s could not be built: %s %s" % (
             SAY, case, exc, (getattr(exc, "stderr", "") or "").strip()[:300]))
         return 1
+    if case.startswith("declaration-"):
+        bad += run_declaration_plant(top, case)
+        for why in bad:
+            print("%s: fixture · FAIL · %s" % (SAY, why))
+        return 1 if bad else 0
     code, _payload, said = run_scratch_check(top)
     for line in said:
         print(line)
