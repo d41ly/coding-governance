@@ -182,8 +182,8 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113
 | [TOOL-dTotalRecall-86 — unit 76's S5 and S6 reads of unit 70's table and unit 46's strings are made again at verified revisions, so an unresolved pass is a red and never a count](spec/2026-10-26-spec-TOOL-dTotalRecall-86.md) | 36 | 2 | CLOSED | rev-3 | 2026-11-24 |
 | [TOOL-dTotalRecall-90 — units 82 to 84's S1 counts are read again with every line labelled and an unresolved pass printed red, and each decision they fed is made from its own line](spec/2026-10-26-spec-TOOL-dTotalRecall-90.md) | 36 | 2 | CLOSED | rev-3 | 2026-11-24 |
 | [TOOL-dTotalRecall-88 — the round-7 minors: each reading of units 71 to 76 that observed nothing or two things is made once at the tip, and each gap it hid is closed](spec/2026-10-26-spec-TOOL-dTotalRecall-88.md) | 37 | 2 | CLOSED | rev-4 | 2026-11-24 |
-| [TOOL-dTotalRecall-91 — unit 69's AC1 is answered only from a read in which C5 ran, classified by the read's exit status and the checks that failed before it](spec/2026-10-26-spec-TOOL-dTotalRecall-91.md) | 37 | 2 | INPROGRESS | rev-3 | 2026-11-24 |
-| [TOOL-dTotalRecall-93 — the write-once probe counts a deviation record under the unit its own file stem names, never under its Departs from address](spec/2026-10-26-spec-TOOL-dTotalRecall-93.md) | 37 | 2 | DEFERRED | rev-2 | 2026-11-24 |
+| [TOOL-dTotalRecall-91 — unit 69's AC1 is answered only from a read in which C5 ran, classified by the read's exit status and the checks that failed before it](spec/2026-10-26-spec-TOOL-dTotalRecall-91.md) | 37 | 2 | DEFERRED | rev-3 | 2026-11-24 |
+| [TOOL-dTotalRecall-93 — the write-once probe counts a deviation record under the unit its own file stem names, never under its Departs from address](spec/2026-10-26-spec-TOOL-dTotalRecall-93.md) | 37 | 2 | INPROGRESS | rev-2 | 2026-11-24 |
 | [TOOL-dTotalRecall-94 — the write-once probe is seen to count the real records: a census over every unit holding one, seen red on unit 90's probe, and a fixture of the records' own shape](spec/2026-10-26-spec-TOOL-dTotalRecall-94.md) | 37 | 2 | DEFERRED | rev-2 | 2026-11-24 |
 | [TOOL-dTotalRecall-95 — a record of unit 59's absorbs departure carries one key, `pass(59)` with the string, whichever unit writes it, so every counter of it counts the same records](spec/2026-10-26-spec-TOOL-dTotalRecall-95.md) | 37 | 2 | DEFERRED | rev-2 | 2026-11-24 |
 | [TOOL-dTotalRecall-89 — unit 88's AC13 is answered on both arms of unit 83's decision, so no record of unit 59 is written or kept to satisfy a count the decision rules out](spec/2026-10-26-spec-TOOL-dTotalRecall-89.md) | 38 | 2 | DEFERRED | rev-3 | 2026-11-24 |
@@ -195,7 +195,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-2 | 2026-11-24 |
 <!-- /gen:build-units -->
 
-Records: 868 bound to this build, across 4 record folder(s).
+Records: 869 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -303,7 +303,7 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-24-prompt-TOOL-dTotalRecall-99-reground-spec-writer.md`, `2026-11-24-prompt-TOOL-dTotalRecall-99-reground-brief.md` and 399 more under prompts/ |
+| briefs | `2026-11-24-prompt-TOOL-dTotalRecall-99-reground-spec-writer.md`, `2026-11-24-prompt-TOOL-dTotalRecall-99-reground-brief.md` and 400 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-24-build-TOOL-dTotalRecall-65-deviation-1012.md`, `2026-11-24-build-TOOL-dTotalRecall-38-deviation-1013.md` and 148 more under build/ |
 | red-fix | `2026-11-24-build-TOOL-dTotalRecall-60-red-fix-26.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md` and 24 more under build/ |
