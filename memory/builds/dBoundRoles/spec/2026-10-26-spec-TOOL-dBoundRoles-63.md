@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-63 — the round-1 audit of units 59 and 60, its 19 minors: a floor sum that counts its base, criteria that can fail on the text they retire, observations on a tree that imports, and write sets that name every file
 
-**Status:** DEFERRED · rev-6 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-6 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -19,6 +19,7 @@
 | [2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md) | journal | TOOL-dBoundRoles-43 TOOL-dBoundRoles-50 TOOL-dBoundRoles-56 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-11-23-prompt-TOOL-dBoundRoles-63-2-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-63-2-spec-writer.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief.md) | journal | TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-11-24-prompt-TOOL-dBoundRoles-63-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-63-build-brief.md) | journal | — |
 | [2026-10-26-review-TOOL-dBoundRoles-61-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-61-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 |
 
 <!-- /gen:spec-records -->
