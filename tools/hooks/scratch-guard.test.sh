@@ -1783,6 +1783,20 @@ SG7_PRELOAD="$SG_TMP_N/sw7throw.js"
 run_shell_write "BR7-AC7 a throw in the arm, gov-builder -> deny naming the shell-write arm" 2 "any;;the shell-write arm threw" gov-builder "sed -i 's/a/b/' a.py" session_id=sgtest-o1 agent_id=a7
 run_shell_write "BR7-AC7 a throw in the arm, the main loop -> allow, stderr EMPTY" 0 empty - "sed -i 's/a/b/' a.py" session_id=sgtest-o1
 unset SG7_PRELOAD
+# check_program_rows <label> <file> — count a node program's printed `ok ` and `FAIL ` rows; its last line is
+# `rows <count>`, and a program that printed none, or a line of another shape, fails.
+check_program_rows() {
+  local l rows=0
+  while IFS= read -r l; do
+    case $l in
+      ok\ *) echo "$l"; pass=$((pass+1)) ;;
+      rows\ *) rows=${l#rows } ;;
+      FAIL\ *) echo "$l"; fail=$((fail+1)) ;;
+      *) echo "FAIL $1 printed: $l"; fail=$((fail+1)) ;;
+    esac
+  done < "$2"
+  [ "$rows" -gt 0 ] || { echo "FAIL $1 printed no row count"; fail=$((fail+1)); }
+}
 # ---- TOOL-dBoundRoles-86: the spelling family. One node program calls checkShellWrites over the write --
 # ---- gate's fixture: each row is a verdict, a role, a tool and a spelling whose @ is the target, run at --
 # ---- a path of the fixture outside the role's class, and at a path in no repository, which is null under -
@@ -1845,18 +1859,73 @@ for (const [verdict, role, tool, spelling] of rows) {
 console.log(`rows ${rows.length * 2}`)
 SW86
   node "$TMP/sw86.js" "$HOOK" "$SG_CWD_WT" "$SGP/sw86.py" "$SG_NOREPO_FWD/sw86.py" > "$TMP/sw86.out" 2>&1
-  local l rows=0
-  while IFS= read -r l; do
-    case $l in
-      ok\ *) echo "$l"; pass=$((pass+1)) ;;
-      rows\ *) rows=${l#rows } ;;
-      FAIL\ *) echo "$l"; fail=$((fail+1)) ;;
-      *) echo "FAIL BR86 the spelling family printed: $l"; fail=$((fail+1)) ;;
-    esac
-  done < "$TMP/sw86.out"
-  [ "$rows" -gt 0 ] || { echo "FAIL BR86 the spelling family printed no row count"; fail=$((fail+1)); }
+  check_program_rows "BR86 the spelling family" "$TMP/sw86.out"
 }
 scan_shell_spellings
+# ---- TOOL-dBoundRoles-87: the reserved words. One node program reads the exported list and, per entry, --
+# ---- calls checkShellWrites over the write gate's fixture: a deny of its spelling, W being a `sed -i` of a
+# ---- path outside the role's class, and the admit twin, where the word is an argument. A list entry with -
+# ---- no spelling, and a spelling with no entry, each fail by name. The two named-coproc rows and the -----
+# ---- polling rows stand beside them. With `reserved: true` cut from scanWriteTargets' call every deny row
+# ---- reads null; with `coproc` and `function` cut from the list their spellings have no entry; with a ----
+# ---- loop that steps neither, the polling rows naming a P row read null. ---------------------------------
+check_reserved_words() {
+  cat > "$TMP/sw87.js" <<'SW87'
+const [hook, top] = process.argv.slice(2)
+const g = require(hook)
+const target = 'sw87.py'
+const W = `sed -i s/a/b/ ${target}`
+const spellings = {
+  '!': `! ${W}`,
+  '{': `{ ${W}; }`,
+  do: `for f in a; do ${W}; done`,
+  then: `if :; then ${W}; fi`,
+  else: `if :; then :; else ${W}; fi`,
+  elif: `if :; then :; elif ${W}; then :; fi`,
+  if: `if ${W}; then :; fi`,
+  while: `while ${W}; do :; done`,
+  until: `until ${W}; do :; done`,
+  coproc: `coproc ${W}`,
+  function: `function f { ${W}; }`,
+}
+const list = Array.isArray(g.SHELL_RESERVED_WORDS) ? g.SHELL_RESERVED_WORDS : []
+let rows = 0
+const put = (ok, name, got) => {
+  rows++
+  console.log(`${ok ? 'ok  ' : 'FAIL'} BR87 ${name}${ok ? '' : ` (read ${JSON.stringify(got)})`}`)
+}
+const check = (verdict, word, cmd) => {
+  let got
+  try { got = g.checkShellWrites(cmd, { tool_name: 'Bash', cwd: top, agent_type: 'gov-researcher', session_id: 'sgtest-o1' }, {}) } catch (e) { got = { threw: String(e) } }
+  put(verdict === 'admit' ? got === null : Boolean(got && got.deny && got.deny.toLowerCase().includes(`/${target}`)), `${word}: ${JSON.stringify(cmd)} -> ${verdict}`, got)
+}
+for (const w of list) {
+  if (spellings[w] === undefined) { put(false, `${w}: an entry of SHELL_RESERVED_WORDS with no spelling here`, null); continue }
+  check('deny', w, spellings[w])
+  check('admit', w, `echo ${w} ${W}`)
+}
+for (const w of Object.keys(spellings)) if (!list.includes(w)) put(false, `${w}: a spelling whose word SHELL_RESERVED_WORDS lacks`, list)
+check('deny', 'a named coproc', `coproc N { ${W}; }`)
+check('admit', 'a named coproc', `echo coproc N { ${W}; }`)
+const polls = [
+  ['coproc sleep 30', 'P3'],
+  ['function f { sleep 30; }', 'P3'],
+  ['coproc while true; do sleep 1; done', 'P2'],
+  ['coproc tail -f x', 'P1'],
+  ['coproc cat x', null],
+  ['function sleep { :; }', null],
+  ['sleep 1', null],
+]
+for (const [cmd, row] of polls) {
+  const got = g.checkPollWait(cmd)
+  put(row ? Boolean(got && got.row.startsWith(`${row} `)) : got === null, `polling: ${JSON.stringify(cmd)} -> ${row}`, got && got.row)
+}
+console.log(`rows ${rows}`)
+SW87
+  node "$TMP/sw87.js" "$HOOK" "$SG_CWD_WT" > "$TMP/sw87.out" 2>&1
+  check_program_rows "BR87 the reserved words" "$TMP/sw87.out"
+}
+check_reserved_words
 write_roles absent
 
 # ==================================================================================================
@@ -2380,8 +2449,10 @@ n=$((pass+fail))
 # hand under the same rule; a tree with no kickoff writer or no memory-tree kit skips them, as AC10's arm does.
 # 560 = 465 + the 95 rows TOOL-dBoundRoles-86 added (27 scan_targets rows, and the 68 rows its spelling family
 # prints, its count row printing only on a red), counted by hand under the same rule.
+# 591 = 560 + the 31 rows TOOL-dBoundRoles-87 added (a deny and an admit row for each of the 11 entries of
+# SHELL_RESERVED_WORDS, the 2 named-coproc rows and the 7 polling rows), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=560
+FLOOR_ASSERTIONS=591
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

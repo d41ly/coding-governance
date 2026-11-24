@@ -155,7 +155,8 @@
  * or `-m`, a Node `-e` or `-p` and `command -v` end the command, and a shell's `-c` and `env -S`
  * scan their body once. A shell option cluster takes one word for each `o` or `O` it carries
  * (TOOL-aTrimmedWait-6), so `-eo pipefail` steps past `pipefail`. The same arm refuses a role
- * agent's polling wait, read by `checkPollWait` with the shell's reserved words stepped: P1 tail
+ * agent's polling wait, read by `checkPollWait` with the shell's reserved words stepped, `coproc` and
+ * `function` with the name each takes among them (TOOL-dBoundRoles-87): P1 tail
  * follow, a `tail` carrying a follow option; P2 sleep in a loop, a `sleep` in a command holding a
  * `while` or `until` loop; P3 sleep at or over 5 s, a `sleep` of `POLL_SLEEP_FLOOR_S` or more, or
  * of a duration that does not read. A shell comment is read by no row. A gate row refusing the same command wins, and the background
@@ -187,7 +188,8 @@
  * `appendFileSync(`, PowerShell's `[IO.File]::WriteAllText(`) in a `python -c`, `node -e` or
  * `python -` / `node` heredoc, each `+++ b/` and `rename to` path of a `git apply` patch, and the
  * shapes checkCommand reads, a redirect through scanRedirects and the operands of a write word through
- * scanWriteOperands, each from its own simple command (TOOL-dBoundRoles-86) — places it against the
+ * scanWriteOperands, each from its own simple command (TOOL-dBoundRoles-86), its leading reserved words
+ * stepped as the polling rows step them (TOOL-dBoundRoles-87) — places it against the
  * payload `cwd`, and judges one in the session's repository with checkRouted on a synthetic `Write` of it, so the route arm, the role arm
  * and step 6b class it exactly as they class an `Edit`. Where the agent's work order, the first
  * `user` record of its transcript, hands an `### allowance` block in its `## Task` section
@@ -691,7 +693,7 @@ function scanWriteTargets(cmd, cwd, tool) {
     pairs.add(`${why}\0${value}`)
     found.push({ value, why })
   }
-  for (const c of scanCommandHeads(cmd, 0, { inline: true, tool })) {
+  for (const c of scanCommandHeads(cmd, 0, { inline: true, reserved: true, tool })) {
     if (c.redirect !== undefined) {
       addTarget(c.redirect, 'redirect')
       continue
@@ -2300,8 +2302,13 @@ const GATE_OPTION_RULES = {
 const GATE_RUNNERS = ['run-gates.sh', 'run-selftests.sh', 'run-unattended-gates.sh', 'pass-legs.sh']
 /** G3's admitting words: a render, a listing or a usage text runs no arm. */
 const GATE_SUITE_ADMITS = ['--render', '--list', '--help']
-/** The words the polling rows' scan steps before a head (TOOL-aTrimmedWait-6); the gate rows step none. */
-const SHELL_RESERVED_WORDS = ['!', '{', 'do', 'then', 'else', 'elif', 'if', 'while', 'until']
+/**
+ * The words the polling rows' scan (TOOL-aTrimmedWait-6) and the shell-write scan (TOOL-dBoundRoles-87)
+ * step before a head; the gate rows step none. A new word here owes its spelling in the suite.
+ */
+const SHELL_RESERVED_WORDS = ['!', '{', 'do', 'then', 'else', 'elif', 'if', 'while', 'until', 'coproc', 'function']
+/** The compound openers before which Bash reads the word after `coproc` as its name (TOOL-dBoundRoles-87). */
+const NAMED_COPROC = ['{', 'if', 'while', 'until']
 /** P3's floor in seconds: a flat `sleep` this long or longer is a poll. */
 const POLL_SLEEP_FLOOR_S = 5
 
@@ -2358,8 +2365,10 @@ function scanLauncherOptions(a, k, rule, depth, out, opts) {
  * first word after any `NAME=value`, any prefix word with its options, and `timeout` with its options and duration, then past a
  * launcher and its options, each stepped by GATE_OPTION_RULES through scanLauncherOptions: a shell's
  * `-c` scans its body ONCE as a command of its own, a shell's `-n` executes nothing, and a Python
- * `-c` or `-m` names no script — each ends the segment. With `opts.reserved` (TOOL-aTrimmedWait-6,
- * the polling rows alone) the prefix loop also steps a word of SHELL_RESERVED_WORDS.
+ * `-c` or `-m` names no script — each ends the segment. With `opts.reserved` (the polling rows,
+ * TOOL-aTrimmedWait-6, and the shell-write scan, TOOL-dBoundRoles-87) the prefix loop also steps a word
+ * of SHELL_RESERVED_WORDS; `function` takes the word after it, its name, and so does `coproc` where the
+ * word after that is in NAMED_COPROC and the first is no word of the list.
  * Returns `[{ text, head, argv, launched, reserved }]`, argv being the head and every word after it,
  * reserved the reserved words stepped. A `#` beginning a word, outside quotes and heredoc bodies,
  * blanks the rest of its line first, as the shell drops a comment (TOOL-aTrimmedWait-9).
@@ -2411,7 +2420,9 @@ function scanCommandHeads(cmd, depth = 0, opts = {}) {
     for (;;) {
       while (k < a.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(a[k])) k++
       if (opts.reserved && SHELL_RESERVED_WORDS.includes(a[k])) {
-        reserved.push(a[k++])
+        const w = a[k++]
+        reserved.push(w)
+        if (w === 'function' || (w === 'coproc' && NAMED_COPROC.includes(a[k + 1]) && !SHELL_RESERVED_WORDS.includes(a[k]))) k++
         continue
       }
       if (GATE_PREFIX_WORDS.includes(a[k])) {
@@ -3042,4 +3053,4 @@ function resolveKitDir(home, anchor, here) {
 // <<< resolveKitDir
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines, scanWriteTargets, checkShellWrites, readWorkOrderAllowance, checkRoutedEntry, checkDriverRead, RUN_ID_RE, WORKFLOW_RUNS_DIR, resolveSessionDir, KIT_AGENT_CAP_VERSION, extractBuildSlug, extractWorkflowArgs, HANDOFF_MARK_RE, extractHandoffMarker, resolvePolicyHelper, resolveKitDir }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkWriteClass, checkRoleClass, checkPollWait, SHELL_RESERVED_WORDS, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines, scanWriteTargets, checkShellWrites, readWorkOrderAllowance, checkRoutedEntry, checkDriverRead, RUN_ID_RE, WORKFLOW_RUNS_DIR, resolveSessionDir, KIT_AGENT_CAP_VERSION, extractBuildSlug, extractWorkflowArgs, HANDOFF_MARK_RE, extractHandoffMarker, resolvePolicyHelper, resolveKitDir }
