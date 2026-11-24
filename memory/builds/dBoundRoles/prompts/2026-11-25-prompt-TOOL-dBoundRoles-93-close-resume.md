@@ -2,6 +2,9 @@
 
 # Resume brief — the close of the dBoundRoles build run, after the closing review
 
+Decisions 2 and 3 below are answered in `../build/2026-11-25-build-TOOL-dBoundRoles-93-1-owner-ruling.md`: the one reconcile
+merge, yes, under its conditions; the flagged bar, no. Decision 1 stands open.
+
 Every unit of the roster is CLOSED, the closing review is CONVERGED, and the run stands at VERIFYING on
 `branch/unattended-dboundroles-62c3df`. The two earlier briefs, `2026-11-23-prompt-TOOL-dBoundRoles-51-resume-node-a.md` and
 `2026-11-24-prompt-TOOL-dBoundRoles-69-close-resume.md`, still hold the close's steps; this one replaces their state.
