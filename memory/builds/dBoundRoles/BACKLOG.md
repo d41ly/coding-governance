@@ -57,3 +57,10 @@
 - SEV · TOOL-dBoundRoles-78 · MED · a role's budget cannot be declared to widen as it rises, so unit 20 waits
 - SEV · TOOL-dBoundRoles-79 · MED · an exclusion of a role or leg another row requires passes, so unit 20 waits
 - SEV · TOOL-dBoundRoles-80 · MED · a role's house text cannot move into the overlay, so unit 19 waits
+- DEFERRED · TOOL-dBoundRoles-70 · until TOOL-dFurnishedOrders-6 · TOOL-dBoundRoles-13 is CLOSED and frozen, so its hand-off is corrected on top: the child build that specs the hook records the restated home when TOOL-dFurnishedOrders-6 builds, TOOL-dFurnishedOrders-14 beside it
+- DEFERRED · TOOL-dBoundRoles-71 · until TOOL-dFurnishedOrders-9 · TOOL-dBoundRoles-1 and TOOL-dBoundRoles-20 are CLOSED and frozen; TOOL-dFurnishedOrders-9 builds `check_role_coverage` and records the arm's restated owner there
+- DEFERRED · TOOL-dBoundRoles-72 · until TOOL-dFurnishedOrders-16 · `derive_attended` does not exist until TOOL-dFurnishedOrders-16 builds it; `resolve_owner_question` takes its answer there, TOOL-dBoundRoles-11 being CLOSED and frozen
+- DEFERRED · TOOL-dBoundRoles-73 · until TOOL-dFurnishedOrders-19 · TOOL-dBoundRoles-5 is CLOSED and frozen; TOOL-dFurnishedOrders-19 builds `render_return_schema` and records the restated owner there
+- CLOSED · TOOL-dBoundRoles-74 · by TOOL-dBoundRoles-1 · `3b479f2fe` writes the `plan` and `design` rows of the loop kit's `loop.toml`; the roles check exits 0 on the built tree, and on a scratch copy with the `plan` row taken out it prints R6, the workflow 'plan' has no row in the loop definition
+- DEFERRED · TOOL-dBoundRoles-75 · until TOOL-dWellOiledMachine-49 · no return carries a `breaker` field until TOOL-dWellOiledMachine-49's breaker writes one, so `route-refusal` has nothing to draw on before it
+- CLOSED · TOOL-dBoundRoles-76 · by TOOL-dBoundRoles-25 · spec 25's leg line names `run-gates gov canary` at its CLOSED revision, and `check-spec-tokens.py --spec` over it prints no gov-canary hit

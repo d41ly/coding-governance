@@ -697,9 +697,9 @@ check_arm "arm 10 a conf with its CHARTER line alone is unarmed, exit 2 naming M
 
 # ---- arm 11: the roles kit reads a prompt's marker and the charter's fence as the hooks kit does --
 # TOOL-aOrientedCast-25 S2 and S6, after arm 6's idiom: the hooks kit is found the derived way, and
-# with no hooks kit or no node the arm SKIPs, naming what is absent. It stays out of the floor. Part A
-# feeds five prompt variants to roles_lib.extract_prompt_marker and to the spawn guard; part B three
-# charter copies to roles_lib.extract_microformat_shapes and to format-guard's readCharterShapes.
+# with no hooks kit or no node the arm SKIPs, naming what is absent. Its floor status is stated once,
+# beside FLOOR_ASSERTIONS. Part A feeds five prompt variants to roles_lib.extract_prompt_marker and to the
+# spawn guard; part B three charter copies to roles_lib.extract_microformat_shapes and to format-guard's readCharterShapes.
 # WHAT IT DOES NOT COMPARE: a refusal's wording, any marker field beyond the whole line, and any head
 # but `agent` and `returned`.
 HK11=$("$PY" -B -c 'import sys
@@ -1084,9 +1084,9 @@ check_arm "arm 19 a model two profiles match exits 1 through both verbs, naming 
 # ---- policy, which holds `tfam` and `tven`, and by the hooks kit's `resolveModelProfile` over the
 # ---- index rendered from it: a profile's name, `-` for none, `!` for two. The list holds the empty
 # ---- id, `affable-1`, `atfam-1`, which holds `tfam` inside a longer word, and the two-profile
-# ---- `vendor-tfam-9`. It SKIPs as arm 6 does and stays out of the floor. The failing case, observed
-# ---- at the close and not by the pass that wrote this: a substring match in the hook, which answers
-# ---- `tfam` for `atfam-1`. WHAT IT DOES NOT CHECK: an id holding a letter outside ASCII.
+# ---- `vendor-tfam-9`. It SKIPs as arm 6 does; its floor status is stated once, beside FLOOR_ASSERTIONS.
+# ---- The failing case, observed at the close and not by the pass that wrote this: a substring match in the
+# ---- hook, which answers `tfam` for `atfam-1`. WHAT IT DOES NOT CHECK: an id holding a letter outside ASCII.
 A20_IDS=("" "affable-1" "atfam-1" "tfam9" "maker-tfam-9" "Maker-TFAM-9" "vendor-other-9" "vendor-tfam-9" "us.maker/x-tfam-9:0" "---")
 if [ -z "$HK" ]; then
   echo "SKIP arm 20 — no hooks kit holding scratch-guard.js was found from $KREL"

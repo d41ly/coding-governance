@@ -422,7 +422,6 @@ Cite ids, never line numbers.
 | [TOOL-cTracedPromise-4](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | check-memory-hygiene.test.sh printed an AUTHORED assertion count, stuck… |
 | [TOOL-cTracedPromise-5](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | an adopter who fills TRACE_CUTOFF before closing any spec after it reds… |
 | [TOOL-cTracedPromise-7](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | the unset-TRACE_CUTOFF row prints DEAD PROBE though --check ignores it:… |
-| [TOOL-dBoundRoles-27](../builds/dBoundRoles/BACKLOG.md) | INPROGRESS | MED | TOOL-dBoundRoles-69 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dBoundRoles-28](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE MARKER'S item= HAS NO WRITER IN THE SPEC WHO IS HANDED IT.… |
 | [TOOL-dBoundRoles-29](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | PLAY-dOrderedCharter-36's KIND SCHEMA HAS NO ROW-SCOPED fixed-by. A… |
 | [TOOL-dBoundRoles-30](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | PLAY-dOrderedCharter-11 S3 AND S4 READ A TABLE THIS BUILD DELETES. They… |
@@ -432,13 +431,11 @@ Cite ids, never line numbers.
 | [TOOL-dBoundRoles-34](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | TOOL-dDeclaredLoop-14's REFUSAL ROW CARRIES NO REMEDY OR ACTOR.… |
 | [TOOL-dBoundRoles-35](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | TOOL-dPlacedRequest-4's place --return READS AN UNCHECKED RETURN.… |
 | [TOOL-dBoundRoles-36](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | TOOL-dWitnessedBar-23 WRITES THE TESTER IN THE RETIRING ROLE SHAPE. Its… |
-| [TOOL-dBoundRoles-70](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE ANSWERED-CALL HOOK HAS TWO HOMES. TOOL-dBoundRoles-13 §3 hands the… |
-| [TOOL-dBoundRoles-71](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | ARM 2 OF THE ROLE MATRIX HAS NO SPEC IN ITS NAMED OWNER.… |
-| [TOOL-dBoundRoles-72](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE OWNER-QUESTION READER TAKES ATTENDANCE FROM ITS CALLER.… |
-| [TOOL-dBoundRoles-73](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PER-ORDER RETURN SCHEMA IS HANDED IN A CIRCLE. TOOL-dBoundRoles-5… |
-| [TOOL-dBoundRoles-74](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE plan WORKFLOW HAS NO LOOP ROW. TOOL-dBoundRoles-1 S4 adds the plan… |
-| [TOOL-dBoundRoles-75](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE BREAKER'S BUDGET DRAW HAS NO DRAWER. cl-dClosedLoop-0327 has an act… |
-| [TOOL-dBoundRoles-76](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE. TOOL-dWitnessedBar-84 S9 put… |
+| [TOOL-dBoundRoles-70](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dFurnishedOrders-6 | 2026-10-26 | THE ANSWERED-CALL HOOK HAS TWO HOMES. TOOL-dBoundRoles-13 §3 hands the… |
+| [TOOL-dBoundRoles-71](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dFurnishedOrders-9 | 2026-10-26 | ARM 2 OF THE ROLE MATRIX HAS NO SPEC IN ITS NAMED OWNER.… |
+| [TOOL-dBoundRoles-72](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | MED | TOOL-dFurnishedOrders-16 | 2026-10-26 | THE OWNER-QUESTION READER TAKES ATTENDANCE FROM ITS CALLER.… |
+| [TOOL-dBoundRoles-73](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dFurnishedOrders-19 | 2026-10-26 | THE PER-ORDER RETURN SCHEMA IS HANDED IN A CIRCLE. TOOL-dBoundRoles-5… |
+| [TOOL-dBoundRoles-75](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | MED | TOOL-dWellOiledMachine-49 | 2026-10-26 | THE BREAKER'S BUDGET DRAW HAS NO DRAWER. cl-dClosedLoop-0327 has an act… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | DEFERRED | MED | TOOL-dCalibratedLens-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
