@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-67 — unit 65's leftover sweep also selects the observation's worktrees by what they checked out, so a leftover at an unnamed `%TEMP%` path is found
 
-**Status:** DEFERRED · rev-2 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-2 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-11-24-build-TOOL-dBoundRoles-58-1-main-loop-decision.md](../build/2026-11-24-build-TOOL-dBoundRoles-58-1-main-loop-decision.md) | journal | TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-owner-review-stop.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-owner-review-stop.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-65-reground-q-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-65-reground-q-brief.md) | journal | TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
+| [2026-11-24-prompt-TOOL-dBoundRoles-67-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-67-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
