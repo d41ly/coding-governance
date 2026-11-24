@@ -141,9 +141,11 @@ reference; this page is the short version.
    `handoff.py stage-efforts <workflow> --model <id>` prints, where `<id>` is the session's own
    model id as its environment states it. A harness call at another level is refused by the spawn
    guard, which names the stage, both levels and that command; pass what it prints. A stage that
-   neither `roles` nor `efforts` names is refused too. A harness call also carries `retries`, what
-   `policy.py get roles.retries` prints: a stage outside a fan that returns nothing is spawned again
-   up to that many times, at most 4, and a value that is no integer in that range is refused.
+   neither `roles` nor `efforts` names is refused too. A build or review harness call also carries
+   `retries`, what `policy.py get roles.retries` prints: a stage outside a fan that only reads and
+   returns nothing is spawned again up to that many times, at most 4, and a value that is no integer
+   in that range is refused. A stage that writes is spawned once, the unit harness's builder included,
+   since one that returned nothing may already have written.
 7. **Each block carries its level.** With the playbook kit installed, every block a subagent gets
    sits in an envelope, `[<doc> · Level <n> · <direction>]` up to `[/<doc>]`, so it ranks them as
    the main session does. The agent file holds the charter at level 0 inside its own level 5. The

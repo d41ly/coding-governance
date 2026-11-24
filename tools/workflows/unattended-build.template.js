@@ -230,11 +230,11 @@ function chunk(a, n) {
 //                                                   //   dispatch.args; the three review keys go to the
 //                                                   //   audit's review call. An absent key runs at the
 //                                                   //   agent type's own level, else the session's.
-//   retries: <integer 0..4>,                        // optional (TOOL-dBoundRoles-5 S6): how often a
-//                                                   //   single-call stage returning nothing is spawned
+//   retries: <integer 0..4>,                        // optional (TOOL-dBoundRoles-5 S6): how often the
+//                                                   //   subject resolver, returning nothing, is spawned
 //                                                   //   again, as `policy.py get roles.retries` prints it;
-//                                                   //   forwarded in dispatch.args and to the audit's
-//                                                   //   review call. ABSENT reads 0 and logs that it did
+//                                                   //   forwarded to the audit's review call and never
+//                                                   //   to a unit. ABSENT reads 0 and logs that it did
 //   optIn: { "<opt-in lens>": "<default lens>" },   // optional (TOOL-dFairHearing-3): forwarded unchanged
 //                                                   //   to the audit's review call, never checked here:
 //                                                   //   the review harness's boundary is the one check.
@@ -626,10 +626,12 @@ for (const k of ['skeptic', 'specFinder', 'synthesis']) {
 function renderStageOpts(key, base) {
   return Object.assign(base, roles[key] ? { agentType: roles[key] } : {}, efforts[key] ? { effort: efforts[key] } : {})
 }
-// TOOL-dBoundRoles-5 S6 - `retries`, how often a single-call stage whose `agent()` returns null or
-// undefined is spawned again, the policy key `roles.retries` the caller reads. Refused before any agent
+// TOOL-dBoundRoles-5 S6 - `retries`, how often the subject resolver, whose `agent()` returns null or
+// undefined, is spawned again, the policy key `roles.retries` the caller reads. Refused before any agent
 // unless an integer from 0 to `ATTEMPTS.length - 1`, so a string is never coerced; absent, it is 0 and
-// logged. Forwarded in `dispatch.args` and to the audit's review call where the caller passed it.
+// logged. Forwarded to the audit's review call where the caller passed it. TOOL-dBoundRoles-90 - and not
+// to the unit harness, whose one spawn writes: the spec commit, the round record, the disposal and the
+// builder are each spawned once, since one that returned nothing may already have written.
 const ATTEMPTS = [0, 1, 2, 3, 4]
 const retries = a.retries === undefined ? 0 : a.retries
 if (typeof retries !== 'number' || !Number.isInteger(retries) || retries < 0 || retries > ATTEMPTS.length - 1) {
@@ -640,13 +642,16 @@ if (typeof retries !== 'number' || !Number.isInteger(retries) || retries < 0 || 
   )
 }
 log(a.retries === undefined
-  ? 'retries: 0 — no retries was passed, so a stage returning nothing is not spawned again'
-  : 'retries: ' + retries + ' — a single-call stage returning nothing is spawned again up to ' + retries + ' time(s)')
-// THE ONE MARKED LOOP OF THIS FILE: a single-call stage's spawn, run once and re-run while it returns
-// nothing. A stage inside a fan, the spec writers' groups, keeps its direct `agent()` call and is never
-// re-run here: a helper called from a fan would hide that fan's `agent()` from the fan-out rule. WHAT
-// THE RULE DOES NOT CHECK: this helper's call sites, so each stage that calls it spawns up to
-// `ATTEMPTS.length` agents, a total read off the stages and not off the marker.
+  ? 'retries: 0 — no retries was passed, so a subject resolver returning nothing is not spawned again'
+  : 'retries: ' + retries + ' — the subject resolver, the one stage re-run here, is spawned again up to ' + retries + ' time(s) while it returns nothing')
+// THE ONE MARKED LOOP OF THIS FILE, and it is for a stage that READS: the subject resolver's spawn, run
+// once and re-run while it returns nothing. TOOL-dBoundRoles-90 - a stage whose effect may already have
+// landed when it returned nothing, the spec commit, the round record and the disposal, calls `agent()`
+// itself and meets its own stop; the suite's declared set reds a stage newly wrapped here. A stage inside
+// a fan, the spec writers' groups, keeps its direct `agent()` call too: a helper called from a fan would
+// hide that fan's `agent()` from the fan-out rule. WHAT THE RULE DOES NOT CHECK: this helper's call
+// sites, so each stage that calls it spawns up to `ATTEMPTS.length` agents, a total read off the stages
+// and not off the marker.
 async function runWithRetries(prompt, opts) {
   let r = null
   for (const n of ATTEMPTS) { // gov:sequential-agents(5)
@@ -1379,7 +1384,7 @@ if (!authoredIds.length) {
     'git commit --only -q -m \'spec(' + slug + '): ' + authoredIds.join(' ') + '\' -m \'Committed by the spec commit stage of the build harness.\' --trailer \'Pass: none\' --trailer \'<attribution trailer>\' -- <spec paths> "${delta[@]}"',
     'git status --porcelain -- <spec paths>',
   ].join('\n')
-  const sc = await runWithRetries(
+  const sc = await agent(
     GROUND +
       // TOOL-aOrientedCast-4 S3 - the committer has no role span: only the stamp moves.
       (roles.committer ? ROLE_STAMP[0] + roles.committer + ROLE_STAMP[1] : '') +
@@ -2107,7 +2112,7 @@ async function writeRound(disposition, adjudicated, tally) {
   const roundMinors = au.confirmed - au.blockers - au.highs
   const rv = attended
     ? { token: au.blockers === 0 ? 'CONVERGED' : 'CONVERGING', exitCode: 0 }
-    : await runWithRetries(
+    : await agent(
     GROUND +
       'Record AUDIT round ' + roundNo + ' with the driver and return its convergence token.\n\n' +
       'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --round-highs ' + au.highs + ' --round-minors ' + roundMinors +
@@ -2647,7 +2652,7 @@ if (!specAudit) {
     '`review-dispose: gate` line it prints as an ask in `memory/builds/' + slug + '/BACKLOG.md` naming the slug, the ' +
     'records and `item.review.dispose`' + (reviewPolicy.leftShift === 'owner-selects' ? ', each an owner item' : '') +
     '; it exits 2 only where it cannot read this report, which you name in `summary`. '
-  const d = await runWithRetries(
+  const d = await agent(
     GROUND +
       (roles.disposal ? ROLE_STAMP[0] + roles.disposal + ROLE_STAMP[1] : '') +
       'BEFORE ANY UNIT IS DISPATCHED, DISPOSE of every CONFIRMED and every UNVERIFIED finding in `' +
@@ -3216,8 +3221,6 @@ const handOut = {
       ...(roles.builder ? { roles: { builder: roles.builder } } : {}),
       // TOOL-aOrientedCast-10 S7 - `efforts.builder` travels the same way, and alone.
       ...(efforts.builder ? { efforts: { builder: efforts.builder } } : {}),
-      // TOOL-dBoundRoles-5 S6 - `retries` travels beside them, where the caller passed it.
-      ...(a.retries !== undefined ? { retries: retries } : {}),
     },
     // TOOL-dBoundRoles-13 S6 - `facts` varies per unit too where `roles.builder` travels, the child's
     // one case that requires it; `cutFacts` names the command that cuts it, beside `declare`.

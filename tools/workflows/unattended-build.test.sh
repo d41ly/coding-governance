@@ -325,13 +325,17 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
     const returns = JSON.parse(process.argv[3])
     // TOOL-dBoundRoles-5 - a returns value `{"__seq": [v1, v2, ...]}` answers the spawns of its key in turn, the
     // last value repeating, so one stage can return null twice and then an object; any other value
-    // answers every spawn, as before.
+    // answers every spawn, as before. TOOL-dBoundRoles-90 - an element `{"__wroteThenNull": "<row>"}` is an
+    // agent that died after its write: the spawn traces `wrote:<row>` and answers null.
     const seqAt = {}
     const readSeq = (k) => {
       const v = returns[k]
       if (!v || typeof v !== "object" || !Array.isArray(v.__seq)) return v
       seqAt[k] = (seqAt[k] || 0) + 1
-      return v.__seq[Math.min(seqAt[k], v.__seq.length) - 1]
+      const s = v.__seq[Math.min(seqAt[k], v.__seq.length) - 1]
+      if (!s || Object.keys(s).join() !== "__wroteThenNull") return s
+      trace.push("wrote:" + s.__wroteThenNull)
+      return null
     }
     const agent = async (prompt, opts) => {
       // TOOL-aOrientedCast-27 - a label is `<slug> · <scope> · <stage>`. The whole one is traced on a
@@ -3476,36 +3480,71 @@ for v in '[]' '{"finder":"high"}' '{"builder":"High"}'; do
   hasnt_ "OC10 AC6 ...before any spawn for $v" "$o" "agent:"
 done
 
-# ==== TOOL-dBoundRoles-5 — A SINGLE-CALL STAGE RETURNING NOTHING IS RE-RUN UP TO `retries` (AC6, AC7) ====
-# The plant `harness-null-twice`: the builder returns null twice, then a committed object. With `retries`
-# 2 the child's result is that object and its log names two re-runs; with 1 it takes the dead-agent path;
-# absent, it spawns once and logs `retries: 0`. Against a re-run loop staged to return the first result,
-# the retries-2 rows red. `-1`, `"3"`, 5 (one above ATTEMPTS.length - 1), 1.5 and null are refused before
-# any spawn by the child and by the parent, and the parent forwards a passed count to the child and to
-# the audit's review call. WHAT IT DOES NOT CHECK: a stage inside a fan, which keeps its direct call and
+# ==== TOOL-dBoundRoles-5, amended by TOOL-dBoundRoles-90 — ONLY A STAGE THAT READS IS RE-RUN ====
+# A stage whose effect may have landed before it returned nothing is spawned ONCE whatever `retries` says:
+# the round record, the spec commit, the disposal and the unit harness's builder, each answering
+# `__wroteThenNull` and then a good return nobody may take. The subject resolver, which reads, is spawned
+# again. Against any of those calls put back in the re-run helper, or a marked loop back around the
+# builder's, its count row reds. `-1`, `"3"`, 5 (one above ATTEMPTS.length - 1), 1.5 and null are refused
+# by the parent before any spawn, and the parent forwards a passed count to the audit's review call and
+# never in `dispatch.args`. WHAT IT DOES NOT CHECK: a stage inside a fan, which keeps its direct call and
 # is never re-run; the review harness's own refusal, which its own suite reads.
-DBR5_NULL2='{"build":{"__seq":[null,null,{"committed":true,"sha":"abc1234","why":"","summary":"s"}]}}'
-o=$(run_wf "${OC_CHILD/'"slug":"tB",'/'"slug":"tB","retries":2,'}" "$DBR5_NULL2" "$C")
-same   "DBR5 AC6 retries 2: the builder spawns three times" "$(printf '%s\n' "$o" | grep -c '^agent:build$')" "3"
-has    "DBR5 AC6 ...and the result is the third return" "$(printf '%s\n' "$o" | grep '^RESULT')" '"committed":true,"sha":"abc1234"'
-same   "DBR5 AC6 ...and the log names two re-runs" "$(printf '%s\n' "$o" | grep -c '^log:unit A-tB-1: the builder returned nothing, re-run [12] of 2$')" "2"
-o=$(run_wf "${OC_CHILD/'"slug":"tB",'/'"slug":"tB","retries":1,'}" "$DBR5_NULL2" "$C")
-same   "DBR5 AC6 retries 1: the builder spawns twice" "$(printf '%s\n' "$o" | grep -c '^agent:build$')" "2"
-has    "DBR5 AC6 ...and takes the dead-agent path" "$(printf '%s\n' "$o" | grep '^RESULT')" '"committed":false,"sha":""'
-o=$(run_wf "$OC_CHILD" "$DBR5_NULL2" "$C")
-same   "DBR5 AC6 absent: the builder spawns once" "$(printf '%s\n' "$o" | grep -c '^agent:build$')" "1"
-has    "DBR5 AC6 ...and the log says retries is 0" "$o" "log:retries: 0 — no retries was passed"
+DBR90_ARGS=${UNITS/'"slug":"tB",'/'"slug":"tB","retries":2,'}
+review_out 0 >/dev/null
+o=$(run_wf "$DBR90_ARGS" "$(printf '{"spec-write":%s,"workflow":%s,"record":{"__seq":[{"__wroteThenNull":"review"},{"token":"CONVERGED","exitCode":0}]},"dispose":%s}' "$SPEC_C" "$_review_out" "$DISPOSE_OK")")
+same   "DBR90 AC1 the round record is spawned once" "$(printf '%s\n' "$o" | grep -c '^agent:record')" "1"
+same   "DBR90 AC1 ...and wrote its row once" "$(printf '%s\n' "$o" | grep -c '^wrote:review$')" "1"
+has    "DBR90 AC1 ...and the run stops on the unrecorded round" "$(printf '%s\n' "$o" | grep '^THROW')" "the round was not recorded"
+o=$(run_wf "${OFF_UNITS/'"slug":"tB",'/'"slug":"tB","retries":2,'}" "$(printf '{"spec-write":%s,"commit":{"__seq":[{"__wroteThenNull":"commit"},%s]}}' "$SPEC_OK" "$COMMIT_OK")")
+same   "DBR90 AC2 the spec commit is spawned once" "$(printf '%s\n' "$o" | grep -c '^agent:commit$')" "1"
+has    "DBR90 AC2 ...and the run stops on the empty return" "$(printf '%s\n' "$o" | grep '^THROW')" "the spec commit stage returned nothing"
+o=$(run_wf "$DBR90_ARGS" "$(returns NON-CONVERGENT 1 '{"__seq":[{"__wroteThenNull":"dispose"},{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":["A-tB-p"],"edges":[],"placements":[{"unit":"A-tB-p","repairs":"A-tB-3","order":3}],"summary":"ok"}]}')")
+same   "DBR90 AC3 the disposal is spawned once" "$(printf '%s\n' "$o" | grep -c '^agent:dispose$')" "1"
+has    "DBR90 AC3 ...and the note names the empty return" "$(printf '%s\n' "$o" | grep '^RESULT' | sed 's/.*"note":"//')" "the disposal stage returned nothing at all"
+o=$(run_wf "${OC_CHILD/'"slug":"tB",'/'"slug":"tB","retries":2,'}" '{"build":{"__seq":[{"__wroteThenNull":"commit"},{"committed":true,"sha":"abc1234","why":"","summary":"s"}]}}' "$C")
+same   "DBR90 AC5 the builder is spawned once" "$(printf '%s\n' "$o" | grep -c '^agent:build$')" "1"
+same   "DBR90 AC5 ...and wrote once" "$(printf '%s\n' "$o" | grep -c '^wrote:commit$')" "1"
+has    "DBR90 AC5 ...and takes the dead-agent path" "$(printf '%s\n' "$o" | grep '^RESULT')" '"committed":false,"sha":""'
+o=$(run_wf "${EL5_NOSUBJ/'"slug":"tB",'/'"slug":"tB","retries":2,'}" "$(build_el5_res '{"__seq":[null,{"subjects":[{"path":"s2","blob":"'"$B40"'","tree":"'"$B40"'","rev":1}]}]}')")
+same   "DBR90 AC4 the subject resolver, which reads, is spawned again" "$(printf '%s\n' "$o" | grep -c '^agent:subjects$')" "2"
+has    "DBR90 AC4 ...and the retries line names it" "$o" "log:retries: 2 — the subject resolver"
+# S5 - THE STATIC CHECK, over the template on stdin and the stages declared as arguments. Each re-run
+# call's text, up to its label, is graded for a write, and the stages found are compared with the declared
+# set both ways, so a source holding no call reds rather than reading clean. IT GRADES TEXT: a prompt that
+# orders a write in other words passes the word list, which is why a newly wrapped stage reds by name too.
+DBR90_JS='
+  const declared = process.argv.slice(1)
+  const pieces = require("fs").readFileSync(0, "utf8").split("await runWithRetries(").slice(1)
+  const words = [["DRIVER", /\bDRIVER\b/], ["commitBlock", /\bcommitBlock\b/],
+    ["git write", /\bgit (?:add|commit|push|merge)(?![\w-])/], ["--write", /--write(?![\w-])/]]
+  const found = pieces.map((p) => {
+    const at = p.indexOf("renderAgentLabel(")
+    const label = at < 0 ? null : /^renderAgentLabel\(([^)]*)\)/.exec(p.slice(at))
+    const stage = label ? (label[1].match(/\x27[^\x27]*\x27/g) || ["unlabelled"]).pop().split("\x27").join("") : "unlabelled"
+    for (const [name, re] of words) if (re.test(at < 0 ? p : p.slice(0, at))) console.log(stage + " is re-run and names " + name)
+    return stage
+  })
+  for (const s of found) if (!declared.includes(s)) console.log(s + " is re-run and not declared")
+  for (const s of declared) if (!found.includes(s)) console.log(s + " is declared and not re-run")
+'
+same   "DBR90 AC4 the build template re-runs its declared reading stage alone" "$(node -e "$DBR90_JS" subjects < "$HERE/unattended-build.template.js" 2>&1)" ""
+same   "DBR90 AC4 ...and the review template its three" "$(node -e "$DBR90_JS" resume:checklist resume:probe synth < "$HERE/tier2-review.template.js" 2>&1)" ""
+same   "DBR90 AC4 a record wrapped again is named" "$(sed 's/: await agent($/: await runWithRetries(/' "$HERE/unattended-build.template.js" | node -e "$DBR90_JS" subjects 2>&1)" "record is re-run and names DRIVER
+record is re-run and not declared"
+same   "DBR90 AC4 an unwrapped resolver is named missing" "$(sed 's/const res = await runWithRetries(/const res = await agent(/' "$HERE/unattended-build.template.js" | node -e "$DBR90_JS" subjects 2>&1)" "subjects is declared and not re-run"
+same   "DBR90 AC4 a source holding no call is not clean" "$(node -e "$DBR90_JS" subjects < "$C" 2>&1)" "subjects is declared and not re-run"
+same   "DBR90 AC4 the unit harness holds no re-run" "$(grep -cE 'runWithRetries|gov:sequential-agents' "$C")" "0"
+same   "DBR90 AC4 ...over a pattern the build harness answers" "$(grep -qE 'runWithRetries' "$F" && grep -qE 'gov:sequential-agents' "$F" && echo live)" "live"
 for v in '-1' '"3"' '5' '1.5' 'null'; do
-  o=$(run_wf "${OC_CHILD/'"slug":"tB",'/'"slug":"tB","retries":'"$v"','}" '{}' "$C")
-  has    "DBR5 AC7 the unit harness REFUSES retries $v" "$o" "THROW unattended-unit: \`retries\`"
-  hasnt_ "DBR5 AC7 ...before any spawn for $v" "$o" "agent:"
   o=$(run_wf "${UNITS/'"slug":"tB",'/'"slug":"tB","retries":'"$v"','}" '{}')
   has    "DBR5 AC7 the build harness REFUSES retries $v" "$o" "THROW unattended-build: \`retries\`"
   hasnt_ "DBR5 AC7 ...before any spawn for $v" "$o" "agent:"
 done
-o=$(run_wf "${UNITS/'"slug":"tB",'/'"slug":"tB","retries":2,'}" "$(returns CONVERGED 0)")
+o=$(run_wf "$DBR90_ARGS" "$(returns CONVERGED 0)")
 has    "DBR5 S6 the audit's review call carries retries" "$(printf '%s\n' "$o" | grep '^wargs:')" '"retries":2'
-has    "DBR5 S6 dispatch.args carries retries" "$(printf '%s\n' "$o" | grep '^RESULT')" '"retries":2'
+d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
+has    "DBR90 AC6 the hand-out carries dispatch.args" "$d" '"args":{"repo":"/tmp/r"'
+hasnt_ "DBR90 AC6 ...and no retries in it" "$d" '"retries"'
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 hasnt_ "DBR5 S6 absent: nothing forwards retries" "$(printf '%s\n' "$o" | grep -E '^(wargs|RESULT)')" '"retries"'
 
@@ -4276,7 +4315,11 @@ hasnt_ "TW1 AC5 ...and hands out no roster" "$o" '"roster":[{'
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 950 at 846d51d39, plus main's 93
 # (TOOL-aLightenedLoop-3's 4, TOOL-aTwinnedPass-1's 50, -4's 28 and -11's 11), plus this branch's 8 (TOOL-aTrimmedWait-1) = 1051.
 # MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: the base 1043 at 5d48501da, plus main's 8 (TOOL-aTrimmedWait-1), plus this branch's 28 (TOOL-dDeclaredLoop-20 and -56) = 1079.
-FLOOR_ASSERTIONS=1079
+# RAISED 1079 -> 1082 by TOOL-dBoundRoles-90: its `DBR90` group executes 20 — AC1's three, AC2's two, AC3's two,
+# AC5's three, AC4's nine, and AC6's hand-out row beside the absence that replaces one — less the 17 DBR5 rows
+# they stand for, the builder's seven and the child's refusals' ten. Counted by reading, not measured by a run:
+# the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=1082
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The
