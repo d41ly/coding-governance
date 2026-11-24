@@ -184,8 +184,8 @@ projects needs two descriptions. `--check` re-renders and diffs, so a `FAMILIES`
 re-rendered is a red leg instead of a silently stale trigger.
 
 Three things about that description are pinned by `selftest.py`, because breaking any of them is
-silent. It **augments** Grep and Glob rather than replacing them, so ordinary code search still
-goes where it already worked. Every flag it prints is one `query.py` actually parses (the flag set
+silent. It **augments** shell `grep` and `git grep` rather than replacing them, so ordinary code
+search still goes where it already worked. Every flag it prints is one `query.py` actually parses (the flag set
 is imported from `query.py`, not restated). And it claims nothing about a numbered `/session-kickoff`
 step — upstream's clause named a step that issues this query in *its* repo, which ported verbatim
 would suppress the tool at the exact moment it exists for.

@@ -1721,9 +1721,12 @@ def test_skill_description_invariants():
         assert len(parts) >= 3, "no YAML frontmatter in the rendered skill"
         desc = parts[1]
 
-        # 1. AUGMENTS grep, never replaces it. Not editorial: this is what keeps the skill from
-        #    intercepting ordinary code search, which Grep and Glob already do correctly.
-        for token in ("Grep", "Glob", "ordinary code search", "ADDS retrieval"):
+        # 1. AUGMENTS shell `grep` and `git grep`, never replaces or intercepts them. Not
+        #    editorial: this is what keeps the skill off ordinary code search, which they already
+        #    do correctly. Neither search tool is named, so the skill steers no session to one.
+        named = sorted(set(re.findall(r"\b(?:Grep|Glob)\b", desc)))
+        assert not named, f"the description names a search tool: {named}"
+        for token in ("git grep", "ordinary code search", "ADDS retrieval"):
             assert token in desc, f"the description dropped {token!r}"
 
         # 2. Every flag printed beside an invocation is one query.py parses.
@@ -1748,8 +1751,8 @@ def test_skill_description_invariants():
 
         # 4. No BARE `python` launcher. A stock Debian/Ubuntu adopter without python-is-python3
         #    has python3 and no `python`, so such a line exits 127 — quietly, because this
-        #    skill's own guidance says a miss is ordinary and to fall back to Grep. The whole
-        #    trigger surface is this file, so one launcher is enough to make the kit look dead.
+        #    skill's own guidance says a miss is ordinary and to fall back to shell `grep`. The
+        #    whole trigger surface is this file, so one launcher makes the kit look dead.
         bare = [ln.strip() for ln in text.splitlines()
                 if re.search(r"\bpython(?!3)\s+\S*query\.py", ln)]
         assert not bare, f"the rendered skill launches query.py with a bare `python`: {bare}"
