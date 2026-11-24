@@ -576,3 +576,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T08:06:50Z dispatch · item 790cea67 TOOL-dBoundRoles-68 · reason memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-65-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-68-deviation-682.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-68-1-acceptance-ledger.md
 
 2026-11-24T08:06:57Z brief · item TOOL-dBoundRoles-68 · reason d0535e522cff memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-68-build-brief.md
+
+2026-11-24T08:31:14Z dispatch · item afbbccea TOOL-dBoundRoles-69 · reason tools/roles/adopt-roles.test.sh tools/roles/spawn-guard.test.sh tools/run-gates/selftest-budgets.txt memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-60-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-63-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-64-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-65-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-66-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-69-deviation-692.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-69-1-acceptance-ledger.md
+
+2026-11-24T08:31:20Z brief · item TOOL-dBoundRoles-69 · reason 533bc9f5948b memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-69-build-brief.md

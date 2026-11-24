@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered
 
-**Status:** DEFERRED · rev-3 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 39 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-3 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 39 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -17,6 +17,7 @@
 | [2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md) | journal | TOOL-dBoundRoles-43 TOOL-dBoundRoles-50 TOOL-dBoundRoles-56 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 |
 | [2026-11-23-prompt-TOOL-dBoundRoles-69-2-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-69-2-spec-writer.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief.md) | journal | TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 |
+| [2026-11-24-prompt-TOOL-dBoundRoles-69-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-69-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
