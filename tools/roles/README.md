@@ -111,8 +111,14 @@ effort level; rule 7, the settings in force against the landed agent limit; then
 pack's presence. Each refusal opens `BLOCKED by spawn-guard:`. A declared harness is admitted only where its
 working-tree blob, through the repository's clean filters, is its blob at the landed revision the policy
 kit's `readLandedRevision` names: an edited harness, committed or not, waits until it lands, so the merge
-bar has read it before it runs. The pack reads the role index, card, fence, marker and args readers from the
-hooks kit's `scratch-guard.js` exports, found through its own `resolveKitDir` port; where that file does not
+bar has read it before it runs. Every declared harness it nests through its own `workflow()` call, and every
+one those nest, is held the same way, whatever the call's `args` (TOOL-dBoundRoles-88); the refusal names the
+callee and the harness that runs it, and a nested call naming no quoted declared harness refuses. A swap to
+the landed bytes covers every nested harness for the whole call, since a nested one is loaded when the script
+reaches it. The scan reads text: it does not see a nested call not spelled `workflow(`, one on a line opening
+`//` that a template literal or a block comment spans, a second `scriptPath` key or a spread in the same
+literal, or a nested file edited after admission. The pack reads the role index, card, fence, marker
+and args readers from the hooks kit's `scratch-guard.js` exports, found through its own `resolveKitDir` port; where that file does not
 resolve it refuses every call, as it does where the policy kit cannot name the landed revision. Its suite,
 `spawn-guard.test.sh`, is withheld from adopters and runs as the leg `spawn-guard self-test`. An adopter's
 wiring moves from the retired hook to the pack through the hooks kit's upgrade step

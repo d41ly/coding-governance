@@ -65,9 +65,10 @@
  * (TOOL-dBoundRoles-4 S4, `checkFraming`); the refusal names the three-call route: render the prompt writer with
  * `--for`, spawn it, render the destination with `--framed-by`.
  * CEILING, said rather than implied: it stops forgetting, not evasion. A hook-less or `--bare` run,
- * the agents a running harness spawns through its own `agent()`, a session-to-session message, a
- * self-consistent hand-written prompt file whose marker copies the index's `role-sha`, and an index
- * edited by shell, which the write gate's step 5a refuses only to a tool write, all pass it.
+ * the agents a running harness spawns through its own `agent()`, a nested harness call the text scan cannot
+ * see (NESTED CEILING below), a session-to-session message, a self-consistent hand-written prompt file whose
+ * marker copies the index's `role-sha`, and an index edited by shell, which the write gate's step 5a refuses
+ * only to a tool write, all pass it.
  *
  * RULE 8 (TOOL-aGuardedEffort-1) — the level a call runs at is the one the effort policy gives its
  * model. Armed by the index's `effort` key, which the roles kit's renderer writes with every level
@@ -107,8 +108,19 @@
  * declared harness is admitted only where that file's working-tree blob id, `git hash-object` with the
  * repository's clean filters, equals its blob id at the landed revision the policy kit's `readLandedRevision`
  * names; absent there it is refused as not landed. No policy kit, or a refusal from it, refuses the call naming
- * the owner. It runs after the path match and before the `args.roles` checks: two git calls per admitted call.
+ * the owner. It runs after the path match and before the `args.roles` checks: two git calls per file held.
  * An uncommitted edit and a committed but unlanded one are refused alike (§8 F2).
+ * Every declared harness the admitted script nests through its own `workflow({ scriptPath: '<path>' })` call, and
+ * every one those nest, is held the same way on every call, whatever the `args` (TOOL-dBoundRoles-88,
+ * `checkHarnessClosure`): the refusal names the callee and the harness that runs it, and a nested call naming no
+ * quoted declared harness refuses. So a swap to the landed bytes covers every nested harness for the whole call,
+ * since a nested one is loaded when the script reaches it.
+ * NESTED CEILING: the scan reads text, not JavaScript. It does not see a nested call not spelled `workflow(`, that
+ * name bound to another among them; one on a line opening `//` that a template literal or a block comment spans; or
+ * a second `scriptPath` key, or a spread, after the first in the same literal. Each needs a landed harness that hides
+ * its call, and the bar read that harness. A block comment spelling `workflow(`, or a comment between the parenthesis
+ * and the object, refuses rather than hides. A nested file edited after admission and before its call loads is not
+ * compared again.
  *
  * Wiring (per project): run `python <prefix>/settings-merge.py` (idempotent), whose default fragment is this
  * kit's `spawn-guard.fragment.json`; or merge it by hand:
@@ -580,7 +592,8 @@ function checkHarnessCall(data, index, root) {
   }
   // TOOL-dBoundRoles-25 S3 - the declared harness runs only at its landed bytes: after the path match, so a call
   // refused for its path pays no git call, and before the args, so an edited harness is named first.
-  const unlanded = checkHarnessLanded(entry, root)
+  // TOOL-dBoundRoles-88 - and so does every declared harness its text nests.
+  const unlanded = checkHarnessClosure(entry, root, index)
   if (unlanded) return renderHandoffDeny('Workflow', unlanded, index)
   const a = loadScratchGuard().extractWorkflowArgs(data)
   if (!a) return renderHandoffDeny('Workflow', '`args` is not a plain object, or a JSON string of one.', index)
@@ -602,7 +615,6 @@ function checkHarnessCall(data, index, root) {
 function resolveHarnessEntry(data, index, root) {
   const fs = require('fs')
   const path = require('path')
-  const { buildComparablePath } = loadScratchGuard()
   const sp = String((data.tool_input || {}).scriptPath)
   const folded = process.platform === 'win32' ? sp.replace(/\\/g, '/').replace(/^\/([A-Za-z])\//, '$1:/') : sp
   const abs = path.resolve(data.cwd || process.cwd(), folded)
@@ -610,10 +622,15 @@ function resolveHarnessEntry(data, index, root) {
   try { real = fs.realpathSync(abs) } catch { real = abs }
   let top = root
   try { top = fs.realpathSync(root) } catch { top = root }
-  const rel = buildComparablePath(path.relative(top, real)).replace(/^\.\//, '')
+  const rel = buildHarnessKey(path.relative(top, real))
   resolveHarnessEntry.rel = rel
-  const hit = index.harnesses.find((h) => buildComparablePath(h).replace(/^\.\//, '') === rel)
+  const hit = index.harnesses.find((h) => buildHarnessKey(h) === rel)
   return hit === undefined ? null : hit
+}
+
+// A harness path as compared: the hooks kit's fold, a leading `./` ignored.
+function buildHarnessKey(p) {
+  return loadScratchGuard().buildComparablePath(p).replace(/^\.\//, '')
 }
 
 // TOOL-dBoundRoles-25 S3 - THE TWO BLOBS ADMISSION COMPARES, for the declared harness `rel` (repo-relative, as the
@@ -657,6 +674,48 @@ function checkHarnessLanded(rel, root) {
   const L8 = b.L.slice(0, 8)
   if (!b.landed) return `harness ${rel} is not landed at ${L8}; land it before running it (the driver lands it, or runs a harness that is).`
   if (b.landed !== b.worktree) return `harness ${rel} differs from its blob at the landed revision ${L8}; an edited harness runs only after it lands, so the bar has read it (the driver lands the edit, or restores the landed bytes with git show ${L8}:${rel} for the call).`
+  return null
+}
+
+// TOOL-dBoundRoles-88 S1 - the `harnesses` entries a harness script's text nests, `{ callees }`, or `{ why }` naming
+// the line of the first nested call that cannot be placed. A nested call is `workflow(` on a line whose first
+// non-blank characters are not `//`; its argument must open with an object literal whose first key is `scriptPath`
+// and whose value is one quoted literal naming a declared harness. The literal is compared repository-relative, as
+// the runtime resolves it. Lines end where JavaScript ends them, so a comment line hides no code behind a lone
+// carriage return. The docblock's NESTED CEILING says what a text scan does not see.
+function extractNestedHarnesses(text, index) {
+  const code = text.split(/\r\n|[\n\r\u2028\u2029]/).map((l) => (/^\s*\/\//.test(l) ? '' : l)).join('\n')
+  const callees = []
+  for (const m of code.matchAll(/\bworkflow\s*\(/g)) {
+    const line = code.slice(0, m.index).split('\n').length
+    const rest = code.slice(m.index + m[0].length)
+    const lit = /^\s*\{\s*scriptPath\s*:\s*(['"])([^'"\\\n]+)\1\s*[,}]/.exec(rest)
+    if (!lit) return { why: `line ${line} nests workflow(${rest.trim().split('\n')[0].trim().slice(0, 80)}, whose argument does not open with a quoted { scriptPath: '<path>' }` }
+    const hit = index.harnesses.find((h) => buildHarnessKey(h) === buildHarnessKey(lit[2]))
+    if (hit === undefined) return { why: `line ${line} nests ${lit[2]}, which is not a declared harness` }
+    callees.push(hit)
+  }
+  return { callees }
+}
+
+// TOOL-dBoundRoles-88 S2 - THE TRANSITIVE HOLD: `checkHarnessLanded` on the entry and on every declared harness it
+// nests, each file's text read after its blob compared equal, so the bytes scanned are the bytes that run. Each entry
+// is held once, so the index's list bounds the walk and a cycle ends it. null to admit, else the reason; the entry's
+// own is `checkHarnessLanded`'s, unchanged.
+function checkHarnessClosure(entry, root, index) {
+  const path = require('path')
+  const caller = new Map([[entry, null]])
+  for (const [rel, by] of caller) { // a Map's walk reaches the entries added during it
+    const unlanded = checkHarnessLanded(rel, root)
+    if (unlanded) return by === null ? unlanded : `${unlanded} Harness ${by} runs it through a nested workflow() call, so the driver keeps both files at their landed bytes for the whole call.`
+    let text
+    try { text = require('fs').readFileSync(path.join(root, rel), 'utf8') } catch (e) {
+      return `harness ${rel} could not be read for its nested calls (${(e && e.code) || e}), and a rule that cannot read does not admit; the driver restores the file.`
+    }
+    const nested = extractNestedHarnesses(text, index)
+    if (nested.why) return `harness ${rel} ${nested.why}, so what it runs cannot be held to its landed blob; the driver lands it naming a declared harness by a quoted path.`
+    for (const n of nested.callees) if (!caller.has(n)) caller.set(n, rel)
+  }
   return null
 }
 

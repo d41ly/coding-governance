@@ -2603,6 +2603,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "buildHarnessKey",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
+    },
+    {
       "id": "buildHeredocView",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -5079,6 +5084,11 @@
     },
     {
       "id": "checkHarnessCall",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
+    },
+    {
+      "id": "checkHarnessClosure",
       "kind": "function",
       "file": "tools/roles/spawn-guard.js"
     },
@@ -15751,6 +15761,11 @@
       "id": "extractItemSlug",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "extractNestedHarnesses",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.js"
     },
     {
       "id": "extractNewCommits",
@@ -35709,6 +35724,11 @@
     },
     {
       "id": "run_landed",
+      "kind": "function",
+      "file": "tools/roles/spawn-guard.test.sh"
+    },
+    {
+      "id": "run_landed_call",
       "kind": "function",
       "file": "tools/roles/spawn-guard.test.sh"
     },

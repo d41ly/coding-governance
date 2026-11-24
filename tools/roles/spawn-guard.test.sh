@@ -1261,10 +1261,13 @@ else
       && git config user.name t && git config core.autocrlf false && git add -A && git commit -qm landed --no-verify \
       && git remote add origin "$LBR" && git push -q origin main 2>/dev/null )
   LB_L8=$(git -C "$LB" rev-parse origin/main | cut -c1-8)
+  run_landed_call() { # harness path from the checkout root; its stderr in $TMP/err, its exit the hook's
+    printf '%s' '{"tool_name":"Workflow","cwd":"'"$LBJ"'","tool_input":{"scriptPath":"'"$LBJ/$1"'","args":{"roles":{"builder":"gov-builder"}}}}' \
+      | (cd "$TMP" && node "$LB_HOOK") >/dev/null 2>"$TMP/err"
+  }
   run_landed() { # name expected_exit harness-file [text stderr must carry ...]
     local name=$1 want=$2 h=$3 got miss="" n; shift 3
-    printf '%s' '{"tool_name":"Workflow","cwd":"'"$LBJ"'","tool_input":{"scriptPath":"'"$LBJ/$LBW/$h"'","args":{"roles":{"builder":"gov-builder"}}}}' \
-      | (cd "$TMP" && node "$LB_HOOK") >/dev/null 2>"$TMP/err"; got=$?
+    run_landed_call "$LBW/$h"; got=$?
     for n in "$@"; do grep -qF -- "$n" "$TMP/err" || miss="$miss '$n'"; done
     if [ "$got" = "$want" ] && [ -z "$miss" ]; then echo "ok   $name (exit $got)"; pass=$((pass+1))
     else echo "FAIL $name (exit $got, want $want${miss:+, stderr missing$miss})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
@@ -1280,6 +1283,64 @@ else
   printf 'const s = await agent("five")\n' > "$LB/$LBW/h5.js"
   run_landed "BR25 AC5 a declared harness in the working tree and absent at the landed revision is refused as not landed" 2 h5.js \
     "harness $LBW/h5.js is not landed at $LB_L8"
+
+  # ---- TOOL-dBoundRoles-88: every declared harness a landed harness nests is held to its landed blob too ----
+  # One landing holds every fixture: h.js, h5.js and h6.js nest one another in a cycle; h7.js nests by a
+  # variable, h8.js a path outside the index, h9.js spells a nested call on a comment line alone; and every
+  # harness gov's own index declares sits at its path with its bytes. Against a hold that runs
+  # checkHarnessLanded on the entry alone, the edited-callee, transitive and real-held rows are admitted;
+  # against a scan that returns no callee, those and the two unplaced rows are; against one that reads comment
+  # lines, the comment row and the real liveness row are refused. The real-held row derives its pairs with its
+  # own grep, never through the guard's reader. WHAT THESE DO NOT CHECK: a nested call the text scan cannot see
+  # (the pack's NESTED CEILING), and a nested file edited after admission.
+  BR88_REAL=$("$TESTPY" -c 'import json,sys; print("\n".join(json.load(open(sys.argv[1], encoding="utf-8"))["harnesses"]))' "$ROOTDIR/.claude/roles.json" | tr -d '\r')
+  printf 'const s = await workflow({ scriptPath: "%s/h5.js" }, {})\n' "$LBW" > "$LB/$LBW/h.js"
+  printf "const s = await workflow(\n  { scriptPath: './%s/h6.js', },\n  {},\n)\n" "$LBW" > "$LB/$LBW/h5.js"
+  printf 'const s = await workflow({ scriptPath: "%s/h.js" }, {})\n' "$LBW" > "$LB/$LBW/h6.js"
+  printf 'const p = "%s/h.js"\n// a comment\nconst s = await workflow({ scriptPath: p })\n' "$LBW" > "$LB/$LBW/h7.js"
+  printf 'const s = await workflow({ scriptPath: "%s/elsewhere.js" })\n' "$LBW" > "$LB/$LBW/h8.js"
+  printf '  // the runtime provides workflow({scriptPath}, args)\nconst s = await agent("nine")\n' > "$LB/$LBW/h9.js"
+  for h in $BR88_REAL; do mkdir -p "$LB/$(dirname "$h")"; cp "$ROOTDIR/$h" "$LB/$h"; done
+  "$TESTPY" -c 'import json,sys
+p, w, real = sys.argv[1], sys.argv[2], sys.argv[3].split()
+i = json.load(open(p, encoding="utf-8"))
+i["harnesses"] = [f"{w}/h{n}.js" for n in ("", 5, 6, 7, 8, 9)] + real
+json.dump(i, open(p, "w", encoding="utf-8"))' "$LB/.claude/roles.json" "$LBW" "$BR88_REAL"
+  ( cd "$LB" && git add -A && git commit -qm nested --no-verify && git push -q origin main 2>/dev/null )
+  LB_L8=$(git -C "$LB" rev-parse origin/main | cut -c1-8)
+  run_landed "BR88 LIVENESS three landed harnesses that nest one another in a cycle are admitted, and the walk ends" 0 h.js
+  printf '// edited\n' >> "$LB/$LBW/h5.js"
+  run_landed "BR88 a landed harness whose callee is edited is refused, naming the callee, the landed sha and the caller" 2 h.js \
+    "harness $LBW/h5.js differs from its blob at the landed revision $LB_L8" "Harness $LBW/h.js runs it"
+  ( cd "$LB" && git reset -q --hard origin/main )
+  printf '// edited\n' >> "$LB/$LBW/h6.js"
+  run_landed "BR88 ...and one whose callee's callee is edited, naming that callee and its own caller" 2 h.js \
+    "harness $LBW/h6.js differs from its blob at the landed revision $LB_L8" "Harness $LBW/h5.js runs it"
+  ( cd "$LB" && git reset -q --hard origin/main )
+  run_landed "BR88 a nested call whose path is no literal is refused, naming the line" 2 h7.js "harness $LBW/h7.js line 3 nests workflow("
+  run_landed "BR88 a nested call naming no declared harness is refused, naming the path" 2 h8.js \
+    "harness $LBW/h8.js line 1 nests $LBW/elsewhere.js, which is not a declared harness"
+  run_landed "BR88 a comment line spelling the nested call is no nested call" 0 h9.js
+  br88_bad=""
+  for h in $BR88_REAL; do run_landed_call "$h" || br88_bad="$br88_bad $h($(head -1 "$TMP/err" | cut -c1-200))"; done
+  if [ -n "$BR88_REAL" ] && [ -z "$br88_bad" ]; then echo "ok   BR88 LIVENESS every harness gov's index declares, landed, is admitted"; pass=$((pass+1))
+  else echo "FAIL BR88 LIVENESS every harness gov's index declares, landed, is admitted (refused:${br88_bad:- the index declares none})"; fail=$((fail+1)); fi
+  # Each `workflow(` line of a declared harness that opens no comment owes a pair: the scriptPath literal on it
+  # or the two lines under it, edited in the fixture, refuses a call to the harness holding the line.
+  br88_bad=""; br88_pairs=0
+  for h in $BR88_REAL; do
+    for ln in $(grep -nE '\bworkflow[[:space:]]*\(' "$ROOTDIR/$h" | grep -vE '^[0-9]+:[[:space:]]*//' | cut -d: -f1); do
+      callee=$(sed -n "$ln,$((ln+2))p" "$ROOTDIR/$h" | sed -nE "s/.*scriptPath[[:space:]]*:[[:space:]]*['\"]([^'\"]+)['\"].*/\1/p" | head -1)
+      if [ -z "$callee" ] || [ ! -f "$LB/$callee" ]; then br88_bad="$br88_bad $h:$ln(no pair)"; continue; fi
+      br88_pairs=$((br88_pairs+1))
+      printf '// edited\n' >> "$LB/$callee"
+      run_landed_call "$h"; got=$?
+      if [ "$got" != 2 ] || ! grep -qF -- "harness $callee differs from its blob at the landed revision $LB_L8" "$TMP/err"; then br88_bad="$br88_bad $h->$callee(exit $got)"; fi
+      ( cd "$LB" && git reset -q --hard origin/main )
+    done
+  done
+  if [ "$br88_pairs" -gt 0 ] && [ -z "$br88_bad" ]; then echo "ok   BR88 each harness gov's declared harnesses nest, edited, refuses its landed caller"; pass=$((pass+1))
+  else echo "FAIL BR88 each harness gov's declared harnesses nest, edited, refuses its landed caller ($br88_pairs pairs;$br88_bad)"; fail=$((fail+1)); fi
 
   # AC6 (gap-roles-25): an adopter layout at prefix `scripts`, its index naming gov's review harness there,
   # landed, is admitted; so is a CRLF checkout of the same LF blob, read through the repository's clean filter.
@@ -1318,8 +1379,9 @@ n=$((pass+fail))
 # does NOT CHECK that an executed arm can fail.
 # +1 for spec 13 handed whole to the guard (TOOL-dBoundRoles-50).
 # +6 for the entry guard, the check order, the one block reader and the derived exemption (TOOL-dBoundRoles-58).
+# +8 for the nested harnesses held to their landed blobs, one per row (TOOL-dBoundRoles-88).
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=194
+FLOOR_ASSERTIONS=202
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL $pass assertions passed against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
