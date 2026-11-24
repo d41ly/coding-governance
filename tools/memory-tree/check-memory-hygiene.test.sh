@@ -3984,6 +3984,20 @@ hit 'cause-writer · keep registry · read at docs/memory/project/census-kept-pa
 hit 'cause-writer · keep registry · registered at memory/project/census-kept-paths.txt in '
 n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = 1 ] || { echo "FAIL kept-home-rooted: want exactly one red"; st=1; }
 n=$((n+1)); [ "$(grep 'record causes: RED ' <<<"$out" | grep 'the censuses read docs/memory/project/census-kept-paths.txt and' | grep -c 'registers memory/project/census-kept-paths.txt,')" = 1 ] || { echo "FAIL kept-home-rooted: want its red naming both homes"; st=1; }
+# --- TOOL-dTotalRecall-87 AC2 AC3 — the memory root the home joins is resolved once: under `MEMORY_ROOT=docs/memory/`
+# --- the census reads and the ledger registers one home, no doubled slash and no red, and a declared blank is one red
+# --- naming `MEMORY_ROOT`, the home read nowhere. Red on the conf's raw value joined in `resolve_kept_home`.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-home-trailing-root 2>&1); _brc=$?   # AC2
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant kept-home-trailing-root exited $_brc, expected 0"; st=1; }
+hit 'cause-writer · keep registry · read at docs/memory/project/census-kept-paths.txt'
+hit 'cause-writer · keep registry · registered at docs/memory/project/census-kept-paths.txt in '
+n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = 0 ] || { echo "FAIL kept-home-trailing-root: want no red"; st=1; }
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-root-blank 2>&1); _brc=$?   # AC3
+n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL record_causes.py --fixture --plant kept-root-blank exited $_brc, expected 1"; st=1; }
+hit 'cause-writer · keep registry · read nowhere: MEMORY_ROOT='
+hit 'record causes: RED cause-writer MEMORY_ROOT='
+n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = 1 ] || { echo "FAIL kept-root-blank: want exactly one red"; st=1; }
+n=$((n+1)); [ "$(grep -c 'keep registry · read at' <<<"$out")" = 0 ] || { echo "FAIL kept-root-blank: want no read at line"; st=1; }
 # --- TOOL-dTotalRecall-65 AC3 — the kit holds no keep row: in a fixture with no census-kept-paths.txt the check
 # --- is green naming no kept or drained row, and the reader answers none for either census. Red on one
 # --- engine-held row returned beside the registry's, which exits the plant 1.

@@ -670,12 +670,30 @@ KEPT_FIELDS = ("census", "path", "reason", "records")
 KEPT_CENSUSES = ("check_cause_writers", "check_alias_compares")   # the column's domain (TOOL-dTotalRecall-70 S11)
 
 
+def resolve_memory_root(conf: dict) -> str:
+    """The memory tree's repo-relative root from a parsed `.memory-tree.conf`: the kit default where
+    the key is absent, else the value with `\\` folded to `/` and empty and `.` segments dropped.
+    `ValueError` naming the key for a blank, absolute or `..`-holding value (TOOL-dTotalRecall-87 S1)."""
+    if "MEMORY_ROOT" not in conf:
+        return "memory"
+    raw = conf["MEMORY_ROOT"]
+    value = raw.strip().replace("\\", "/")
+    if value.startswith("/") or re.match(r"[A-Za-z]:", value):
+        raise ValueError(f"MEMORY_ROOT={raw!r} is absolute, and a memory root is repo-relative")
+    parts = [p for p in value.split("/") if p not in ("", ".")]
+    if not parts:
+        raise ValueError(f"MEMORY_ROOT={raw!r} names no directory")
+    if ".." in parts:
+        raise ValueError(f"MEMORY_ROOT={raw!r} leaves the repository")
+    return "/".join(parts)
+
+
 def resolve_kept_home(root) -> str:
-    """The keep registry's one path, repo-relative under `root`'s memory root (TOOL-dTotalRecall-73 S1). It reads
-    no registration: `record_causes.check_kept_home` joins those to it."""
+    """The keep registry's one path, repo-relative under `root`'s memory root (TOOL-dTotalRecall-73 S1), which
+    `resolve_memory_root` resolves or refuses with a ValueError. It reads no registration:
+    `record_causes.check_kept_home` joins those to it."""
     from design_lib import read_design_conf   # noqa: E402  the conf's one reader; at call time, no cycle
-    memory = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/") or "memory"
-    return f"{memory}/project/{CENSUS_KEPT_REGISTRY}"
+    return f"{resolve_memory_root(read_design_conf(root))}/project/{CENSUS_KEPT_REGISTRY}"
 
 
 def read_kept_rows(census, root) -> dict:
@@ -686,7 +704,8 @@ def read_kept_rows(census, root) -> dict:
     named, or names a census outside `KEPT_CENSUSES` or a `(census, path)` pair an earlier row holds, whatever
     its reason, each such line named (TOOL-dTotalRecall-70 S11), or
     names a path holding a `..` segment or outside `build_kept_path_re` over the conf's memory root
-    (TOOL-dTotalRecall-57 S1, TOOL-dTotalRecall-66 S11 S13). It does not check that a row's
+    (TOOL-dTotalRecall-57 S1, TOOL-dTotalRecall-66 S11 S13); and where the memory root does not resolve, naming
+    `MEMORY_ROOT` (TOOL-dTotalRecall-87 S2). It does not check that a row's
     file exists, is tracked or is pinned, nor that a row is filed under the right census of the two."""
     import legacy_ledger as ll   # noqa: E402  the ledger factory; at call time, as it imports this kit's engines
     home = resolve_kept_home(root)

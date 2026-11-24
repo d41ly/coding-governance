@@ -33355,6 +33355,11 @@
     {
       "id": "resolve_memory_root",
       "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
+      "id": "resolve_memory_root",
+      "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
     },
     {
@@ -35211,6 +35216,11 @@
       "id": "run_case_arms",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "run_cause_writers",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "run_census",

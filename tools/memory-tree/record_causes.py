@@ -61,7 +61,9 @@ holding any other row, a malformed one, one of an unknown census or a second row
 (TOOL-dTotalRecall-70 S11) is red naming it, an editable file being kept by its census marker,
 and the walk then reads every hit unkept; an absent registry holds no rows. Last come the registry's homes
 (`check_kept_home`, TOOL-dTotalRecall-73 S3): the one the censuses read, under the conf's memory root, and each
-one a ledger registration names, red where the two are not one path.
+one a ledger registration names, red where the two are not one path. A memory root naming no directory inside
+the tree (`tree_lib.resolve_memory_root`, TOOL-dTotalRecall-87) is one red naming `MEMORY_ROOT`, and the home is
+then read nowhere.
 
 THE PINNED WRITERS (`read_pinned_rows`, TOOL-dTotalRecall-50 S2 S3, TOOL-dTotalRecall-66 S36). One
 `check_cause_writers` row of `census-kept-paths.txt` per pinned instrument that writes a record with no cause,
@@ -139,7 +141,8 @@ PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "non
           "reason-on-other-file", "adopter-no-registry", "kept-row-caused", "kept-row-untracked",
           "kept-row-traversal", "kept-row-nested", "kept-row-docs-root", "pinned-ask-is-spec",
           "build-slug-traversal", "build-slug-absent", "kept-row-multiword", "kept-row-arity",
-          "kept-row-unknown-census", "kept-row-duplicate", "kept-home-rooted")
+          "kept-row-unknown-census", "kept-row-duplicate", "kept-home-rooted", "kept-home-trailing-root",
+          "kept-root-blank")
 #: TOOL-dTotalRecall-47 S1: the causes check's absent-cause rule, the one finding `--backfill` selects;
 #: TOOL-dTotalRecall-53 S4: it names its remedy, and stays the one spelling the backfill selects by
 ABSENT_CAUSE = "names no Caused-by, and its kind is no root; run record_causes.py --backfill"
@@ -680,16 +683,20 @@ def check_kept_home(root) -> tuple:
     """TOOL-dTotalRecall-73 S3: `(lines, reds)` joining the keep registry's one path (`tree_lib.resolve_kept_home`),
     which both censuses read, to each ledger registration of its population, the registry file's stem: one line
     naming the path read, one per registration naming its home and source, or one saying none registers it, and
-    one red per registration whose home is another path. ValueError where the registrations do not read. It does
-    not check that a registration exists, its fields, or that a file stands at either home."""
+    one red per registration whose home is another path. A refused memory root is one line naming it and no red,
+    `read_kept_rows`' catch being the red (TOOL-dTotalRecall-87 S2). ValueError where the registrations do not read.
+    It does not check that a registration exists, its fields, or that a file stands at either home."""
     import legacy_ledger as ll   # noqa: E402  the ledger factory
-    home = tree_lib.resolve_kept_home(root)
+    lead = "cause-writer · keep registry"
+    try:
+        home = tree_lib.resolve_kept_home(root)
+    except ValueError as exc:   # read_kept_rows' catch is the red
+        return [f"{lead} · read nowhere: {exc}"], []
     population = pathlib.PurePosixPath(tree_lib.CENSUS_KEPT_REGISTRY).stem
     try:
         regs = [r for r in ll.read_registrations(root) if r.population == population]
     except ValueError as exc:
         raise ValueError(f"the ledger registrations do not read: {str(exc).splitlines()[0]}") from None
-    lead = "cause-writer · keep registry"
     lines = [f"{lead} · read at {home}"]
     lines += [f"{lead} · registered at {r.home} in {r.source}" for r in regs] or [f"{lead} · registered nowhere"]
     reds = [f"cause-writer {tree_lib.CENSUS_KEPT_REGISTRY}: the censuses read {home} and {r.source} registers {r.home}, "
@@ -720,7 +727,8 @@ def check_cause_writers(root) -> tuple:
     build folders' own count line. Each line of those files carrying this census's marker is red, whatever
     row keeps the file and outside that count line's reds (TOOL-dTotalRecall-58 S1). A registry
     holding a malformed row, one of an unknown census, a second row for one census and path (TOOL-dTotalRecall-70
-    S11), or one outside `tree_lib.build_kept_path_re`'s domain, is one red naming it, and the walk reads every
+    S11), or one outside `tree_lib.build_kept_path_re`'s domain, is one red naming it, as is a memory root
+    `tree_lib.resolve_memory_root` refuses (TOOL-dTotalRecall-87 S2), and the walk reads every
     hit unkept (TOOL-dTotalRecall-57 S1). Last, the registry's homes (`check_kept_home`, TOOL-dTotalRecall-73 S3)."""
     import record_kinds   # noqa: E402  the tool root and the code census's one walk
     from id_grammar import check_marker_domain   # noqa: E402  the build-folder walk's marker refusal
@@ -848,6 +856,15 @@ def check_cause_writers(root) -> tuple:
     return lines + home_lines, reds + home_reds
 
 
+def run_cause_writers(root) -> tuple:
+    """`--cause-writers`: `(lines, exit)`, the writer census's table alone (TOOL-dTotalRecall-53 S35)."""
+    try:
+        lines, reds = check_cause_writers(root)
+    except ValueError as exc:
+        return [f"{SAY}: refused · {exc}"], 2
+    return [f"{SAY}: {ln}" for ln in lines] + [f"{SAY}: RED {r}" for r in reds], 1 if reds else 0
+
+
 def run_check(root) -> tuple:
     """`--check`: `(lines, exit)`; an unarmed tree reads no pinned row."""
     try:
@@ -973,10 +990,15 @@ DOMAIN_KEPT_PLANTS = {"kept-row-traversal": "memory/builds/../build/traversal.py
 #: TOOL-dTotalRecall-66 AC1 AC7: KEPT_SCRIPT spelling a Serves literal past its binding window, the hit a row keeps
 KEPT_HIT = "# a line of the head\n" * tree_lib.BIND_HEAD_LINES + f'HEAD = "{SERVES_LITERAL}log {FIXTURE_UNIT}"\n'
 #: TOOL-dTotalRecall-66 AC7, TOOL-dTotalRecall-73 S4: the plants whose fixture's memory root is not `memory`
-FIXTURE_MEMORY_ROOTS = {"kept-row-docs-root": "docs/memory", "kept-home-rooted": "docs/memory"}
+FIXTURE_MEMORY_ROOTS = {"kept-row-docs-root": "docs/memory", "kept-home-rooted": "docs/memory",
+                        "kept-home-trailing-root": "docs/memory"}
+#: TOOL-dTotalRecall-87 S3 S4: the plants whose conf is rewritten to this memory root after the seed, and which grade
+#: the writer census alone, since `--check` is red or refused under either value before any census prints
+REWRITTEN_ROOTS = {"kept-home-trailing-root": "docs/memory/", "kept-root-blank": ""}
 #: TOOL-dTotalRecall-65 S4: the fixture's own registry, where each of those plants writes its row, through
 #: `record_kinds.write_kept_fixture` (TOOL-dTotalRecall-68 S6); and the literal home the plant `kept-home-rooted`
-#: registers, which its tree under `docs/memory` does not read (TOOL-dTotalRecall-73 S4)
+#: registers, which its tree under `docs/memory` does not read (TOOL-dTotalRecall-73 S4), where
+#: `kept-home-trailing-root` registers it under that root (TOOL-dTotalRecall-87 S3)
 FIXTURE_REGISTRY = f"memory/project/{tree_lib.CENSUS_KEPT_REGISTRY}"
 
 
@@ -1035,10 +1057,11 @@ def write_fixture(top, plant, memory="memory") -> pathlib.Path:
         + ("root = true\n" if n in roots else "") + "\n" for n, (h, f) in rows.items()))
     sibling = "/".join(("govkit", "registry.toml"))   # spelled in parts: the install-prefix ban reads a kit path
     split = ""
-    if plant == "kept-home-rooted":   # TOOL-dTotalRecall-73 S4: the keep registry registered at its literal home
+    if plant in ("kept-home-rooted", "kept-home-trailing-root"):   # TOOL-dTotalRecall-73 S4, TOOL-dTotalRecall-87 S3
+        kept_home = FIXTURE_REGISTRY if plant == "kept-home-rooted" else derive_rel(FIXTURE_REGISTRY)
         split = (f'\n[[ledger]]\npopulation = "{pathlib.PurePosixPath(FIXTURE_REGISTRY).stem}"\nleg = "record causes"\n'
                  f'seed = ["python"]\nkey = "key"\nfields = {json.dumps(tree_lib.KEPT_FIELDS)}\ndrain = "key"\n'
-                 f'direction = "shrink-only"\nhome = "{FIXTURE_REGISTRY}"\n')
+                 f'direction = "shrink-only"\nhome = "{kept_home}"\n')
     write_file(f"{tool_rel}/{sibling}" if tool_rel else sibling,
                f'[[ledger]]\npopulation = "{POPULATION}"\nleg = "record causes"\n'
                f'seed = {json.dumps(["python", f"{prefix}/{kit_rel[len(tool_rel) + 1:] if tool_rel else kit_rel}/record_causes.py", "--measure"])}\n'
@@ -1165,6 +1188,8 @@ def write_fixture(top, plant, memory="memory") -> pathlib.Path:
                    f'# census: kept {CAUSE_WRITER_CENSUS} {KEPT_INSTRUMENT}\n')
         write_file(KEPT_SCRIPT, KEPT_HIT)
         record_kinds.write_kept_fixture(root, FIXTURE_REASON_KEPT)
+    if plant in REWRITTEN_ROOTS:   # TOOL-dTotalRecall-87 S3 S4: the seed ran under the root the tree is built at
+        write_file(".memory-tree.conf", conf.replace(f'MEMORY_ROOT="{memory}"', f'MEMORY_ROOT="{REWRITTEN_ROOTS[plant]}"'))
     if plant in CENSUS_PLANTS:   # TOOL-dTotalRecall-53 AC9 AC34: literals graded by line, a marker kept by line
         rel, text, _red = CENSUS_PLANTS[plant]
         write_file(f"{tool_rel}/{rel}" if tool_rel else rel,
@@ -1338,7 +1363,8 @@ def check_census_plant(root, plant) -> tuple:
 
 def run_fixture(plant) -> tuple:
     """`--fixture --plant <case>`: the plant's repository under the system temp directory, its population's
-    rows printed, then `--check` run there. -> `(lines, exit)`. `adopter-no-registry` grades its own check, PASS
+    rows printed, then `--check` run there, `--cause-writers` under a `REWRITTEN_ROOTS` plant
+    (TOOL-dTotalRecall-87 S3 S4). -> `(lines, exit)`. `adopter-no-registry` grades its own check, PASS
     and exit 0 where that exits 0 naming no kept or drained row and the reader answers `{}` for both censuses."""
     if plant not in PLANTS:
         return [f"{SAY}: refused · no plant {plant!r}: the plants are {', '.join(PLANTS)}"], 2
@@ -1360,7 +1386,7 @@ def run_fixture(plant) -> tuple:
             if plant in CENSUS_PLANTS:
                 lines, ok = check_census_plant(root, plant)
                 return head + lines, 0 if ok else 1
-            lines, rc = run_check(root)
+            lines, rc = run_cause_writers(root) if plant in REWRITTEN_ROOTS else run_check(root)
             if plant == "adopter-no-registry":   # TOOL-dTotalRecall-65 AC3: a row the kit itself held fails it
                 read = {c: tree_lib.read_kept_rows(c, root) for c in tree_lib.KEPT_CENSUSES}
                 ok = rc == 0 and not (root / FIXTURE_REGISTRY).exists() and not any(read.values()) \
@@ -1385,12 +1411,7 @@ def main(argv) -> int:
     if argv == ["--check"]:
         lines, rc = run_check(root)
     elif argv == ["--cause-writers"]:   # TOOL-dTotalRecall-53 S35: the writer census's table alone
-        try:
-            lines, reds = check_cause_writers(root)
-        except ValueError as exc:
-            lines, reds = [f"refused · {exc}"], None
-        lines = [f"{SAY}: {ln}" for ln in lines] + [f"{SAY}: RED {r}" for r in reds or ()]
-        rc = 2 if reds is None else 1 if reds else 0
+        lines, rc = run_cause_writers(root)
     elif argv == ["--measure"]:
         try:
             rows = derive_population_rows(root)
