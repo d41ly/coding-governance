@@ -105,19 +105,23 @@ CH=$("$PY" -B -c "$CONF_READ" "$HERE" "$REPO/.memory-tree.conf" CHARTER); CH=${C
 [ -f "$ADOPTER" ] || { echo "adopt-roles.test: no adopter at $ADOPTER"; exit 2; }
 TMP_ROOT=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP_ROOT"' EXIT
-# 10, then +3 for arm 7 (TOOL-aOrientedCast-15). Arm 6 is NOT in the floor: it SKIPs out loud on a
-# host with no hooks kit or no node, and a skip must not red the floor.
+# 10, then +3 for arm 7 (TOOL-aOrientedCast-15). The floor is the EXECUTED count, read from source
+# (TOOL-dBoundRoles-64): a call site counts once per execution, so one in a loop over a literal list counts
+# once per item, and a loop over a computed list counts the fewest items its own arm admits: arm 42's typed
+# names at two, arms 46's and 47's verdict lines at the number their line counts demand. An arm whose SKIP
+# takes its assertions back off the floor on that line is in it whole, arm 6 and arm 36's edges reading, so
+# a skip never reds the floor; an arm whose SKIP lowers nothing is named below and counts nothing.
+# out of the floor: SKIP arm 11
+# out of the floor: SKIP arm 20
 # +3 for arm 8 (TOOL-aOrientedCast-17). +3 for arm 9 (TOOL-aOrientedCast-20). +4 for arm 9 and +10
-# for arm 10 (TOOL-aOrientedCast-25); arm 11 is out of the floor, as arm 6 is. +1 for arm 6's named
-# spawn and +4 for arm 12 (TOOL-aOrientedCast-27): arm 6's one floored assertion is taken back off the
-# floor by the SKIP that announces the arm unrun, so a skip still cannot red it.
+# for arm 10 (TOOL-aOrientedCast-25). +1 for arm 6's named spawn and +4 for arm 12 (TOOL-aOrientedCast-27).
 # +2 for arm 13 (TOOL-dRedressedBar-6). +3 for arm 14 (TOOL-dRenderedAnchor-2). +1 for arm 14, +3
 # for arm 15 and +2 for arm 16 (TOOL-dRenderedAnchor-3). +1 for arm 17 (TOOL-dRenderedAnchor-4).
 # +1 for arm 18 (TOOL-dFoldedAudit-15).
 # +4 for arm 19 (TOOL-aProfiledEffort-2).
 # +1 for arm 9 and +1 for arm 19 (TOOL-aProfiledEffort-4).
-# +2 for arm 21 (TOOL-aGuardedEffort-1); arm 20 and arm 6's added payload are out of the floor.
-# +0 for arm 6's harness calls and rendered tables (TOOL-aGuardedEffort-2): on its SKIP path, out of the floor.
+# +2 for arm 21 (TOOL-aGuardedEffort-1).
+# +0 for arm 6's harness calls and rendered tables (TOOL-aGuardedEffort-2), which the last term carries.
 # +2 for arm 22 (TOOL-dPavedRoad-3).
 # +1 for arm 10's planted `stage` key (TOOL-dDeclaredLoop-1).
 # +4 for arm 23 (TOOL-dDeclaredLoop-29).
@@ -154,7 +158,9 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +2 for arm 38's balanced flip (TOOL-dBoundRoles-58).
 # +6 for arm 42's typed set, its diff renders and its two staged cases (TOOL-dBoundRoles-58).
 # +3 for arm 37's heading, fact and framing lines after a carriage return (TOOL-dBoundRoles-60).
-FLOOR_ASSERTIONS=238
+# +7 for the arms of units TOOL-aOrientedCast-15, TOOL-aGuardedEffort-1 and TOOL-aGuardedEffort-2, five in
+# arm 6, and of PLAY-dOrderedCharter-21, two in arm 10, whose arm lines moved no floor (TOOL-dBoundRoles-64).
+FLOOR_ASSERTIONS=245
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -214,7 +220,9 @@ check_role_reads() { # <role> <key>... -> one check_arm; rc 0 when the fixture's
   # Three verdicts, the slice's stdout, stderr and exit status read apart (TOOL-dBoundRoles-61 S1): a non-zero exit
   # fails naming the role, the exit and the slice's last stderr line, so a slot the kit holds no file for (its
   # `KeyError`) or front matter `parse_front_matter` refuses (its `R2`) is never read as every key read; exit 0 with a
-  # key printed fails naming the role and that key; exit 0 with nothing printed passes.
+  # key printed fails naming the role and that key; exit 0 with nothing printed passes. An empty TMP_ROOT stops
+  # the call naming the variable, before a redirect could land at the filesystem root (TOOL-dBoundRoles-64 S26).
+  : "${TMP_ROOT:?}"
   local _miss _rcr _err="$TMP_ROOT/reads.err"
   _miss=$("$PY" -B -c 'import pathlib, sys
 kit = pathlib.Path(sys.argv[1]); sys.path.insert(0, str(kit))
@@ -306,9 +314,9 @@ try:
 except LookupError:
     pass' "$HERE"); HK=${HK%$'\r'}
 if [ -z "$HK" ]; then
-  echo "SKIP arm 6 — no hooks kit holding scratch-guard.js was found from $KREL"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-1))
+  echo "SKIP arm 6 — no hooks kit holding scratch-guard.js was found from $KREL"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-6))
 elif ! command -v node >/dev/null 2>&1; then
-  echo "SKIP arm 6 — no node on PATH to run $HERE/spawn-guard.js"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-1))
+  echo "SKIP arm 6 — no node on PATH to run $HERE/spawn-guard.js"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-6))
 else
   build_fixture
   # TOOL-aGuardedEffort-1: the rendered index carries `effort`, so the hook's rule 8 grades this

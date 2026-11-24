@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-64 — the round-1 audit of units 61 to 63, its 32 minors: floors at the executed count naming every unit, a negative case inverting its verdict, criteria failing on the text they retire, no stray worktree, and an edge per bumped spec
 
-**Status:** INPROGRESS · rev-5 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dBoundRoles-27
+**Status:** CLOSED · rev-5 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,8 @@
 | [2026-10-26-build-TOOL-dBoundRoles-64-deviation-642.md](../build/2026-10-26-build-TOOL-dBoundRoles-64-deviation-642.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md) | research | TOOL-dBoundRoles-42 |
 | [2026-11-24-build-TOOL-dBoundRoles-58-1-main-loop-decision.md](../build/2026-11-24-build-TOOL-dBoundRoles-58-1-main-loop-decision.md) | journal | TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
+| [2026-11-24-build-TOOL-dBoundRoles-64-1-acceptance-ledger.md](../build/2026-11-24-build-TOOL-dBoundRoles-64-1-acceptance-ledger.md) | journal | — |
+| [2026-11-24-build-TOOL-dBoundRoles-64-deviation-643.md](../build/2026-11-24-build-TOOL-dBoundRoles-64-deviation-643.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-64-round6-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-64-round6-fix-brief.md) | research | TOOL-dBoundRoles-42 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-brief.md) | journal | TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 |
