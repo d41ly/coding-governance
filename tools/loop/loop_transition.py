@@ -818,11 +818,12 @@ def check_parent_interfaces(root, slug, parent):
         return 2, "--lease show build %s printed %s" % (parent, wit)
     if read_git(root, "cat-file", "-e", "%s^{commit}" % wit)[0] != 0:
         remote = resolve_remote(root)[0]
-        try:
-            subprocess.run(["git", "fetch", "-q", remote or "origin"], cwd=str(root), capture_output=True,
-                           stdin=subprocess.DEVNULL, timeout=MAIL_GUARD_SECONDS)
-        except (OSError, subprocess.TimeoutExpired):
-            pass
+        if remote:
+            try:
+                subprocess.run(["git", "fetch", "-q", remote], cwd=str(root), capture_output=True,
+                               stdin=subprocess.DEVNULL, timeout=MAIL_GUARD_SECONDS)
+            except (OSError, subprocess.TimeoutExpired):
+                pass
         if read_git(root, "cat-file", "-e", "%s^{commit}" % wit)[0] != 0:
             return 2, "the witness %s of %s is not a commit here, fetched or not" % (wit[:12], parent)
     fd, name = tempfile.mkstemp(prefix="loop-interfaces-")
