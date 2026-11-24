@@ -668,6 +668,10 @@ READER_SHAPES = (
     # (TOOL-dLandedOwners-2)
     ((".py",),
      re.compile(r"(?<![\w.$])(?=[A-Za-z_][\w.]*\((?P<args>[^()\n]*))")),
+    # the reader CLI's get in an argv list, its key the name of a module constant: [sys.executable,
+    # str(policy), "get", KEY], as history_store.py and template_cache.py read theirs (KICK-dKeptSession-80)
+    ((".py",),
+     re.compile(r"[\"']get[\"'][ \t]*,[ \t]*(?P<args>[A-Za-z_]\w*)")),
 )
 # a module constant: a column-0 line binding one name to one string literal, `KEY = "flow.adapt"`, an
 # optional comment after it; group 1 the name, group 3 the literal's text (TOOL-dLandedOwners-2)
@@ -4021,6 +4025,13 @@ RC_CASES = {
                          "other.py": "value = resolve(KEY)\n",
                          "local.py": 'def read_value():\n    key = "fixture.planted"\n    return resolve(key)\n'},
                         RC_KEY, 1),
+    # the CLI's get in an argv list by a module constant, and a list whose name no constant binds
+    "reader-argv": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED",
+                    {"consumer.py": 'KEY = "fixture.planted"\n\n\ndef read_value(policy):\n'
+                                    '    return run([PY, str(policy), "get", KEY])\n'}, None, 1),
+    "argv-unbound": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED",
+                     {"consumer.py": 'def read_value(policy, key):\n    return run([PY, str(policy), "get", key])\n',
+                      "other.py": 'KEY = "fixture.planted"\n'}, RC_KEY, 1),
 }
 
 
