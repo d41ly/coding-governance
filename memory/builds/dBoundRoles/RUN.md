@@ -23,8 +23,8 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 4848506d10b951a1813d558e659d793bd6649ecb
-phase: VERIFYING
+witness: f3ec096a83f63cac1ff056b7df11820845fb722b
+phase: SPECCING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
@@ -590,3 +590,19 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T11:41:03Z hold · item host-owner-action · reason until owner · reaped 32792f1d · resume none(owner)
 
 2026-11-24T12:24:32Z resume · item dBoundRoles · reason held · keepalive efe49660 · manual
+
+2026-11-24T12:46:51Z review · item dBoundRoles · reason verdict BLOCKED · blockers 1 · round-highs 9 · round-minors 20
+
+2026-11-24T12:49:00Z rescope · item add TOOL-dBoundRoles-86 · reason closing diff review round 1 item B1 (findings 2, 3, 27, 28): the shell-write arm reads operands and redirects off raw text
+
+2026-11-24T12:49:02Z rescope · item add TOOL-dBoundRoles-87 · reason closing diff review round 1 item H1 (finding 1): an in-place write behind a shell reserved word yields no target
+
+2026-11-24T12:49:05Z rescope · item add TOOL-dBoundRoles-88 · reason closing diff review round 1 item H2 (finding 4): harness admission holds only the top-level harness to its landed blob
+
+2026-11-24T12:49:08Z rescope · item add TOOL-dBoundRoles-89 · reason closing diff review round 1 item H3 (findings 5 and 29): the send-back orders a JSON return that place cannot read
+
+2026-11-24T12:49:11Z rescope · item add TOOL-dBoundRoles-90 · reason closing diff review round 1 item H4 (findings 6 and 11): runWithRetries re-runs stages whose effect has already landed
+
+2026-11-24T12:49:13Z rescope · item add TOOL-dBoundRoles-91 · reason closing diff review round 1 item H5 (findings 9 and 13): the declaration verb reads gov's rows alone
+
+2026-11-24T12:49:16Z rescope · item add TOOL-dBoundRoles-92 · reason closing diff review round 1 minors M1 to M14 and L1 to L4, batched into one unit, with unit 43's owed atomic step key
