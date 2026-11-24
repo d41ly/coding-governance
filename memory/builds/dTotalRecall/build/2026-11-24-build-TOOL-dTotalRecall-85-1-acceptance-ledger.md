@@ -9,7 +9,7 @@ The reads are §4's fence, its body verbatim, with the first bash fence of unit 
 two specs into files under the scratch directory and run from a script file there.
 
 The reads' lines in the fence's order (DERIVED 2026-11-24, that run at the base). The lines before the first `live`
-line are S1's: row 1, row 2 and the control over spec 55, rows 3 and 4 over spec 56, row 5 over spec 57, each at the
+line are S1's: row 1, row 2 and the control over spec 55, rows 3 and 4 over spec 56, row 5 over spec 57 (DERIVED 2026-11-24), each at the
 parent of the pass `pass_of` resolves. The rest are S2's, each under the spec it read.
 
 ```text
