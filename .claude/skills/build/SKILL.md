@@ -34,7 +34,8 @@ before stage 3, and it wins any difference. The stages below are the workflows o
   `handoff.py role-efforts --model <id>` prints, on every direct spawn and for any model.
   Every harness call carries `roles`, the JSON `handoff.py harness-args <harness>` prints, and
   `efforts`, the JSON `handoff.py stage-efforts <workflow> --model <id>` prints for the workflow that
-  call runs, and `retries`, the integer `policy.py get roles.retries` prints, beside `efforts`.
+  call runs. The build and review harness calls also carry `retries`, the integer
+  `policy.py get roles.retries` prints, beside `efforts`.
   `<id>` is the model in use: the session's own model id, exactly as the session's
   environment states it, read again at each call. The roles kit's README states the limits.
 - Every agent the session dispatches or receives is reported by pasting, unchanged, what
@@ -85,7 +86,7 @@ Until `--plan --paths` prints `next: none - every tracked spec is terminal`, for
 3. call the hand-out's `dispatch.scriptPath` with `dispatch.args` plus `unitId`, `specPath`,
    `briefPath`, `roles` from `handoff.py harness-args unattended-unit`, `efforts` from
    `handoff.py stage-efforts build --model <id>`,
-   beside `efforts`, `retries` from `policy.py get roles.retries`, and `facts` from `handoff.py facts --build <slug>
+   and `facts` from `handoff.py facts --build <slug>
    --unit <id> --input prompt=<briefPath> --input spec=<specPath>`, cut just before the call, on every
    dispatch;
 4. act on the return's `nextAction`, where it carries one, before the next dispatch;
