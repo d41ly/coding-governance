@@ -433,9 +433,13 @@ of a return that is no valid refusal, and 2 when a reader it asks refuses.
   landed revision holds for it, the default branch's tip the policy kit names, or the landed revision
   holds no such file. An edit committed and not yet landed is refused like one never committed, since
   the merge bar has not read it. The refusal names the harness and the landed revision's first eight
-  hex digits; land the edit, or run the harness at its landed bytes. A checkout with CRLF line endings
-  compares through git's own filters, so it is not refused for them. Without the policy kit no landed
-  revision can be read, and every listed harness is refused, naming the kit to install.
+  hex digits; land the edit, or run the harness at its landed bytes. Every listed harness it nests
+  through its own `workflow()` call is held the same way, as deep as they nest and whatever the call's
+  arguments, so running at landed bytes means all of those files for the whole call. A nested call that
+  names no quoted listed harness is refused too, naming its line. The nested calls are read from the
+  script's text, so one hidden from it, or a nested file edited after admission, is not seen. A checkout
+  with CRLF line endings compares through git's own filters, so it is not refused for them. Without
+  the policy kit no landed revision can be read, and every listed harness is refused, naming the kit to install.
   <!-- usage: hook:spawn-guard 66668593 -->
 - A role agent's direct return that fails its role's `return` template: no `json` block or
   `key: value` fields to read, a required field missing, a field the template does not name, a value
