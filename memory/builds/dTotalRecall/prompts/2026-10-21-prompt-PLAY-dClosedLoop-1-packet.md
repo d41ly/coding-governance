@@ -78,7 +78,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `408d05723354b00d8e79aba5e6eb60868b8d15ce`
+- rendered at: `147f4583394f7a124cf5bac140eeb4c92b344d5f`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -200,32 +200,32 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dTotalRec
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dTotalRecall-1` · README:60 | 1 | `TOOL-dTotalRecall-1` | `cl-dClosedLoop-0212@121cf0ba` | the memory contract: the record-kind registry (per kind: tag |
-- unit id `TOOL-dTotalRecall-2` · README:61 | 2 | `TOOL-dTotalRecall-2` | `cl-dClosedLoop-0213@09982ca6` | the one `record` write command |
-- unit id `TOOL-dTotalRecall-3` · README:62 | 3 | `TOOL-dTotalRecall-3` | `cl-dClosedLoop-0214@78961f0f` | for every filer outside a build |
-- unit id `TOOL-dTotalRecall-4` · README:63 | 4 | `TOOL-dTotalRecall-4` | `cl-dClosedLoop-0215@10676c23` | the build README's declared front-matter schema |
-- unit id `TOOL-dTotalRecall-5` · README:64 | 5 | `TOOL-dTotalRecall-5` | `cl-dClosedLoop-0216@f8936b35` | the slug and id grammar exported once and read by every slug and id reader (`builds.slug-words` |
-- unit id `TOOL-dTotalRecall-6` · README:65 | 6 | `TOOL-dTotalRecall-6` | `cl-dClosedLoop-0217@631907d1` | typed relations (`depends-on` |
-- unit id `TOOL-dTotalRecall-7` · README:66 | 7 | `TOOL-dTotalRecall-7` | `cl-dClosedLoop-0218@939beda1` | the ask kind's acceptance at filing (`asks.acceptance`) |
-- unit id `TOOL-dTotalRecall-8` · README:67 | 8 | `TOOL-dTotalRecall-8` | `cl-dClosedLoop-0219@927a3172` | the core `code` record (night pass |
-- unit id `TOOL-dTotalRecall-9` · README:68 | 9 | `TOOL-dTotalRecall-9` | `cl-dClosedLoop-0220@d0de1caf` | the `section` |
-- unit id `TOOL-dTotalRecall-10` · README:69 | 10 | `TOOL-dTotalRecall-10` | `cl-dClosedLoop-0221@5746ccbd` | derived anchors suffixed for a repeated heading |
-- unit id `TOOL-dTotalRecall-11` · README:70 | 11 | `TOOL-dTotalRecall-11` | `cl-dClosedLoop-0222@bc317ce6` | the shape-run kind |
-- unit id `TOOL-dTotalRecall-12` · README:71 | 12 | `TOOL-dTotalRecall-12` | `cl-dClosedLoop-0223@18c3e1ad` | the acceptance re-measure counted over every read channel |
-- unit id `TOOL-dTotalRecall-13` · README:72 | 13 | `TOOL-dTotalRecall-13` | `cl-dClosedLoop-0224@bfb0a85c` | the shared extraction primitive in `tools/lib` (LX-2) |
-- unit id `TOOL-dTotalRecall-14` · README:73 | 14 | `TOOL-dTotalRecall-14` | `cl-dClosedLoop-0225@db15491d` | the level-0 project map (PM-1 |
-- unit id `TOOL-dTotalRecall-15` · README:74 | 15 | `TOOL-dTotalRecall-15` | `cl-dClosedLoop-0226@0bd15de1` | the three-way completeness check and the `map` leg pack |
-- unit id `TOOL-dTotalRecall-16` · README:75 | 16 | `TOOL-dTotalRecall-16` | `cl-dClosedLoop-0227@b1bcbcb9` | the record-kind registry's purpose field |
-- unit id `TOOL-dTotalRecall-17` · README:76 | 17 | `TOOL-dTotalRecall-17` | `cl-dClosedLoop-0228@fcc9ca71` | the replay with the map and without at its first unit |
-- unit id `TOOL-dTotalRecall-18` · README:77 | 18 | `TOOL-dTotalRecall-18` | `cl-dClosedLoop-0229@03c635cf` | the kind registry completed: home |
-- unit id `TOOL-dTotalRecall-19` · README:78 | 19 | `TOOL-dTotalRecall-19` | `cl-dClosedLoop-0230@63f11811` | `record` writing each record's header (Serves |
-- unit id `TOOL-dTotalRecall-20` · README:79 | 20 | `TOOL-dTotalRecall-20` | `cl-dClosedLoop-0231@392c9e56` | its own upgrade steps: the `journal` alias |
-- unit id `TOOL-dTotalRecall-21` · README:80 | 21 | `TOOL-dTotalRecall-21` | `cl-dClosedLoop-0232@94a25816` | memory-recall's FTS5 tables moved into the one index file |
-- unit id `TOOL-dTotalRecall-22` · README:81 | 22 | `TOOL-dTotalRecall-22` | `cl-dClosedLoop-0233@50683b2a` | each edge type's cardinality declared per target as well as per source in the kind registry and checked over the merged tree after every merge |
-- unit id `TOOL-dTotalRecall-23` · README:82 | 23 | `TOOL-dTotalRecall-23` | `cl-dClosedLoop-0234@eb7b1784` | the memory legs reading the index's rows for unchanged blobs and re-parsing only changed ones |
-- unit id `TOOL-dTotalRecall-24` · README:83 | 24 | `TOOL-dTotalRecall-24` | `cl-dClosedLoop-0235@dba1fb83` | every commit that touches a record appended to the change feed with its edges once it lands |
-- unit id `TOOL-dTotalRecall-25` · README:84 | 25 | `TOOL-dTotalRecall-25` | `cl-dClosedLoop-0236@4e9bd61a` | the stream-plan kind: a build's units grouped into streams |
-- unit id `TOOL-dTotalRecall-26` · README:85 | 26 | `TOOL-dTotalRecall-26` | `cl-dClosedLoop-0237@0c51b12a` | the atlas under `help/atlas/` |
+- unit id `TOOL-dTotalRecall-1` · README:62 | 1 | `TOOL-dTotalRecall-1` | `cl-dClosedLoop-0212@121cf0ba` | the memory contract: the record-kind registry (per kind: tag |
+- unit id `TOOL-dTotalRecall-2` · README:63 | 2 | `TOOL-dTotalRecall-2` | `cl-dClosedLoop-0213@09982ca6` | the one `record` write command |
+- unit id `TOOL-dTotalRecall-3` · README:64 | 3 | `TOOL-dTotalRecall-3` | `cl-dClosedLoop-0214@78961f0f` | for every filer outside a build |
+- unit id `TOOL-dTotalRecall-4` · README:65 | 4 | `TOOL-dTotalRecall-4` | `cl-dClosedLoop-0215@10676c23` | the build README's declared front-matter schema |
+- unit id `TOOL-dTotalRecall-5` · README:66 | 5 | `TOOL-dTotalRecall-5` | `cl-dClosedLoop-0216@f8936b35` | the slug and id grammar exported once and read by every slug and id reader (`builds.slug-words` |
+- unit id `TOOL-dTotalRecall-6` · README:67 | 6 | `TOOL-dTotalRecall-6` | `cl-dClosedLoop-0217@631907d1` | typed relations (`depends-on` |
+- unit id `TOOL-dTotalRecall-7` · README:68 | 7 | `TOOL-dTotalRecall-7` | `cl-dClosedLoop-0218@939beda1` | the ask kind's acceptance at filing (`asks.acceptance`) |
+- unit id `TOOL-dTotalRecall-8` · README:69 | 8 | `TOOL-dTotalRecall-8` | `cl-dClosedLoop-0219@927a3172` | the core `code` record (night pass |
+- unit id `TOOL-dTotalRecall-9` · README:70 | 9 | `TOOL-dTotalRecall-9` | `cl-dClosedLoop-0220@d0de1caf` | the `section` |
+- unit id `TOOL-dTotalRecall-10` · README:71 | 10 | `TOOL-dTotalRecall-10` | `cl-dClosedLoop-0221@5746ccbd` | derived anchors suffixed for a repeated heading |
+- unit id `TOOL-dTotalRecall-11` · README:72 | 11 | `TOOL-dTotalRecall-11` | `cl-dClosedLoop-0222@bc317ce6` | the shape-run kind |
+- unit id `TOOL-dTotalRecall-12` · README:73 | 12 | `TOOL-dTotalRecall-12` | `cl-dClosedLoop-0223@18c3e1ad` | the acceptance re-measure counted over every read channel |
+- unit id `TOOL-dTotalRecall-13` · README:74 | 13 | `TOOL-dTotalRecall-13` | `cl-dClosedLoop-0224@bfb0a85c` | the shared extraction primitive in `tools/lib` (LX-2) |
+- unit id `TOOL-dTotalRecall-14` · README:75 | 14 | `TOOL-dTotalRecall-14` | `cl-dClosedLoop-0225@db15491d` | the level-0 project map (PM-1 |
+- unit id `TOOL-dTotalRecall-15` · README:76 | 15 | `TOOL-dTotalRecall-15` | `cl-dClosedLoop-0226@0bd15de1` | the three-way completeness check and the `map` leg pack |
+- unit id `TOOL-dTotalRecall-16` · README:77 | 16 | `TOOL-dTotalRecall-16` | `cl-dClosedLoop-0227@b1bcbcb9` | the record-kind registry's purpose field |
+- unit id `TOOL-dTotalRecall-17` · README:78 | 17 | `TOOL-dTotalRecall-17` | `cl-dClosedLoop-0228@fcc9ca71` | the replay with the map and without at its first unit |
+- unit id `TOOL-dTotalRecall-18` · README:79 | 18 | `TOOL-dTotalRecall-18` | `cl-dClosedLoop-0229@03c635cf` | the kind registry completed: home |
+- unit id `TOOL-dTotalRecall-19` · README:80 | 19 | `TOOL-dTotalRecall-19` | `cl-dClosedLoop-0230@63f11811` | `record` writing each record's header (Serves |
+- unit id `TOOL-dTotalRecall-20` · README:81 | 20 | `TOOL-dTotalRecall-20` | `cl-dClosedLoop-0231@392c9e56` | its own upgrade steps: the `journal` alias |
+- unit id `TOOL-dTotalRecall-21` · README:82 | 21 | `TOOL-dTotalRecall-21` | `cl-dClosedLoop-0232@94a25816` | memory-recall's FTS5 tables moved into the one index file |
+- unit id `TOOL-dTotalRecall-22` · README:83 | 22 | `TOOL-dTotalRecall-22` | `cl-dClosedLoop-0233@50683b2a` | each edge type's cardinality declared per target as well as per source in the kind registry and checked over the merged tree after every merge |
+- unit id `TOOL-dTotalRecall-23` · README:84 | 23 | `TOOL-dTotalRecall-23` | `cl-dClosedLoop-0234@eb7b1784` | the memory legs reading the index's rows for unchanged blobs and re-parsing only changed ones |
+- unit id `TOOL-dTotalRecall-24` · README:85 | 24 | `TOOL-dTotalRecall-24` | `cl-dClosedLoop-0235@dba1fb83` | every commit that touches a record appended to the change feed with its edges once it lands |
+- unit id `TOOL-dTotalRecall-25` · README:86 | 25 | `TOOL-dTotalRecall-25` | `cl-dClosedLoop-0236@4e9bd61a` | the stream-plan kind: a build's units grouped into streams |
+- unit id `TOOL-dTotalRecall-26` · README:87 | 26 | `TOOL-dTotalRecall-26` | `cl-dClosedLoop-0237@0c51b12a` | the atlas under `help/atlas/` |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
