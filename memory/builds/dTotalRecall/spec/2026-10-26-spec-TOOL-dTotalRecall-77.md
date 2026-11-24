@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-77 — manifest-check is read at one commit by its exit status and its own failure line, never through a grep pipe, and the read is seen red on a staged C9 stall
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,8 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-77-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-77-1-spec-writer.md) | journal | TOOL-dTotalRecall-1 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-77-round7-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-77-round7-fix-brief.md) | research | — |
+| [2026-11-24-prompt-TOOL-dTotalRecall-77-reground-brief.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-77-reground-brief.md) | journal | — |
+| [2026-11-24-prompt-TOOL-dTotalRecall-77-reground-spec-writer.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-77-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-87 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-88 |
 
 <!-- /gen:spec-records -->
@@ -26,61 +28,61 @@ The round-1 spec audit of units 71 to 76
 confirmed finding **id 23 at BLOCKER**. It shares item **B1** with ids 1, 16 and 34, which are
 `TOOL-dTotalRecall-79`, `TOOL-dTotalRecall-80` and `TOOL-dTotalRecall-78`.
 
-`TOOL-dTotalRecall-76` (order 35) sweeps `manifest-check.sh` over every pass commit, its S19, and
-pipes the checker through `grep -E 'fail (5|9)'`. The checker prints a failure through
+The finding reads `TOOL-dTotalRecall-76` (order 35) at its S19: a sweep of `manifest-check.sh` over
+every pass commit, piped through `grep -E 'fail (5|9)'`. The checker prints a failure through
 `fail() { echo "MANIFEST check $1 FAILED — $2"; status=1; }`
-(`skills/session-kickoff/manifest-check.sh:1279`) and exits with that status
-(`manifest-check.sh:1626`). The text `fail 5` or `fail 9` therefore never reaches output, and the
-pipe discards the exit status. The sweep reads nothing else, so it prints nothing at a red commit
-and at a green one. Unit 76's S19 red spans, its S20 verdict at unit 69's pass and its AC13 all rest
-on a reading that cannot see a failure.
+(`skills/session-kickoff/manifest-check.sh@aec378661:2396`) and exits with that status
+(`skills/session-kickoff/manifest-check.sh@aec378661:2815`). So the text the pipe wanted never reaches
+output, and the pipe discards the exit status: a red commit and a green one both print nothing.
 
-This unit is the reading of one commit: the checker run in a worktree of that commit, its exit
-status recorded as its own line, and each failure line matched by the checker's own format. It is
-seen red once, on a staged C9 stall, before any sweep relies on it. It repairs
-`TOOL-dTotalRecall-76`, at step 36, one above that unit's order.
+Unit 76 rev-4 spells the repair in its own sweep. Its `print_read` prints each run's status and each
+`MANIFEST check` failure line, and its last read is a staged `live` red. The main loop runs it before
+unit 76's pass, the only run of the checker this unit's question needs (§8 F2).
+
+This unit is the reading of one commit, as a shell function the later units run: the checker run in a
+worktree of that commit, its exit status recorded as its own line, and each failure line matched by
+the checker's own format. It is seen red on a stub that carries the checker's own `fail()` line, and
+the checker's real red is read from unit 76's sweep, before any later sweep relies on either. It
+repairs `TOOL-dTotalRecall-76`, at step 36, one above that unit's order.
 
 ## 2. Scope (IN)
 
 - **S1** — The read. §4's `read_checker` runs `manifest-check.sh` in a given worktree and prints one
   line `<label> rc=<status>` for every run, then each output line matching
   `^MANIFEST check [0-9]+ FAILED`, prefixed by the label. The status is captured before any filter
-  runs, so no pipe can discard it. Observed by AC1 and AC2.
-- **S2** — The staged red. In a scratch worktree of this pass's base, placed under
-  `$(git rev-parse --git-common-dir)` by `add_scratch_worktree`
-  (`tools/run-gates/lib-attribute.sh:59`), `last-body-change` is set to the eleventh newest
-  non-merge commit touching a path of the manifest's `watch:` line. `read_checker` there prints
-  `live rc=1` and a `live MANIFEST check 9 FAILED` line. The worktree is then removed by
-  `remove_scratch_worktree` (`:63`), and a failed removal prints the orphan's path as a red line.
-  Observed by AC1.
-  **Readers:** by name: no name retires, the item removing only its own scratch worktree, whose path
-  is spelled by `add_scratch_worktree` and `remove_scratch_worktree`
-  (`tools/run-gates/lib-attribute.sh:59`, `:63`) and their callers `tools/run-gates/post-merge.sh`,
-  `tools/run-gates/run-gates.sh` and `tools/run-gates/run-selftests.sh` · by value: NO VALUE READERS —
-  the worktree is made and removed inside this item, and no reader outside it compares, counts or
-  derives from its path.
-- **S3** — The green read. `read_checker` at this pass's base worktree prints `base rc=<status>` and
-  every failure line it finds, so S2's red is set beside a read of the same tree unstaged. Observed
-  by AC2.
+  runs, so no pipe can discard it, and an empty or missing worktree prints a non-zero status. §4's
+  stub probe sees it red and green. Observed by AC1.
+- **S2** — The staged red. No second run is made. Unit 76's sweep stages a check-9 failure in its
+  scratch clone and reads it last, under the label `live`, in the two line shapes of S1. Its `live`
+  lines are read from unit 76's ledger and quoted in this unit's. The staging makes
+  `last-body-change` a commit unknown to the repository, the unknown-baseline arm of C9 and not its
+  count arm. Both arms print through the one `fail()`, which is all this read keys on, so the count
+  arm's staging is cut (§8 F2). Observed by AC1.
+- **S3** — The unstaged read. The sweep's last unit line before `live` is the same checkout read
+  before the staging. It is quoted with every failure line beneath it, so S2's red is set beside a
+  read of the same tree unstaged. A read at this pass's own base is cut: the base's verdict is unit
+  79's S4 (§8 F2). Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
-- Visiting every pass commit: `TOOL-dTotalRecall-78`, which runs this read at each.
+- Running the checker. The main loop ran it, in unit 76's sweep.
+- Visiting every pass commit: `TOOL-dTotalRecall-78`.
 - The red spans and unit 76's AC13: `TOOL-dTotalRecall-79`.
 - Unit 69's AC1 pair and unit 76's S20: `TOOL-dTotalRecall-80`.
 - Fixing a red the read finds at the base: unit 79 owns the tip's verdict.
+- A check the checker skipped with a `WARN` or `NOTE` line at exit 0: `TOOL-dTotalRecall-91`.
 - Editing unit 76's spec, frozen once its unit builds.
 - The output-format lint the report suggests as the left-shift gate: the close's left-shift step
   (BUILD-METHOD M8).
 
 ### Edges
 
-- **consumes-from** `TOOL-dTotalRecall-76` — its S19 sweep and its AC12 and AC13 lines, whose grep this read replaces
-- **hands-off** `TOOL-dTotalRecall-78` — `read_checker`, which that unit's sweep runs at each pass commit
+- **consumes-from** `TOOL-dTotalRecall-76` — its S19 sweep's output, the `live` lines and the last unit line its AC13 answer carries, whose grep this read replaces
+- **hands-off** `TOOL-dTotalRecall-78` — `read_checker`, the read each pass commit gets where that unit's sweep runs one
 - **hands-off** `TOOL-dTotalRecall-79` — `read_checker` and S2's `live` lines, the known red that unit's span derivation must find
-- **hands-off** `TOOL-dTotalRecall-80` — `read_checker`, which that unit runs at unit 69's pass commit and its parent
+- **hands-off** `TOOL-dTotalRecall-80` — `read_checker`, the read unit 69's pass commit and its parent get where that unit runs one
 - **hands-off** `TOOL-dTotalRecall-91` — `read_checker`'s line format, which that unit classifies by status and failed checks for unit 69's AC1 (the round-1 audit of units 77 to 88, id 23)
-- **hands-off** `TOOL-dTotalRecall-92` — `read_checker` and the `mc77` worktree path, which that batch reads at unit 79's pass and clears at the tip (the round-1 audit of units 77 to 88, ids 5, 13, 19)
+- **hands-off** `TOOL-dTotalRecall-92` — `read_checker`, which that batch reads at unit 79's pass, and the `mc77` worktree path, which this unit no longer makes and that batch finds clear at the tip (the round-1 audit of units 77 to 88, ids 5, 13, 19)
 - **hands-off** `TOOL-dTotalRecall-97` — `read_checker`'s two line shapes, which define a placed line of that unit's extraction (the round-1 audit of units 89 to 92, id 30)
 
 ## 4. Design
@@ -88,11 +90,10 @@ seen red once, on a staged C9 stall, before any sweep relies on it. It repairs
 ### The read
 
 ```bash
-# run from the repository root
-source tools/run-gates/lib-attribute.sh
-read_checker() {  # worktree path · label -> "<label> rc=<n>", then each failure line of the checker, labelled
+# a caller names the worktree by path
+read_checker() {  # worktree path, label -> "<label> rc=<n>", then each failure line of the checker, labelled
   local out rc
-  out=$(cd "$1" && bash skills/session-kickoff/manifest-check.sh 2>&1); rc=$?
+  out=$(cd "${1:?no worktree}" && bash skills/session-kickoff/manifest-check.sh 2>&1); rc=$?
   printf '%s rc=%s\n' "$2" "$rc"
   printf '%s\n' "$out" | grep -E '^MANIFEST check [0-9]+ FAILED' | sed "s|^|$2 |"
   return 0
@@ -100,32 +101,50 @@ read_checker() {  # worktree path · label -> "<label> rc=<n>", then each failur
 ```
 
 `rc` is the status of the substitution, taken on the next statement, so the filter below it cannot
-change it. A `cd` that fails gives a non-zero `rc` too, never a silent green. The match is the
-checker's own line format at `manifest-check.sh:1279`, every check number, so a red from a check
-other than 5 or 9 is still printed.
+change it. A `cd` that fails gives a non-zero `rc`, never a silent green. `cd ""` would stay in the
+caller's tree at status 0, so the `:?` refuses an empty path inside the substitution. The match is the
+checker's own line format at `skills/session-kickoff/manifest-check.sh@aec378661:2396`, every check
+number, so a red from a check other than 5 or 9 is still printed. An environment refusal, exit 2,
+prints its status and no failure line.
 
-### The staged red
+### The stub probe
+
+`fail()` is lifted from the checker at the tip, never retyped, so a checker that changes its line
+reds the probe. The stub is placed at the checker's path in a scratch tree, and the checker itself is
+never run. The builder saves the function above and this body in one file with the Write tool and runs
+it by its path, the repository root as its one argument. The role hook reads the command text, where
+the function's checker line is the leg's argv.
 
 ```bash
-W="$(git rev-parse --git-common-dir)/mc77"
-add_scratch_worktree "$W" HEAD || echo "live red worktree-add-failed"
-WATCH=$(sed -n 's/^watch: //p' memory/guides/SESSION-KICKOFF.md | tr ';' ' ')
-OLD=$(git rev-list --no-merges HEAD -- $WATCH | sed -n 11p)
-sed -i "s/^last-body-change: .*/last-body-change: $OLD/" "$W/memory/guides/SESSION-KICKOFF.md"
-read_checker "$W" live
-remove_scratch_worktree "$W" || echo "live red orphan $W"
-read_checker . base
+CHECKER=$1/skills/session-kickoff/manifest-check.sh
+T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
+write_stub() {  # case, body -> a tree whose checker is the real fail() line and that body
+  mkdir -p "$T/$1/skills/session-kickoff"
+  { echo 'status=0'; grep '^fail() ' "$CHECKER"; printf '%s\n' "$2"; echo 'exit "$status"'; } \
+    > "$T/$1/skills/session-kickoff/manifest-check.sh"
+}
+echo "fail lines $(grep -c '^fail() ' "$CHECKER")"
+write_stub stall 'fail 9 "stalled
+  a second line"'
+write_stub two 'fail 5 "stale"; fail 9 "stalled"'
+write_stub crash 'echo "MANIFEST env ERROR"; exit 2'
+write_stub green 'echo "WARN: skipped C9"'
+for c in stall two crash green absent; do read_checker "$T/$c" "$c"; done
+read_checker "" empty
+echo "old pipe $(cd "$T/stall" && bash skills/session-kickoff/manifest-check.sh 2>&1 | grep -cE 'fail (5|9)')"
 ```
 
-C9 counts non-merge watched commits since `last-body-change` and fails at 10
-(`manifest-check.sh:1574-1581`). With `last-body-change` at the eleventh newest watched commit,
-the ten newer ones are in the range, so C9 must fail. The edit is to the scratch worktree's file
-only and is never committed.
+It was run 2026-11-24 on node a against the checker at `aec378661` and printed the lines AC1 states
+(DERIVED 2026-11-24, this probe). Its last line is the audited defect: the old pipe over the same
+failing stub counts no line.
 
-PINNED, measured 2026-10-26 at `af814dba8`: the eleventh newest non-merge watched commit is
-`427e1e0385c9d3f1e7b730b16a768d40461ad5cb`, an ancestor of HEAD, and
-`git rev-list --count --no-merges 427e1e03..HEAD -- <watch paths>` prints 10. The checker run itself
-is the pass's; this spec's writer may not run that leg.
+### The sweep's lines
+
+Unit 76 §4 prints each unit's read as `<n> <sha> rc=<status>` and the staged read as
+`live rc=<status>`, each followed by its labelled failure lines, then a `population` line. Those are
+`read_checker`'s two shapes with the labels `<n> <sha>` and `live`. The read before `live` is the last
+unit of its loop, in the one scratch clone. A `<n> red checkout-failed` there means `live` was staged
+on another tree.
 
 ### Why order 36
 
@@ -134,7 +153,8 @@ share step 36 and read through it, so the §3 edges run this pass first.
 
 ### Inventory
 
-Minted: the probe function `read_checker`, spec text only. Naming cell: none, no product symbol.
+Minted: the probe functions `read_checker` and `write_stub`, spec text only. Naming cell: none, no
+product symbol.
 
 ### Files touched (estimate)
 
@@ -147,43 +167,44 @@ Minted: the probe function `read_checker`, spec text only. Naming cell: none, no
 - **`grep` with `set -o pipefail`.** It returns grep's status where no line matched, which is 1 on a
   green commit, so a green and a red still look alike to the caller.
 - **A staged red by editing a watched file.** It moves C5 as well, so the line expected would depend
-  on two checks; editing `last-body-change` alone reaches C9 only.
+  on two checks; editing `last-body-change` alone reaches C9 only, as unit 76's staging does.
 
 ## 5. Production-readiness checklist
 
-- security — no surface. The scratch worktree is removed, and an orphan is named.
-- perf / scale — two checker runs and one worktree.
-- error / empty / loading states — a failed worktree add or removal is a red line. A run that prints
-  nothing still prints its `rc=` line, so an empty read cannot occur.
+- security — no surface. Nothing is run but a stub in a scratch tree the probe removes.
+- perf / scale — seconds. No checker run and no worktree.
+- error / empty / loading states — a run that prints nothing still prints its `rc=` line, so an empty
+  read cannot occur. An empty or missing worktree reads as a non-zero status.
 - observability — every run prints its status and every failure line.
-- risks — on a shallow clone C9 warns and skips (`manifest-check.sh:1568`), and S2 would read
-  green. The run's checkout is a full clone, and a `live rc=0` is a red of AC1 that names it.
+- risks — a check the checker skips at exit 0, on a shallow clone or a file with no manifest marker,
+  reads `rc=0` and no line. That is the checker's verdict, and unit 91 classifies it. The sweep's
+  scratch clone shares the object store of the run's checkout, which is a full clone.
 - testing — AC1 and AC2 by the pass.
 - migration — none.
 - user docs — none under `help/`.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When §4's staged red runs at this pass's base, it prints `live rc=1` and a line starting
-  `live MANIFEST check 9 FAILED`, and no `live red` line.
-  Red when: the read prints no `rc=` line, prints `live rc=0`, or prints no check-9 line on a C9
-  stall.
-  figure: the eleventh-commit sha and the count of 10 are PINNED in §4, measured 2026-10-26; the run
-  re-derives both at its base.
-  permission: `bash skills/session-kickoff/manifest-check.sh` is the argv of the `kickoff-manifest ratchet`
-  leg, which no role agent may run (`.claude/roles.json`). The main loop runs §4's staged red and its base read when
-  this unit is dispatched and records the output in this unit's acceptance ledger under a
-  `Pass: none` commit, before the builder's pass reads it.
+- **AC1** — When §4's stub probe runs at the tip by its file path, it prints `fail lines 1`,
+  `stall rc=1` with one `stall MANIFEST check 9 FAILED` line, `two rc=1` with a check-5 and a check-9
+  line, `crash rc=2` and `green rc=0` with none, `absent rc=1` and `empty rc=1` with none, and
+  `old pipe 0` (DERIVED 2026-11-24, the probe). And when
+  `git grep -nE "live (rc=|MANIFEST check 9 FAILED)" -- "memory/builds/dTotalRecall/build/*TOOL-dTotalRecall-76-*acceptance-ledger.md"`
+  runs, it prints `live rc=1` and a `live MANIFEST check 9 FAILED` line.
+  Red when: a run prints no `rc=` line, a stub that fails reads `rc=0`, `empty` reads `rc=0`, a failure
+  line is missing from either read, or the sweep's `live` read is green.
 - **AC2** — When `git grep -n "Evidences:\*\* TOOL-dTotalRecall-77" -- memory/builds/dTotalRecall/build`
-  runs after the pass, its AC1 line quotes the two `live` lines and its AC2 line quotes the
-  `base rc=` line with every failure line beneath it.
-  Red when: the ledger records a verdict with no `rc=` value.
+  runs after the pass, its AC1 line quotes the two `live` lines and the probe's output, and its AC2
+  line quotes the sweep's last unit line before `live`, an `rc=` line, with every failure line beneath
+  it. That line carries no check-9 failure, so the staging alone put one in `live`.
+  Red when: the ledger records a verdict with no `rc=` value, or the last unit line is a named red or
+  carries a check-9 failure, so the staged read distinguishes nothing.
 
 ## 7. Gates
 
-`kickoff-manifest ratchet` · `memory hygiene` · `recall floor` · `recall floor arms`
+`memory hygiene` · `recall floor` · `recall floor arms`
 
-No new arm: the observation is this pass's staged red, which proves the read prints a failure.
+No new arm: the stub probe and unit 76's staged red prove the read prints a failure.
 
 ## 8. Open questions
 
@@ -193,6 +214,13 @@ No new arm: the observation is this pass's staged red, which proves the read pri
   carry of `TOOL-dTotalRecall-19`'s clause, which would split a clause that unit carries whole. (b)
   reds the parts join; veto 1 discards it. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the
   precedent `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
+- **F2 — Does this unit run the checker again, when unit 76's sweep already reads a staged red?**
+  Options: (a) the main loop runs a worktree of this pass's base, staged on the count arm of C9, and a
+  read of the base; (b) this unit reads the sweep's `live` lines and its last unit line, and proves
+  `read_checker` on a stub. Each meets AC1 and AC2. (a) is a second run of the question unit 76's AC13
+  answers, and its base read repeats unit 79's S4. RESOLVED (agent, 2026-11-24, delegated): (b), the
+  tie-break's reuse of a seam, per `2026-11-24-prompt-TOOL-dTotalRecall-77-reground-brief`. The count
+  arm is not staged, as S2 states. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -202,18 +230,23 @@ No new arm: the observation is this pass's staged red, which proves the read pri
   unit the round-1 spec audit of units 77 to 88 promoted wrote; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-97, each the other end of an edge a
   unit the round-1 spec audit of units 89 to 92 promoted wrote; nothing else moved.
+- rev-4 · 2026-11-24 · §1 · S1 to S3 · §3 · §4 · §5 · AC1, AC2 · §7 · §8 F2 · §10 · re-grounded at `aec378661`
+  per `2026-11-24-prompt-TOOL-dTotalRecall-77-reground-brief`, over unit 76 rev-4: the second run of the
+  checker and the `mc77` worktree are cut, S2 and S3 reading the sweep's `live` and last unit lines (F2);
+  `read_checker` is seen red on a stub of the checker's own `fail()` line and refuses an empty worktree
+  path; the `kickoff-manifest ratchet` leg leaves the gates line; citations are pinned.
 
 ## 10. Reuse audit
 
-The seams are the checker itself, run rather than re-implemented, its own line format at
-`skills/session-kickoff/manifest-check.sh:1279`, and the scratch-worktree pair
-`add_scratch_worktree` and `remove_scratch_worktree` (`tools/run-gates/lib-attribute.sh:59` and
-`:63`), whose header places a worktree under the git common directory. `python tools/codebase-map/reuse_lookup.py "run a checker at each historical commit in a scratch worktree"`
-ranked `add_scratch_worktree` among its SEAM candidates, with `run` and `check` name-stem
-neighbours. The recall query below found the audit's B1 item, `TOOL-dTotalRecall-75` and an
-inherited-red ask of `aLevelledCopy` naming this leg, and none of them reads the checker's status at
-a past commit. The class a filter on a word belongs to is
-`memory/gotchas/a-grep-for-a-word-is-a-presence-probe.md`. No existing seam reads the checker's
-verdict; the read is three lines over the two seams.
+The seams are the checker's own line format at
+`skills/session-kickoff/manifest-check.sh@aec378661:2396`, lifted and not retyped, and unit 76 §4's
+sweep, whose `print_read` already prints the two shapes and whose output is read rather than made
+again. The run of `python tools/codebase-map/reuse_lookup.py "read a checker's exit status and its failure lines at a commit"`
+on 2026-11-24 ranked name-stem neighbours of `read` and `check`, none of which reads a checker's
+status. The recall query below was made when the spec was written. It found the audit's B1 item,
+`TOOL-dTotalRecall-75` and an inherited-red ask of `aLevelledCopy` naming this leg, and none of them
+reads the checker's status at a past commit. The class a filter on a word belongs to is
+`memory/gotchas/a-grep-for-a-word-is-a-presence-probe.md`. No existing seam is a shell read of the
+checker's verdict with its failure lines; the function is three lines.
 
 Recall terms used: `python tools/memory-recall/query.py "how is the kickoff manifest checker read at a past commit without losing its exit status" --terms "manifest-check exit status fail line MANIFEST check FAILED sweep worktree pipe grep ratchet C9"`
