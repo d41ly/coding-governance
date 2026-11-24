@@ -9,6 +9,9 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: KICK-dKeptSession-29=OPEN KICK-dKeptSession-66=CLOSED KICK-dKeptSession-68=OPEN KICK-dKeptSession-70=OPEN KICK-dKeptSession-71=OPEN KICK-dKeptSession-72=OPEN KICK-dKeptSession-73=OPEN KICK-dKeptSession-74=OPEN KICK-dKeptSession-75=OPEN KICK-dKeptSession-76=OPEN KICK-dKeptSession-77=OPEN KICK-dKeptSession-78=OPEN KICK-dKeptSession-81=OPEN KICK-dKeptSession-82=OPEN KICK-dKeptSession-83=OPEN KICK-dKeptSession-84=OPEN KICK-dKeptSession-85=OPEN KICK-dKeptSession-86=OPEN KICK-dKeptSession-87=OPEN KICK-dKeptSession-88=OPEN
+units-at-landing: KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-67 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-69 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 KICK-dKeptSession-79 KICK-dKeptSession-80 KICK-dKeptSession-89
+gates-run: unattended-179550929237807519318-683250 ba8d75fd
 parked-surfaced: yes, 4 surfaced
 keepalive-reaped: yes
 hold-run: 
@@ -22,7 +25,7 @@ held-from: VERIFYING
 refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 5f32c80ff3a832ccff25c85338e2c4c04d5aa3d9
-phase: VERIFYING
+phase: LANDING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dkeptsession-a0567a
