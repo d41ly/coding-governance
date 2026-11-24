@@ -12,19 +12,19 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 asks-at-landing: TOOL-dBoundRoles-27=DEFERRED TOOL-dBoundRoles-28=OPEN TOOL-dBoundRoles-29=DEFERRED TOOL-dBoundRoles-30=OPEN TOOL-dBoundRoles-31=OPEN TOOL-dBoundRoles-32=OPEN TOOL-dBoundRoles-33=DEFERRED TOOL-dBoundRoles-34=OPEN TOOL-dBoundRoles-35=OPEN TOOL-dBoundRoles-36=OPEN TOOL-dBoundRoles-70=OPEN TOOL-dBoundRoles-71=OPEN TOOL-dBoundRoles-72=OPEN TOOL-dBoundRoles-73=OPEN TOOL-dBoundRoles-74=OPEN TOOL-dBoundRoles-75=OPEN TOOL-dBoundRoles-76=OPEN TOOL-dBoundRoles-77=OPEN TOOL-dBoundRoles-78=OPEN TOOL-dBoundRoles-79=OPEN TOOL-dBoundRoles-80=OPEN
 units-at-landing: TOOL-dBoundRoles-14 TOOL-dBoundRoles-2 TOOL-dBoundRoles-1 TOOL-dBoundRoles-21 TOOL-dBoundRoles-37 TOOL-dBoundRoles-22 TOOL-dBoundRoles-49 TOOL-dBoundRoles-16 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-6 TOOL-dBoundRoles-13 TOOL-dBoundRoles-3 TOOL-dBoundRoles-38 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-48 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-7 TOOL-dBoundRoles-5 TOOL-dBoundRoles-10 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-4 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-12 TOOL-dBoundRoles-41 TOOL-dBoundRoles-11 TOOL-dBoundRoles-47 TOOL-dBoundRoles-26 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-20 TOOL-dBoundRoles-59 TOOL-dBoundRoles-19 TOOL-dBoundRoles-61 TOOL-dBoundRoles-18 TOOL-dBoundRoles-25 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69
 hold-run: 
-hold-streak: 1 · at 760ca206
+hold-streak: 1 · at 581c7336
 resume-owed: none · owner
-held-at: 2026-11-23T20:40:23Z
-hold-reason: the owner moves this run to node a: resume it there with --resume after the take-over; units 51 of 64 closed, unit 56 at order 31 is next and not yet dispatched
+held-at: 2026-11-24T11:41:00Z
+hold-reason: the closing review needs the gov-reviewer agent type, which this session, launched from a tree at main, does not register; the owner must launch a session from the run worktree, and must decide whether the one close runs with GATE_FULL=1 GATE_SELFTESTS=1
 hold-until: owner
 hold-code: host-owner-action
-held-from: RUNNING
+held-from: VERIFYING
 parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: ea9387ee4868ae8a8347bc6f6a8b3b0a1315af1f
-phase: VERIFYING
+witness: 581c7336f6a2a64799fa7b89d2e9a084f66ede64
+phase: HELD
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
@@ -586,3 +586,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T09:19:07Z draw · re-dispatch · TOOL-dBoundRoles-69 · 51/122 · 20261124T091907Z-6c2f5c
 
 2026-11-24T09:19:07Z dispatch · item f6e7ae14 TOOL-dBoundRoles-69 · reason tools/roles/adopt-roles.test.sh tools/roles/spawn-guard.test.sh tools/run-gates/selftest-budgets.txt memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-60-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-63-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-64-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-65-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-66-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-69-deviation-692.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-69-1-acceptance-ledger.md memory/builds/dBoundRoles/BACKLOG.md memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-69.md
+
+2026-11-24T11:41:03Z hold · item host-owner-action · reason until owner · reaped 32792f1d · resume none(owner)
