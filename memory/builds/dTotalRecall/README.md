@@ -161,8 +161,8 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113
 | [TOOL-dTotalRecall-58 — the census keep marker is honoured only under the tool root, so no pass writes it into a pinned instrument](spec/2026-10-26-spec-TOOL-dTotalRecall-58.md) | 30 | 2 | CLOSED | rev-4 | 2026-11-24 |
 | [TOOL-dTotalRecall-60 — the round-1 spec audit of units 44 to 53: its 35 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-60.md) | 31 | 2 | CLOSED | rev-3 | 2026-11-24 |
 | [TOOL-dTotalRecall-65 — the census keep rows live in a project registry, so the memory-tree engine ships no path of this repository](spec/2026-10-26-spec-TOOL-dTotalRecall-65.md) | 31 | 2 | CLOSED | rev-5 | 2026-11-24 |
-| [TOOL-dTotalRecall-66 — the round-1 spec audit of units 54 to 60: its 40 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-66.md) | 32 | 2 | INPROGRESS | rev-5 | 2026-11-24 |
-| [TOOL-dTotalRecall-68 — the census keep registry is a `[[ledger]]` population read through the ledger factory, so a keep added later is refused `gained`](spec/2026-10-26-spec-TOOL-dTotalRecall-68.md) | 32 | 2 | DEFERRED | rev-3 | 2026-11-24 |
+| [TOOL-dTotalRecall-66 — the round-1 spec audit of units 54 to 60: its 40 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-66.md) | 32 | 2 | DEFERRED | rev-5 | 2026-11-24 |
+| [TOOL-dTotalRecall-68 — the census keep registry is a `[[ledger]]` population read through the ledger factory, so a keep added later is refused `gained`](spec/2026-10-26-spec-TOOL-dTotalRecall-68.md) | 32 | 2 | INPROGRESS | rev-3 | 2026-11-24 |
 | [TOOL-dTotalRecall-69 — the kickoff manifest's `last-audit` is re-stamped over unit 65's `.memory-tree.conf` edit, so the manifest ratchet is green from step 32](spec/2026-10-26-spec-TOOL-dTotalRecall-69.md) | 32 | 2 | DEFERRED | rev-3 | 2026-11-24 |
 | [TOOL-dTotalRecall-70 — the round-5 minors: each criterion that observed nothing is observed at the tip, and each gap it hid in units 61 to 66 is closed](spec/2026-10-26-spec-TOOL-dTotalRecall-70.md) | 33 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dTotalRecall-73 — the census and its base compare read one registry path: the `census-kept-paths` registration re-rooted under the conf's memory root](spec/2026-10-26-spec-TOOL-dTotalRecall-73.md) | 33 | 2 | DEFERRED | rev-2 | 2026-10-26 |
@@ -193,7 +193,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 756 bound to this build, across 4 record folder(s).
+Records: 757 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -301,7 +301,7 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-24-prompt-TOOL-dTotalRecall-69-reground-spec-writer.md`, `2026-11-24-prompt-TOOL-dTotalRecall-69-reground-brief.md` and 326 more under prompts/ |
+| briefs | `2026-11-24-prompt-TOOL-dTotalRecall-69-reground-spec-writer.md`, `2026-11-24-prompt-TOOL-dTotalRecall-69-reground-brief.md` and 327 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-24-build-TOOL-dTotalRecall-65-deviation-1012.md`, `2026-11-23-build-TOOL-dTotalRecall-9-deviation-1006.md` and 147 more under build/ |
 | red-fix | `2026-11-24-build-TOOL-dTotalRecall-60-red-fix-26.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md` and 24 more under build/ |
