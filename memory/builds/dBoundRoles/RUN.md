@@ -608,3 +608,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T12:49:16Z rescope · item add TOOL-dBoundRoles-92 · reason closing diff review round 1 minors M1 to M14 and L1 to L4, batched into one unit, with unit 43's owed atomic step key
 
 2026-11-24T13:19:52Z brief · item TOOL-dBoundRoles-86 · reason d168703d9e29 memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-86-build-brief.md
+
+2026-11-24T13:32:37Z dispatch · item 1374ba07 TOOL-dBoundRoles-86 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/run-gates/selftest-budgets.txt memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-86-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-86-deviation-861.md
