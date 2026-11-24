@@ -6968,6 +6968,7 @@ memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-63.md	58 lines	1
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-66.md	5 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-66.md	7 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-69.md	3600 seconds	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dBoundRoles/spec/2026-11-24-spec-TOOL-dBoundRoles-89.md	6530 bytes	1	d44c4b07fe5672635f162495056324ddfdf94831	widened:2026-11-24-build-TOOL-dBoundRoles-86-widen-17
 memory/builds/dBriefedPass/BACKLOG.md	53 KB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBriefedPass/BACKLOG.md	61440 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBriefedPass/RUN.md	500 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -15163,5 +15164,4 @@ memory/map/features/row-grammar.md	137 rows	1	9e21ac760dc0a43d6ed007396922722cce
 memory/map/features/runlog.md	100,000 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/features/unattended-mandate.md	2 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/generated/CARDS.md	1024 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	71 specs	1	d44c4b07fe5672635f162495056324ddfdf94831	widened:2026-11-24-build-TOOL-dBoundRoles-86-widen-17
-memory/builds/dBoundRoles/spec/2026-11-24-spec-TOOL-dBoundRoles-89.md	6530 bytes	1	d44c4b07fe5672635f162495056324ddfdf94831	widened:2026-11-24-build-TOOL-dBoundRoles-86-widen-17
+memory/builds/dBoundRoles/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	72 specs	1	f5b1d8b588bbefaf605c1950c05f783c86872502	widened:2026-11-24-build-TOOL-dBoundRoles-93-widen-18

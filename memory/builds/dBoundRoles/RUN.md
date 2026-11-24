@@ -23,8 +23,8 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 43b674008a237487c7eab8755dd300be7ad93c5d
-phase: BUILDING
+witness: f5b1d8b588bbefaf605c1950c05f783c86872502
+phase: VERIFYING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
