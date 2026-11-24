@@ -149,7 +149,10 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +6 for arm 47, five verdicts over the house fixture and its line count (TOOL-dBoundRoles-19).
 # +1 for arm 32's stand-in with roles.no-spawn unset and +2 for arm 48 (TOOL-dBoundRoles-43).
 # +2 for arm 49 (TOOL-dBoundRoles-50).
-FLOOR_ASSERTIONS=223
+# +4 for arm 37's CR-split marker, comment and lone-fence cases (TOOL-dBoundRoles-58).
+# +2 for arm 38's balanced flip (TOOL-dBoundRoles-58).
+# +6 for arm 42's typed set, its diff renders and its two staged cases (TOOL-dBoundRoles-58).
+FLOOR_ASSERTIONS=235
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -2166,26 +2169,25 @@ rm -f "$FX/.claude/orientation-card.md"
 
 # ---- arm 37 (TOOL-dBoundRoles-45 AC1 AC2): a typed input is authored text, written unfenced under the authored-line
 # ---- rule. The researcher's `handoff.py render --stdout` of `--input question='plain words'` puts `plain words` on the
-# ---- line after its fact line's blank, no fence line between; the fixture's gov-spec-writer, reading its brief fields
-# ---- and `field.input.spec?` as arm 36's does, still wraps a scratch spec's bytes in a fence. A question whose second
+# ---- line after its fact line's blank, no fence line between; the fixture's gov-builder, which reads `input:spec` and
+# ---- no task, required brief or required card key, still wraps a scratch spec's bytes in a fence, with no brief record
+# ---- in the build (TOOL-dBoundRoles-58 S4 S6). A question whose second
 # ---- line is a whole fact line, a `### allowance` heading, a whole marker line, a `Framed by:` line or a line of four
 # ---- backticks nothing closes exits 1 naming `input:question` and line 2, and writes no file; one quoting words
 # ---- inside a closed three-backtick fence renders. The failing case, owed at the close and not observed by the pass
 # ---- that wrote this: `render_handoff` fencing the typed value and skipping `check_authored_lines`. WHAT IT DOES NOT
 # ---- CHECK: `input:diff`, which takes the same branch, or a typed value handed as an item's input.
+# ---- TOOL-dBoundRoles-58 AC21 AC22 AC28: a marker line after a carriage return is refused as one, `# install deps`
+# ---- renders inside a closed three-backtick fence and is refused outside one, and a question holding one line of a
+# ---- three-backtick fence is refused naming the open line. The failing cases, owed at the close: the authored-line
+# ---- check matching a line with its carriage returns kept, under which the CR case renders, and a check grading a
+# ---- level-one heading on every line, under which the fenced comment is refused.
 build_fixture; _rc37=$?
-sed 's/^reads: .*/reads: field.brief.prompt, field.brief.goal, field.brief.items, field.brief.acceptance, field.brief.gates, field.brief.non-goals, field.input.spec?/' \
-  "$FX/$FXK/agents/gov-spec-writer.agent.md" > "$TMP_ROOT/a37.role" && cp "$TMP_ROOT/a37.role" "$FX/$FXK/agents/gov-spec-writer.agent.md"
 A37P="$FX/$MR/builds/tFix/prompts"; A37S="$MR/builds/tFix/spec/2026-11-22-spec-TOOL-tFix-1.md"; A37E="$TMP_ROOT/a37.err"
 mkdir -p "$A37P" "$FX/$MR/builds/tFix/spec" && printf '# TOOL-tFix-1\n\nThe spec line one.\n' > "$FX/$A37S"
-"$PY" -B -c 'import pathlib, sys
-heads = ("Goal", "Items", "Acceptance", "Gates", "Non-goals")
-pathlib.Path(sys.argv[1], "2026-11-22-prompt-TOOL-tFix-1-brief.md").write_text(
-    "# Brief\n\n## The prompt\n\n> owner words\n\n## The brief\n\n" + "".join("### %s\n\n%s text\n\n" % (h, h) for h in heads),
-    encoding="utf-8", newline="\n")' "$A37P"
 render37() { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --build tFix --unit TOOL-tFix-1 "$@" 2>"$A37E"); }
 render37 --role gov-researcher --input "question=plain words" --stdout > "$TMP_ROOT/a37.q"; _rcq=$?
-render37 --role gov-spec-writer --input "spec=$A37S" --stdout > "$TMP_ROOT/a37.s"; _rcs=$?
+render37 --role gov-builder --input "spec=$A37S" --stdout > "$TMP_ROOT/a37.s"; _rcs=$?
 A37=$("$PY" -B -c 'import pathlib, sys
 q, s = (pathlib.Path(p).read_bytes().decode("utf-8").replace("\r\n", "\n") for p in sys.argv[1:3])
 after = q.split("\n### input:question\n\n", 1)[-1].split("\n")
@@ -2195,7 +2197,7 @@ print("file %d" % (block[0].startswith("<!-- gov:fact key=record:") and block[2:
                    and block[6] == "```"))' "$TMP_ROOT/a37.q" "$TMP_ROOT/a37.s" 2>&1); A37=${A37//$'\r'/}
 check_arm "arm 37 AC1 the researcher's typed question sits unfenced on the line after its fact line's blank" \
    "$([ "$_rc37" = 0 ] && [ "$_rcq" = 0 ] && [[ $A37 == *"typed 1"* ]] && echo 1 || echo 0)"
-check_arm "arm 37 AC1 ...and the spec writer's file input still wraps the spec's bytes in a fence" \
+check_arm "arm 37 AC1 ...and the builder's file input, with no brief record, still wraps the spec's bytes in a fence" \
    "$([ "$_rcs" = 0 ] && [[ $A37 == *"file 1"* ]] && echo 1 || echo 0)"
 [ "$_rcq" = 0 ] && [ "$_rcs" = 0 ] && [ "$A37" = $'typed 1\nfile 1' ] || { printf '    exit %s %s: %s\n' "$_rcq" "$_rcs" "${A37//$'\n'/ | }"; sed 's/^/    /' "$A37E"; }
 _ls=$(ls -A "$A37P")
@@ -2216,6 +2218,21 @@ done
 render37 --role gov-researcher --input "question=a question"$'\n''```'$'\n''quoted words'$'\n''```' --stdout >/dev/null; _rc=$?
 check_arm "arm 37 AC2 a typed question quoting words inside a closed three-backtick fence renders" "$([ "$_rc" = 0 ] && echo 1 || echo 0)"
 [ "$_rc" = 0 ] || sed 's/^/    /' "$A37E"
+for _c in cr comment lone; do
+  case $_c in
+    cr) _l=$'\r'"<!-- gov:handoff role=gov-researcher build=tFix unit=TOOL-tFix-1 item=- path=$MR/builds/tFix/prompts/x.md role-sha=0123456789ab task-sha=0123456789ab -->"
+        _w='input:question — line 2 reads as a gov:handoff marker line' ;;
+    comment) _l='# install deps'; _w='input:question — line 2 reads as a heading' ;;
+    lone) _l='```'; _w='input:question — a fence opened at line 2 of the value is never closed' ;;
+  esac
+  render37 --role gov-researcher --input "question=a question"$'\n'"$_l" >/dev/null; _rc=$?
+  check_arm "arm 37 BR58 a typed question carrying the $_c line exits 1 naming input:question and line 2, writing nothing" \
+     "$([ "$_rc" = 1 ] && grep -qF -- "$_w" "$A37E" && [ "$(ls -A "$A37P")" = "$_ls" ] && echo 1 || echo 0)"
+  [ "$_rc" = 1 ] && grep -qF -- "$_w" "$A37E" || { printf '    exit %s, want 1 naming %s\n' "$_rc" "$_w"; sed 's/^/    /' "$A37E"; }
+done
+render37 --role gov-researcher --input "question=a question"$'\n''```'$'\n''# install deps'$'\n''```' --stdout >/dev/null; _rc=$?
+check_arm "arm 37 BR58 AC22 ...and the comment line inside a closed three-backtick fence renders" "$([ "$_rc" = 0 ] && echo 1 || echo 0)"
+[ "$_rc" = 0 ] || sed 's/^/    /' "$A37E"
 
 # ---- arm 38 (TOOL-dBoundRoles-48 AC1 AC2): the task section checked block by block. `check_block_fences` over the
 # ---- section §4 of that spec walks, a `framing:job` block holding a three-backtick line, an `input:spec` block whose
@@ -2227,6 +2244,10 @@ check_arm "arm 37 AC2 a typed question quoting words inside a closed three-backt
 # ---- case, owed at the close and not observed by the pass that wrote this: a `check_block_fences` reading only the
 # ---- end of the walk, under which the first row passes the flipped section. WHAT IT DOES NOT CHECK: a block a later
 # ---- unit appends after the check, which the hands-off to TOOL-dBoundRoles-23 orders.
+# ---- TOOL-dBoundRoles-58 AC7: the same flip through the render. A scratch copy of handoff.py placing one unfenced
+# ---- block that opens a three-backtick fence before the handed blocks and one holding a longer run after them, so the
+# ---- walk ends balanced, exits 1 naming `### input:spec` and writes nothing; the same copy with `check_block_fences`
+# ---- returning nothing, the walk's end still read by `check_open_fence`, exits 0, so the arm reads that staged break.
 build_fixture; _rc38=$?
 A38P="$FX/$MR/builds/tFix/prompts"; A38S="$MR/builds/tFix/spec/2026-11-22-spec-TOOL-tFix-1.md"; A38E="$TMP_ROOT/a38.err"
 mkdir -p "$A38P" "$FX/$MR/builds/tFix/spec" && printf '# TOOL-tFix-1\n\nThe spec line one.\n' > "$FX/$A38S"
@@ -2240,8 +2261,8 @@ def compose_section(flip):
     L += ["", "### allowance", "", "- tools/"]
     ae, fa = len(L), len(L) + 2
     L += ["", "### framing:added", "", "more"] + (["`````"] if flip else [])
-    return "\n".join(L) + "\n", [("framing:job", 3, sp - 2, None), ("input:spec", sp, sl, (sp + 4, sl)),
-                                 ("allowance", al, ae, None), ("framing:added", fa, len(L), None)]
+    return "\n".join(L) + "\n", [("framing:job", 3, sp - 2, None, False), ("input:spec", sp, sl, (sp + 4, sl), True),
+                                 ("allowance", al, ae, None, False), ("framing:added", fa, len(L), None, False)]
 sec, ext = compose_section(True)
 got = lib.check_block_fences(sec, ext)
 balanced = not [n for n, l in lib.read_unfenced_lines(sec) if l is None]
@@ -2259,7 +2280,7 @@ check_arm "arm 38 AC2 the skeptic's render handing a scratch spec exits 0" "$([ 
 kit = pathlib.Path(sys.argv[1]); src = (kit / "handoff.py").read_text(encoding="utf-8")
 anchor = "    if declaration is not None:\n        # TOOL-dBoundRoles-3 S2"
 (kit / "handoff_a38.py").write_text(src.replace(anchor, sys.argv[2] + "\n" + anchor, 1), encoding="utf-8", newline="\n")' \
-  "$FX/$FXK" $'    blocks.append(("added", "### framing:added\\n\\n```", None, "### framing:added\\n\\n```"))'
+  "$FX/$FXK" $'    blocks.append(("added", "### framing:added\\n\\n```", None))'
 _ls=$(ls -A "$A38P")
 (cd "$FX" && "$PY" -B "$FXK/handoff_a38.py" render --role gov-skeptic --build tFix --unit TOOL-tFix-1 --input "spec=$A38S" \
    --input "diff=one diff line" >/dev/null 2>"$A38E"); _rc=$?
@@ -2267,6 +2288,26 @@ check_arm "arm 38 AC2 a handoff.py appending an unfenced block holding a lone fe
    "$([ "$_rc" = 1 ] && grep -qF -- '### framing:added — a fence opened at line' "$A38E" && [ "$(ls -A "$A38P")" = "$_ls" ] && echo 1 || echo 0)"
 [ "$_rc" = 1 ] || { printf '    exit %s, want 1\n' "$_rc"; sed 's/^/    /' "$A38E"; }
 rm -f "$FX/$FXK/handoff_a38.py"
+"$PY" -B -c 'import pathlib, sys
+kit = pathlib.Path(sys.argv[1]); src = (kit / "handoff.py").read_text(encoding="utf-8")
+anchor = "    if declaration is not None:\n        # TOOL-dBoundRoles-3 S2"
+bar = chr(96)
+assert src.count(anchor) == 1
+flip = src.replace(anchor, "    blocks += [(\"role\", \"### framing:job\\n\\n%s\", None), (\"added\", \"### framing:added\\n\\n%s\", None)]\n%s"
+                   % (bar * 3, bar * 5, anchor), 1)
+(kit / "handoff_a38f.py").write_text(flip, encoding="utf-8", newline="\n")
+(kit / "handoff_a38e.py").write_text(flip.replace("import roles_lib as lib", "import roles_lib as lib\nlib.check_block_fences = lambda section, extents: []", 1),
+                                     encoding="utf-8", newline="\n")' "$FX/$FXK"
+render_flip() { (cd "$FX" && "$PY" -B "$FXK/$1" render --role gov-skeptic --build tFix --unit TOOL-tFix-1 --input "spec=$A38S" \
+   --input "diff=one diff line" "${@:2}" >/dev/null 2>"$A38E"); }
+render_flip handoff_a38f.py; _rc=$?
+check_arm "arm 38 BR58 AC7 a render flipped around its handed block, its walk ending balanced, exits 1 naming it, writing nothing" \
+   "$([ "$_rc" = 1 ] && grep -qF -- '### input:spec — ' "$A38E" && ! grep -qF -- 'never closed' "$A38E" && [ "$(ls -A "$A38P")" = "$_ls" ] && echo 1 || echo 0)"
+[ "$_rc" = 1 ] || { printf '    exit %s, want 1\n' "$_rc"; sed 's/^/    /' "$A38E"; }
+render_flip handoff_a38e.py --stdout; _rc=$?
+check_arm "arm 38 BR58 AC7 ...and renders where only the end of the walk is read" "$([ "$_rc" = 0 ] && echo 1 || echo 0)"
+[ "$_rc" = 0 ] || sed 's/^/    /' "$A38E"
+rm -f "$FX/$FXK/handoff_a38f.py" "$FX/$FXK/handoff_a38e.py"
 
 # ---- arm 39 (TOOL-dBoundRoles-24 AC1 AC2 AC4): every anchor the rendered task points at resolves to a fact the work
 # ---- order hands. `check_anchors` over a scratch file holding one backticked `blob:` key names it as resolving to no
@@ -2423,30 +2464,63 @@ check_arm "arm 41 AC5 an unknown kind exits 2 naming it" \
 # ---- failing cases, owed at the close and not observed by the pass that wrote this: the case re-roled to
 # ---- `gov-builder`, under which the read check fails naming `input:question` before any render runs, and a
 # ---- `handoff.py` that calls `ap.error` on every render, under which the refusal arm fails naming the usage error.
+# ---- TOOL-dBoundRoles-58 AC1 AC2 AC35: the case runs once per typed input, the names the fixture kit's handoff.py
+# ---- derives, `INPUT_NAMES` less `PATH_INPUTS`, each mapped to the role that reads it and the file input it hands:
+# ---- `question` to gov-orienter beside `input:prompt`, `diff` to gov-skeptic beside `input:spec`. A typed name with no
+# ---- mapped role fails the case naming it, staged by a scratch copy of handoff.py declaring one more, and the diff
+# ---- case over a gov-skeptic whose `reads` drops `input:spec` fails at the read check before any render. Both staged
+# ---- cases run in a subshell, so their own assertions are read by one outer line and never counted.
 build_fixture; _rc42=$?
-A42R=gov-orienter
 A42P="$FX/$MR/builds/tFix/prompts"; A42S="$MR/builds/tFix/spec/2026-11-23-spec-TOOL-tFix-1.md"; A42E="$TMP_ROOT/a42.err"
 A42K="record:TOOL-tFix-9@$(printf '%012d' 0)"
 mkdir -p "$A42P" "$FX/$MR/builds/tFix/spec" \
   && printf '# TOOL-tFix-1\n\nThe spec quotes `%s` in its prose.\n' "$A42K" > "$FX/$A42S"
-check_role_reads "$A42R" input:question input:prompt; _rr42=$?
-_ls=$(ls -A "$A42P"); _rc=unread
-[ "$_rr42" = 0 ] && { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role "$A42R" --build tFix --unit TOOL-tFix-1 \
-   --input "prompt=$A42S" --input 'question=which seam fits' >/dev/null 2>"$A42E"); _rc=$?; }
-check_arm "arm 42 AC1 the orienter's render with the question in plain words exits 0 and writes its prompt file" \
-   "$([ "$_rc42" = 0 ] && [ "$_rc" = 0 ] && [ -z "$_ls" ] && [ -n "$(ls -A "$A42P")" ] && echo 1 || echo 0)"
-case $_rc in 0) ;; unread) echo "    not run: $A42R does not read a key the case passes" ;; *) sed 's/^/    /' "$A42E" ;; esac
-_ls=$(ls -A "$A42P"); _rc=unread
-[ "$_rr42" = 0 ] && { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role "$A42R" --build tFix --unit TOOL-tFix-1 \
-   --input "prompt=$A42S" --input "question=which seam fits; see \`$A42K\`" >/dev/null 2>"$A42E"); _rc=$?; }
-_v42=$([ "$_rc" = 1 ] && [ "$(grep -oF -- "$A42K" "$A42E" | wc -l | tr -d ' ')" = 1 ] && ! grep -qF -- 'does not read' "$A42E" \
-      && [ "$(ls -A "$A42P")" = "$_ls" ] && echo 1 || echo 0)
-check_arm "arm 42 AC1 ...and with its span planted in the typed question and the handed prompt it exits 1 naming it once, the anchor check's refusal" "$_v42"
-[ "$_v42" = 1 ] || case $_rc in
-  2) echo "    exit 2: a usage error, not the anchor check's refusal"; sed 's/^/    /' "$A42E" ;;
-  unread) echo "    not run: $A42R does not read a key the case passes" ;;
-  *) printf '    exit %s, want 1 naming the span once, no does-not-read line and no file written\n' "$_rc"; sed 's/^/    /' "$A42E" ;;
-esac
+read_typed_names() { "$PY" -B -c 'import importlib.util, sys
+sys.path.insert(0, sys.argv[1])
+spec = importlib.util.spec_from_file_location("a42", sys.argv[1] + "/" + sys.argv[2])
+mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+print(" ".join(n for n in mod.INPUT_NAMES if n not in mod.PATH_INPUTS))' "$FX/$FXK" "$1" | tr -d '\r'; }
+check_typed_input() { # <typed name> -> the read check, the plain-words control render and the refusal render, or one
+  # failing line naming a typed name no role is mapped for; the planted span sits in the typed value and the handed file
+  local _role _file _rr _ls _rc _v
+  case $1 in
+    question) _role=gov-orienter _file=prompt ;;
+    diff) _role=gov-skeptic _file=spec ;;
+    *) check_arm "arm 42 the typed input $1 maps to a role that reads it: no role is mapped" 0; return ;;
+  esac
+  check_role_reads "$_role" "input:$1" "input:$_file"; _rr=$?
+  _ls=$(ls -A "$A42P"); _rc=unread
+  [ "$_rr" = 0 ] && { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role "$_role" --build tFix --unit TOOL-tFix-1 \
+     --input "$_file=$A42S" --input "$1=which seam fits" >/dev/null 2>"$A42E"); _rc=$?; }
+  check_arm "arm 42 AC1 the $_role render with the typed $1 in plain words exits 0 and writes its prompt file" \
+     "$([ "$_rc42" = 0 ] && [ "$_rc" = 0 ] && [ "$(ls -A "$A42P")" != "$_ls" ] && echo 1 || echo 0)"
+  case $_rc in 0) ;; unread) echo "    not run: $_role does not read a key the case passes" ;; *) sed 's/^/    /' "$A42E" ;; esac
+  _ls=$(ls -A "$A42P"); _rc=unread
+  [ "$_rr" = 0 ] && { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role "$_role" --build tFix --unit TOOL-tFix-1 \
+     --input "$_file=$A42S" --input "$1=which seam fits; see \`$A42K\`" >/dev/null 2>"$A42E"); _rc=$?; }
+  _v=$([ "$_rc" = 1 ] && [ "$(grep -oF -- "$A42K" "$A42E" | wc -l | tr -d ' ')" = 1 ] && ! grep -qF -- 'does not read' "$A42E" \
+        && [ "$(ls -A "$A42P")" = "$_ls" ] && echo 1 || echo 0)
+  check_arm "arm 42 AC1 ...and with its span planted in the typed $1 and the handed $_file it exits 1 naming it once, the anchor check's refusal" "$_v"
+  [ "$_v" = 1 ] || case $_rc in
+    2) echo "    exit 2: a usage error, not the anchor check's refusal"; sed 's/^/    /' "$A42E" ;;
+    unread) echo "    not run: $_role does not read a key the case passes" ;;
+    *) printf '    exit %s, want 1 naming the span once, no does-not-read line and no file written\n' "$_rc"; sed 's/^/    /' "$A42E" ;;
+  esac
+}
+A42T=$(read_typed_names handoff.py)
+check_arm "arm 42 AC35 the typed set of the fixture kit's handoff.py derives, holding question and diff" \
+   "$([[ " $A42T " == *" question "* && " $A42T " == *" diff "* ]] && echo 1 || echo 0)"
+for _t42 in $A42T; do check_typed_input "$_t42"; done
+sed 's/^PATH_INPUTS = /INPUT_NAMES += ("extra",)\nPATH_INPUTS = /' "$FX/$FXK/handoff.py" > "$FX/$FXK/handoff_a42.py"
+_o42=$(for _t42 in $(read_typed_names handoff_a42.py); do case $_t42 in question|diff) ;; *) check_typed_input "$_t42" ;; esac; done)
+check_arm "arm 42 AC35 a typed input a scratch handoff.py adds fails the case naming it" \
+   "$([[ $_o42 == "FAIL "*"the typed input extra maps to a role"* ]] && echo 1 || echo 0)"
+rm -f "$FX/$FXK/handoff_a42.py"
+A42R="$FX/$FXK/agents/gov-skeptic.agent.md"; cp "$A42R" "$TMP_ROOT/a42.role"; _ls=$(ls -A "$A42P")
+sed '/^reads: /s/,[ ]*field\.input\.spec?//' "$TMP_ROOT/a42.role" > "$A42R"
+_o42=$(check_typed_input diff); cp "$TMP_ROOT/a42.role" "$A42R"
+check_arm "arm 42 AC2 the diff case over a gov-skeptic that reads no input:spec fails at the read check, rendering nothing" \
+   "$([[ $_o42 == *"gov-skeptic does not read input:spec"* && $_o42 == *"    not run: "* && $(ls -A "$A42P") == "$_ls" ]] && echo 1 || echo 0)"
 
 # ---- arm 43 (TOOL-dBoundRoles-26 AC1 AC2 AC3 AC5): the typed refusal. The fixture gains the policy kit, as arm
 # ---- 41's does, with no run.on-owner-question set on `main`. AC3: every scaffolded agent file counts one

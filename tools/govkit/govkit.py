@@ -4983,6 +4983,13 @@ def decline_findings(root: pathlib.Path, target: pathlib.Path, deploy: dict,
         out[(kit, dest)] = state
     return out
 
+def derive_seed_writes(rows: list[dict]) -> list[dict]:
+    """The seed rows of a `planned_writes` list a plan previews as `write` or `KEEP`: kind `write`, role `seed`,
+    no token missing. The one predicate `cmd_plan` and the self-test's `derive_seed_expected` read
+    (TOOL-dBoundRoles-58 S31)."""
+    return [x for x in rows if x["kind"] == "write" and x["role"] == "seed" and not x["missing"]]
+
+
 def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str],
              coverage: bool = False, emit_declines: bool = False,
              run_discharge: bool = False) -> int:
@@ -5004,6 +5011,7 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
           "path · BLOCK = apply refuses the install over it · FORK = gov's copy is a derivative of "
           "the target's, reported and never written · UNRES. = unresolved token, not a path")
     n_keep = 0
+    seeds = {id(x) for x in derive_seed_writes(rows)}
     for row in rows:
         # A destination still carrying a brace is NOT a path, and printing it under `write` would
         # promise a write this tool cannot perform — the row is marked UNRESOLVED so the plan never
@@ -5011,8 +5019,7 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
         mark = "UNRES." if row["missing"] else KIND_MARKS.get(row["kind"], "?????")
         # DEPL-aRepatriatedFork-17 S6. `apply` leaves a seed that already exists in place, so the
         # plan says KEEP there rather than promising a write `apply` will not make.
-        if (not row["missing"] and row["kind"] == "write" and row["role"] == "seed"
-                and os.path.lexists(target / row["dest"])):
+        if id(row) in seeds and os.path.lexists(target / row["dest"]):
             mark = "KEEP  "
             n_keep += 1
         print(f"  {mark} [{row['role']:<13}] {row['dest']}   <- {row['kit']}")

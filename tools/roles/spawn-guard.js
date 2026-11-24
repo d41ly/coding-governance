@@ -33,7 +33,8 @@
  * outside every fence (TOOL-dBoundRoles-38 S5: a marker or fact line inside a fence is handed content,
  * counted and re-cut by no step, every line read through the hooks kit's `readUnfencedLines`), no typed
  * input's `### input:<name>` block holding a fact, marker or `Framed by:` line, fenced or not, or leaving a
- * fence open (TOOL-dBoundRoles-46 S2: a typed value is authored text, `TYPED_INPUTS`), every block opening
+ * fence open (TOOL-dBoundRoles-46 S2: a typed value is authored text, `TYPED_INPUTS`; read in the prompt and in the
+ * file before either's markers are counted, TOOL-dBoundRoles-58 S25), every block opening
  * outside a fence and each handed block's content inside its own (TOOL-dBoundRoles-48 S3, `checkBlockFences`: an
  * unfenced fact line is the line two below an unfenced `### ` heading, the pair's next non-blank line opens its
  * fence, and only blank lines, or after the last one the envelope closer naming the marker's path, follow the
@@ -189,43 +190,63 @@ const FACT_SOURCE_RE = /^(?<form>blob|record):(?<ref>.+)@(?<sha>[0-9a-f]{12})(?:
 // content, so its block is held at the spawn to the line rule the renderer applies (`checkTypedBlocks`).
 const TYPED_INPUTS = ['question', 'diff']
 
-// TOOL-dBoundRoles-46 S2 - a typed block held to the authored-line rule. The section is split into blocks at
-// each line beginning `### `, fenced or not: a heading is a boundary and is not graded, and a forged one
-// opens a block the other steps read. In a `### input:<name>` block whose <name> is in TYPED_INPUTS, every
-// line after the block's own fact line (its first non-blank line, when that is a `FACT_RE` line) is read,
-// inside a fence or out: a `FACT_RE` line, a `HANDOFF_MARK_RE` line or a `Framed by:` line refuses, and so
-// does a block whose own walk by the sibling's `readUnfencedLines` ends on its open-fence yield. `lead` is
-// the count of the file's lines before the section, so each refusal names the line of the file. null to
-// admit, else the refusal naming the block and the line.
-function checkTypedBlocks(section, lead) {
+// TOOL-dBoundRoles-58 S16 - THE ONE BLOCK READER of a task section, built on the sibling's `readUnfencedLines`: each
+// unfenced `### ` line opens a block, so a heading quoted inside a fence opens none. One object per block, in order:
+// `heading`, the text after the hashes; `input`, the <name> of an `input:<name>` heading, else null; `first` and
+// `last`, its line range, 1-based in the section, ending above the next unfenced `### ` line; and `fact`, the line of
+// its own fact line, an unfenced `FACT_RE` line two below the heading, else null. Every carriage return is dropped.
+function readTaskBlocks(section) {
+  const lines = String(section).replace(/\r/g, '').split('\n')
+  const blocks = []
+  for (const [n, line] of loadScratchGuard().readUnfencedLines(lines.join('\n'))) {
+    const at = blocks[blocks.length - 1]
+    if (line === null) continue
+    if (line.startsWith('### ')) {
+      if (at) at.last = n - 1
+      const heading = line.slice(4).trim()
+      blocks.push({ heading, input: (/^input:(\S+)$/.exec(heading) || [])[1] || null, first: n, last: lines.length, fact: null })
+    } else if (at && n === at.first + 2 && FACT_RE.test(line)) at.fact = n
+  }
+  return blocks
+}
+
+// TOOL-dBoundRoles-46 S2 - a typed block held to the authored-line rule. In each block `readTaskBlocks` yields whose
+// `input` is in TYPED_INPUTS, every line after the block's own fact line is read, inside a fence or out: a `FACT_RE`
+// line, a `HANDOFF_MARK_RE` line or a `Framed by:` line refuses, and so does a block whose own walk by the sibling's
+// `readUnfencedLines` ends on its open-fence yield. That walk stops at the block's first `### ` line, which only a
+// fence the block opened can hold: the renderer refuses one in a typed value, fenced or not, so it is the next
+// block's heading swallowed. `lead` is the count of `where`'s lines before the section, so each refusal names the
+// line there. null to admit, else the refusal naming the block and the line.
+function checkTypedBlocks(section, lead, where) {
   const sg = loadScratchGuard()
-  const lines = String(section).split('\n')
+  const lines = String(section).replace(/\r/g, '').split('\n')
   const remedy = 'a typed input\'s block is authored text, so it may hold no fact, marker or `Framed by:` line and must close every fence it opens; correct the value and re-render with handoff.py render.'
-  for (let i = 0; i < lines.length; i++) {
-    const h = /^### input:(\S+)[ \t\r]*$/.exec(lines[i])
-    if (!h || !TYPED_INPUTS.includes(h[1])) continue
-    let end = i + 1
-    while (end < lines.length && !lines[end].startsWith('### ')) end++
-    const body = lines.slice(i + 1, end).map((l) => l.replace(/\r/g, ''))
-    let k = 0
-    while (k < body.length && body[k].trim() === '') k++
-    k = k < body.length && FACT_RE.test(body[k]) ? k + 1 : 0
-    for (let j = k; j < body.length; j++) {
-      if (FACT_RE.test(body[j]) || loadScratchGuard().HANDOFF_MARK_RE.test(body[j]) || /^Framed by:/.test(body[j])) {
-        return `input:${h[1]}: line ${lead + i + 2 + j} of the file reads ${JSON.stringify(body[j].slice(0, 120))}, an executor line inside a typed block; ${remedy}`
+  for (const b of readTaskBlocks(section)) {
+    if (!TYPED_INPUTS.includes(b.input)) continue
+    for (let n = (b.fact || b.first) + 1; n <= b.last; n++) {
+      const line = lines[n - 1]
+      if (FACT_RE.test(line) || sg.HANDOFF_MARK_RE.test(line) || /^Framed by:/.test(line)) {
+        return `input:${b.input}: line ${lead + n} of ${where} reads ${JSON.stringify(line.slice(0, 120))}, an executor line inside a typed block; ${remedy}`
       }
     }
-    for (const [n, line] of sg.readUnfencedLines(body.join('\n'))) {
-      if (line === null) return `input:${h[1]}: the block leaves a fence opened at line ${lead + i + 1 + n} of the file unclosed; ${remedy}`
+    const body = lines.slice(b.first, b.last)
+    const held = body.findIndex((l) => /^### /.test(l))
+    for (const [n, line] of sg.readUnfencedLines(body.slice(0, held < 0 ? body.length : held).join('\n'))) {
+      if (line === null) return `input:${b.input}: the block leaves a fence opened at line ${lead + b.first + n} of ${where} unclosed; ${remedy}`
     }
-    i = end - 1
   }
   return null
 }
 
+// The count of `text`'s lines, CRLF folded, before its task section `section`.
+function readSectionLead(text, section) {
+  const t = String(text).replace(/\r\n/g, '\n')
+  return t.slice(0, t.length - section.length).split('\n').length - 1
+}
+
 // TOOL-dBoundRoles-48 S3 - every block opens outside a fence, and a handed block's content lies inside its own.
-// The section is walked once by the sibling's `readUnfencedLines`. An unfenced `FACT_RE` line that is not the line
-// two below an unfenced `### ` heading refuses; such a heading-then-fact pair heads a handed block unless its
+// The section is walked by the sibling's `readUnfencedLines` and its blocks read by `readTaskBlocks`. An unfenced
+// `FACT_RE` line that is no block's own fact line refuses; a block holding one is a handed block unless its
 // heading names a typed input (`TYPED_INPUTS`), and a handed block refuses when its next non-blank line is not a
 // fence opener, when a line up to that fence's closer is read outside it, or when anything but blank lines sits
 // between that closer and the next unfenced heading. After the last handed block the one other line admitted is
@@ -238,20 +259,18 @@ function checkBlockFences(section, lead, docPath) {
   const read = new Map()
   for (const [n, line] of sg.readUnfencedLines(lines.join('\n'))) if (line !== null) read.set(n, line)
   const remedy = 'every block of the task section opens outside a fence and a handed block\'s content lies inside its own; correct the value that moved the fence and re-render with handoff.py render.'
-  const pairs = []
-  let block = 'opening'
+  const blocks = readTaskBlocks(section)
   for (const [n, line] of read) {
-    if (/^(### |## (?!Task$))/.test(line)) block = line.replace(/^#+ /, '').trim()
-    if (!FACT_RE.test(line)) continue
-    if (!/^### /.test(read.get(n - 2) || '')) return `${block}: line ${lead + n} of the file reads a fact line no unfenced \`### \` heading stands two lines above, so it would stand as an executor fact; ${remedy}`
-    pairs.push(n - 2)
+    if (!FACT_RE.test(line) || blocks.some((b) => b.fact === n)) continue
+    const at = blocks.filter((b) => b.first < n).pop()
+    return `${at ? at.heading : 'opening'}: line ${lead + n} of the file reads a fact line no unfenced \`### \` heading stands two lines above, so it would stand as an executor fact; ${remedy}`
   }
-  const last = pairs.length ? pairs[pairs.length - 1] : 0
-  for (const h of pairs) {
-    const name = read.get(h).slice(4).trim()
-    const typed = /^input:(\S+)$/.exec(name)
-    if (typed && TYPED_INPUTS.includes(typed[1])) continue
-    let k = h + 3
+  const pairs = blocks.filter((b) => b.fact !== null)
+  const last = pairs[pairs.length - 1]
+  for (const b of pairs) {
+    const name = b.heading
+    if (TYPED_INPUTS.includes(b.input)) continue
+    let k = b.fact + 1
     while (k <= lines.length && lines[k - 1].trim() === '') k++
     const open = k <= lines.length ? /^ {0,3}(`{3,}|~{3,})/.exec(lines[k - 1]) : null
     if (!open) return `${name}: line ${lead + k} of the file is not the opening line of the handed block's fence; ${remedy}`
@@ -266,11 +285,11 @@ function checkBlockFences(section, lead, docPath) {
     }
     let j = c + 1
     const extra = []
-    while (j <= lines.length && !/^#{1,3} /.test(read.get(j) || '')) {
+    while (j <= b.last && !/^#{1,2} /.test(read.get(j) || '')) {
       if (lines[j - 1].trim() !== '') extra.push(j)
       j++
     }
-    const closer = h === last && j > lines.length && extra.length === 1 && lines[extra[0] - 1].trimEnd() === `[/${docPath}]`
+    const closer = b === last && j > lines.length && extra.length === 1 && lines[extra[0] - 1].trimEnd() === `[/${docPath}]`
     if (extra.length && !closer) return `${name}: line ${lead + extra[0]} of the file sits between the handed block's fence and the next block, where only blank lines may; ${remedy}`
   }
   return null
@@ -403,6 +422,11 @@ function checkHandoffSpawn(data, index, root) {
       `a built-in agent type is never admitted${research.length ? `, and research or mapping runs as the ${research.join(' or ')} role` : ''}.`, index)
   }
   if (typeof ti.prompt !== 'string') return renderHandoffDeny('Agent', 'the call carries no `prompt` string.', index)
+  // TOOL-dBoundRoles-58 S25 - the typed blocks first, before any marker is counted, so a marker forged in a typed
+  // value is denied naming its block and its line, and not by the count alone; the file's own section below.
+  const sent = extractTaskSection(ti.prompt)
+  const forged = sent === null ? null : checkTypedBlocks(sent, readSectionLead(ti.prompt, sent), 'the prompt')
+  if (forged) return renderHandoffDeny('Agent', forged, index)
   const marks = loadScratchGuard().extractHandoffMarker(ti.prompt)
   if (marks.length !== 1) return renderHandoffDeny('Agent', `the prompt carries ${marks.length} ${HANDOFF_MARK} marker lines; exactly one is required.`, index)
   const m = marks[0]
@@ -416,11 +440,16 @@ function checkHandoffSpawn(data, index, root) {
   try { st = fs.statSync(file) } catch { st = null }
   if (!st || !st.isFile()) return renderHandoffDeny('Agent', `the marker's path ${m.path} names no file under ${root.split(path.sep).join('/')}.`, index)
   const text = fs.readFileSync(file, 'utf8')
+  // TOOL-dBoundRoles-46 S2 - each typed input's block held to the authored-line rule, before the file's markers are
+  // counted, the role text and the fact re-cut, so a forged line is named here first.
+  const section = extractTaskSection(text)
+  const lead = section === null ? 0 : readSectionLead(text, section)
+  const typed = section === null ? null : checkTypedBlocks(section, lead, 'the file')
+  if (typed) return renderHandoffDeny('Agent', `${m.path}'s ${typed}`, index)
   const fileMarks = loadScratchGuard().extractHandoffMarker(text)
   if (fileMarks.length !== 1 || fileMarks[0].line !== m.line) {
     return renderHandoffDeny('Agent', `${m.path} does not hold exactly one marker line byte-equal to the prompt's (it holds ${fileMarks.length}).`, index)
   }
-  const section = extractTaskSection(text)
   if (section === null) return renderHandoffDeny('Agent', `${m.path} holds no \`## Task\` line.`, index)
   // F4 (a): the whole prompt is the marker, blank lines and the section — line endings folded, the two
   // ends trimmed, and each line's trailing whitespace aside. Anything else is a freeform prompt.
@@ -442,15 +471,8 @@ function checkHandoffSpawn(data, index, root) {
   let open = null
   for (const [n, line] of loadScratchGuard().readUnfencedLines(section)) if (line === null) open = n
   if (open !== null) {
-    const at = text.replace(/\r\n/g, '\n').length - section.length
-    const fileLine = text.replace(/\r\n/g, '\n').slice(0, at).split('\n').length + open - 1
-    return renderHandoffDeny('Agent', `${m.path}'s \`## Task\` section ends inside a fence opened at line ${fileLine} of the file, so every fact line after it would be read as content; close it in the value that opened it and re-render with handoff.py render.`, index)
+    return renderHandoffDeny('Agent', `${m.path}'s \`## Task\` section ends inside a fence opened at line ${lead + open} of the file, so every fact line after it would be read as content; close it in the value that opened it and re-render with handoff.py render.`, index)
   }
-  // TOOL-dBoundRoles-46 S2 - each typed input's block held to the authored-line rule, after the section's own
-  // fence walk and before the role text and the fact re-cut, so a forged fact line is named here first.
-  const lead = text.replace(/\r\n/g, '\n').slice(0, text.replace(/\r\n/g, '\n').length - section.length).split('\n').length - 1
-  const typed = checkTypedBlocks(section, lead)
-  if (typed) return renderHandoffDeny('Agent', `${m.path}'s ${typed}`, index)
   // TOOL-dBoundRoles-48 S3 - the fence state at every block: after the typed blocks, before the role text and the
   // fact re-cut, so a fact line a flipped fence surfaced from handed content is denied before it is read as one.
   const flipped = checkBlockFences(section, lead, m.path)
@@ -519,12 +541,12 @@ function checkFraming(type, m, section, root) {
   const route = `${PROMPTS_AUTHOR_KEY} is prompt-writer, so a ${type} task carries the prompt writer's framing: render the prompt writer with \`handoff.py render --role ${PROMPT_WRITER} --for ${type} --build ${m.build}${m.unit === '-' ? '' : ` --unit ${m.unit}`} --input question=<your details> ...\`, spawn it, then render this task with \`handoff.py render --role ${type} ... --framed-by <the prompt writer's agent id>\` and spawn that.`
   const lines = []
   for (const [n, raw] of loadScratchGuard().readUnfencedLines(section)) if (raw !== null) lines.push([n, raw.replace(/\r/g, '')])
-  const heads = lines.filter(([, l]) => /^### framing:job[ \t]*$/.test(l))
+  const heads = readTaskBlocks(section).filter((b) => b.heading === 'framing:job')
   if (heads.length !== 1) return `the task carries ${heads.length} \`### framing:job\` blocks; exactly one is required. ${route}`
   const framed = lines.filter(([, l]) => l.startsWith('Framed by:'))
   if (framed.length !== 1) return `the task carries ${framed.length} \`Framed by:\` lines; exactly one is required, inside its \`### framing:job\` block. ${route}`
-  const next = lines.find(([n, l]) => n > heads[0][0] && /^#{2,3} /.test(l))
-  if (framed[0][0] < heads[0][0] || (next && framed[0][0] > next[0])) return `the task's \`Framed by:\` line sits outside its \`### framing:job\` block. ${route}`
+  const next = lines.find(([n, l]) => n > heads[0].first && /^## /.test(l))
+  if (framed[0][0] < heads[0].first || framed[0][0] > heads[0].last || (next && framed[0][0] > next[0])) return `the task's \`Framed by:\` line sits outside its \`### framing:job\` block. ${route}`
   const f = FRAMED_BY_RE.exec(framed[0][1].trimEnd())
   if (!f) return `the task's line ${JSON.stringify(framed[0][1].slice(0, 120))} is not \`Framed by: <path> task-sha=<12 hex>\`. ${route}`
   const parts = checkPromptPath(f.groups.path, m.build)

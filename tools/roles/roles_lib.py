@@ -957,7 +957,7 @@ def extract_microformat_shapes(text):
 
 def read_unfenced_lines(text):
     """`(line number, line)` for every line of `text` outside a fence, then `(opened at, None)` when the
-    text ends inside one (TOOL-dBoundRoles-38 S3). A fence opens on a line of at most three spaces of
+    text leaves one open (TOOL-dBoundRoles-38 S3). A fence opens on a line of at most three spaces of
     indent and then three or more backticks or three or more tildes, and closes only on a line of the
     same character whose run is at least as long, with nothing after it but whitespace; a fence line is
     yielded by neither end. The hooks kit's `readUnfencedLines` is the same walker. `tree_lib.unfenced_lines`'
@@ -991,26 +991,21 @@ def render_handed_fence(content):
 
 def check_block_fences(section, extents):
     """One refusal line per fence defect of `section`, walked by `read_unfenced_lines`, at each block's extents
-    (TOOL-dBoundRoles-48 S1); `[]` when every block holds. `extents` lists `(key, first, last, fence)` per
-    block, its first and last line in `section`, and `fence` the `(opening, closing)` lines of a handed block's
-    fence or None for an authored one. A line names the key and the line for each block whose first line the
-    walk reads inside a fence, each handed block whose heading or fact line it reads inside one, each handed
-    content line it reads outside its fence, and a walk that ends inside one, named by the block holding the
-    line the fence opened at. So a walk that ends balanced after an authored block flipped the fence state
-    across a handed one still refuses."""
-    read, opened = set(), None
-    for n, line in read_unfenced_lines(section):
-        if line is None:
-            opened = n
-        else:
-            read.add(n)
+    (TOOL-dBoundRoles-48 S1); `[]` when every block holds. `extents` lists one record per block, `(key, first,
+    last, fence, handed)` (TOOL-dBoundRoles-58 S17): its first and last line in `section`, `fence` the `(opening,
+    closing)` lines of the fence its content sits in or None, and `handed` whether its content is handed or
+    authored. A line names the key and the line for each block whose first line the walk reads inside a fence,
+    each handed block whose heading or fact line it reads inside one and each handed content line it reads outside
+    its fence. So a walk that ends balanced after an authored block flipped the fence state across a handed one
+    still refuses. A walk that leaves a fence open is `check_open_fence`'s, not refused here (S30)."""
+    read = {n for n, line in read_unfenced_lines(section) if line is not None}
     lines, out = str(section).split("\n"), []
-    for key, first, _last, fence in extents:
+    for key, first, _last, fence, handed in extents:
         if first not in read:
             out.append("%s — its first line, line %d of the ## Task section, is read inside a fence a block before "
                        "it left open, so the block would stand as content; close that fence in the value that "
                        "opened it and render again" % (key, first))
-        if fence is None:
+        if not handed or fence is None:
             continue
         hidden = next((n for n in range(first, fence[0]) if lines[n - 1].strip() and n not in read), None)
         if hidden is not None:
@@ -1021,18 +1016,41 @@ def check_block_fences(section, extents):
                 "a fence, so the handed content would stand as executor lines; close the fence a block before "
                 "it opened and render again" % (key, n, fence[0], fence[1])
                 for n in range(fence[0] + 1, fence[1]) if n in read]
-    if opened is not None:
-        holder = [key for key, first, last, _f in extents if first <= opened <= last]
-        out.append("%s — a fence opened at line %d of the ## Task section is never closed, so every fact line "
-                   "after it would be read as content; close it in the value that opened it and render again"
-                   % (holder[-1] if holder else "the ## Task section", opened))
     return out
 
 
-#: The line shapes a typed input may not carry (TOOL-dBoundRoles-45 S2), each one a handoff's reader acts on:
-#: a heading of level one to three, a fact line, a `gov:handoff` marker line and a framing line.
-AUTHORED_LINE_SHAPES = (("a heading", re.compile(r"#{1,3} ")), ("a fact line", FACT_RE),
-                        ("a gov:handoff marker line", MARKER_RE), ("a Framed by: line", re.compile(r"Framed by:")))
+def check_open_fence(section, extents):
+    """The one refusal of a `section` whose walk leaves a fence open (TOOL-dBoundRoles-38 S5), in a list, `[]` when
+    every fence closes: the line the fence opened at, named by the innermost block of `extents`,
+    `check_block_fences`' records, holding it."""
+    opened = next((n for n, line in read_unfenced_lines(section) if line is None), None)
+    if opened is None:
+        return []
+    holder = [e[0] for e in extents if e[1] <= opened <= e[2]]
+    return ["%s — a fence opened at line %d of the ## Task section is never closed, so the section ends inside it "
+            "and every fact line after it would be read as content; close it in the value that opened it and "
+            "render again" % (holder[-1] if holder else "the ## Task section", opened)]
+
+
+def render_graded_section(section, extents):
+    """The graded text of `section` (TOOL-dBoundRoles-41 S1): the same lines with the content of every handed block
+    of `extents`, `check_block_fences`' records, left out (TOOL-dBoundRoles-58 S17). A fenced handed block keeps its
+    heading and fact line, and a handed block with no fence, the practices cut from the charter or the card
+    block, its first line; every other line stands, so only the text the order authors is graded."""
+    cut = set()
+    for _key, first, last, fence, handed in extents:
+        if handed:
+            cut.update(range(fence[0] - 1 if fence else first + 1, last + 1))
+    return "\n".join(line for n, line in enumerate(str(section).split("\n"), 1) if n not in cut)
+
+
+#: The line shapes a typed input may not carry (TOOL-dBoundRoles-45 S2), each one a handoff's reader acts on: a
+#: level-three heading, a fact line, a `gov:handoff` marker line and a framing line on every line, fenced or not,
+#: and a level-one or level-two heading, which only an unfenced reader acts on, on an unfenced line alone, its
+#: third item True (TOOL-dBoundRoles-58 S22).
+AUTHORED_LINE_SHAPES = (("a heading", re.compile(r"### "), False), ("a heading", re.compile(r"#{1,2} "), True),
+                        ("a fact line", FACT_RE, False), ("a gov:handoff marker line", MARKER_RE, False),
+                        ("a Framed by: line", re.compile(r"Framed by:"), False))
 
 
 def check_authored_lines(value, field):
@@ -1040,17 +1058,22 @@ def check_authored_lines(value, field):
     the line's number, then one more where `read_unfenced_lines(value)` ends on its open-fence yield, naming
     the line the fence opened at; `[]` for a value that would stand as text alone. A typed input is written
     unfenced, so a line of one of those shapes would stand as an executor line; a fence the value opens and
-    closes is legal (TOOL-dBoundRoles-45 S2)."""
-    text, out = str(value), []
+    closes is legal (TOOL-dBoundRoles-45 S2). The value is split at its newlines alone and every carriage return
+    is dropped from a line before it is matched, as `extract_prompt_marker` and the hooks kit's
+    `extractHandoffMarker` read one (TOOL-dBoundRoles-58 S21); the handed value keeps them."""
+    text, out = str(value).replace("\r", ""), []
+    walked = list(read_unfenced_lines(text))
+    unfenced = {n for n, line in walked if line is not None}
     for n, line in enumerate(text.split("\n"), 1):
-        what = next((what for what, shape in AUTHORED_LINE_SHAPES if shape.match(line)), None)
+        what = next((what for what, shape, bare in AUTHORED_LINE_SHAPES
+                     if shape.match(line) and (not bare or n in unfenced)), None)
         if what:
             out.append("%s — line %d reads as %s, which a typed input may not carry: it is written unfenced, so "
                        "the line would stand as one; hand quoted text as a file through --input spec=<path>"
                        % (field, n, what))
     out +=["%s — a fence opened at line %d of the value is never closed, so every line after it would be read "
             "as content; close it in the value and render again" % (field, n)
-            for n, line in read_unfenced_lines(text) if line is None]
+            for n, line in walked if line is None]
     return out
 
 
@@ -1059,8 +1082,8 @@ def extract_prompt_marker(prompt):
     kit's spawn guard reads it (its rule 6): exactly one line outside every fence, carriage returns
     removed, is a whole marker line, and it is the prompt's first line once CRLF is folded, the two ends
     trimmed and that line's trailing whitespace dropped. None otherwise (TOOL-aOrientedCast-25); a marker
-    line inside a fence is handed content and is not counted (TOOL-dBoundRoles-38 S4). A prompt the walk
-    ends inside a fence is None too, since its lines after the fence's opening read as neither
+    line inside a fence is handed content and is not counted (TOOL-dBoundRoles-38 S4). A prompt whose walk
+    leaves a fence open is None too, since its lines after the fence's opening read as neither
     (TOOL-dBoundRoles-50 S17)."""
     text = str(prompt)
     walked = list(read_unfenced_lines(text))
@@ -1074,7 +1097,7 @@ def extract_prompt_marker(prompt):
 def extract_unfenced_marker(text):
     """The `MARKER_RE` match, over `text` itself, of the first marker line `read_unfenced_lines` yields, so a
     marker quoted inside a fence is content and never the file's own (TOOL-dBoundRoles-50 S11); None where no
-    unfenced line is a marker line, or where the walk ends inside a fence (S17). Every reader of a file's own
+    unfenced line is a marker line, or where the walk leaves a fence open (S17). Every reader of a file's own
     marker reads it here: `check_handoff`, `print_agent_lines`, `scan_stand_in_declarations`,
     `scan_work_orders` and the render self-test's `check_ranked_arms`."""
     text, found = str(text), None
