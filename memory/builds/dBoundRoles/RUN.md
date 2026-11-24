@@ -23,7 +23,7 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 5f3f0d652527cc7c0a33e2cdc5e66e00144634f8
+witness: aa91533e0eef506747794d816e82a74ebf70c701
 phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -630,3 +630,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T16:28:02Z dispatch · item 5f3f0d65 TOOL-dBoundRoles-91 · reason tools/loop/loop_lib.py tools/loop/loop_items.py tools/loop/README.md tools/roles/handoff.py tools/roles/render_agents.py tools/roles/adopt-roles.test.sh tools/roles/README.md help/loop.md tools/run-gates/selftest-budgets.txt memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-91-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-91-deviation-911.md
 
 2026-11-24T16:28:04Z brief · item TOOL-dBoundRoles-91 · reason 7622281cb35e memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-91-build-brief.md
+
+2026-11-24T17:03:14Z dispatch · item aa91533e TOOL-dBoundRoles-92 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/roles/handoff.py tools/roles/README.md tools/roles/SKILL.template.md tools/roles/kit.toml .claude/skills/build/SKILL.md tools/workflows/unattended-build.test.sh tools/policy/catalogue.toml tools/policy/check_policy.py .governance/policy.json tools/govkit/selftest.py tools/govkit/registry.toml tools/gate-legs.json tools/loop/position.py tools/loop/placement.py tools/loop/item-schema.toml tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/roles/spawn-guard.test.sh tools/check-wiring.test.sh tools/memory-tree/check-memory-hygiene.test.sh tools/run-gates/selftest-budgets.txt help/roles.md help/reference/policy.md memory/guides/SESSION-KICKOFF.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-92-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-92-deviation-921.md
+
+2026-11-24T17:03:16Z brief · item TOOL-dBoundRoles-92 · reason 7d3bd5ab79b3 memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-92-build-brief.md
