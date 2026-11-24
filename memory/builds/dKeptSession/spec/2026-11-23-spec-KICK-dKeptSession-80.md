@@ -21,8 +21,10 @@
 | [2026-11-23-prompt-KICK-dKeptSession-80-spec-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-80-spec-brief.md) | research | — |
 | [2026-11-24-prompt-KICK-dKeptSession-80-1-builder.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-80-1-builder.md) | journal | — |
 | [2026-11-24-prompt-KICK-dKeptSession-80-2-spec-writer.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-80-2-spec-writer.md) | journal | — |
+| [2026-11-24-prompt-KICK-dKeptSession-80-3-builder.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-80-3-builder.md) | journal | — |
 | [2026-11-24-prompt-KICK-dKeptSession-80-divergence-brief.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-80-divergence-brief.md) | research | — |
 | [2026-11-24-prompt-KICK-dKeptSession-80-node-a-bootstrap.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-80-node-a-bootstrap.md) | research | KICK-dKeptSession-69 |
+| [2026-11-24-prompt-KICK-dKeptSession-80-pass-brief.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-80-pass-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 

@@ -404,3 +404,8 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T20:47:29Z hold · item host-owner-action · reason until owner · reaped 64fde974 · resume none(owner)
 
 2026-11-24T02:15:10Z resume · item dKeptSession · reason held · keepalive 996b51d4 · manual
+2026-11-24T03:12:17Z draw · re-dispatch · KICK-dKeptSession-80 · 22/132 · 20261124T031217Z-ec2c32
+
+2026-11-24T03:12:17Z dispatch · item 87640872 KICK-dKeptSession-80 · reason memory/builds/dKeptSession/spec/2026-11-23-spec-KICK-dKeptSession-80.md memory/builds/dKeptSession/build/2026-11-23-build-KICK-dKeptSession-80-1-acceptance-ledger.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md
+
+2026-11-24T03:21:54Z brief · item KICK-dKeptSession-80 · reason 4fd7cfdfd115 memory/builds/dKeptSession/prompts/2026-11-24-prompt-KICK-dKeptSession-80-pass-brief.md
