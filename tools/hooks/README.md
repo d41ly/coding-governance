@@ -821,8 +821,15 @@ recorded commands through the exported `checkRoleGate` and `scanCommandHeads`, n
 `TOOL-dBoundRoles-7`. On a Bash or PowerShell payload carrying an `agent_type`, after the role-gate
 arm, `checkShellWrites` holds every write target the one scanner, `scanWriteTargets`, finds in the
 command to the verdict an `Edit` or `Write` of that target gets, and to the agent's work order's
-allowance where one was handed. The scanner reads, beside the shapes the write-target guard below
-always read:
+allowance where one was handed. The scanner reads each operand and each redirect from the simple
+command that holds it (`TOOL-dBoundRoles-86`): `scanRedirects` takes every redirect operator and its
+word, glued or spaced, `>|`, `&>>`, `<>`, `>&<file>` and PowerShell's `*>` among them, out of the
+command, and `scanWriteOperands` reads the operands `scanCommandHeads` leaves, the directory of a
+target-directory option of `cp`, `mv` and `install` included. A trailing `2>/dev/null`, a comment or
+the next line's command is no operand; a redirect in a `bash -c` body and an unquoted substitution are
+read; a duplication, a process substitution, a comparison in `[[ ]]` or `(( ))` and an escaped arrow are
+no target. The tool's name says whether the command is PowerShell, where the last two are redirects.
+It reads, beside the shapes the write-target guard below always read:
 
 - the file operands of `sed -i` and `sed --in-place`, and of `perl -i`;
 - the string-literal first argument of an interpreter's write call — `open(<lit>, "w")` (any mode
@@ -866,7 +873,13 @@ list does not name; a `sed`, `perl`, `git` or interpreter that does not head its
 (`xargs sed -i`); `rm`, `mv` of a file out of a folder, `git checkout`, `git restore`, `git stash`,
 `git merge` and `git am`; a patch read from a pipe, or one whose paths `-p` or `--directory` move,
 its paths placed against the payload `cwd`; and a transcript an agent rewrites, since it lives
-outside the repository. A word such as `install` or `touch` left unquoted as an argument
+outside the repository. Of the operands and redirects: one inside a quoted `$( )` or backticks; an
+operand after an escaped separator, or after an unquoted substitution whose parentheses do not balance;
+a PowerShell operand built in parentheses, and a PowerShell alias or cmdlet the list does not name; a
+target directory glued to a longer option cluster (`-vtDIR`) or an abbreviated `--target-directory`; and
+the `-d` form of `install`, of which the last operand is read. A comparison in more than one nested
+parenthesis level, one across lines, and an unquoted arrow inside `${ }` read as redirects, so they
+refuse rather than escape; quoting is the remedy. A word such as `install` or `touch` left unquoted as an argument
 (`grep -n install x`) still reads as a write, as the write-target guard reads it; quoting it is the
 agent's remedy. It stops forgetting, not evasion.
 
@@ -929,7 +942,9 @@ gate cannot see and says so in its header.
 ## scratch-guard — the write-target guard, and what it cannot see
 
 The second hook in this home, wired on `Bash|PowerShell`, reads each tool call's TEXT for write
-targets (redirects, `tee`/`touch`/`mkdir`, the last argument of `cp`/`mv`/`install`/`rsync`, a
+targets (redirects in every spelling the fifth check names, the operands of `tee`/`touch`/`mkdir`, the
+last operand of `cp`/`mv`/`install`/`rsync` or the first three's target directory, each read from its
+own simple command since `TOOL-dBoundRoles-86` and with no tool name, so as Bash; a
 `TMPDIR=`/`TMP=`/`TEMP=` assignment, and since `TOOL-dBoundRoles-7` the file operands of `sed -i`
 and `perl -i`, an interpreter's literal write call and the paths a `git apply` patch names, the
 fifth check's list above) and denies one that lands where agent scratch does not belong.

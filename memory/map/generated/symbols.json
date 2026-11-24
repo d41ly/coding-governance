@@ -2563,6 +2563,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "buildBlank",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "buildBlankedRun",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -21563,6 +21568,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "readWordText",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "readWorkOrderAllowance",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -37928,6 +37938,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "scanRedirects",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "scanSegments",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -37938,9 +37953,19 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "scanSubstitutions",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "scanTurnRecords",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "scanWriteOperands",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "scanWriteTargets",
@@ -38636,6 +38661,11 @@
       "id": "scan_shell_lines",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "scan_shell_spellings",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "scan_shell_tokens",

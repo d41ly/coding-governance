@@ -88,8 +88,8 @@
  * write (`sed -i`, an interpreter, a redirect) is never seen, and the push-time leg owns that
  * guarantee; a role agent's is held by the shell-write arm below to the same verdict, for the shapes
  * scanWriteTargets reads (a redirect, `tee`, `touch`, `mkdir`, the PowerShell write cmdlets, the
- * last argument of `cp`, `mv`, `install` and `rsync`, `sed -i`, `perl -i`, an interpreter's
- * literal write call and `git apply`), and a role agent's other shell writes still escape; a
+ * last operand of `cp`, `mv`, `install` and `rsync` or the first three's target directory, `sed -i`,
+ * `perl -i`, an interpreter's literal write call and `git apply`), and a role agent's other shell writes still escape; a
  * hook-less or `--bare` run fires no hook; a narrowed ROUTED_PATHS is a conf diff, not a refusal; a
  * hand-written card with a `## route` is read like the writer's; and a spec status flipped to
  * INPROGRESS without the owner's approval admits, because the gate reads a status the agent writes.
@@ -186,8 +186,9 @@
  * write call on a string literal (`open(<lit>, "w")`, `Path(<lit>).write_text(`, `writeFileSync(`,
  * `appendFileSync(`, PowerShell's `[IO.File]::WriteAllText(`) in a `python -c`, `node -e` or
  * `python -` / `node` heredoc, each `+++ b/` and `rename to` path of a `git apply` patch, and the
- * shapes checkCommand already read — places it against the payload `cwd`, and judges one in the
- * session's repository with checkRouted on a synthetic `Write` of it, so the route arm, the role arm
+ * shapes checkCommand reads, a redirect through scanRedirects and the operands of a write word through
+ * scanWriteOperands, each from its own simple command (TOOL-dBoundRoles-86) — places it against the
+ * payload `cwd`, and judges one in the session's repository with checkRouted on a synthetic `Write` of it, so the route arm, the role arm
  * and step 6b class it exactly as they class an `Edit`. Where the agent's work order, the first
  * `user` record of its transcript, hands an `### allowance` block in its `## Task` section
  * (readWorkOrderAllowance), a target the class admits must also lie under one of its entries
@@ -201,8 +202,14 @@
  * `sudo python -c`); `rm`, `mv` of a
  * file out of a folder, `git checkout`, `git restore`, `git stash`, `git merge` and `git am`; a patch
  * read from a pipe, or one whose paths `-p` or `--directory` move, its paths placed against the
- * payload `cwd`; and a transcript an agent rewrites, since it lives outside the repository. A word
- * like `install` or `touch` heading no command but unquoted in one (`grep -n install x`) still reads
+ * payload `cwd`; and a transcript an agent rewrites, since it lives outside the repository. Of the
+ * redirects and operands (TOOL-dBoundRoles-86): one inside a quoted `$( )` or backticks; an operand
+ * after an escaped separator (`a\&b`), or after an unquoted substitution whose parentheses do not
+ * balance; a PowerShell operand built in parentheses, and a PowerShell alias or cmdlet the list does not
+ * name; a target directory glued to a longer cluster (`-vtDIR`) or an abbreviated `--target-directory`;
+ * and the `-d` form of `install`, of which the last operand is read. Three spellings refuse rather than
+ * escape, quoting being the remedy: a comparison in more than one nested parenthesis level, one across
+ * lines, and an unquoted arrow inside `${ }`. A word like `install` or `touch` heading no command but unquoted in one (`grep -n install x`) still reads
  * as a write, as checkCommand reads it; quoting it is the agent's remedy.
  *
  * THE THIRD EVENT: SUBAGENTSTART (TOOL-aRoutedQuill-4). A subagent inherits the hooks but not the
@@ -362,8 +369,9 @@ function readHeredocBodies(cmd) {
 /**
  * Blank the CONTENTS of quoted strings and heredoc bodies, preserving length so offsets still line
  * up with the original. Operators are then located in this view and targets read from the original.
+ * A backslash escapes a quote in a double-quoted run, except where <tool> is `PowerShell`.
  */
-function buildCommandView(cmd) {
+function buildCommandView(cmd, tool) {
   const buildBlankedRun = (s, from, to) =>
     to <= from ? s : s.slice(0, from) + ' '.repeat(to - from) + s.slice(to)
   let view = cmd
@@ -380,7 +388,7 @@ function buildCommandView(cmd) {
     if (ch === "'" || ch === '"') {
       let j = i + 1
       while (j < view.length && view[j] !== ch) {
-        if (ch === '"' && view[j] === '\\') j++
+        if (ch === '"' && view[j] === '\\' && tool !== 'PowerShell') j++
         j++
       }
       const close = j < view.length ? j : view.length
@@ -417,10 +425,136 @@ function readTokenAt(cmd, from) {
   return out
 }
 
-const WRITE_ANY_ARG = /(?:^|[\s;&|(])(tee|touch|mkdir|Out-File|Set-Content|Add-Content|New-Item)\b/g
-const WRITE_LAST_ARG = /(?:^|[\s;&|(])(cp|mv|install|rsync)\b/g
-const REDIRECT = /(?:^|[\s;&|(])(?:\d?>>?|&>)/g
+/** The write words: every operand after one of the first list is a target, the last operand of one of the second. */
+const WRITE_ANY_ARG = ['tee', 'touch', 'mkdir', 'Out-File', 'Set-Content', 'Add-Content', 'New-Item']
+const WRITE_LAST_ARG = ['cp', 'mv', 'install', 'rsync']
+/** Every redirect operator, its descriptor only where one opens a word (TOOL-dBoundRoles-86 S3). */
+const REDIRECT = /(?:(?<![^\s;|&()<>])(?:\{[A-Za-z_]\w*\}|\d+))?(?:&>>?|<>|[<>]&|>>?\|?|<{1,3}-?)/g
+/** A redirect's word in the view, where a quoted run is blank and a substitution may be a filler. */
+const REDIRECT_WORD = /(?:"[^"]*"|'[^']*'|[^\s;|&()<>"'])+/y
+/**
+ * The spans whose arrows compare (S4): a `(( ))` whose parentheses balance up to the closing pair, which
+ * the fallback `((echo x) > f; (true))` does not; and a `[[ ... ]]` on one line that opens at command
+ * position, which `echo [[ a > f ]]` does not.
+ */
+const COMPARISON = /\(\((?:[^()]|\([^()]*\))*\)\)|(?:^|(?<![\\>])[;&|\n]|(?<!\\)\(|\(\))[ \t]*(?:(?:if|elif|while|until|then|else|do|!|\{)[ \t]+)*\[\[[ \t][^\n]*?[ \t]\]\]/g
 const TMP_ASSIGN = /(?:^|[\s;&|(])(TMPDIR|TMP|TEMP)=/g
+
+/**
+ * The text of one shell word without its quotes. In a double-quoted run an escaped quote is part of the
+ * run and loses its backslash, so a `bash -c` body is read as the shell reads it (TOOL-dBoundRoles-86
+ * S6); no other backslash goes, so a Windows path keeps its own.
+ */
+function readWordText(raw) {
+  return raw.replace(/"((?:\\[\s\S]|[^"\\])*)"|'([^']*)'|"([^"]*)"/g, (_, d, s, e) =>
+    d !== undefined ? d.replace(/\\([\s\S])/g, (w, c) => (c === '"' ? c : w)) : s !== undefined ? s : e)
+}
+
+/**
+ * The redirects of a command (TOOL-dBoundRoles-86 S3, S4): `{ targets, view }`, the word of each output
+ * redirect in order, read from <cmd>, and <view> with every operator and its word blanked to the same
+ * length, so offsets hold. <view> is string- and comment-blanked; an operator is matched after any
+ * character and its word starts past blanks, so a glued `a>f`, `>|`, `&>>`, `<>`, `>&f` and, in
+ * PowerShell, `*>` each read `f`. The word ends at unquoted whitespace, `;`, `|`, `&`, `(`, `)`, `<` or
+ * `>`. No target comes from an input redirect, a duplication or a close (`n>&m`, `n>&-`), a process
+ * substitution, or, outside PowerShell, an arrow of a COMPARISON span or one behind a backslash. An arrow
+ * after `=` or `-` is a redirect like any other. What it does not see: an operator inside quotes, a
+ * quoted `$( )` included. A word before a closing backtick keeps it, and a comparison in more nested
+ * parentheses than COMPARISON holds, or one across lines, reads as a redirect, as does an unquoted arrow
+ * inside `${ }`.
+ */
+function scanRedirects(cmd, view, tool) {
+  const ps = tool === 'PowerShell'
+  const seen = ps ? view : view
+    .replace(COMPARISON, (w) => w.replace(/[<>]/g, ' '))
+    .replace(/\\[\s\S]/g, (w) => (/[<>]/.test(w) ? '  ' : w))
+  const targets = []
+  let out = ''
+  let from = 0
+  let m
+  REDIRECT.lastIndex = 0
+  while ((m = REDIRECT.exec(seen)) !== null) {
+    const op = m[0]
+    const star = ps && seen[m.index - 1] === '*' && (m.index === 1 || /[\s;|&({]/.test(seen[m.index - 2]))
+    const at = star ? m.index - 1 : m.index
+    let end = m.index + op.length
+    if (seen[end] !== '(') {
+      const copy = /[<>]&$/.test(op) ? (ps ? /[ \t]*\d+/y : /[ \t]*(?:\d+-?|-)(?![^\s;&|()<>`])/y) : null
+      if (copy) copy.lastIndex = end
+      const dup = copy && copy.exec(view)
+      if (dup) end += dup[0].length
+      else {
+        while (view[end] === ' ' || view[end] === '\t') end++
+        REDIRECT_WORD.lastIndex = end
+        const w = REDIRECT_WORD.exec(view)
+        if (w) {
+          if (op.includes('>')) targets.push(readWordText(cmd.slice(end, end + w[0].length)))
+          end += w[0].length
+        }
+      }
+    }
+    out += view.slice(from, at) + ' '.repeat(end - at)
+    from = end
+    REDIRECT.lastIndex = end
+  }
+  return { targets, view: out + view.slice(from) }
+}
+
+/**
+ * The outermost unquoted substitutions of <view>, `$( )`, `<( )` and `>( )`, left to right, each
+ * `{ from, to, body }`, `body` the bounds of the text it runs. One whose parentheses do not balance is
+ * left out. The body of a `$((` keeps the outer parentheses, so an arithmetic one reads as one.
+ */
+function scanSubstitutions(view, tool) {
+  const open = []
+  const spans = []
+  for (let i = 0; i < view.length; i++) {
+    const ch = view[i]
+    if (ch === '\\' && tool !== 'PowerShell') i++
+    else if (ch === '(') open.push(i)
+    else if (ch === ')' && open.length) {
+      const at = open.pop()
+      if (at === 0 || !'$<>'.includes(view[at - 1])) continue
+      while (spans.length && spans[spans.length - 1].from > at) spans.pop()
+      spans.push({ from: at - 1, to: i + 1, body: view[at - 1] === '$' && view[at + 1] === '(' ? [at, i + 1] : [at + 1, i] })
+    }
+  }
+  return spans
+}
+
+/**
+ * The write targets of one inline entry <c> of scanCommandHeads, as `[value, why]` pairs
+ * (TOOL-dBoundRoles-86 S1, S2). A write word counts as the head, by basename, or as an unquoted word at
+ * any later place of the same simple command, so `sudo cp`, `xargs touch` and a `cp` behind a reserved
+ * word are read. A WRITE_ANY_ARG word takes every operand after it, a WRITE_LAST_ARG word the last one,
+ * and `cp`, `mv` and `install` the directory of `-t <dir>`, a short cluster ending in `t`, `-t<dir>` or
+ * `--target-directory`, their operands then being sources. An option word is no operand, nor is the
+ * backslash `find`'s escaped `;` leaves.
+ */
+function scanWriteOperands(c) {
+  const out = []
+  c.raw.forEach((raw, i) => {
+    const base = i === 0 ? buildBaseName(c.head) : ''
+    const name = [...WRITE_ANY_ARG, ...WRITE_LAST_ARG].find((w) => (i === 0 ? w.toLowerCase() === base : w === raw))
+    if (!name) return
+    const rest = c.argv.slice(i + 1)
+    const ops = rest.filter((w) => w !== '' && w !== '\\' && !w.startsWith('-'))
+    if (WRITE_ANY_ARG.includes(name)) {
+      for (const v of ops) out.push([v, name])
+      return
+    }
+    let dest = ops[ops.length - 1]
+    for (let k = 0; name !== 'rsync' && k < rest.length && rest[k] !== '--'; k++) {
+      const glued = /^(?:-t|--target-directory=)([\s\S]+)$/.exec(rest[k])
+      if (glued) dest = glued[1]
+      else if (/^(?:-[A-Za-z]*t|--target-directory)$/.test(rest[k]) && rest[k + 1] !== undefined) dest = rest[k + 1]
+      else continue
+      break
+    }
+    if (dest !== undefined) out.push([dest, `${name} destination`])
+  })
+  return out
+}
 
 /**
  * TOOL-dBoundRoles-7 S1: an interpreter's write call whose first argument is a string literal, the
@@ -531,11 +665,15 @@ function scanPatchTargets(argv, here, cwd) {
 }
 
 /**
- * Locate write targets. Operators come from the blanked VIEW; the token itself is read from the
- * ORIGINAL, so a quoted target still resolves while a quoted operator stays invisible.
- *
- * `cp`/`mv`/`install`/`rsync` take their LAST argument only — those read a source first, and a
- * home-rooted SOURCE is a read. Getting this wrong would have denied this build's own inventory step.
+ * Locate write targets, each `value` and `why` pair once. Redirects and operands come from the entries
+ * scanCommandHeads yields in its inline mode, so neither is read past its own simple command
+ * (TOOL-dBoundRoles-86): scanRedirects reads the redirects, one of a `-c` body included, and
+ * scanWriteOperands the operands of `tee`, `touch`, `mkdir`, the PowerShell write cmdlets, `cp`, `mv`,
+ * `install` and `rsync`. The last four take their LAST operand only, or a target-directory option's
+ * directory: they read a source first, and a home-rooted SOURCE is a read. A word opening with `<(` or
+ * `>(` is no target. A temp-root assignment is located in the blanked VIEW and read from the ORIGINAL,
+ * so a quoted target still resolves while a quoted operator stays invisible. <tool>, the tool's name,
+ * tells scanRedirects which syntax the command is in; without it the command reads as Bash.
  *
  * TOOL-dBoundRoles-7 S1 adds four shapes, read per simple command through scanCommandHeads' inline
  * mode: the file operands of `sed -i` (and `perl -i`, its own `why`); the string-literal first
@@ -544,17 +682,25 @@ function scanPatchTargets(argv, here, cwd) {
  * `[IO.File]::` write calls in the command itself; and each path a `git apply` patch names. <cwd>,
  * the payload's, places a relative patch file; without it only an absolute one is read.
  */
-function scanWriteTargets(cmd, cwd) {
+function scanWriteTargets(cmd, cwd, tool) {
   const view = buildCommandView(cmd)
   const found = []
+  const pairs = new Set()
   const addTarget = (value, why) => {
-    if (value && !value.startsWith('-')) found.push({ value, why })
+    if (!value || /^(?:-|[<>]\()/.test(value) || pairs.has(`${why}\0${value}`)) return
+    pairs.add(`${why}\0${value}`)
+    found.push({ value, why })
   }
-  for (const c of scanCommandHeads(cmd, 0, { inline: true })) {
+  for (const c of scanCommandHeads(cmd, 0, { inline: true, tool })) {
+    if (c.redirect !== undefined) {
+      addTarget(c.redirect, 'redirect')
+      continue
+    }
     if (c.inline !== undefined) {
       for (const v of scanInterpreterWrites(c.inline)) addTarget(v, 'interpreter write')
       continue
     }
+    for (const [v, why] of scanWriteOperands(c)) addTarget(v, why)
     const base = buildBaseName(c.head)
     if (base === 'sed' || base === 'perl') for (const v of scanInPlaceOperands(c.argv)) addTarget(v, `${base} -i`)
     else if (base === 'git') for (const v of scanPatchTargets(c.argv, c.here, cwd)) addTarget(v, 'git apply')
@@ -570,43 +716,9 @@ function scanWriteTargets(cmd, cwd) {
     if (lit && lit.index === pm.index) addTarget(lit[2], 'interpreter write')
   }
 
-  for (const [rx, why] of [[REDIRECT, 'redirect'], [TMP_ASSIGN, 'temp-root assignment']]) {
-    rx.lastIndex = 0
-    let m
-    while ((m = rx.exec(view)) !== null) {
-      addTarget(readTokenAt(cmd, m.index + m[0].length), why)
-    }
-  }
-
-  WRITE_ANY_ARG.lastIndex = 0
+  TMP_ASSIGN.lastIndex = 0
   let m
-  while ((m = WRITE_ANY_ARG.exec(view)) !== null) {
-    let at = m.index + m[0].length
-    for (let k = 0; k < 8 && at < cmd.length; k++) {
-      const tok = readTokenAt(cmd, at)
-      if (!tok) break
-      addTarget(tok, m[1])
-      at = cmd.indexOf(tok.replace(/^["']|["']$/g, ''), at)
-      at = at === -1 ? cmd.length : at + tok.length
-    }
-  }
-
-  WRITE_LAST_ARG.lastIndex = 0
-  while ((m = WRITE_LAST_ARG.exec(view)) !== null) {
-    const seg = view.slice(m.index + m[0].length).split(/[;|&]/)[0]
-    const args = []
-    let at = m.index + m[0].length
-    const stop = at + seg.length
-    while (at < stop) {
-      const tok = readTokenAt(cmd, at)
-      if (!tok) break
-      args.push({ tok, at })
-      const hit = cmd.indexOf(tok.replace(/^["']|["']$/g, ''), at)
-      at = hit === -1 ? stop : hit + tok.length
-    }
-    const last = args.filter((a) => !a.tok.startsWith('-')).pop()
-    if (last) addTarget(last.tok, m[1] + ' destination')
-  }
+  while ((m = TMP_ASSIGN.exec(view)) !== null) addTarget(readTokenAt(cmd, m.index + m[0].length), 'temp-root assignment')
   return found
 }
 
@@ -2095,7 +2207,8 @@ function renderShellDeny(tool, t, shown, reason) {
  * THE ONE EVALUATION ORDER of the shell-write arm (TOOL-dBoundRoles-7). Returns null to admit,
  * `{ witness }` to admit with one stderr line, `{ deny }` to refuse.
  *  1. `agent_type` absent or empty → null (the main loop meets checkCommand and checkOriented alone)
- *  2. scanWriteTargets(cmd, cwd) finds no target but a temp-root assignment → null, with no file read
+ *  2. scanWriteTargets(cmd, cwd, tool_name) finds no target but a temp-root assignment → null, with no
+ *     file read
  *  3. each target, with `~` and `$HOME` expanded; one still holding `$` or a backtick (a computed
  *     path, §8 F4), a relative one with no payload `cwd`, and a device name (`nul`, `con`, `/dev/…`)
  *     are not placed; the rest placed by resolveTargetPlace against the payload `cwd`:
@@ -2118,13 +2231,13 @@ function checkShellWrites(cmd, data, env) {
   const type = typeof data.agent_type === 'string' ? data.agent_type : ''
   if (!type) return null
   const cwd = typeof data.cwd === 'string' ? data.cwd : ''
-  const targets = scanWriteTargets(cmd, cwd).filter((t) => t.why !== 'temp-root assignment')
+  const tool = typeof data.tool_name === 'string' ? data.tool_name : 'Bash'
+  const targets = scanWriteTargets(cmd, cwd, tool).filter((t) => t.why !== 'temp-root assignment')
   if (targets.length === 0) return null
   const sessionStart = env.CLAUDE_PROJECT_DIR || cwd
   if (!sessionStart) return null
   const session = resolveComparableCommon(path.resolve(buildNativePath(sessionStart)))
   if (!session.key) return null
-  const tool = typeof data.tool_name === 'string' ? data.tool_name : 'Bash'
   const home = env.HOME || env.USERPROFILE || ''
   const witnesses = []
   let allowance = null
@@ -2214,8 +2327,8 @@ function buildGateWord(w, base, topC) {
  * the index of the next non-option word, or a negative number when the simple command ends: -2 - <j>
  * where the `ends` option at index <j> ended it (TOOL-dBoundRoles-7 S1), else -1. A cluster takes one
  * word per `clusterTakes` letter it carries. A body option scans the word after those ONCE through
- * scanCommandHeads into <out>, with <opts>, at depth 0 only, then ends it. A `--` is stepped past and
- * ends the options.
+ * scanCommandHeads into <out>, with <opts> but their `tool`, a shell's body being shell text whatever
+ * tool ran it, at depth 0 only, then ends it. A `--` is stepped past and ends the options.
  */
 function scanLauncherOptions(a, k, rule, depth, out, opts) {
   const r = rule || {}
@@ -2227,7 +2340,7 @@ function scanLauncherOptions(a, k, rule, depth, out, opts) {
     if (r.ends && r.ends.test(w)) return -2 - k
     const j = r.clusterTakes && /^[-+][A-Za-z]+$/.test(w) ? (w.match(r.clusterTakes) || []).length : 0
     if (r.body && r.body.test(w)) {
-      if (depth === 0 && a[k + 1 + j] !== undefined) out.push(...scanCommandHeads(a[k + 1 + j], depth + 1, opts))
+      if (depth === 0 && a[k + 1 + j] !== undefined) out.push(...scanCommandHeads(a[k + 1 + j], depth + 1, { ...opts, tool: undefined }))
       return -1
     }
     k += j
@@ -2237,9 +2350,12 @@ function scanLauncherOptions(a, k, rule, depth, out, opts) {
 
 /**
  * The simple commands of <cmd> and their heads. A simple command is a segment of the blanked view
- * between `;`, `|`, `&`, `(`, `)` and a newline, its words read from the original text with their
- * quotes dropped and its redirections removed. The HEAD is the first word after any `NAME=value`,
- * any prefix word with its options, and `timeout` with its options and duration, then past a
+ * between `;`, `|`, `&`, `(`, `)` and a newline, its words read from the original text by readWordText,
+ * their quotes dropped. scanRedirects first takes every redirect operator and its word out of the view,
+ * wherever they stand, so none splits a command or is a word (TOOL-dBoundRoles-86), and a line
+ * continuation is blanked: a backslash before a newline, or a backtick in PowerShell, `opts.tool` naming
+ * the tool and Bash being read without one; a PowerShell `<# #>` comment is blanked too. The HEAD is the
+ * first word after any `NAME=value`, any prefix word with its options, and `timeout` with its options and duration, then past a
  * launcher and its options, each stepped by GATE_OPTION_RULES through scanLauncherOptions: a shell's
  * `-c` scans its body ONCE as a command of its own, a shell's `-n` executes nothing, and a Python
  * `-c` or `-m` names no script — each ends the segment. With `opts.reserved` (TOOL-aTrimmedWait-6,
@@ -2251,30 +2367,45 @@ function scanLauncherOptions(a, k, rule, depth, out, opts) {
  * `here`, the body of the heredoc its segment opens, or undefined; and a Python launcher ended by a
  * `-c` cluster, or a Node one by `-e`, `--eval`, `-p` or `--print`, yields an entry whose `inline` is
  * the word after it, as does a Python or Node launcher left with no script word, or a Python one
- * whose script is `-`, its `inline` being `here`, the program it reads from standard input.
+ * whose script is `-`, its `inline` being `here`, the program it reads from standard input. In that mode
+ * too (TOOL-dBoundRoles-86) each output redirect is an entry of its own, `{ redirect }`, the word as
+ * scanRedirects read it; each unquoted `$( )`, `<( )` and `>( )` of scanSubstitutions is scanned as a
+ * command of its own at the same depth and stands in the outer command as one word; and an ordinary
+ * entry carries `raw`, its argv words with their quotes kept.
  */
 function scanCommandHeads(cmd, depth = 0, opts = {}) {
-  const view = buildCommandView(cmd).replace(/(^|[\s;&|()<>])#[^\n]*/g, (w, p) => p + ' '.repeat(w.length - p.length))
+  const ps = opts.tool === 'PowerShell'
+  const buildBlank = (w) => ' '.repeat(w.length)
+  let view = buildCommandView(cmd, opts.tool)
+  if (ps) view = view.replace(/<#[\s\S]*?#>/g, buildBlank)
+  view = view.replace(/(^|[\s;&|()<>])#[^\n]*/g, (w, p) => p + ' '.repeat(w.length - p.length))
+  view = ps ? view.replace(/`\r?\n/g, buildBlank) : view.replace(/\\(?:\r?\n|[\s\S])/g, (w) => (w.endsWith('\n') ? buildBlank(w) : w))
   const out = []
+  if (opts.inline) {
+    let masked = ''
+    let from = 0
+    for (const u of scanSubstitutions(view, opts.tool)) {
+      out.push(...scanCommandHeads(cmd.slice(...u.body), depth, opts))
+      masked += view.slice(from, u.from) + '_'.repeat(u.to - u.from)
+      from = u.to
+    }
+    view = masked + view.slice(from)
+  }
+  const red = scanRedirects(cmd, view, opts.tool)
+  view = red.view
+  if (opts.inline) for (const v of red.targets) out.push({ redirect: v })
   const seg = /[^;|&()\n]+/g
   const bodies = opts.inline ? readHeredocBodies(cmd) : []
   let m
   while ((m = seg.exec(view)) !== null) {
     const opened = bodies.find((h) => h.open >= m.index && h.open < m.index + m[0].length)
     const here = opened ? cmd.slice(opened.from, Math.max(opened.from, opened.to)) : undefined
-    const tok = new RegExp(VIEW_TOKEN, 'g')
-    const words = []
+    // a quote left open takes the rest: `cp a "C:\x\"` from PowerShell, read as Bash, leaves one
+    const tok = new RegExp(opts.inline ? `${VIEW_TOKEN}|["'][\\s\\S]*` : VIEW_TOKEN, 'g')
+    const raw = []
     let t
-    while ((t = tok.exec(m[0])) !== null) {
-      const at = m.index + t.index
-      words.push(cmd.slice(at, at + t[0].length).replace(/"([^"]*)"|'([^']*)'/g, (_, d, s) => (d !== undefined ? d : s)))
-    }
-    const a = []
-    for (let i = 0; i < words.length; i++) {
-      const r = /^(?:\d*|&)(?:>>?|<{1,3})(.*)$/.exec(words[i])
-      if (!r) a.push(words[i])
-      else if (r[1] === '') i++
-    }
+    while ((t = tok.exec(m[0])) !== null) raw.push(cmd.slice(m.index + t.index, m.index + t.index + t[0].length))
+    const a = raw.map(readWordText)
     let k = 0
     const reserved = []
     for (;;) {
@@ -2313,7 +2444,7 @@ function scanCommandHeads(cmd, depth = 0, opts = {}) {
       if (k < 0 || k >= a.length) continue
       launched = true
     }
-    out.push(Object.assign({ text, head: a[k], argv: a.slice(k), launched, reserved }, opts.inline ? { here } : {}))
+    out.push(Object.assign({ text, head: a[k], argv: a.slice(k), launched, reserved }, opts.inline ? { here, raw: raw.slice(k) } : {}))
   }
   return out
 }
@@ -2351,10 +2482,10 @@ function deriveSleepSeconds(words) {
  * The polling rows (TOOL-aTrimmedWait-6): `{ row, c }` for the first simple command of <cmd>, its
  * reserved words stepped, that is P1 a `tail` with a follow option, P2 a `sleep` in a command holding
  * a `while` or `until` loop, or P3 a `sleep` of POLL_SLEEP_FLOOR_S or more, or of a duration that
- * does not read; else null.
+ * does not read; else null. <tool>, the tool's name, is scanCommandHeads' `opts.tool`.
  */
-function checkPollWait(cmd) {
-  const cs = scanCommandHeads(cmd, 0, { reserved: true })
+function checkPollWait(cmd, tool) {
+  const cs = scanCommandHeads(cmd, 0, { reserved: true, tool })
   const loop = cs.some((c) => c.reserved.includes('while') || c.reserved.includes('until'))
   for (const c of cs) {
     const b = buildBaseName(c.head)
@@ -2476,8 +2607,8 @@ function checkRoleGate(cmd, data, env) {
   const path = require('path')
   const type = typeof data.agent_type === 'string' ? data.agent_type : ''
   if (!type) return null
-  const cands = scanCommandHeads(cmd).filter((c) => c.launched || /[\\/]/.test(c.head) || checkGateRunner(c) || checkGateSuite(c))
-  const poll = checkPollWait(cmd)
+  const cands = scanCommandHeads(cmd, 0, { tool: data.tool_name }).filter((c) => c.launched || /[\\/]/.test(c.head) || checkGateRunner(c) || checkGateSuite(c))
+  const poll = checkPollWait(cmd, data.tool_name)
   if (cands.length === 0 && !poll) return null
   const raw = typeof data.cwd === 'string' ? data.cwd : ''
   const project = env && env.CLAUDE_PROJECT_DIR
