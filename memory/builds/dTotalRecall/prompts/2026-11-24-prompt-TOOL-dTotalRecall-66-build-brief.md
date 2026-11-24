@@ -8,7 +8,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dTotalRecall's build run. Its spec run landed every spec DEFERRED at base `462d20f3`, and this run builds
-  them in the build-order table's order from base `8b8b1374c`. This unit is build order 32, the first of three, after TOOL-dTotalRecall-65. A spec writer may be
+  them in the build-order table's order from base `8b8b1374c`. This unit is build order 32, the second built of three, after TOOL-dTotalRecall-68. A spec writer may be
   revising another unit's spec in this working tree: stage explicit paths only, leave every file you did not write
   unstaged, and when the pre-commit hook re-renders the build README stage only your own rows.
 - Built so far, CLOSED: TOOL-dTotalRecall-1 (`record_kinds.py`, `record_kinds.py new` for `fields` and `fence` rows), -13,
@@ -59,12 +59,17 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   `memory/project/census-kept-paths.txt` named in `PROJECT_REGISTRY_EXTRA`, `tree_lib.py#read_kept_rows(census, root)`
   and `read_kept_path(census, path, root)`, the `kept` arguments and `CENSUS_KEPT_PATHS` gone, the kickoff manifest
   re-stamped in that commit, deviation 1012: `reason-on-other-file` and `marker-in-kept-script` write their fixture's
-  own registry).
-  This unit is order 32, rev-5, first of units 66, 68 and 69; its S36 takes in unit 68's amendment. Unit 65 landed
-  after rev-5 was written against its spec: re-derive every claim that leans on it. A literal in a suite arm that spells
-  a file name, a colon and a line number reads as a positional citation (unit 60's red-fix): split it into two adjacent
-  shell strings. `record_kinds.py --check` exits 1 on this node on stray entries of the git common dir
-  (`recovery-manifests`, `theirs.tmp`, `history-verdicts`), which are the close's: read its lines, not its exit. A §8 resolution mark is exactly `RESOLVED (agent, YYYY-MM-DD, delegated)`. Verify each claim about current code
+  own registry), and -68 (`7252440fd`, rev-3: the `census-kept-paths` `[[ledger]]` registration in `tools/govkit/registry.toml`,
+  the rows rewritten by `write_rows`, `tree_lib.py#KEPT_FIELDS`, `read_kept_rows` through `legacy_ledger.read_rows`
+  answering `{path: row}`, `read_kept_path` one row or None, the plants' `record_kinds.py#write_kept_fixture`; a row
+  with a blank reason reads as keeping nothing, and no item reds it by name).
+  This unit is order 32, rev-5, built second after unit 68, whose registration and row grammar it consumes; its S36
+  takes in unit 68's amendment. Units 65 and 68 landed after rev-5 was written against their specs: re-derive every
+  claim that leans on them. A literal in a suite arm that spells a file name, a colon and a line number reads as a
+  positional citation (unit 60's red-fix): split it into two adjacent shell strings. A criterion spelled `deviations.py
+  line 380` means the census's own print of that file, a colon and 380. `record_kinds.py --check` exits 1 on this node
+  on stray entries of the git common dir (`recovery-manifests`, `theirs.tmp`, `history-verdicts`), the close's: read its
+  lines. Its fixture's memory-root parameter (`write_fixture`) is read by unit 73's S4: keep it as the spec states it. A §8 resolution mark is exactly `RESOLVED (agent, YYYY-MM-DD, delegated)`. Verify each claim about current code
   against source before building on it, and hand one that no longer holds back as a divergence.
 - A pass that edits `tools/policy/catalogue.toml` re-renders `.governance/policy.json` with `python
   tools/policy/policy.py mirror --write` and commits it, or the pass legs refuse a stale mirror. A literal markdown
