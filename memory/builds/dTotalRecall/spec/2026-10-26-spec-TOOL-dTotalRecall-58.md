@@ -12,6 +12,7 @@
 | [2026-10-26-build-TOOL-dTotalRecall-58-deviation-581.md](../build/2026-10-26-build-TOOL-dTotalRecall-58-deviation-581.md) | deviation | — |
 | [2026-11-24-build-TOOL-dTotalRecall-58-1-builder-return.md](../build/2026-11-24-build-TOOL-dTotalRecall-58-1-builder-return.md) | journal | — |
 | [2026-11-24-build-TOOL-dTotalRecall-58-2-acceptance-ledger.md](../build/2026-11-24-build-TOOL-dTotalRecall-58-2-acceptance-ledger.md) | log | — |
+| [2026-11-24-build-TOOL-dTotalRecall-58-2-builder-return.md](../build/2026-11-24-build-TOOL-dTotalRecall-58-2-builder-return.md) | journal | — |
 | [2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md](../build/2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md) | research | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-session.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-session.md) | log | — |

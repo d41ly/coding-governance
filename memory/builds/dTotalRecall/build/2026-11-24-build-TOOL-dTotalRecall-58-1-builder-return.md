@@ -36,6 +36,6 @@ Every other claim I probed at base holds, so after the AC4/S4 revision the unit 
 - **AC3 baseline:** with `FIXTURE_BUILD_ALIAS` rebound to the `check_alias_compares` kept path, `record_kinds.py --fixture --plant unkept-build-alias` exits 0, kept by its row with no other red. The hit sits at line 14.
 - **Files touched:** none of the three modules is on the kickoff manifest's `watch:` list.
 
-AC2's second half is SKIPPED, not observed. `packet.py --check dTotalRecall` exceeded a 100 s bound (its `carries.py --report` child was killed with 143); a second background run with a 580 s bound had printed nothing when I returned. The next pass should give it 600000 ms in the background and await the notification, or the close observes it.
+AC2's second half is SKIPPED, not observed. `packet.py --check dTotalRecall` exceeded a 100 s bound (DERIVED 2026-11-24, the pass; its `carries.py --report` child was killed with 143); a second background run with a 580 s bound had printed nothing when I returned. The next pass should give it 600000 ms in the background and await the notification, or the close observes it.
 
 Owed to the close after the rebuild: §7's legs and the RED-first observation of both New arms, `marker-in-build-script` (record_causes.py) and `marker-in-kept-script` (record_kinds.py). gotchas.py --for-diff was not run, as there is no commit to read.
