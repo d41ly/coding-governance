@@ -765,6 +765,10 @@ run_card "AC7 tool_use_id absent, session_id and cwd present, sentinel card -> d
 # The population is EXTRACTED from the engine file at run time, so a command the engine adds to its
 # orientation batch is fed here without anyone remembering to add an arm. The floor is PINNED at the
 # base measurement; an empty extraction is REFUSED rather than passed, the green-by-absence class.
+# A `<word>` in a span is a placeholder the engine's reader fills, and as written the shell reads `<remote>/HEAD`
+# as a redirect to `/HEAD`, which the hook refuses; so each is filled with a plain word before the span is fed.
+# The row set and its count are the extracted spans', and each row is labelled with its span as written
+# (TOOL-dBoundRoles-92). WHAT THIS DOES NOT CHECK: a span run unfilled, which is the shell's redirect.
 SG_SPAN_FLOOR=7   # 7 at main b7dee206 (was 8 at c95fe32a, 2026-09-14) — re-pin note below
 # RE-PINNED 8 -> 7 on 2026-09-20 (closing review of aBlindedTrial units 2–5, F7): `KICK-aReplayedCard-3`
 # restructured the engine's Steps and the count has read 7 at main b7dee206 and every commit since, so
@@ -783,7 +787,7 @@ if [ -f "$SG_ENGINE" ] && extract_git_spans "$SG_ENGINE" > "$TMP/spans" 2>"$TMP/
   if [ "$sg_nspans" -ge "$SG_SPAN_FLOOR" ]; then echo "ok   AC9 the extracted count is at or above the pinned floor"; pass=$((pass+1))
   else echo "FAIL AC9 extracted $sg_nspans spans, under the floor of $SG_SPAN_FLOOR — the engine lost commands or the extractor lost its grip"; fail=$((fail+1)); fi
   while IFS= read -r sg_span; do
-    run_card "AC9 engine span '$sg_span' on a sentinel card -> allow, stderr EMPTY" 0 empty "$sg_span" session_id=sgtest-d1 "cwd=$SG_CWD_WT"
+    run_card "AC9 engine span '$sg_span' on a sentinel card -> allow, stderr EMPTY" 0 empty "$(printf '%s' "$sg_span" | sed 's/<[^<> ]*>/word/g')" session_id=sgtest-d1 "cwd=$SG_CWD_WT"
   done < "$TMP/spans"
 else
   echo "FAIL AC9 the engine file yielded no git spans — an empty population is refused, not passed"; cat "$TMP/spans.err" 2>/dev/null; fail=$((fail+1))
@@ -1660,6 +1664,37 @@ scan_targets "BR7-AC3 git-apply-heredoc: the same patch in a heredoc" 'd.py:git 
 $(cat "$TMP/sw7.patch")
 EOF"
 scan_targets "BR7-AC3 git apply --check writes nothing" '' 'git apply --check sw7.patch' "$SG_TMP_N"
+# ---- TOOL-dBoundRoles-92: a perl switch that takes a value ends its cluster, and `--` ends the options ----
+# ---- alone. Against the walk at base every value row reads a target, and the two script rows after `--` --
+# ---- read the script as a file beside it. Then one row per shape the scan names and no row held: with ----
+# ---- that alternative of INTERPRETER_WRITES, the `rename to` regex or the perl branch cut, its row reds. -
+scan_targets "BR92-AC1 perl -MList::Util is no in-place edit" '' 'perl -MList::Util=sum -ne print x.py'
+scan_targets "BR92-AC1 perl -MTime::Piece is no in-place edit" '' 'perl -MTime::Piece -e 1 a.txt'
+scan_targets "BR92-AC1 perl -Ilib is no in-place edit" '' 'perl -Ilib -ne print f'
+for sg92_c in M m I F C D x V; do
+  scan_targets "BR92-AC1 perl -${sg92_c}i: the i is -$sg92_c's value" '' "perl -${sg92_c}i -e 1 x.py"
+done
+scan_targets "BR92-AC1 perl -pi is in place" 'x.py:perl -i' 'perl -pi -e 1 x.py'
+scan_targets "BR92-AC1 a bare -I takes the next word, and the -pi after it is in place" 'x.py:perl -i' 'perl -I lib -pi -e 1 x.py'
+scan_targets "BR92-AC2 sed -i --: the script is no file" 'out.txt:sed -i' 'sed -i -- s/a/b/ out.txt'
+scan_targets "BR92-AC2 perl -pi --: the script is no file" 'out.txt:perl -i' 'perl -pi -- s/a/b/ out.txt'
+scan_targets "BR92-AC2 sed -i -e --: the first word after it is a file" 'out.txt:sed -i' 'sed -i -e s/a/b/ -- out.txt'
+for sg92_c in a x r+; do
+  scan_targets "BR92-AC4 a python -c open in $sg92_c mode" 'a.py:interpreter write' "python -c \"open('a.py','$sg92_c').write('x')\""
+done
+scan_targets "BR92-AC4 Path.write_bytes" 'b.bin:interpreter write' "python -c \"Path('b.bin').write_bytes(b'x')\""
+scan_targets "BR92-AC4 a node -e appendFileSync" 'c.js:interpreter write' "node -e \"require('fs').appendFileSync('c.js','')\""
+scan_targets "BR92-AC4 [IO.File]::WriteAllBytes" 'ps.bin:interpreter write' "[IO.File]::WriteAllBytes('ps.bin', \$b)"
+scan_targets "BR92-AC4 [IO.File]::AppendAllText" 'ps.txt:interpreter write' "[IO.File]::AppendAllText('ps.txt', 'x')"
+scan_targets "BR92-AC4 sed --in-place" 'f:sed -i' 'sed --in-place s/a/b/ f'
+scan_targets "BR92-AC4 sed --in-place=<suffix>" 'f:sed -i' 'sed --in-place=.bak s/a/b/ f'
+scan_targets "BR92-AC4 perl -i" 'f:perl -i' 'perl -i -pe s/a/b/ f'
+scan_targets "BR92-AC4 a patch's rename to line" 'e.py:git apply' "git apply <<'EOF'
+diff --git a/d.py b/e.py
+similarity index 100%
+rename from d.py
+rename to e.py
+EOF"
 # ---- TOOL-dBoundRoles-86: the exact value of each redirect operator, of the target-directory option --
 # ---- and of a substitution. Against a REDIRECT that needs a separator before it, as at base, the glued -
 # ---- rows read none; with the target-directory loop cut from scanWriteOperands, its rows read `a` -------
@@ -1776,6 +1811,18 @@ write_sw7_prompt "### allowance
 
 - mem/builds/bx/spec/" truncate 300000
 run_shell_write "BR43-AC39 ...that record cut mid-JSON -> deny for the typed agent, naming the record that does not parse" 2 "any;;does not parse" gov-spec-writer 'echo x > mem/builds/bx/spec/sw7.md' session_id=sgtest-o1 agent_id=a7 "transcript_path=$SG7_TP"
+# ---- TOOL-dBoundRoles-92 AC3: the harness-run transcript folder and the first record's bound. With the ----
+# ---- run-folder candidates cut the first row admits with the not-located witness; with the over-bound ----
+# ---- deny cut the second, whose target its allowance holds, admits. ---------------------------------------
+write_sw7_transcript '- mem/builds/bx/spec/'
+mkdir -p "$TMP/sw7sess/subagents/workflows/wf_x"
+mv "$TMP/sw7sess/subagents/agent-a7.jsonl" "$TMP/sw7sess/subagents/workflows/wf_x/agent-a8.jsonl"
+run_shell_write "BR92-AC3 a transcript under subagents/workflows/wf_x/, a write outside its allowance -> deny naming the allowance" 2 "any;;outside the allowance;;mem/builds/bx/spec/;;workflows/wf_x/agent-a8.jsonl" gov-spec-writer 'echo x > mem/builds/other/spec/sw7.md' session_id=sgtest-o1 agent_id=a8 "transcript_path=$SG7_TP"
+write_sw7_prompt "### allowance
+
+- mem/builds/bx/spec/" "" $((8 * 1024 * 1024 + 1))
+run_shell_write "BR92-AC3 a first record past the bound -> deny naming the bound" 2 "any;;runs past $((8 * 1024 * 1024)) bytes" gov-spec-writer 'echo x > mem/builds/bx/spec/sw7.md' session_id=sgtest-o1 agent_id=a7 "transcript_path=$SG7_TP"
+write_sw7_transcript '- mem/builds/bx/spec/'
 # AC7: a throw inside the arm refuses a role agent through main's catch and never the main loop. The
 # preloaded stub makes fs.existsSync throw, which the arm's placing walk reaches first on this command.
 printf '%s\n' 'const fs = require("fs"); fs.existsSync = function () { throw new Error("stub: existsSync throws") }' > "$TMP/sw7throw.js"
@@ -2252,11 +2299,12 @@ for sgdr_v in none:none-scout-only probes:read-only-probes; do
   sgdr_top=$(printf '040000 tree %s\t.governance\n' "$sgdr_tree" | git -C "$SGDR" mktree)
   git -C "$SGDR" update-ref "refs/heads/sgdr-${sgdr_v%%:*}" "$($SGGIT -C "$SGDR" commit-tree "$sgdr_top" -m "driver.reads ${sgdr_v#*:}")"
 done
-# run_read <name> <expected exit> <branch> <tool> <needle, empty for an empty stderr> [agent_type] [hook]
+# run_read <name> <expected exit> <branch> <tool> <needle, empty for an empty stderr> [agent_type] [hook];
+# SG7_PRELOAD, when set, is preloaded as run_shell_write preloads it.
 run_read() {
   local payload got
   payload=$(node -e 'const d = { tool_name: process.argv[1], cwd: process.argv[2], session_id: "sgtest-dr", tool_input: { pattern: "x" } }; if (process.argv[3]) d.agent_type = process.argv[3]; console.log(JSON.stringify(d))' "$4" "$SGDR_CWD" "${6:-}")
-  printf '%s' "$payload" | GOV_DEFAULT_BRANCH="$3" node "${7:-$HOOK}" >/dev/null 2>"$TMP/err"; got=$?
+  printf '%s' "$payload" | GOV_DEFAULT_BRANCH="$3" node ${SG7_PRELOAD:+-r "$SG7_PRELOAD"} "${7:-$HOOK}" >/dev/null 2>"$TMP/err"; got=$?
   if [ "$got" = "$2" ] && { if [ -z "$5" ]; then [ ! -s "$TMP/err" ]; else grep -qF -- "$5" "$TMP/err"; fi; }; then
     echo "ok   $1 (exit $got)"; pass=$((pass+1))
   else
@@ -2276,6 +2324,14 @@ run_read "DR-AC2 policy-absent: no policy kit beside the hook, the main loop's G
 # arm that denied a refused read, both rows exit 2.
 run_read "BR43-AC40 policy-refusal: the reader refuses, the main loop's Read -> allow with one witness naming the refusal" 0 sgdr-no-such-branch Read 'driver.reads unread'
 run_read "BR43-AC40 policy-refusal: ...and the main loop's Grep too -> allow with the witness" 0 sgdr-no-such-branch Grep 'driver.reads unread'
+# TOOL-dBoundRoles-92 AC4: a throw in the read arm refuses the main loop through main's catch and never a
+# worker; with the catch's deny cut the first row exits 0. The preloaded stub makes fs.existsSync throw on the
+# policy reader alone: BR7-AC7's, which throws on every path, ends in the kit resolver's own catch instead.
+printf '%s\n' 'const fs = require("fs"); const real = fs.existsSync; fs.existsSync = function (f) { if (String(f).endsWith("policy-mirror.js")) throw new Error("stub: existsSync throws"); return real(f) }' > "$TMP/sgdrthrow.js"
+SG7_PRELOAD="$SG_TMP_N/sgdrthrow.js"
+run_read "BR92-AC4 a throw in the read arm, the main loop's Grep -> deny naming the arm" 2 "$SGDR_MAIN" Grep 'the main-loop read arm threw'
+run_read "BR92-AC4 a throw in the read arm, gov-researcher's Grep -> allow, nothing said" 0 "$SGDR_MAIN" Grep '' gov-researcher
+unset SG7_PRELOAD
 
 # ---- TOOL-dBoundRoles-50 AC9 AC16 AC17 (S9, S16, S17): the hooks kit's one fence walker. `readUnfencedLines`
 # over a four-backtick fence holding a three-backtick line, then a separate five-backtick fence, yields only
@@ -2451,8 +2507,10 @@ n=$((pass+fail))
 # prints, its count row printing only on a red), counted by hand under the same rule.
 # 591 = 560 + the 31 rows TOOL-dBoundRoles-87 added (a deny and an admit row for each of the 11 entries of
 # SHELL_RESERVED_WORDS, the 2 named-coproc rows and the 7 polling rows), counted by hand under the same rule.
+# 622 = 591 + the 31 rows TOOL-dBoundRoles-92 added (13 for AC1, 3 for AC2, 2 for AC3, and 13 for AC4, 11
+# scan_targets rows and 2 run_read rows), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=591
+FLOOR_ASSERTIONS=622
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

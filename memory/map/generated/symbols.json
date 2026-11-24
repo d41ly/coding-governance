@@ -8693,6 +8693,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "check_refused_return",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "check_registered",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
@@ -8991,6 +8996,11 @@
       "id": "check_row_owners",
       "kind": "function",
       "file": "tools/playbook/overlay_rows.py"
+    },
+    {
+      "id": "check_row_recorded",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_row_schema",
@@ -9801,6 +9811,11 @@
       "id": "check_typed_input",
       "kind": "function",
       "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
+      "id": "check_typed_refused",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "check_unclosed",
@@ -14196,6 +14211,11 @@
       "id": "derive_retired_rows",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "derive_retries_join",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_rev_prefix",
@@ -23806,6 +23826,11 @@
       "id": "read_h49_token",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_handed_allowance",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
     },
     {
       "id": "read_handoff_edges",
@@ -36858,6 +36883,11 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "run_retries_join",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_return_check",
       "kind": "function",
       "file": "tools/roles/handoff.py"
@@ -37434,6 +37464,11 @@
     },
     {
       "id": "run_strict_preflight",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_stub_dispatch",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
     },

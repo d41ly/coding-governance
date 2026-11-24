@@ -195,7 +195,7 @@ for any other `blob:` or `cmd:` key. The hooks kit's spawn guard re-derives each
 key at the spawn and refuses one whose source moved; a handoff rendered before this carries no fact
 line and is admitted as before. `python handoff.py facts --build <slug> [--unit <id>] --input
 <key>=<value>...` prints the same cut, one line of JSON, the list `[{name, key, class, text}]` in the
-order the inputs were given, refusing as `render` refuses: the unit harness's caller cuts
+order the inputs were given, each `text` inside its handed fence, refusing as `render` refuses: the unit harness's caller cuts
 `--input prompt=<briefPath> --input spec=<specPath>` immediately before each call and passes it as
 `facts`, which that harness requires wherever `roles.builder` travels. It reads no charter. A path
 holding whitespace refuses, since `FACT_RE` could not read its key back. What it does not check: that
@@ -781,8 +781,9 @@ build harnesses' attended mode, the review harness) instead of restating them; e
 is spawned from a `handoff.py render` and every harness call carries `handoff.py harness-args` and
 `handoff.py stage-efforts <workflow> --model <id>`. Its Stage 1 is the driver's one orientation step
 (TOOL-dBoundRoles-12 S4): an orientation scout's `placed` return is recorded with the loop kit's `placement.py
-place --request <content key> --return <file>`, then `placement.py check --request <content key>`, and a refusal
-of either routes back to the scout.
+place --request <content key> --return <file>`, then `placement.py check --request <content key>`. A `refused`
+return goes through `handoff.py route-refusal --return <file>`, and the scout is spawned again only on a `self`
+route, a malformed return or a refusal of either command.
 
 The render substitutes three tokens literally: `{{KIT_DIR}}` and `{{TOOL_ROOT}}`, derived by the
 same `.git` walk the unattended adopter uses, and `{{MEMORY_ROOT}}`, read from `.memory-tree.conf`.

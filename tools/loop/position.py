@@ -92,7 +92,7 @@ its local witnesses.
 prints the engine's lines and one `position: fixture · <case> · held` or `· MISSED <why>` line, and
 removes the scratch; it exits as the engine did where the case held, 1 where it missed, 2 where a kit it
 needs does not resolve. Every case runs with `GIT_CONFIG_GLOBAL` and `GIT_CONFIG_SYSTEM` naming one empty
-file under its scratch top, so no setting of the machine's reaches it (TOOL-dDeclaredLoop-75 S34). `frontier-refused`, `frontier-bad-key`, `plan-frontier`, `built-unarmed`,
+file under its scratch top, so no setting of the machine's reaches it (TOOL-dDeclaredLoop-75 S34). `frontier-refused`, `frontier-bad-key`, `refusal-typed`, `plan-frontier`, `built-unarmed`,
 `plan-line` and `status-line` run the unattended driver found by `resolve_kit_dir`. `--selftest` runs every case
 through `loop_lib.run_selftest_cases`.
 
@@ -172,6 +172,8 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
           "frontier-parallel": "A and B with no needs, neither witnessed: the frontier is A and B",
           "frontier-refused": "the driver's --refused on A at its key: one refusal row, A on the frontier",
           "frontier-bad-key": "--refused with a malformed key, then an undeclared tag: exit 1 each, the file unchanged",
+          "refusal-typed": "frontier-refused with --rule, --remedy and --actor: the row reads back the three and the "
+                           "reason before them, and the printed refusal line ends with them",
           "frontier-none": "the step narrowed to A witnessed and an item whose need is unmet: no frontier",
           "plan-frontier": "the frontier-refused repository, then --plan: frontier: A beneath next:",
           "built-unarmed": "B tested, then A's pass commit and no record under the shipped stand-in writer: A built, "
@@ -203,7 +205,10 @@ FX_A, FX_B, FX_C, FX_D = "item.build.base", "item.build.unit-lease", "item.build
 #: The build step's unit-forward item, the one the least-advanced designed unit has not passed.
 FX_UNIT = "item.build.acceptance"
 #: The plants that run the unattended driver, and so copy its conf into the scratch repository.
-FX_DRIVER = ("frontier-refused", "frontier-bad-key", "plan-frontier", "built-unarmed", "plan-line", "status-line")
+FX_DRIVER = ("frontier-refused", "frontier-bad-key", "refusal-typed", "plan-frontier", "built-unarmed", "plan-line",
+             "status-line")
+#: The rule, the remedy and the actor the `refusal-typed` plant records (TOOL-dBoundRoles-92 S6).
+FX_TYPED = {"rule": "practice.yagni", "remedy": "cut it smaller", "actor": "driver"}
 #: The `url-forms` plant's pairs (TOOL-dDeclaredLoop-77 S3): a configured URL, a URL as git wrote it into
 #: `FETCH_HEAD`, and whether `derive_fetch_url` owes them equal.
 FX_URL_FORMS = (("git@example.com:up.git", "example.com:up", "equal"),
@@ -750,7 +755,8 @@ def render_position_lines(pos):
         lines.append("next — %s · unit %s · actor %s · key %s" % (n["item"], n["unit"], n["actor"], n["key"]))
     lines.append("frontier — %s" % (" · ".join(f["item"] for f in pos["frontier"]) or "none"))
     lines += ["refusal — unarmed · %s" % r["unarmed"] if "unarmed" in r else
-              "refusal — %s · %s · %s" % (r["item"], r["key"], r["reason"]) for r in pos["refusals"]]
+              "refusal — %s · %s · %s%s" % (r["item"], r["key"], r["reason"], " · rule %(rule)s · remedy %(remedy)s · "
+                                            "actor %(actor)s" % r if r["actor"] else "") for r in pos["refusals"]]
     lines += ["interrupt — %s · %s" % (i["kind"], i["subject"]) for i in pos["interrupts"]]
     lines += ["read — %s" % r for r in pos["read"]]
     lines += ["claim — %s · key %s · %s" % (c["name"], c["key"], c["verdict"]) for c in pos["claims"]]
@@ -1002,8 +1008,9 @@ def check_plan_line(repo):
 
 
 def run_refusal_plant(case, repo, definition, handover):
-    """The misses of the three driver frontier plants: `--refused` on A at the key the frontier gives
-    it, or with a malformed key and an undeclared tag, then `--plan` for `plan-frontier`."""
+    """The misses of the four driver frontier plants: `--refused` on A at the key the frontier gives
+    it, typed for `refusal-typed`, or with a malformed key and an undeclared tag, then `--plan` for
+    `plan-frontier`."""
     run_path = repo / ("memory/builds/%s/RUN.md" % FX_SLUG)
     before = run_path.read_bytes()
     key = next(f["key"] for f in derive_plant_position(repo, definition, handover)["frontier"] if f["item"] == FX_A)
@@ -1018,9 +1025,12 @@ def run_refusal_plant(case, repo, definition, handover):
         if run_path.read_bytes() != before:
             misses.append("a refused --refused moved the run-state file's bytes")
         return misses
-    out, rc = run_driver(repo, "--refused", FX_SLUG, "--item", FX_A, "--key", key, "--reason", "probe")
+    typed = FX_TYPED if case == "refusal-typed" else {}
+    out, rc = run_driver(repo, "--refused", FX_SLUG, "--item", FX_A, "--key", key, "--reason", "probe",
+                         *[x for k, v in typed.items() for x in ("--" + k, v)])
     print(out.rstrip())
-    row = re.compile(r"\S+ refusal · item %s · step %s · reason probe" % (re.escape(FX_A), re.escape(key)))
+    row = re.compile(r"\S+ refusal · item %s · step %s · reason probe%s" % (
+        re.escape(FX_A), re.escape(key), re.escape("".join(" · %s %s" % kv for kv in typed.items()))))
     text = run_path.read_text(encoding="utf-8")
     rows = [ln for ln in text.splitlines() if row.fullmatch(ln)]
     for ln in rows:
@@ -1056,6 +1066,10 @@ def check_plant(case, pos, rc, repo):
             "frontier-none": lambda: pos["build_step"] == "step.build" and tags == [],
             "frontier-refused": lambda: FX_A in tags and [(r.get("item"), r.get("reason")) for r in pos["refusals"]]
             == [(FX_A, "probe")] and pos["refusals"][0]["key"] == next(f["key"] for f in pos["frontier"] if f["item"] == FX_A),
+            "refusal-typed": lambda: [{k: r.get(k) for k in ("item", "reason", *FX_TYPED)} for r in pos["refusals"]]
+            == [{"item": FX_A, "reason": "probe", **FX_TYPED}] and any(
+                ln.startswith("refusal — %s · " % FX_A) and ln.endswith(
+                    " · probe · rule %(rule)s · remedy %(remedy)s · actor %(actor)s" % FX_TYPED) for ln in lines),
             "steps": lambda: steps == ["deployed", "built", "designed"] and pos["answer"] == "act"
             and pos["build_step"] == "step.build" and any(r.startswith("memory/") for r in pos["read"])
             and any(c["name"].startswith("remote tip") and c["key"].startswith("k1:") and c["verdict"] == "fresh"
@@ -1197,7 +1211,8 @@ def run_plant(case):
         elif case in ("frontier-bad-key", "plan-frontier"):
             misses, rc = run_refusal_plant(case, repo, definition, handover), 0
         else:
-            misses = run_refusal_plant(case, repo, definition, handover) if case == "frontier-refused" else []
+            misses = (run_refusal_plant(case, repo, definition, handover)
+                      if case in ("frontier-refused", "refusal-typed") else [])
             readings = [definition]
             if case == "built-armed":  # read again with the acceptance row absent
                 readings.append(dict(definition, **{"computed-witness": [

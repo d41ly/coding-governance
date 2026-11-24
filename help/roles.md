@@ -29,9 +29,11 @@ reference; this page is the short version.
    answering a work order whose marker names another role is refused, one
    `placement: refused — return — <defect>` line each, and nothing is recorded. The return is `key:
    value` lines or one JSON object, and a return the return check sent back is the JSON; `place` reads
-   either, each value of the JSON a string on one line. A refusal of either
-   command goes back to the scout, spawned again from its work order. The `/build` Skill's Stage 1
-   states this step.
+   either, each value of the JSON a string on one line. A return reading `outcome: refused` carries no
+   placement: `place` refuses it, in either shape, naming its rule, its actor and
+   `handoff.py route-refusal --return <file>`, which prints where it goes. The scout is spawned again from
+   its work order only on a `self` route, a malformed return or a refusal of either command. The
+   `/build` Skill's Stage 1 states this step.
 3. **A role supplies the constant part.** Each role is one file under `<prefix>/roles/agents/`: its
    instructions, the inputs it reads, the file class it may write and the tags of the charter's
    practices it needs, under `rules`. It also says when the role is mandatory, under `mandatory`, and
@@ -66,8 +68,8 @@ reference; this page is the short version.
    a render in which a block would start inside a fence an earlier block left open, a handed block's
    content would be read outside its own fence, or the task would end inside an unclosed fence is
    refused, naming the block and the line, and nothing is written. `handoff.py facts --build <slug> --unit <id> --input prompt=<brief>
-   --input spec=<spec>` prints the same cut as one JSON list for a caller that hands it on: the unit
-   harness takes it as `facts` wherever `roles.builder` travels, and refuses a call without it.
+   --input spec=<spec>` prints the same cut as one JSON list for a caller that hands it on, each text
+   inside its fence: the unit harness takes it as `facts` wherever `roles.builder` travels, and refuses a call without it.
    Its `gov:handoff` marker line names the item the work order was cut for as `item=`: pass
    `--item <tag>`, a tag in the `item.<step>.<name>` shape, or the marker reads `item=-`. A tag in
    any other shape is refused and nothing is written.
@@ -449,7 +451,8 @@ of a return that is no valid refusal, and 2 when a reader it asks refuses.
   `key: value` fields to read, a required field missing, a field the template does not name, a value
   of the wrong type or outside its set, a `sha` naming no commit, a `path` naming no file, or an
   `answers` naming another work order. The stop is sent back to the agent with every defect named, up
-  to `roles.retries` times (3 unless your policy file sets it); after that the stop goes ahead and the
+  to `roles.retries` times (3 unless your policy file sets another, at most 4, the most a build or review
+  harness takes; a larger value is an invalid policy file); after that the stop goes ahead and the
   record under `.git/return-check/` says the return stayed invalid. A failed check never blocks a stop.
   <!-- usage: hook:return-check 2329c48d -->
 - A spec write from anything but the spec writer, and a product write from anything but the builder

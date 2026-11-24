@@ -51,8 +51,10 @@ place a request and it returned `outcome: placed`, write its return unchanged to
 bound to the scout's agent id its call returned, so a file that is not the scout's own last text is refused:
 `python tools/loop/placement.py place --request <content key> --return <file> --agent <agent id>`, then check it:
 `python tools/loop/placement.py check --request <content key>`.
-Act only on a check that passes. A refusal of either routes back to the scout, spawned again from its work order,
-never to a placement of your own.
+Act only on a check that passes. A return reading `outcome: refused` goes through
+`handoff.py route-refusal --return <file>`, which prints the route of the actor it names. The scout is spawned again
+from its work order only on a `self` route, a malformed return or a refusal of either command, never replaced by a
+placement of your own.
 
 ## Stage 2 — reuse
 

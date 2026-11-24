@@ -563,6 +563,18 @@ def framed(path, sha):
 plants = {"spawn-unframed": ("gov-builder", opening, "build"),
           "spawn-framed": ("gov-builder", framed(pw, pw_sha), "build"),
           "spawn-framed-by-researcher": ("gov-builder", framed(rs, rs_sha), "build")}
+# TOOL-dBoundRoles-92 - one plant per refusal of checkFraming, each the framed task with one thing moved.
+whole, named = framed(pw, pw_sha), "Framed by: %s task-sha=%s\n\n" % (pw, pw_sha)
+for rel, text in (("plain.md", "no marker\n"), ("twice.md", pw_mark + "\n\n" + pw_mark + "\n")):
+    with open(os.path.join(root, pre + rel), "w", newline="\n", encoding="utf-8") as f:
+        f.write(text)
+plants.update({"frame-" + k: ("gov-builder", task, "build") for k, task in {
+    "two-blocks": whole + "\n### framing:job\n\nAgain.\n", "no-line": whole.replace(named, ""),
+    "two-lines": whole.replace(named, named + named), "before": whole.replace(named, "").replace("\n### framing:job", "\n" + named + "### framing:job"),
+    "after": whole.replace(named, "") + "\n" + named, "misspelt": framed(pw, "no-sha"),
+    "outside": framed("memory/builds/bx/spec/x.md", pw_sha), "dotdot": framed(pre + "../prompts/" + pw[len(pre):], pw_sha),
+    "no-file": framed(pre + "none.md", pw_sha), "no-marker": framed(pre + "plain.md", pw_sha),
+    "two-markers": framed(pre + "twice.md", pw_sha), "other-sha": framed(pw, "0123456789ab")}.items()})
 index = {"roles": {r: {"agent": True, "role-sha": h(role[r]), "workflow": w, "writes": c} for r, w, c in (
     ("gov-builder", "build", "product"), ("gov-prompt-writer", "handoff", "none"), ("gov-researcher", "research", "none"))},
     "harnesses": []}
@@ -587,6 +599,21 @@ for name, (r, prompt, wf) in calls.items():
   GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-framed-by-researcher: its Framed by: line names a role=gov-researcher work order -> deny" 2 "$(cat "$TMP/spawn-framed-by-researcher.json")" "$PF_HOOK" 'marker names role=gov-researcher, not gov-prompt-writer'
   run_limit_call "rule6 BR4 AC3 spawn-unframed: under requesting-worker-rendered the unframed builder task -> allow" 0 "$(cat "$TMP/spawn-unframed.json")" "$PF_HOOK"
   GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-prompt-writer: the prompt writer's own task, unframed, under the default -> allow" 0 "$(cat "$TMP/spawn-prompt-writer.json")" "$PF_HOOK"
+  # TOOL-dBoundRoles-92 AC14: every refusal of checkFraming past the role's, each by its own text; with one of
+  # them cut, its plant is admitted or refused by another text. The line count, the placement test, the path check
+  # and the marker count take two plants each.
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-two-blocks: two framing:job blocks -> deny" 2 "$(cat "$TMP/frame-two-blocks.json")" "$PF_HOOK" 'the task carries 2 `### framing:job` blocks'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-no-line: no Framed by: line -> deny" 2 "$(cat "$TMP/frame-no-line.json")" "$PF_HOOK" 'the task carries 0 `Framed by:` lines'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-two-lines: two Framed by: lines -> deny" 2 "$(cat "$TMP/frame-two-lines.json")" "$PF_HOOK" 'the task carries 2 `Framed by:` lines'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-before: the line before its block -> deny" 2 "$(cat "$TMP/frame-before.json")" "$PF_HOOK" 'line sits outside its `### framing:job` block'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-after: the line in the block after its own -> deny" 2 "$(cat "$TMP/frame-after.json")" "$PF_HOOK" 'line sits outside its `### framing:job` block'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-misspelt: a task-sha of no hex -> deny" 2 "$(cat "$TMP/frame-misspelt.json")" "$PF_HOOK" 'is not `Framed by: <path> task-sha=<12 hex>`'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-outside: a path outside prompts/ -> deny" 2 "$(cat "$TMP/frame-outside.json")" "$PF_HOOK" 'path memory/builds/bx/spec/x.md is not a repo-relative file under builds/bx/prompts/'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-dotdot: a path holding .. -> deny" 2 "$(cat "$TMP/frame-dotdot.json")" "$PF_HOOK" '/prompts/../prompts/2026-11-23-prompt-T-1-1-prompt-writer.md is not a repo-relative file under builds/bx/prompts/'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-no-file: a path naming no file -> deny" 2 "$(cat "$TMP/frame-no-file.json")" "$PF_HOOK" 'prompts/none.md names no file under'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-no-marker: a file holding no marker -> deny" 2 "$(cat "$TMP/frame-no-marker.json")" "$PF_HOOK" 'prompts/plain.md holds 0 gov:handoff marker lines'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-two-markers: a file holding two markers -> deny" 2 "$(cat "$TMP/frame-two-markers.json")" "$PF_HOOK" 'prompts/twice.md holds 2 gov:handoff marker lines'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR92 AC14 frame-other-sha: a task-sha of another render -> deny" 2 "$(cat "$TMP/frame-other-sha.json")" "$PF_HOOK" 'and the `Framed by:` line names 0123456789ab: the framing was cut from another render of it'
 fi
 # ---- rule 6: every agent prompt is a rendered handoff (TOOL-aOrientedCast-7) ----------------------
 # Armed by `.claude/roles.json` at the checkout root of the payload `cwd`. Every arm above runs with
@@ -632,6 +659,7 @@ printf '%s\n' '#!/bin/bash' '[ "$1" = --card ] && [ "$2" = --path ] && [ "$3" = 
   'printf "%s\n" "$PWD/cards/$4.md"' > "$TMP/rule6-hooks/session-kickoff/manifest-check.sh"
 printf '## route\n- build: bx\n- unit: T-1 · spec memory/builds/bx/spec/x.md\n' > "$HOREPO/cards/ho-c1.md"
 printf '## route\n- build: bx\n- unit: T-2 · spec memory/builds/bx/spec/x.md\n' > "$HOREPO/cards/ho-c2.md"
+printf '## route\n- build: bx\n' > "$HOREPO/cards/ho-c4.md"   # the card a handed fact is cut over (TOOL-dBoundRoles-92)
 HO_CWD=""
 HO_PROJECT=""
 # TOOL-dBoundRoles-50 S16: spec 13 of the tree this suite runs in, the one `write_handoff` hands whole as its
@@ -699,6 +727,25 @@ ftask = task + "\n### input:spec\n\n<!-- gov:fact key=record:%s@%s class=claimed
 faced = pre + "2026-10-11-prompt-T-1-4-researcher.md"
 MF = render_marker(faced, ftask)
 write_prompt_file(faced, MF, ftask)
+# TOOL-dBoundRoles-92 - a fact under each other source form: the card of the session ho-c4, cut over its bytes as
+# they stand, and one of a session with no card; a key escaping the checkout, spelled four ways; and a spec written
+# here for the arm to remove. Each handed block is a fenced line no check reads.
+def read_blob(path):
+    with open(path, "rb") as f:
+        held = f.read().replace(b"\r\n", b"\n")
+    return hashlib.sha1(b"blob %d\0" % len(held) + held).hexdigest()[:12]
+gone = "memory/builds/bx/spec/gone.md"
+with open(os.path.join(root, gone), "w", newline="\n") as f:
+    f.write("A spec line.\n")
+srcs = {"kcard": "card/ho-c4@" + read_blob(os.path.join(root, "cards", "ho-c4.md")), "kcardless": "card/ho-c8@0123456789ab",
+        "kslash": "memory/../../out.md@0123456789ab", "kback": "memory\\..\\..\\out.md@0123456789ab",
+        "kroot": "/out.md@0123456789ab", "kdrive": "C:out.md@0123456789ab", "kgone": "%s@%s" % (gone, read_blob(os.path.join(root, gone)))}
+forms = {}
+for k, (name, src) in enumerate(srcs.items()):
+    rel = pre + "2026-11-24-prompt-T-1-%d-researcher.md" % (60 + k)
+    sec = task + "\n### input:spec\n\n<!-- gov:fact key=record:%s class=claimed -->\n\n```\nA line.\n```\n" % src
+    forms[name] = (render_marker(rel, sec), sec)
+    write_prompt_file(rel, *forms[name])
 # TOOL-dBoundRoles-38 - handed content fenced: a spec quoting a three-backtick fence that holds a heading and a
 # fact line keyed to no file, then a whole marker line, handed under its own record: key inside a four-backtick
 # fence; `moved` is that handoff with the quoted marker hand-moved below the fence, `open` one whose task section
@@ -817,7 +864,7 @@ prompts = {
 }
 
 prompts.update({name: typed[name] + "\n\n" + sec for name, sec in tvars.items()})
-prompts.update({name: mark + "\n\n" + sec for name, (mark, sec) in flips.items()})
+prompts.update({name: mark + "\n\n" + sec for name, (mark, sec) in (*flips.items(), *forms.items())})
 prompts.update(s13)
 for k, v in prompts.items():
     with open(out + "." + k, "w", newline="") as f:
@@ -942,6 +989,21 @@ run_spawn "rule6 BR13 AC3: the spec moved after rendering refused, naming its re
 run_spawn "rule6 BR13 AC3: ...and naming the re-render that cuts it fresh" 2 gov-researcher fact "re-render the handoff, which cuts it fresh"
 write_handoff
 run_spawn "rule6 BR13 AC3: ...and the handoff re-rendered after the move admitted" 0 gov-researcher fact ""
+# TOOL-dBoundRoles-92 AC15 - the other three source forms of the re-cut: the card, read through readCard, a key that
+# leaves the checkout, spelled under a slash, a backslash, a leading slash and a drive letter, and a source removed.
+# Against checkFactKeys with the card branch cut the first row is refused; with the escape branch, or one test of
+# it, cut, a row reads another text; with a missing source read as held, the last is admitted.
+run_spawn "rule6 BR92 AC15: a card fact whose card is unchanged is admitted" 0 gov-researcher kcard ""
+printf -- '- unit: T-1 · spec memory/builds/bx/spec/x.md\n' >> "$HOREPO/cards/ho-c4.md"
+run_spawn "rule6 BR92 AC15: ...and refused once the card moved, naming its key" 2 gov-researcher kcard "fact: record:card/ho-c4@"
+run_spawn "rule6 BR92 AC15: a card fact whose session has no card refused, naming what the source reads" 2 gov-researcher kcardless "and its source now reads nothing, "
+run_spawn "rule6 BR92 AC15: a key holding .. under a slash refused" 2 gov-researcher kslash "reads nothing: the key names no path inside the checkout"
+run_spawn "rule6 BR92 AC15: ...and under a backslash" 2 gov-researcher kback "reads nothing: the key names no path inside the checkout"
+run_spawn "rule6 BR92 AC15: a leading-slash key refused" 2 gov-researcher kroot "reads nothing: the key names no path inside the checkout"
+run_spawn "rule6 BR92 AC15: a drive-letter key refused" 2 gov-researcher kdrive "reads nothing: the key names no path inside the checkout"
+rm -f "$HOREPO/memory/builds/bx/spec/gone.md"
+run_spawn "rule6 BR92 AC15: a source removed after the render refused" 2 gov-researcher kgone "reads nothing: no file is there"
+write_handoff
 # TOOL-dBoundRoles-38 AC3 AC4 - handed content fenced. The `fenced` handoff's spec quotes a fact line keyed to no
 # file and a whole marker line, both inside the four-backtick fence, and is admitted: neither is counted nor
 # re-cut. The `moved` copy carries the quoted marker below the fence and is refused naming 2 marker lines; the
@@ -1380,8 +1442,9 @@ n=$((pass+fail))
 # +1 for spec 13 handed whole to the guard (TOOL-dBoundRoles-50).
 # +6 for the entry guard, the check order, the one block reader and the derived exemption (TOOL-dBoundRoles-58).
 # +8 for the nested harnesses held to their landed blobs, one per row (TOOL-dBoundRoles-88).
+# +20 for the twelve framing refusals and the eight rows of the other fact sources (TOOL-dBoundRoles-92).
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=202
+FLOOR_ASSERTIONS=222
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL $pass assertions passed against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
