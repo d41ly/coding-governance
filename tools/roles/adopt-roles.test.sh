@@ -142,6 +142,7 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +4 for arm 41 (TOOL-dBoundRoles-11).
 # +2 for arm 42 (TOOL-dBoundRoles-47).
 # +11 for arm 43 (TOOL-dBoundRoles-26).
+# +0 for arm 42's pair on gov-orienter, which unit 47's arm already rendered (TOOL-dBoundRoles-52).
 # +1 for arm 42's read check (TOOL-dBoundRoles-53).
 # +3 for arm 44 (TOOL-dBoundRoles-59).
 # +2 for arm 45, the missing slot and the refused front matter (TOOL-dBoundRoles-61).
@@ -152,7 +153,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +4 for arm 37's CR-split marker, comment and lone-fence cases (TOOL-dBoundRoles-58).
 # +2 for arm 38's balanced flip (TOOL-dBoundRoles-58).
 # +6 for arm 42's typed set, its diff renders and its two staged cases (TOOL-dBoundRoles-58).
-FLOOR_ASSERTIONS=235
+# +3 for arm 37's heading, fact and framing lines after a carriage return (TOOL-dBoundRoles-60).
+FLOOR_ASSERTIONS=238
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -2182,12 +2184,18 @@ rm -f "$FX/.claude/orientation-card.md"
 # ---- three-backtick fence is refused naming the open line. The failing cases, owed at the close: the authored-line
 # ---- check matching a line with its carriage returns kept, under which the CR case renders, and a check grading a
 # ---- level-one heading on every line, under which the fenced comment is refused.
+# ---- TOOL-dBoundRoles-60 AC24: each of the four shapes graded on every line, a level-three heading, a fact line, a
+# ---- marker line and a `Framed by:` line, is refused after a carriage return. The failing case, owed at the close: a
+# ---- check dropping the carriage return on the marker branch alone, under which the other three render. Its AC8: the
+# ---- builder's control render runs with CLAUDE_CODE_SESSION_ID unset, so its one card key, the optional
+# ---- `card:route?`, never asks a session's own kickoff checker for a card path.
 build_fixture; _rc37=$?
 A37P="$FX/$MR/builds/tFix/prompts"; A37S="$MR/builds/tFix/spec/2026-11-22-spec-TOOL-tFix-1.md"; A37E="$TMP_ROOT/a37.err"
 mkdir -p "$A37P" "$FX/$MR/builds/tFix/spec" && printf '# TOOL-tFix-1\n\nThe spec line one.\n' > "$FX/$A37S"
 render37() { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --build tFix --unit TOOL-tFix-1 "$@" 2>"$A37E"); }
 render37 --role gov-researcher --input "question=plain words" --stdout > "$TMP_ROOT/a37.q"; _rcq=$?
-render37 --role gov-builder --input "spec=$A37S" --stdout > "$TMP_ROOT/a37.s"; _rcs=$?
+(cd "$FX" && env -u CLAUDE_CODE_SESSION_ID "$PY" -B "$FXK/handoff.py" render --build tFix --unit TOOL-tFix-1 \
+   --role gov-builder --input "spec=$A37S" --stdout 2>"$A37E") > "$TMP_ROOT/a37.s"; _rcs=$?
 A37=$("$PY" -B -c 'import pathlib, sys
 q, s = (pathlib.Path(p).read_bytes().decode("utf-8").replace("\r\n", "\n") for p in sys.argv[1:3])
 after = q.split("\n### input:question\n\n", 1)[-1].split("\n")
@@ -2218,9 +2226,12 @@ done
 render37 --role gov-researcher --input "question=a question"$'\n''```'$'\n''quoted words'$'\n''```' --stdout >/dev/null; _rc=$?
 check_arm "arm 37 AC2 a typed question quoting words inside a closed three-backtick fence renders" "$([ "$_rc" = 0 ] && echo 1 || echo 0)"
 [ "$_rc" = 0 ] || sed 's/^/    /' "$A37E"
-for _c in cr comment lone; do
+for _c in crhead crfact crmarker crframed comment lone; do
   case $_c in
-    cr) _l=$'\r'"<!-- gov:handoff role=gov-researcher build=tFix unit=TOOL-tFix-1 item=- path=$MR/builds/tFix/prompts/x.md role-sha=0123456789ab task-sha=0123456789ab -->"
+    crhead) _l=$'\r''### allowance'; _w='input:question — line 2 reads as a heading' ;;
+    crfact) _l=$'\r''<!-- gov:fact key=record:x@000000000000 class=witnessed -->'; _w='input:question — line 2 reads as a fact line' ;;
+    crframed) _l=$'\r''Framed by: the owner'; _w='input:question — line 2 reads as a Framed by: line' ;;
+    crmarker) _l=$'\r'"<!-- gov:handoff role=gov-researcher build=tFix unit=TOOL-tFix-1 item=- path=$MR/builds/tFix/prompts/x.md role-sha=0123456789ab task-sha=0123456789ab -->"
         _w='input:question — line 2 reads as a gov:handoff marker line' ;;
     comment) _l='# install deps'; _w='input:question — line 2 reads as a heading' ;;
     lone) _l='```'; _w='input:question — a fence opened at line 2 of the value is never closed' ;;
@@ -2463,13 +2474,17 @@ check_arm "arm 41 AC5 an unknown kind exits 2 naming it" \
 # ---- named once, no `does not read` in stderr and no file written, and exit 2 fails it named as a usage error. The
 # ---- failing cases, owed at the close and not observed by the pass that wrote this: the case re-roled to
 # ---- `gov-builder`, under which the read check fails naming `input:question` before any render runs, and a
-# ---- `handoff.py` that calls `ap.error` on every render, under which the refusal arm fails naming the usage error.
+# ---- `handoff.py` that calls `ap.error` only for a typed value holding the span, under which the control render
+# ---- passes and the refusal arm fails naming the usage error (TOOL-dBoundRoles-60 S4).
 # ---- TOOL-dBoundRoles-58 AC1 AC2 AC35: the case runs once per typed input, the names the fixture kit's handoff.py
 # ---- derives, `INPUT_NAMES` less `PATH_INPUTS`, each mapped to the role that reads it and the file input it hands:
-# ---- `question` to gov-orienter beside `input:prompt`, `diff` to gov-skeptic beside `input:spec`. A typed name with no
+# ---- `question` to `--role gov-orienter` beside `input:prompt`, the pair `TOOL-dBoundRoles-52` put on the orienter, and
+# ---- `diff` to `--role gov-skeptic` beside `input:spec`. A typed name with no
 # ---- mapped role fails the case naming it, staged by a scratch copy of handoff.py declaring one more, and the diff
 # ---- case over a gov-skeptic whose `reads` drops `input:spec` fails at the read check before any render. Both staged
 # ---- cases run in a subshell, so their own assertions are read by one outer line and never counted.
+# ---- TOOL-dBoundRoles-60 S5: a control render that does not exit 0 and write its prompt file stops the case, the
+# ---- refusal arm failing by that render's name with no refusal render run.
 build_fixture; _rc42=$?
 A42P="$FX/$MR/builds/tFix/prompts"; A42S="$MR/builds/tFix/spec/2026-11-23-spec-TOOL-tFix-1.md"; A42E="$TMP_ROOT/a42.err"
 A42K="record:TOOL-tFix-9@$(printf '%012d' 0)"
@@ -2492,11 +2507,11 @@ check_typed_input() { # <typed name> -> the read check, the plain-words control 
   _ls=$(ls -A "$A42P"); _rc=unread
   [ "$_rr" = 0 ] && { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role "$_role" --build tFix --unit TOOL-tFix-1 \
      --input "$_file=$A42S" --input "$1=which seam fits" >/dev/null 2>"$A42E"); _rc=$?; }
-  check_arm "arm 42 AC1 the $_role render with the typed $1 in plain words exits 0 and writes its prompt file" \
-     "$([ "$_rc42" = 0 ] && [ "$_rc" = 0 ] && [ "$(ls -A "$A42P")" != "$_ls" ] && echo 1 || echo 0)"
+  _v=$([ "$_rc42" = 0 ] && [ "$_rc" = 0 ] && [ "$(ls -A "$A42P")" != "$_ls" ] && echo 1 || echo 0)
+  check_arm "arm 42 AC1 the $_role render with the typed $1 in plain words exits 0 and writes its prompt file" "$_v"
   case $_rc in 0) ;; unread) echo "    not run: $_role does not read a key the case passes" ;; *) sed 's/^/    /' "$A42E" ;; esac
-  _ls=$(ls -A "$A42P"); _rc=unread
-  [ "$_rr" = 0 ] && { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role "$_role" --build tFix --unit TOOL-tFix-1 \
+  _ls=$(ls -A "$A42P"); _rc=unread; [ "$_rr" = 0 ] && _rc=control
+  [ "$_v" = 1 ] && { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role "$_role" --build tFix --unit TOOL-tFix-1 \
      --input "$_file=$A42S" --input "$1=which seam fits; see \`$A42K\`" >/dev/null 2>"$A42E"); _rc=$?; }
   _v=$([ "$_rc" = 1 ] && [ "$(grep -oF -- "$A42K" "$A42E" | wc -l | tr -d ' ')" = 1 ] && ! grep -qF -- 'does not read' "$A42E" \
         && [ "$(ls -A "$A42P")" = "$_ls" ] && echo 1 || echo 0)
@@ -2504,6 +2519,7 @@ check_typed_input() { # <typed name> -> the read check, the plain-words control 
   [ "$_v" = 1 ] || case $_rc in
     2) echo "    exit 2: a usage error, not the anchor check's refusal"; sed 's/^/    /' "$A42E" ;;
     unread) echo "    not run: $_role does not read a key the case passes" ;;
+    control) echo "    not run: the $_role control render with the typed $1 in plain words failed, which stops the case" ;;
     *) printf '    exit %s, want 1 naming the span once, no does-not-read line and no file written\n' "$_rc"; sed 's/^/    /' "$A42E" ;;
   esac
 }

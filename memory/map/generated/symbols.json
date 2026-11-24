@@ -9263,6 +9263,11 @@
       "file": "tools/lexicon/adopt-lexicon.sh"
     },
     {
+      "id": "check_skill_description",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "check_skill_install",
       "kind": "function",
       "file": "tools/check-wiring.sh"
