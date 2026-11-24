@@ -1,0 +1,53 @@
+**Serves:** journal TOOL-dBoundRoles-66
+
+# TOOL-dBoundRoles-66 — acceptance ledger
+
+Each criterion of section 6, read by the pass that built the unit with a probe of the code and the text it changed, on
+its worktree before the pass commit at base `581ae374f`. Specs 60 to 64 are CLOSED, so the restated text is the After
+field of `memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-66-deviation-663.md`,
+and a criterion that greps a frozen spec is answered AMENDED, by
+`memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-58-1-main-loop-decision.md`, item 4. No gate, suite or bar ran in
+the pass: this unit adds no arm, and the legs its gate line lists, each roles suite's printed count beside the recorded
+E within the bound record 663 gives unit 64's `New arm:` lines, are owed to the main loop at the close.
+
+## Items a landed unit had already left
+
+- S16: the spawn guard's comment opens `# 187 (TOOL-dBoundRoles-43)`, as unit 64's pass wrote it.
+- S17, S18 and S19: spec 64's rev-4 already cites spec 52's lines 102-103, already states the route's sources and
+  already gives the spawn guard's suite no site count; record 663 restates the bullets whole.
+- S20: the adopter suite's floor comment already holds the two lines for arms 11 and 20 and none of the four prose
+  phrases, so `tools/roles/adopt-roles.test.sh` is not edited.
+- S14: spec 63's S11 and §4 Evidence cite no line of spec 53, so the half is empty on the tree.
+- S15: records 643 and 663 hold the three halves; spec 61 is not restated.
+
+## The staged observation, S10
+
+The probe took S12's form: `git log -1 --format=%H -S derive_overlay_expected -- tools/govkit/selftest.py` printed
+`bfccd9126`, whose subject names `TOOL-dBoundRoles-19`; its parent `7dae6faf2` was checked out detached at a direct
+child of `dbr63obs` under `C:\Temp`, named for the epoch and the probe's process, and a child process imported a
+module name that does not exist.
+
+- Before the run no entry lay under the root, and none was `prunable`, so the recovery step took nothing away.
+- After `git worktree add` and before the import, the list named the run's own path, the liveness of the comparison.
+- The probe printed `ModuleNotFoundError: No module named 'selftest_absent'` and exited 1.
+- Afterwards no entry equalled the run's own path through `derive_key` of `os.path.realpath`, none lay under the root,
+  and neither the path nor the root stood.
+
+**Evidences:** TOOL-dBoundRoles-66
+- AC1 — `SKIP` — the probe applied the predicate to both suites (DERIVED on the staged tree): in `tools/roles/adopt-roles.test.sh` it matched arm 6's two echoes, arm 11's two, arm 20's two and arm 36's edges reading, in `tools/roles/spawn-guard.test.sh` none, its suite skipping no arm. It matched no comment line, no heredoc or docstring line and neither line holding `-ge "$FLOOR_ASSERTIONS"`; `SKIP arm 11` and `SKIP arm 20` each stand on exactly one `# out of the floor:` line, and each such payload is a substring of a matched echo. With the predicate widened to any line holding the word skip, case-folded, the adopter's comparison line and its comments matched too, the failing case. AMENDED by the main loop's decision, item 4, and by the build brief for S2's echo: record 663's text for spec 64's §4, S33 and AC8 states the predicate, the population and the join.
+- AC2 — `FLOOR_ASSERTIONS` — 194, equal to E (DERIVED from source at the pass, `tools/roles/spawn-guard.test.sh@790478e7`): 182 call sites, of which three sit in loops. The listed shell loops, each body read up to its `done`: line 402, the `--only=` one, four; line 447, the direct spawns, six; line 895, the refused spawns, five. The sweep also lists Python lines inside quoted programs, which reach a later shell `done` and execute no shell assertion, 0 each: lines 145, 156, 257, 268, 572, 576, 734, 749, 768 and 822. No other listed loop's body calls a helper or echoes ok or FAIL. AMENDED by the main loop's decision, item 4: record 663's §4 Evidence text for spec 64 holds the sweep and the instances of S4.
+- AC3 — `New arm:` — AMENDED by the main loop's decision, item 4: record 663's text for spec 64's §7 gives both lines the bound of the printed n less the recorded E with the `# out of the floor:` arms as its ceiling, and its AC7 text holds no comparison with the close's run. OWED: the bound at the close, n from 245 to 257 on `tools/roles/adopt-roles.test.sh` and 194 on `tools/roles/spawn-guard.test.sh` (DERIVED on the staged tree).
+- AC4 — `$pass` — the comparison line of `tools/roles/spawn-guard.test.sh` reads it, where it read `$n` at the base; the section opening at the `# ---- ` header naming `TOOL-dBoundRoles-50` counts 1, equal to its term's n (DERIVED on the staged tree). At the base the same count read 6 against 1, the red the header added before unit 46's rows clears. A scratch shell evaluating the floor and comparison lines alone, copied out by `grep`, printed `FAIL 193 assertions passed against a floor of 194` at 193 and nothing at 194. AMENDED by the main loop's decision, item 4: record 663's AC2 for spec 64 names `pass` and holds no synthetic-value half.
+- AC5 — `python -c` — over a scratch copy of spec 63 with the retired phrase of its S2 and the retired phrase of its §10 each rewrapped across a line break, the joined checks of AC1 and AC19 reported each, where a line grep printed nothing for either. AMENDED by the main loop's decision, item 4: record 663 states the joined rule once for spec 64's §6, and its AC1, AC9 and AC19 text each name the joined form.
+- AC6 — `git grep -nE` — run with the lines of specs 63, 64 and 66 set aside it printed spec 59's lines 60 and 175 of blob `1a0baf0f` and spec 69's line 130 of blob `f85541c4`, no bare token among them and no line of spec 53. AMENDED by the main loop's decision, item 4: record 663's S16 clause for spec 63 names each, S11 and §4 Evidence cite no line of spec 53, and its S28 and AC18 for spec 64 hold one regex.
+- AC7 — `TOOL-dBoundRoles-50` — AMENDED by the main loop's decision, item 4: record 663's S24 for spec 60 names the token, `TOOL-dBoundRoles-60` and `TOOL-dBoundRoles-61` with no condition, and the phrase AC7 refuses is absent from the After field; its S1, S16, S23, AC1, AC11 and AC16 for spec 64 each name S24.
+- AC8 — `git worktree list --porcelain -z` — the section above: the staged probe exited 1 and no entry equalled the run's own path through `branch_reconcile.derive_key` and `os.path.realpath`, the same comparison having named it before the import. AMENDED by the main loop's decision, item 4: record 663's S18 for spec 64 and S12 for spec 63 name the hard kill and the `prunable` recovery.
+- AC9 — `git worktree prune` — AMENDED by the main loop's decision, item 4: record 663's S12 and S18 confine the cleanup to the run's own path and to `prunable` entries under the root, each says the command is not run, the retired clause is absent, and both section 5 security lines name what the probe may take away.
+- AC10 — `gov-orienter` — AMENDED by the main loop's decision, item 4: record 663's AC5 for spec 64 names it and `R2`, its AC8 spec 62's section 5 overcount and its AC13 spec 63's S8 and section 5; record 643's S1 for spec 61 names `gov-orienter`, `R2` and `check_arm`, and record 663 spec 62's overcount and the forced cleanup in spec 63's S8 and section 5.
+- AC11 — `FLOOR_ASSERTIONS` — the first comment line above it in `tools/roles/spawn-guard.test.sh` matches `^# [0-9]+ \(TOOL-dBoundRoles-43\)`, and 187 plus the terms 1 and 6 equals 194 (DERIVED on the staged tree). AMENDED by the main loop's decision, item 4: record 663's §4 text for spec 64 states the grammar.
+- AC12 — `102-103` — AMENDED by the main loop's decision, item 4: it stands in record 663's §4 Evidence text for spec 64, as in its frozen rev-5; that text names `tools/workflows/spec-audit-optin.test.sh` as where the sites of `check_spec_audit` went, gives the spawn guard's suite no count of them and holds no census phrase AC12 refuses. The grep over that file printed 54 (DERIVED at `581ae374f`).
+- AC13 — `# out of the floor: SKIP arm 11` — the comment block above `FLOOR_ASSERTIONS` in `tools/roles/adopt-roles.test.sh` holds that line and arm 20's, and no match of `NOT in the floor|out of the floor` outside such lines (DERIVED on the staged tree); over blob `a8b141b6` the same probe reported its four prose lines. AMENDED by the main loop's decision, item 4: the Inventory sentence stands in record 663's text for spec 64.
+- AC14 — `TOOL-aWokenSentinel-19` — AMENDED by the main loop's decision, item 4: record 663's §8 F2 and §10 text for spec 64 names it, `c5a31443a` and the scratch-guard pin by symbol and by blob-pinned lines, and the open ask AC14 names is absent from the After field. Both pins read as the text says, `tools/unattended/adopt-unattended.test.sh@cf6bb292:847-854` closing on a floor of 78 and the scratch-guard one on 401 (PINNED, those blobs).
+- AC15 — `TOOL-dBoundRoles-50` — AMENDED by the main loop's decision, item 4: it stands in record 663's arm line for spec 62, and the phrase AC15 refuses is absent from the After field; the frozen line still prints it.
+- AC16 — `LEDGER` — AMENDED by the main loop's decision, item 4: run over unit 60's AC15 line it matches nothing, the line answering AMENDED and naming `TOOL-dBoundRoles-62`, `TOOL-dBoundRoles-63` and `TOOL-dBoundRoles-64` with their records in place of the revisions, by item 3; over the synthetic line `- AC15 — amended rev-6 (rev-5) — x` it matched revision 6. Record 663's "How an item closes" for spec 64 states both readings, and no revision member is lost, no spec being bumped.
+- AC17 — `**Evidences:**` — a probe over the blocks of units 60 to 64 found no label answered twice in one block; unit 64's AC1, AC2, AC5, AC7, AC8, AC9, AC11, AC13, AC15, AC16, AC18, AC19 and AC23 each answer AMENDED naming `TOOL-dBoundRoles-66` and record 663, in place of the revision token, by the main loop's decision, item 3. No criterion of units 60 to 63 changed.

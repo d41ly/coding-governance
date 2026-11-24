@@ -961,6 +961,7 @@ if [ -n "$SG50_S13" ] && [ -f "$TMP/ho.s13" ]; then
 else
   echo "FAIL rule6 BR50 AC16: no spec 13 under ${SG50_MR:-memory}/builds of $ROOTDIR, so the s13 handoff was not written"; fail=$((fail+1))
 fi
+# ---- TOOL-dBoundRoles-46 AC1 AC2: a typed block held to the authored-line rule ----------------------------------
 # TOOL-dBoundRoles-46 AC1 AC2 - a typed block is authored text at the spawn. The `t*` handoffs carry the question
 # block under its fact line, its value fenced: a plain value is admitted; a forged fact line, a whole marker line
 # or a `Framed by:` line inside it is refused naming input:question and the line of the prompt, fenced or not; a
@@ -1312,13 +1313,14 @@ n=$((pass+fail))
 # counted it, every assertion but those of the terms below. A shrink-only pin on the EXECUTED count: an arm stranded
 # past an early exit leaves the suite green with no floor. Base and terms are DERIVED by reading each assertion call
 # site from source, one per execution, so a site in a loop counts once per item of its literal list, and every helper
-# here asserts once per call. No arm of this suite skips: a missing kit is a FAIL. The close's run is the executed
-# observation. It does NOT CHECK that an executed arm can fail.
+# here asserts once per call. No arm of this suite skips: a missing kit is a FAIL. The comparison reads `$pass`, since
+# a failed assertion reds the run on its own (TOOL-dBoundRoles-66). The close's run is the executed observation. It
+# does NOT CHECK that an executed arm can fail.
 # +1 for spec 13 handed whole to the guard (TOOL-dBoundRoles-50).
 # +6 for the entry guard, the check order, the one block reader and the derived exemption (TOOL-dBoundRoles-58).
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
 FLOOR_ASSERTIONS=194
-[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
+[ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL $pass assertions passed against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ]
