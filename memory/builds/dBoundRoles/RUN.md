@@ -23,7 +23,7 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: b97a99033fa8a1c696e5439db08ed3f6e05f9f1a
+witness: 21e3f97977e1588d52f46ef7b8714831f0494e07
 phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -618,3 +618,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T14:52:29Z dispatch · item b97a9903 TOOL-dBoundRoles-88 · reason tools/roles/spawn-guard.js tools/roles/spawn-guard.test.sh tools/run-gates/selftest-budgets.txt tools/roles/README.md help/roles.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-88-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-88-deviation-881.md
 
 2026-11-24T14:52:33Z brief · item TOOL-dBoundRoles-88 · reason 6b7b1aacd0d9 memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-88-build-brief.md
+
+2026-11-24T15:24:44Z dispatch · item 21e3f979 TOOL-dBoundRoles-89 · reason tools/roles/agents/gov-orienter.agent.md .claude/agents/gov-orienter.md .claude/roles.json tools/roles/handoff.py tools/roles/README.md tools/loop/placement.py tools/run-gates/selftest-budgets.txt help/roles.md help/loop.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-89-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-89-deviation-891.md
+
+2026-11-24T15:24:46Z brief · item TOOL-dBoundRoles-89 · reason 8293f831689a memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-89-build-brief.md
