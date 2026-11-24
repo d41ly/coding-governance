@@ -14394,7 +14394,6 @@ memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-85.md	76 recor
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-85.md	81 calls	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-86.md	76 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-86.md	81 calls	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-89.md	88 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-9.md	1,000 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-9.md	130,000 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-9.md	130000 B	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -14404,7 +14403,6 @@ memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-9.md	96000 B	1
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-91.md	80 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-92.md	1540 B	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-92.md	1800 B	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-92.md	8 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTracedLattice/build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md	127 rows	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTracedLattice/build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md	150 commits	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTracedLattice/build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md	164 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

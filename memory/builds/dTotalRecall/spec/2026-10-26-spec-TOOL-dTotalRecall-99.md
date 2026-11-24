@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-99 — the tip scan is graded only on a full read: it exits 0, counts the records it read against the folder, and its `by` lines sum to the live records
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 40 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 40 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-99-deviation-991.md](../build/2026-10-26-build-TOOL-dTotalRecall-99-deviation-991.md) | deviation | — |
+| [2026-11-24-prompt-TOOL-dTotalRecall-99-reground-brief.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-99-reground-brief.md) | journal | — |
+| [2026-11-24-prompt-TOOL-dTotalRecall-99-reground-spec-writer.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-99-reground-spec-writer.md) | log | — |
 
 <!-- /gen:spec-records -->
 
@@ -20,9 +22,9 @@ The round-1 spec audit of units 89 to 92
 confirmed finding **id 29 at HIGH**, its item **H5**, alone in that item. The skeptic judged the
 finder's fix unsound, and this unit follows the corrected fix the report writes.
 
-`TOOL-dTotalRecall-92` §6 grades its tip scan in AC8, AC11, AC15, AC16, AC18 and AC22 only by the
-absence of a line: no `malformed`, `untracked`, `shared-n` or `dup` line, or at most one `by` line per
-unit. Nothing reads the scan's exit status or requires a line to appear. The scan is a bare
+As audited, `TOOL-dTotalRecall-92` §6 grades its tip scan in AC8, AC11, AC15, AC16, AC18 and AC22 only
+by the absence of a line: no `malformed`, `untracked`, `shared-n` or `dup` line, or at most one `by`
+line per unit. Nothing reads the scan's exit status or requires a line to appear. The scan is a bare
 `python -` heredoc that imports `deviation_join` from `tools/memory-tree` relative to the working
 directory and reads each record with `read_text(encoding='utf-8')` outside any `try`. It exits
 non-zero with nothing on stdout when it runs outside the repository root, when a record is not UTF-8,
@@ -31,32 +33,43 @@ refuse. In each case those criteria certify a folder the scan never read.
 
 This unit makes the scan witness its own read. It prints how many records it read and how many are
 live, turns any read failure into a red line and a non-zero exit, and runs through the resolved
-launcher. `tip_check` passes only when the scan exits 0, its record count equals the folder's, and
-its `by` lines sum to the live count. It groups `by` and `dup` by `TOOL-dTotalRecall-93`'s
-`unit_of`. The break is seen red, and unit 92's tip criteria are graded again through it. It repairs
-`TOOL-dTotalRecall-92`, at order 40, one above that unit's 39.
+launcher. `tip_check` passes only when the scan exits 0, its record count equals the folder's and is
+not zero, and its `by` lines sum to the live count. It groups `by` and `dup` by
+`TOOL-dTotalRecall-93`'s `unit_of`. The break is seen red, and unit 92's tip criteria are graded again
+through it. It repairs `TOOL-dTotalRecall-92`, at order 40, one above that unit's 39.
 
 ## 2. Scope (IN)
 
-- **S1** — The scan. §4's `tip_scan` is unit 92's, with four changes: it prints `records <n>` first
-  and `live <n>` after the per-record lines; a record it cannot read prints `red unreadable <path>`
-  and a failed `git ls-files` prints `red ls-files <rc>`; it exits 1 on any red; and `dup` and `by`
-  group by `unit_of`, spelled as `TOOL-dTotalRecall-93` §4 spells it. It runs under the launcher
-  `resolve_python` prints. Observed by AC1.
+- **S1** — The scan. §4's `tip_scan` is unit 92's as audited, with four changes: it prints
+  `records <n>` first and `live <n>` after the per-record lines; a record it cannot read prints
+  `red unreadable <path>`, a failed `git ls-files` prints `red ls-files <rc>` and a failed `git grep`
+  prints `red grep <rc>`; it exits 1 on any red; and `dup` and `by` group by `unit_of`, spelled as
+  `TOOL-dTotalRecall-93` rev-2 §4 spells it. It runs under the launcher `resolve_python` prints, and
+  writes UTF-8 with bare newlines, so a Windows launcher's line end or code page never reaches the
+  comparison. Observed by AC1.
 - **S2** — The criterion. §4's `tip_check` prints the scan's lines, then `scan ok <records> <live>`,
-  only where the scan exited 0, its `records` value equals the number of `*-deviation-*.md` files `ls`
-  lists in the folder, and the counts on its `by` lines sum to its `live` value. Otherwise it prints
-  `red scan <why>` and returns 1. Observed by AC1.
-- **S3** — Seen red. `tip_check` run one directory above the repository root prints
+  only where the scan exited 0, the number of `*-deviation-*.md` files `ls` lists in the folder is not
+  zero, the scan's `records` value equals it, and the counts on its `by` lines sum to its `live`
+  value. Otherwise it prints `red scan <why>` and returns 1. Observed by AC1.
+- **S3** — Seen red, each arm of S2. `tip_check` run from outside the repository prints
   `red scan exit 1`, and over a fixture repository holding a record that is not UTF-8 it prints
-  `red unreadable` and `red scan exit 1`. Observed by AC2.
+  `red unreadable` and `red scan exit 1`. Over a folder that does not exist it prints
+  `red scan no records`. With `tip_scan` stubbed to exit 0, it prints
+  `red scan records` for a silent and for a short scan, and `red scan by-sum` for a scan that missed
+  a live record. Observed by AC2.
 - **S4** — Unit 92's tip criteria, graded again. At this pass's base `tip_check` runs over
   `memory/builds/dTotalRecall/build`, and the ledger grades unit 92's AC8, AC11's `dup` half, AC15,
   AC16, AC18 and AC22's tip half as `scan ok` together with the absence of the line each names, beside
-  unit 92's own answer. Where unit 92 answered green from a scan that read red here, or recorded no
-  scan line that shows a full read, a deviation record of `TOOL-dTotalRecall-92` names each criterion,
-  with the token `audit-89 id 29 s4`, by `TOOL-dTotalRecall-90` §4's recipe, only where
-  `has_deviation memory/builds/dTotalRecall/build 92 'audit-89 id 29 s4'` prints 0. Observed by AC3.
+  unit 92's own answer. A line naming a record whose adding commit follows unit 92's pass commit is not
+  unit 92's: the ledger names it by path and commit and grades the criterion without it. Where unit 92
+  answered green from a scan that read red here, or its ledger quotes neither a `by` line nor a
+  `records` count from its own tip run, a deviation record of `TOOL-dTotalRecall-92` names each
+  criterion, with the token `audit-89 id 29 s4` in place of that recipe's `audit-77` token, by
+  `TOOL-dTotalRecall-90` §4's recipe, only where
+  `has_deviation memory/builds/dTotalRecall/build 92 'audit-89 id 29 s4'` prints 0. A quoted `by` line
+  is a full read because unit 92's scan reads every record before it prints one. The probe is
+  `TOOL-dTotalRecall-93` §4's, and the recipe reaches this unit through unit 92, which consumes it.
+  Observed by AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -65,13 +78,15 @@ its `by` lines sum to the live count. It groups `by` and `dup` by `TOOL-dTotalRe
   unit 92 spells them.
 - The restore listing (item H4, id 15): `TOOL-dTotalRecall-98`.
 - Editing spec 92, frozen once its unit builds.
+- A departure the scan finds: a `malformed`, `dup`, `shared-n` or `untracked` line is graded here, and
+  its remedy is unit 92's or `TOOL-dTotalRecall-100`'s.
 - The checklist entry the report suggests as the left-shift gate: the close's left-shift step
   (BUILD-METHOD M8).
 
 ### Edges
 
 - **consumes-from** `TOOL-dTotalRecall-92` — its tip scan and the answers its ledger gives AC8, AC11, AC15, AC16, AC18 and AC22, which this unit witnesses and grades again
-- **consumes-from** `TOOL-dTotalRecall-93` — `unit_of`, by which the scan groups its `by` and `dup` lines
+- **consumes-from** `TOOL-dTotalRecall-93` — `unit_of`, by which the scan groups its `by` and `dup` lines, and `has_deviation`, by which S4 writes its record once
 - **consumes-from** `TOOL-dTotalRecall-2` — `gov_record.py new deviation`, the door S4's record is written through
 - **hands-off** `TOOL-dTotalRecall-100` — `tip_scan` and `tip_check`, which that batch changes for ids 3, 23 and 22 and runs at the tip
 
@@ -80,15 +95,16 @@ its `by` lines sum to the live count. It groups `by` and `dup` by `TOOL-dTotalRe
 ### The scan and its criterion
 
 ```bash
-# run from the repository root
+# $SCRATCH/scan99.sh, sourced from the repository root; SCRATCH is the pass's scratch folder, absolute
 . tools/lib/resolve-python.sh; PY=$(resolve_python) || exit 2
 tip_scan() {  # folder -> records, live, malformed, shared-n, untracked, dup, by and quoted lines; exit 1 on any red
   "$PY" - "$1" <<'SCAN'
 import collections, glob, os, pathlib, re, subprocess, sys
 sys.path.insert(0, 'tools/memory-tree')
 import deviation_join
+sys.stdout.reconfigure(encoding='utf-8', newline='\n')
 def unit_of(r):  # TOOL-dTotalRecall-93 section 4, spelled identically
-    m = re.fullmatch(r'\d{4}-\d{2}-\d{2}-build-(' + deviation_join._ID + r')-deviation-\d+', r['id'])
+    m = re.fullmatch(r'\d{4}-\d{2}-\d{2}-build-(' + deviation_join._ID.pattern + r')-deviation-\d+', r['id'])
     return m.group(1) if m else None
 folder = sys.argv[1]
 paths = sorted(p.replace(os.sep, '/') for p in glob.glob(os.path.join(folder, '*-deviation-*.md')))
@@ -122,8 +138,10 @@ for ps in key.values():
 by = collections.Counter((unit_of(r) or '-', (r['caused_by'] or '').strip('`') or '-') for r in live)
 for (u, c), n in sorted(by.items()):
     print('by', u, c, n)
-for q in subprocess.run(['git', 'grep', '-l', 'deviation TOOL-dTotalRecall-', '--', folder],
-                        capture_output=True, text=True).stdout.split():
+grep = subprocess.run(['git', 'grep', '-l', 'deviation TOOL-dTotalRecall-', '--', folder], capture_output=True, text=True)
+if grep.returncode > 1:
+    print('red grep', grep.returncode); red += 1
+for q in grep.stdout.split():
     if q not in paths:
         print('quoted', q)
 sys.exit(1 if red else 0)
@@ -135,43 +153,79 @@ tip_check() {  # folder -> the scan's lines, then "scan ok <records> <live>" or 
   printf '%s\n' "$out"
   [ "$rc" = 0 ] || { echo "red scan exit $rc"; return 1; }
   n=$(ls "$1" | grep -c -- '-deviation-.*\.md$')
+  [ "$n" -gt 0 ] || { echo "red scan no records"; return 1; }
   [ "$(printf '%s\n' "$out" | sed -n 's/^records //p')" = "$n" ] || { echo "red scan records, glob $n"; return 1; }
   live=$(printf '%s\n' "$out" | sed -n 's/^live //p')
-  sum=$(printf '%s\n' "$out" | awk '$1 == "by" { s += $4 } END { print s + 0 }')
+  sum=$(printf '%s\n' "$out" | awk '$1 == "by" { s += $NF } END { print s + 0 }')
   [ "$sum" = "$live" ] || { echo "red scan by-sum $sum live $live"; return 1; }
   echo "scan ok $n $live"
 }
 ```
 
-An empty `by` field prints `-`, so every `by` line keeps four fields and the sum reads each count. The
-folder count is `ls`, a reader independent of the scan's glob and parse.
+`deviation_join._ID` is a lazy `tools/memory-tree/id_grammar.py#SlugPattern`, so its text is
+`_ID.pattern`. Rev-1's `_ID + r'...'` raised `TypeError` at the first live record, and rev-1's
+`tip_check` over the build folder printed `records 150`, `live 147` and `red scan exit 1` (PINNED 2026-11-24).
 
-PINNED, measured 2026-10-26 at `32febccb6` over `memory/builds/dTotalRecall/build`: `tip_check`
-printed `records 8`, `live 8`, seven `by` lines whose counts sum to 8, and `scan ok 8 8`, and returned
-0. Run one directory above the repository root it printed `red scan exit 1` and returned 1.
+An empty `by` field prints `-`, so `awk` reads the count as the last of four fields. The folder count
+is `ls`, a reader independent of the scan's glob and parse. The `[ "$n" -gt 0 ]` line is there because
+a mistyped folder gives `records 0` and a count of 0 from `ls` too, and `git ls-files` exits 0 over it:
+rev-1 printed `scan ok 0 0` there.
 
-### The fixture repository
+PINNED, measured 2026-11-24 at `67ffd1289` on node a over `memory/builds/dTotalRecall/build`:
+`tip_check` printed `records 150`, `live 147`, 120 `by` lines, three `quoted` lines (PINNED 2026-11-24),
+no other scan line, and `scan ok 150 147`, and returned 0 in 4 s. Units 59, 74 and 92 each had one
+`by` line, of count 1, caused by `PLAY-dClosedLoop-2`: their roster records (PINNED 2026-11-24).
 
-A fixture repository needs a short path on Windows, so it is made under the system temp directory,
-never inside the worktree and never at a drive root.
+### The reds
+
+The fixture repository needs a short path on Windows, so it sits directly under the pass's scratch
+folder, never inside the worktree and never at a drive root. An isolated worktree session refuses an
+inline command that changes directory before git, so the two `git` lines are run as they stand, each
+its own command with `$R` spelled out, and the rest is a file run as `bash <file>`. Nothing is
+committed: `ls-files` lists a staged record.
 
 ```bash
-# run from the repository root, with tip_scan and tip_check defined
-R="$TEMP/r99"; rm -rf "$R"; mkdir -p "$R/tools" "$R/memory/builds/dFx/build"
+R="${SCRATCH:?}/r99"; rm -rf "$R"; mkdir -p "$R/tools" "$R/memory/builds/dFx/build"
 cp -r tools/memory-tree "$R/tools/"
-cp memory/builds/dTotalRecall/build/2026-10-26-build-TOOL-dTotalRecall-2-deviation-21.md "$R/memory/builds/dFx/build/"
-printf '\377\376 not utf-8\n' > "$R/memory/builds/dFx/build/2026-10-26-build-TOOL-dTotalRecall-2-deviation-22.md"
-(cd "$R" && git init -q && git add -A && git -c user.email=f@x -c user.name=f commit -qm fx)
-(cd "$R" && tip_check memory/builds/dFx/build)
+F="$R/memory/builds/dFx/build"
+cp memory/builds/dTotalRecall/build/2026-10-26-build-TOOL-dTotalRecall-2-deviation-21.md "$F/"
+printf '\377\376 not utf-8\n' > "$F/2026-10-26-build-TOOL-dTotalRecall-2-deviation-22.md"
+git init -q "$R"
+git -C "$R" add -A
 ```
 
-PINNED, measured 2026-10-26 with these exact commands: it printed `records 2`, `red unreadable`
-naming `-deviation-22` with `UnicodeDecodeError`, `live 1`, one `by` line and `red scan exit 1`, and
-returned 1.
+```bash
+. "$SCRATCH/scan99.sh"; R="$SCRATCH/r99"; F="$R/memory/builds/dFx/build"
+echo "== outside"; (cd "$SCRATCH" && tip_check memory/builds/dTotalRecall/build); echo "rc $?"
+echo "== no folder"; tip_check memory/builds/dTotalRecall/nope; echo "rc $?"
+echo "== unreadable"; (cd "$R" && tip_check memory/builds/dFx/build); echo "rc $?"
+echo "== silent"; (tip_scan() { :; }; tip_check "$F"); echo "rc $?"
+echo "== short"; (tip_scan() { printf 'records 1\nlive 1\nby u c 1\n'; }; tip_check "$F"); echo "rc $?"
+echo "== dropped"; (tip_scan() { printf 'records 2\nlive 2\nby u c 1\n'; }; tip_check "$F"); echo "rc $?"
+echo "== whole"; (tip_scan() { printf 'records 2\nlive 2\nby u c 1\nby u d 1\n'; }; tip_check "$F"); echo "rc $?"
+```
+
+PINNED, measured 2026-11-24 on node a with these exact lines:
+
+| Block | Last line printed (PINNED 2026-11-24) | Returned |
+|---|---|---|
+| `outside` | `red scan exit 1`, no scan line before it | 1 |
+| `no folder` | `red scan no records`, after `records 0` and `live 0` | 1 |
+| `unreadable` | `red scan exit 1`, after `records 2`, `red unreadable` naming `-deviation-22` with `UnicodeDecodeError`, `live 1` and one `by` line | 1 |
+| `silent` | `red scan records, glob 2` | 1 |
+| `short` | `red scan records, glob 2` | 1 |
+| `dropped` | `red scan by-sum 1 live 2` | 1 |
+| `whole` | `scan ok 2 2` | 0 |
+
+What the scan does not read: a record in a subfolder, or one whose name lacks `-deviation-`, is in
+neither the glob nor the `ls` count.
 
 ### Why order 40
 
-Unit 92 runs its tip scan at order 39, so this unit grades the folder that unit left.
+Unit 92 runs its tip scan at order 39, so this unit grades the folder that unit left. The §3 edge holds
+the order: `--dispatch` refuses this unit while unit 92 is neither CLOSED nor WONTDO
+(`tools/unattended/unattended.sh#verb_dispatch`). `TOOL-dTotalRecall-98` shares order 40 and may write
+records first, which is why S4 sets a record added after unit 92's pass aside.
 
 ### Inventory
 
@@ -185,18 +239,21 @@ Minted: the functions `tip_scan` and `tip_check`, spec text only; at most one de
 ### Alternatives rejected
 
 - **Require only the exit status.** A scan that exits 0 over a glob matching nothing, given the wrong
-  folder, reads the same as a clean folder; the record count against `ls` is what tells them apart,
-  and the report's corrected fix asks for it.
+  folder, reads the same as a clean folder. A count that must be positive, against `ls`, is what tells
+  them apart, and the report's corrected fix asks for the count.
 - **Grade the `by` lines' presence alone.** A scan that dropped a record before grouping still prints
   `by` lines; the sum against `live` catches the drop.
+- **Run the scan over a folder outside any repository in place of the fixture repository.** `ls-files`
+  fails there, so the exit would be red before the unreadable record was reached.
 
 ## 5. Production-readiness checklist
 
-- security — no surface. The fixture repository sits under the system temp directory and is removed.
-- perf / scale — one pass over the folder's records, about twenty at the tip.
-- error / empty / loading states — a crash, a failed `ls-files`, an unreadable record, a count short of
-  the folder and a sum short of the live records each print a `red` line and return 1; an empty
-  folder prints `scan ok 0 0`.
+- security — no surface. The fixture repository sits under the pass's scratch folder and is removed.
+- perf / scale — one pass over the folder's records, 4 s over 150 of them (PINNED 2026-11-24, node a).
+- error / empty / loading states — a crash, a failed `ls-files` or `git grep`, an unreadable record, a
+  count short of the folder and a sum short of the live records each print a `red` line and return 1;
+  an empty or missing folder prints `red scan no records`; no resolvable launcher exits 2 before any
+  function is defined.
 - observability — every red names its cause; the ledger quotes the full scan beside unit 92's answers.
 - risks — none beyond the scan's, which `TOOL-dTotalRecall-92` states.
 - testing — AC1 to AC3 by the pass.
@@ -207,29 +264,30 @@ Minted: the functions `tip_scan` and `tip_check`, spec text only; at most one de
 
 - **AC1** — When `tip_check memory/builds/dTotalRecall/build` runs from the repository root at this
   pass's base, it returns 0 and its last line is `scan ok <n> <live>`, with `<n>` equal to the number
-  of `*-deviation-*.md` files `ls` lists there.
+  of `*-deviation-*.md` files `ls` lists there, above zero.
   Red when: the scan's record count, or the sum of its `by` lines, falls short of the folder.
-  figure: 8 and 8 are PINNED in §4 at `32febccb6`; at the pass both are DERIVED.
-- **AC2** — When `tip_check memory/builds/dTotalRecall/build` runs one directory above the repository
-  root, and when §4's fixture repository is checked, each prints `red scan exit 1` and returns 1, the
-  second after a `red unreadable` line.
-  Red when: either break prints `scan ok`, or prints nothing and returns 0.
-  fixture: the repository is made under the system temp directory by the pass; the tree holds none.
-  figure: the lines are PINNED in §4, measured 2026-10-26.
-- **AC3** — When `git grep -n "Evidences:\*\* TOOL-dTotalRecall-99" -- memory/builds/dTotalRecall/build`
-  runs after the pass, its AC3 line quotes `tip_check`'s output at this pass's base and grades each of
-  unit 92's AC8, AC11, AC15, AC16, AC18 and AC22 from it beside unit 92's answer, and
-  `has_deviation memory/builds/dTotalRecall/build 92 'audit-89 id 29 s4'` prints 1 where any of them
-  differs or rested on no full read, else 0.
-  Red when: a criterion is graded green from a scan that did not end `scan ok`, or a differing answer
-  goes unrecorded.
+  figure: 150 and 147 are PINNED in §4, 2026-11-24 at `67ffd1289`; at the pass both are DERIVED.
+- **AC2** — When §4's reds run, each block ends in the line and the status §4's table gives it: the
+  run from outside the repository and the fixture repository in `red scan exit 1`, the second after a
+  `red unreadable` line, the missing folder in `red scan no records`, the silent and short scans in
+  `red scan records`, the dropped one in `red scan by-sum`, and the whole one in `scan ok`.
+  Red when: any break prints `scan ok`, or prints nothing and returns 0.
+  fixture: the repository is made under the pass's scratch folder by the pass; the tree holds none.
+  figure: the lines are PINNED in §4, measured 2026-11-24.
+- **AC3** — When `git grep --untracked -n "Evidences:\*\* TOOL-dTotalRecall-99" -- memory/builds/dTotalRecall/build`
+  runs after the pass, the AC3 line of the ledger it names quotes `tip_check`'s output at this pass's
+  base and grades each of unit 92's AC8, AC11, AC15, AC16, AC18 and AC22 from it beside unit 92's
+  answer, and `has_deviation memory/builds/dTotalRecall/build 92 'audit-89 id 29 s4'` prints 1 where any
+  of them differs or rested on no full read, as S4 states each, else 0.
+  Red when: a criterion is graded green from a scan that did not end `scan ok`, a differing answer goes
+  unrecorded, or a record added after unit 92's pass is charged to it.
 
 ## 7. Gates
 
 `memory hygiene` · `recall floor` · `recall floor arms`
 
-No new arm: the observation is `tip_check` over the build folder, over a fixture repository and from
-outside the repository root.
+No new arm: the observation is `tip_check` over the build folder, over a fixture repository, from
+outside the repository and over stubbed scans.
 
 ## 8. Open questions
 
@@ -244,16 +302,32 @@ outside the repository root.
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 89 to 92, id 29
   (HIGH, item H5).
+- rev-2 · 2026-11-24 · §1 · S1 · S2 · S3 · S4 · §3 · §4 · §5 · AC1 · AC2 · AC3 · §10 · re-grounded at
+  `67ffd1289` per `2026-11-24-prompt-TOOL-dTotalRecall-99-reground-brief`, over unit 93 rev-2 and unit 92
+  as audited: the scan reads `_ID.pattern`, a failed `git grep` is a red and its output is UTF-8 with bare
+  newlines; a missing or empty folder, which rev-1 printed `scan ok 0 0` for, is a red; every arm of
+  `tip_check` is seen red; the fixture is staged by plain commands an isolated session admits; S4 sets
+  a record added after unit 92's pass aside and states what a full read is; AC3 reads the untracked
+  ledger; citations are by symbol. No scope item or criterion is cut.
 
 ## 10. Reuse audit
 
-The seams are `TOOL-dTotalRecall-92`'s tip scan, witnessed here; `deviation_join.read_record`
-(`tools/memory-tree/deviation_join.py:212`); `TOOL-dTotalRecall-93`'s `unit_of`; and
-`tools/lib/resolve-python.sh`'s `resolve_python`, the launcher that runs each candidate.
-`python tools/codebase-map/reuse_lookup.py "assign a deviation record to its unit by its file name stem"`
-ranked `read_records` (`deviation_join.py:268`) among its SEAM candidates; it reads tracked files
-only, and the scan's `untracked` arm needs the working tree, so the scan keeps the per-file reader.
-The recall query below found this audit's item H5, unit 92's tip scan and the Facts line naming the
-MS-Store stub. No existing seam fits beyond them.
+The seams, re-read at `67ffd1289`, are `TOOL-dTotalRecall-92`'s tip scan, witnessed here;
+`tools/memory-tree/deviation_join.py#read_record`; `TOOL-dTotalRecall-93` rev-2's `unit_of`; and
+`resolve_python` of `tools/lib/resolve-python.sh`, the launcher that runs each candidate.
+`python tools/codebase-map/reuse_lookup.py "assign a deviation record to its unit by its file name stem"`,
+re-run 2026-11-24, ranked `read_records` among its SEAM candidates.
+`tools/memory-tree/deviation_join.py#read_records` reads tracked files only, and the scan's `untracked`
+arm needs the working tree, so the scan keeps the per-file reader. Asked to refuse a scan whose record
+count falls short of the folder, it ranked name-stem neighbours; its `compare_counts`
+(`tools/lib/legacy_ledger.py#compare_counts`) compares keyed legacy rows, not a scan to a folder. The
+class is `memory/gotchas/fixture-passes-by-finding-nothing.md`, whose rule, a green probe prints what it
+read, is S2.
+The recall query below, re-run 2026-11-24, found this audit's item H5, unit 92's tip scan and spec 100,
+and no scan that witnesses its own read.
+`tools/memory-tree/id_grammar.py#read_kept_reason` and the build-folder walks of
+`tools/memory-tree/record_causes.py#check_cause_writers` and
+`tools/memory-tree/record_kinds.py#check_alias_compares` are no seam here: this unit reads no marker and
+no registry. No existing seam fits beyond them.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a scan graded so a crash with empty output never reads as a clean folder" --terms "tip scan exit status records count live by sum unreadable resolve_python absence of a line criterion"`
