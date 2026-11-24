@@ -1027,7 +1027,17 @@ unchanged:
 
 Two things are not carve-outs at all. A value in the rendered `HYGIENE.md` that states the shipping
 repo's figure is a render gap, and `INDEX_CAP_LINES` and `ENTRY_CAP_UNIT` now render from your conf.
-A registry a KIT ships, such as `pass-order-waiver.txt`, is admitted by name.
+A registry a KIT ships, such as `pass-order-waiver.txt`, or reads at its default path, such as
+`census-kept-paths.txt`, is admitted by name.
+
+**Keeping a census hit in your own build folders.** The writer census (`record_causes.py`) and the
+alias census (`record_kinds.py`) read the scripts under `<MEMORY_ROOT>/builds/*/build/`. A hit in one of
+them is kept by a row naming that file in `<MEMORY_ROOT>/project/census-kept-paths.txt`, since no pass may edit
+a landed build's script; the kit ships no row. A row is seven TAB-separated fields, the ledger factory's
+grammar: the census (`check_cause_writers` or `check_alias_compares`), the file's path, the reason,
+`-`, `1`, a commit sha and `seeded`. A pinned writer gives the glob of the records it writes in
+place of `-`, and `keep:<ask id>` in place of `seeded`. One row per census and path; a `#` line is
+skipped. A file a pass may edit keeps its hit by the census marker on its line instead.
 
 **The worked instance is adopter nc**, measured 2026-09-23 by running gov's engine over its tree:
 its registries under `project/` go to `PROJECT_REGISTRY_EXTRA`; its ten build-root status

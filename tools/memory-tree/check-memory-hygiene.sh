@@ -1121,6 +1121,9 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # The same class again: the roles kit's catalogue checker reads the owner's stand-in waivers at
   # this DEFAULT path under <M>/project/ (TOOL-aOrientedCast-19 S5).
   F:role-stand-in-waiver.txt) ;;
+  # The same class: this kit's two record censuses read their keep rows at this DEFAULT path, at every
+  # adopter that keeps a hit in its build folders (TOOL-dTotalRecall-70 S12, TOOL-bQuiltedLantern-3).
+  F:census-kept-paths.txt) ;;
   # The same class: the drift-audit kit's populations, its pins and its baselines, which its
   # `[[upgrade]]` steps write at this DEFAULT path at every adopter (TOOL-dWitnessedBar-16 S14).
   F:drift-pins.txt|F:drift-baselines.txt) ;;

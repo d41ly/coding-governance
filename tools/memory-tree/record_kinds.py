@@ -94,7 +94,8 @@ reader. A listed line is red unless the census marker on its line, `# census: ke
 (`//` in JavaScript, `id_grammar.read_kept_reason`), keeps it, printed `kept <reason>`. Then the build
 folders' Python scripts, each below its binding head, a hit kept only by its file's path-keyed row of
 the project registry `census-kept-paths.txt` (`tree_lib.read_kept_rows`, TOOL-dTotalRecall-65 S2), a registry
-holding a malformed row, or one outside `tree_lib.build_kept_path_re`'s domain, red naming it and read as no row
+holding a malformed row, one of an unknown census, a second row for one census and path (TOOL-dTotalRecall-70
+S11), or one outside `tree_lib.build_kept_path_re`'s domain, red naming it and read as no row
 (TOOL-dTotalRecall-57 S1), a row whose file that walk lists no raw compare in red, drained
 (TOOL-dTotalRecall-66 S3), and a line carrying the marker red whatever keeps its file
 (`id_grammar.check_marker_domain`, TOOL-dTotalRecall-58 S3); a count line closes each walk. THE PENDING RULE reads `memory.map-purpose`
@@ -1266,7 +1267,8 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
     `BIND_HEAD_LINES` binding head (TOOL-dTotalRecall-53 S22) by every form but the module constant, a hit
     kept only where `tree_lib.read_kept_path` answers for its file's row of `root`'s
     `census-kept-paths.txt`, census `check_alias_compares` (TOOL-dTotalRecall-56 S1, TOOL-dTotalRecall-65 S2). A
-    registry holding a malformed row, or one outside `tree_lib.build_kept_path_re`'s domain, is one red naming it,
+    registry holding a malformed row, one of an unknown census, a second row for one census and path
+    (TOOL-dTotalRecall-70 S11), or one outside `tree_lib.build_kept_path_re`'s domain, is one red naming it,
     and the walk reads every hit unkept (TOOL-dTotalRecall-57 S1 S3). A row whose file the walk lists no hit in,
     its compare gone or the file not walked, is one red, drained (TOOL-dTotalRecall-66 S3). Each line of those scripts, head included,
     carrying this census's marker is red, whatever row keeps the file and outside that walk's count line

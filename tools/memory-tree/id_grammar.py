@@ -921,10 +921,13 @@ def read_kept_reason(line: str, census: str) -> str | None:
 def check_marker_domain(path: str, text: str, census: str) -> list[tuple[int, str]]:
     """TOOL-dTotalRecall-58: `[(line number, finding)]`, one per line of `text` carrying `census`'s keep marker
     (`read_kept_reason`), for `text` the whole of `path`, a build folder's file. The alias and cause censuses
-    call it in their build-folder walks, whose files they keep by a path-keyed row alone. It does not check
+    call it in their build-folder walks, whose files they keep by a registry row alone; the finding names that
+    registry under the memory root `path` gives, what stands before its last four segments,
+    `builds/<slug>/build/<file>` (TOOL-dTotalRecall-70 S8). It does not check
     that `path` sits in a build folder, which is the calling walk's, nor another census's marker."""
+    registry = f"{path.rsplit('/', 4)[0]}/project/{load_sibling('tree_lib').CENSUS_KEPT_REGISTRY}"
     return [(n, f"{census} {path}:{n}: carries the `{census}` census marker; the marker is the tool root's; a build "
-                "folder's script is kept by its path-keyed row, since its bytes are not this build's")
+                f"folder's script is kept by a row of `{registry}`, since its bytes are not this build's")
             for n, ln in enumerate(text.splitlines(), 1) if read_kept_reason(ln, census)]
 
 

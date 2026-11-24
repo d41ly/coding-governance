@@ -3906,6 +3906,8 @@ hit 'record causes: fixture pinned-ask-is-spec · PASS'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant marker-in-build-script 2>&1); _brc=$?   # AC13
 n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant marker-in-build-script exited $_brc, expected 0"; st=1; }
 hit '-deviations.py'':13: carries the `cause-writer` census marker'; hit 'record causes: fixture marker-in-build-script · PASS'
+# --- TOOL-dTotalRecall-70 AC3 — its remedy names the registry under the tree's memory root. Red on the old remedy text.
+hit 'is kept by a row of `memory/project/census-kept-paths.txt`'
 # --- TOOL-dTotalRecall-60 AC26 — the renderer's kept reason on two files that are not it, a tool-root writer's
 # --- marker and a build-folder script's keep row, is one red each while the renderer's own marker keeps it.
 # --- Red on the file test skipped, which exits the plant 0.
@@ -3947,6 +3949,27 @@ kept-row-untracked|$_krd: is no file the build-folder walk reads
 kept-row-traversal|row memory/builds/../build/traversal.py: is no file under
 kept-row-nested|row memory/builds/fRoot/build/nested/nested.py: is no file under
 KRP
+# --- TOOL-dTotalRecall-70 AC2 — a reason of several words survives whole, a plain keep's on its line and a pinned
+# --- writer's in its row. Red on the reason split at a space.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-row-multiword 2>&1); _brc=$?   # AC2
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant kept-row-multiword exited $_brc, expected 0"; st=1; }
+hit "cause-writer · $_krd"":13 · kept outside the write set"; hit 'pinned reason · pinned instrument'
+hit 'record causes: fixture kept-row-multiword · PASS'
+# --- TOOL-dTotalRecall-70 AC2 AC4 — a registry holding a row of the wrong field count, one of an unknown census, or
+# --- a second row for one census and path is refused by line, and its hits read unkept. Red on each refusal
+# --- skipped, which exits its plant 0.
+while IFS='|' read -r _krp _krc _krs; do
+  out=$("$_PY" "$HERE/record_causes.py" --fixture --plant "$_krp" 2>&1); _brc=$?   # AC2 AC4
+  n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL record_causes.py --fixture --plant $_krp exited $_brc, expected 1"; st=1; }
+  hit "record causes: RED cause-writer census-kept-paths.txt: $_krs"
+  n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = "$_krc" ] || { echo "FAIL $_krp: want exactly $_krc red(s)"; st=1; }
+done <<KRP
+kept-row-arity|1|line 2: not the key's fields
+kept-row-unknown-census|1|line 2: census 'check_cause_writer' is none of
+kept-row-duplicate|2|line 3: a second row for check_cause_writers $_krd, the first at line 2
+KRP
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-row-arity 2>&1)   # AC2: its second row too
+hit "; line 3: not the key's fields"
 # --- TOOL-dTotalRecall-66 AC7 — the row's domain is the conf's memory root: under `MEMORY_ROOT=docs/memory` a
 # --- build-folder row keeps its hit. Red on the literal `memory` root, which refuses the row.
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-row-docs-root 2>&1); _brc=$?   # AC7
@@ -4390,6 +4413,7 @@ printf '# a build record\n\nno serves line\n' > "$_b1/memory/builds/tOne/build/2
 printf '{"a": 1}\n' > "$_b1/memory/builds/tOne/build/result.json"
 printf '# pass-order waivers\n' > "$_b1/memory/project/pass-order-waiver.txt"
 printf '# stand-in waivers\n' > "$_b1/memory/project/role-stand-in-waiver.txt"
+printf '# census keep rows\n' > "$_b1/memory/project/census-kept-paths.txt"
 printf 'x\n' > "$_b1/memory/project/zz-probe.txt"
 printf '# legacy\n' > "$_b1/memory/project/legacy-files.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10 --no-verify ) >/dev/null 2>&1
@@ -4418,7 +4442,8 @@ n=$((n+1))
 case "$o" in
   *"memory/project/pass-order-waiver.txt"*) echo "FAIL check 3 named pass-order-waiver.txt, a registry the unattended kit reads at its default path"; st=1 ;;
   *"memory/project/role-stand-in-waiver.txt"*) echo "FAIL check 3 named role-stand-in-waiver.txt, a registry the roles kit reads at its default path"; st=1 ;;
-  *"HYGIENE check 3 FAILED"*"memory/project/zz-probe.txt"*) echo "ok   check 3 admits the kit registries pass-order-waiver.txt and role-stand-in-waiver.txt by name" ;;
+  *"memory/project/census-kept-paths.txt"*) echo "FAIL check 3 named census-kept-paths.txt, a registry this kit reads at its default path"; st=1 ;;
+  *"HYGIENE check 3 FAILED"*"memory/project/zz-probe.txt"*) echo "ok   check 3 admits the kit registries pass-order-waiver.txt, role-stand-in-waiver.txt and census-kept-paths.txt by name" ;;
   *) echo "FAIL check 3 did not name the unlisted zz-probe.txt, so its silence about either kit registry proves nothing"; st=1 ;;
 esac
 printf '# legacy\nmemory/builds/tOne/NOTES.md\nmemory/builds/tOne/build/2026-08-01-build-tOne-1.md\n' > "$_b1/memory/project/legacy-files.txt"

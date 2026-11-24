@@ -57,7 +57,8 @@ cannot outlive its hit (S4, TOOL-dTotalRecall-66 S1): a row whose file the build
 because the file is not walked, spells `Caused-by` past its binding window or spells no Serves literal there, is
 red, named `census-kept-paths.txt` and its path: drain the row. A row may name only a build folder's file
 (`tree_lib.build_kept_path_re`, TOOL-dTotalRecall-66 S11 S13): a registry
-holding any other row, or a malformed one, is red naming it, an editable file being kept by its census marker,
+holding any other row, a malformed one, one of an unknown census or a second row for one census and path
+(TOOL-dTotalRecall-70 S11) is red naming it, an editable file being kept by its census marker,
 and the walk then reads every hit unkept; an absent registry holds no rows.
 
 THE PINNED WRITERS (`read_pinned_rows`, TOOL-dTotalRecall-50 S2 S3, TOOL-dTotalRecall-66 S36). One
@@ -134,7 +135,8 @@ PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "non
           "kept-row-editable", "marker-in-build-script", "other-build-causeless", "pinned-ask-closed",
           "reason-on-other-file", "adopter-no-registry", "kept-row-caused", "kept-row-untracked",
           "kept-row-traversal", "kept-row-nested", "kept-row-docs-root", "pinned-ask-is-spec",
-          "build-slug-traversal", "build-slug-absent")
+          "build-slug-traversal", "build-slug-absent", "kept-row-multiword", "kept-row-arity",
+          "kept-row-unknown-census", "kept-row-duplicate")
 #: TOOL-dTotalRecall-47 S1: the causes check's absent-cause rule, the one finding `--backfill` selects;
 #: TOOL-dTotalRecall-53 S4: it names its remedy, and stays the one spelling the backfill selects by
 ABSENT_CAUSE = "names no Caused-by, and its kind is no root; run record_causes.py --backfill"
@@ -692,8 +694,9 @@ def check_cause_writers(root) -> tuple:
     hit is red once, drained, saying why (S4, TOOL-dTotalRecall-66 S1); then the
     build folders' own count line. Each line of those files carrying this census's marker is red, whatever
     row keeps the file and outside that count line's reds (TOOL-dTotalRecall-58 S1). A registry
-    holding a malformed row, or one outside `tree_lib.build_kept_path_re`'s domain, is one red naming it, and the walk reads every hit unkept
-    (TOOL-dTotalRecall-57 S1)."""
+    holding a malformed row, one of an unknown census, a second row for one census and path (TOOL-dTotalRecall-70
+    S11), or one outside `tree_lib.build_kept_path_re`'s domain, is one red naming it, and the walk reads every
+    hit unkept (TOOL-dTotalRecall-57 S1)."""
     import record_kinds   # noqa: E402  the tool root and the code census's one walk
     from id_grammar import check_marker_domain   # noqa: E402  the build-folder walk's marker refusal
     tool_rel = record_kinds.derive_tool_rel(record_kinds.derive_kit_rel())
@@ -917,9 +920,10 @@ FIXTURE_CLAIM = "TOOL-fClaim-1"
 #: in fRoot's BACKLOG.md; the drained plant's instrument spells the cause past its binding window, and
 #: TOOL-dTotalRecall-58 AC1's carries the census marker on its Serves literal's line; TOOL-dTotalRecall-60
 #: AC19's adds a WONTDO row for the ask. Their conf declares the builds layout, without which no ask is live
-#: (TOOL-dTotalRecall-66 AC20's row names FIXTURE_UNIT, an open spec, for its ask)
+#: (TOOL-dTotalRecall-66 AC20's row names FIXTURE_UNIT, an open spec, for its ask); TOOL-dTotalRecall-70 S4's
+#: multiword plant adds KEPT_SCRIPT under a plain keep
 PINNED_PLANTS = ("pinned-writer-drained", "departures-pinned", "marker-in-build-script", "pinned-ask-closed",
-                 "pinned-ask-is-spec")
+                 "pinned-ask-is-spec", "kept-row-multiword")
 PINNED_INSTRUMENT = f"memory/builds/fRoot/build/2026-01-01-build-{FIXTURE_UNIT}-deviations.py"
 PINNED_ASK = "TOOL-fRoot-2"
 PINNED_RECORD = f"memory/builds/fRoot/build/2026-01-02-build-{FIXTURE_UNIT}-departures-build.md"
@@ -927,6 +931,7 @@ PINNED_BACKLOG = "memory/builds/fRoot/BACKLOG.md"
 #: TOOL-dTotalRecall-55 AC2: the drained plant's build-folder script, a one-line docstring spelling no Serves
 #: literal, and the one `check_cause_writers` row keeping it, which S4 reds as a row with no hit behind it
 KEPT_SCRIPT = f"memory/builds/fRoot/build/2026-01-01-build-{FIXTURE_UNIT}-kept.py"
+KEPT_NO_HIT = '"""A script its row keeps, spelling no record head."""\n'
 FIXTURE_KEPT = ("check_cause_writers", KEPT_SCRIPT, "outside the write set")
 #: TOOL-dTotalRecall-60 AC26: the renderer's kept reason on two files that are not it, a tool-root writer whose
 #: marker gives it and KEPT_SCRIPT spelling a Serves literal past its binding window under a row giving it
@@ -1070,9 +1075,12 @@ def write_fixture(top, plant, memory="memory") -> pathlib.Path:
         if plant == "pinned-ask-closed":   # TOOL-dTotalRecall-60 AC19: the ask disposed, its row still filed
             with open(root / PINNED_BACKLOG, "ab") as fh:
                 fh.write((backlog.render_status_row("WONTDO", PINNED_ASK, "the planted ask is closed") + "\n").encode("utf-8"))
-        record_kinds.write_kept_fixture(root, (   # TOOL-dTotalRecall-66 S36: its row, in the fixture's registry
-            "check_cause_writers", PINNED_INSTRUMENT, "pinned instrument", DEPARTURES_GLOB,
-            f"keep:{FIXTURE_UNIT if plant == 'pinned-ask-is-spec' else PINNED_ASK}"))
+        kept = [("check_cause_writers", PINNED_INSTRUMENT, "pinned instrument", DEPARTURES_GLOB,   # TOOL-dTotalRecall-66 S36
+                 f"keep:{FIXTURE_UNIT if plant == 'pinned-ask-is-spec' else PINNED_ASK}")]
+        if plant == "kept-row-multiword":   # TOOL-dTotalRecall-70 S4: a plain keep beside it, its reason of words too
+            write_file(KEPT_SCRIPT, KEPT_HIT)
+            kept.append(FIXTURE_KEPT)
+        record_kinds.write_kept_fixture(root, *kept)
         if plant in ("departures-pinned", "pinned-ask-closed"):
             write_file(PINNED_RECORD, f"# Departures: fRoot, its build run\n\n**Serves:** journal {FIXTURE_UNIT}\n")
     elif plant == "claim-root":
@@ -1085,8 +1093,19 @@ def write_fixture(top, plant, memory="memory") -> pathlib.Path:
         write_file(f"{tool_rel}/{CAUSE_WRITER_PLANT}" if tool_rel else CAUSE_WRITER_PLANT,
                    f'"""A record writer."""\nHEAD = "{SERVES_LITERAL}log {FIXTURE_UNIT}\\n"\n')
     if plant == "kept-row-drained":   # TOOL-dTotalRecall-55 AC2: a kept script whose hit is gone
-        write_file(KEPT_SCRIPT, '"""A script its row keeps, spelling no record head."""\n')
+        write_file(KEPT_SCRIPT, KEPT_NO_HIT)
         record_kinds.write_kept_fixture(root, FIXTURE_KEPT)
+    if plant == "kept-row-arity":   # TOOL-dTotalRecall-70 S5: a row of four TAB fields, and one of six
+        write_file(KEPT_SCRIPT, KEPT_NO_HIT)
+        record_kinds.write_kept_fixture(root)
+        with open(root / FIXTURE_REGISTRY, "ab") as fh:
+            fh.write("".join("\t".join((*FIXTURE_KEPT, "-", "1", ll.NULL_SHA)[:n]) + "\n" for n in (4, 6)).encode("utf-8"))
+    if plant == "kept-row-unknown-census":   # TOOL-dTotalRecall-70 S11: a census no census function bears
+        write_file(KEPT_SCRIPT, KEPT_NO_HIT)
+        record_kinds.write_kept_fixture(root, ("check_cause_writer", *FIXTURE_KEPT[1:]))
+    if plant == "kept-row-duplicate":   # TOOL-dTotalRecall-70 S11: two rows of one pair, their reasons apart
+        write_file(KEPT_SCRIPT, KEPT_HIT)
+        record_kinds.write_kept_fixture(root, FIXTURE_KEPT, (*FIXTURE_KEPT[:2], "another reason"))
     if plant == "kept-row-editable":   # TOOL-dTotalRecall-57 AC1: a row naming an editable file
         row = f"{tool_rel}/{EDITABLE_KEPT_PLANT}" if tool_rel else EDITABLE_KEPT_PLANT
         record_kinds.write_kept_fixture(root, ("check_cause_writers", row, "outside the write set"))
@@ -1213,8 +1232,18 @@ def check_pinned_plant(root, plant) -> tuple:
     PINNED_RECORD under causes. The marker plant (TOOL-dTotalRecall-58 AC1) runs the first alone and passes when
     it exits 1 with one red, naming the instrument's Serves literal's line; the closed-ask plant
     (TOOL-dTotalRecall-60 AC19) alike, its one red naming the row and its ask not live, WONTDO, and the spec-ask
-    plant (TOOL-dTotalRecall-66 AC20), its one red naming the row and the open spec id no filed ask."""
+    plant (TOOL-dTotalRecall-66 AC20), its one red naming the row and the open spec id no filed ask. The multiword
+    plant (TOOL-dTotalRecall-70 S4) passes when the first exits 0, KEPT_SCRIPT's keep line ends with its whole
+    reason and the reader answers the pinned row's whole reason in its `reason` field."""
     first, rc1 = run_check(root)
+    if plant == "kept-row-multiword":
+        line = [ln for ln in first if f" · {KEPT_SCRIPT}:" in ln and ln.endswith(f" · kept {FIXTURE_KEPT[2]}")]
+        row = tree_lib.read_kept_path("check_cause_writers", PINNED_INSTRUMENT, root) or {}
+        ok = rc1 == 0 and len(line) == 1 and row.get("reason") == "pinned instrument"
+        return [f"{SAY}: fixture {plant} · check 1 · {ln}" for ln in first] + [
+            f"{SAY}: fixture {plant} · pinned reason · {row.get('reason')}",
+            f"{SAY}: fixture {plant} · {'PASS' if ok else 'FAIL'} · check 1 exit {rc1} · a reason of several words "
+            "is read whole, on a plain keep and on a pinned writer's row"], ok
     if plant == "marker-in-build-script":
         at = f"{CAUSE_WRITER_CENSUS} {PINNED_INSTRUMENT}:{tree_lib.BIND_HEAD_LINES + 1}: "
         red = [ln for ln in first if ln.startswith(f"{SAY}: RED ")]
@@ -1301,7 +1330,7 @@ def run_fixture(plant) -> tuple:
                 return head + lines, 0 if ok else 1
             lines, rc = run_check(root)
             if plant == "adopter-no-registry":   # TOOL-dTotalRecall-65 AC3: a row the kit itself held fails it
-                read = {c: tree_lib.read_kept_rows(c, root) for c in ("check_cause_writers", "check_alias_compares")}
+                read = {c: tree_lib.read_kept_rows(c, root) for c in tree_lib.KEPT_CENSUSES}
                 ok = rc == 0 and not (root / FIXTURE_REGISTRY).exists() and not any(read.values()) \
                     and not any(" · kept " in ln for ln in lines)
                 lines += [f"{SAY}: fixture {plant} · {c} reads {len(rows)} row(s)" for c, rows in read.items()]

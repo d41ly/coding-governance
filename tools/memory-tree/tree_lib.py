@@ -667,6 +667,7 @@ HEAD_EDGE_RE = re.compile(BIND_PREFIX + r"\*\*(?P<key>Made-by|Caused-by):\*\*[ \
 # TOOL-dTotalRecall-53 S34).
 CENSUS_KEPT_REGISTRY = "census-kept-paths.txt"
 KEPT_FIELDS = ("census", "path", "reason", "records")
+KEPT_CENSUSES = ("check_cause_writers", "check_alias_compares")   # the column's domain (TOOL-dTotalRecall-70 S11)
 
 
 def read_kept_rows(census, root) -> dict:
@@ -674,9 +675,11 @@ def read_kept_rows(census, root) -> dict:
     its one reader (TOOL-dTotalRecall-55 S1, TOOL-dTotalRecall-65 S2), through the ledger factory's `read_rows`
     (TOOL-dTotalRecall-68 S3). A row is a mapping of `KEPT_FIELDS` and `count`, `sha` and `disposition`.
     ValueError naming the registry where any row of it, whatever census asked, is malformed, every refused line
-    named, or names a path holding a `..` segment or outside `build_kept_path_re` over the conf's memory root
+    named, or names a census outside `KEPT_CENSUSES` or a `(census, path)` pair an earlier row holds, whatever
+    its reason, each such line named (TOOL-dTotalRecall-70 S11), or
+    names a path holding a `..` segment or outside `build_kept_path_re` over the conf's memory root
     (TOOL-dTotalRecall-57 S1, TOOL-dTotalRecall-66 S11 S13). It does not check that a row's
-    file exists, is tracked or is pinned, that a pair is unique, nor that a row is filed under the right census."""
+    file exists, is tracked or is pinned, nor that a row is filed under the right census of the two."""
     import legacy_ledger as ll   # noqa: E402  the ledger factory; at call time, as it imports this kit's engines
     from design_lib import read_design_conf   # noqa: E402  the conf's one reader; at call time, no cycle
     memory = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/") or "memory"
@@ -686,11 +689,21 @@ def read_kept_rows(census, root) -> dict:
     rows, bad = ll.read_rows(registry, len(KEPT_FIELDS))
     if bad:
         raise ValueError(f"{CENSUS_KEPT_REGISTRY}: " + "; ".join(ll.render_malformed(b) for b in bad))
+    first, bad = {}, []
+    for key, (_n, _tail, line, _row) in rows.items():
+        census_, path = key[:2]
+        if census_ not in KEPT_CENSUSES:
+            bad.append(f"line {line}: census {census_!r} is none of {', '.join(KEPT_CENSUSES)}")
+        at = first.setdefault((census_, path), line)
+        if at != line:
+            bad.append(f"line {line}: a second row for {census_} {path}, the first at line {at}")
+    if bad:
+        raise ValueError(f"{CENSUS_KEPT_REGISTRY}: " + "; ".join(bad))
     kept = [dict(zip(KEPT_FIELDS, key), count=n, sha=sha, disposition=disposition)
             for key, (n, (sha, disposition), *_rest) in rows.items()]
     domain = build_kept_path_re(memory)
     for row in kept:
-        if ".." in row["path"].split("/") or not domain.fullmatch(row["path"]):
+        if ".." in pathlib.PurePosixPath(row["path"]).parts or not domain.fullmatch(row["path"]):
             raise ValueError(f"{CENSUS_KEPT_REGISTRY} row {row['path']}: is no file under {memory}/builds/*/build/*, and an editable "
                              "file is kept by its census marker: mark the kept line `# census: kept <census> <reason>`")
     return {row["path"]: row for row in kept if row["census"] == census}
