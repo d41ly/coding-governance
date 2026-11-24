@@ -12,6 +12,7 @@
 | [2026-11-23-build-KICK-dKeptSession-80-close-bar-attribution.md](../build/2026-11-23-build-KICK-dKeptSession-80-close-bar-attribution.md) | research | — |
 | [2026-11-23-build-KICK-dKeptSession-80-close-debts.md](../build/2026-11-23-build-KICK-dKeptSession-80-close-debts.md) | research | KICK-dKeptSession-69 |
 | [2026-11-23-build-KICK-dKeptSession-80-widen-4.md](../build/2026-11-23-build-KICK-dKeptSession-80-widen-4.md) | widen | — |
+| [2026-11-24-build-KICK-dKeptSession-80-close-bar-2-attribution.md](../build/2026-11-24-build-KICK-dKeptSession-80-close-bar-2-attribution.md) | research | — |
 | [2026-11-24-build-KICK-dKeptSession-80-red-fix-20.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-20.md) | red-fix | — |
 | [2026-11-24-build-KICK-dKeptSession-80-red-fix-21.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-21.md) | red-fix | — |
 | [2026-11-24-build-KICK-dKeptSession-80-red-fix-22.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-22.md) | red-fix | — |
@@ -21,6 +22,7 @@
 | [2026-11-24-build-KICK-dKeptSession-80-red-fix-26.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-26.md) | red-fix | — |
 | [2026-11-24-build-KICK-dKeptSession-80-red-fix-27.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-27.md) | red-fix | — |
 | [2026-11-24-build-KICK-dKeptSession-80-red-fix-28.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-28.md) | red-fix | — |
+| [2026-11-24-build-KICK-dKeptSession-80-red-fix-29.md](../build/2026-11-24-build-KICK-dKeptSession-80-red-fix-29.md) | red-fix | — |
 | [2026-11-24-build-KICK-dKeptSession-80-widen-5.md](../build/2026-11-24-build-KICK-dKeptSession-80-widen-5.md) | widen | — |
 | [2026-11-24-build-KICK-dKeptSession-80-widen-6.md](../build/2026-11-24-build-KICK-dKeptSession-80-widen-6.md) | widen | — |
 | [2026-11-24-build-KICK-dKeptSession-80-widen-7.md](../build/2026-11-24-build-KICK-dKeptSession-80-widen-7.md) | widen | — |
