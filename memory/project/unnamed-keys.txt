@@ -48,3 +48,6 @@ verdict.flakes	1	e7ab8c818222236d6c83040a5a0e326122c3edf0	seeded
 verdict.peer.signers	1	e7ab8c818222236d6c83040a5a0e326122c3edf0	seeded
 verdict.red-route	1	e7ab8c818222236d6c83040a5a0e326122c3edf0	seeded
 verdict.tree	1	e7ab8c818222236d6c83040a5a0e326122c3edf0	seeded
+install.baseline	1	f5dc6512ffc8632c9d4cead48a17da98f4396340	widened:2026-11-24-build-KICK-dKeptSession-80-widen-5
+tests.fixture-templates	1	f5dc6512ffc8632c9d4cead48a17da98f4396340	widened:2026-11-24-build-KICK-dKeptSession-80-widen-5
+tests.history-verdicts	1	f5dc6512ffc8632c9d4cead48a17da98f4396340	widened:2026-11-24-build-KICK-dKeptSession-80-widen-5
