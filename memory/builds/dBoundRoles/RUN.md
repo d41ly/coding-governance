@@ -23,7 +23,7 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 04608f915bfc7a6c9bcfb90a83bbde71833c3f4e
+witness: 5f3f0d652527cc7c0a33e2cdc5e66e00144634f8
 phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -626,3 +626,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T15:58:13Z dispatch · item 04608f91 TOOL-dBoundRoles-90 · reason tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-unit.js tools/workflows/unattended-build.test.sh tools/workflows/README.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/roles/SKILL.template.md .claude/skills/build/SKILL.md help/roles.md tools/run-gates/selftest-budgets.txt memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-90-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-90-deviation-901.md
 
 2026-11-24T15:58:15Z brief · item TOOL-dBoundRoles-90 · reason 7dac506834cf memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-90-build-brief.md
+
+2026-11-24T16:28:02Z dispatch · item 5f3f0d65 TOOL-dBoundRoles-91 · reason tools/loop/loop_lib.py tools/loop/loop_items.py tools/loop/README.md tools/roles/handoff.py tools/roles/render_agents.py tools/roles/adopt-roles.test.sh tools/roles/README.md help/loop.md tools/run-gates/selftest-budgets.txt memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-91-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-91-deviation-911.md
+
+2026-11-24T16:28:04Z brief · item TOOL-dBoundRoles-91 · reason 7622281cb35e memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-91-build-brief.md
