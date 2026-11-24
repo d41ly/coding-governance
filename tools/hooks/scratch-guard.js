@@ -2259,7 +2259,7 @@ function checkFreeAction(data, env) {
       const hit = resolveToplevel(top)
       const common = hit && resolveCommonDir(hit)
       if (!common) throw new Error(`no git common dir resolves at ${buildComparablePath(top)} to hold ${FREE_ACTIONS_LOG}`)
-      fs.appendFileSync(path.join(common, FREE_ACTIONS_LOG), `${new Date().toISOString()} · ${sid} · ${cls} · ${tool} · item none\n`)
+      fs.appendFileSync(path.join(common, FREE_ACTIONS_LOG), `${new Date().toISOString()} · ${sid} · ${cls} · ${tool} · item none\n`, 'utf8')
     }
     admit = true
   } else {
