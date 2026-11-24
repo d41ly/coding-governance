@@ -23,8 +23,8 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 3c9b6ad0ed85759e8ccd90863ff0369c361eb224
-phase: SPECCING
+witness: 43b674008a237487c7eab8755dd300be7ad93c5d
+phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
@@ -647,3 +647,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T18:33:27Z review · item dBoundRoles · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 0 · round-minors 9 · CONVERGED · highs 9 · minors 29 · to units · disposition promote
 
 2026-11-24T19:13:16Z rescope · item add TOOL-dBoundRoles-93 · reason closing diff review round 2 mediums M1 to M9 (findings 6 and 10 to 17), batched into one unit
+
+2026-11-24T19:44:51Z dispatch · item 43b67400 TOOL-dBoundRoles-93 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/loop/loop_items.py tools/govkit/registry.toml tools/gate-legs.json tools/run-gates/selftest-budgets.txt help/roles.md help/loop.md memory/guides/SESSION-KICKOFF.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-93-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-93-deviation-931.md
+
+2026-11-24T19:44:54Z brief · item TOOL-dBoundRoles-93 · reason c0a7be26038c memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-93-build-brief.md
