@@ -11,9 +11,14 @@ CLIs, `py_reads.py --guards <leg>` per leg, the step program's sixteen plants on
 scratch clone of `8b8b1374` for the one red that stayed. The two pre-commit hooks ran over the staged
 merge at the end of the pass, as the brief asks, and the builder's return names their exits.
 
-Owed to the close: every leg the spec's section 7 names; AC2, AC3, AC11 to AC14 and AC18's hygiene
-run, which read the committed merge or a gate leg; AC9 from the policy fixtures leg's run record; and
-the `New arm:` line's RED-first observation, the cases `reader-join`, `purposes-new` and
+The main loop committed that merge as `ad02f1a6a`, `Pass: none`. A second pass, on node a, 2026-11-24,
+completed this ledger by the spec's rev-4 and flipped the spec CLOSED, and committed nothing. A reading
+named "the main loop's" below was taken by the main loop and handed to that pass, which did not repeat
+it. The run head those readings name is `815c02ef8`; the commits from there to `f9bff5b86`, where the
+second pass ran, move records under `memory/` alone (DERIVED, `git diff --name-only`).
+
+Owed to the close: every leg the spec's section 7 names; the pass commit's own trailer count of AC2;
+and the `New arm:` line's RED-first observation, the cases `reader-join`, `purposes-new` and
 `purposes-drain` staged red against `policy.py` at `e7ab8c81`.
 
 **Evidences:** KICK-dKeptSession-69
@@ -21,12 +26,21 @@ the `New arm:` line's RED-first observation, the cases `reader-join`, `purposes-
   files holds a `<<<<<<< ` line (DERIVED, that run). The three generated outputs were checked out from
   main's side and re-rendered by `regen.py --write` over a provisional commit of the staged merge, HEAD
   detached on it and put back on the run branch after the write (S2, S4).
+- AC2 — rev-4 amended it; observed at the merge, the main loop's and re-read: `git rev-parse ad02f1a6a^2` printed `8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e`,
+  `git rev-parse ad02f1a6a^1` printed `e7ab8c818222236d6c83040a5a0e326122c3edf0`, and the message of
+  `ad02f1a6a` holds one `Pass: none` line. Before the pass commit, the count of
+  `Pass: KICK-dKeptSession-69` over `ad02f1a6a..HEAD` printed 0 (DERIVED, at `f9bff5b86`); the count of
+  1 is the main loop's, read after that commit.
+- AC3 — rev-4 amended it; observed at `815c02ef8`, the main loop's: `python tools/run-gates/regen.py --check` exited 0, every output fresh,
+  and `python tools/policy/policy.py mirror --check` printed `policy: mirror fresh`.
 - AC4 — `memory/project/unpinned-facts.txt` holds one `widened:2026-11-22-build-KICK-dKeptSession-69-widen-1`
   row, the dKeptSession packet's `65 specs` fact, written by the factory's widen route after
   `writing_practice.py check pinned-facts --shrink` dropped 19 stale rows and printed `pinned-facts:
   green · 0 red`; `positional.py shrink` dropped 162 stale rows; `grep -c '^policy:card.pointers'` over
   `memory/project/docs-undocumented.txt` printed 0 (DERIVED, that run). `core-pending.txt` keeps
-  neither `kind.preset` nor `kind.gate-leg`.
+  neither `kind.preset` nor `kind.gate-leg`. The exits of `positional.py check` and `core.py meta-check`
+  were read by neither pass, whose role runs no leg; the close's second full bar, at `3b7cfc355`, lists
+  neither leg among its red ones.
 - AC5 — `memory/guides/SESSION-KICKOFF.md` holds one `last-audit:` line, its sha `e7ab8c81`, the
   merge's first parent.
 - AC6 — `git grep` of the five factory names over `tools/` and `help/` printed nothing, the two
@@ -41,11 +55,28 @@ the `New arm:` line's RED-first observation, the cases `reader-join`, `purposes-
 - AC8 — in process over the merged tree, `arm_reader_join` graded 274 keys, `225 of 274 catalogue
   key(s) named on their owner's row · population unnamed-keys`, and `arm_purposes` graded 59
   namespaces, `14 purposed, 45 awaiting review · population unpurposed-namespaces`, each with no
-  finding (DERIVED, that run).
+  finding (DERIVED, that run). rev-4 amended it to those two arms alone; the exit stays unread, for the
+  seven findings the AC16 answer records as INHERITED.
+- AC9 — rev-4 amended it; observed, the main loop's, and read again at `f9bff5b86` with the whole output: `python tools/policy/check_policy.py --fixture reader-join`,
+  `--fixture purposes-new` and `--fixture purposes-drain` each exited 0 and printed `0 wrong`, over 108,
+  103 and 104 assertions executed (DERIVED, the second pass's three runs).
 - AC10 — over `help/policy.md` the two `memory/project/` homes count 1 each and the two kit-dir
   paths 0 (DERIVED, that run).
+- AC11 — rev-4 amended it; observed at `815c02ef8`, the main loop's: the two scans of `tools/gate-lint/sh_hygiene.py`, `--location-probes` and `--stage-commits`, each exited 0,
+  and `git diff ad02f1a6a^2 ad02f1a6a` over `memory/project/location-probe-waivers.txt` and
+  `memory/project/stage-commit-sites.txt` printed nothing (re-read by the second pass). The scans hold
+  over `ec9226a9b`, the red-fix commit; before it, at `3b7cfc355`, the second full bar read both red,
+  the scans the criterion's `Red when` names.
+- AC12 — rev-4 amended it; observed at `815c02ef8`, the main loop's: the `--spawn-idioms` scan exited 0, printing `pure-fn-subst` twice for `manifest-check.sh`
+  and `cat-file` eleven times for the scratch-guard suite, and `git diff ad02f1a6a^2 ad02f1a6a` over
+  `memory/project/spawn-idiom-sites.txt` printed nothing (re-read by the second pass). The scan holds
+  over `ec9226a9b`; before it, at `3b7cfc355`, it read red, the scan the criterion's `Red when` names.
 - AC13 — after the guards widened, `py_reads.py --guards <leg>` printed RED lines for the five legs
-  until the regeneration re-rendered `tools/gate-legs.json`; the leg's own run is owed (see below).
+  until the regeneration re-rendered `tools/gate-legs.json`. rev-4 amended it to the run head; observed
+  at `815c02ef8`, the main loop's: `python tools/run-gates/py_reads.py` exited 0 and printed no
+  `py-reads: RED` line.
+- AC14 — rev-4 amended it; observed at `815c02ef8`, the main loop's: `git ls-tree HEAD tools/govkit/steps/kickoff_facts_to_overlay.py` printed the blob `bf63aab8aafdcfe3cf645325f945ee97305c73b3` (re-read at `f9bff5b86`),
+  and `python tools/govkit/upgrade_steps.py frozen` printed 0 problems.
 - AC15 — each of the sixteen plants of `kickoff_facts_to_overlay.py --fixture --plant <case>` over
   the restored program exited 0 and printed ` · 0 failed` (DERIVED, that run), so §8 F3 resolves to
   (b): nothing else moves, `cmd_scaffold` keeps its refusal and no `scaffold-bare` case is added.
@@ -54,10 +85,18 @@ the `New arm:` line's RED-first observation, the cases `reader-join`, `purposes-
   `verdict.remote.trust`, `verdict.remote.pin-scope` and `verdict.remote.pin` of dWitnessedBar, each
   `has no reader`. The same arm over a scratch clone detached at `8b8b1374`, its `origin/main` set
   there, printed the same seven (DERIVED, that probe): the `policy check` leg's red is INHERITED, for
-  the close to attribute with `GATE_ATTRIBUTE=8b8b1374`.
-- AC17 — the superseded passages are quoted below; no CLOSED unit's spec or ledger was written.
+  the close to attribute with `GATE_ATTRIBUTE=8b8b1374`. rev-4 amended it; observed at
+  `b086c0c39`, the main loop's: `python tools/drift-audit/drift_report.py --check` exited 0 with no
+  `RATCHET WEAKENED` line on stderr.
+- AC17 — rev-4 amended it to two commands; over this ledger, each `tr -s` into its `grep -c` printed `1`
+  (DERIVED, at `f9bff5b86`). The superseded passages are quoted below; no CLOSED unit's spec or ledger was
+  written: `git diff --name-only ad02f1a6a^1 ad02f1a6a --` over the build's spec and build folders printed
+  this unit's spec, ledger and widen record alone (DERIVED, at `f9bff5b86`).
 - AC18 — both homes are staged and `PROJECT_REGISTRY_EXTRA` names `unnamed-keys.txt` and
-  `unpurposed-namespaces.txt` with one member note; check 3's run is owed.
+  `unpurposed-namespaces.txt` with one member note. rev-4 amended it; observed: `git ls-files` printed
+  both paths, the key's word count printed `2`, and the whole output of AC9's three runs holds no
+  `guard-trace · WRONG` line (DERIVED, at `f9bff5b86`). At `815c02ef8`, the main loop's,
+  `bash tools/memory-tree/check-memory-hygiene.sh --only 3` printed no failure line.
 
 ## Superseded text
 
