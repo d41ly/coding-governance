@@ -673,7 +673,12 @@ KEPT_CENSUSES = ("check_cause_writers", "check_alias_compares")   # the column's
 def resolve_memory_root(conf: dict) -> str:
     """The memory tree's repo-relative root from a parsed `.memory-tree.conf`: the kit default where
     the key is absent, else the value with `\\` folded to `/` and empty and `.` segments dropped.
-    `ValueError` naming the key for a blank, absolute or `..`-holding value (TOOL-dTotalRecall-87 S1)."""
+    `ValueError` naming the key for a blank, absolute or `..`-holding value (TOOL-dTotalRecall-87 S1).
+
+    It diverges from `runlog_lib`'s reader of the same name, which refuses any backslash or `:`, strips a
+    leading slash and keeps inner empty and `.` segments and outer whitespace. This one folds a backslash, as
+    the kit's `design_lib` does, so one root is one path here. `loop_lib` and the `memory-recall` self-test
+    define the name too (TOOL-dTotalRecall-92 S23)."""
     if "MEMORY_ROOT" not in conf:
         return "memory"
     raw = conf["MEMORY_ROOT"]
