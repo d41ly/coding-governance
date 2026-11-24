@@ -33601,8 +33601,6 @@ memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-75.md	BUILD-ME
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-76.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-76.md	BUILD-METHOD M6	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-76.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-76.md	tools/codebase-map/selftest.py:1815	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-76.md	tools/memory-tree/check-memory-hygiene.sh:732-737	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-77.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-77.md	manifest-check.sh:1279	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-77.md	manifest-check.sh:1568	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
