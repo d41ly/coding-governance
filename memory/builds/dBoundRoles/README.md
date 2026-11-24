@@ -166,7 +166,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 519 bound to this build, across 4 record folder(s).
+Records: 520 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
