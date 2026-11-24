@@ -23,7 +23,7 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: c12557bfa8e15fd741eaa7bf1ea3a167222f29af
+witness: d44c4b07fe5672635f162495056324ddfdf94831
 phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -610,3 +610,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T13:19:52Z brief · item TOOL-dBoundRoles-86 · reason d168703d9e29 memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-86-build-brief.md
 
 2026-11-24T13:32:37Z dispatch · item 1374ba07 TOOL-dBoundRoles-86 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/run-gates/selftest-budgets.txt memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-86-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-86-deviation-861.md
+
+2026-11-24T14:17:55Z dispatch · item d44c4b07 TOOL-dBoundRoles-87 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/run-gates/selftest-budgets.txt memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-87-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-87-deviation-871.md
+
+2026-11-24T14:17:57Z brief · item TOOL-dBoundRoles-87 · reason df0165d2ffc1 memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-87-build-brief.md
