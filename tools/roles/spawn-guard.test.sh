@@ -1307,5 +1307,17 @@ else
   run_adopter_call "BR25 AC6 ...and a CRLF checkout of the same LF blob is admitted, through the clean filter" 0
 fi
 
+n=$((pass+fail))
+# 188 is the base, every assertion but those of the terms below, the arms of each unit before them included. A
+# shrink-only pin on the EXECUTED count (TOOL-dBoundRoles-62): an arm stranded past an early exit leaves the suite
+# green with no floor. Base and terms are DERIVED by reading each assertion call site from source, one per execution,
+# so a site in a loop counts once per item of its literal list, and every helper here asserts once per call. No arm
+# of this suite skips: a missing kit is a FAIL. The close's run is the executed observation. It does NOT CHECK that
+# an executed arm can fail.
+# +6 for the entry guard, the check order, the one block reader and the derived exemption (TOOL-dBoundRoles-58).
+# The pin sits alone on its line because the testsuite-counts leg reads it anchored.
+FLOOR_ASSERTIONS=194
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
+[ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ]
