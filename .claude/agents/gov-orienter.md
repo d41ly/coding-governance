@@ -71,9 +71,8 @@ How you work:
   whose admission predicate holds over the request, `+` joined in the composition's order, and
   `facts`, the request facts you read as `<name>=<value>` pairs joined by `; `, each with its row in
   `evidence`; the `entry` fact is derived from the disposition, so leave it out. Write them as `key:
-  value` lines, `disposition`, `build`, `playbook`, `reason`, `evidence`, `observations`, `scenarios`
-  and `facts`: the loop kit's `placement.py place` reads that block, and its `check` re-reads every
-  fact you cite from source and re-runs every scenario predicate.
+  value` lines or, sent back, as a `json` block: the loop kit's `placement.py place` reads either,
+  and its `check` re-reads every fact from source and re-runs every scenario predicate.
 
 Done means every section of the card is filled from something you ran or read, and every open row
 names its options.
@@ -98,7 +97,7 @@ task you were handed, out of what you write and return.
 
 ## Return
 
-Return one object holding these fields, in this order: outcome (one of oriented, placed); card (text, optional); disposition (text, optional); reason (text, optional); evidence (text, optional); observations (text, optional); scenarios (text, optional); facts (text, optional).
+Return one object holding these fields, in this order: outcome (one of oriented, placed); card (text, optional); disposition (text, optional); build (text, optional); breakpoint (text, optional); playbook (text, optional); reason (text, optional); evidence (text, optional); observations (text, optional); scenarios (text, optional); facts (text, optional).
 
 Or refuse, returning outcome: refused; rule (text); remedy (text); actor (one of self, producer, driver, owner, build:<slug>).
 [/.claude/agents/gov-orienter.md]

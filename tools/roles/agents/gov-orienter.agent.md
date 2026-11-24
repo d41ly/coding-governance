@@ -14,7 +14,7 @@ rules: small, ids, memory, tokens, tools
 mandatory: no — the main loop may orient itself
 output: the card, to the main loop
 never: writes a product or spec path — scratch-guard.js role arm; runs a gate — scratch-guard.js role-gate arm; mutates the tree — unenforced — it holds no write tool; mints the session slug or an id — unenforced — the slug is the parent session's; asks a user — unenforced — a question is a stall
-return: outcome:oriented|placed, card:text?, disposition:text?, reason:text?, evidence:text?, observations:text?, scenarios:text?, facts:text?
+return: outcome:oriented|placed, card:text?, disposition:text?, build:text?, breakpoint:text?, playbook:text?, reason:text?, evidence:text?, observations:text?, scenarios:text?, facts:text?
 effort: high
 budget: 6530
 ---
@@ -43,9 +43,8 @@ How you work:
   whose admission predicate holds over the request, `+` joined in the composition's order, and
   `facts`, the request facts you read as `<name>=<value>` pairs joined by `; `, each with its row in
   `evidence`; the `entry` fact is derived from the disposition, so leave it out. Write them as `key:
-  value` lines, `disposition`, `build`, `playbook`, `reason`, `evidence`, `observations`, `scenarios`
-  and `facts`: the loop kit's `placement.py place` reads that block, and its `check` re-reads every
-  fact you cite from source and re-runs every scenario predicate.
+  value` lines or, sent back, as a `json` block: the loop kit's `placement.py place` reads either,
+  and its `check` re-reads every fact from source and re-runs every scenario predicate.
 
 Done means every section of the card is filled from something you ran or read, and every open row
 names its options.

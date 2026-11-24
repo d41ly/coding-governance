@@ -27,7 +27,9 @@ reference; this page is the short version.
    a line, `place` runs the roles kit's `handoff.py check-return-file --role gov-orienter --file <file>`:
    a return missing a field its template requires, `outcome` among them, naming no work order, or
    answering a work order whose marker names another role is refused, one
-   `placement: refused — return — <defect>` line each, and nothing is recorded. A refusal of either
+   `placement: refused — return — <defect>` line each, and nothing is recorded. The return is `key:
+   value` lines or one JSON object, and a return the return check sent back is the JSON; `place` reads
+   either, each value of the JSON a string on one line. A refusal of either
    command goes back to the scout, spawned again from its work order. The `/build` Skill's Stage 1
    states this step.
 3. **A role supplies the constant part.** Each role is one file under `<prefix>/roles/agents/`: its
