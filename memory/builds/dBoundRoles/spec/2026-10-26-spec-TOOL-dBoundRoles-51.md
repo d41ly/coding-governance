@@ -16,6 +16,7 @@
 | [2026-10-26-prompt-TOOL-dBoundRoles-45-round2-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-45-round2-fix-brief.md) | research | TOOL-dBoundRoles-45 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-brief.md) | journal | TOOL-dBoundRoles-44 TOOL-dBoundRoles-50 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-51-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-51-build-brief.md) | journal | — |
+| [2026-11-23-prompt-TOOL-dBoundRoles-51-resume-node-a.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-51-resume-node-a.md) | journal | — |
 | [2026-10-26-review-TOOL-dBoundRoles-45-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-45-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-49 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-48 TOOL-dBoundRoles-47 TOOL-dBoundRoles-50 |
 
 <!-- /gen:spec-records -->
