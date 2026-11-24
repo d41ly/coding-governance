@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.137 -->
+<!-- gov:kit unattended@1.138 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -52,8 +52,9 @@ skips it, `Pass: none` is taken at its word, and check 23 grades both at the clo
 in the run's own tree, paired with the unit harness's `passBase` key. `--merge <slug> --pass <unit>
 --branch <branch> --from <sha>` takes the branch the harness returned and the commit that key carried,
 merges it `--no-ff` with a `Pass: none` merge commit whose second parent is the pass commit, resolves
-only a conflict on an effective generated output or a gen-region-only change, re-renders the outputs,
-and takes the pass's worktree and branch away; `--remove <slug> --branch <branch>` takes away those of
+only a conflict on an effective generated output or a gen-region-only change, re-renders the outputs
+over the merge as it will be committed, so a renderer that reads the committed revision, as the policy
+mirror does, reads the pass's inputs, and takes the pass's worktree and branch away; `--remove <slug> --branch <branch>` takes away those of
 a pass that committed nothing. It finds `regen.py` beside the run-gates kit, and without it announces
 the skip and merges what the resolution left. Its header states the order the main loop runs it in.
 
@@ -298,7 +299,7 @@ header of the `health_log_sh` block in `lib-unattended.sh`.
 ## The sidecar
 
 `<git-dir>/unattended/` is where the keepalive actors write, and it is the WORKTREE's git dir,
-never the common dir, because a run lives in one worktree. Four kinds, one file per run each:
+never the common dir, because a run lives in one worktree. Five kinds, one file per run each:
 `stop.<slug>.log`, one JSON line per stop the stop-guard decided (unit 3); `stall.<slug>.log`, one
 line per API-error end the stall-recorder saw (unit 4); `resume.<slug>.log`, one attempt line per
 tick, with the launcher `resume.<slug>.<utc>.sh` and its `.out` beside it (unit 5). The first three
@@ -307,6 +308,14 @@ The fourth, `liveness.<slug>.json`, is the stop-guard's cache of the driver's `-
 (`TOOL-aLightenedLoop-5`): one entry, rewritten whole, keyed on a hash of every input that verdict
 reads, a LIVE entry expiring before a fresh read could say STALE. Only the stop-guard reads it, and
 `STOP_GUARD_LIVENESS_CACHE=off` in the hook's environment stops it being read or written.
+The fifth, `mail-notice.<slug>.log`, is the notice stamp (`KICK-dKeptSession-21`): rewritten whole by
+`--mail notice` after every notice that fetched, its first line the `mailbox.notice` and
+`mailbox.fetch-seconds` values that notice read and the bash that ran it, then one line per unread
+message; its mtime is the age of the build's local mail copy. Only the `mail-notice.js` hook reads it,
+at every tool call, and its `<stamp>.fetching` marker beside it lasts for one detached fetch: a notice
+that fetched, an `off` notice and a `--local` notice remove it, and a notice whose fetch failed keeps
+it, touched at its end, so the hook starts no fetch until it is twice `mailbox.fetch-seconds` old
+(`KICK-dKeptSession-79`).
 
 ## The bar `--close` runs
 

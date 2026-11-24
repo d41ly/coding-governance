@@ -976,22 +976,28 @@ def write_placement_fixture(top, policy="", driver=False, remote=False, scenario
     return root
 
 
-def write_foreign_lease(root, build):
-    """A build lease of `build` held live by another node's fleet tag, pushed to the fixture's remote."""
+def write_foreign_lease(root, build, fields=(), remote=FIXTURE_REMOTE):
+    """A build lease of `build` held live by another node's fleet tag, pushed to the fixture's remote, `remote`
+    naming it; `fields` are extra `(key, value)` pairs after the twelve, such as `witness`, which the position
+    engine's dependency plants pass with their own remote (KICK-dKeptSession-7)."""
     now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     msg = "gov-claim %s/build\n\n" % build + "".join("%s: %s\n" % kv for kv in (
         ("slug", build), ("node", "z"), ("host", "elsewhere"), ("session", "s-other"), ("keepalive", "k-other"),
         ("status", "live"), ("lease-utc", now), ("beat-utc", now), ("epoch", "1"), ("kind", "build"),
-        ("fleet-tag", "z"), ("renews", "yes")))
-    write_fixture_gov_ref(root, "refs/gov/leases/%s/build" % build, msg)
+        ("fleet-tag", "z"), ("renews", "yes")) + tuple(fields))
+    write_fixture_gov_ref(root, "refs/gov/leases/%s/build" % build, msg, remote=remote)
 
 
-def write_fixture_gov_ref(root, ref, msg):
-    """One parentless commit over the empty tree, its message `msg`, pushed to `ref` on the fixture's remote."""
+def write_fixture_gov_ref(root, ref, msg, remote=FIXTURE_REMOTE, parent=None):
+    """One commit over the empty tree, its message `msg`, pushed to `ref` on the fixture's remote, `remote`
+    naming it, as the position engine's mail plants pass their own (KICK-dKeptSession-10): parentless, or
+    with `parent`, where given, its one parent, so a plant lands a second message on a ref after the first
+    (KICK-dKeptSession-53 S7). -> the commit's sha; the callers passing no `parent` ignore it."""
     tree = subprocess.run(["git", "mktree"], cwd=str(root), input="", capture_output=True, text=True, encoding="utf-8", check=True,
                           env=read_clean_env()).stdout.strip()
-    sha = run_fixture_git(root, "commit-tree", tree, "-m", msg)
-    run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "%s:%s" % (sha, ref))
+    sha = run_fixture_git(root, "commit-tree", tree, *(("-p", parent) if parent else ()), "-m", msg)
+    run_fixture_git(root, "push", "-q", remote, "%s:%s" % (sha, ref))
+    return sha
 
 
 def read_fleet_user():

@@ -1,5 +1,5 @@
 {
-  "catalogue_blob": "3c136d9f8dbe0a179056ed235d568cc7e5886673",
+  "catalogue_blob": "25a1aa130584e018d5d6c6f2050f5227ed494f2a",
   "keys": {
     "actions.free": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -1346,7 +1346,8 @@
   },
   "legacy_blobs": {
     ".agent-cap.conf": null,
-    ".governance/instructions.toml": "6b3049c9cc983619025574c23e5146d330901c22"
+    ".governance/instructions.toml": "6b3049c9cc983619025574c23e5146d330901c22",
+    "tools/policy/presets.toml": "d1bf02e57fe9e8f52c3976f2967fc6e345be60cc"
   },
   "policy_blob": "1475a5e4ad9d506b5c6084c239bc4bfd0783d60d"
 }

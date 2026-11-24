@@ -9,6 +9,7 @@
     python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
     python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
     python <prefix>/memory-tree/gen_build_index.py --doctor <slug> # every failing rule for one build folder
+    python <prefix>/memory-tree/gen_build_index.py --latest-records <slug>  # the newest bound record of each base kind
     python <prefix>/memory-tree/gen_build_index.py --new-spec <ID> --tier <1|2>  # a spec skeleton
     python <prefix>/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
 
@@ -192,6 +193,7 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
     BIND_HEAD_LINES, BIND_RE, GIT_ENV_LEAKS, HDR_RE, RECORD_KIND_TOKENS, RECORD_KINDS, STATUS_TOKENS, TERMINAL,
+    TYPED_RECORD_KINDS,
     UNBOUND_RE, _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, derive_constant_charges, kit_rel,
     parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at, read_id_pins, read_policy_value,
     read_text, record_paths, scan_missing_citations, unfenced, unfenced_lines,
@@ -349,8 +351,9 @@ PRECEDENCE = ("INPROGRESS", "BLOCKED", "OPEN", "SPECCED", "DEFERRED")
 
 H1_RE = re.compile(r"^#\s+(?P<id>[A-Za-z0-9][A-Za-z0-9-]*)\s+—\s+(?P<title>.+?)\s*$")
 # The build-order verb, appended after `base` in a spec's status header. Units sharing a value are
-# the parallel group; the owner resolved against a second `group` verb, which would have needed its
-# own contradiction refusals to render an identical region.
+# one step, whose Parallel cell `derive_parallel_step` derives, as `render_order` reads
+# (KICK-dKeptSession-63 S24); the owner resolved against a second `group` verb, which would have
+# needed its own contradiction refusals to render an identical region.
 # TOOL-dFramedEntrypoint-4 S2 — ANCHORED on both sides. The shipped form ended `(?![0-9])`, which
 # rejects a longer number and nothing else: `order 0x2` matched `0` and rendered as step 0, and
 # `order 2x` matched `2` and rendered as step 2 — both probed on the shipped regex before this change.
@@ -843,6 +846,31 @@ def derive_audit_writers(root: str, memory_root: str, rels, resolve=None) -> set
     older = {sha for sha in shas if blobs.get((sha, harness)) is not None
              and AUDIT_WRITER_MARK not in blobs[(sha, harness)]}
     return {rel for rel, sha in added.items() if sha in older}
+
+
+def cmd_latest_records(root: str, conf: dict, slug: str) -> int:
+    """READ-ONLY (KICK-dKeptSession-13 S3): one `<kind> <path>` line for each base kind the build's bound
+    records carry, `RECORD_KIND_TOKENS` less `TYPED_RECORD_KINDS`, the newest of that kind by filename,
+    sorted by kind. `read_bindings` runs over the build folder's tracked paths alone, and a typed kind is
+    never printed, so a kind `TYPED_RECORD_KINDS` gains never lengthens the card's `records —` line
+    (KICK-dKeptSession-44 S22). Exit 0, a build with no bound record printing nothing; 2 on a slug that
+    is not one. WHAT THIS DOES NOT CHECK: that a record's content is current; the newest name is the
+    newest date."""
+    if not re.fullmatch(r"[A-Za-z0-9]+", slug or ""):
+        print(f"build-index: --latest-records takes a build slug, [A-Za-z0-9]+, and was given {slug!r}",
+              file=sys.stderr)
+        return 2
+    folder = f"{conf['MEMORY_ROOT']}/builds/{slug}/"
+    tracked = [p for p in run("git", "ls-files", "--", folder, cwd=root).split("\n") if p]
+    newest: dict = {}
+    base = set(RECORD_KIND_TOKENS) - set(TYPED_RECORD_KINDS)
+    for rel, rec in read_bindings(root, tracked, conf).items():
+        kind = rec["kind"] if rec["state"] == "bound" and rec["kind"] in base else None
+        if kind and (kind not in newest or os.path.basename(rel) > os.path.basename(newest[kind])):
+            newest[kind] = rel
+    for kind in sorted(newest):
+        print(f"{kind} {newest[kind]}")
+    return 0
 
 
 def cmd_print_bindings(root: str, conf: dict, resolve=None) -> int:
@@ -9959,12 +9987,13 @@ def main(argv: list) -> int:
     if mode not in ("--check", "--write", "--write-staged", "--check-format", "--print-bindings", "--survey",
                     "--check-asbuilt",
                     "--report", "--bump", "--asks", "--new-build", "--placed-build", "--new-spec", "--doctor",
-                    "--check-coverage"):
+                    "--check-coverage", "--latest-records"):
         print("usage: gen_build_index.py "
               "[--check [--staged|--with-verdicts]|--write|--write-staged|--check-coverage [--staged]|"
               "--check-asbuilt [--staged]|"
               "--check-format|--survey|--report|--bump|"
-              "--print-bindings|--asks|--new-build|--placed-build|--new-spec|--doctor|--selftest]")
+              "--print-bindings|--asks|--new-build|--placed-build|--new-spec|--doctor|--latest-records <slug>|"
+              "--selftest]")
         return 2
     # TOOL-dTrueNorth-27 S4: `--with-verdicts` is `--check`'s alone, and never beside `--staged`, whose
     # skip would print no verdict while a full run's checks 29 and 30 read them from these lines.
@@ -9987,6 +10016,17 @@ def main(argv: list) -> int:
             return cmd_print_bindings(root, conf)
         except Problem as exc:
             print(f"build-index: {exc}")
+            return 2
+    # `--latest-records` (KICK-dKeptSession-13 S3): its stdout is the card's `records —` line's source,
+    # so a refusal goes to stderr, as `--asks` puts its own.
+    if mode == "--latest-records":
+        if len(argv) != 3:
+            print("usage: gen_build_index.py --latest-records <slug>", file=sys.stderr)
+            return 2
+        try:
+            return cmd_latest_records(root, conf, argv[2])
+        except Problem as exc:
+            print(f"build-index: {exc}", file=sys.stderr)
             return 2
     # `--asks` IS DISPATCHED OUTSIDE THE HANDLER BELOW, which prints its message to stdout. That is
     # right for every other mode and wrong for this one, whose stdout is a value a program parses:

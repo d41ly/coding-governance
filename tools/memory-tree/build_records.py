@@ -99,6 +99,13 @@ commit, eight to forty hex digits, or `none`), then the card's text in one `~~~~
 is its reader, which refuses each of those shapes and a record holding no fenced block. It has no `new`
 door: the kickoff engine's snapshot calls `write_record`.
 
+THE MAILBOX-MESSAGE KIND (KICK-dKeptSession-5 S12): `<date>-build-<anchor id>-mailbox-message-<n>.md`, one
+mailbox message a build's transition disposed, the anchor the transition kind's: `Id`, `From` (the sender's
+build), `To`, `Kind`, `Subject`, `Answers`, `State`, `Reply` and `Ref` (the message's ref on the remote), no
+closed field, then the message's body in one `~~~~` fenced block. `read_mailbox_message` is its reader, which
+refuses a missing field and a record holding no single fenced block. It has no `new` door: the loop kit's
+transition writer calls `write_record`.
+
 THE PROBE-TRIGGER AND PROBE KINDS (TOOL-dPlacedRequest-7 S6): `<date>-build-<unit id>-probe-trigger-<n>.md`, a
 probe opened at an item boundary: `Cause`, `Asker`, `Subject`, `At` and `Key`, `none` where the trigger names no
 position or content key. `<date>-build-<unit id>-probe-<n>.md`, the probe it opened: `Sha` (the pinned commit,
@@ -264,6 +271,11 @@ KINDS = {
     "probe": {
         "required": ("Sha", "Kind", "Question", "Losing", "Asker", "Trigger"),
         "closed": (("Kind", PROBE_KINDS), ("Judged", PROBE_JUDGED), ("Writer", ACCEPTANCE_WRITERS)),
+    },
+    "mailbox-message": {   # KICK-dKeptSession-5 S12: written by the loop kit's transition writer, no `new` door;
+        # the message's body is one fenced block after the fields
+        "required": ("Id", "From", "To", "Kind", "Subject", "Answers", "State", "Reply", "Ref"),
+        "closed": (),
     },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
@@ -757,6 +769,25 @@ def read_card(path, text):
 
     fields, bad, name = read_record(path, text, "card", check_fields=check_fields)
     return {**fields, "card": card, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+# -------------------------------------------------------------------------------- the mailbox-message kind
+def read_mailbox_message(path, text):
+    """One mailbox-message record: its fields under their own names, `body` the text of its fenced block, and
+    `id`, `path`, `build`, `n` and `malformed`. Its own rule beside `KINDS`' required fields: exactly one
+    `~~~~` fenced block after the fields, two `~~~~` lines and no third."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    fences = [i for i, ln in enumerate(lines) if ln == "~~~~"]
+    body = "\n".join(lines[fences[0] + 1:fences[1]]) if len(fences) == 2 else None
+
+    def check_fields(_fields):
+        return [] if body is not None else [("body", "is malformed: the record holds the message's body in one "
+                                                     "~~~~ fenced block, and it holds %d ~~~~ line(s)" % len(fences))]
+
+    fields, bad, name = read_record(path, text, "mailbox-message", check_fields=check_fields)
+    return {**fields, "body": body, "id": pathlib.PurePosixPath(path).stem, "path": path,
             "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
             "malformed": bad}
 
@@ -1365,6 +1396,8 @@ def main(argv):
         bad = read_recommendation(rel, text)["malformed"]
     elif kind == "card":
         bad = read_card(rel, text)["malformed"]
+    elif kind == "mailbox-message":
+        bad = read_mailbox_message(rel, text)["malformed"]
     elif kind == "probe-trigger":
         bad = read_probe_trigger(rel, text)["malformed"]
     elif kind == "probe":

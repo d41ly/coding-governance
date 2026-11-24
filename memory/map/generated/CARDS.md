@@ -316,9 +316,9 @@ The line grammar the three run-log producers write, the one reader every consume
 - gate-legs 4: `runlog selftest`, `pre-push run-log line`, `runlog record schema`, `runlog skill wiring`
 - kits 1: `runlog`
 - rendered-skills 1: `runlog`
-- gotcha-classes 7: `nt-against-a-missing-file-is-true.md`, `trapped-signal-waits-for-the-foreground-child.md`, `fixed-sleep-does-not-place-a-signal.md`, `staged-break-runs-stale-bytecode.md`
+- gotcha-classes 8: `nt-against-a-missing-file-is-true.md`, `trapped-signal-waits-for-the-foreground-child.md`, `fixed-sleep-does-not-place-a-signal.md`, `staged-break-runs-stale-bytecode.md`
 - globs 3
-- cut 6 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 7 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## session-kickoff
 
@@ -360,14 +360,14 @@ Unattended runs — a mandate on disk, not a block of chat
 - decisions 1: `TOOL-aOrientedCast-22`
 - gate-legs 6: `unattended kit gate`, `unattended skill wiring`, `pass-order history`, `brief-recorded`, `unattended protocol size`, `unattended skill size`
 - kits 1: `unattended`
-- harness-hooks 3: `PreToolUse tools/unattended/gate-guard.js`, `Stop tools/unattended/stop-guard.js`, `StopFailure tools/unattended/stall-recorder.js`
+- harness-hooks 4: `PostToolUse tools/unattended/mail-notice.js`, `PreToolUse tools/unattended/gate-guard.js`, `Stop tools/unattended/stop-guard.js`, `StopFailure tools/unattended/stall-recorder.js`
 - workflow-scripts 2: `unattended-build.js`, `unattended-unit.js`
 - skill-engines 1: `session-kickoff`
 - rendered-skills 1: `unattended`
-- gotcha-classes 30: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`
+- gotcha-classes 31: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`
 - guides 4
-- globs 3
-- cut 33 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 3: `tools/unattended/*`
+- cut 34 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## unattended-mandate
 

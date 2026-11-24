@@ -1,4 +1,4 @@
-<!-- gov:kit loop@1.9 -->
+<!-- gov:kit loop@1.10 -->
 # loop — the loop's definition: the gov steps, and where each workflow sits in them
 
 A governed build runs one loop: Plan, Design, Build, Test, Deploy. This kit is where that loop is
@@ -63,6 +63,42 @@ disposition`. It carries one word, and which words are legal is the disposed ite
 row declaring `outcomes = "dispositions"` takes the set above, and any other row lists its own, such
 as `ratified` and `rejected`. `check_disposition_record` is that join. It answers `None` for an item
 the definition does not declare, which a caller prints as `unarmed`.
+
+## The mail kinds
+
+`[mail]` holds the mailbox's one closed kind set (KICK-dKeptSession-5 S3), the words a message's `kind`
+may be: `confirm-request`, `confirmed`, `changed`, `overlap`, `takeover`, `landed`, `question`,
+`answer`, `ack`, `intake`, `withdrawn` and `superseded`. `check_loop` grades its `kinds` where the table
+is present as it grades the disposition set: an empty list, a word given twice or one outside a tag
+segment's shape refuses the definition. `read_mail_kinds` returns the members, LoopError where the
+table is absent, and `loop_lib.py --mail-kinds` prints one per line, exit 0, or `loop: <why>`, exit 1.
+The unattended kit's `--mail post` runs that verb and refuses any other kind before it writes; the
+`mail-kinds-repeated` plant holds the grade. An `answer` or an `ack` is a reply: it decides another
+message's state and never waits itself.
+
+## The attendance rows
+
+`[[attendance]]` declares what each value of the `attendance` policy key adds (KICK-dKeptSession-17),
+one row per value, its keys exactly `value` and `adds`: `unattended` adds nothing; `announce` adds
+`announce` and `ask-live`; `confirm-steps` adds those and `confirm-step-exit`; `confirm-acts` adds those
+and `confirm-before-act`. Every member is one of `ATTENDANCE_INTERACTIONS`, the closed set of the
+owner's interactions typed in `loop_lib.py` and never in the definition, so a definition cannot widen
+what attendance may do: no member names an item, an actor, the driver or a binding.
+`check_attendance_rows` prints one `loop: attendance <value> · adds <members|none>` line per row and
+refuses a table that is no array of tables, a row with no value, a key but `value` and `adds`, an
+`adds` that is no list of strings, a member outside the set and a value given twice; `--check` runs it
+after the probe lines. `read_attendance` returns `{value: adds}` once the rows hold.
+
+`breakpoints.py` reads the key beside `autonomy` and hands the rows and the role items' tags to
+`derive_breakpoints`: `confirm-step-exit` places an owner gate at each step's `exit` item and
+`confirm-before-act` one before each item whose actor is a role, cause `attendance`, a position
+`autonomy` already gates keeping its gate, and a value no row declares refuses the list. Each gate is
+held until the owner's disposition record of its tag, as every owner gate is. Under an attended value
+`list` ends with `breakpoints: attendance · <value> · adds <members>`, naming `announce` a stand-in for
+dWellOiledMachine and `ask-live` one for dFurnishedOrders, whose builds change their entries in
+`ATTENDANCE_INTERACTIONS` when they land the mechanism. The plants `attendance-actor`,
+`attendance-member` and `attendance-twice` of `loop_lib.py`, and `attendance-values`,
+`attendance-missing` and `attendance-plan` of `breakpoints.py`, hold both halves.
 
 ## The item programs
 
@@ -275,12 +311,25 @@ a row item that is no tag or resolves to neither an `[[item]]` row nor a stand-i
 its item's set, a disposition outside the set, and a stale or mis-owned stand-in. It joins every
 cross-step route, an outcome routed to `transition` or to an item of another step, with the build
 table both ways, an owed row standing for a row another unit writes and refused once a row covers it,
-and each step's exit to a build row out of its state. Both verbs exit 2 where the definition does not
+and each step's exit to a build row out of its state. It joins the build rows from `none` with the
+claim's `FIRST_MOVES`, each disposition a claim admits and its first move, through `check_entry_rows`
+(KICK-dKeptSession-18): forward, each disposition is a member of `[dispositions]` and exactly one row
+fires its first move, the row's `disposition`, where it carries one, being that disposition; backward,
+every build row from `none` fires a first move. It prints `loop: entry rows · new → planning · patch →
+designing · repeat → designing`, each `to` read from the rows, `?` where no single row fires a
+disposition, and each refusal opens `entry rows · `; `claim.py` is imported inside
+`check_transition_tables`, and an import that fails is one refusal, never a pass. The row's `to` is
+not judged: the table's source rows decide it. A `repeat` names its playbook by a repo-relative path
+until the playbook record kind lands. Both verbs exit 2 where the definition does not
 read or holds no transition row. `--fixture --plant <case>` runs `check` with one break of `PLANTS`
 made in memory by `write_table_plant`: `bad-state`, `two-rows`, `bad-exit`, `dropped-row`,
 `unrouted-row`, `owed-stale`, `stand-in`, `terminal-from` (a build row leaving landed),
 `terminal-open` (landed appended to the build's open states), `unit-terminal-from` (a unit row from
-`@open`, which holds deployed) and `level-no-terminal` (`unit-terminal` taken out of `[states]`). `check --selftest` runs `check`, every
+`@open`, which holds deployed), `level-no-terminal` (`unit-terminal` taken out of `[states]`),
+`entry-row-missing` (the build row from `none` carrying `repeat` taken out), `entry-set-missing`
+(`repeat` taken out of `[dispositions]`), `entry-row-extra` (a build row from `none` on
+`item.entry.claim`'s `claimed` carrying `ask`) and `entry-row-twice` (the `repeat` row appended a second
+time). `check --selftest` runs `check`, every
 plant, each kind of move and direction, and `direction-order`, the shipped rows with building's and
 testing's orders swapped, through `run_selftest_cases`, the case loop `loop_checklist.py` shares,
 and is the kit's `loop transition tables` gate leg.
@@ -376,21 +425,110 @@ The trailer is the source. The log record is the memory-tree kit's typed `transi
 through its `write_record` under the lowest unit id a spec H1 under the build defines; a move made
 before the build's first spec writes none, and the next move after it back-fills one per earlier
 trailer. The micro-format line is printed, never stored, by `render_transition_line` from
-`TRANSITION_LINE`, and the charter's micro-format block defines it. An extension field's name is one of
+`TRANSITION_LINE`, and the charter's micro-format block defines it, the owner's progress line
+`PROGRESS_LINE` defined beside it. An extension field's name is one of
 `TRANSITION_FIELDS`, which holds `stand-in`, written where the item has a `[[stand-in]]` row,
 `composition`, the pin the writer derives on every move and refuses from a `--field` (`composition.py`),
 and `scenario` and `scenario-settled`, the build's scenarios and any conflict settled between them, which
 the writer derives through `scenario.py`'s `derive_move_scenarios` and refuses from a `--field` too, and
 `budget` and `draw`, `BUDGET_FIELDS`, a move's rework budget rows, which the writer derives through
 `budget.py`'s `render_budget_fields` where a set without `log` leaves the build no record, and refuses
-from a `--field` as well.
+from a `--field` as well, and `disposed`, the mail the move disposed, derived and refused as they are.
+
+**The mail guard** (KICK-dKeptSession-5 S9, S10). After the set is read and before `derive_move`, the
+writer runs the unattended kit's `--mail read <slug>` once, `read_mail_rows`, under
+`MAIL_GUARD_SECONDS`, its bash the inline resolver's. The acks follow the computed move
+(KICK-dKeptSession-79 S2): `derive_move`, the patch hold, the witness checks, the field loop, the tree
+verdict, the stand-in, the composition, the disposal over the read's rows, `derive_move_scenarios`, the
+VALUE check and the staged-index check all run first, each reading and refusing and writing nothing,
+so a move refused by any of them posts no ack. Only then, over that one read, does the move acknowledge each
+notice it has consumed, `write_consumed_acks` (KICK-dKeptSession-42): every open `landed`, `superseded`
+or `withdrawn`, and per parent holding an open `confirmed` or `changed` of subject `interfaces
+<parent>`, one `check_parent_interfaces` call, whose `interface — current <id>` line consumes that row
+and every such row of the parent it supersedes, one whose `content-key` equals the current row's or
+which `derive_mail_chain` places before it (KICK-dKeptSession-53): the chain is placed over every
+message the parent wrote, a row preceding a later `seq` on its ref and, through the `after` of the ref's
+`seq` 1 row, every row of the session it took over, transitively, never by `first-seen` or arrival, and
+a row the chain places after the current one or cannot place stays open. To order a parent's notices
+the move also reads every message that parent wrote, with the unattended kit's `--mail read <parent>
+--local --sent`, from the copy its first read fetched (KICK-dKeptSession-61), so a take-over naming its
+predecessor's message to another dependent still places it, while the ids acknowledged stay the rows of
+the build's own read; a chain read that does not answer prints `mail — interfaces <parent> unread ·
+<why>` and acknowledges nothing from that parent. The acks are all or nothing
+(KICK-dKeptSession-55): the consumed ids are computed first, posting nothing, and posted only where every
+`open` row of the read is consumed; otherwise none is posted and the refusal names every open row, so a
+consumed `withdrawn` beside an open `question` stays open and is never acknowledged unread. The
+consumed ids are posted in one call of the
+unattended kit's `--mail ack <slug> <id> [<id> ...]` through `breakpoints.py`'s `run_sourced`, which
+lands every ack in one ref update or none (KICK-dKeptSession-62), a posted call printing `mail — acked
+<kind> <id> from build:<parent>` per id on stderr as it happens, so a move refused after the acks
+still shows it, a failed call `mail — ack not posted <id> · rc <n|->` there per id, and a check
+that does not read `mail — interfaces <parent> unread · <why>`. A `question`, `intake` or `overlap` is
+never acknowledged, nor a `confirmed` or `changed` the check neither names nor finds superseded. A row
+still reading `open`, a message addressed to the
+build or one of its units neither answered, acknowledged nor past its deadline, raises `MailHeld`, a
+`TransitionRefused` printed `refused — <slug> · mail open <id> …`, exit 1, writing nothing; where every
+row it holds is one whose owed ack was refused, for no `CLAUDE_CODE_SESSION_ID` or an origin out of
+reach, `write_consumed_acks` has recorded each ack's own cause and the refusal names it instead,
+`refused — <slug> · mail ack not posted: <id> · <the ack's first line>`, one per row joined by `; `
+(KICK-dKeptSession-56 S32); a row
+acknowledged here is disposed by the build's next move; `claim.py`
+catches it before a row miss and prints `claim held`. A message this node first saw more than its
+`deadline` hours ago reads `expired` (KICK-dKeptSession-24) and holds nothing. `mail — off`, no unattended kit, or a repository with no
+`.unattended.conf` pass with one `loop: mail · unarmed · <why>` line; a driver no bash sees, a read
+silent within the bound, or a non-zero read with no row is `mail unknown`, exit 2. Past the guard each
+`answered`, `acked` or `expired` row no earlier move names is written into `disposed=<id>+<id>`, and
+where the set holds `log`, `write_mail_records` writes one `mailbox-message` record per id, its fields
+and its body in one `~~~~` block, after the move's own record and in its commit.
+
+**The notices** (KICK-dKeptSession-7 S4, S9). On a move from designing to building, after the card
+follow, `write_dependency_notices` posts the build's frozen interfaces to each build
+`loop_transition.py dependents --build <slug>` lists, every one the "Child builds" line of the build's
+own README's rendered `<!-- gen:build-edges -->` region names, the memory-tree kit's inversion of
+`parents:` read by its `GEN_REGIONS` markers (KICK-dKeptSession-44 S20), so a dependent opened after
+that README's last `gen_build_index.py --write` is not notified until the next render: the unattended kit's `--mail post` of kind `confirmed`,
+subject `interfaces <slug>`, its interface `derive_interface_listing`'s bytes of `git ls-tree -r` over
+the build's `spec/` folder at the transition commit (HEAD where the set makes none), its body that
+commit's sha and `--pass <n>`, `<n>` the Design-exit ordinal, one plus the moves from designing to
+building in the `read_transitions` result `write_transition` already holds (KICK-dKeptSession-35), so
+a later exit is a new message rather than a duplicate the mailbox refuses; `changed` where
+`read_mail_rows` over the dependent already holds a `confirmed` of that subject from the build. A
+dependent whose mailbox does not read gets nothing and one `loop: notice · unread · <dependent> · <why>`
+line; a failed post prints its line and, where it exits non-zero, `notice — not posted <kind> to
+build:<dependent> · rc <n> · <its first line>`; neither fails the move. A refused or lost notice is
+posted again (KICK-dKeptSession-56 S33): every other move after a Design exit calls
+`write_dependency_notices` with `repost=True` over the latest exit's commit and ordinal, and per
+dependent runs the unattended kit's `check_interface_notice <dependent> "interfaces <slug>" <listing>`
+through `run_sourced` first, posting that exit's notice again only on its exit 1, `unconfirmed`; exit 2
+or a raise prints the `unread` line, and a dependent holding the current interface is never posted to
+again. The unattended kit's
+`--landed` posts `landed` to the same list with `--pass <sha8>`, the landed sha's first eight hex, and
+the same `notice — not posted` line for a refused post; a refused `landed` is posted again by running
+`--landed <slug>` again, whose recorded exit posts once more, a notice already on the ref refusing as a
+duplicate by its content-derived id. The position engine's dependency gate
+reads the notices back through `check_parent_interfaces`, the confirmation that lets a dependent's Build
+run under `deps.early-build`'s default.
+
+**The progress** (KICK-dKeptSession-11). The policy key `notify.owner`, read in process at HEAD by
+`read_policy_value`, the read `read_record_channels` makes of `transitions.record`, picks the events the
+owner hears of as `progress — <slug> · <event> · <detail>`, `PROGRESS_LINE`, which
+`render_progress_line` alone fills. `NOTIFY_OWNER_EVENTS` maps `turn-micro-formats`, the default, to no
+event, `park-and-landing` to `park` and `landing`, `every-transition` to those and `transition`, and
+`park-only` to `park`; `derive_owner_events` reads it. No value pushes anything. `loop_transition.py
+progress --build <slug> --event <e> --detail <text>` prints the line where the value selects the event,
+nothing otherwise, exit 0; an event outside the three is refused before any read, exit 2. `record`
+reads the key once beside the set and, where it selects `transition`, appends the move's line, detail
+`<from> → <to> · <item tag>`, after every other order line; a key that does not resolve is one `loop:
+progress · unread · <why>` line there and never refuses the move. The unattended kit's `--park` and
+`--landed` run the verb at a park that wrote and at each landing.
 
 `record` (`write_transition`) answers the move by `derive_move` first, so a move no row holds prints
 `refused` and writes nothing; it resolves the witness to HEAD or its ancestor, refuses a staged index,
 and commits the records, or an empty commit, as `loop transition(<slug>): <from> -> <to>` with the
 trailer where selected. `check` (`check_transition_channels`) holds each record to its trailer field by
 field, names a record no trailer backs, prints `pending` while moves wait on the first spec and
-`unstored` where the set stores nothing, and holds the definition in `AGENTS.md` to `TRANSITION_LINE`.
+`unstored` where the set stores nothing, and holds the two definitions in `AGENTS.md` to `TRANSITION_LINE`
+and `PROGRESS_LINE`, each found by its head word (`check_line_definition`).
 `read_transitions(build, repo)` returns the build's moves newest first, each with its `direction`
 derived on read by `derive_direction` over this kit's definition. A backward move goes through the same
 writer, channels and fields as a forward one, and `record` prints its direction on its
@@ -400,12 +538,66 @@ kit takes no edge to it. `--fixture --plant <case>` runs both over a scratch rep
 `subset-trailer-line`, `subset-log`, `empty-set`, `log-drift`, `orphan-log`, `no-row`, `line-drift`,
 `pre-spec`, `field`, and the two over `BACKWARD_MOVES`, three moves forward and three back:
 `backward-rows`, printing each trailer and read with its direction, and `skip-backward`, the newest
-record deleted so the check names the move back owing it. `check --selftest` holds the tree's own definition, then runs every plant, and
-is gov's `loop transition record` leg.
+record deleted so the check names the move back owing it; `descope-spent`, the move back refused on
+a spent rework budget, then a descope; `mail-open` and `mail-disposed`, the
+driver's conf and a bare remote holding an open question, then its `ack`; `mail-expired`, that
+question carrying `deadline: 30`, first sighted 31 hours ago (PINNED) and never answered, disposed as
+`expired` (KICK-dKeptSession-24); and the three over the
+guard's launch, each rebinding the name the guard imports inside its function and restoring it:
+`mail-argv`, the mailbox read's argv recorded and held to the located driver and `resolve_bash`'s
+bash, `mail-no-driver`, the driver's locator over an empty directory, the move recorded unarmed, and
+`mail-no-bash`, `resolve_bash` answering `None`, the move refused as `mail unknown`; `mail-read-crash`,
+the read exiting 3 with no output, the move refused as `mail unknown` naming that exit, no commit
+(KICK-dKeptSession-44 S29); and `deps-notices`, a dependent naming the build in `parents:` and the
+build's README holding the region `render_edges` renders over it, the move out of Design posting it one `confirmed` keyed
+over the listing at the move's commit and a second exit posting `changed`; `notices-two-dependents`,
+two dependents and three exits from Design, back through B21 between them, each dependent reading one
+`confirmed` and two `changed` whose commits carry `pass:` 1, 2 and 3; and `notices-refused`, the post
+to the first dependent rebound to exit 1, the move still recording and printing its `notice — not
+posted` line; `notices-repeat-key`, one dependent and three exits from Design, the spec edited after
+the first exit alone, so the third repeats the second's listing, kind and key, its pass `3` alone
+telling it apart, and every notice still posted; `notices-reposted`, the Design exit's post to the
+first dependent rebound to exit 2, then B7, no exit, posting that notice again to it alone, each
+dependent then holding one `confirmed` of pass 1 (KICK-dKeptSession-56 S33); and the ten over `write_consumed_acks`, each rebinding the launcher to record every ack
+and restoring it: `acks-landed`, a parent's `landed` acknowledged by the move that records past it;
+`acks-confirmed`, a `confirmed` keyed over the parent's listing at its lease's witness, acknowledged
+over the real chain; `acks-superseded`, `check_parent_interfaces` stood in, a `confirmed` and the later
+`changed` it names current both acknowledged, then another parent's pair under an unconfirmed check
+refusing B5; `acks-failed`, one ack across B4 and B5, then an ack exiting 1 and one raising
+`LookupError`, each on stderr, refusing B7 naming each ack's cause; `acks-no-session`, `acks-landed`'s
+move with `CLAUDE_CODE_SESSION_ID` unset, the real ack refused and B4 refused naming its `no session id`,
+the row still `open` (KICK-dKeptSession-56 S32); `acks-takeover`, a take-over's `changed` naming its
+predecessor in `after`, keyed over the parent's listing and sighted before that predecessor's
+`confirmed`, both acknowledged over the real chain and the chain read the same with their `first-seen`
+swapped; `acks-later-key`, the check stood in naming the take-over's `changed` current and a later
+`changed` pushed onto its ref as `seq` 2, through `placement.py`'s `write_fixture_gov_ref` and its
+`parent`, left open, so B4 posts no ack and is refused naming all three; `acks-withdrawn`, a parent's lone
+`withdrawn` acknowledged by B4, which records, its `mail — acked` line read off stderr;
+`acks-withdrawn-question`, a `withdrawn` beside another parent's open `question`, B4 posting no ack and
+refused naming both, the `withdrawn` read `open` after it; `acks-refused-witness`, `acks-refused-field`
+and `acks-refused-scenario`, `acks-landed`'s `landed`, then B4 refused for `--witness deadbeef`, for
+`--field composition=3f9c2a71`, or for a `ScenarioConflict` that `scenario.derive_move_scenarios`,
+stood in, raises, each recording no ack call, the row read `open` and no ref under
+`refs/gov/mail/tFix/` on the bare remote (KICK-dKeptSession-79 AC3); and `chain-two-dependents`, a parent's session
+posting a `confirmed` to `tFix` and then to `tTwo`, and its take-over a `changed` to each, the first
+naming in `after` the message to `tTwo`, so `tFix`'s own rows cannot place its `confirmed`: `tFix`'s and
+`tTwo`'s B4 each acknowledge both their rows over the chain read of every message the parent wrote, its
+chain line printing that read and `tFix`'s rows alone apart, then that sent read's four rows, each
+`acked`, and `build:fy`'s sent read refused; and the six over `notify.owner`: `notify-micro`,
+`notify-park-landing`, `notify-every` and `notify-park-only`, B4 under that value, `NOTIFY_SETS`
+committing it and `notify-micro` none, then a park and a landing run through `progress`, each printing
+`loop: fixture · progress <n>`, the progress lines the three printed, `notify-shape`, an `AGENTS.md`
+whose progress definition drops ` · <detail>`, owing the check one finding, and
+`notify-composition-unread`, B4 under `every-transition`, then B5 through the pinned branch with
+`composition.write_ended_orders` stood in to answer unread, owing B5's progress line beside its
+`loop: composition · unread` line and no `loop: progress · unread` line, since the progress pair is
+bound as `progress_events` and `progress_unread` (KICK-dKeptSession-79 AC6). `check --selftest` holds the
+tree's own two definitions, then runs every plant, and is gov's `loop transition record` leg.
 
 ```bash
 python <prefix>/loop/loop_transition.py record --build <slug> --from <state> --item <tag> --outcome <o> --witness <sha>
 python <prefix>/loop/loop_transition.py check --build <slug> [--root <path>]
+python <prefix>/loop/loop_transition.py progress --build <slug> --event <event> --detail <text>
 python <prefix>/loop/loop_transition.py --fixture --plant default
 python <prefix>/loop/loop_transition.py check --selftest
 ```
@@ -468,7 +660,12 @@ its directory put first on `sys.path` so its `guard` is never this kit's file of
   kit's minimal guard wherever this kit resolves; the push arm, `--push-range <base>..<tip>`, which
   the pre-push hook runs over a default-branch update; and the expansion rule,
   `check_expansion_value(key, value, points)`, over this definition's `[[selects]]` rows, each a key,
-  a value and the layer point that value needs. The verdict reads its rule from the landed revision:
+  a value and the layer point that value needs, printed by the verb `--expansion`, which judges each
+  `<key>=<toml value>` line on stdin by that rule, prints one `loop-guard: refused · stdin:<n> · <why>`
+  line per refused pair or unreadable line, and exits 2 on any, else 0, so the policy kit's
+  `presets.py load` reaches the rule by subprocess and copies none of it (KICK-dKeptSession-1 S8). One
+  row, `build.closes` = `after-release-verifies` at `point.flow.release`, the release slot the core
+  Flow row declares, is the presets' own. The verdict reads its rule from the landed revision:
   guard-self before the value's rule, the live run's admission before guard-self, a change record for
   every change, then `policy-file.guard`, the minimal guard run as a subprocess for every shape it
   admits. The help page's section "Who may change the policy file" is the user's statement.
@@ -483,6 +680,7 @@ temp directory, this tree's kits found beside this one, and prints each scenario
 ```bash
 python <prefix>/loop/guard.py --staged
 python <prefix>/loop/guard.py --push-range <base>..<tip>
+printf '%s\n' 'build.closes="after-release-verifies"' | python <prefix>/loop/guard.py --expansion
 python <prefix>/loop/guard.py --fixture --plant raise-admitted
 python <prefix>/loop/guard.py --selftest
 python <prefix>/loop/floor.py get guard-self
@@ -578,12 +776,18 @@ next item the first of that step whose witness does not hold and whose needs are
 precedence, `render_next_line` maps it onto `--plan`'s five shapes in `NEXT_SHAPES`, and every claim
 prints with its key and verdict through `claims.py`. The driver's `--plan` prints that line as `next:`
 and `--status` prints the engine's lines after its own; both find the module by `resolve_kit_dir`.
-`--fixture --plant <case>` runs one of `PLANTS` over a scratch repository and bare remote, the last two
-over the unattended driver, and `--selftest` runs every case through `run_selftest_cases`; it is gov's
+`<slug> --mail-interrupts [--local]` (KICK-dKeptSession-10) prints the build's open mail as `interrupt —
+mailbox` lines, `read_mail_interrupts` reading `mailbox.reads` through the policy kit's `resolve` and the
+mailbox through the transition guard's one launch, `read_mail_rows`, with `--local` appended under
+`local`; the kickoff engine's boundary verb runs it after a crossing, and every other call keeps the
+`unarmed` mailbox line.
+`--fixture --plant <case>` runs one of `PLANTS` over a scratch repository and bare remote, the `FX_DRIVER`
+plants over the unattended driver, and `--selftest` runs every case through `run_selftest_cases`; it is gov's
 `loop position fixtures` leg.
 
 ```bash
 python <prefix>/loop/position.py <slug> [--json | --next-line]
+python <prefix>/loop/position.py <slug> --mail-interrupts [--local]
 python <prefix>/loop/position.py --fixture --plant steps
 python <prefix>/loop/position.py --selftest
 ```
@@ -729,8 +933,9 @@ python <prefix>/loop/composition.py --selftest
 ## The scenario kind, `scenario.py`
 
 A build records what kind of work it is, and the flow it runs follows (TOOL-dDeclaredLoop-27). The
-register's `kind.scenario` row names `scenario-schema.toml` as its schema, owner seat 1 and five scalar
-fields, `extends`, `admits`, `entry`, `activates` and `then`; gov's pack is `scenarios.toml`, the
+register's `kind.scenario` row names `scenario-schema.toml` as its schema, owner seat 1 and seven scalar
+fields, `extends`, `admits`, `entry`, `activates`, `then`, `preset` and `overrides`, the last two the
+slot (KICK-dKeptSession-20); gov's pack is `scenarios.toml`, the
 `scenario` namespace's source, holding five rows that activate nothing, and a repository adds its own
 in its overlay. Every read composes through the playbook kit's `compose --kind scenario`, reached by
 `loop_items.read_composition`, and `derive_extended_rows` reads each row through its `extends` chain.
@@ -748,13 +953,25 @@ move leaves giving way (`derive_step_scenarios`). `position.py` reads the newest
 activated item rows at its pin through `read_activated_rows` and lists `scenario=<tags> · <n>
 activated`. `check_scenarios(rows, data, kinds)` holds the rules, the activatable kinds read from the
 register through the playbook kit's `pins.read_row_kinds` and the cycles through `scan_cycles`.
-`select` and `check` are the CLI, and `--fixture --plant <case>` runs one of `PLANTS` over
+
+The slot scopes policy to the builds a scenario places: `preset`, a shipped preset's name, and
+`overrides`, a table from a dotted policy key to its value, each inherited through `extends` whole.
+`check` holds each slotted row to `check_scenario_policy`, which runs the policy kit's `presets.py slot`
+and `presets.py pairs` as subprocesses, so a slot setting a key presets never touch, a value outside its
+key's schema or a value breaking a pair rule is refused. `slots --build <slug> --rev <rev>` prints the
+slot a build reads as JSON: the scenarios its newest move carrying `scenario` names, their slots composed
+in declared order by `derive_slot_policy`, a disagreement settled as `flow.scenario-conflict` says, and
+`null` where no placed row carries one. The policy kit's `get <key> --build <slug>` runs it, and reads
+the slot after the file's own values and before the repository's preset.
+
+`select`, `check` and `slots` are the CLI, and `--fixture --plant <case>` runs one of `PLANTS` over
 `composition.py`'s base with a second build `tFix2`; `check --selftest` is gov's `loop scenario
 fixtures` leg.
 
 ```bash
 python <prefix>/loop/scenario.py select --fact entry=patch
 python <prefix>/loop/scenario.py check
+python <prefix>/loop/scenario.py slots --build <slug> --rev HEAD
 python <prefix>/loop/scenario.py check --selftest
 ```
 
@@ -792,11 +1009,15 @@ own, is not graded. None is listed: the lander's wait on a claim push went with
 
 ## The factories, `factories.py`
 
-Six more kinds of the register take their factory from `factories.py` (TOOL-dDeclaredLoop-6): the
-rows `kind.command`, `kind.policy-key`, `kind.hook`, `kind.role`, `kind.workflow` and `kind.scenario`
-each name one of its subcommands, so `core.py new <kind> <name> ...` runs it; the scenario factory
-appends a gov row to `scenarios.toml` and refuses the name `adopter`, its gate `scenario.py check`
-(TOOL-dDeclaredLoop-27). Each validates its arguments first and exits
+Seven more kinds of the register take their factory from `factories.py` (TOOL-dDeclaredLoop-6): the
+rows `kind.command`, `kind.policy-key`, `kind.preset`, `kind.hook`, `kind.role`, `kind.workflow` and
+`kind.scenario` each name one of its subcommands, so `core.py new <kind> <name> ...` runs it; the
+scenario factory appends a gov row to `scenarios.toml` and refuses the name `adopter`, its gate
+`scenario.py check` (TOOL-dDeclaredLoop-27); the seventh, `preset <name> --from <preset>`, appends a
+`[preset.<name>]` table copying the shipped preset `--from` names to the policy kit's `presets.toml`
+and adds the name to the catalogue's `preset` row's `of`, its gate `PRESET_ARMS`, the policy kit's
+`arm_presets` run in process as the policy key's arms are, and a `--from` naming no preset of the
+store refused before any write (KICK-dKeptSession-1 S6). Each validates its arguments first and exits
 2 on a bad one, before any write; holds every path it writes, and the path a renderer it runs writes,
 through `write_guarded` from `policy_edit.py`, one call per path, nested; and runs the kind's gate as the
 innermost record step, so a red gate puts every byte back and removes every created path, prints the
@@ -808,9 +1029,8 @@ for a policy key, a `[[key]]` row of its catalogue, the mirror left to the calle
 caller's index holding the written files, since it grades tracked fragments only; and the roles kit's
 `check_roles.py`, through its `--write` render, for a role and a workflow, the workflow's loop row also
 graded by `loop_lib.py --check`. A role and a workflow join the two sets the roles kit closes in code,
-`BODY_CEILINGS` and `WORKFLOW_NAMES`, by one anchored insertion each. The preset kind is pending for
-dKeptSession, and the stage kind for TOOL-dDeclaredLoop-25's repository stage. `--fixture --plant
-<case>` runs one of thirteen plants, each factory's instance green and a hand-made one red under the same
+`BODY_CEILINGS` and `WORKFLOW_NAMES`, by one anchored insertion each. The stage kind is pending for
+TOOL-dDeclaredLoop-25's repository stage. `--fixture --plant <case>` runs one of seventeen plants, each factory's instance green and a hand-made one red under the same
 gate plus the restore, in a scratch clone of the working tree the policy kit's `build_source_snapshot`
 builds, and `--selftest` runs `check-commands` and every plant over one such clone through
 `run_selftest_cases`.
@@ -864,6 +1084,8 @@ python <prefix>/loop/factories.py --selftest
 | `resolve_item_declaration(item, roles)` | `{inputs, allowance, returns, source}` of one item row, a role item's absent fields its role's, `source` per field `item`, `role:<slot>`, `pending` or `unarmed` |
 | `check_item_declarations(items, roles, why)` | `(lines, refusals)`: one `loop: item` line per item and the count line, and a refusal per actor, missing field, copy or widened allowance |
 | `derive_item_scope(kit_dir, root, tags, units=None)` | one `loop: scope` line per item, its load set as `load_sets.py derive` lists it, or `unarmed` |
+| `check_attendance_rows(rows)` | `(lines, refusals)`: one `loop: attendance` line per `[[attendance]]` row, and a refusal per row shape that does not hold, a member outside `ATTENDANCE_INTERACTIONS` included |
+| `read_attendance(kit_dir)` | `{value: adds}` of the `[[attendance]]` rows once they hold; `LoopError` naming the first refusal, or a definition declaring no row |
 
 Each refuses a definition that does not hold with `LoopError`, a `ValueError` naming the file and
 the row: the gov steps missing, repeated or out of order; a workflow named twice; an `order` that is
@@ -918,7 +1140,9 @@ drive rows by `order` and pick each role's practices by its reach word.
   loop: items · <n> read · <p> pending · <u> unarmed
   ```
 
-  Each item refusal prints `loop: refused · ...` beside the list's, exit 1. It is the
+  Then one `loop: attendance <value> · adds <members|none>` line per `[[attendance]]` row, before the
+  witness lines. Each item refusal and each attendance refusal prints `loop: refused · ...` beside the
+  list's, exit 1. It is the
   `loop definition` gate leg, and it runs no scope derivation.
 - `python loop_lib.py --scopes` reads and checks the definition as `--check` does, then prints
   `loop: scope <tag> · <derive's item line> · <the tags it lists, or none>` per item. Exit 0, every
@@ -960,7 +1184,10 @@ drive rows by `order` and pick each role's practices by its reach word.
   conf by its literal name, through a module constant or through a local name, each exiting 1 naming
   it; `conf-route-opens-none` and `conf-openers-none` empty the route's body, or every declared
   opener's, each exiting 1 on `opens no conf` or `no conf opener found`; `conf-module-unparsable`
-  adds a definition that does not parse and exits 1 on `derive_conf_constants`' refusal. `CONF_PLANTS`
+  adds a definition that does not parse and exits 1 on `derive_conf_constants`' refusal.
+  `attendance-actor` (the `confirm-acts` attendance row given an `actor` key handing an item to the
+  owner), `attendance-member` (`driver:owner` added to its `adds`) and `attendance-twice` (a second
+  `confirm-acts` row) each exit 1 naming the row. `CONF_PLANTS`
   names the seven cases that read no definition. `PLANTS` names what each breaks. Nothing on disk
   changes but the scratch, which is removed after.
 - `python loop_lib.py --grade-site <site> <entry>...` grades one declaration site, `DOD_CORE` or

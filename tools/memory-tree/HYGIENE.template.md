@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.179 -->
+<!-- gov:kit memory-tree@2.180 -->
 [{{MEMORY_ROOT}}/HYGIENE.md · Level 3 · Read before writing any record, index or id under the memory root; yields to levels 0 to 2]
 # {{MEMORY_ROOT}}/ retention & hygiene
 
@@ -683,11 +683,13 @@ carry it too:
   step, its snapshot, fields `Build`, `Step` and `Ref` and the card's text in one `~~~~` fenced block)
   · `probe-trigger` (a probe opened at an item boundary, fields `Cause`, `Asker`, `Subject`, `At` and
   `Key`) · `probe` (the probe it opened: its pinned head, its `## Method` entries, its run lines and
-  its `Verdict` beside `Judged`, written by the loop kit's `probe.py`). The sixteen after `research`
-  are the typed kinds: each record is named
-  `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
-  joined both ways. An open kind field stops being groupable the first time two authors spell one
-  relation differently.
+  its `Verdict` beside `Judged`, written by the loop kit's `probe.py`) · `mailbox-message` (one
+  mailbox message a build's transition disposed, fields `Id`, `From`, `To`, `Kind`, `Subject`,
+  `Answers`, `State`, `Reply` and `Ref` and its body in one `~~~~` fenced block, written by the loop
+  kit's transition writer). The typed kinds, `TYPED_RECORD_KINDS` in `{{KIT_DIR}}/tree_lib.py`, are
+  those after `research`: each record is named `<date>-build-<unit id>-<kind>-<n>.md` in a build's
+  `build/` folder, and the kind and that name are joined both ways. An open kind field stops being
+  groupable the first time two authors spell one relation differently.
 - `<id>` is family-qualified, so a record can name a spec in ANOTHER build — which real corpora need,
   because one closing review legitimately covers two builds. On a `spec-audit` record dated on or
   after `SPEC_AUDIT_PIN_CUTOFF`, or carrying no date, each id is written `<id>@rev-<N>`, N the

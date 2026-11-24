@@ -40,8 +40,9 @@
  *
  * FAILS OPEN. Unparseable stdin, an unknown tool, or a missing command all exit 0. This is a hygiene
  * rule, not a containment boundary; a security control would have to fail the other way. The THIRD
- * check below, the write gate, is one exception: it fails closed. The role-gate arm is the other,
- * for a payload carrying an `agent_type` only.
+ * check below, the write gate, is one exception: it fails closed. The role-gate arm is a second, for
+ * a payload carrying an `agent_type` only, and the FIFTH check, the actions.free arm, is a third once
+ * it is armed.
  *
  * Protocol: deny = stderr text + exit 2. Allow = print nothing, exit 0. Matches agent-cap.js, which
  * records the choice as version-robust and free of any JSON-schema dependency — with ONE departure,
@@ -155,6 +156,31 @@
  * own wait cmdlets, and they refuse a backgrounded poll too. It stops forgetting, not evasion, and
  * the push-boundary bar is still the guarantee.
  *
+ * THE FIFTH CHECK: `actions.free` (KICK-dKeptSession-8). Every write, commit, push or spawn belongs to
+ * the item in flight. On an Edit, Write, MultiEdit or NotebookEdit the write gate admitted, and on a
+ * Bash or PowerShell call the role-gate arm admitted, `checkFreeAction` reads the `item —` line of the
+ * card file `.claude/orientation-card.md` at the payload's checkout root (`readItemPointer`, one file
+ * read, no spawn). It is armed when that file carries `## pointers`, its `card-owner —` line names the
+ * payload's session and its route names a build; a role agent's payload carries the parent's session
+ * id, so its acts read the parent's pointer. An instance key admits every act. At `item — none` the
+ * policy key `actions.free` decides, read in process by `readPolicyValue`: `read-only-probes`, the
+ * default and what an absent or refused read takes, with a NOTE, admits a `read` alone;
+ * `item-reads-only` admits only a `read` made of the two boundary commands, `position.py` and
+ * `manifest-check.sh` (`BOUNDARY_HEADS`); `recorded-anything` admits every act and appends each one
+ * the default would refuse to `gov-free-actions.log` under the git common dir. The class is
+ * `deriveActClass`'s, strongest first: push, commit, write, spawn, read. No card file, or one with no
+ * `## pointers`, adds no arm and prints nothing; a card with pointers owned by another session or
+ * routing no build admits with one `actions.free unarmed` line, and so does an armed card whose
+ * `item —` line reads `skipped: <why>`, the engine's line when its position read does not answer, the
+ * line `item pointer skipped: <why>` (KICK-dKeptSession-43); armed, a missing `item —` line, any other
+ * line that is neither an instance key nor `none`, which refuses as `item pointer malformed: <line>`,
+ * an unreadable card file and every throw refuse. rule 9 of agent-cap.js runs the same check on
+ * every `Agent` and `Workflow` call. THE CEILING: the class reads the command line as text, so a write,
+ * commit or push made through an interpreter, a script, an alias or the lander passes as a read, and
+ * the push-time leg keeps that guarantee; a hand-edited card file is read like the engine's; between
+ * a commit and the boundary verb's rewrite the pointer still names the item just finished; and a
+ * skipped line disarms the check for as long as the engine prints it, saying so on every call.
+ *
  * THE THIRD EVENT: SUBAGENTSTART (TOOL-aRoutedQuill-4). A subagent inherits the hooks but not the
  * parent's card, so it would meet the write gate blind. Wired by `scratch-guard-subagent.fragment.json`
  * (matcher `*`), a payload whose `hook_event_name` is `SubagentStart` is answered on stdout with
@@ -170,7 +196,7 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.51 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.52 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -617,10 +643,17 @@ const VALUE_FLAG = `(?:${GIT_VALUE_FLAGS.join('|')})`
  * `commit` and not a commit — then the whole token `commit` followed by whitespace or the end.
  * `merge-base`, `commit-tree`, `log --grep commit` and a quoted `commit` never match; `merge` and
  * `push` are deliberately outside the set (the engine's own fast-forward is a `merge --ff-only`).
+ * It is `buildGitShaped('commit')`, the one grammar the actions.free arm's PUSH_SHAPED is built from
+ * too (KICK-dKeptSession-8 S2), so the two cannot drift.
  */
-const COMMIT_SHAPED = new RegExp(
-  `(?:^|[\\s;&|(])git(?:\\s+(?:${VALUE_FLAG}\\s+${VIEW_TOKEN}|(?!${VALUE_FLAG}(?:\\s|$))-${VIEW_TOKEN}))*\\s+commit(?=\\s|$)`
-)
+function buildGitShaped(verb) {
+  return new RegExp(
+    `(?:^|[\\s;&|(])git(?:\\s+(?:${VALUE_FLAG}\\s+${VIEW_TOKEN}|(?!${VALUE_FLAG}(?:\\s|$))-${VIEW_TOKEN}))*\\s+${verb}(?=\\s|$)`
+  )
+}
+const COMMIT_SHAPED = buildGitShaped('commit')
+/** The same grammar with the whole token `push`: a commit message reading `push` is a commit. */
+const PUSH_SHAPED = buildGitShaped('push')
 /** The `authorized-by:` values that exempt a NEW build README — the unattended driver's own set. */
 const ANCHOR_MODES = ['prompt', 'recipe']
 const SENTINEL = 'READY — none yet'
@@ -967,8 +1000,10 @@ function resolveComparableCommon(start) {
  * `## ` heading or READY line, backticks stripped. `{ build, units: [{ unit, spec }] }`, `spec` ''
  * when the line names none. The `- brief:` line is not read here. `lines` is every non-blank line of
  * those sections, the heading included, as the card holds it, each with the unit it names or null —
- * what the subagent context copies.
+ * what the subagent context copies. The unattended kit's mail-notice.js carries the function inline
+ * between the markers (KICK-dKeptSession-62 S21).
  */
+// >>> extract_route_units_js -- canonical copy: the hooks kit's scratch-guard.js (byte-identical; gated)
 function extractRouteUnits(text) {
   let inRoute = false
   let build = ''
@@ -989,6 +1024,7 @@ function extractRouteUnits(text) {
   }
   return { seen, build, units, lines }
 }
+// <<< extract_route_units_js
 
 /** The status header's first cell and its `Tier-<n>` cell: `{ status, tier }`, '(none)' and '' when absent. */
 function readStatusCells(text) {
@@ -1383,6 +1419,24 @@ function checkRedLane(w) {
 }
 
 /**
+ * One policy key of the repository at `top`, read in process (KICK-dKeptSession-8 S5): `{ value }`
+ * from the policy kit's `readPolicy`, the helper agent-cap.js's resolvePolicyHelper names;
+ * `{ absent: true }` where that names no file; `{ refused: <the throw's first line> }` on any throw.
+ * The ONE inline read of a key in this file: the red-fix lane and the actions.free arm each map the
+ * three answers to their own fallback. It never throws.
+ */
+function readPolicyValue(key, top) {
+  const fs = require('fs')
+  try {
+    const helper = require('./agent-cap.js').resolvePolicyHelper()
+    if (!helper || !fs.existsSync(helper)) return { absent: true }
+    return { value: require(helper).readPolicy(key, { repo: top }).value }
+  } catch (e) {
+    return { refused: String((e && e.message) || e).split(/\r?\n/)[0] }
+  }
+}
+
+/**
  * The policy file's arm (TOOL-dDeclaredLoop-2 S10): a deny when `target` is the policy file of the
  * repository at `top`, the path the policy kit's policy-mirror.js exports as POLICY_REL, found through
  * agent-cap.js's resolvePolicyHelper; null otherwise, and null with no policy kit beside the hook. A
@@ -1534,19 +1588,12 @@ function checkRouted(data, env) {
     const reds = readOpenReds(gitDir, top)
     const index = loadRoleIndex(top)
     if (!checkRedLane({ agentType, index, lane: { on: true, why: '' }, reds })) return verdict
-    let lane
-    try {
-      const helper = require('./agent-cap.js').resolvePolicyHelper()
-      if (!helper || !fs.existsSync(helper)) {
-        lane = { on: true, why: 'NOTE — no policy kit resolves beside this hook, so bar.inline-red-fixes reads on' }
-      } else {
-        const v = require(helper).readPolicy('bar.inline-red-fixes', { repo: top }).value
-        lane = v === 'on' ? { on: true, why: '' } : v === 'off' ? { on: false, why: '' }
+    const read = readPolicyValue('bar.inline-red-fixes', top)
+    const v = read.value
+    const lane = read.absent ? { on: true, why: 'NOTE — no policy kit resolves beside this hook, so bar.inline-red-fixes reads on' }
+      : read.refused !== undefined ? { on: false, why: read.refused }
+        : v === 'on' ? { on: true, why: '' } : v === 'off' ? { on: false, why: '' }
           : { on: false, why: `bar.inline-red-fixes reads ${JSON.stringify(v)}, neither on nor off, so the red-fix lane is closed` }
-      }
-    } catch (e) {
-      lane = { on: false, why: String((e && e.message) || e).split(/\r?\n/)[0] }
-    }
     const admit = checkRedLane({ agentType, index, lane, reds })
     if (admit) return admit
     return !lane.on && lane.why ? { deny: `${verdict.deny}${lane.why}\n` } : verdict
@@ -1907,7 +1954,9 @@ function checkRoleGate(cmd, data, env) {
 /** The harness's cap on a hook's additionalContext, in characters (Claude Code's documentation). */
 const ROUTE_CONTEXT_CAP = 10000
 /** The card file the card engine renders into each session tree, ignored by every clone (PLAY-dOrderedCharter-8). */
+// >>> card_file_rel_js -- canonical copy: the hooks kit's scratch-guard.js (byte-identical; gated)
 const CARD_FILE_REL = '.claude/orientation-card.md'
+// <<< card_file_rel_js
 const WRITE_TOOLS_PROSE = 'an Edit, Write, MultiEdit or NotebookEdit'
 
 /**
@@ -2029,6 +2078,214 @@ function renderRouteText(data, top, common, reserve) {
   return out.join('\n')
 }
 
+// ---- the item boundary (KICK-dKeptSession-13 S7) -------------------------------------------------
+
+/**
+ * The item in flight, as the card file at `<top>/` CARD_FILE_REL holds it (KICK-dKeptSession-8 S3):
+ * null when that file is absent (ENOENT), a throw on any other read error, else
+ * `{ owner, build, pointers, item }`. `owner` is the session the first `card-owner —` line names, or
+ * ''; `build` the route's `- build:` (extractRouteUnits); `pointers` whether a `## pointers` heading
+ * stands; `item` the section's first `item —` line, the section ended at the next `## ` heading or the
+ * READY line, parsed into `{ key, at }` for an instance key `<item tag>@<pass>#<8 hex>`, `{ none: true,
+ * at }` for `none`, `{ skipped: <why>, at }` for `skipped: ` and a non-empty why, the card engine's
+ * line when its position read does not answer (KICK-dKeptSession-43), the why running to the line's
+ * last ` · at` tail, `{ malformed: <line>, at }` for any other value, or null with no such line. `at`
+ * is the line's ` · at <hex|unborn>` tail, or null. No spawn: one file read. checkItemBoundary and the
+ * actions.free arm read the line here, and nowhere else.
+ */
+function readItemPointer(top) {
+  const fs = require('fs')
+  const path = require('path')
+  let text
+  try {
+    text = fs.readFileSync(path.join(top, CARD_FILE_REL), 'utf8')
+  } catch (e) {
+    if (e && e.code === 'ENOENT') return null
+    throw e
+  }
+  const lines = text.split(/\r?\n/)
+  const owner = lines.map((l) => /^card-owner — ([A-Za-z0-9][A-Za-z0-9._-]*)(?: · .*)?$/.exec(l)).find(Boolean)
+  let pointers = false
+  let inPointers = false
+  let item = null
+  for (const l of lines) {
+    if (/^## pointers\s*$/.test(l)) { pointers = true; inPointers = true; continue }
+    if (inPointers && (l.startsWith('## ') || l.replace(/^- /, '').startsWith('READY — '))) inPointers = false
+    if (!inPointers || item || !l.startsWith('item — ')) continue
+    const m = / · at ([0-9a-f]+|unborn)$/.exec(l)
+    const value = l.slice('item — '.length, m ? m.index : l.length)
+    const at = m ? m[1] : null
+    const skip = /^skipped: (.+)$/.exec(value)
+    item = /^[^\s@#]+@[^\s@#]+#[0-9a-f]{8}$/.test(value) ? { key: value, at } : value === 'none' ? { none: true, at }
+      : skip && skip[1].trim() ? { skipped: skip[1], at } : { malformed: l, at }
+  }
+  return { owner: owner ? owner[1] : '', build: extractRouteUnits(text).build, pointers, item }
+}
+
+/**
+ * THE ITEM-BOUNDARY STEP, run from `main` after every arm admits a Bash or PowerShell call: what the
+ * call is told, or '' for nothing. It never refuses. THE ONE EVALUATION ORDER:
+ *  1. `agent_type` or `agent_id` present, or a `session_id` that is not id-shaped → '' (the main
+ *     session's step alone)
+ *  2. the payload `cwd`, else `CLAUDE_PROJECT_DIR`, under no `.git` → ''
+ *  3. the tree's card file at CARD_FILE_REL absent or unreadable, its `card-owner —` line naming another
+ *     session, or its route naming no build → '' — the card file is read through readItemPointer, the
+ *     one reader of the `item —` line the actions.free arm shares, and no checker spawned
+ *  4. `<git common dir>/orientation/<sid>.boundary` present → its text, cut to ROUTE_CONTEXT_CAP, is the
+ *     return, and the file is unlinked; then the rows below
+ *  5. readItemPointer's `at`, of the card's first `## pointers` `item —` line, equal to `git rev-parse --short=8 HEAD` → no verb,
+ *     the one git spawn
+ *  6. otherwise the kickoff checker's `--card --boundary` starts DETACHED, `--out` naming that file, run
+ *     by the bash resolveCardBash finds, and the step returns without waiting: the verb's position read
+ *     alone took 7.3 s, so its lines are reported at the next shell call after it finishes (§8 F4)
+ * `checker` overrides the resolved one, for the self-test's stub. WHAT THIS DOES NOT CHECK: a boundary
+ * with no local commit, which the next commit or transition notices; a verb the session's next call
+ * starts while one runs, which derives the same answer, a lost compare-and-swap re-rendering once.
+ */
+function checkItemBoundary(data, env, checker) {
+  const fs = require('fs')
+  const path = require('path')
+  const { spawn, spawnSync } = require('child_process')
+  if (!data || data.agent_type || data.agent_id) return ''
+  const sid = typeof data.session_id === 'string' ? data.session_id : ''
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(sid)) return ''
+  const start = typeof data.cwd === 'string' && data.cwd ? data.cwd : (env && env.CLAUDE_PROJECT_DIR) || ''
+  if (!start) return ''
+  const hit = resolveToplevel(path.resolve(buildNativePath(start)))
+  const common = hit && resolveCommonDir(hit)
+  if (!common) return ''
+  let ptr
+  try { ptr = readItemPointer(hit.toplevel) } catch { return '' }
+  if (!ptr || ptr.owner !== sid) return ''
+  const build = ptr.build
+  if (!/^[A-Za-z0-9]+$/.test(build)) return ''
+  const file = path.join(common, 'orientation', `${sid}.boundary`)
+  let context = ''
+  if (fs.existsSync(file)) {
+    context = fs.readFileSync(file, 'utf8').trim().slice(0, ROUTE_CONTEXT_CAP)
+    fs.unlinkSync(file)
+  }
+  const at = ptr.item ? ptr.item.at : null
+  if (at !== null) {
+    const r = spawnSync('git', ['rev-parse', '--short=8', 'HEAD'], { cwd: hit.toplevel, encoding: 'utf8', timeout: CARD_PATH_BOUND_MS, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true })
+    if (r && r.status === 0 && String(r.stdout || '').trim() === at) return context
+  }
+  const engine = checker === undefined ? resolveKickoffChecker() : checker
+  if (!engine) return context
+  const found = resolveCardBash(engine)
+  if (!found.bash) return context
+  // The file's spelling with forward slashes, the one a bash on every host reads as one path.
+  const args = [engine, '--card', '--boundary', '--build', build, '--session', sid, '--out', file.replace(/\\/g, '/')]
+  if (typeof data.transcript_path === 'string' && data.transcript_path) args.push('--transcript', data.transcript_path.replace(/\\/g, '/'))
+  const child = spawn(found.bash, args, { cwd: hit.toplevel, detached: true, stdio: 'ignore', windowsHide: true })
+  child.on('error', () => {})
+  child.unref()
+  return context
+}
+
+// ---- the actions.free arm (KICK-dKeptSession-8) -------------------------------------------------
+
+/** The heads of the two commands that move a session to its next item: the loop kit's position engine
+ *  (`<slug> --boundary <pointer>`) and the kickoff checker (`--card --boundary`). */
+const BOUNDARY_HEADS = ['position.py', 'manifest-check.sh']
+/** The log of each off-item act `recorded-anything` admits, under the git common dir. */
+const FREE_ACTIONS_LOG = 'gov-free-actions.log'
+
+/**
+ * The act a tool call is, strongest first (S2): `push` where PUSH_SHAPED matches a Bash or PowerShell
+ * command's view, `commit` where COMMIT_SHAPED does, `write` for a WRITE_TOOLS call or a command in
+ * which scanWriteTargets finds a target, `spawn` for an `Agent` or `Workflow` call, else `read`. The
+ * command line is read as text: a write through an interpreter or a script reads `read`.
+ */
+function deriveActClass(data) {
+  const tool = data && data.tool_name
+  if (WRITE_TOOLS.includes(tool)) return 'write'
+  if (tool === 'Agent' || tool === 'Workflow') return 'spawn'
+  if (!TOOLS.includes(tool)) return 'read'
+  const cmd = String((data.tool_input && data.tool_input.command) || '')
+  const view = buildCommandView(cmd)
+  if (PUSH_SHAPED.test(view)) return 'push'
+  if (COMMIT_SHAPED.test(view)) return 'commit'
+  return scanWriteTargets(cmd).length > 0 ? 'write' : 'read'
+}
+
+/**
+ * THE FIFTH CHECK'S ONE EVALUATION ORDER (KICK-dKeptSession-8 S3, S4, S7): null to admit silently,
+ * `{ unarmed }` to admit with that line, `{ deny }` with the refusal's two lines and no hook prefix,
+ * which rule 9 of agent-cap.js prefixes with its own; a `note` rides a deny, or admits alone, when the
+ * value read the default. A throw is the caller's refusal.
+ *  1. no checkout root (resolveRoleRoot over the payload `cwd`, then `CLAUDE_PROJECT_DIR`) → null
+ *  2. readItemPointer: no card file, or no `## pointers` heading → null; a card file that exists and
+ *     does not read throws
+ *  3. a `card-owner —` line naming another session, or none, or a route naming no build → unarmed
+ *  4. ARMED. No `item —` line, or a malformed one → throw, its message `item pointer malformed:
+ *     <line>`; a skipped one → unarmed, `item pointer skipped: <why>` (KICK-dKeptSession-43); an
+ *     instance key → null, under every value
+ *  5. `item — none`: readPolicyValue('actions.free'); absent or refused reads read-only-probes, noted
+ *  6. read-only-probes admits a `read`; item-reads-only admits a `read` whose every simple command's
+ *     head is in BOUNDARY_HEADS; recorded-anything admits every act, appending one line to
+ *     FREE_ACTIONS_LOG for each act read-only-probes would refuse; anything else refuses
+ */
+function checkFreeAction(data, env) {
+  const fs = require('fs')
+  const path = require('path')
+  const top = resolveRoleRoot(typeof data.cwd === 'string' ? data.cwd : '', env)
+  if (!top) return null
+  const ptr = readItemPointer(top)
+  if (!ptr || !ptr.pointers) return null
+  const shown = buildComparablePath(path.join(top, CARD_FILE_REL))
+  const sid = typeof data.session_id === 'string' ? data.session_id : ''
+  if (!ptr.owner || ptr.owner !== sid) return { unarmed: `the card file ${shown} names card-owner ${ptr.owner || '(none)'}, and this call's session is ${sid || '(none)'}` }
+  if (!/^[A-Za-z0-9]+$/.test(ptr.build)) return { unarmed: `the card file ${shown} routes no build` }
+  if (!ptr.item) throw new Error(`the ## pointers of ${shown} carry no item — line`)
+  if (ptr.item.skipped !== undefined) return { unarmed: `item pointer skipped: ${ptr.item.skipped}` }
+  if (ptr.item.malformed !== undefined) throw new Error(`item pointer malformed: ${ptr.item.malformed}`)
+  if (ptr.item.key) return null
+  const read = readPolicyValue('actions.free', top)
+  const value = read.absent || read.refused !== undefined ? 'read-only-probes' : read.value
+  const note = read.absent ? 'NOTE — no policy kit resolves beside this hook, so actions.free reads read-only-probes'
+    : read.refused !== undefined ? `NOTE — actions.free could not be read (${read.refused}), so it reads read-only-probes` : ''
+  const cls = deriveActClass(data)
+  const tool = data.tool_name
+  const off = `this ${tool} ${cls} — the card of ${ptr.build} reads item — none.`
+  const remedy = 'Run the act inside the item that owns it, or file it as an intake.'
+  let admit = false
+  if (value === 'read-only-probes') admit = cls === 'read'
+  else if (value === 'item-reads-only') {
+    const heads = TOOLS.includes(tool) ? scanCommandHeads(String((data.tool_input && data.tool_input.command) || '')) : []
+    admit = cls === 'read' && heads.length > 0 && heads.every((c) => BOUNDARY_HEADS.includes(buildBaseName(c.head)))
+  } else if (value === 'recorded-anything') {
+    if (cls !== 'read') {
+      const hit = resolveToplevel(top)
+      const common = hit && resolveCommonDir(hit)
+      if (!common) throw new Error(`no git common dir resolves at ${buildComparablePath(top)} to hold ${FREE_ACTIONS_LOG}`)
+      fs.appendFileSync(path.join(common, FREE_ACTIONS_LOG), `${new Date().toISOString()} · ${sid} · ${cls} · ${tool} · item none\n`, 'utf8')
+    }
+    admit = true
+  } else {
+    return { deny: `actions.free reads ${JSON.stringify(value)}, none of read-only-probes, item-reads-only and recorded-anything, so it refuses ${off}\nSet the key to one of the three, or run the act inside the item that owns it.\n`, note }
+  }
+  if (admit) return note ? { note } : null
+  return { deny: `actions.free (${value}) refuses ${off}\n${remedy}\n`, note }
+}
+
+/** main's run of the fifth check: prints and exits 2 on a refusal or a throw, else prints its lines and returns. */
+function runFreeAction(data) {
+  let free = null
+  try {
+    free = checkFreeAction(data, process.env)
+  } catch (e) {
+    process.stderr.write(`BLOCKED by scratch-guard: the actions.free arm threw (${(e && e.message) || e}) and fails closed on a ${data.tool_name}.\n`)
+    process.exit(2)
+  }
+  if (free && free.deny) {
+    process.stderr.write(`BLOCKED by scratch-guard: ${free.deny}${free.note ? `${free.note}\n` : ''}`)
+    process.exit(2)
+  }
+  if (free && free.unarmed) process.stderr.write(`scratch-guard: actions.free unarmed — ${free.unarmed}\n`)
+  if (free && free.note) process.stderr.write(`scratch-guard: ${free.note}\n`)
+}
+
 function main() {
   let data
   try {
@@ -2062,6 +2319,8 @@ function main() {
       process.exit(2)
     }
     if (gate && gate.witness) process.stderr.write(`scratch-guard: ${gate.witness}\n`)
+    // The actions.free arm (KICK-dKeptSession-8 S6), once the write gate admitted; armed, it FAILS CLOSED.
+    runFreeAction(data)
     process.exit(0)
   }
   if (!data || !TOOLS.includes(data.tool_name)) process.exit(0)
@@ -2098,8 +2357,9 @@ function main() {
     process.exit(2)
   }
   if (orient && orient.witness) process.stderr.write(`scratch-guard: ${orient.witness}\n`)
-  // The role-gate arm, LAST, and it FAILS CLOSED for a role agent as the write gate does: under a
-  // fail-open catch a defect in it would be a silent off (§8 F5). The main loop is never refused.
+  // The role-gate arm, LAST but for the actions.free arm after it, and it FAILS CLOSED for a role agent
+  // as the write gate does: under a fail-open catch a defect in it would be a silent off (§8 F5). The
+  // main loop is never refused by it; the actions.free arm, once armed, refuses the main loop too.
   let gate = null
   try {
     gate = checkRoleGate(cmd, data, process.env)
@@ -2111,8 +2371,20 @@ function main() {
     process.exit(2)
   }
   if (gate && gate.witness) process.stderr.write(`scratch-guard: ${gate.witness}\n`)
-  process.exit(0)
+  // The actions.free arm (KICK-dKeptSession-8 S6), after the role-gate arm admits and before the
+  // boundary step, so a refused act starts no boundary verb. Armed, it FAILS CLOSED.
+  runFreeAction(data)
+  // The item-boundary step, once every arm above admitted the call (KICK-dKeptSession-13 S7). It NEVER
+  // REFUSES and fails open: a throw prints nothing. Returning rather than exiting lets node flush a piped
+  // stdout, as the SubagentStart branch does.
+  let context = ''
+  try {
+    context = checkItemBoundary(data, process.env)
+  } catch {
+    context = ''
+  }
+  if (context) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext: context } }) + '\n')
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkItemBoundary, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, deriveActClass, readItemPointer, checkFreeAction, buildGitShaped, readPolicyValue }

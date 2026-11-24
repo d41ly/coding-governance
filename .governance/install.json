@@ -1781,6 +1781,18 @@
       "source": "tools/unattended/lib-unattended.sh"
     },
     {
+      "path": "tools/unattended/mail-notice.fragment.json",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/mail-notice.fragment.json"
+    },
+    {
+      "path": "tools/unattended/mail-notice.js",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/mail-notice.js"
+    },
+    {
       "path": "tools/unattended/pass-tree.sh",
       "kit": "unattended",
       "role": "engine",

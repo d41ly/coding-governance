@@ -97,7 +97,9 @@ collected, each only where the template carries it. `{{OVERRIDE_RULE}}` is the s
 holds for the value of `charter.override`, read at the target's landed revision; with no policy kit it is
 `CHARTER_OVERRIDE_DEFAULT`'s sentence and a note says so, and any other refused read refuses the render.
 `{{INSTRUCTION_MAP}}` is `instruction_units.render_instruction_map` over the target's document registry, one
-`- ` line each. `{{PRINCIPLES}}` and `{{DECISION_PRINCIPLES}}` are `principles.toml` beside this engine, one
+`- ` line each, its last the policy kit's preset line. `{{PRESET_SECTION}}`, a derived placeholder whose probe
+is `derive_preset_section`, is that kit's `preset --diff --section`, verbatim (KICK-dKeptSession-3).
+`{{PRINCIPLES}}` and `{{DECISION_PRINCIPLES}}` are `principles.toml` beside this engine, one
 `- P<n> <line>` each: the decision principle, `DECISION_PRINCIPLE`, under the second and every other row under
 the first. A registry that does not read refuses the render naming it.
 
@@ -792,6 +794,22 @@ def derive_role_roster(root: Path, _a: dict, _e: Path | None = None) -> str:
     return ''
 
 
+def derive_preset_section(root: Path, _a: dict, _e: Path | None = None) -> str:
+    """The charter's preset section lines, printed by the policy kit's `preset --diff --section` verb.
+
+    KICK-dKeptSession-3 S3. The policy kit stays the one reader of the policy file: this probe takes the
+    verb's lines through `policy_value.read_preset_diff`, the playbook's one caller of that kit, and
+    substitutes them verbatim, as `derive_role_roster` substitutes the roster. A refused read prints its
+    cause and returns the empty string, so an unanswered miss refuses at `resolve_placeholder_raw` naming
+    the key."""
+    from policy_value import PolicyRefused, read_preset_diff
+    try:
+        return '\n'.join(read_preset_diff(root, '--section'))
+    except PolicyRefused as e:
+        print(f'render-playbook: PRESET_SECTION: {e.line}', file=sys.stderr)
+        return ''
+
+
 def write_fleet_claim(engine_dir: Path, user: str, host: str, projects_root: str,
                       variances: str) -> str:
     """Append a row with the lowest letter the fleet has not used, and return that letter.
@@ -866,6 +884,7 @@ PROBES = {
     'lexicon_conf': derive_lexicon_conf,
     'node_table': derive_node_table,
     'role_roster': derive_role_roster,
+    'preset_section': derive_preset_section,
     'primary_tree': derive_primary_tree,
     'worktree_root': derive_worktree_root,
 }
@@ -2309,25 +2328,60 @@ def build_map_rows(*rows) -> str:
 def check_map_arms(check_arm) -> None:
     """PLAY-dOrderedCharter-4 AC1, AC2: `instruction_units.run_map`, the `map` verb, over a two-row registry
     beside the charter's map section rendered from it; a level line planted past MAP_LINE_BYTES, cut; and
-    held rows planted past MAP_CAP_BYTES, refused whole. The registry is laid out by derive_kit_rel."""
+    held rows planted past MAP_CAP_BYTES, refused whole. The registry is laid out by derive_kit_rel.
+    KICK-dKeptSession-3 AC5, AC8: the map's last line is the policy kit's `preset --diff --line` run in the
+    target, which commits no policy file, the charter section carrying the same line; and with
+    MAP_PRESET_SECONDS set past reach the map still exits 0, its last line the unread one, stderr naming the
+    bound. Where no policy kit answers, those two print `unarmed`."""
+    import contextlib
+    import io
     import tempfile
     iu = load_units_module()
     reg = iu.derive_kit_rel(iu.DOCUMENTS)
     two = build_map_rows(('AGENTS.md', 0, None), ('agents/a.md', 5, None)).replace('doc.fx0', 'doc.charter')
-    with tempfile.TemporaryDirectory() as td:
-        eng, tgt = write_render_target(Path(td), tpl=MAP_TEMPLATE, files={reg: two})
-        lines, rc = iu.run_map(tgt)
-        try:
-            body, _n = render(eng, Path(td), tgt)
-        except Refusal as e:
-            body = f'refused: {e}'
+    was = os.environ.pop('GOV_DEFAULT_BRANCH', None)
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            eng, tgt = write_render_target(Path(td), tpl=MAP_TEMPLATE, files={reg: two})
+            lines, rc = iu.run_map(tgt)
+            try:
+                body, _n = render(eng, Path(td), tgt)
+            except Refusal as e:
+                body = f'refused: {e}'
+            try:
+                kit = resolve_kit_dir('policy', 'policy.py', Path(__file__).resolve().parent)
+            except LookupError as exc:
+                kit, verb = None, f'unarmed: {exc}'
+            else:
+                verb = subprocess.run([sys.executable, str(kit / 'policy.py'), 'preset', '--diff', '--line'], cwd=str(tgt),
+                                      capture_output=True, text=True, encoding='utf-8', errors='replace',
+                                      env={k: v for k, v in os.environ.items() if not k.startswith('GIT_')}).stdout.strip()
+            err = io.StringIO()
+            held, iu.MAP_PRESET_SECONDS = iu.MAP_PRESET_SECONDS, 0.001
+            try:
+                with contextlib.redirect_stderr(err):
+                    slow, slow_rc = iu.run_map(tgt)
+            finally:
+                iu.MAP_PRESET_SECONDS = held
+    finally:
+        if was is not None:
+            os.environ['GOV_DEFAULT_BRANCH'] = was
     said = f'exit {rc}: {lines!r} · charter {body!r}'
     section = [ln[2:] for ln in body.splitlines() if ln.startswith('- ')]
     check_arm(rc == 0 and len(lines) == len(iu.LEVELS) + 3 and lines[0].startswith('[AGENTS.md · Level 0 · ')
               and lines[-1] == '[/AGENTS.md]' and lines[1:-1] == section,
               'the map verb prints the charter section\'s lines in the charter\'s envelope', said)
-    check_arm(lines[-2:-1] == [f'preset — {iu.PRESET_LINE_PENDING}'] and 'policy.py get <key> --explain' in lines[-2],
-              'the map\'s last line is the preset line, pointing at get --explain', said)
+    preset = 'preset — standard (the default) · 0 key(s) differ: policy.py preset --diff'
+    if kit is None:
+        print(f'  unarmed: the map\'s preset line and its bound need a policy kit, and {verb}')
+    else:
+        check_arm(lines[-2:-1] == [preset] and verb == preset and f'- {preset}' in body.splitlines(),
+                  'the map\'s last line is the policy kit\'s preset --diff --line, and the charter carries it',
+                  f'{said} · verb {verb!r}')
+        check_arm(slow_rc == 0 and slow[-2:-1] == [f'preset — {iu.PRESET_LINE_UNREAD}']
+                  and 'instruction-map: preset — unread · ' in err.getvalue() and 'within 0.001s' in err.getvalue(),
+                  'a preset read past MAP_PRESET_SECONDS costs the line, never the map, and says the bound',
+                  f'exit {slow_rc}: {slow!r} · stderr {err.getvalue()!r}')
     long = [(f'runbooks/a-long-runbook-document-number-{n}.md', 4, None) for n in range(6)]
     many = [(f'guides/a-long-held-guide-document-number-{n}.md', 3, f'PLAY-fx-{n} F1') for n in range(9)]
     for rows, what in ((long, 'cut'), (long + many, 'over')):
@@ -2351,6 +2405,72 @@ def check_map_arms(check_arm) -> None:
             lines, rc = iu.run_map(tgt)
         check_arm(rc == 2 and len(lines) == 1 and lines[0].startswith('instruction-map: ') and want in lines[0],
                   f'{what} refuses the map at exit 2 with one line', f'exit {rc}: {lines!r}')
+
+
+PRESET_TEMPLATE = (f'<!-- governance-template: v{TEMPLATE_MAJOR}.0 -->\n\n<!-- kit:policy -->\n'
+                   f'## Policy preset — the posture and its exceptions\n\n{ONE_LINE_OPEN}\n{{{{PRESET_SECTION}}}}\n'
+                   f'{ONE_LINE_CLOSE}\n\n<!-- /kit:policy -->\n')
+PRESET_STRICT = 'preset = "strict"\n\n[hooks]\nbypass = "allowed"\n'
+
+
+def check_preset_arms(check_arm) -> None:
+    """KICK-dKeptSession-3 AC3, AC4: a target committed on `main` with no remote, selecting `roles` and
+    `policy`, its template carrying the preset section and its policy file naming `strict` with one override.
+    `render` over a fixture engine whose registry holds a `policy` entry and whose descriptor the
+    `PRESET_SECTION` row carries the heading and the two lines inside `kit:policy`, the policy kit the one
+    `policy_value.resolve_kit_dir` finds; then, the charter written by `main` and a second override committed,
+    `--check` reds the charter and, re-written, is green listing both keys. Where no policy kit answers, the
+    arms print `unarmed`."""
+    import contextlib
+    import io
+    import tempfile
+    try:
+        resolve_kit_dir('policy', 'policy.py', Path(__file__).resolve().parent)
+    except LookupError as exc:
+        print(f'  unarmed: the charter\'s preset section needs a policy kit, and {exc}')
+        return
+    lines = ['- preset — strict', '- `hooks.bypass` — allowed (strict: refused)']
+    second = '- `leases.expiry-hours` — 12 (strict: 24)'
+    was = os.environ.pop('GOV_DEFAULT_BRANCH', None)
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            eng, tgt = write_render_target(Path(td), kits='["roles", "policy"]', tpl=PRESET_TEMPLATE, policy=PRESET_STRICT)
+            with open(eng / 'playbook.kit.toml', 'a', encoding='utf-8') as f:
+                f.write('\n[[placeholder]]\nkey = "PRESET_SECTION"\nclass = "derived"\nprobe = "preset_section"\n'
+                        'kit = "policy"\n')
+            with open(eng / 'registry.toml', 'a', encoding='utf-8') as f:
+                f.write('\n[[entry]]\nid = "policy"\n')
+            try:
+                body, _n = render(eng, Path(td), tgt)
+            except Refusal as e:
+                body = f'refused: {e}'
+            fenced = body.partition('## Policy preset — the posture and its exceptions')[2]
+            check_arm(all(ln in fenced.splitlines() for ln in lines) and second not in body,
+                      'a kept policy fence carries the preset section\'s heading and the verb\'s lines', f'{body!r}')
+            runs = []
+            for argv in (['--target', str(tgt)], None, ['--target', str(tgt), '--check'],
+                         ['--target', str(tgt)], ['--target', str(tgt), '--check']):
+                if argv is None:   # the second override, committed on main: the landed revision moves
+                    (tgt / '.governance' / 'policy.toml').write_text(PRESET_STRICT + '\n[leases]\nexpiry-hours = 12\n',
+                                                                     encoding='utf-8')
+                    read_git(tgt, 'add', '-A', '--', '.governance/policy.toml')
+                    read_git(tgt, '-c', 'user.name=fx', '-c', 'user.email=fx@example.invalid', '-c',
+                             'commit.gpgsign=false', 'commit', '-qm', 'a second override')
+                    continue
+                out, err = io.StringIO(), io.StringIO()
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                    rc = main(argv)
+                runs.append((rc, out.getvalue() + err.getvalue()))
+            charter = (tgt / 'AGENTS.md').read_text(encoding='utf-8') if (tgt / 'AGENTS.md').is_file() else ''
+    finally:
+        if was is not None:
+            os.environ['GOV_DEFAULT_BRANCH'] = was
+    (w1, _s1), (c1, s1), (w2, _s2), (c2, s2) = runs
+    check_arm(w1 == 0 and c1 != 0 and 'DRIFT' in s1 and 'charter' in s1,
+              'a committed override the written charter does not show reds --check naming the charter',
+              f'write {w1}, check {c1}: {s1!r}')
+    check_arm(w2 == 0 and c2 == 0 and all(ln in charter.splitlines() for ln in (*lines, second)),
+              'the charter re-written lists both keys and --check is green', f'write {w2}, check {c2}: {s2!r} · {charter!r}')
 
 
 def write_memory_fixture(td: Path, policy=None) -> tuple:
@@ -3400,6 +3520,7 @@ def run_selftest() -> int:
     check_practice_arms(check_arm)
     check_override_arms(check_arm)
     check_map_arms(check_arm)
+    check_preset_arms(check_arm)
     check_memory_arms(check_arm)
     check_reference_arms(check_arm)
 
@@ -4098,4 +4219,4 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.48"  # gov:kit playbook-render@1.48
+KIT_PLAYBOOK_RENDER_VERSION = "1.49"  # gov:kit playbook-render@1.49

@@ -29,6 +29,9 @@ Which exception records excuse a core red: any well-formed record a session wrot
 core.exceptions = "owner-only-expiring"
 ```
 
+## `attendance`
+Documented on [help/loop.md](../loop.md).
+
 ## `policy-file.on-invalid`
 Documented on [help/policy.md](../policy.md).
 
@@ -40,8 +43,40 @@ Whether a hook bypass is only recorded or also refused. Under both values each o
 hooks.bypass = "refused"
 ```
 
+## `deps.messaging`
+Documented on [help/loop.md](../loop.md).
+
+## `actions.free`
+Documented on [help/orientation-card.md](../orientation-card.md).
+
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
+
+## `notify.owner`
+<!-- usage: policy:notify.owner 42cdf26c -->
+Which events report the build's progress to the owner as one progress line.
+
+```text
+notify.owner = "park-and-landing"
+```
+
+## `mailbox.reads`
+Documented on [help/loop.md](../loop.md).
+
+## `mailbox.notice`
+Documented on [help/loop.md](../loop.md).
+
+## `mailbox.fetch-seconds`
+Documented on [help/loop.md](../loop.md).
+
+## `context.on-full`
+Documented on [help/orientation-card.md](../orientation-card.md).
+
+## `context.threshold`
+Documented on [help/orientation-card.md](../orientation-card.md).
+
+## `card.pointers`
+Documented on [help/orientation-card.md](../orientation-card.md).
 
 ## `instructions.checks`
 <!-- usage: policy:instructions.checks 24ae9920 -->
@@ -315,12 +350,11 @@ Whether a self-test that opts into the template cache builds each base repositor
 tests.fixture-templates = "per-case"
 ```
 
-## Not yet summarised (226)
+## Not yet summarised (216)
 - `preset`
 - `design.forks`
 - `design.reentry`
 - `autonomy`
-- `attendance`
 - `attendance.scope`
 - `policy-file.guard`
 - `policy-file.proof`
@@ -336,7 +370,6 @@ tests.fixture-templates = "per-case"
 - `leases.offer-seconds`
 - `deps.coordination`
 - `deps.early-build`
-- `deps.messaging`
 - `landing.order`
 - `card.follows`
 - `placement`
@@ -344,7 +377,6 @@ tests.fixture-templates = "per-case"
 - `kickoff.runs`
 - `card.store`
 - `card.snapshot`
-- `actions.free`
 - `resume.partial`
 - `resume.context`
 - `orient.budget`
@@ -394,21 +426,14 @@ tests.fixture-templates = "per-case"
 - `runtime.secret-scan`
 - `plan.ratification`
 - `run.host`
-- `notify.owner`
 - `notify.channel`
 - `notify.owner-items`
 - `run.owner-deadline`
 - `run.on-owner-silence`
 - `run.on-owner-question`
 - `deps.landing`
-- `mailbox.reads`
-- `mailbox.notice`
-- `mailbox.fetch-seconds`
 - `review.follow-up`
 - `prompts.batch`
-- `context.on-full`
-- `context.threshold`
-- `card.pointers`
 - `notices.record`
 - `review.breakpoints`
 - `probe.points`

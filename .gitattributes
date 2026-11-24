@@ -141,6 +141,9 @@ memory/project/instructions-legacy.txt merge=rows
 memory/project/landed-steps.txt merge=rows
 # TOOL-dWitnessedBar-20 S7: the legacy policy homes list, a ledger keyed by conf and key.
 memory/project/legacy-homes.txt merge=rows
+# KICK-dKeptSession-69 S5: the policy kit's two plain-name lists, ledgers keyed by name and by namespace.
+memory/project/unnamed-keys.txt merge=rows
+memory/project/unpurposed-namespaces.txt merge=rows
 # TOOL-dWitnessedBar-24 S13: the portability pack's five populations.
 memory/project/encoding-stdout-sites.txt merge=rows
 memory/project/encoding-js-sites.txt merge=rows

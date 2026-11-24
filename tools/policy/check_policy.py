@@ -38,7 +38,19 @@ the landed revision sets that the helper `policy-mirror.js` and the reader answe
 each report `policy.py lists --check` makes on the legacy-homes list (TOOL-dGroundRules-7), a ledger
 population gov's govkit registry registers at `memory/project/legacy-homes.txt` (TOOL-dWitnessedBar-20);
 in any tree but gov's source tree, as in every install, it prints `policy-check: arm_legacy_homes ·
-not graded · <why>` (TOOL-dGroundRules-17).
+not graded · <why>` (TOOL-dGroundRules-17). `arm_reader_join` grades the shrink-only `unnamed-keys`
+population, the catalogue keys no clause on their owner build's row of the design view names, as
+`policy.py lists --check` does (KICK-dKeptSession-19), a gov-own ledger population at
+`memory/project/unnamed-keys.txt` (KICK-dKeptSession-69); where every `DESIGN_*` key is blank, as in
+every adopter, or the tree is not gov's source tree, it prints `policy-check: arm_reader_join · not
+graded · <why>`. `arm_purposes` grades the catalogue's `[[namespace]]` rows and the shrink-only
+`unpurposed-namespaces` population, the policy namespaces no row purposes, a gov-own ledger
+population at `memory/project/unpurposed-namespaces.txt` (KICK-dKeptSession-69), as
+`memory.map-purpose`'s default `review` says (KICK-dKeptSession-16): a new namespace that declares
+no purpose reds, a listed one prints `policy purposes: <a> awaiting review · <names>`, and any other
+value of the key prints that it is dTotalRecall's to arm and is graded as `review`; in any tree but
+gov's source tree the population is not graded and every unpurposed namespace prints as awaiting
+review.
 
 THE FIXTURE makes one git repository per case under the system temp directory, with a short prefix
 because a long path fails a Windows clone: a copy of this kit's catalogue and list at the kit's own
@@ -66,9 +78,19 @@ read as a value.
 
 `resolution-order` is an outcome case (TOOL-dGroundRules-3), one repository per scenario read at
 `--rev HEAD`: it reds a default read over a key the file sets, an unset key or an absent file that
-refuses or reads anything but the catalogue default with its case's reason, a named preset missing
-from the reason, and a row with no default that prints a value; that row is planted in a copy of
-this kit, never in the tracked catalogue.
+refuses or reads anything but the catalogue default with its case's reason, and a row with no
+default that prints a value; that row is planted in a copy of this kit, never in the tracked
+catalogue. Its preset scenarios (KICK-dKeptSession-2) red a file naming `strict` whose
+`hooks.bypass` reads anything but `refused` from `preset` in `get` and in the mirror, a preset
+winning over the file's own `hooks.bypass`, a declared `[presets.ours]` whose own key or `strict`
+base is not read, and a kit copy carrying `presets.py` and no store that reads a value or escapes
+its refusal. `preset-every-key` reads every key each shipped preset assigns, which must answer its
+preset value from `preset`, every `never` key but `preset`, which must answer as the absent
+file's does, and every derived row the preset leaves unassigned, which must raise the absent file's
+`DerivedDefault` refusal (KICK-dKeptSession-34), in process, one line per preset; any other key the
+preset leaves unassigned reds naming it. `preset-derived-cap` runs `budgets.py resolve --explain`
+for one derived switch cap over an empty file and under `strict`, and reds a value or source the
+two rows do not share, or a mode that is not `warn` and strict's `refuse`.
 
 `on-invalid-classes` and `on-invalid-strict` are outcome cases (TOOL-dGroundRules-4). The first plants
 each failure class of the invalid-file branch in its own repository, and reds a default or the invalid
@@ -88,6 +110,11 @@ and `mirror-absent-refuse` are outcome cases (TOOL-dGroundRules-5): each copies 
 policy-mirror.js and policy-shim.sh into the kit copy, pushes a landed revision L to a bare remote,
 and asserts what the helper, the hooks kit's agent-cap.js and `arm_mirror_landed` answer there.
 `mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in six ladder states.
+`mirror-input-parity` (KICK-dKeptSession-59, KICK-dKeptSession-62) holds policy-mirror.js's `MIRROR_KIT_INPUTS`, each
+name spelled by `derive_kit_rel`, joined with its `MIRROR_LEGACY_INPUTS`, to `derive_mirror_inputs`
+in one join, each list read by its one `const`, `let` or `var` declaration, and stages three plants
+of its own: a header comment spelling a list, a doubled declaration and an absent one
+(KICK-dKeptSession-63).
 `mirror-commit-rewrite` (TOOL-dGroundRules-65) commits the mirror rendered at its parent, rewrites
 that commit with `git commit-tree` as the lander does, and reds a `mirror --check` that is not fresh
 at either commit, or a helper reading the rewrite that leaves the render's `{rev}` unfilled.
@@ -213,6 +240,27 @@ each run's peak overlap. It costs real sessions, so no leg runs it.
 installed scratch adopter and in a clone of the tree under test, with `bar.inline-red-fixes` and
 `pass.fast-legs` each on and off. Its docstring holds the steps and what neither case checks.
 
+`arm_presets` (KICK-dKeptSession-1 S5) grades the shipped preset store beside the kit,
+`presets.check_presets`' findings, then two halves comparing each preset's load, `presets.load_preset`
+through the loop kit's `guard.py --expansion`, with that rule run on each `[[selects]]` pair the preset
+assigns: the by-key half reds a refusal whose key and value no `[[selects]]` row names, the row-named half
+a row-named pair the rule refuses and the load admits; a pair the rule admits is named `presets-core-only ·
+not graded` until TOOL-dDeclaredLoop-101's judgement refuses it, and a loop kit that does not resolve
+announces both halves. Its cases are outcome cases: `presets-complete` plants a cut key, a refused value,
+the default preset off a default and a fifth table on a copy of the store; `presets-derived`
+(KICK-dKeptSession-33) a key on a derived row the store leaves unassigned, a derived default's text as a
+value, a stage key one preset lacks, a literal-default row in the `literal` list and the default preset's
+`review.build` off the member its row's text names for that stage (KICK-dKeptSession-56); `presets-pairs` a broken pair in
+a preset, which the arm and `presets.py check` both red, then `policy.py check` admitting a file whose one
+revision sets a round count past its preset's ceiling, since the pair rules judge the store alone (§8
+F10); `presets-repo` a repository preset admitted and refused; and `presets-core-only` copies this kit,
+the loop kit whole and the playbook kit's `layers.toml`, its core rows stripped of the release slot,
+loads `standard` and `strict` there and reds a load refusing by key or admitting every value. WHAT THEY
+DO NOT CHECK: a core-only install's own refusal of `after-release-verifies`, which the register copy
+stands in for until that ask lands; the four loads over the shipped register, which `policy check`
+grades over the real tree; and a repository file's round count above its ceiling, which the loop kit's
+`review_bounds.py` refuses and its own fixture plants.
+
 Later units add arms to ARMS and cases to CASES.
 """
 import ast
@@ -237,6 +285,7 @@ from pathlib import Path
 sys.dont_write_bytecode = True  # a gate leg leaves no bytecode cache in an adopter's kit dir
 import policy  # noqa: E402  (the module beside this file)
 import budgets  # noqa: E402  (the size caps' module beside this file, TOOL-dGroundRules-9)
+import presets  # noqa: E402  (the named presets' module beside this file, KICK-dKeptSession-1)
 import atexit
 import pathlib
 
@@ -483,9 +532,11 @@ def arm_on_invalid(repo, kit):
 
 MIRROR_FILE = tuple(policy.MIRROR_REL.split("/"))
 # The reader and what `validate` reads beside it: the caps module and its census (TOOL-dGroundRules-9).
-# Every kit copy that runs the reader carries all three.
+# Every kit copy that runs the reader carries all three. A mirror kit copy carries the preset store
+# and its module too: a stale read falls through to the copy's shim, whose reader refuses a file
+# naming a preset with no `presets.py` beside it (KICK-dKeptSession-49 S3).
 READER_FILES = ("policy.py", "budgets.py", budgets.CENSUS)
-MIRROR_KIT_FILES = (*READER_FILES, "policy-mirror.js", "policy-shim.sh")
+MIRROR_KIT_FILES = (*READER_FILES, "policy-mirror.js", "policy-shim.sh", "presets.py", presets.STORE)
 CODE_PATHSPECS = ("*.js", "*.mjs", "*.cjs", "*.py", "*.sh", ".githooks/*")
 MIRROR_REMEDY = "run: python <this kit>/policy.py mirror --write"
 
@@ -617,6 +668,10 @@ READER_SHAPES = (
     # (TOOL-dLandedOwners-2)
     ((".py",),
      re.compile(r"(?<![\w.$])(?=[A-Za-z_][\w.]*\((?P<args>[^()\n]*))")),
+    # the reader CLI's get in an argv list, its key the name of a module constant: [sys.executable,
+    # str(policy), "get", KEY], as history_store.py and template_cache.py read theirs (KICK-dKeptSession-80)
+    ((".py",),
+     re.compile(r"[\"']get[\"'][ \t]*,[ \t]*(?P<args>[A-Za-z_]\w*)")),
 )
 # a module constant: a column-0 line binding one name to one string literal, `KEY = "flow.adapt"`, an
 # optional comment after it; group 1 the name, group 3 the literal's text (TOOL-dLandedOwners-2)
@@ -973,6 +1028,85 @@ def arm_reader_coverage(repo, kit):
             [tuple(f.split(": ", 1)) for f in findings])
 
 
+def arm_reader_join(repo, kit):
+    """The catalogue's reader join (KICK-dKeptSession-19 S5): `policy.check_unnamed_list` over the
+    design `policy.load_design` reads from `repo`, the one grade `policy.py lists --check` makes of
+    the `unnamed-keys` ledger population (KICK-dKeptSession-69 S6). Where the repository's conf leaves
+    every DESIGN_* key blank, as in every adopter, or `policy.check_legacy_graded` does not hold for
+    the population, the list being gov's own and never installed, it grades nothing and says so. A
+    memory-tree kit that does not resolve, or any other DesignRefusal, is the one finding where the
+    population is graded, as `arm_reader_coverage` reds a memory-tree miss, and so is a Refusal of
+    the census or the registration."""
+    rows, bad = load_rows(kit)
+    if bad:
+        return 0, "the catalogue did not parse", [bad]
+    design, miss = None, None
+    try:
+        design = policy.load_design(kit, repo)
+    except LookupError as exc:
+        miss = ("kit.toml", f"requires memory-tree, which does not resolve: {exc}")
+    except ValueError as exc:
+        if policy.check_design_blank(exc):
+            return None, str(exc), []
+        miss = (".memory-tree.conf", str(exc))
+    try:
+        if not policy.check_legacy_graded(repo, kit, policy.UNNAMED_POPULATION):
+            return None, f"{policy.UNNAMED_LIST} · {policy.LEGACY_WITHHELD}", []
+        if miss is not None:
+            return len(rows), "the design was not read", [miss]
+        findings, note = policy.check_unnamed_list(repo, kit, design)
+    except policy.Refusal as exc:
+        return 0, f"population {policy.UNNAMED_POPULATION} was not graded", [(f"{exc.path}:{exc.line}", exc.why)]
+    m = sum(1 for r in rows if r.get("name"))
+    n = m - len(policy.derive_unnamed_keys(rows, design))
+    return m, f"{n} of {m} catalogue key(s) named on their owner's row · population {policy.UNNAMED_POPULATION} · {note}", findings
+
+
+def arm_purposes(repo, kit):
+    """The policy namespaces' purposes (KICK-dKeptSession-16 S5 to S7), graded as `memory.map-purpose`'s
+    default, `review`, says: `policy.check_namespaces` over the catalogue's `[[namespace]]` rows, and
+    `policy.check_unpurposed_list`, the one grade `policy.py lists --check` makes of the
+    `unpurposed-namespaces` ledger population (KICK-dKeptSession-69 S6), so a namespace the list does
+    not carry, or carries above its compare base, reds. The namespaces with no row that the list
+    carries print as one `awaiting review` line and are no finding. Where `policy.check_legacy_graded`
+    does not hold for the population, the list being gov's own and never installed, one `not graded`
+    line prints and every unpurposed namespace prints as awaiting review with no finding; a Refusal of
+    the census or the registration is a finding. The key is read through `policy.resolve` at the
+    landed revision: any value but `review` is dTotalRecall's to arm and prints one line, graded as
+    `review`; a read the reader refuses prints one NOTE line and takes the catalogue default. The
+    population is the derived namespaces, and the arm prints its lines itself, as `arm_cap_census` does."""
+    rows, bad = load_rows(kit)
+    if bad:
+        return 0, "the catalogue did not parse", [bad]
+    purposed = policy.load_namespaces(kit)
+    namespaces = policy.derive_policy_namespaces(rows)
+    findings = policy.check_namespaces(purposed, namespaces)
+    more, note = [], f"not graded · {policy.LEGACY_WITHHELD}"
+    try:
+        if policy.check_legacy_graded(repo, kit, policy.UNPURPOSED_POPULATION):
+            more, note = policy.check_unpurposed_list(repo, kit)
+        else:
+            print(f"policy purposes: {policy.UNPURPOSED_LIST} · {note}")
+    except policy.Refusal as exc:
+        more, note = [(f"{exc.path}:{exc.line}", exc.why)], "not graded · refused"
+    unpurposed = policy.derive_unpurposed(purposed, namespaces)
+    red = {n for n, _why in more}
+    awaiting = [n for n in unpurposed if n not in red]
+    if awaiting:
+        print(f"policy purposes: {len(awaiting)} awaiting review · {', '.join(awaiting)}")
+    key = "memory.map-purpose"
+    try:
+        value = policy.resolve(key, repo).value
+        if value != "review":
+            print(f"policy purposes: {key} {value} is dTotalRecall's to arm; graded as review until it lands")
+    except (policy.Refusal, UnicodeDecodeError) as exc:
+        why = getattr(exc, "why", None) or str(exc)
+        print(f"policy purposes: NOTE - {key} did not read ({why}); graded as review, its catalogue default")
+    n = len(namespaces)
+    return n, (f"{n} namespace(s), {n - len(unpurposed)} purposed, {len(awaiting)} awaiting review"
+               f" · population {policy.UNPURPOSED_POPULATION} · {note}"), findings + more
+
+
 # ---- the size caps (TOOL-dGroundRules-9) --------------------------------------------------------
 
 # A request of the size switch as an enforcer spells it: a verb of budgets.py's CLI, a
@@ -1157,6 +1291,89 @@ def arm_cap_census(repo, kit):
                          f"· {asked} request(s) in {len(files)} tracked code file(s) · {len(lrows)} row(s) of {lrel}"), out
 
 
+# ---- the named presets (KICK-dKeptSession-1) ----------------------------------------------------
+
+LOOP_UNRESOLVED = "not graded · the loop kit does not resolve"
+
+
+def read_selects(loop):
+    """{(key, the value as compact JSON)} of the `[[selects]]` rows of `loop.toml` in the loop kit's
+    directory `loop`; a Refusal naming the file where it does not read."""
+    path = Path(loop) / "loop.toml"
+    try:
+        rows = tomllib.loads(path.read_text(encoding="utf-8")).get("selects") or []
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        raise policy.Refusal(path.as_posix(), 0, f"does not read: {exc}") from None
+    return {(r["key"], policy.render_json(r["value"])) for r in rows if isinstance(r, dict) and "key" in r and "value" in r}
+
+
+def check_preset_loads(store, kit, repo, loader):
+    """-> (the two halves' note, findings) for each shipped preset of `store`: its load by `loader`,
+    `presets.load_preset`'s signature, against the expansion rule run once on the `[[selects]]` pairs it
+    assigns. The by-key half reds a refusal whose key and value no `[[selects]]` row names; the
+    row-named half reds a row-named pair the rule refuses and the load admits, and names the pairs the
+    rule admits, which it cannot grade until TOOL-dDeclaredLoop-101's judgement refuses one. Where the
+    loop kit does not resolve from `kit`, both halves announce and nothing is a finding (§8 F7)."""
+    try:
+        loop = policy.resolve_kit_dir("loop", "guard.py", kit)
+    except LookupError:
+        return f"by-key half {LOOP_UNRESOLVED} · row-named half {LOOP_UNRESOLVED}", []
+    try:
+        named = read_selects(loop)
+    except policy.Refusal as exc:
+        return "the [[selects]] rows did not read", [(f"{exc.path}:{exc.line}", exc.why)]
+    findings, loads, graded, admitted = [], 0, 0, set()
+    for name in store.get("preset") or {}:
+        try:
+            load = loader(name, None, presets=store, here=kit, top=repo)
+        except policy.Refusal as exc:
+            findings.append((f"preset.{name}", f"the load did not answer: {exc.path}:{exc.line} · {exc.why}"))
+            continue
+        loads += 1
+        refused = {(k, policy.render_json(v)) for k, v, _w in load.refusals}
+        findings += [(f"preset.{name} · {k}", f"the load refuses {k} = {policy.render_toml_value(v)}, which no "
+                      f"[[selects]] row names: {why}") for k, v, why in load.refusals if (k, policy.render_json(v)) not in named]
+        pairs = [(policy.render_dotted(k), v) for k, v in load.assignment.items()
+                 if (policy.render_dotted(k), policy.render_json(v)) in named]
+        if not pairs:
+            continue
+        try:
+            rule = {i for i, _w in presets.run_expansion_verb(loop / "guard.py", pairs, repo)[0]}
+        except policy.Refusal as exc:
+            findings.append((f"preset.{name}", f"the expansion rule did not answer: {exc.why}"))
+            continue
+        for i, (k, v) in enumerate(pairs):
+            if i not in rule:
+                admitted.add(policy.render_toml_value(v).strip('"'))
+                continue
+            graded += 1
+            if (k, policy.render_json(v)) not in refused:
+                findings.append((f"preset.{name} · {k}", f"the expansion rule refuses {k} = "
+                                 f"{policy.render_toml_value(v)} and the load admits it"))
+    note = f"by-key half {loads} load(s) · row-named half {graded} refused pair(s) graded"
+    if admitted:
+        note += f" · presets-core-only · not graded · TOOL-dDeclaredLoop-2 S8 admits {', '.join(sorted(admitted))}"
+    return note, findings
+
+
+def arm_presets(repo, kit, loader=presets.load_preset):
+    """The shipped preset store beside `kit` (KICK-dKeptSession-1 S5): `presets.check_presets`' findings,
+    then the two load halves of `check_preset_loads`, the loads run in `repo`. A store that does not
+    read is the one finding; a store holding no preset is a population of 0, a finding."""
+    rows, bad = load_rows(kit)
+    if bad:
+        return 0, "the catalogue did not parse", [bad]
+    try:
+        store = presets.load_presets(kit)
+    except policy.Refusal as exc:
+        return 0, f"{presets.STORE} did not read", [(f"{exc.path}:{exc.line}", exc.why)]
+    findings = presets.check_presets(rows, store)
+    shipped = store.get("preset") if isinstance(store.get("preset"), dict) else {}
+    note, more = check_preset_loads(store, kit, repo, loader) if shipped else ("no load ran", [])
+    n = len(presets.derive_presettable(rows, presets.derive_never(store), presets.derive_literal(store)))
+    return len(shipped), f"{len(shipped)} preset(s), {n} presettable key(s) each · {note}", findings + more
+
+
 # One row per arm: its name, its function (repo, kit) -> (population, why, findings), what a
 # population of 0 means, `finding` or `announce` (TOOL-dGroundRules-21 S5), the choice the README's
 # "Each arm in an adopter" table opens its last column with, and the reason for that choice. Every row
@@ -1181,9 +1398,14 @@ ARMS = [
         why="gov's own list derives rows; with no list, or in an adopter's tree, it is announced"),
     Arm("arm_reader_coverage", arm_reader_coverage, empty="announce",
         why="no owner build landed, or no landed revision, is legal"),
+    Arm("arm_reader_join", arm_reader_join, empty="announce",
+        why="every DESIGN_* key blank, as in every adopter, or the list withheld from installs, is legal"),
     Arm("arm_limits_readers", lambda repo, kit: arm_single_reader(repo, budgets.LIMITS_NAME, kit, "LIMITS_NAME"),
         empty="announce", why="a tree with no tracked code is legal"),
     Arm("arm_cap_census", arm_cap_census, empty="finding", why="the census ships in the kit, so it always has rows"),
+    Arm("arm_presets", arm_presets, empty="finding", why="the presets ship in the kit, so the store always holds them"),
+    Arm("arm_purposes", arm_purposes, empty="finding",
+        why="the catalogue ships in the kit, so its dotted keys always derive a namespace"),
 ]
 ARM = {a.name: a for a in ARMS}
 
@@ -1294,6 +1516,13 @@ def seed_direction_wrong_value(repo, kit, rows):
     write_edit(kit / policy.CATALOGUE, lambda t: set_row_block(
         t, name, lambda b: re.sub(r"^direction = .*$", 'direction = "raise-tightens"', b, flags=re.M)))
     return name, "must be raise-loosens"
+
+
+def seed_namespace_new(repo, kit, rows):
+    """`purposes-new` (KICK-dKeptSession-16 AC1): the planted key opens the namespace `zz`, which no
+    `[[namespace]]` row purposes and the list at the compare base does not carry."""
+    write_edit(kit / policy.CATALOGUE, lambda t: t + render_planted_row(None))
+    return PLANTED.split(".", 1)[0], "declares no purpose"
 
 
 # ---- the adopter's fresh target (TOOL-dGroundRules-16) ------------------------------------------
@@ -1629,12 +1858,13 @@ def remove_gate_runner(desc):
     desc.write_text(text, encoding="utf-8", newline="")
 
 
-def build_install_target(name, ids):
+def build_install_target(name, ids, answers=None):
     """A fresh target ready for the deployer (TOOL-dGroundRules-24, -26): `build_source_snapshot`'s
     clone of the tree under test, and beside it `git init` with a pinned autocrlf and a one-line README,
     over which the snapshot's deployer runs `intake` (TOOL-dGroundRules-34 S22): `ids` as `--kits`,
-    this kit's tool root's name as the `prefix` answer, and one `--answer` per key of
-    `read_deploy_answers`, so `intake` writes `.governance/deploy.toml`, the answers the closure needs
+    this kit's tool root's name as the `prefix` answer, and one `--answer` per key of `answers`,
+    `read_deploy_answers`'s where None, the one override the `intake-preset` case passes
+    (KICK-dKeptSession-4 S4), so `intake` writes `.governance/deploy.toml`, the answers the closure needs
     and its `[gate_runner]` seed, and this builder types no descriptor and no answer list; the seed is
     then stripped (`remove_gate_runner`), and the target committed once, through `run_fixture_git`.
     Prints the snapshot line, with the snapshot's file count and the seconds it took (S27). -> (target, snapshot), which `run_govkit` installs from; the caller removes
@@ -1652,7 +1882,7 @@ def build_install_target(name, ids):
     took = time.monotonic() - began
     t = Path(tempfile.mkdtemp(prefix="pol-"))
     try:
-        answers = read_deploy_answers(top)
+        answers = read_deploy_answers(top) if answers is None else answers
         snap, over = (policy.run_git(s, "rev-parse", "HEAD", "HEAD^") or "? ?").split()
         files = len((policy.run_git(s, "ls-tree", "-r", "HEAD") or "").splitlines())
         print(f"{name}: installing from snapshot {snap[:8]} of the working tree over HEAD {over[:8]} · "
@@ -1747,7 +1977,14 @@ def run_fresh_target(name):
         asserted += 1
         if not verdict.startswith(want):
             wrong.append(f"an Arm planted with population 0 under `{empty}` printed {verdict!r}, not {want!r}")
-    keys = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.render_scaffold(policy.load_catalogue(KIT))), []))
+    # KICK-dKeptSession-4 S4: the installed file carries the `preset` key the install answered, so the
+    # count is the scaffold's under that answer; a failed read is the install's own WRONG below.
+    try:
+        preset = read_deploy_answers(derive_source_top()).get("preset")
+    except RuntimeError:
+        preset = None
+    keys = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.render_scaffold(policy.load_catalogue(KIT),
+                                                                                 preset=preset)), []))
     lines = {"arm_schema": re.compile(rf"0 finding\(s\) · {keys} key\(s\) of "),
              "arm_mirror_readers": re.compile(r"0 finding\(s\) · [1-9][0-9]* tracked code file\(s\)"),
              "arm_reader_coverage": re.compile(r"not graded · "),
@@ -1958,6 +2195,67 @@ def run_legacy_withheld_install(name):
     return print_checks(name, checks)
 
 
+def run_intake_preset(name):
+    """`intake-preset` (KICK-dKeptSession-4 AC1, AC2, AC3): this kit and its `requires` closure, with
+    every `read_deploy_answers` answer but `preset`, must make `build_install_target` raise intake's
+    exit 2 naming the missing `preset` and `Refusing to invent one`. With `preset = "strict"` added, the
+    target's `.governance/deploy.toml` must carry it under `[answers]`, its `[policy]` table only the
+    deployer's two switches; then `apply` through `run_govkit`, the install committed, the line after
+    the policy file's header must be `preset = "strict"`, and the installed `policy.py get hooks.bypass
+    --rev HEAD --explain` must print `refused` on stdout and the strict preset as its source on stderr."""
+    ids, missed = derive_requires_closure([tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))["id"]])
+    checks = [("the selection", "every id resolves in the registry", False, m) for m in missed]
+    t = s = None
+    try:
+        answers = {k: v for k, v in read_deploy_answers(derive_source_top()).items() if k != "preset"}
+        try:
+            made = build_install_target(name, ids, answers=answers)
+            for d in made:
+                remove_repo(d)
+            checks.append(("no preset answer", "intake refuses, exit 2", False, "intake exited 0 and the target was built"))
+        except RuntimeError as exc:
+            said = str(exc)
+            checks.append(("no preset answer", "intake refuses, exit 2, naming the missing preset",
+                           "exited 2" in said and "the selected kits need answer(s) preset" in said
+                           and "Refusing to invent one" in said, said.replace("\n", " · ")))
+        t, s = build_install_target(name, ids, answers=dict(answers, preset="strict"))
+        deploy = tomllib.loads(Path(t, ".governance", "deploy.toml").read_text(encoding="utf-8"))
+        switches = sorted((deploy.get("policy") or {}).keys())
+        checks.append(("preset strict", "deploy.toml's [answers] carries preset = \"strict\", its [policy] only the two switches",
+                       (deploy.get("answers") or {}).get("preset") == "strict"
+                       and switches == ["on_baseline_red", "on_hook_block"],
+                       f"answers.preset {(deploy.get('answers') or {}).get('preset')!r} · [policy] {switches}"))
+        rc, out = run_govkit(s, derive_source_top(), "apply", "--target", t.as_posix(), "--kits", ",".join(ids))
+        checks.append(("preset strict", f"apply --kits {','.join(ids)} exits 0", rc == 0,
+                       f"exit {rc}" + (f" · {out.strip()}" if rc else "")))
+        if rc == 0:
+            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "commit", "-q", "-m", "install the policy kit")
+            lines = Path(t, *POLICY_FILE).read_text(encoding="utf-8").split("\n")
+            first = lines[policy.SCAFFOLD_HEADER.count("\n")] if len(lines) > policy.SCAFFOLD_HEADER.count("\n") else None
+            checks.append(("preset strict", "the line after the policy file's header is preset = \"strict\"",
+                           first == 'preset = "strict"', repr(first)))
+            installed = next((r["path"] for r in read_receipt_rows(t) if r.get("kit") == ids[0]
+                              and str(r.get("path")).endswith("/policy.py")), None)
+            if installed is None:
+                checks.append(("preset strict", "the receipt has the installed policy.py", False, "no such row"))
+            else:
+                env = {k: v for k, v in os.environ.items() if k not in policy.GIT_ENV_LEAKS}
+                p = subprocess.run([sys.executable, (t / installed).as_posix(), "get", "hooks.bypass", "--rev", "HEAD",
+                                    "--explain"], cwd=t, capture_output=True, text=True, encoding="utf-8",
+                                   errors="replace", env=env)
+                checks.append(("preset strict", "get hooks.bypass --rev HEAD --explain reads refused from the preset",
+                               p.stdout.strip() == "refused" and "policy: hooks.bypass · preset · preset strict at " in p.stderr,
+                               f"exit {p.returncode} · stdout {p.stdout.strip()!r} · stderr {p.stderr.strip()!r}"))
+    except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
+        checks.append((name, "the target", False, f"{type(exc).__name__}: {exc}"))
+    finally:
+        for d in (t, s):
+            if d is not None:
+                remove_repo(d)
+    return print_checks(name, checks)
+
+
 def run_census_default_adopter(name):
     """`census-default-adopter` (TOOL-dGroundRules-25 S12): this kit, its `requires` closure and
     `kickoff-manifest` installed by `apply` into the target `build_install_target` makes, with the
@@ -2060,8 +2358,8 @@ def run_arms_empty_target(name):
             said = render_said(out, f"policy-check: {arm} · ")
             checks.append(("the empty target", arm, said.startswith(f"policy-check: {arm} · not graded · "), said))
         rows = policy.load_catalogue(KIT)
-        keys = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.render_scaffold(rows)), []))
-        write_policy(t, policy.render_scaffold(rows))
+        keys = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.render_scaffold(rows, None)), []))
+        write_policy(t, policy.render_scaffold(rows, None))
         _rc, out = run_case_argv(t, [sys.executable, str(KIT / "check_policy.py"), "--repo", t.as_posix()])
         said = render_said(out, "policy-check: arm_schema · ")
         checks.append(("the scaffolded target", f"arm_schema grades the scaffold's {keys} key(s) with no finding",
@@ -2204,18 +2502,22 @@ def run_reader_parsed(name):
 
 def run_resolution_order(name):
     """One repository per case, each read at `--rev HEAD`: a key the file sets and one it does not, an
-    absent file, a file naming `strict` without and with an override, and a copy of this kit whose
-    `budgets.enforce` row carries no default, read where the file does not set the key."""
+    absent file, a file naming `strict` without and with an override of `hooks.bypass`, its mirror, a
+    file declaring `[presets.ours]` over `strict` and naming it, and a copy of this kit carrying
+    `presets.py` and no store, whose `budgets.enforce` row carries no default, read where the file
+    does not set the key and where it names `strict` (KICK-dKeptSession-2)."""
     t = Path(tempfile.mkdtemp(prefix="pol-"))
     try:
         sets = build_reader_repo(t / "sets", '[budgets]\nenforce = "refuse"\n')
         absent = build_reader_repo(t / "absent", None)
         named = build_reader_repo(t / "named", 'preset = "strict"\n')
-        over = build_reader_repo(t / "over", 'preset = "strict"\n\n[budgets]\nenforce = "refuse"\n')
+        over = build_reader_repo(t / "over", 'preset = "strict"\n\n[hooks]\nbypass = "allowed"\n')
+        ours = build_reader_repo(t / "ours", 'preset = "ours"\n\n[presets.ours]\nextends = "strict"\n'
+                                             '"hooks.bypass" = "allowed"\n')
         other = build_reader_repo(t / "other", "[runtime]\nagents-in-flight = 3\n")
         kit = t / "kit"
         kit.mkdir()
-        for f in (*READER_FILES, policy.CATALOGUE):
+        for f in (*READER_FILES, "presets.py", policy.CATALOGUE):  # presets.py and no store, for `preset-store-absent`
             (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
         write_edit(kit / policy.CATALOGUE, lambda text: set_row_block(
             text, "budgets.enforce", lambda b: re.sub(r"^default = .*\n", "", b, flags=re.M)))
@@ -2227,15 +2529,128 @@ def run_resolution_order(name):
                       lambda rc, o, e: rc == 0 and o == "6\n" and " · default · not set in " in e),
             check_get("file-absent", absent, ["budgets.enforce", *get],
                       lambda rc, o, e: rc == 0 and o == "warn\n" and f" · default · {POLICY_REL} is absent at " in e),
-            check_get("preset-named", named, ["budgets.enforce", *get],
-                      lambda rc, o, e: rc == 0 and o == "warn\n" and " · default · " in e
-                      and "preset strict, not applied until dKeptSession" in e),
-            check_get("preset-overridden", over, ["budgets.enforce", *get],
-                      lambda rc, o, e: rc == 0 and o == "refuse\n" and " · file · " in e),
+            check_get("preset-named", named, ["hooks.bypass", *get],
+                      lambda rc, o, e: rc == 0 and o == "refused\n" and " · preset · preset strict at " in e),
+            check_get("preset-named", named, ["--print"], lambda rc, o, e: rc == 0 and json.loads(o)["keys"].get(
+                      "hooks.bypass") == {"reason": "preset strict at {rev}", "source": "preset", "value": "refused"},
+                      verb="mirror"),
+            check_get("preset-overridden", over, ["hooks.bypass", *get],
+                      lambda rc, o, e: rc == 0 and o == "allowed\n" and " · file · " in e),
+            check_get("preset-declared", ours, ["hooks.bypass", *get],
+                      lambda rc, o, e: rc == 0 and o == "allowed\n" and " · preset · preset ours at " in e),
+            check_get("preset-declared", ours, ["leases", *get],
+                      lambda rc, o, e: rc == 0 and o == "refuse\n" and " · preset · preset ours at " in e),
+            check_get("preset-store-absent", named, ["hooks.bypass", "--rev", "HEAD"],
+                      lambda rc, o, e: rc == 2 and not o and len(e.splitlines()) == 1
+                      and e.startswith("policy: refused · ") and presets.STORE in e, kit=kit),
             check_get("no-default", other, ["budgets.enforce", "--rev", "HEAD"],
                       lambda rc, o, e: rc == 2 and not o and "catalogue.toml" in e
                       and "the row budgets.enforce carries no default" in e, kit=kit),
         ]
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def run_preset_every_key(name):
+    """`preset-every-key` (KICK-dKeptSession-2 S3), DA-M10's resolution-order check per shipped preset:
+    one repository whose policy file sets only `preset = "<name>"` per preset of the shipped store,
+    beside one with no policy file, each read once through `policy.read_revision` at HEAD. Every key
+    the preset's assignment holds must read in process through `policy.resolve_read` at its preset
+    value with source `preset`; every `never` key but `preset`, which the file sets, must read what
+    the absent file reads, value and source, or the same refusal, a placeholder or `*` segment read
+    at the concrete segment `fixture`. Its third class (KICK-dKeptSession-34 S2): each row
+    `presets.derive_derived_rows` returns whose concrete key the assignment does not hold, `budgets.*`
+    read at the census's first cap as one quoted segment as `budgets.resolve_caps` spells it, must
+    raise the absent file's `DerivedDefault` refusal, type and reason, never a value or a `preset`
+    source; whether the preset assigns such a row is decided at that concrete key, never by its
+    name. Any other catalogue row whose concrete key the assignment does not hold is a WRONG naming
+    the preset and the key. One line per preset; an empty assignment, an empty `never` list, no
+    unassigned derived row or a store holding no preset is a WRONG, never a pass. WHAT IT DOES NOT
+    CHECK: a placeholder row at any concrete segment but `fixture`, a cap but the census's first, a
+    repository's declared preset, which `resolution-order`'s `preset-declared` reads, and what `get`
+    prints; `preset-derived-cap` reads a derived cap through `budgets.py`."""
+
+    def read_outcome(path, read):
+        try:
+            hit = policy.resolve_read(path, policy.read_catalogue_row(path, read["rows"]), read)
+        except policy.Refusal as exc:
+            return ("refused", type(exc).__name__, exc.path, exc.line, exc.why)
+        return (hit.source, policy.render_json(hit.value))
+
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        store = presets.load_presets(KIT)
+        rows = policy.load_catalogue(KIT)
+        held = presets.derive_never(store)
+        never = [n for n in held if n != presets.PRESET_KEY[0]]
+        paths = [tuple("fixture" if policy.check_pattern_name(s) else s for s in n.split(".")) for n in never]
+        derived = {r["name"] for r in presets.derive_derived_rows(rows, held)}
+        cap = policy.render_json(next(iter(budgets.read_cap_census(t)), "fixture"))  # one quoted segment, as resolve_caps reads it
+        concrete = {r["name"]: policy.parse_key(f"budgets.{cap}") if r["name"] == "budgets.*" else
+                    tuple("fixture" if policy.check_pattern_name(s) else s for s in r["name"].split(".")) for r in rows
+                    if r["name"] not in held}
+        absent = policy.read_revision(build_reader_repo(t / "absent", None), "HEAD")
+        shipped = store.get("preset") if isinstance(store.get("preset"), dict) else {}
+        for preset in shipped:
+            read = policy.read_revision(build_reader_repo(t / preset, f'preset = "{preset}"\n'), "HEAD")
+            assignment = presets.derive_preset_assignment(preset, store, None)
+            wrong = [f"{policy.render_dotted(p)} read {seen}" for p, want in assignment.items()
+                     if (seen := read_outcome(p, read)) != ("preset", policy.render_json(want))]
+            wrong += [f"{policy.render_dotted(p)} read {seen}, the absent file {base}" for p in paths
+                      if (seen := read_outcome(p, read)) != (base := read_outcome(p, absent))]
+            unheld = {n: p for n, p in concrete.items() if p not in assignment}
+            unassigned = [p for n, p in unheld.items() if n in derived]
+            wrong += [f"{policy.render_dotted(p)} read {seen}, the absent file {base}" for p in unassigned
+                      if (seen := read_outcome(p, read)) != (base := read_outcome(p, absent))
+                      or seen[:2] != ("refused", policy.DerivedDefault.__name__)]
+            wrong += [f"preset {preset} leaves {n} unassigned, and it is neither a never key nor a derived row"
+                      for n in unheld if n not in derived]
+            if not assignment or not paths or not unassigned:
+                wrong.append(f"a population of 0: {len(assignment)} assigned key(s), {len(paths)} never key(s), "
+                             f"{len(unassigned)} unassigned derived row(s)")
+            checks.append((preset, f"{len(assignment)} assigned key(s) from the preset, {len(paths)} never key(s) "
+                           f"as the absent file, {len(unassigned)} unassigned derived row(s) refused as the absent file",
+                           not wrong, "; ".join(wrong[:3]) or "every read as wanted"))
+        if not shipped:
+            checks.append(("store", "the shipped presets", False, f"{presets.STORE} holds no [preset.<name>] table"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def run_preset_derived_cap(name):
+    """`preset-derived-cap` (KICK-dKeptSession-34 S3): a derived cap read through the caps module, its
+    one reader, under a preset. Two repositories on `main`, one whose policy file is empty and one
+    whose file is `preset = "strict"`, each running this kit's own `budgets.py resolve --explain
+    <cap>` for the census's first `switch` row that is no family and whose home is not `limits:`. Each
+    must exit 0 with one `<cap>\\t<value>\\t<mode>\\t<source>` row and one `budgets: <cap> ·
+    budgets.enforce is <mode> · <reason>` line, the mode `warn` with no preset and `refuse` under
+    strict, whose `budgets.enforce` is `refuse`; the two rows must carry one value and one source, so
+    the preset writes no value over the cap's derived default. A census holding no such row is a
+    WRONG, never a pass. WHAT IT DOES NOT CHECK: any other cap, preset or pinned cap, and a cap's
+    value where the file or a home sets one."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks, seen = [], {}
+    try:
+        cap = next((c.name for c in budgets.read_cap_census(t).values() if c.cls == "switch" and not c.family
+                    and c.home.partition(":")[0] != "limits"), None)
+        if cap is None:
+            checks.append(("census", "a switch cap that is no family and has no limits: home", False,
+                           f"{budgets.CENSUS} holds none"))
+        for scenario, text, mode in ([] if cap is None else [("empty", "", "warn"), ("strict", 'preset = "strict"\n', "refuse")]):
+            repo = build_reader_repo(t / scenario, text)
+            checks.append(check_run(
+                scenario, f"budgets.py resolve --explain {cap}", [sys.executable, str(KIT / "budgets.py"), "resolve", "--explain", cap],
+                lambda rc, o, e, scenario=scenario, mode=mode: seen.setdefault(scenario, o.rstrip("\n").split("\t")) is not None
+                and rc == 0 and len(o.splitlines()) == 1 and len(seen[scenario]) == 4 and seen[scenario][0] == cap
+                and seen[scenario][2] == mode and len(e.splitlines()) == 1
+                and e.startswith(f"budgets: {cap} · budgets.enforce is {mode} · "), repo))
+        if cap is not None:
+            pair = [seen.get(s, [])[1::2] for s in ("empty", "strict")]
+            checks.append(("strict", "the empty file's value and source", pair[0] == pair[1] and len(pair[0]) == 2,
+                           f"value and source {pair[1]}, the empty file's {pair[0]}"))
     finally:
         remove_repo(t)
     return print_checks(name, checks)
@@ -2335,11 +2750,7 @@ def derive_strict_value(row, cell):
     return next((m for m in members if (m if isinstance(m, str) else policy.render_toml_value(m)) == cell), cell)
 
 
-def check_same_value(a, b):
-    """True when two policy values are one: a set-valued pair compared as a set, else type and value."""
-    if isinstance(a, list) and isinstance(b, list):
-        return {policy.render_json(m) for m in a} == {policy.render_json(m) for m in b}
-    return policy.check_member(a, [b])
+check_same_value = presets.check_same_value  # the one comparison of two policy values, the presets' module's
 
 
 def derive_strict_population(text, rows):
@@ -2565,8 +2976,9 @@ def seed_mirror_direct_reader(repo, kit, rows):
 
 
 def build_landed_repo(rows):
-    """build_repo's fixture with this kit's policy.py, policy-mirror.js and policy-shim.sh copied beside
-    its catalogue and committed with no mirror, its remote moved to a bare repository. -> (repo, kit, bare)."""
+    """build_repo's fixture with this kit's MIRROR_KIT_FILES, the reader, policy-mirror.js, policy-shim.sh
+    and the preset store with its module, copied beside its catalogue and committed with no mirror, its
+    remote moved to a bare repository. -> (repo, kit, bare)."""
     repo, kit = build_repo(rows)
     for f in MIRROR_KIT_FILES:
         (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
@@ -2605,7 +3017,18 @@ def run_mirror_landed(name):
     setting budgets.enforce, b merged --no-ff onto main detached, `mirror --write` over the merge, and
     `commit-tree` over the written tree with parents main and b, pushed as main: at that rewrite
     `mirror --check` is fresh, `arm_mirror_parity` finds nothing, and the helper reads the key from
-    the mirror with no `mirror stale at`. A failed git step is a WRONG naming the step."""
+    the mirror with no `mirror stale at`. `mirror-presets-stale` (KICK-dKeptSession-40): the copy given
+    this kit's store and its module, a policy file naming strict under `last-valid`, its fresh mirror
+    pushed as L, then strict's `hooks.bypass` set to `allowed` in the store alone and pushed: the helper
+    reads the mirror stale and answers `allowed`, and the copy's `mirror --print` records the store
+    under `legacy_blobs`. `mirror-pre-unit-stale` (KICK-dKeptSession-49): a policy file naming strict
+    under `last-valid` and, pushed as L, a mirror rendered at HEAD with the store's key taken out of
+    `legacy_blobs`, as a render before the store joined writes it: the helper reads it stale and
+    answers `refused` with the store unchanged, then `allowed` once strict's `hooks.bypass` is set so
+    in the store alone and pushed. `mirror-legacy-expected` (KICK-dKeptSession-62 S24): the same policy
+    file and, pushed as L, a mirror rendered at HEAD with `.agent-cap.conf`'s key taken out of
+    `legacy_blobs`: the helper reads it stale, never fresh, and answers `refused` through the reader.
+    A failed git step is a WRONG naming the step."""
     rows = policy.load_catalogue(KIT)
     repo, kit, bare = build_landed_repo(rows)
     try:
@@ -2733,6 +3156,80 @@ def run_mirror_landed(name):
             at = run_fixture_git(repo, "rev-parse", "HEAD")[:8]
             checks.append(check_run(at_l, what + " --explain", helper + ["--explain"], lambda rc, o, e: rc == 0
                                     and o == "2\n" and f" · mirror stale at {at}; " in e))
+        elif name == "mirror-presets-stale":
+            # KICK-dKeptSession-40 S2: the preset store a recorded input. The copy carries the store and
+            # its module, MIRROR_KIT_FILES, its policy file names strict, and the mirror is fresh at L;
+            # then a landing that changes strict's hooks.bypass in the store alone.
+            write_policy(repo, 'preset = "strict"\n' + LANDED_POLICY.format(on="last-valid", n=3))
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "-m", "the store, and a policy file naming strict")
+            Path(repo, *MIRROR_FILE).write_bytes(policy.render_mirror(repo, "HEAD"))
+            run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+            run_fixture_git(repo, "commit", "-q", "-m", "the mirror, fresh")
+            run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+            write_edit(kit / presets.STORE, lambda t: set_preset_block(t, "strict", lambda b: re.sub(
+                r'(?m)^"hooks\.bypass" = .*$', '"hooks.bypass" = "allowed"', b)))
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "-m", "a store-only landing")
+            run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+            at = run_fixture_git(repo, "rev-parse", "HEAD")[:8]
+            bypass = ["node", str(kit / "policy-mirror.js"), "get", "hooks.bypass", "--repo", str(repo), "--explain"]
+            checks.append(check_run(at_l, "policy-mirror.js get hooks.bypass --explain", bypass, lambda rc, o, e: rc == 0
+                                    and o == "allowed\n" and f"policy: hooks.bypass · preset · mirror stale at {at}; " in e))
+            # AC3: the render the copy's own CLI prints records the store beside the two legacy inputs;
+            # the line names the recorded inputs, never the render's whole bytes.
+            inputs, recorded = {policy.LEGACY_FANOUT, policy.OVERLAY_REL, policy.derive_kit_rel(presets.STORE)}, []
+            scenario, what, ok, seen = check_run(
+                at_l, "policy.py mirror --print", [sys.executable, str(kit / "policy.py"), "mirror", "--print"],
+                lambda rc, o, e: rc == 0 and not recorded.extend(sorted(json.loads(o).get("legacy_blobs") or {}))
+                and inputs <= set(recorded), cwd=repo)
+            checks.append((scenario, what, ok, seen.split(" · stdout ")[0] + " · legacy_blobs " + ", ".join(recorded)
+                           if recorded else seen))
+        elif name == "mirror-pre-unit-stale":
+            # KICK-dKeptSession-49 S1: the reader takes the inputs it compares from its own code. A
+            # mirror rendered before the store joined its inputs records no store key, so it reads stale
+            # whether or not the store moved; a reader listing the mirror's own keys reads it fresh.
+            write_policy(repo, 'preset = "strict"\n' + LANDED_POLICY.format(on="last-valid", n=3))
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "-m", "a policy file naming strict")
+            doc = json.loads(policy.render_mirror(repo, "HEAD"))
+            del doc["legacy_blobs"][policy.derive_kit_rel(presets.STORE)]
+            Path(repo, *MIRROR_FILE).write_bytes(
+                (json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii"))
+            run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+            run_fixture_git(repo, "commit", "-q", "-m", "a pre-unit mirror, the store's key omitted")
+            run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+            bypass = ["node", str(kit / "policy-mirror.js"), "get", "hooks.bypass", "--repo", str(repo), "--explain"]
+            for store, value in (("the store unchanged", "refused"), ("the store changed", "allowed")):
+                if value == "allowed":
+                    write_edit(kit / presets.STORE, lambda t: set_preset_block(t, "strict", lambda b: re.sub(
+                        r'(?m)^"hooks\.bypass" = .*$', '"hooks.bypass" = "allowed"', b)))
+                    run_fixture_git(repo, "add", "-A")
+                    run_fixture_git(repo, "commit", "-q", "-m", "a store-only landing")
+                    run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+                at = run_fixture_git(repo, "rev-parse", "HEAD")[:8]
+                checks.append(check_run(f"{at_l}, {store}", "policy-mirror.js get hooks.bypass --explain", bypass,
+                                        lambda rc, o, e, value=value, at=at: rc == 0 and o == f"{value}\n"
+                                        and f"policy: hooks.bypass · preset · mirror stale at {at}; " in e))
+        elif name == "mirror-legacy-expected":
+            # KICK-dKeptSession-62 S24: the repository-relative inputs are the reader's own list too. A
+            # mirror whose `legacy_blobs` lacks `.agent-cap.conf` reads stale with nothing changed since its
+            # render; a reader comparing only the keys the mirror records reads it fresh.
+            write_policy(repo, 'preset = "strict"\n' + LANDED_POLICY.format(on="last-valid", n=3))
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "-m", "a policy file naming strict")
+            doc = json.loads(policy.render_mirror(repo, "HEAD"))
+            del doc["legacy_blobs"][policy.LEGACY_FANOUT]
+            Path(repo, *MIRROR_FILE).write_bytes(
+                (json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii"))
+            run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+            run_fixture_git(repo, "commit", "-q", "-m", "a mirror missing its .agent-cap.conf key")
+            run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+            at = run_fixture_git(repo, "rev-parse", "HEAD")[:8]
+            bypass = ["node", str(kit / "policy-mirror.js"), "get", "hooks.bypass", "--repo", str(repo), "--explain"]
+            checks.append(check_run(at_l, "policy-mirror.js get hooks.bypass --explain", bypass,
+                                    lambda rc, o, e: rc == 0 and o == "refused\n"
+                                    and f"policy: hooks.bypass · preset · mirror stale at {at}; " in e))
         elif name == "mirror-shim-exit-one":
             # TOOL-dGroundRules-21 S16: every shim outcome but exit 0 and its own refusal is a PolicyRefusal
             # naming the status, never an undefined value or another throw.
@@ -2775,7 +3272,7 @@ def run_mirror_absent_adopter(name):
     try:
         carried = t / "carried"
         build_reader_repo(carried, None)
-        write_policy(carried, policy.render_scaffold(policy.load_catalogue(KIT)))
+        write_policy(carried, policy.render_scaffold(policy.load_catalogue(KIT), None))
         (t / "bare").mkdir()
         run_fixture_git(t / "bare", "init", "-q")
         for target, repo in (("HEAD carries neither", carried), ("no commit", t / "bare")):
@@ -2836,6 +3333,150 @@ def run_mirror_landed_parity(name):
     finally:
         remove_repo(repo)
         remove_repo(bare)
+    return print_checks(name, checks)
+
+
+def run_mirror_upgrade(name):
+    """`mirror-upgrade` (KICK-dKeptSession-50 S1, S2): a pre-unit mirror, the render at HEAD with the
+    store's key taken out of `legacy_blobs`, committed in `build_landed_repo`'s repository, read by
+    this kit's own adopter with `--target`, each path forward-slashed. First the skipped upgrade, as an
+    update with `GOVKIT_RERENDER=0` exported leaves the mirror unrendered: `adopt-policy.sh --check`
+    must print `arm_mirror_parity` with 1 finding naming `legacy_blobs`. Its exit is 1 whatever the
+    mirror holds, since `arm_legacy_homes` finds gov's list against the scratch tree, so the line is
+    what is read. Then the `[[regenerate]]` row's argv, `adopt-policy.sh --scaffold`, must exit 0
+    printing `kept` and `policy: mirror written`, the written mirror's `legacy_blobs` naming the
+    store, and `policy.py mirror --check` there must print `policy: mirror fresh`."""
+    repo, kit, bare = build_landed_repo(policy.load_catalogue(KIT))
+    adopter = (KIT / "adopt-policy.sh").as_posix()
+    checks = []
+    try:
+        bash = resolve_bash(adopter)
+        if bash is None:
+            return print_checks(name, [(name, "a bash that can see the adopter", False, "none: set GOV_BASH")])
+        store = policy.derive_kit_rel(presets.STORE)
+        doc = json.loads(policy.render_mirror(repo, "HEAD"))
+        del doc["legacy_blobs"][store]
+        Path(repo, *MIRROR_FILE).write_bytes(
+            (json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii"))
+        run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+        run_fixture_git(repo, "commit", "-q", "-m", "a pre-unit mirror, the store's key omitted")
+        # The arm's own line and its first finding line, never the other arms' findings over the scratch tree.
+        wants, said = ("policy-check: arm_mirror_parity · 1 finding(s) · ", "  legacy_blobs: differs from the render at HEAD"), []
+        scenario, what, ok, seen = check_run(
+            "the pre-unit mirror kept", "adopt-policy.sh --check", [bash, adopter, "--check", "--target", repo.as_posix()],
+            lambda rc, o, e: not said.extend(next((ln for ln in o.split("\n") if ln.startswith(w)), "(no line)")
+                                             for w in wants) and rc == 1 and "(no line)" not in said)
+        checks.append((scenario, what, ok, seen.split(" · stdout ")[0] + " · " + " · ".join(s.strip() for s in said)))
+        checks.append(check_run("the pre-unit mirror", "adopt-policy.sh --scaffold", [bash, adopter, "--scaffold",
+                                "--target", repo.as_posix()], lambda rc, o, e: rc == 0 and o.startswith("kept ")
+                                and any(ln.startswith("policy: mirror written") for ln in o.split("\n"))))
+        recorded = sorted(json.loads(Path(repo, *MIRROR_FILE).read_bytes()).get("legacy_blobs") or {})
+        checks.append(("the written mirror", f"legacy_blobs names {store}", store in recorded,
+                       "legacy_blobs " + (", ".join(recorded) or "(none)")))
+        checks.append(check_get("the written mirror", repo, ["--check"], lambda rc, o, e: rc == 0
+                                and o == "policy: mirror fresh\n", kit=KIT, verb="mirror"))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        remove_repo(repo)
+        remove_repo(bare)
+    return print_checks(name, checks)
+
+
+# Each JS list is found by its DECLARATION, a line opening `const`, `let` or `var` (KICK-dKeptSession-63
+# S8), so a header comment spelling a list is neither counted nor graded; the brackets span newlines.
+MIRROR_KIT_INPUTS_RX = re.compile(r"^(?:const|let|var)\s+MIRROR_KIT_INPUTS\s*=\s*(\[[^\]]*\])", re.M)
+MIRROR_LEGACY_INPUTS_RX = re.compile(r"^(?:const|let|var)\s+MIRROR_LEGACY_INPUTS\s*=\s*(\[[^\]]*\])", re.M)
+# A name no input of the kit carries, which the comment plant's declaration adds.
+MIRROR_PLANTED_NAME = "planted-input.toml"
+
+
+def read_mirror_literal(text, const, rx):
+    """`(names, seen)`: the one `<const> = [...]` declaration `rx` takes from policy-mirror.js's
+    `text`, parsed as JSON, or `(None, <why>)` where it is absent, doubled, unparseable or no list of
+    names (KICK-dKeptSession-63 S26: each list must have exactly one declaration)."""
+    found = rx.findall(text)
+    if len(found) != 1:
+        return None, f"policy-mirror.js holds {len(found)} {const} declaration(s), not one"
+    try:
+        names = json.loads(found[0])
+    except ValueError as exc:  # a JSONDecodeError is a ValueError
+        return None, f"policy-mirror.js's {const} did not read: {type(exc).__name__}: {exc}"
+    if not isinstance(names, list) or not all(isinstance(n, str) for n in names):
+        return None, f"policy-mirror.js's {const} literal is no list of names: {found[0]}"
+    return names, ""
+
+
+def check_mirror_inputs(text):
+    """`(ok, seen)` for policy-mirror.js's `text` (KICK-dKeptSession-63 S21): its two lists, each read
+    by its one declaration, held to `policy.derive_mirror_inputs()` in ONE join,
+    `{derive_kit_rel(n) for n in MIRROR_KIT_INPUTS} | set(MIRROR_LEGACY_INPUTS)`, so a legacy name is
+    never spelled by the kit's prefix. A declaration absent, doubled, unparseable or no list of names,
+    or a name `derive_kit_rel` refuses, is not ok; unequal sets name each input on one side only."""
+    kit, why_kit = read_mirror_literal(text, "MIRROR_KIT_INPUTS", MIRROR_KIT_INPUTS_RX)
+    legacy, why_legacy = read_mirror_literal(text, "MIRROR_LEGACY_INPUTS", MIRROR_LEGACY_INPUTS_RX)
+    if kit is None or legacy is None:
+        return False, "; ".join(w for w in (why_kit, why_legacy) if w)
+    try:
+        js = {policy.derive_kit_rel(n) for n in kit} | set(legacy)
+        want = set(policy.derive_mirror_inputs())
+    except policy.Refusal as exc:
+        return False, f"derive_kit_rel refused: {exc}"
+    only = [f"{r} in derive_mirror_inputs alone" for r in sorted(want - js)]
+    only += [f"{r} in the JS lists alone" for r in sorted(js - want)]
+    return not only, "; ".join(only) or f"{len(js)} input(s) on each side: {', '.join(sorted(js)) or '(none)'}"
+
+
+def derive_mirror_plants(text):
+    """`(label, planted text, what its seen must name)` per plant of `mirror-input-parity`'s own arm
+    (KICK-dKeptSession-63 AC8, AC21, AC26), each staged on `text`: a header comment spelling
+    `MIRROR_KIT_INPUTS` as the list stood while the declaration gains MIRROR_PLANTED_NAME, a second
+    `MIRROR_KIT_INPUTS` declaration, and `MIRROR_LEGACY_INPUTS` declared nowhere. A plant whose
+    declaration is absent from `text` stages nothing and is returned as `text` itself."""
+    kit = MIRROR_KIT_INPUTS_RX.search(text)
+    legacy = MIRROR_LEGACY_INPUTS_RX.search(text)
+    plants = []
+    try:
+        names = json.loads(kit[1]) if kit else None
+    except ValueError:
+        names = None
+    if isinstance(names, list):
+        grown = json.dumps([*names, MIRROR_PLANTED_NAME])
+        commented = (f"// MIRROR_KIT_INPUTS = {json.dumps(names)};\n" + text[:kit.start(1)] + grown + text[kit.end(1):])
+        plants.append(("a header comment spelling the list while the declaration holds a second name",
+                       commented, MIRROR_PLANTED_NAME))
+    else:
+        plants.append(("a header comment spelling the list while the declaration holds a second name", text,
+                       MIRROR_PLANTED_NAME))
+    plants.append(("MIRROR_KIT_INPUTS declared twice",
+                   text + (f"\n{kit[0]};\n" if kit else ""), "2 MIRROR_KIT_INPUTS declaration(s)"))
+    plants.append(("MIRROR_LEGACY_INPUTS declared nowhere",
+                   (text[:legacy.start()] + text[legacy.end():]) if legacy else text,
+                   "0 MIRROR_LEGACY_INPUTS declaration(s)"))
+    return plants
+
+
+def run_mirror_input_parity(name):
+    """`mirror-input-parity` (KICK-dKeptSession-59 S1, KICK-dKeptSession-62 S24): this kit's
+    policy-mirror.js, its `MIRROR_KIT_INPUTS` and `MIRROR_LEGACY_INPUTS` each read by its one
+    declaration (KICK-dKeptSession-63 S8, S26) and held together to `policy.derive_mirror_inputs()`
+    read live from the kit's own policy.py, by `check_mirror_inputs`' one join (S21). Beside it the
+    case's own arm: each of `derive_mirror_plants`' texts, staged on the file as read, reds naming
+    what it planted, so a reader grading a comment's literal, a second declaration or an absent one
+    is a WRONG here and never a pass."""
+    try:
+        text = (KIT / "policy-mirror.js").read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        return print_checks(name, [("the JS literals", "policy-mirror.js read", False,
+                                    f"policy-mirror.js did not read: {type(exc).__name__}: {exc}")])
+    ok, seen = check_mirror_inputs(text)
+    checks = [("the kit's two lists", "MIRROR_KIT_INPUTS by derive_kit_rel and MIRROR_LEGACY_INPUTS against "
+               "derive_mirror_inputs", ok, seen)]
+    for label, planted, needle in derive_mirror_plants(text):
+        pok, pseen = check_mirror_inputs(planted)
+        staged = planted != text
+        checks.append(("a planted policy-mirror.js", label, staged and not pok and needle in pseen,
+                       pseen if staged else "the plant did not stage: its declaration is absent"))
     return print_checks(name, checks)
 
 
@@ -3073,7 +3714,7 @@ TREE_KIT = "memory-tree"  # the sibling kit the legacy-homes fixture copies the 
 LEGACY_FACTORY = ("legacy_ledger.py", "coverage_join.py", "backlog.py")  # the memory-tree copy and its two imports
 
 
-def build_legacy_repo(t, gate, house):
+def build_legacy_repo(t, gate, house, also=()):
     """A repository at `t`/r holding a copy of this kit's policy.py, catalogue and summary list at the
     kit's own path; gov's own govkit registry under the copy's tool root, found as
     `derive_registry_tree` finds it from gov's top, so the copy's census answers `source` and its
@@ -3083,7 +3724,8 @@ def build_legacy_repo(t, gate, house):
     where `house`, a house file where the copy resolves HOUSE_HOME. Committed on main and pushed to one
     bare remote, then the copy's `legacy_ledger.py seed --population legacy-homes` runs the
     registration's seed argv against the kit copy and writes the list, committed and pushed, so the
-    landed list is that seed (TOOL-dWitnessedBar-20 §4 "The fixture"). -> the kit copy."""
+    landed list is that seed (TOOL-dWitnessedBar-20 §4 "The fixture"); each population `also` names,
+    gov's registration again, is seeded alike in that commit (KICK-dKeptSession-69 S6). -> the kit copy."""
     repo = t / "r"
     kit = repo / (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
     kit.mkdir(parents=True)
@@ -3113,10 +3755,11 @@ def build_legacy_repo(t, gate, house):
     run_fixture_git(repo, "symbolic-ref", "HEAD", "refs/heads/main")
     run_fixture_git(repo, "remote", "add", FIXTURE_REMOTE, (t / "b.git").as_posix())
     for msg in ("the legacy homes", "the legacy list, seeded"):
-        if msg.endswith("seeded"):  # `lists --write` never creates the list: the factory's seed does
+        for population in (policy.LEGACY_POPULATION, *also) if msg.endswith("seeded") else ():
+            # `lists --write` never creates a list: the factory's seed does
             rc, out = run_case_argv(repo, [sys.executable, str(kit.parent / TREE_KIT / LEGACY_FACTORY[0]),
-                                           "seed", "--population", policy.LEGACY_POPULATION])
-            if rc != 0 or not out.startswith(f"armed {policy.LEGACY_POPULATION} "):
+                                           "seed", "--population", population])
+            if rc != 0 or not out.startswith(f"armed {population} "):
                 raise RuntimeError(f"the seed exited {rc}: {out.strip()}")
         run_fixture_git(repo, "add", "-A")
         run_fixture_git(repo, "commit", "-q", "-m", msg)
@@ -3382,6 +4025,13 @@ RC_CASES = {
                          "other.py": "value = resolve(KEY)\n",
                          "local.py": 'def read_value():\n    key = "fixture.planted"\n    return resolve(key)\n'},
                         RC_KEY, 1),
+    # the CLI's get in an argv list by a module constant, and a list whose name no constant binds
+    "reader-argv": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED",
+                    {"consumer.py": 'KEY = "fixture.planted"\n\n\ndef read_value(policy):\n'
+                                    '    return run([PY, str(policy), "get", KEY])\n'}, None, 1),
+    "argv-unbound": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED",
+                     {"consumer.py": 'def read_value(policy, key):\n    return run([PY, str(policy), "get", key])\n',
+                      "other.py": 'KEY = "fixture.planted"\n'}, RC_KEY, 1),
 }
 
 
@@ -3681,6 +4331,107 @@ def run_reader_declared(name):
             checks.append((f"case {case}: refused", "check_reader_coverage", False, str(exc)))
         finally:
             remove_repo(t)
+    return print_checks(name, checks)
+
+
+# ---- the catalogue's reader join (KICK-dKeptSession-19) -----------------------------------------
+
+RJ_OWNER = "dKeptSession"
+RJ_ROW = f'\n[[key]]\nname = "{PLANTED}"\nallowed = ["a"]\ndefault = "a"\nowner = "{RJ_OWNER}"\n'
+RJ_BLANK_CONF = 'DESIGN_RECORD=""\nDESIGN_BASELINE=""\nDESIGN_VIEW=""\nDESIGN_NODES=""\n'
+RJ_ARM_LINE = "policy-check: arm_reader_join · not graded · "
+
+
+def render_join_design(named):
+    """A design of `read_design`'s shape, `{"builds": ...}`, holding one clause per (owner, key) pair
+    of `named`, the clause naming that key in backticks, and a clause on RJ_OWNER's row naming no
+    catalogue key, so the planted row's owner is a build of the view."""
+    builds = {RJ_OWNER: {"cl-dFixture-0000": ("the fixture's clause names `zz.nothing`", "", "baseline")}}
+    for n, (owner, key) in enumerate(named, 1):
+        builds.setdefault(owner, {})[f"cl-dFixture-{n:04d}"] = (f"the fixture's clause names `{key}`", "", "baseline")
+    return {"builds": builds}
+
+
+def run_reader_join(name):
+    """`reader-join` (KICK-dKeptSession-19 AC2, AC3): `build_legacy_repo`'s copy, gov's registration of
+    the `unnamed-keys` population among its registry's, a design the case builds naming the
+    catalogue's first row on its owner's row, and the population's home seeded by the factory's
+    `seed_population` over that design, its seed argv printing the case's derivation, committed and
+    pushed as its base (KICK-dKeptSession-69 S6). `check_unnamed_list` must be green unplanted; red naming a planted RJ_OWNER row no clause names `unnamed and not listed`; red naming a
+    listed key `stale` once a clause on its owner's row names it; and red naming the planted row `added
+    to a shrink-only list above the base` once its name is added to the list copy. `reader-join-blank`
+    (AC6): `check_policy.py --repo` over a scratch repository whose `.memory-tree.conf` leaves every
+    DESIGN_* key blank prints `arm_reader_join · not graded` naming the blank keys, no finding under it."""
+    if name == "reader-join-blank":
+        t = Path(tempfile.mkdtemp(prefix="pol-"))
+        try:
+            Path(t, ".memory-tree.conf").write_text(RJ_BLANK_CONF, encoding="utf-8", newline="\n")
+            run_fixture_git(t, "init", "-q")
+            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "commit", "-q", "-m", "a conf leaving every DESIGN_* key blank")
+            rc, out = run_case_argv(t, [sys.executable, KIT / "check_policy.py", "--repo", t])
+            lines = out.split("\n")
+            at = next((i for i, ln in enumerate(lines) if ln.startswith(RJ_ARM_LINE)), None)
+            told = at is not None and "DESIGN_" in lines[at]
+            under = at is not None and at + 1 < len(lines) and lines[at + 1].startswith("  ")
+            seen = lines[at] if at is not None else f"no {RJ_ARM_LINE.strip()} line (exit {rc})"
+            checks = [("blank DESIGN_* keys", "check_policy.py --repo", told and not under,
+                       seen + (" · a finding under it" if under else ""))]
+        except subprocess.CalledProcessError as exc:
+            checks = [(name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}")]
+        finally:
+            remove_repo(t)
+        return print_checks(name, checks)
+    import dataclasses
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        kit = build_legacy_repo(t, LEGACY_GATE, True)
+        repo = t / "r"
+        rows = policy.load_catalogue(kit)
+        first = next(r for r in rows if r.get("name") and r.get("owner"))
+        design = render_join_design([(first["owner"], first["name"])])
+        ll, reg = policy.read_legacy_registration(repo, kit, policy.UNNAMED_POPULATION)
+        derived = t / "derived.txt"  # the seed's rows over the case's design, outside the repository
+        derived.write_text("".join(f"{n}\t1\n" for n in policy.derive_unnamed_keys(rows, design)),
+                           encoding="utf-8", newline="\n")
+        argv = (sys.executable, "-c", "import sys; sys.stdout.write(open(sys.argv[1], encoding='utf-8').read())",
+                str(derived))
+        sha = run_fixture_git(repo, "rev-parse", "HEAD")
+        said, armed = ll.seed_population(repo, dataclasses.replace(reg, seed=argv), sha)
+        if not armed or not said.startswith(f"armed {policy.UNNAMED_POPULATION} "):
+            raise RuntimeError(f"the seed said {said!r}")
+        run_fixture_git(repo, "add", "-A")
+        run_fixture_git(repo, "commit", "-q", "-m", "the unnamed-keys list, seeded over the case's design")
+        run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+        cat, listed = kit / policy.CATALOGUE, Path(repo, reg.home)
+        saved = {p: p.read_bytes() for p in (cat, listed)}
+        names = {k[0] for k in ll.read_ledger(repo, reg)[0]}
+        stale = next(r for r in rows if r.get("name") in names and r.get("owner"))
+
+        def check_join_case(scenario, key, needle, plant_design=design):
+            findings, note = policy.check_unnamed_list(repo, kit, plant_design)
+            ok = (not findings) if key is None else any(k == key and needle in why for k, why in findings)
+            seen = "; ".join(f"{k}: {why}" for k, why in findings) or f"no finding · {note}"
+            checks.append((scenario, "check_unnamed_list", ok, seen))
+            for p, b in saved.items():
+                p.write_bytes(b)
+
+        check_join_case("unplanted: green", None, "")
+        write_edit(cat, lambda s: s + RJ_ROW)
+        check_join_case(f"a {RJ_OWNER} row no clause names", PLANTED, policy.UNNAMED_WHY)
+        check_join_case("a clause naming a listed key", stale["name"], "stale",
+              render_join_design([(first["owner"], first["name"]), (stale["owner"], stale["name"])]))
+        write_edit(cat, lambda s: s + RJ_ROW)
+        write_edit(listed, lambda s: s + f"{PLANTED}\t1\t{sha}\tseeded\n")
+        check_join_case("the list grown above its base", PLANTED, "added to a shrink-only list above the base")
+        check_join_case("put back: green", None, "")
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    except (RuntimeError, policy.Refusal) as exc:
+        checks.append((name, "the population's seed", False, str(exc)))
+    finally:
+        remove_repo(t)
     return print_checks(name, checks)
 
 
@@ -4071,7 +4822,8 @@ def run_limit_case(name):
             # spawns on install day without running the render by hand.
             repo, kit, hook = build_limit_repo(t / "r", None, mirror=False)
             (kit / "adopt-policy.sh").write_bytes((KIT / "adopt-policy.sh").read_bytes().replace(b"\r\n", b"\n"))
-            rc, out = run_case_argv(repo, ["bash", (kit / "adopt-policy.sh").as_posix(), "--scaffold", "--target", repo.as_posix()])
+            rc, out = run_case_argv(repo, ["bash", (kit / "adopt-policy.sh").as_posix(), "--scaffold", "--preset", "standard",
+                                           "--target", repo.as_posix()])
             checks.append(("--scaffold over a committed target", "exit 0, the settings written", rc == 0
                            and Path(repo, *SETTINGS_FILE).is_file(), f"exit {rc} · {render_said(out, 'settings')}"))
             checks.append(check_hook_call(name, "the first Agent call", hook, render_spawn(repo, "u-first"), admits))
@@ -4447,6 +5199,40 @@ def derive_outside_probe_plant(cap):
                                   f"import {mod}; print({mod}.{key})"], "warn": str(v)}
 
 
+def derive_orient_calls_plant(cap):
+    """The enforcer's kit and the policy kit copied in, so the copy finds `policy.py` and `budgets.py` beside
+    it and the census it reads holds the row, and one planted projects dir: a main transcript running the
+    driver's preflight for `fx`, then more tool calls than `budgets.orient-calls`, then one `Edit`
+    (KICK-dKeptSession-9 S10). The cap's value is the plant's `extra`; `orient.budget = "owner-ceiling"`
+    is its `post`, appended and committed, because `derive_zero_plant` replaces `extra` whole and keeps
+    `post`, so the zero mode reads the cap too. The window variable is set, so no context read scans
+    the host's transcripts."""
+    rel = derive_enforcer_rel(cap)
+    v, sid = 2, "00000000-0000-4000-8000-00000000000a"
+
+    def render_turn(i, name, args):
+        return json.dumps({"type": "assistant", "uuid": f"o-a{i}", "timestamp": f"2026-01-01T00:00:{i:02d}.000Z",
+                           "requestId": f"req-o{i}", "message": {
+                               "id": f"msg-o{i}", "role": "assistant", "model": "fixture-model",
+                               "content": [{"type": "tool_use", "id": f"toolu_o{i}", "name": name, "input": args}],
+                               "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0,
+                                         "cache_creation_input_tokens": 0}}})
+    lines = [json.dumps({"type": "user", "uuid": "o-u0", "timestamp": "2026-01-01T00:00:00.000Z",
+                         "message": {"role": "user", "content": "go"}}),
+             render_turn(1, "Bash", {"command": "bash unattended.sh --preflight fx"})]
+    lines += [render_turn(i, "Read", {"file_path": "notes.txt"}) for i in range(2, v + 2)]
+    lines.append(render_turn(v + 2, "Edit", {"file_path": "notes.txt", "old_string": "a", "new_string": "b"}))
+
+    def write_owner_ceiling(t):
+        with open(Path(t, *POLICY_FILE), "a", encoding="utf-8", newline="\n") as fh:
+            fh.write('\n[orient]\nbudget = "owner-ceiling"\n')
+    return {"files": {f"projects/case/{sid}.jsonl": "\n".join(lines) + "\n"}, "extra": f'"{cap.name}" = {v}\n',
+            "post": write_owner_ceiling, "copies": (posixpath.dirname(rel), budgets.derive_kit_rel().rstrip("/")),
+            "env": {"CLAUDE_CODE_MAX_CONTEXT_TOKENS": "200000"},
+            "argv": [sys.executable, rel, "extract", "--orient", "projects", "--slug", "fx"],
+            "warn": f"BUDGET WARN — {cap.name}", "refuse": "budgets.enforce is refuse"}
+
+
 def derive_zero_plant(cap, p):
     """`p`, a census row's plant, with the row's value at 0 in the policy file and none in its legacy
     home, so the reader answers 0 from the file: a `limits:` row's line left out of the limits file the
@@ -4480,6 +5266,7 @@ CAP_CASES = {
     "orientation-card": derive_outside_probe_plant, "cited-file-cap": derive_outside_probe_plant,
     "codex-instructions": derive_outside_probe_plant, "runlog-record": derive_outside_probe_plant,
     "feature-card": derive_outside_probe_plant, "hook-context": derive_outside_probe_plant,
+    "orient-calls": derive_orient_calls_plant,
 }
 
 
@@ -5780,6 +6567,512 @@ def run_pass_lane_case(name):
     return print_checks(name, checks)
 
 
+# ---- the named presets' cases (KICK-dKeptSession-1) ------------------------------------------------
+
+def set_preset_block(text, name, edit):
+    """The store's `text` with the `[preset.<name>]` table's body passed through `edit`."""
+    head = f"\n[preset.{name}]\n"
+    at = text.index(head) + len(head)
+    end = text.find("\n[", at)
+    end = len(text) if end < 0 else end + 1
+    return text[:at] + edit(text[at:end]) + text[end:]
+
+
+def render_fifth_preset(text):
+    """The store's `text` with a fifth table, the default preset's keys under a name the `preset` row lacks."""
+    body = []
+    set_preset_block(text, presets.derive_default_preset(policy.load_catalogue(KIT))[0], lambda b: body.append(b) or b)
+    return text.rstrip("\n") + "\n\n[preset.extra]\n" + body[0]
+
+
+# Each `presets-complete` plant (AC2) and the `presets-pairs` store plant (AC3): (edit of the store's
+# text, the preset and the key its finding must name, a needle of its why).
+PRESET_PLANTS = {
+    "key-cut": (lambda t: set_preset_block(t, "strict", lambda b: re.sub(r'(?m)^"hooks\.bypass" = .*\n', "", b)),
+                "strict", "hooks.bypass", "lacks"),
+    "value-refused": (lambda t: set_preset_block(t, "guarded", lambda b: re.sub(
+        r'(?m)^"hooks\.bypass" = .*$', '"hooks.bypass" = "maybe"', b)), "guarded", "hooks.bypass", "maybe"),
+    "default-moved": (lambda t: set_preset_block(t, "standard", lambda b: re.sub(
+        r'(?m)^"leases\.expiry-hours" = .*$', '"leases.expiry-hours" = 25', b)), "standard", "leases.expiry-hours",
+        "is not the row's default"),
+    "fifth-table": (render_fifth_preset, "extra", "preset", "`of` lacks"),
+}
+PAIR_PLANT = (lambda t: set_preset_block(t, "velocity", lambda b: re.sub(
+    r'(?m)^"review\.design\.round-count" = .*$', '"review.design.round-count" = 5', b)),
+    "velocity", "review.design.round-count", "review.max-rounds")
+
+
+def check_store_plant(scenario, repo, kit, plant):
+    """`plant` written over the kit copy's store, `arm_presets` run, then the store put back and run
+    again -> the two checks: red naming the plant's preset and key, then green. A plant whose preset is
+    None names a place of the store's own lists, its key spelled whole."""
+    edit, name, key, needle = plant
+    at = key if name is None else f"preset.{name} · {key}"
+    store = kit / presets.STORE
+    shipped = store.read_bytes()
+    write_edit(store, edit)
+    _v, findings = run_arm(ARM["arm_presets"], repo, kit)
+    hit = any(k == at and needle in why for k, why in findings)
+    store.write_bytes(shipped)
+    verdict, clean = run_arm(ARM["arm_presets"], repo, kit)
+    seen = "; ".join(f"{k}: {w}" for k, w in findings) or "no finding"
+    return [(scenario, f"arm_presets names {at}", hit, seen),
+            (scenario + ", unplanted", "arm_presets", not clean, "; ".join(f"{k}: {w}" for k, w in clean) or verdict)]
+
+
+def build_presets_repo(rows):
+    """`build_repo`'s repository with this kit's store copied beside its catalogue, and the three
+    modules `presets.py check` runs on there."""
+    repo, kit = build_repo(rows)
+    for name in (presets.STORE, "presets.py", "policy.py", "budgets.py"):
+        (kit / name).write_bytes((KIT / name).read_bytes().replace(b"\r\n", b"\n"))
+    return repo, kit
+
+
+def run_presets_complete(name):
+    """`presets-complete` (AC2): each plant of PRESET_PLANTS on a copy of the shipped store reds
+    `arm_presets` naming its preset and key, and the copy put back is green. The repository holds no
+    loop kit, so the load halves announce."""
+    repo, kit = build_presets_repo(policy.load_catalogue(KIT))
+    try:
+        checks = [c for plant, p in PRESET_PLANTS.items() for c in check_store_plant(plant, repo, kit, p)]
+    finally:
+        remove_repo(repo)
+    return print_checks(name, checks)
+
+
+def run_presets_derived(name):
+    """`presets-derived` (KICK-dKeptSession-33 AC2): five plants on a copy of the shipped store, each
+    red in `arm_presets` naming its place, the copy put back green: `5` on the census's first cap in
+    `strict`, a row the store leaves unassigned; `velocity`'s `maintain.fixes` set to the one member
+    equal to its row's derived text; `review.test` cut from `guarded`, a stage key the other presets
+    assign; `hooks.bypass`, a row whose default is literal, added to `literal`; and `standard`'s
+    `review.build` set to `off`, the default preset off the member its row's text names for that stage
+    (KICK-dKeptSession-56 AC6). The repository holds no loop kit, so the load halves announce."""
+    rows = policy.load_catalogue(KIT)
+    cap = next(iter(budgets.read_cap_census(KIT)))
+    text = policy.read_catalogue_row(("maintain", "fixes"), rows)["default"]["derived"]
+    plants = {
+        "budget-cap": (lambda t: set_preset_block(t, "strict", lambda b: policy.render_toml_value(
+            policy.render_dotted(("budgets", cap))) + " = 5\n" + b), "strict", policy.render_dotted(("budgets", cap)),
+            "not a presettable key"),
+        "derived-text": (lambda t: set_preset_block(t, "velocity", lambda b: re.sub(
+            r'(?m)^"maintain\.fixes" = .*$', lambda _m: '"maintain.fixes" = ' + policy.render_toml_value([text]), b)),
+            "velocity", "maintain.fixes", "derived default text"),
+        "stage-cut": (lambda t: set_preset_block(t, "guarded", lambda b: re.sub(r'(?m)^"review\.test" = .*\n', "", b)),
+                      "guarded", "review.test", "lacks this key"),
+        "literal-widened": (lambda t: re.sub(r'(?m)^literal = \[', 'literal = ["hooks.bypass", ', t),
+                            None, "literal · hooks.bypass", "names no catalogue row"),
+        # KICK-dKeptSession-56 AC6: the default preset's stage key off the member its row's text names for
+        # that stage, `owed` for build, which `check_value` alone admits
+        "stage-default": (lambda t: set_preset_block(t, "standard", lambda b: re.sub(
+            r'(?m)^"review\.build" = .*$', '"review.build" = "off"', b)), "standard", "review.build",
+            "is not the row's default"),
+    }
+    repo, kit = build_presets_repo(rows)
+    try:
+        checks = [c for plant, p in plants.items() for c in check_store_plant(plant, repo, kit, p)]
+    finally:
+        remove_repo(repo)
+    return print_checks(name, checks)
+
+
+def run_presets_pairs(name):
+    """`presets-pairs` (AC3, AC4): `velocity`'s `review.design.round-count` set past its
+    `review.max-rounds` on a copy of the store reds `arm_presets` naming the pair and the preset, and
+    `presets.py check` over that planted copy exits 1 naming `velocity` and both keys; and `policy.py
+    check` over a file whose only revision sets the round count past `standard`'s ceiling exits 0
+    valid, since the pair rules judge the store alone (§8 F10)."""
+    edit, preset, key, needle = PAIR_PLANT
+    repo, kit = build_presets_repo(policy.load_catalogue(KIT))
+    try:
+        checks = check_store_plant("velocity-pair", repo, kit, PAIR_PLANT)
+        store = kit / presets.STORE
+        shipped = store.read_bytes()
+        write_edit(store, edit)
+        checks.append(check_run("velocity-pair", "presets.py check", [sys.executable, str(kit / "presets.py"), "check"],
+                                lambda rc, o, e: rc == 1 and any(f"preset.{preset} · {key}" in ln and needle in ln
+                                                                 for ln in o.splitlines()), repo))
+        store.write_bytes(shipped)
+    finally:
+        remove_repo(repo)
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        over = build_reader_repo(t / "over", 'preset = "standard"\nreview.design.round-count = 4\n')
+        checks.append(check_get("override-past-ceiling", over, [], lambda rc, o, e: rc == 0 and "is valid" in o,
+                                verb="check"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def run_presets_repo(name):
+    """`presets-repo` (AC5): a `[presets.ours]` table extending `strict` with one override, named by
+    `preset`, reads valid; committed alone extending `lax`, or setting a key presets never touch, it is
+    refused naming the key; and a `[presets.strict]` table, a shipped name, is refused at its line
+    naming `strict` (KICK-dKeptSession-44 S32, AC29)."""
+    ours = 'preset = "ours"\n\n[presets.ours]\nextends = "{base}"\n{key} = {value}\n'
+    cases = (("extends-strict", ours.format(base="strict", key='"leases.expiry-hours"', value="12"), 0, "is valid"),
+             ("extends-lax", ours.format(base="lax", key='"leases.expiry-hours"', value="12"), 2, "presets.ours.extends"),
+             ("never-key", ours.format(base="strict", key='"policy-file.guard"', value='"owner-only"'), 2,
+              'presets.ours."policy-file.guard"'),
+             ("shipped-name", ours.replace("ours", "strict").format(base="standard", key='"leases.expiry-hours"',
+                                                                    value="12"), 2,
+              f'{POLICY_REL}:3 · presets.strict: "strict" is a shipped preset'))
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        for scenario, text, want, needle in cases:
+            repo = build_reader_repo(t / scenario, text)
+            checks.append(check_get(scenario, repo, [], lambda rc, o, e, want=want, needle=needle: rc == want and (
+                needle in o if want == 0 else e.startswith(f"policy: refused · {POLICY_REL}:") and needle in e), verb="check"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def derive_preset_overrides(name, n):
+    """`n` top-level dotted assignments, each moving one key of the shipped preset `name` off its value
+    to another member of the key's closed list, sorted by key, no key a prefix of another; fewer
+    where the store holds fewer such keys."""
+    rows = policy.load_catalogue(KIT)
+    assignment = presets.derive_preset_assignment(name, presets.load_presets(KIT), None, rows)
+    out, held = [], []
+    for path in sorted(assignment, key=policy.render_dotted):
+        allowed = policy.read_catalogue_row(path, rows).get("allowed")
+        members = allowed if isinstance(allowed, list) else allowed.get("of", []) if allowed.get("type") == "enum" else []
+        other = next((m for m in members if not presets.check_same_value(m, assignment[path])), None)
+        if other is None or any(p[:len(path)] == path or path[:len(p)] == p for p in held):
+            continue
+        held.append(path)
+        out.append(f"{policy.render_dotted(path)} = {policy.render_toml_value(other)}\n")
+        if len(out) == n:
+            break
+    return out
+
+
+def run_preset_diff(name):
+    """`preset-diff` (KICK-dKeptSession-3 AC1, AC2): `policy.py preset --diff --rev HEAD` over a file
+    naming `strict` and setting `hooks.bypass = "allowed"` prints the preset line and that one key
+    line, and its `--line` form one line within PRESET_DIFF_LINE_CHARS bytes naming `strict` and
+    `1 key(s) differ`; over a file declaring `[presets.ours]` over `strict` with its own
+    `leases.expiry-hours` and naming it, `- preset — ours` and `- no key differs`; and over a file
+    naming `strict` with PRESET_DIFF_LINES + 1 keys moved off it, `--section` prints
+    PRESET_DIFF_LINES key lines and a `(+1)` line naming the verb. WHAT IT DOES NOT CHECK: a file
+    naming no preset, which the map arms read, and the charter render, which the playbook kit's
+    selftest reads."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        over = build_reader_repo(t / "over", 'preset = "strict"\n\n[hooks]\nbypass = "allowed"\n')
+        ours = build_reader_repo(t / "ours", 'preset = "ours"\n\n[presets.ours]\nextends = "strict"\n'
+                                             '"leases.expiry-hours" = 12\n')
+        planted = derive_preset_overrides("strict", policy.PRESET_DIFF_LINES + 1)
+        many = build_reader_repo(t / "many", 'preset = "strict"\n' + "".join(planted))
+        diff = ["--diff", "--rev", "HEAD"]
+        key_line = "- `hooks.bypass` — allowed (strict: refused)"
+        checks += [
+            check_get("strict-override", over, diff, lambda rc, o, e: rc == 0 and o.splitlines() == [
+                "- preset — strict", key_line], verb="preset"),
+            check_get("strict-override", over, ["--diff", "--line", "--rev", "HEAD"], lambda rc, o, e: rc == 0 and len(
+                o.splitlines()) == 1 and len(o.splitlines()[0].encode("utf-8")) <= policy.PRESET_DIFF_LINE_CHARS
+                and "strict" in o and "1 key(s) differ" in o, verb="preset"),
+            check_get("declared-preset", ours, diff, lambda rc, o, e: rc == 0 and o.splitlines() == [
+                "- preset — ours", "- no key differs"], verb="preset"),
+            check_get(f"{len(planted)}-overrides", many, ["--diff", "--section", "--rev", "HEAD"],
+                      lambda rc, o, e: rc == 0 and len(planted) == policy.PRESET_DIFF_LINES + 1
+                      and sum(ln.startswith("- `") for ln in o.splitlines()) == policy.PRESET_DIFF_LINES
+                      and o.splitlines()[-1] == f"- … (+1) — `{policy.PRESET_DIFF_VERB}`"
+                      and all(len(ln) <= policy.PRESET_DIFF_LINE_CHARS for ln in o.splitlines()), verb="preset"),
+        ]
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def run_scaffold_preset(name):
+    """`scaffold-preset` (KICK-dKeptSession-32 S3, AC1, AC2): per shipped preset, the stdout of this
+    kit's `policy.py scaffold --preset <name>`, exit 0 and nothing on stderr, committed as the policy
+    file of a `build_reader_repo` repository on `main`. There this kit's `policy.py get <key>
+    --explain`, for every key the preset's assignment holds, must exit 0 printing the assignment's
+    value as `get` spells it and `· preset · preset <name> at ` on stderr, so no literal the scaffold
+    writes beats the preset it names; and `policy.py preset --diff` must print `- no key differs`.
+    The presets run concurrently, one repository each. A store holding no preset, or a preset
+    assigning no key, is a WRONG, never a pass. WHAT IT DOES NOT CHECK: a scaffold naming no preset,
+    a repository's declared preset, and the adopter's write of the file, which `adopter-fresh-target`
+    and `intake-preset` read."""
+    import concurrent.futures
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+
+    def check_preset_scaffold(preset):
+        held = {}
+        made = check_run(preset, f"policy.py scaffold --preset {preset} exits 0 printing the file",
+                         [sys.executable, str(KIT / "policy.py"), "scaffold", "--preset", preset],
+                         lambda rc, o, e: held.update(text=o) is None and rc == 0 and bool(o) and not e.strip())
+        if not made[2]:
+            return [made]
+        repo = build_reader_repo(t / preset, held["text"])
+        assignment = presets.derive_preset_assignment(preset, presets.load_presets(KIT), None)
+        wrong = []
+        for path, value in assignment.items():
+            key = policy.render_dotted(path)
+            want = [v if isinstance(v, str) else policy.render_toml_value(v)
+                    for v in (value if isinstance(value, list) else [value])]
+            got = check_get(preset, repo, [key, "--explain"], lambda rc, o, e, want=want, key=key: rc == 0 and
+                            o.splitlines() == want and f"policy: {key} · preset · preset {preset} at " in e)
+            if not got[2]:
+                wrong.append(f"{key}: {got[3]}")
+        reads = (preset, f"get <key> --explain reads each of the {len(assignment)} assigned key(s) from the preset",
+                 bool(assignment) and not wrong, "; ".join(wrong[:3]) or (f"{len(assignment)} read from preset {preset}"
+                                                                         if assignment else "a population of 0"))
+        diff = check_get(preset, repo, ["--diff"], lambda rc, o, e: rc == 0 and o.splitlines() == [
+            f"- preset — {preset}", "- no key differs"], verb="preset")
+        return [made, reads, diff]
+
+    try:
+        store = presets.load_presets(KIT)
+        shipped = list(store.get("preset") or {}) if isinstance(store.get("preset"), dict) else []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            for got in pool.map(check_preset_scaffold, shipped):
+                checks += got
+        if not shipped:
+            checks.append(("store", "the shipped presets", False, f"{presets.STORE} holds no [preset.<name>] table"))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+CORE_FLOW_POINT ="point.flow.release"  # the release slot `build.closes = after-release-verifies` selects
+
+
+def build_core_only_repo(t):
+    """A repository at `t` holding this kit's files, the loop kit whole and the playbook kit's
+    `layers.toml` at their own paths under the tool root, committed on main, the register copy's core
+    rows declaring no CORE_FLOW_POINT. -> (repo, kit copy)."""
+    repo = t / "core"
+    prefix = (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
+    kit = repo / prefix if prefix else repo
+    kit.mkdir(parents=True)
+    for p in KIT.iterdir():
+        if p.is_file() and p.suffix in (".py", ".toml", ".txt"):
+            (kit / p.name).write_bytes(p.read_bytes())
+    loop = policy.resolve_kit_dir("loop", "guard.py", KIT)
+    shutil.copytree(loop, kit.parent / loop.name, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    layers = policy.resolve_kit_dir("playbook", "layers.toml", loop) / "layers.toml"
+    register = kit.parent / layers.parent.name / layers.name
+    register.parent.mkdir()
+    register.write_bytes(re.sub(rb'(?m)^(declares = \[.*?)"%s", ' % CORE_FLOW_POINT.encode(), rb"\1", layers.read_bytes()))
+    run_fixture_git(repo, "init", "-q")
+    run_fixture_git(repo, "symbolic-ref", "HEAD", "refs/heads/main")
+    run_fixture_git(repo, "add", "-A")
+    run_fixture_git(repo, "commit", "-q", "-m", "a core-only register")
+    return repo, kit
+
+
+def load_absent_by_key(name, table, presets=None, here=KIT, top="."):
+    """`absent-by-key`: a loader refusing every key a `[[selects]]` row names, whatever its value."""
+    keys = {k for k, _v in read_selects(policy.resolve_kit_dir("loop", "guard.py", here))}
+    assignment = presets_module.derive_preset_assignment(name, presets, table)
+    return presets_module.Load(assignment, [(policy.render_dotted(k), v, "planted: its key is a [[selects]] key")
+                                            for k, v in assignment.items() if policy.render_dotted(k) in keys], [])
+
+
+def load_accept_all(name, table, presets=None, here=KIT, top="."):
+    """`accept-all`: a loader admitting every value."""
+    return presets_module.Load(presets_module.derive_preset_assignment(name, presets, table), [], [])
+
+
+presets_module = presets  # the plants' own parameter shadows the module's name
+
+
+def run_presets_core_only(name):
+    """`presets-core-only` (AC6, AC7): in a scratch tree whose register copy's core rows declare no
+    CORE_FLOW_POINT, `presets.py load` exits 0 for a preset whose `build.closes` selects nothing and 2
+    for one selecting the release slot, naming that key, its value and the point and no other key;
+    `arm_presets` prints no finding there, its row-named half grading each preset's refused pair, and
+    it reds the `absent-by-key` plant naming `standard` and the `accept-all` plant naming `strict`.
+    Only `standard` and `strict` load here; the four loads over the shipped register are `policy
+    check`'s, over the real tree (AC9)."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        repo, kit = build_core_only_repo(t)
+        store = presets.load_presets(kit)
+        selects = {n: any(policy.render_dotted(k) == "build.closes" and v == "after-release-verifies"
+                          for k, v in presets.derive_preset_assignment(n, store, None).items()) for n in store["preset"]}
+        want = {n: selects[n] for n in ("standard", "strict")}
+
+        def derive_load_check(refuses):
+            def check_load(rc, o, e):
+                said = [ln for ln in o.splitlines() if " · refused · " in ln]
+                if not refuses:
+                    return rc == 0 and not said and " · loaded · " in o
+                return rc == 2 and len(said) == 1 and all(n in said[0] for n in (
+                    "build.closes", "after-release-verifies", CORE_FLOW_POINT))
+            return check_load
+        argv = [sys.executable, str(kit / "presets.py"), "load"]
+        checks += [check_run(f"register without {CORE_FLOW_POINT}", f"presets.py load {n}", argv + [n], derive_load_check(r), repo)
+                   for n, r in want.items()]
+        verdict, findings = run_arm(ARM["arm_presets"], repo, kit)
+        graded = f"row-named half {sum(selects.values())} refused pair(s) graded"
+        checks.append((f"register without {CORE_FLOW_POINT}", f"arm_presets unplanted, {graded}",
+                       not findings and graded in verdict, "; ".join(f"{k}: {w}" for k, w in findings) or verdict))
+        for plant, loader, preset in (("absent-by-key", load_absent_by_key, "standard"),
+                                      ("accept-all", load_accept_all, "strict")):
+            _v, findings = run_arm(Arm(plant, lambda r, k, loader=loader: arm_presets(r, k, loader), "finding"), repo, kit)
+            checks.append((plant, f"arm_presets names preset.{preset} · build.closes",
+                           any(k == f"preset.{preset} · build.closes" for k, _w in findings),
+                           "; ".join(f"{k}: {w}" for k, w in findings) or "no finding"))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+# ---- the policy namespaces' purposes (KICK-dKeptSession-16) -------------------------------------
+
+def run_purposes_case(name):
+    """The outcome cases of `arm_purposes` (KICK-dKeptSession-16 S7). `purposes-new`, `purposes-listed`
+    and `purposes-drain` run over `build_legacy_repo`'s copy, pushed to one bare remote, with the
+    `unpurposed-namespaces` population seeded there by the factory's seed (KICK-dKeptSession-69 S6).
+    `purposes-new`: the planted key's namespace, which no `[[namespace]]` row purposes and the seeded
+    list lacks, is the arm's finding `declares no purpose`, and the arm is green with it removed.
+    `purposes-listed`: every namespace the seeded list carries prints on the `awaiting review` line and
+    the arm is green; over `build_repo`'s copy, which holds no registry, the arm prints the population
+    `not graded`, every derived unpurposed namespace awaiting review, and is green. `purposes-drain`: a
+    row given to a listed namespace makes the copy's `lists --check` exit 1 naming it stale, `lists
+    --write` drains it alone, and `--check` then exits 0.
+    `purposes-shape`: four planted `[[namespace]]` rows, one naming no namespace, a second row for a
+    purposed namespace, an empty purpose and an unknown field, give `check_namespaces` four
+    findings, one per row, and leave the `[[key]]` rows and each `[[key]]` arm's verdict as they were.
+    `purposes-map-purpose`: `memory.map-purpose = "refuse"` committed at the landed revision prints
+    the stand-in line naming `refuse` with the unplanted verdict; with no landed revision the NOTE
+    line prints, the verdict the same again."""
+    rows, checks = policy.load_catalogue(KIT), []
+
+    def run_arm_quietly(repo, kit, arm=ARM["arm_purposes"]):
+        """-> (verdict, findings, the lines the arm printed), its stdout held."""
+        held = io.StringIO()
+        with contextlib.redirect_stdout(held):
+            verdict, findings = run_arm(arm, repo, kit)
+        return verdict, findings, held.getvalue().replace("\r", "").split("\n")
+
+    t = repo = None
+    try:
+        if name in ("purposes-new", "purposes-listed", "purposes-drain"):
+            t = Path(tempfile.mkdtemp(prefix="pol-"))
+            kit = build_legacy_repo(t, LEGACY_GATE, True, also=(policy.UNPURPOSED_POPULATION,))
+            ll, reg = policy.read_legacy_registration(t / "r", kit, policy.UNPURPOSED_POPULATION)
+            before = sorted(k[0] for k in ll.read_ledger(t / "r", reg)[0])
+        if name == "purposes-new":
+            cat = kit / policy.CATALOGUE
+            saved = cat.read_bytes()
+            key, needle = seed_namespace_new(t / "r", kit, rows)
+            verdict, findings, _lines = run_arm_quietly(t / "r", kit)
+            checks.append((f"the namespace {key}, unlisted", f"arm_purposes names {key} with '{needle}'",
+                           any(k == key and needle in why for k, why in findings),
+                           f"{verdict} · {'; '.join(f'{k}: {w}' for k, w in findings) or 'no finding'}"))
+            cat.write_bytes(saved)
+            verdict, findings, _lines = run_arm_quietly(t / "r", kit)
+            checks.append(("put back", "arm_purposes green", not findings, f"{verdict} · findings {findings or 'none'}"))
+            return print_checks(name, checks)
+        if name == "purposes-drain":
+            ns = before[0] if before else "(none listed)"
+            write_edit(kit / policy.CATALOGUE, lambda s: s + f'\n[[namespace]]\nname = "{ns}"\npurpose = "A planted purpose."\n')
+            rc, out = run_legacy_lists(kit, "--check")
+            stale = f"  {ns}: stale: drain it with `lists --write`"
+            checks.append((f"{ns} given a row", "lists --check", rc == 1 and stale in out.split("\n"),
+                           f"exit {rc} · {render_said(out, f'  {ns}: ')}"))
+            rc, out = run_legacy_lists(kit, "--write")
+            after = sorted(k[0] for k in ll.read_ledger(t / "r", reg)[0])
+            wrote = f"policy lists: wrote {policy.UNPURPOSED_LIST} · drained 1: {ns}"
+            checks.append((f"{ns} given a row", "lists --write", rc == 0 and wrote in out.split("\n") and after == before[1:],
+                           f"exit {rc} · {render_said(out, f'wrote {policy.UNPURPOSED_LIST}')} · {len(after)} of {len(before)} kept"))
+            rc, out = run_legacy_lists(kit, "--check")
+            checks.append(("after lists --write", "lists --check", rc == 0,
+                           f"exit {rc} · {render_said(out, f'policy lists: {policy.UNPURPOSED_LIST} · ')}"))
+            return print_checks(name, checks)
+
+        def read_awaiting(lines):
+            told = next((ln for ln in lines if ln.startswith("policy purposes: ") and " awaiting review · " in ln), "")
+            return told, told.split(" awaiting review · ", 1)[1].split(", ") if told else []
+        if name == "purposes-listed":
+            verdict, findings, lines = run_arm_quietly(t / "r", kit)
+            told, names = read_awaiting(lines)
+            checks.append(("the seeded list", f"{len(before)} listed namespace(s) printed awaiting review, the arm green",
+                           bool(before) and not findings and names == before,
+                           f"{verdict} · {told[:200] or 'no awaiting line'} · findings {findings or 'none'}"))
+        repo, kit = build_repo(rows)
+        if name == "purposes-listed":
+            free = policy.derive_unpurposed(policy.load_namespaces(kit), policy.derive_policy_namespaces(rows))
+            verdict, findings, lines = run_arm_quietly(repo, kit)
+            told, names = read_awaiting(lines)
+            said = f"policy purposes: {policy.UNPURPOSED_LIST} · not graded · "
+            ungraded = any(ln.startswith(said) for ln in lines)
+            checks.append(("no registry", f"not graded, {len(free)} derived namespace(s) awaiting review, the arm green",
+                           ungraded and bool(free) and not findings and names == free,
+                           f"{verdict} · {'not graded' if ungraded else 'NO not-graded line'} · {told[:200] or 'no awaiting line'}"
+                           f" · findings {findings or 'none'}"))
+        elif name == "purposes-shape":
+            arms = [ARM[a] for a in ("arm_schema", "arm_shape", "arm_summaries", "arm_direction")]  # the [[key]] arms
+            was = [run_arm_quietly(repo, kit, a)[:2] for a in arms]
+            held = policy.load_namespaces(kit)
+            free = policy.derive_unpurposed(held, policy.derive_policy_namespaces(rows))
+            if not held or len(free) < 2:
+                checks.append(("the kit copy", "a purposed namespace and two awaiting ones to plant over", False,
+                               f"{len(held)} row(s), {len(free)} awaiting"))
+                return print_checks(name, checks)
+            plants = [("zz-none", 'purpose = "A planted purpose."\n', "names no policy namespace"),
+                      (held[0]["name"], 'purpose = "A planted purpose."\n', "is written twice"),
+                      (free[0], 'purpose = ""\n', "empty or absent `purpose`"),
+                      (free[1], 'purpose = "A planted purpose."\nowner = "dKeptSession"\n', "unknown field `owner`")]
+            write_edit(kit / policy.CATALOGUE,
+                       lambda s: s + "".join(f'\n[[namespace]]\nname = "{n}"\n{body}' for n, body, _w in plants))
+            found = policy.check_namespaces(policy.load_namespaces(kit),
+                                            policy.derive_policy_namespaces(policy.load_catalogue(kit)))
+            for n, _body, needle in plants:
+                hits = [why for k, why in found if k == n]
+                checks.append((f"the planted row {n}", needle, len(hits) == 1 and needle in hits[0], f"{hits or 'no finding'}"))
+            checks.append(("the four planted rows", "four findings, one per row", len(found) == 4, f"{len(found)} finding(s)"))
+            keys = len(policy.load_catalogue(kit))
+            checks.append(("the [[key]] rows", "load_catalogue reads no [[namespace]] row as a key", keys == len(rows),
+                           f"{keys} of {len(rows)} row(s)"))
+            for a, (verdict, findings) in zip(arms, was):
+                now = run_arm_quietly(repo, kit, a)[:2]
+                checks.append(("the [[key]] arms", f"{a.name} keeps its verdict", now == (verdict, findings), f"{now[0]}"))
+        elif name == "purposes-map-purpose":
+            stand = "policy purposes: memory.map-purpose refuse is dTotalRecall's to arm; graded as review until it lands"
+            was = run_arm_quietly(repo, kit)
+            said = [ln for ln in was[2] if ln.startswith(("policy purposes: memory.map-purpose", "policy purposes: NOTE"))]
+            checks.append(("the scaffold landed", "no stand-in line under the default review", not said, f"{was[0]} · {said or 'none'}"))
+            write_edit(Path(repo, *POLICY_FILE), lambda s: s + '\n[memory]\nmap-purpose = "refuse"\n')
+            run_fixture_git(repo, "add", POLICY_REL)
+            run_fixture_git(repo, "commit", "-q", "-m", "memory.map-purpose refuse")
+            run_fixture_git(repo, "update-ref", f"refs/remotes/{FIXTURE_REMOTE}/main", "HEAD")
+            now = run_arm_quietly(repo, kit)
+            checks.append(("refuse at the landed revision", "the stand-in line names refuse, the verdict unplanted's",
+                           stand in now[2] and now[:2] == was[:2], f"{now[0]} · stand-in {'printed' if stand in now[2] else 'ABSENT'}"))
+            run_fixture_git(repo, "update-ref", "-d", f"refs/remotes/{FIXTURE_REMOTE}/main")
+            now = run_arm_quietly(repo, kit)
+            note = next((ln for ln in now[2] if ln.startswith("policy purposes: NOTE - memory.map-purpose did not read (")), "")
+            checks.append(("no landed revision", "the NOTE line, graded as review, the verdict unplanted's",
+                           note.endswith("; graded as review, its catalogue default") and now[:2] == was[:2],
+                           f"{now[0]} · {note[:200] or 'no NOTE line'}"))
+        else:
+            checks.append((name, "a purposes case", False, "no such case"))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        for root in (t, repo):
+            if root is not None:
+                remove_repo(root)
+    return print_checks(name, checks)
+
+
 CASES = [
     ("shape-no-empty", ARM["arm_shape"], seed_no_empty),
     ("shape-unknown-field", ARM["arm_shape"], seed_unknown_field),
@@ -5794,12 +7087,15 @@ CASES = [
     ("adopter-suite", None, run_adopter_suite),  # the adopter's sibling suite, which arms its refusals
     ("legacy-homes-withheld-install", None, run_legacy_withheld_install),  # no plan row and no applied file names the list (TOOL-dWitnessedBar-20)
     ("census-default-adopter", None, run_census_default_adopter),  # the census over a real install without check-line-length
+    ("intake-preset", None, run_intake_preset),  # intake asks for the preset and the scaffold writes it (KICK-dKeptSession-4)
     ("govkit-source-root-refused", None, run_govkit_source_root_refused),  # run_govkit refuses the tree under test's own root
     ("arms-empty-declared", None, run_arms_empty_declared),  # every ARMS row declares its empty and why
     ("arms-empty-target", None, run_arms_empty_target),  # the announcing arms over an empty target, arm_schema over its scaffold
     ("reader-landed", None, run_reader_landed),  # outcome cases: the reader over its own repositories
     ("reader-parsed", None, run_reader_parsed),
     ("resolution-order", None, run_resolution_order),
+    ("preset-every-key", None, run_preset_every_key),  # every assigned, `never` and unassigned derived key per shipped preset (KICK-dKeptSession-2, -34)
+    ("preset-derived-cap", None, run_preset_derived_cap),  # a derived cap through budgets.py, empty file and strict (KICK-dKeptSession-34)
     ("on-invalid-classes", None, run_on_invalid_classes),
     ("on-invalid-strict", None, run_on_invalid_strict),
     *((c, None, run_reader_refusals) for c in READER_REFUSAL_CASES),  # the reader's refusals (TOOL-dGroundRules-21)
@@ -5813,9 +7109,14 @@ CASES = [
     ("mirror-commit-rewrite", None, run_mirror_landed),
     ("mirror-landed-merge", None, run_mirror_landed),
     ("mirror-stale-legacy", None, run_mirror_landed),
+    ("mirror-presets-stale", None, run_mirror_landed),  # the preset store a recorded input (KICK-dKeptSession-40)
+    ("mirror-pre-unit-stale", None, run_mirror_landed),  # the reader's own expected inputs (KICK-dKeptSession-49)
+    ("mirror-legacy-expected", None, run_mirror_landed),  # the repository-relative inputs expected too (KICK-dKeptSession-62)
     ("mirror-shim-exit-one", None, run_mirror_landed),
     ("mirror-absent-adopter", None, run_mirror_absent_adopter),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
+    ("mirror-upgrade", None, run_mirror_upgrade),  # a pre-unit mirror through the adopter's check and scaffold (KICK-dKeptSession-50)
+    ("mirror-input-parity", None, run_mirror_input_parity),  # the JS reader's kit inputs against policy.py's (KICK-dKeptSession-59)
     *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR, *GUARD_INPUTS, *GUARD_RUN]),  # outcome cases: guard.py --staged
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
     ("legacy-homes-main-dropped", None, run_legacy_main_dropped),  # the base is the merge-base, not the tip
@@ -5825,6 +7126,8 @@ CASES = [
     ("reader-coverage-declared", None, run_reader_declared),  # a key read only outside the scan, declared in the list
     ("reader-quoted-pattern", None, run_reader_quoted),  # a pattern key read through a quoted segment
     ("reader-coverage-carried", None, run_reader_carried),  # a build run landed with a unit carried forward
+    ("reader-join", None, run_reader_join),  # an outcome case: the unnamed-keys list over the case's own design
+    ("reader-join-blank", None, run_reader_join),  # arm_reader_join over a conf leaving every DESIGN_* key blank
     *((c, None, run_limit_case) for c in LIMIT_CASES),  # outcome cases: the agent limit, one repository each
     *((c, ARM["arm_schema"], s) for c, s in BUDGET_SCHEMA_SEEDS.items()),  # the size switch's schema plants
     *((c, None, run_budget_case) for c in BUDGET_CASES),  # outcome cases: the size switch
@@ -5838,6 +7141,18 @@ CASES = [
     ("census-source-receipt", None, run_census_source_receipt),  # gov's source-mode receipt read as no receipt is
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
     *((c, None, run_pass_lane_case) for c in PASS_LANE_CASES),  # a pass-leg run and an inline red fix, end to end
+    ("presets-complete", None, run_presets_complete),  # the named presets (KICK-dKeptSession-1): the store's plants
+    ("presets-derived", None, run_presets_derived),  # the derived-default rows (KICK-dKeptSession-33): five store plants
+    ("presets-pairs", None, run_presets_pairs),  # a pair broken in a preset and over a repository's override
+    ("presets-repo", None, run_presets_repo),  # a repository preset admitted and refused
+    ("presets-core-only", None, run_presets_core_only),  # the load over a core-only register, and its two planted loaders
+    ("preset-diff", None, run_preset_diff),  # the preset and its differing keys, three forms (KICK-dKeptSession-3)
+    ("scaffold-preset", None, run_scaffold_preset),  # each shipped preset's scaffold reads its preset (KICK-dKeptSession-32)
+    ("purposes-new", None, run_purposes_case),  # outcome cases: a new namespace with no purpose (KICK-dKeptSession-16),
+    ("purposes-listed", None, run_purposes_case),  # a listed namespace awaiting review,
+    ("purposes-drain", None, run_purposes_case),  # a purposed one drained, the row shape,
+    ("purposes-shape", None, run_purposes_case),
+    ("purposes-map-purpose", None, run_purposes_case),  # and memory.map-purpose's other values
 ]
 
 
@@ -5854,9 +7169,10 @@ def run_fixture_git(repo, *args):
 
 
 def build_repo(rows):
-    """A committed copy of this kit's catalogue and list at the kit's own path, the scaffold beside it,
-    a consumer outside the kit that reads policy through the helper, and a remote-tracking ref at that
-    commit; then the mirror rendered at it, in the working tree. -> (repo, kit copy)."""
+    """A committed copy of this kit's catalogue, its summary list and its cap census at the kit's own
+    path, the scaffold beside it, a consumer outside the kit that reads policy
+    through the helper, and a remote-tracking ref at that commit; then the mirror rendered at it, in
+    the working tree. -> (repo, kit copy)."""
     repo = Path(tempfile.mkdtemp(prefix="pol-"))
     prefix = (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
     kit = repo / prefix if prefix else repo
@@ -5864,7 +7180,7 @@ def build_repo(rows):
     for name in (policy.CATALOGUE, policy.LIST, budgets.CENSUS):
         (kit / name).write_bytes((KIT / name).read_bytes().replace(b"\r\n", b"\n"))
     Path(repo, POLICY_FILE[0]).mkdir()
-    Path(repo, *POLICY_FILE).write_bytes(policy.render_scaffold(rows).encode("utf-8"))
+    Path(repo, *POLICY_FILE).write_bytes(policy.render_scaffold(rows, None).encode("utf-8"))
     Path(repo, *CONSUMER_FILE[:-1]).mkdir()
     Path(repo, *CONSUMER_FILE).write_text(CONSUMER_TEXT.replace("@helper@", json.dumps(f"../{prefix}policy-mirror.js")),
                                           encoding="utf-8", newline="\n")
@@ -5913,8 +7229,8 @@ def run_fixture(only=None):
             continue
         repo, kit = build_repo(rows)
         try:
-            files = [kit / policy.CATALOGUE, kit / policy.LIST, kit / budgets.CENSUS, Path(repo, *POLICY_FILE),
-                     Path(repo, *MIRROR_FILE), Path(repo, *CONSUMER_FILE)]
+            files = [kit / policy.CATALOGUE, kit / policy.LIST, kit / budgets.CENSUS,
+                     Path(repo, *POLICY_FILE), Path(repo, *MIRROR_FILE), Path(repo, *CONSUMER_FILE)]
             saved = {p: p.read_bytes() for p in files}
             held = set(repo.rglob("*"))
             key, needle = seed(repo, kit, rows)

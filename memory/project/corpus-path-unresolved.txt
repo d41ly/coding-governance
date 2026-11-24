@@ -1,3 +1,4 @@
 # ledger · corpus-path-unresolved · key site path,cited · direction shrink-only · drain hunk
 memory/builds/dHonouredPark/BACKLOG.md	tools/dead-path-waivers.txt	2	4e7482c5cc245a40087158ad5dd9c753af5fbfdd	seeded
 memory/builds/dSpentCeiling/BACKLOG.md	tools/dead-path-waivers.txt	1	4e7482c5cc245a40087158ad5dd9c753af5fbfdd	seeded
+memory/guides/UNATTENDED-VERBS.md	.claude/orientation-card.md	1	d4f64934ca1b987434214ea8412f2f1950416afa	widened:2026-11-24-build-KICK-dKeptSession-80-widen-9

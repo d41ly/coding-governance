@@ -11,13 +11,32 @@
 # the build `tFix` (one spec, one brief), the memory-tree, loop and unattended kits copied from the tree
 # this file sits in at the paths the engine's own resolver finds them, a `.unattended.conf` with
 # RUN_CLAIMS on, so the driver writes the card's ref (TOOL-dPlacedRequest-33), a stub policy kit answering the case's
-# planted values from a file outside the repository, and a stub playbook kit whose `pockets` verb
-# prints one fact. The engine writes the session card `t1`, appends a READY body with a `## route`
+# planted values from a file outside the repository, a stub playbook kit whose `pockets` verb
+# prints one fact, and the copied loop kit's `position.py` replaced by a stub answering from a second
+# planted file, CARD_STUB_POSITION, so no case runs the real engine (KICK-dKeptSession-13 S9): `<slug>
+# --boundary <pointer>` the planted `key`, `answer` and `forked` units, `<slug> --json` the planted
+# `json` and `rc`, each after the planted `delay`, and `<slug> --mail-interrupts [--local]` the planted
+# `mail` line after the planted `mail-delay`, its arguments appended to `$CARD_STUB_POSITION.log`
+# (KICK-dKeptSession-10 S1); and its `budget.py` replaced by a stub answering `state
+# --build <slug>` with the planted `budget` from that same file, `open 0/4` where none is planted, so no case
+# runs the real module either (KICK-dKeptSession-26 S4); and the runlog kit's `runlog.py`, at the path the
+# engine's resolver finds it, as a stub answering `context <path>` with the planted `fill` from that same file
+# after the planted `fill-delay`, `none` where no fill is planted, so no case parses a transcript
+# (KICK-dKeptSession-14 S7). The `mail-` cases put each mail message straight into the bare remote by
+# `update-ref` under the `gov-claim` identity, never a post, since the stub playbook kit holds no fleet
+# reader for the driver's fleet tag (KICK-dKeptSession-5 S13). The stub policy kit appends each key it is asked to `$CARD_STUB_POLICY.log`, so
+# a case can see a key never read. The engine writes the session card `t1`, appends a READY body with a `## route`
 # naming `tFix`, and the case runs its verbs and prints one `card-store: <case> · <what> · held|MISSED`
-# line per observation. The scratch tree is removed at exit.
+# line per observation. The scratch tree is removed at exit. The card-import fixture's verdict
+# (KICK-dKeptSession-12) is planted in its file, or recorded by `--card --fixture-run` over a stub
+# fixture named by CARD_FIXTURE; those cases and every `context-` case export one `AI_AGENT`, or unset
+# it where the case says so, and the cases that record one or replay a recorded pass put a stub `claude`
+# first on PATH, whose version the verdict records (KICK-dKeptSession-37) and its reader compares
+# (KICK-dKeptSession-38), so no outcome reads the version of the session or the node running the suite.
 # Exit 2 is a usage error, or a fixture that could not be built.
 # WHAT THIS DOES NOT CHECK: a remote other than a local bare one; a lost compare-and-swap, which needs
-# two writers between one read and its push; the engine's other cells, which their own arms cover.
+# two writers between one read and its push; the engine's other cells, which their own arms cover; the
+# real card-compaction.fixture.sh, which starts harness sessions and is never run here.
 set -u
 case "$0" in */*) HERE=${0%/*} ;; *) HERE=. ;; esac
 HERE=$(CDPATH= cd -- "$HERE" && pwd) || exit 2
@@ -26,7 +45,12 @@ PLANTS="render publish publish-off publish-unwritten publish-late publish-hung s
 follow-fixed snapshot-terminal snapshot-every lookup lookup-offline lookup-upstream lookup-hung replay context-idle context-always-resume
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
 partial-ask terminal-route close-follow-twice follow-offline-publish follow-offline-publish-online
-follow-foreign-after-cached follow-foreign-after-offline"
+follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-run fixture-run-cli worktree-named replay-order
+fixture-cli-path-differs fixture-cli-unknown fixture-cli-short pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay
+budget-open budget-spent budget-unfrozen budget-omitted budget-no-kit
+position-act position-awaiting position-disagrees position-skips lead-compact lead-resume
+fill-fresh-past fill-under fill-compact fill-replay fill-slow
+mail-open mail-none mail-off mail-boundary mail-notice-boundary"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
 BRIEF=memory/builds/tFix/prompts/2026-01-01-prompt-TOOL-tFix-1-brief.md
@@ -54,8 +78,10 @@ R="$S/repo"; O="$S/origin.git"; OUT="$S/out"
 # The fixture repository's one remote, named apart from any real one: kit code names no remote by literal
 # (check-remote-literals.sh), and the driver reads a repository of one remote through the ladder's only-remote rung.
 FX_REMOTE=upstream
-export CARD_STUB_POLICY="$S/policy.txt"
+export CARD_STUB_POLICY="$S/policy.txt" CARD_STUB_POSITION="$S/position.txt"
 MISSED=0
+# Two item keys in the engine's instance shape, `<item tag>@<pass>#<inputs>`.
+K1=item.build.base@TOOL-tFix-1#aaaa0001; K2=item.build.base@TOOL-tFix-1#aaaa0002
 
 # print_card_held <what> <0 held | else missed>
 print_card_held() {
@@ -67,6 +93,13 @@ set_card_policy() {
   local t; t=$(mktemp "$CARD_STUB_POLICY.XXXXXXXX") || exit 2
   grep -v "^$1=" "$CARD_STUB_POLICY" > "$t" 2>/dev/null; mv -f "$t" "$CARD_STUB_POLICY"
   printf '%s=%s\n' "$1" "$2" >> "$CARD_STUB_POLICY"
+}
+# set_card_position <key|answer|forked|json|rc|delay|mail|mail-delay> <value> — the stub position engine's
+# planted answer, `mail` and `mail-delay` its `--mail-interrupts` line and sleep (KICK-dKeptSession-10).
+set_card_position() {
+  local t; t=$(mktemp "$CARD_STUB_POSITION.XXXXXXXX") || exit 2
+  grep -v "^$1=" "$CARD_STUB_POSITION" > "$t" 2>/dev/null; mv -f "$t" "$CARD_STUB_POSITION"
+  printf '%s=%s\n' "$1" "$2" >> "$CARD_STUB_POSITION"
 }
 # run_card_engine <tree> <engine args…> — stdin closed, stdout and stderr to $OUT; the engine's exit.
 run_card_engine() {
@@ -81,6 +114,23 @@ read_ref_card() {
 }
 # measure_card_records <tree> — the build's card records.
 measure_card_records() { ls "$1/memory/builds/tFix/build/" 2>/dev/null | grep -c -- '-card-[0-9]*\.md$'; }
+# set_card_verdict <verdict> <blob8> <cli> — the card-import fixture's recorded verdict, planted in the
+# writer's grammar where the engine's reader finds it.
+set_card_verdict() {
+  local at; printf -v at '%(%Y-%m-%dT%H:%M:%S%z)T' -1
+  mkdir -p "$R/.git/orientation" \
+    && printf 'card-fixture — %s · fixture %s · cli %s · %s\n' "$1" "$2" "$3" "$at" > "$R/.git/orientation/card-fixture.verdict"
+}
+# write_claude_stub <script body> — a stub `claude` at $S/clibin, that dir first on PATH, whose version
+# the fixture's verdict records (KICK-dKeptSession-37 S2). The PATH entry is the POSIX spelling: a
+# drive-letter one's colon splits PATH, and the node's own `claude` answers instead of the stub.
+write_claude_stub() {
+  local d="$S/clibin"
+  { mkdir -p "$d" && printf '#!/usr/bin/env bash\n%s\n' "$1" > "$d/claude" && chmod +x "$d/claude"; } \
+    || { echo "card-store: no stub claude could be written under $d"; exit 2; }
+  command -v cygpath >/dev/null 2>&1 && d=$(cygpath -u "$d")
+  case ":$PATH:" in *":$d:"*) ;; *) export PATH="$d:$PATH" ;; esac
+}
 
 # The scratch repository: its build, the copied kits and the two stubs, committed and pushed.
 write_card_fixture() {
@@ -94,10 +144,61 @@ write_card_fixture() {
     rel=${f#"$GOVROOT"/}; rel=${rel%/*}
     mkdir -p "$R/$rel" && cp -R "$GOVROOT/$rel/." "$R/$rel/" || return 1
   done
+  # The stub position engine over the copied one: nothing a plant runs imports a name from it.
+  f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file loop position.py); [ -n "$f" ] || return 1
+  f="$R/${f#"$GOVROOT"/}"; [ -f "$f" ] || return 1
+  printf '%s\n' 'import os, sys, time' \
+    'sys.stdout.reconfigure(encoding="utf-8")' \
+    'vals = dict(l.rstrip("\n").partition("=")[::2] for l in open(os.environ["CARD_STUB_POSITION"], encoding="utf-8") if "=" in l)' \
+    'time.sleep(float(vals.get("delay") or 0))' \
+    'if len(sys.argv) == 4 and sys.argv[2] == "--boundary":' \
+    '    p, key, answer = sys.argv[3], vals.get("key") or "none", vals.get("answer") or "act"' \
+    '    if answer in ("stale-remote", "invalid-input"):' \
+    '        print("boundary — none crossed · item %s · %s" % (p, answer))' \
+    '    elif key == p:' \
+    '        print("boundary — none crossed · item %s" % p)' \
+    '    else:' \
+    '        print("boundary — %s → %s" % (p, key))' \
+    '    print("forked — %s" % (" · ".join(u for u in (vals.get("forked") or "").split(",") if u) or "none"))' \
+    '    sys.exit(2 if answer == "invalid-input" else 0)' \
+    'if len(sys.argv) == 3 and sys.argv[2] == "--json":' \
+    '    print(vals.get("json") or "{}")' \
+    '    sys.exit(int(vals.get("rc") or 0))' \
+    'if len(sys.argv) in (3, 4) and sys.argv[2] == "--mail-interrupts" and sys.argv[3:] in ([], ["--local"]):' \
+    '    open(os.environ["CARD_STUB_POSITION"] + ".log", "a", encoding="utf-8").write(" ".join(sys.argv[1:]) + "\n")' \
+    '    time.sleep(float(vals.get("mail-delay") or 0))' \
+    '    if vals.get("mail"):' \
+    '        print(vals["mail"])' \
+    '    sys.exit(0)' \
+    'sys.exit("stub position: <slug> --boundary <pointer>, <slug> --json or <slug> --mail-interrupts [--local], and was asked %s" % sys.argv[1:])' > "$f"
+  # The stub rework budget over the copied one (KICK-dKeptSession-26 S4): no card path imports a name from it.
+  f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file loop budget.py); [ -n "$f" ] || return 1
+  f="$R/${f#"$GOVROOT"/}"; [ -f "$f" ] || return 1
+  printf '%s\n' 'import os, sys' \
+    'sys.stdout.reconfigure(encoding="utf-8")' \
+    'vals = dict(l.rstrip("\n").partition("=")[::2] for l in open(os.environ["CARD_STUB_POSITION"], encoding="utf-8") if "=" in l)' \
+    'if sys.argv[1:3] == ["state", "--build"] and len(sys.argv) == 4:' \
+    '    print(vals.get("budget") or "open 0/4")' \
+    '    sys.exit(0)' \
+    'sys.exit("stub budget: state --build <slug>, and was asked %s" % sys.argv[1:])' > "$f"
+  : > "$CARD_STUB_POSITION"
+  # The stub runlog kit (KICK-dKeptSession-14 S7): the fixture copies no runlog kit, so the stub stands at the
+  # path the resolver answers over this kit's own tree.
+  f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file runlog runlog.py); [ -n "$f" ] || return 1
+  rel=${f#"$GOVROOT"/}; mkdir -p "$R/${rel%/*}"
+  printf '%s\n' 'import os, sys, time' \
+    'sys.stdout.reconfigure(encoding="utf-8")' \
+    'vals = dict(l.rstrip("\n").partition("=")[::2] for l in open(os.environ["CARD_STUB_POSITION"], encoding="utf-8") if "=" in l)' \
+    'if len(sys.argv) != 3 or sys.argv[1] != "context":' \
+    '    sys.exit("stub runlog: context <transcript>, and was asked %s" % sys.argv[1:])' \
+    'time.sleep(float(vals.get("fill-delay") or 0))' \
+    'print(vals.get("fill") or "none")' > "$R/$rel"
   f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file policy policy.py); [ -n "$f" ] || return 1
   rel=${f#"$GOVROOT"/}; mkdir -p "$R/${rel%/*}"
   printf '%s\n' 'import os, sys' \
     'vals = dict(l.rstrip("\n").partition("=")[::2] for l in open(os.environ["CARD_STUB_POLICY"], encoding="utf-8") if "=" in l)' \
+    'if len(sys.argv) == 3 and sys.argv[1] == "get":' \
+    '    open(os.environ["CARD_STUB_POLICY"] + ".log", "a", encoding="utf-8").write(sys.argv[2] + "\n")' \
     'if len(sys.argv) != 3 or sys.argv[1] != "get" or sys.argv[2] not in vals:' \
     '    sys.exit("stub policy: get <a planted key>, and was asked %s" % sys.argv[1:])' \
     'if vals[sys.argv[2]] == "":' \
@@ -116,8 +217,11 @@ write_card_fixture() {
   set_card_policy card.store remote-ref,build-folder,local-clone
   set_card_policy card.follows re-render-at-transition
   set_card_policy card.snapshot terminal-only
+  set_card_policy card.pointers every-item
   set_card_policy resume.context fresh-when-idle
   set_card_policy resume.partial continue-item
+  set_card_policy context.on-full fresh-at-boundary
+  set_card_policy context.threshold 60%
   git -C "$R" add -A && ! git -C "$R" diff --cached --quiet && git -C "$R" commit -q -m "fixture: the build tFix" \
     && git -C "$R" branch -M main && git -C "$R" remote add "$FX_REMOTE" "$O" \
     && git -C "$R" push -q "$FX_REMOTE" main 2>/dev/null || return 1
@@ -132,13 +236,68 @@ write_card_body() {
     [ "$2" = 0 ] || printf 'READY — tFix · node a · main · base %s · Tier-1 · gates none\n' "$(git -C "$R" rev-parse --short=12 HEAD)"
   } > "$1"
 }
+# write_card_records — AC1's build: two journal records a day apart, one spec-audit record and a second
+# spec, TOOL-tFix-2, the unit the stub engine grades FORKED, committed; and the memory root's LIVE.md, which
+# the session card's `live —` cell names absent, so `--card --check` finds that path tracked.
+write_card_records() {
+  printf '# LIVE\n' > "$R/memory/LIVE.md"
+  printf '**Serves:** journal TOOL-tFix-1\n\n# the older journal\n' > "$R/memory/builds/tFix/build/2026-01-01-build-TOOL-tFix-1-agent-ledger.md"
+  printf '**Serves:** journal TOOL-tFix-1\n\n# the newer journal\n' > "$R/memory/builds/tFix/build/2026-01-02-build-TOOL-tFix-1-agent-ledger.md"
+  mkdir -p "$R/memory/builds/tFix/reviews"
+  printf '## Verdict: CLEAN\n\n**Serves:** spec-audit TOOL-tFix-1@rev-1\n' > "$R/memory/builds/tFix/reviews/2026-01-01-review-TOOL-tFix-1-spec-audit.md"
+  printf '# TOOL-tFix-2 — the forked unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-1\n' > "$R/memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-2.md"
+  git -C "$R" add -A memory && ! git -C "$R" diff --cached --quiet && git -C "$R" commit -q -m "fixture: tFix's records and its forked unit"
+}
+# read_card_section <card file> — its `## pointers` section, the heading to the line before the next `## ` or READY line.
+read_card_section() {
+  tr -d '\r' < "$1" | awk '/^## pointers$/ { p = 1; print; next } p && (/^## / || /^(- )?READY — /) { p = 0 } p'
+}
+# read_card_budget <card file> — the line of its `## pointers` section directly after the `item —` line.
+read_card_budget() {
+  read_card_section "$1" | awk 'i { print; exit } /^item — / { i = 1 }'
+}
+# write_card_mail <ref> <build> <id> <to> <kind> <answers> — one mail commit over the empty tree, as
+# `KICK-dKeptSession-5`'s post recorded it, with no deadline, set on the bare remote's <ref> by `update-ref`
+# (KICK-dKeptSession-5 S13).
+write_card_mail() {
+  local t c m
+  printf -v m 'gov-mail %s/%s\n\nid: %s\nbuild: %s\nfrom-tag: z\nfrom-session: s-other\nto: %s\nkind: %s\nitem: none\npass: none\nsubject: the fixture'"'"'s question\nanswers: %s\n\nthe fixture'"'"'s message' \
+    "$2" "$3" "$3" "$2" "$4" "$5" "$6"
+  t=$(git --git-dir="$O" mktree </dev/null) \
+    && c=$(GIT_AUTHOR_NAME=gov-claim GIT_AUTHOR_EMAIL=gov-claim@invalid GIT_COMMITTER_NAME=gov-claim GIT_COMMITTER_EMAIL=gov-claim@invalid \
+         git --git-dir="$O" commit-tree "$t" -m "$m") && git --git-dir="$O" update-ref "$1" "$c" \
+    || { echo "card-store: the mail message $3 could not be set on $1"; exit 2; }
+}
 # The append at READY, which publishes the build card.
 run_card_append() {
   write_card_body "$S/body" 1
   (cd "$R" && bash "$CHECK" --card --append --session t1 < "$S/body") > "$OUT" 2>&1
 }
+# run_card_replay [source] [transcript] — the replay as the hook runs it, its payload piped on stdin with no
+# --session, naming the given `source` and `transcript_path`, never through run_card_engine, which closes
+# stdin (KICK-dKeptSession-15 S6, KICK-dKeptSession-14 S7).
+run_card_replay() {
+  local payload tx=""
+  [ -z "${2:-}" ] || printf -v tx ',"transcript_path":"%s"' "$2"
+  if [ -n "${1:-}" ]; then printf -v payload '{"session_id":"t1","cwd":"%s","source":"%s"%s}' "$R" "$1" "$tx"
+  else printf -v payload '{"session_id":"t1","cwd":"%s"%s}' "$R" "$tx"; fi
+  (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+}
+# set_card_answer <answer> <next item, empty for null> [rc] — the stub engine's `--json` answer, in the
+# engine's own spelling, a frontier row naming another item ahead of `next`, so a match not anchored on
+# `next` reads that row's item instead.
+set_card_answer() {
+  local nx=null j
+  [ -z "$2" ] || nx="{\"item\": \"$2\", \"unit\": \"TOOL-tFix-1\", \"actor\": \"agent\", \"key\": \"$2@TOOL-tFix-1#aaaa0003\"}"
+  printf -v j '{"slug": "tFix", "state": "building", "units": [{"id": "TOOL-tFix-1", "step": "building", "state": "INPROGRESS"}], "frontier": [{"item": "item.design.unit-spec", "unit": "TOOL-tFix-2", "actor": "agent", "key": "item.design.unit-spec@TOOL-tFix-2#aaaa0004"}], "next": %s, "answer": "%s", "reason": ""}' "$nx" "$1"
+  set_card_position json "$j"; set_card_position rc "${3:-0}"
+}
 
 write_card_fixture || { echo "card-store: the fixture could not be built under $S"; sed 's/^/    /' "$OUT" 2>/dev/null; exit 2; }
+# The installed card-import fixture's blob, as the engine hashes it from the tree it runs in, and that
+# tree's toplevel as git spells it, the bytes of the `tree —` cell.
+FX_BLOB=$(git -C "$R" hash-object -- "$HERE/card-compaction.fixture.sh" 2>/dev/null)
+RT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$R" rev-parse --show-toplevel)
 
 case "$PLANT" in
   render)
@@ -297,22 +456,80 @@ case "$PLANT" in
     (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
     print_card_held "AC12 the replay re-keyed the routed build's card" "$(grep -q '^card — tFix · ' "$OUT"; echo $?)"
     print_card_held "AC12 FETCH_HEAD's mtime is unchanged" "$([ "$(stat -c %Y "$R/.git/FETCH_HEAD")" = "$m0" ]; echo $?)" ;;
-  context-*|partial-*|terminal-route)
-    run_card_append
+  fixture-run)
+    # KICK-dKeptSession-12 AC4: the verb over a stub fixture exiting 0, 1 and 2, each into its own
+    # scratch dir; every file under the scratch tree but those dirs and the case's output is listed
+    # before and after, so a write outside <dir> other than the verdict is seen. The verdict records PATH's
+    # `claude` (KICK-dKeptSession-37 S2), so a stub answering 9.9.2 stands first on PATH.
+    export AI_AGENT=claude-code_9-9-2_agent
+    write_claude_stub 'echo "9.9.2 (Claude Code)"'
+    v="$R/.git/orientation/card-fixture.verdict"; mkdir -p "$S/snap"
+    printf 'exit 0\n' > "$S/stub0.sh"
+    printf '%s\n' 'echo "card-compaction: FAILED limb B — the stub names its limb"' 'exit 1' > "$S/stub1.sh"
+    printf 'exit 2\n' > "$S/stub2.sh"
+    find "$S" -path "$S/snap" -prune -o -path "$S/fx*" -prune -o -path "$OUT" -prune -o -type f -printf '%p %s %T@\n' | sort > "$S/snap/before"
+    for x in 0 1 2; do
+      CARD_FIXTURE="$S/stub$x.sh" run_card_engine "$R" --card --fixture-run "$S/fx$x"; rc=$?
+      case "$x" in 0) want='pass' ;; 1) want='red B' ;; 2) want='absent' ;; esac
+      b8=$(git -C "$R" hash-object -- "$S/stub$x.sh" | cut -c1-8)
+      print_card_held "AC4 a stub exiting $x records $want, and the verb prints that line and exits 0" \
+        "$([ "$rc" = 0 ] && grep -qx "card-fixture — $want · fixture $b8 · cli 9\.9\.2 · [0-9T:+-]*" "$v" && [ "$(tr -d '\r' < "$OUT")" = "$(tr -d '\r' < "$v")" ]; echo $?)"
+    done
+    find "$S" -path "$S/snap" -prune -o -path "$S/fx*" -prune -o -path "$OUT" -prune -o -type f -printf '%p %s %T@\n' | sort > "$S/snap/after"
+    moved=$(diff "$S/snap/before" "$S/snap/after" | sed -n 's/^[<>] \(.*\) [0-9]* [0-9.]*$/\1/p' | sort -u)
+    print_card_held "AC4 nothing outside the scratch dirs was written but the verdict (moved: ${moved:-none})" "$([ "$moved" = "$v" ]; echo $?)"
+    rm -f "$v"
+    CARD_FIXTURE="$S/stub9.sh" run_card_engine "$R" --card --fixture-run "$S/fx9"; rc=$?
+    print_card_held "AC4 with CARD_FIXTURE naming no file the verb exits 2 and writes no verdict" "$([ "$rc" = 2 ] && [ ! -e "$v" ]; echo $?)" ;;
+  fixture-run-cli)
+    # KICK-dKeptSession-37 AC2, AC3: the verdict records the version of the `claude` first on PATH, the
+    # binary the fixture launches, never the one AI_AGENT names; a stub printing no version records
+    # `unknown`, and a card written beside it keeps the `cli —` cell's skipped: reason.
+    export AI_AGENT=claude-code_9-9-2_agent
+    v="$R/.git/orientation/card-fixture.verdict"
+    printf 'exit 0\n' > "$S/stub0.sh"
+    write_claude_stub 'echo "9.9.1 (Claude Code)"'
+    CARD_FIXTURE="$S/stub0.sh" run_card_engine "$R" --card --fixture-run "$S/fx0"; rc=$?
+    print_card_held "AC2 the verdict records PATH's claude 9.9.1, not AI_AGENT's 9.9.2" \
+      "$([ "$rc" = 0 ] && grep -q '^card-fixture — pass · fixture [0-9a-f]\{8\} · cli 9\.9\.1 · ' "$v"; echo $?)"
+    write_claude_stub 'exit 1'
+    CARD_FIXTURE="$S/stub0.sh" run_card_engine "$R" --card --fixture-run "$S/fx1"; rc=$?
+    print_card_held "AC3 a PATH claude printing nothing records cli unknown" \
+      "$([ "$rc" = 0 ] && grep -q '^card-fixture — pass · fixture [0-9a-f]\{8\} · cli unknown · ' "$v"; echo $?)"
+    run_card_engine "$R" --card --write --session t1
+    print_card_held "AC3 the card's cli — cell keeps its reason" \
+      "$(grep -m1 '^cli — ' "$R/.git/orientation/t1.md" | tr -d '\r' | grep -qx 'cli — skipped: claude --version printed no version'; echo $?)" ;;
+  context-*|partial-*|terminal-route|fixture-stale|fixture-cli-*|worktree-named|replay-order)
+    case "$PLANT" in context-*|fixture-stale|fixture-cli-path-differs|worktree-named|replay-order) export AI_AGENT=claude-code_9-9-2_agent ;; fixture-cli-unknown) unset AI_AGENT ;; fixture-cli-short) export AI_AGENT=claude-code_9-9-0_agent ;; esac
+    # The verdict's reader compares a recorded pass with PATH's `claude` too (KICK-dKeptSession-38 S1),
+    # so every case replaying one past its blob test answers from a stub, never the node's own binary.
+    case "$PLANT" in context-always-resume|fixture-stale|fixture-cli-*) write_claude_stub 'echo "9.9.2 (Claude Code)"' ;; esac
+    if [ "$PLANT" = worktree-named ]; then
+      # The build card published from a linked worktree, so its `tree —` cell names that tree, and the
+      # replay below runs in the primary.
+      git -C "$R" worktree add -q "$S/wt" -b wt 2>/dev/null || { echo "card-store: no worktree could be added under $S"; exit 2; }
+      WT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$S/wt" rev-parse --show-toplevel)
+      write_card_body "$S/body" 1
+      (cd "$S/wt" && bash "$CHECK" --card --append --session t1 < "$S/body") > "$OUT" 2>&1
+    else
+      run_card_append
+    fi
     case "$PLANT" in
-      context-always-resume|context-fixture-red) set_card_policy resume.context always-resume ;;
+      context-always-resume|context-fixture-red|fixture-stale|fixture-cli-*) set_card_policy resume.context always-resume ;;
       context-always-fresh) set_card_policy resume.context always-fresh ;;
       partial-restart) set_card_policy resume.partial restart-item ;; partial-ask) set_card_policy resume.partial ask-owner ;;
     esac
     tx="$S/transcript.jsonl"; : > "$tx"; touch -d "@$(( EPOCHSECONDS - 1800 ))" "$tx"
     printf -v payload '{"session_id":"t1","transcript_path":"%s","cwd":"%s"}' "$tx" "$R"
-    read_card_fixture_verdict() { printf 'pass\n'; }
-    export -f read_card_fixture_verdict
     case "$PLANT" in
+      context-always-resume) set_card_verdict pass "${FX_BLOB:0:8}" 9.9.2 ;;
       context-fixture-red)
         printf '@.claude/orientation-card.md\n' > "$R/CLAUDE.md"
-        read_card_fixture_verdict() { printf 'red: no recorded run\n'; }
-        export -f read_card_fixture_verdict ;;
+        set_card_verdict 'red A' "${FX_BLOB:0:8}" 9.9.2 ;;
+      fixture-stale) set_card_verdict pass 00000000 9.9.2 ;;
+      fixture-cli-path-differs) set_card_verdict pass "${FX_BLOB:0:8}" 9.9.2; write_claude_stub 'echo "9.9.1 (Claude Code)"' ;;
+      fixture-cli-unknown) set_card_verdict pass "${FX_BLOB:0:8}" unknown ;;
+      fixture-cli-short) set_card_verdict pass "${FX_BLOB:0:8}" 9.9; write_claude_stub 'echo "9.9.0 (Claude Code)"' ;;
       context-transcript-absent) printf -v payload '{"session_id":"t1","cwd":"%s"}' "$R" ;;
       partial-*) : > "$R/one.txt"; : > "$R/two.txt" ;;
     esac
@@ -326,20 +543,56 @@ case "$PLANT" in
     fi
     (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
     case "$PLANT" in
-      context-idle) print_card_held "AC7 fresh-when-idle, idle 1800s: fresh" "$(grep -q '^resume — fresh recommended: idle 1[0-9]*s past 300s (resume.context: fresh-when-idle)$' "$OUT"; echo $?)" ;;
-      context-always-resume) print_card_held "AC7 always-resume, the verdict pass: resume" "$(grep -qx 'resume — resume recommended (resume.context: always-resume)' "$OUT"; echo $?)" ;;
-      context-always-fresh) print_card_held "AC7 always-fresh: fresh" "$(grep -qx 'resume — fresh recommended (resume.context: always-fresh)' "$OUT"; echo $?)" ;;
+      context-idle) print_card_held "AC7 fresh-when-idle, idle 1800s: fresh, in the publisher's tree" "$([[ $(grep '^resume — ' "$OUT" | tr -d '\r') == "resume — fresh recommended: idle 1"*"s past 300s · in $RT (resume.context: fresh-when-idle)" ]]; echo $?)" ;;
+      context-always-resume) print_card_held "AC2 always-resume, a pass recorded for this fixture and cli: resume, no override" "$(grep -qx 'resume — resume recommended (resume.context: always-resume)' "$OUT"; echo $?)" ;;
+      context-always-fresh) print_card_held "AC7 always-fresh: fresh, in the publisher's tree" "$(grep -qxF "resume — fresh recommended · in $RT (resume.context: always-fresh)" "$OUT"; echo $?)" ;;
       context-fixture-red)
-        want='(resume.context: always-resume read as fresh-when-idle · card-import fixture red: no recorded run)'
-        print_card_held "AC7 always-resume, the verdict red and the import line present: fresh, the override named" "$(grep -F "$want" "$OUT" | grep -q '^resume — fresh recommended: idle '; echo $?)"
-        unset -f read_card_fixture_verdict
+        want='(resume.context: always-resume read as fresh-when-idle · card-import fixture red: red A)'
+        print_card_held "AC1 always-resume, a red verdict recorded and the import line present: fresh, the override named" "$(grep -F "$want" "$OUT" | grep -q '^resume — fresh recommended: idle '; echo $?)" ;;
+      fixture-stale)
+        print_card_held "AC3 a pass recorded for another fixture blob overrides" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: recorded for fixture 00000000, now ${FX_BLOB:0:8})"; echo $?)"
+        set_card_verdict pass "${FX_BLOB:0:8}" 1.0.0
         (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
-        print_card_held "AC7 ...and with no reader exported, the same" "$(grep -qF "$want" "$OUT" && grep -q '^resume — fresh recommended' "$OUT"; echo $?)" ;;
+        print_card_held "AC3 a pass recorded under another cli overrides, named against PATH's" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: recorded under cli 1.0.0, PATH now 9.9.2)"; echo $?)" ;;
+      fixture-cli-path-differs)
+        # KICK-dKeptSession-38 AC1, AC2: a pass recorded at 9.9.2 replayed under each side differing in
+        # turn, then under all three equal.
+        print_card_held "AC1 the session's 9.9.2 equal, PATH's 9.9.1 not: fresh, the PATH reason named" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: recorded under cli 9.9.2, PATH now 9.9.1)"; echo $?)"
+        write_claude_stub 'echo "9.9.2 (Claude Code)"'; export AI_AGENT=claude-code_9-9-3_agent
+        (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+        print_card_held "AC2 PATH's 9.9.2 equal, the session's 9.9.3 not: fresh, the session reason named" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: fixture ran cli 9.9.2, this session runs 9.9.3)"; echo $?)"
+        export AI_AGENT=claude-code_9-9-2_agent
+        (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+        print_card_held "AC2 all three 9.9.2: resume, no override" "$(grep -qx 'resume — resume recommended (resume.context: always-resume)' "$OUT"; echo $?)" ;;
+      fixture-cli-unknown)
+        # KICK-dKeptSession-38 AC3 and S2's other two sides: an unknown version is red, never an equality.
+        print_card_held "AC3 a recorded cli unknown, AI_AGENT unset: fresh, unknown named for the record" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: cli version unknown · recorded)"; echo $?)"
+        set_card_verdict pass "${FX_BLOB:0:8}" 9.9.2; write_claude_stub 'exit 1'; export AI_AGENT=claude-code_9-9-2_agent
+        (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+        print_card_held "S2 a PATH claude printing no version: fresh, unknown named for PATH" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: cli version unknown · PATH)"; echo $?)"
+        write_claude_stub 'echo "9.9.2 (Claude Code)"'; unset AI_AGENT
+        (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+        print_card_held "S2 AI_AGENT naming no version: fresh, unknown named for the session" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: cli version unknown · session)"; echo $?)" ;;
+      fixture-cli-short)
+        # KICK-dKeptSession-56 AC19, S37: a pass recorded under cli 9.9 replayed with PATH and the session at
+        # 9.9.0, one version field by field, so no override; a string compare would red it as recorded under
+        # cli 9.9, PATH now 9.9.0.
+        print_card_held "AC19 a pass recorded under cli 9.9, PATH and the session at 9.9.0: resume, no override" "$(grep -qx 'resume — resume recommended (resume.context: always-resume)' "$OUT"; echo $?)" ;;
+      worktree-named)
+        print_card_held "AC5 a fresh recommendation names the worktree the stored tree cell names" "$([[ $(grep '^resume — ' "$OUT" | tr -d '\r') == "resume — fresh recommended: idle 1"*"s past 300s · in $WT (resume.context: fresh-when-idle)" ]] && [ "$WT" != "$RT" ]; echo $?)"
+        git -C "$R" worktree remove --force "$S/wt" 2>/dev/null
+        (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+        print_card_held "AC5 that tree no longer listed: a new worktree of tFix" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF ' · in a new worktree of tFix (resume.context: fresh-when-idle)'; echo $?)" ;;
+      replay-order)
+        at=$(tr -d '\r' < "$OUT" | awk '/^READY — tFix/ && !r { r = NR } /^card — tFix · / && !c { c = NR } /^route — / && !o { o = NR }
+          /^resume — / && !e { e = NR } /^partial — / && !p { p = NR } /^now — / && !n { n = NR } END { print r + 0, c + 0, o + 0, e + 0, p + 0, n + 0 }')
+        read -r l1 l2 l3 l4 l5 l6 <<<"$at"
+        print_card_held "AC6 READY, card, route, resume, partial and now at lines $at, increasing" "$([ "$l1" -gt 0 ] && [ "$l1" -lt "$l2" ] && [ "$l2" -lt "$l3" ] && [ "$l3" -lt "$l4" ] && [ "$l4" -lt "$l5" ] && [ "$l5" -lt "$l6" ]; echo $?)" ;;
       context-transcript-absent)
-        print_card_held "AC7 no transcript_path: fresh, transcript absent" "$(grep -qx 'resume — fresh recommended: transcript absent (resume.context: fresh-when-idle)' "$OUT"; echo $?)"
+        print_card_held "AC7 no transcript_path: fresh, transcript absent, in the publisher's tree" "$(grep -qxF "resume — fresh recommended: transcript absent · in $RT (resume.context: fresh-when-idle)" "$OUT"; echo $?)"
         printf -v payload '{"session_id":"t1","transcript_path":"%s","cwd":"%s"}' "$S/deleted.jsonl" "$R"
         (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
-        print_card_held "AC7 a transcript_path naming a deleted file: the same" "$(grep -qx 'resume — fresh recommended: transcript absent (resume.context: fresh-when-idle)' "$OUT"; echo $?)" ;;
+        print_card_held "AC7 a transcript_path naming a deleted file: the same" "$(grep -qxF "resume — fresh recommended: transcript absent · in $RT (resume.context: fresh-when-idle)" "$OUT"; echo $?)" ;;
       partial-*)
         v=${PLANT#partial-}; case "$v" in continue) v=continue-item ;; restart) v=restart-item ;; ask) v=ask-owner ;; esac
         print_card_held "AC8 the partial line counts 2 paths and names $v" "$(grep -q "^partial — 2 uncommitted path(s) · resume.partial: $v · " "$OUT"; echo $?)"
@@ -407,5 +660,345 @@ case "$PLANT" in
         print_card_held "S4 resolve_build_card, run after the follow, re-keys that same card" \
           "$(grep -q '^card — tFix · ' "$OUT" && [ -s "$S/card.tail" ] && cmp -s "$S/card.tail" "$S/t1.tail"; echo $?)" ;;
     esac ;;
+  pointers-render)
+    # KICK-dKeptSession-13 AC1, AC11: `--card --pointers` over two journal records, one spec-audit record
+    # and a FORKED unit, the stub answering K1. Staged against an older record of a kind winning, the
+    # resolved spec listed, or the section after the READY line, a row reds; AC11's second row is the
+    # failing case, a section missing a POINTER_LINES line passing the check.
+    write_card_records; set_card_position key "$K1"; set_card_position forked TOOL-tFix-2
+    run_card_append
+    run_card_engine "$R" --card --pointers --build tFix --session t1
+    read_ref_card "$O" > "$S/card"; read_card_section "$S/card" > "$S/sec"; h8=$(git -C "$R" rev-parse --short=8 HEAD)
+    print_card_held "AC1 records — names the newer journal and the review, never the older journal" \
+      "$(grep -q '^records — .*journal memory/builds/tFix/build/2026-01-02-build-TOOL-tFix-1-agent-ledger\.md' "$S/sec" \
+        && grep -q '^records — .*spec-audit memory/builds/tFix/reviews/2026-01-01-review-TOOL-tFix-1-spec-audit\.md' "$S/sec" \
+        && ! grep -q '2026-01-01-build-TOOL-tFix-1-agent-ledger' "$S/sec"; echo $?)"
+    print_card_held "AC1 forks — names the FORKED spec's §8 alone" "$(grep -qx 'forks — memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-2\.md §8' "$S/sec"; echo $?)"
+    print_card_held "AC1 item — names the stub's key at HEAD $h8" "$(grep -qxF "item — $K1 · at $h8" "$S/sec"; echo $?)"
+    print_card_held "AC1 the section sits above the READY line, which is still last" \
+      "$(tr -d '\r' < "$S/card" | awk '/^## pointers$/ { p = NR } /^READY — / { r = NR } END { exit !(p && r > p && r == NR) }'; echo $?)"
+    run_card_engine "$R" --card --check --session t1; rc=$?
+    print_card_held "AC11 --card --check passes the session card as written" "$([ "$rc" = 0 ] && read_card_section "$R/.git/orientation/t1.md" | grep -q '^forks — '; echo $?)"
+    grep -v '^forks — ' "$R/.git/orientation/t1.md" > "$S/t1.cut" && cp "$S/t1.cut" "$R/.git/orientation/t1.md"
+    run_card_engine "$R" --card --check --session t1; rc=$?
+    print_card_held "AC11 with its forks — line cut the check exits 1 naming forks —" "$([ "$rc" = 1 ] && grep -q "no 'forks —' line" "$OUT"; echo $?)" ;;
+  pointers-boundary)
+    # KICK-dKeptSession-13 AC2: the session card brought to K1, then the stub at K2. Staged against a
+    # crossing that leaves the ref's `item —` unchanged, the first row reds; against a run with no
+    # crossing that publishes, the second.
+    run_card_append; set_card_position key "$K1"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC2 a card with no section crosses none → K1" "$(grep -qxF "boundary — none → $K1" "$OUT"; echo $?)"
+    set_card_position key "$K2"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC2 K1 → K2 prints the crossing and the ref's card reads item — K2" \
+      "$(grep -qxF "boundary — $K1 → $K2" "$OUT" && read_ref_card "$O" | grep -q "^item — $K2 · at "; echo $?)"
+    c1=$(git -C "$O" rev-parse --verify -q "$REF"); git -C "$R" commit -q --allow-empty -m "fixture: another commit"; h8=$(git -C "$R" rev-parse --short=8 HEAD)
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC2 the stub still at K2 after a commit: nothing published, the session card's at reads $h8" \
+      "$(grep -qxF "boundary — none crossed · item $K2" "$OUT" && [ "$(git -C "$O" rev-parse --verify -q "$REF")" = "$c1" ] \
+        && read_card_section "$R/.git/orientation/t1.md" | grep -qxF "item — $K2 · at $h8"; echo $?)"
+    run_card_engine "$R" --card --boundary --build tFix --session t1 --out "$S/boundary.out"
+    print_card_held "AC2 with --out the stdout is empty and the file holds the lines" "$([ ! -s "$OUT" ] && grep -qxF "boundary — none crossed · item $K2" "$S/boundary.out"; echo $?)"
+    run_card_engine "$R" --card --boundary --build tFix --session t1 --out "$S/nowhere/boundary.out"; rc=$?
+    print_card_held "AC2 an --out whose directory does not exist is refused, exit 2" "$([ "$rc" = 2 ] && [ ! -e "$S/nowhere" ]; echo $?)" ;;
+  pointers-at-transitions)
+    # KICK-dKeptSession-13 AC3: under at-transitions a crossing publishes nothing and the follow re-renders.
+    set_card_policy card.pointers at-transitions
+    run_card_append; c1=$(git -C "$O" rev-parse --verify -q "$REF"); set_card_position key "$K1"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC3 the crossing leaves the ref unchanged and rewrites the session card's item — line" \
+      "$(grep -qxF "boundary — none → $K1" "$OUT" && [ "$(git -C "$O" rev-parse --verify -q "$REF")" = "$c1" ] \
+        && read_card_section "$R/.git/orientation/t1.md" | grep -q "^item — $K1 · at "; echo $?)"
+    # KICK-dKeptSession-44 S10, AC8: the tree's card file, which KICK-dKeptSession-8's arm reads, is
+    # re-rendered at the same crossing, so under at-transitions it holds the new item too. Staged against a
+    # crossing that skips write_card_file, the row reds on the stale item.
+    print_card_held "AC8 the crossing re-renders the tree card file to item — $K1" \
+      "$(read_card_section "$R/.claude/orientation-card.md" | grep -q "^item — $K1 · at "; echo $?)"
+    run_card_engine "$R" --card --follow --build tFix --to designing
+    print_card_held "AC3 the follow re-renders the section with the stub's key" \
+      "$(read_ref_card "$O" | head -n 1 | grep -q '^card — tFix · step designing ·' && read_ref_card "$O" | grep -q "^item — $K1 · at "; echo $?)" ;;
+  pointers-cap)
+    # KICK-dKeptSession-13 AC6: a cap the card fits under without its section and not with it, the
+    # `## pockets` section's room taken out, since the render drops it before it refuses the card.
+    set_card_position key "$K1"; run_card_append; c1=$(git -C "$O" rev-parse --verify -q "$REF")
+    read_ref_card "$O" > "$S/card"
+    b=$(wc -c < "$S/card"); sb=$(read_card_section "$S/card" | wc -c)
+    pb=$(tr -d '\r' < "$S/card" | awk '/^## pockets$/ { p = 1 } /^recent —/ { p = 0 } p' | wc -c)
+    CARD_CAP_BYTES=$((b - pb - sb / 2)) run_card_engine "$R" --card --pointers --build tFix --session t1
+    print_card_held "AC6 under CARD_CAP_BYTES=$((b - pb - sb / 2)) the publish names the pointers not written" "$(grep -q '^card — pointers not written: [0-9]* bytes over the cap$' "$OUT"; echo $?)"
+    print_card_held "AC6 the ref is unchanged" "$([ "$(git -C "$O" rev-parse --verify -q "$REF")" = "$c1" ]; echo $?)"
+    # KICK-dKeptSession-44 S22, AC20: the base kinds' records and one record of every typed kind the
+    # memory-tree kit declares, read from its tree_lib; under the default cap the pointers publish, and the
+    # records — line names base kinds alone. Staged against a reader keeping typed kinds, the row reds.
+    tl=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file memory-tree tree_lib.py)
+    write_card_records
+    mapfile -t typed < <("$PY" -c 'import sys; sys.path.insert(0, sys.argv[1]); import tree_lib; print("\n".join(tree_lib.TYPED_RECORD_KINDS))' "${tl%/*}" | tr -d '\r')
+    base=$("$PY" -c 'import sys; sys.path.insert(0, sys.argv[1]); import tree_lib as t
+print("|".join(k for k in t.RECORD_KIND_TOKENS if k not in t.TYPED_RECORD_KINDS))' "${tl%/*}" | tr -d '\r')
+    for k in "${typed[@]}"; do
+      printf '**Serves:** %s TOOL-tFix-1\n\n# a %s record\n' "$k" "$k" > "$R/memory/builds/tFix/build/2026-01-03-build-TOOL-tFix-1-$k-1.md"
+    done
+    git -C "$R" add -A memory && ! git -C "$R" diff --cached --quiet && git -C "$R" commit -q -m "fixture: a record of every typed kind"
+    run_card_engine "$R" --card --pointers --build tFix --session t1
+    read_ref_card "$O" > "$S/card"
+    read_card_section "$S/card" | sed -n 's/^records — //p' | sed 's/ · /\n/g' | awk '{ print $1 }' > "$S/kinds"
+    print_card_held "AC20 beside a record of each of the ${#typed[@]} typed kinds the pointers publish, the records — line naming base kinds alone" \
+      "$([ "${#typed[@]}" -gt 0 ] && ! grep -q 'pointers not written' "$OUT" && [ -s "$S/kinds" ] \
+        && [ -n "$base" ] && ! grep -qvxE "$base" "$S/kinds"; echo $?)" ;;
+  pointers-replay)
+    # KICK-dKeptSession-13 AC7: a compacted session's replay in a second clone, after a publish carrying
+    # K1, prints the section the lookup re-keyed from the build card.
+    set_card_position key "$K1"; run_card_append
+    git clone -q -b main "$O" "$S/clone2" 2>/dev/null && git -C "$S/clone2" config core.hooksPath "$S/hooks"
+    run_card_engine "$S/clone2" --card --lookup --build tFix --session t2
+    C2=$(unset GIT_DIR GIT_WORK_TREE; git -C "$S/clone2" rev-parse --show-toplevel)
+    printf -v payload '{"session_id":"t2","cwd":"%s"}' "$C2"
+    (cd "$S/clone2" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+    print_card_held "AC7 the replay prints the ## pointers section the lookup re-keyed" \
+      "$(read_card_section "$OUT" | grep -q "^item — $K1 · at " && read_card_section "$OUT" | grep -q '^records — '; echo $?)" ;;
+  budget-open)
+    # KICK-dKeptSession-26 AC1, AC4: the stub loop kit answering open 3/10 at the append, then two
+    # `--card --boundary` runs, the stub moved to K2 and open 4/10 between them, so the second crosses and
+    # publishes under every-item. Staged against a line placed outside the section or after another line,
+    # the first row reds; against a boundary re-rendering the section with the earlier figure, the second.
+    set_card_position key "$K1"; set_card_position budget "open 3/10"; run_card_append
+    read_ref_card "$O" > "$S/card"
+    print_card_held "AC1 the published card's line directly after item — reads budget — open 3/10" \
+      "$([ "$(read_card_budget "$S/card")" = 'budget — open 3/10' ]; echo $?)"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    set_card_position key "$K2"; set_card_position budget "open 4/10"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    read_ref_card "$O" > "$S/card"
+    print_card_held "AC4 the second boundary crosses to K2 and the ref's card reads budget — open 4/10 after item — K2" \
+      "$(grep -qxF "boundary — $K1 → $K2" "$OUT" && read_card_section "$S/card" | grep -q "^item — $K2 · at " \
+        && [ "$(read_card_budget "$S/card")" = 'budget — open 4/10' ]; echo $?)" ;;
+  budget-spent|budget-unfrozen)
+    # KICK-dKeptSession-26 AC1: the other two answers, printed as the stub prints them.
+    case "$PLANT" in budget-spent) want='budget — spent' ;; *) want='budget — unfrozen 1/4' ;; esac
+    set_card_position key "$K1"; set_card_position budget "${want#budget — }"; run_card_append
+    read_ref_card "$O" > "$S/card"
+    print_card_held "AC1 the published card's line directly after item — reads $want" \
+      "$([ "$(read_card_budget "$S/card")" = "$want" ]; echo $?)" ;;
+  budget-omitted)
+    # KICK-dKeptSession-26 AC2: the session card as written passes `--card --check`; with its `budget —`
+    # line cut, the failing case, the check exits 1 naming `budget —`.
+    write_card_records; set_card_position key "$K1"; run_card_append
+    run_card_engine "$R" --card --pointers --build tFix --session t1
+    run_card_engine "$R" --card --check --session t1; rc=$?
+    print_card_held "AC2 --card --check passes the session card as written, its line after item — reading budget — open 0/4" \
+      "$([ "$rc" = 0 ] && [ "$(read_card_budget "$R/.git/orientation/t1.md")" = 'budget — open 0/4' ]; echo $?)"
+    grep -v '^budget — ' "$R/.git/orientation/t1.md" > "$S/t1.cut" && cp "$S/t1.cut" "$R/.git/orientation/t1.md"
+    run_card_engine "$R" --card --check --session t1; rc=$?
+    print_card_held "AC2 with its budget — line cut the check exits 1 naming budget —" "$([ "$rc" = 1 ] && grep -q "no 'budget —' line" "$OUT"; echo $?)" ;;
+  budget-no-kit)
+    # KICK-dKeptSession-26 AC3: the copied loop kit's budget.py taken out of the repository, so
+    # `resolve_kit_file` answers nothing; the line is a skip, and a skip is a line the check passes.
+    f=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file loop budget.py); [ -n "$f" ] || { echo "card-store: no budget.py resolves in $R"; exit 2; }
+    git -C "$R" rm -q -- "${f#"$R"/}" && git -C "$R" commit -q -m "fixture: no budget.py" || { echo "card-store: $f could not be taken out"; exit 2; }
+    print_card_held "AC3 no budget.py resolves in the repository" "$([ -z "$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file loop budget.py)" ]; echo $?)"
+    write_card_records; set_card_position key "$K1"; run_card_append
+    run_card_engine "$R" --card --pointers --build tFix --session t1
+    read_ref_card "$O" > "$S/card"
+    print_card_held "AC3 the published card's line directly after item — reads budget — skipped: no loop kit" \
+      "$([ "$(read_card_budget "$S/card")" = 'budget — skipped: no loop kit' ]; echo $?)"
+    run_card_engine "$R" --card --check --session t1; rc=$?
+    print_card_held "AC3 --card --check passes the session card carrying the skip" \
+      "$([ "$rc" = 0 ] && read_card_section "$R/.git/orientation/t1.md" | grep -qx 'budget — skipped: no loop kit'; echo $?)" ;;
+  position-act)
+    # KICK-dKeptSession-15 AC1: the stub engine answering act at item.build.unit-pass, a frontier row
+    # naming item.design.unit-spec ahead of it, so a match not anchored on `next` misses.
+    run_card_append; set_card_answer act item.build.unit-pass; run_card_replay
+    print_card_held "AC1 act at item.build.unit-pass prints position — act · next item.build.unit-pass" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — act · next item.build.unit-pass'; echo $?)" ;;
+  position-awaiting)
+    # KICK-dKeptSession-15 AC1: a non-act answer names no item, its JSON's next filled or not; an
+    # invalid-input JSON exiting 2 reads as the answer it prints.
+    run_card_append; set_card_answer awaiting item.build.unit-pass; run_card_replay
+    print_card_held "AC1 awaiting, its JSON naming a next item, prints position — awaiting · next none" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — awaiting · next none'; echo $?)"
+    set_card_answer invalid-input "" 2; run_card_replay
+    print_card_held "AC1 invalid-input, exit 2, prints position — invalid-input · next none" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — invalid-input · next none'; echo $?)" ;;
+  position-disagrees)
+    # KICK-dKeptSession-15 AC2, S4: the card's stored item — pointer at item.design.unit-spec, the stub
+    # engine answering item.build.unit-pass; the line takes the engine's and the pointer stays as written.
+    set_card_position key item.design.unit-spec@TOOL-tFix-1#aaaa0001; run_card_append
+    set_card_answer act item.build.unit-pass; run_card_replay
+    print_card_held "AC2 the replayed card's item — pointer names item.design.unit-spec" \
+      "$(read_card_section "$OUT" | grep -q '^item — item\.design\.unit-spec@TOOL-tFix-1#aaaa0001 · at '; echo $?)"
+    print_card_held "AC2 the position line names the engine's item.build.unit-pass" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — act · next item.build.unit-pass'; echo $?)" ;;
+  position-skips)
+    # KICK-dKeptSession-15 AC3: the session card as the fixture wrote it routes no build; then routed, the
+    # copied loop kit's position.py moved aside, then the stub sleeping past a lowered bound, timed against
+    # a control replay whose stub answers at once, as lookup-hung measures; then a usage line exiting 2.
+    run_card_replay
+    print_card_held "AC3 an unrouted card prints position — skipped: the card routes no build, and the card" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — skipped: the card routes no build' && grep -q '^orientation — t1 · ' "$OUT" && grep -q '^READY — none yet' "$OUT"; echo $?)"
+    run_card_append; set_card_answer act item.build.unit-pass
+    f=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file loop position.py); [ -n "$f" ] || { echo "card-store: no position.py resolves in $R"; exit 2; }
+    t=$(mktemp "$S/position.XXXXXXXX") && cp -p "$f" "$t" && rm -f "$f" || { echo "card-store: $f could not be moved aside"; exit 2; }
+    run_card_replay
+    print_card_held "AC3 no position.py resolving prints position — skipped: no loop kit, and the card" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — skipped: no loop kit' && grep -q '^READY — tFix' "$OUT"; echo $?)"
+    cp -p "$t" "$f" || { echo "card-store: $f could not be restored"; exit 2; }
+    t0=$EPOCHSECONDS; run_card_replay; t1=$EPOCHSECONDS
+    set_card_position delay 30
+    t2=$EPOCHSECONDS; CARD_POSITION_BOUND=2 run_card_replay; t3=$EPOCHSECONDS
+    set_card_position delay 0
+    print_card_held "AC3 a stub past CARD_POSITION_BOUND=2 prints did not answer within 2s, and the card" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — skipped: position.py did not answer within 2s' && grep -q '^READY — tFix' "$OUT"; echo $?)"
+    print_card_held "AC3 the slow replay took $((t3 - t2 - t1 + t0))s over the control, within the bound plus 5s" "$([ $((t3 - t2 - t1 + t0)) -le 7 ]; echo $?)"
+    set_card_position json "usage: position.py [-h] [--json | --next-line] [slug]"; set_card_position rc 2; run_card_replay
+    print_card_held "AC3 a usage line exiting 2 prints the unreadable skip, never invalid-input" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — skipped: position.py printed no answer this replay reads' && ! grep -q '^position — invalid-input' "$OUT"; echo $?)" ;;
+  lead-compact|lead-resume)
+    # KICK-dKeptSession-15 AC4, AC5: the payload's source compact, then resume, the position answered by
+    # the stub; after a compaction the notice follows the position line, in I10's slot before now —.
+    run_card_append; set_card_answer act item.build.unit-pass; run_card_replay "${PLANT#lead-}"
+    lead="lead — the compaction summary is a lead, never a source: check it against the position above and the card's pointers"
+    if [ "$PLANT" = lead-compact ]; then
+      print_card_held "AC4 source compact: the lead — notice directly follows the position line" \
+        "$(tr -d '\r' < "$OUT" | grep -A1 -x 'position — act · next item.build.unit-pass' | tail -n 1 | grep -qxF "$lead"; echo $?)"
+      at=$(tr -d '\r' < "$OUT" | awk '/^partial — / && !p { p = NR } /^position — / && !o { o = NR } /^lead — / && !l { l = NR }
+        /^now — / && !n { n = NR } END { print p + 0, o + 0, l + 0, n + 0 }')
+      read -r l1 l2 l3 l4 <<<"$at"
+      print_card_held "AC5 partial, position, lead and now at lines $at, increasing" "$([ "$l1" -gt 0 ] && [ "$l1" -lt "$l2" ] && [ "$l2" -lt "$l3" ] && [ "$l3" -lt "$l4" ]; echo $?)"
+    else
+      print_card_held "AC4 source resume: the position line prints and no lead — line does" \
+        "$(tr -d '\r' < "$OUT" | grep -qx 'position — act · next item.build.unit-pass' && ! grep -q '^lead — ' "$OUT"; echo $?)"
+    fi ;;
+  fill-fresh-past|fill-under|fill-compact)
+    # KICK-dKeptSession-14 AC3, AC4, AC5: the session card's first boundary, crossing none → K1, with a
+    # transcript named by --transcript and the stub runlog kit answering the planted share. Staged against
+    # a crossing past the threshold that prints nothing, fill-fresh-past reds; against a line printed under
+    # the threshold or away from a crossing, fill-under; against compact-with-card measuring or reading
+    # the threshold, fill-compact.
+    run_card_append; set_card_position key "$K1"
+    tx="$S/transcript.jsonl"; : > "$tx"
+    case "$PLANT" in
+      fill-fresh-past) set_card_position fill 72% ;;
+      fill-under) set_card_position fill 41% ;;
+      fill-compact) set_card_position fill 72%; set_card_policy context.on-full compact-with-card ;;
+    esac
+    : > "$CARD_STUB_POLICY.log"
+    run_card_engine "$R" --card --boundary --build tFix --session t1 --transcript "$tx"
+    crossed=$(grep -qxF "boundary — none → $K1" "$OUT"; echo $?)
+    case "$PLANT" in
+      fill-fresh-past)
+        print_card_held "AC3 a crossing at 72% under fresh-at-boundary and 60% prints the fresh-now line" \
+          "$([ "$crossed" = 0 ] && tr -d '\r' < "$OUT" | grep -qxF 'context — 72% of window · past 60% · fresh now, at this item boundary (context.on-full: fresh-at-boundary)'; echo $?)" ;;
+      fill-under)
+        print_card_held "AC4 a crossing at 41% prints no context — line" "$([ "$crossed" = 0 ] && ! grep -q '^context — ' "$OUT"; echo $?)"
+        set_card_position fill 72%
+        run_card_engine "$R" --card --boundary --build tFix --session t1 --transcript "$tx"
+        print_card_held "AC4 no crossing at 72% prints no context — line" \
+          "$(grep -qxF "boundary — none crossed · item $K1" "$OUT" && ! grep -q '^context — ' "$OUT"; echo $?)" ;;
+      fill-compact)
+        print_card_held "AC5 compact-with-card: the crossing at 72% prints no context — line" "$([ "$crossed" = 0 ] && ! grep -q '^context — ' "$OUT"; echo $?)"
+        print_card_held "AC5 the stub policy kit's log shows context.on-full read and context.threshold never" \
+          "$(tr -d '\r' < "$CARD_STUB_POLICY.log" | grep -qx 'context.on-full' && ! tr -d '\r' < "$CARD_STUB_POLICY.log" | grep -qx 'context.threshold'; echo $?)" ;;
+    esac ;;
+  fill-replay)
+    # KICK-dKeptSession-14 AC6: a compaction replayed with the payload's transcript_path, the stub engine
+    # answering act and the stub runlog kit 72%; the line stands after position — and before now —, then
+    # reads compact-with-card's own line, and under the threshold S4's `under` line. Staged against the
+    # line printed after now —, or not at all, the first row reds.
+    run_card_append; set_card_answer act item.build.unit-pass; set_card_position fill 72%
+    tx="$S/transcript.jsonl"; : > "$tx"
+    run_card_replay compact "$tx"
+    want='context — 72% of window · past 60% · fresh at next item boundary (context.on-full: fresh-at-boundary)'
+    at=$(tr -d '\r' < "$OUT" | awk -v w="$want" '/^position — / && !o { o = NR } $0 == w && !c { c = NR } /^now — / && !n { n = NR }
+      END { print o + 0, c + 0, n + 0 }')
+    read -r l1 l2 l3 <<<"$at"
+    print_card_held "AC6 fresh-at-boundary at 72%: position, context and now at lines $at, increasing" \
+      "$([ "$l1" -gt 0 ] && [ "$l1" -lt "$l2" ] && [ "$l2" -lt "$l3" ]; echo $?)"
+    set_card_policy context.on-full compact-with-card; run_card_replay compact "$tx"
+    print_card_held "AC6 compact-with-card at 72% reads context — 72% of window (context.on-full: compact-with-card)" \
+      "$(tr -d '\r' < "$OUT" | grep -qxF 'context — 72% of window (context.on-full: compact-with-card)'; echo $?)"
+    set_card_policy context.on-full fresh-at-boundary; set_card_position fill 41%; run_card_replay compact "$tx"
+    print_card_held "S4 fresh-at-boundary at 41% reads context — 41% of window · under 60%" \
+      "$(tr -d '\r' < "$OUT" | grep -qxF 'context — 41% of window · under 60%'; echo $?)" ;;
+  fill-slow)
+    # KICK-dKeptSession-14 AC10: the stub runlog kit sleeping past a lowered CARD_CONTEXT_BOUND, timed
+    # against a control replay whose stub answers at once, as position-skips times its bound.
+    run_card_append; set_card_answer act item.build.unit-pass; set_card_position fill 72%
+    tx="$S/transcript.jsonl"; : > "$tx"
+    t0=$EPOCHSECONDS; run_card_replay "" "$tx"; t1=$EPOCHSECONDS
+    set_card_position fill-delay 30
+    t2=$EPOCHSECONDS; CARD_CONTEXT_BOUND=2 run_card_replay "" "$tx"; t3=$EPOCHSECONDS
+    set_card_position fill-delay 0
+    print_card_held "AC10 a stub past CARD_CONTEXT_BOUND=2 prints did not answer within 2s, and the replay still ends with its now — line" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'context — skipped: runlog.py did not answer within 2s' && tr -d '\r' < "$OUT" | tail -n 1 | grep -q '^now — '; echo $?)"
+    print_card_held "AC10 the slow replay took $((t3 - t2 - t1 + t0))s over the control, within the bound plus 5s" "$([ $((t3 - t2 - t1 + t0)) -le 7 ]; echo $?)" ;;
+  mail-open|mail-none|mail-off)
+    # KICK-dKeptSession-5 AC8: fy's question to build:tFix on the remote; mail-none adds tFix's ack of it,
+    # mail-off turns RUN_CLAIMS off in the repository's conf. Staged against a pointers writer omitting the
+    # `mail —` line, or reading the mailbox without --open, the row reds.
+    write_card_mail refs/gov/mail/fy/z/s-other fy a1b2c3d4e5f6 build:tFix question none
+    [ "$PLANT" != mail-none ] || write_card_mail refs/gov/mail/tFix/z/s-fx tFix 0f1e2d3c4b5a build:fy ack a1b2c3d4e5f6
+    if [ "$PLANT" = mail-off ]; then
+      sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$R/.unattended.conf" && git -C "$R" commit -q -am "fixture: RUN_CLAIMS off" \
+        || { echo "card-store: RUN_CLAIMS could not be turned off in $R"; exit 2; }
+    fi
+    case "$PLANT" in mail-open) want='mail — a1b2c3d4e5f6' ;; mail-none) want='mail — none' ;; *) want='mail — skipped: RUN_CLAIMS is off' ;; esac
+    set_card_position key "$K1"; run_card_append
+    run_card_engine "$R" --card --pointers --build tFix --session t1
+    print_card_held "AC8 the session card's pointers section carries $want" \
+      "$(read_card_section "$R/.git/orientation/t1.md" | grep -qxF "$want"; echo $?)" ;;
+  mail-boundary)
+    # KICK-dKeptSession-10 AC2: the card moved to K1 by a first crossing, then the stub engine answering K2
+    # and its planted `mail` line; then the key held, no crossing; then a crossing back to K1 with the
+    # stub's `mail-delay` past a lowered CARD_CLAIMS_BOUND. Staged against the step run with no crossing,
+    # the second row reds; against a crossing that reads no mail, the first.
+    run_card_append; set_card_position key "$K1"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    mail='interrupt — mailbox · m1 question from fy'
+    set_card_position key "$K2"; set_card_position mail "$mail"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    at=$(tr -d '\r' < "$OUT" | awk -v b="boundary — $K1 → $K2" -v m="$mail" '$0 == b && !x { x = NR } $0 == m && !y { y = NR }
+      END { print x + 0, y + 0 }')
+    read -r l1 l2 <<<"$at"
+    print_card_held "AC2 a crossing prints boundary — K1 → K2 and then the planted mailbox line, at lines $at" \
+      "$([ "$l1" -gt 0 ] && [ "$l1" -lt "$l2" ]; echo $?)"
+    n=$(grep -c -- '--mail-interrupts' "$CARD_STUB_POSITION.log" 2>/dev/null)
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC2 no crossing prints no mailbox line and the stub's log gains no --mail-interrupts row" \
+      "$(grep -qxF "boundary — none crossed · item $K2" "$OUT" && ! grep -q '^interrupt — mailbox' "$OUT" \
+        && [ "$(grep -c -- '--mail-interrupts' "$CARD_STUB_POSITION.log" 2>/dev/null)" = "$n" ]; echo $?)"
+    set_card_position key "$K1"; set_card_position mail-delay 5
+    CARD_CLAIMS_BOUND=2 run_card_engine "$R" --card --boundary --build tFix --session t1
+    set_card_position mail-delay 0
+    print_card_held "AC2 a crossing past CARD_CLAIMS_BOUND=2 prints the read passed its 2s bound" \
+      "$(grep -qxF "boundary — $K2 → $K1" "$OUT" && tr -d '\r' < "$OUT" | grep -qxF 'interrupt — mailbox · unarmed · the read passed its 2s bound'; echo $?)" ;;
+  mail-notice-boundary)
+    # KICK-dKeptSession-21 AC3: the card moved to K1 by a first crossing, then fy's question to build:tFix
+    # set on the bare remote and a crossing to K2, the stub engine answering its planted `mail` line; the
+    # copied driver's `--mail notice` reads `mailbox.notice` as its default, since the stub policy kit
+    # refuses an unplanted key. Then the key held, no crossing; then `mailbox.notice` planted `off` and a
+    # crossing back to K1. Staged against the step left out of the boundary verb, the first row reds;
+    # against unit 10's read fetching after a fetched notice, the second.
+    run_card_append; set_card_position key "$K1"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    write_card_mail refs/gov/mail/fy/z/s-other fy a1b2c3d4e5f6 build:tFix question none
+    mail='interrupt — mailbox · a1b2c3d4e5f6 question from fy'
+    set_card_position key "$K2"; set_card_position mail "$mail"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    at=$(tr -d '\r' < "$OUT" | awk -v n="notice — mail — 1 unread for tFix · a1b2c3d4e5f6 · fetched · item $K2" -v m="$mail" \
+      '$0 == n && !x { x = NR } $0 == m && !y { y = NR } END { print x + 0, y + 0 }')
+    read -r l1 l2 <<<"$at"
+    print_card_held "AC3 a crossing prints the fetched notice naming the id, then the mailbox line, at lines $at" \
+      "$([ "$l1" -gt 0 ] && [ "$l1" -lt "$l2" ]; echo $?)"
+    print_card_held "AC3 after a fetched notice the stub's log records --mail-interrupts --local" \
+      "$([ "$(tail -n 1 "$CARD_STUB_POSITION.log" 2>/dev/null | tr -d '\r')" = 'tFix --mail-interrupts --local' ]; echo $?)"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC3 no crossing prints no notice — line" \
+      "$(grep -qxF "boundary — none crossed · item $K2" "$OUT" && ! grep -q '^notice — ' "$OUT"; echo $?)"
+    set_card_policy mailbox.notice off; set_card_position key "$K1"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC3 under mailbox.notice off a crossing prints no notice — line and the read fetches itself" \
+      "$(grep -qxF "boundary — $K2 → $K1" "$OUT" && ! grep -q '^notice — ' "$OUT" \
+        && [ "$(tail -n 1 "$CARD_STUB_POSITION.log" 2>/dev/null | tr -d '\r')" = 'tFix --mail-interrupts' ]; echo $?)" ;;
 esac
 exit "$MISSED"

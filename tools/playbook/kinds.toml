@@ -55,11 +55,11 @@ usage = "python {prefix}/playbook/core.py new policy-key <name> --allowed <toml>
 tag = "kind.preset"
 owner = "dKeptSession"
 binds = ["principle.p16"]
-population = ""
-factory = ""
-gate = ""
-summary = "A named preset of policy values an adopter selects at once; dKeptSession lands its factory, with the preset store."
-usage = "no factory has landed; dKeptSession lands it, and until then the kind has no member"
+population = "{prefix}/policy/presets.toml"
+factory = "python {prefix}/loop/factories.py preset"
+gate = "policy check"
+summary = "A named preset of policy values an adopter selects at once: one table of the policy kit's preset store assigning every presettable key, complete, inside each key's schema and inside the pair rules."
+usage = "python {prefix}/playbook/core.py new preset <name> --from <preset>"
 
 [[kind]]
 tag = "kind.gate-leg"

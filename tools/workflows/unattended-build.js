@@ -2642,7 +2642,7 @@ if (!specAudit) {
       'as a spec, under `auditIds`, before it is built like any other. ' +
       'GIVE THAT SPEC AN `order` VERB THAT PLACES IT IMMEDIATELY AFTER THE UNIT IT REPAIRS: one ' +
       'above that unit\'s own order, so the defect is closed at the next step rather than after the ' +
-      'whole roster. Units sharing an order are a parallel group and do not block each other, so a ' +
+      'whole roster. Units sharing an order are candidates for one parallel group and do not block each other, so a ' +
       'tie with whatever already sits at that number is the intended shape and NOTHING DOWNSTREAM ' +
       'IS RENUMBERED. A promotion that repairs no unit in particular takes an order ABOVE EVERY ' +
       'unit in this build — the honest append-past-the-end default, and the only case in which a ' +

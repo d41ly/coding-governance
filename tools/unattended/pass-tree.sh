@@ -35,7 +35,11 @@
 #    path an effective generated output covers or one the pass changed inside gen regions alone; any
 #    other conflict is two passes that were not disjoint, so the merge is aborted and refused naming
 #    every such path. It then runs the run-gates kit's `regen.py --write`, found as the lander finds
-#    it and announced and skipped where it is not installed, stages, and commits a merge whose second
+#    it and announced and skipped where it is not installed. The regeneration runs with HEAD on a
+#    provisional commit of the merge, the index written as a tree with the merge's two parents and its
+#    message, so a renderer that reads the committed revision, as the policy mirror does, reads the
+#    pass's inputs; HEAD goes back on the run's branch after it, whatever its exit, as the lander's
+#    `--prepare` regenerates detached on its merge. It then stages, and commits a merge whose second
 #    parent is the builder's own pass commit, hooks running and never `--no-verify`. A failure after
 #    the merge started and before its commit landed restores the pre-merge HEAD with nothing staged,
 #    no merge in progress and no new file: the clean-tree refusal up front is what makes that exact.
@@ -65,6 +69,15 @@
 #      tree to lose; the lost-commit refusal still guards its commits.
 #    - A runtime that cuts passes under another name or place: each such pass is refused, never merged
 #      or removed, until this tool learns the spelling.
+#    - A process killed while the regeneration runs leaves HEAD detached on the provisional commit,
+#      with the merge in progress. The next `--merge` refuses at the run check, since the tree no
+#      longer has the run's branch checked out. The recovery is `git symbolic-ref HEAD <run ref>`,
+#      then `git reset --hard` and `git clean -fd`.
+#    - A generator that reads HEAD's tree for an output an earlier stage wrote reads the provisional
+#      commit's bytes, from before the regeneration. The lander's `--prepare` has the same property.
+#    - A generator that reads the checked-out branch's name reads none while HEAD is detached. The
+#      lander's `--prepare` regenerates detached too, so such a generator already meets this at every
+#      landing.
 set -u
 case "${BASH_SOURCE[0]}" in */*) _pt_dir=${BASH_SOURCE[0]%/*} ;; *) _pt_dir=. ;; esac
 [ -f "$_pt_dir/unattended.sh" ] || {
@@ -153,8 +166,11 @@ check_resolvable_path() { # path · merge base · branch -> 0 this side may be k
 
 # The regeneration, found as the lander's `run_regen` finds it: the resolved python, the run-gates kit
 # beside this one, and the file under this tree. No python or no kit is announced and is not a failure.
-run_pass_tree_regen() { # -> 0 regenerated or announced-skipped · 1 the write failed or was refused
-  local py dir out rc
+# Both skips return before HEAD moves. The write then runs with HEAD detached on the provisional merge,
+# the index as a tree with the pre-merge HEAD and the pass tip as parents and the merge's own message,
+# and HEAD goes back on the run's branch, `HW_REF` as the run check left it, whatever the write's exit.
+run_pass_tree_regen() { # pre-merge HEAD · pass tip · message file -> 0 regenerated or announced-skipped · 1 a provisional step or the write failed
+  local py dir out rc tree prov
   if ! py=$(resolve_python 2>/dev/null); then
     echo "pass-tree: generated outputs were NOT regenerated — no usable python launcher; the merge commits what the resolution left, and the bar grades them." >&2
     return 0
@@ -164,16 +180,31 @@ run_pass_tree_regen() { # -> 0 regenerated or announced-skipped · 1 the write f
     return 0
   fi
   out=$(mktemp) || { echo "pass-tree: cannot create a scratch file for the regeneration's output" >&2; return 1; }
+  if ! tree=$(GIT write-tree); then
+    rm -f "$out"; echo "pass-tree: the provisional merge failed at write-tree: the index could not be written as a tree" >&2; return 1
+  fi
+  if ! prov=$(GIT commit-tree "$tree" -p "$1" -p "$2" -F "$3"); then
+    rm -f "$out"; echo "pass-tree: the provisional merge failed at commit-tree: no commit was made over tree ${tree:0:8}" >&2; return 1
+  fi
+  if ! GIT update-ref --no-deref HEAD "$prov"; then
+    rm -f "$out"; echo "pass-tree: the provisional merge failed at the detach: HEAD could not be moved onto ${prov:0:8}" >&2; return 1
+  fi
   "$py" "$ROOT/$dir/regen.py" --write >"$out" 2>&1; rc=$?
   grep -v -e ' · moved: none$' "$out" >&2 || :
   rm -f "$out"
+  if ! GIT symbolic-ref HEAD "$HW_REF"; then
+    echo "pass-tree: the provisional merge failed at the re-attach: HEAD is still detached on ${prov:0:8}, not on $HW_REF" >&2
+    return 1
+  fi
   [ "$rc" = 0 ]
 }
 
 # The restore after the merge started: exact because `--merge` required a clean tree, untracked files
 # included, so every untracked file present is one this verb made. Ignored files are never touched.
+# HEAD goes back on the run's branch first, so a failure while it is detached on the provisional merge
+# resets to the pre-merge commit; where HEAD is already on the branch, the re-attach writes what it holds.
 remove_merge_attempt() { # -> 0 the tree is at HEAD, nothing staged, no merge in progress, no new file
-  GIT reset -q --hard HEAD && GIT clean -qfd
+  GIT symbolic-ref HEAD "$HW_REF" && GIT reset -q --hard HEAD && GIT clean -qfd
 }
 
 # The pass's worktree, only the one `check_pass_holder` admitted, then the branch.
@@ -251,7 +282,10 @@ cmd_merge_tree() { # slug · unit · branch · from -> 0 merged, its sha printed
       return 1
     fi
   done <"$f"
-  if ! run_pass_tree_regen; then
+  tip=$(GIT rev-parse "refs/heads/$PT_BRANCH")
+  printf "merge(%s): %s's pass tree\n\nMerges %s at %s, dispatched from %s.\n\nPass: none\n" \
+    "$slug" "$unit" "$PT_BRANCH" "${tip:0:8}" "${PT_FROM:0:8}" >"$msg"
+  if ! run_pass_tree_regen "$head" "$tip" "$msg"; then
     remove_merge_attempt; rm -f "$f" "$msg"
     print_pass_tree_refusal "the regeneration failed, as its lines above say, so the merge was undone; HEAD is ${head:0:8} as before"
     return 1
@@ -265,9 +299,6 @@ cmd_merge_tree() { # slug · unit · branch · from -> 0 merged, its sha printed
     if check_generated_output "$p" "$GENERATED_INDEXES"; then GIT add -- "$p"; else left="$left $p"; fi
   done <"$f"
   [ -z "$left" ] || echo "pass-tree: NOTE - left untracked, since no effective generated output covers them:$left" >&2
-  tip=$(GIT rev-parse "refs/heads/$PT_BRANCH")
-  printf "merge(%s): %s's pass tree\n\nMerges %s at %s, dispatched from %s.\n\nPass: none\n" \
-    "$slug" "$unit" "$PT_BRANCH" "${tip:0:8}" "${PT_FROM:0:8}" >"$msg"
   if ! GIT commit -q -F "$msg" >&2; then
     remove_merge_attempt; rm -f "$f" "$msg"
     print_pass_tree_refusal "the merge commit was refused, as the lines above say, so the merge was undone; HEAD is ${head:0:8} as before"

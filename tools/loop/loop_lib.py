@@ -2,6 +2,8 @@
 """loop_lib — the one reader of the loop's definition, `loop.toml` beside this file (TOOL-dDeclaredLoop-1).
 
     python loop_lib.py --check                    # read the definition, print what was read
+    python loop_lib.py --steps                    # one `<step tag> TAB <state>` line per step
+    python loop_lib.py --mail-kinds               # the mailbox's closed kind set, one kind per line
     python loop_lib.py --scopes                   # each item's instruction scope, derived
     python loop_lib.py --fixture --plant <case>   # read it with one break planted in memory
     python loop_lib.py --selftest                 # every plant, each held to the exit and line it owes
@@ -22,6 +24,22 @@ declares `outcomes = "dispositions"` and the row's own list otherwise, and `chec
 joins an owner's disposition record to its item's set: True for a member, LoopError for any other word,
 None for an item the definition does not declare, which a caller prints as `unarmed` and never as green.
 The join compares the word as written, never through an alias.
+
+The definition also holds the mailbox's one closed kind set (KICK-dKeptSession-5 S3): `[mail]` with its
+`kinds`, the words a message's `kind` may be. `check_loop` grades it where present as it grades the
+disposition set, an empty list, a repeated member or one outside `SEG` refused, and `read_mail_kinds`
+returns the members, LoopError where the table is absent. `--mail-kinds` prints one kind per line, exit 0,
+or `loop: <why>`, exit 1; the unattended driver's `--mail post` runs it before any commit.
+
+The definition also declares what each value of the `attendance` policy key adds (KICK-dKeptSession-17):
+one `[[attendance]]` row per value, its keys exactly `value` and `adds`, `adds` a list of members of
+`ATTENDANCE_INTERACTIONS`, the closed set of the owner's interactions typed in this module and never in
+the definition. `check_attendance_rows` returns one `loop: attendance <value> · adds <members|none>`
+line per row and a refusal per row that carries another key, a member outside the set or a value
+given twice, so a row that would swap an item's actor, the driver or a binding is refused; `--check`
+prints its lines after the probe lines and joins its refusals to the item refusals. `read_attendance`
+returns `{value: adds}` once the rows hold, LoopError naming the first refusal or a definition that
+declares no row; the loop kit's breakpoint list places the owner gates an attended value adds.
 
 The definition also classes every witness (TOOL-dDeclaredLoop-5): `[witnesses]` with its `classes`, the
 facts the acting agent cannot type, and its `refused` class `actor`, a fact it typed; `[[witness-alias]]`
@@ -127,6 +145,10 @@ of the `SEG` shape, or holds a word twice; a `[[disposition-alias]]` row whose `
 repeats an earlier row's, or whose `means` is no member. The table is graded where the definition holds
 it; `read_dispositions` and `--check` refuse a definition that declares no set.
 
+`--steps` prints one `<step tag>` TAB `<state>` line per `[[step]]` row, from `read_steps`, in the loop's order,
+and exits 0; a refused definition prints `loop: <why>` and exits 1, as `--check` does. It is the contract a
+sibling kit reads a step's state through, by subprocess (KICK-dKeptSession-9 S9).
+
 `--check` prints one line per step and per workflow, the set and one line per alias, then a count, and exits 0; a refused definition is one
 line and exit 1. It prints each step's program, `loop: program <step> · <n> item(s) · <tags>` in needs
 order, then the breakpoint program's, the probe program's and the entry program's as `loop: program review`,
@@ -189,7 +211,7 @@ import sys
 import tempfile
 import tomllib
 
-KIT_LOOP_VERSION = "1.9"
+KIT_LOOP_VERSION = "1.10"
 
 DEFINITION = "loop.toml"
 #: The shrink-only list of actor witnesses beside the definition, `<site>\t<witness>\t<build>` per row.
@@ -284,7 +306,12 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "probe-step": "a copy of item.probe.trigger tagged item.plan.x, at step none",
           "role-no-probe": "item.plan.research's probe outcome and its route taken out",
           "probe-self": "item.probe.design given the probe outcome, routed to the probe tool",
-          "probe-route": "item.plan.research's probe outcome routed to item.probe.trigger"}
+          "probe-route": "item.plan.research's probe outcome routed to item.probe.trigger",
+          "mail-kinds-repeated": "the mail kind confirm-request given twice in the [mail] kinds",
+          "attendance-actor": "the confirm-acts attendance row given actor = { item.build.unit-pass = owner }, an "
+                              "actor swapped for the owner",
+          "attendance-member": "driver:owner appended to the confirm-acts attendance row's adds",
+          "attendance-twice": "a second confirm-acts attendance row appended"}
 #: `--selftest`'s owed answer of each plant (TOOL-dDeclaredLoop-67 S30): its exit, the opening of a line
 #: it prints and a needle that line holds, each pair found by running the plant alone at the pass's base.
 #: A definition the reader refuses prints `loop: <path>: <why>`, a graded refusal `loop: refused · <why>`.
@@ -350,7 +377,11 @@ PLANT_OWED = {"missing-step": (1, "loop: ", "the step step.deploy is missing"),
                                                        "outcome"),
               "probe-self": (1, "loop: refused · ", "the item item.probe.design carries the probe outcome"),
               "probe-route": (1, "loop: refused · ", "the item item.plan.research routes probe to "
-                                                     "'item.probe.trigger', not ")}
+                                                     "'item.probe.trigger', not "),
+              "mail-kinds-repeated": (1, "loop: ", "the mail kind confirm-request is given twice"),
+              "attendance-actor": (1, "loop: refused · ", "the attendance row confirm-acts carries actor"),
+              "attendance-member": (1, "loop: refused · ", "adds driver:owner, no member of"),
+              "attendance-twice": (1, "loop: refused · ", "the attendance value confirm-acts is given twice")}
 #: The kit home whose `namespaces.toml` registers the namespace words an item unfolds (TOOL-dPlacedRequest-6 S3).
 NS_KIT_HOME = "playbook"
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
@@ -395,6 +426,14 @@ ACTOR_FORM = re.compile(r"([a-z]+):([^\s,:]+)")
 CHECKLIST_REGISTRIES = ("DOD_CORE", "DIRECTIVES_CORE")
 #: A `[[checklist]]` row's keys, and its only keys: a row never stores a position.
 CHECKLIST_KEYS = ("registry", "handle", "item")
+#: The closed set of the owner's interactions an `[[attendance]]` row may add, each member's answer (KICK-dKeptSession-17
+#: S2, S6): a code constant and never data, so a definition cannot widen what attendance may do, and no member names
+#: an item, an actor, the driver or a binding. A member answering `stand-in <build>` waits on that build, which
+#: changes its entry here in the landing that ships its mechanism.
+ATTENDANCE_INTERACTIONS = {"announce": "stand-in dWellOiledMachine",
+                           "ask-live": "stand-in dFurnishedOrders",
+                           "confirm-step-exit": "an owner gate at each step's exit item",
+                           "confirm-before-act": "an owner gate before each role item"}
 
 
 class LoopError(ValueError):
@@ -461,6 +500,17 @@ def check_loop(data, where):
                 raise LoopError(where, "the disposition %s is given twice" % word)
     check_alias_rows(tables.pop("disposition-alias"), members, "disposition-alias", where)
     tables["dispositions"] = list(members)
+    kinds = []
+    if "mail" in data:   # KICK-dKeptSession-5 S3: the mailbox's closed kind set, graded as the disposition set is
+        kinds = data["mail"].get("kinds") if isinstance(data["mail"], dict) else None
+        if not isinstance(kinds, list) or not kinds:
+            raise LoopError(where, "'mail' carries no non-empty kinds")
+        for word in kinds:
+            if not isinstance(word, str) or not SEG.fullmatch(word):
+                raise LoopError(where, "the mail kind %r is not one word of the shape %s" % (word, SEG.pattern))
+            if kinds.count(word) > 1:
+                raise LoopError(where, "the mail kind %s is given twice" % word)
+    tables["mail"] = list(kinds)
     return tables
 
 
@@ -1334,6 +1384,60 @@ def read_dispositions(kit_dir):
     return members
 
 
+def read_mail_kinds(kit_dir):
+    """The members of the mailbox's one closed kind set, `[mail]`'s `kinds`, in file order
+    (KICK-dKeptSession-5 S3); LoopError for a definition that declares none."""
+    data, where = read_definition(kit_dir)
+    kinds = check_loop(data, where)["mail"]
+    if not kinds:
+        raise LoopError(where, "declares no mail kinds, a [mail] table with its kinds")
+    return kinds
+
+
+def check_attendance_rows(rows):
+    """`(lines, refusals)` of the definition's `[[attendance]]` rows `rows` (KICK-dKeptSession-17 S3): one
+    `loop: attendance <value> · adds <members|none>` line per row, and one refusal per shape that does not
+    hold: `rows` no array of tables, a row with no non-empty string `value`, a key but `value` and `adds`,
+    an `adds` that is no list of strings, a member outside `ATTENDANCE_INTERACTIONS`, a value on two rows.
+    No member names an actor, the driver or a binding, so a row that would swap one is one of these."""
+    if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
+        return [], ["'attendance' is not an array of tables"]
+    lines, refusals, seen = [], [], set()
+    for row in rows:
+        value = row.get("value")
+        if not isinstance(value, str) or not value:
+            refusals.append("an attendance row carries no value")
+            continue
+        for key in row:
+            if key not in ("value", "adds"):
+                refusals.append("the attendance row %s carries %s, a key outside value and adds" % (value, key))
+        adds = row.get("adds")
+        if not isinstance(adds, list) or not all(isinstance(m, str) for m in adds):
+            refusals.append("the attendance row %s adds is not a list of members" % value)
+            adds = []
+        for member in adds:
+            if member not in ATTENDANCE_INTERACTIONS:
+                refusals.append("the attendance row %s adds %s, no member of ATTENDANCE_INTERACTIONS" % (value, member))
+        if value in seen:
+            refusals.append("the attendance value %s is given twice" % value)
+        seen.add(value)
+        lines.append("loop: attendance %s · adds %s" % (value, " ".join(adds) or "none"))
+    return lines, refusals
+
+
+def read_attendance(kit_dir):
+    """`{value: adds}` of the definition's `[[attendance]]` rows, in file order, once `check_attendance_rows`
+    holds (KICK-dKeptSession-17 S2); LoopError naming the first refusal, or a definition that declares no row."""
+    data, where = read_definition(kit_dir)
+    rows = data.get("attendance", [])
+    refusals = check_attendance_rows(rows)[1]
+    if refusals:
+        raise LoopError(where, refusals[0])
+    if not rows:
+        raise LoopError(where, "declares no attendance rows, the [[attendance]] table")
+    return {row["value"]: list(row["adds"]) for row in rows}
+
+
 def resolve_disposition(kit_dir, word):
     """The member `word` is or, through a `[[disposition-alias]]` row, means; LoopError for any other word."""
     data, where = read_definition(kit_dir)
@@ -1975,6 +2079,16 @@ def write_loop_plant(data, case, rows, base_rows):
         workflows["spec-review"]["reach"] = "revew"
     elif case == "disposition-unknown":
         data["dispositions"]["set"].append("ask")
+    elif case == "mail-kinds-repeated":
+        data["mail"]["kinds"].append("confirm-request")
+    elif case in ("attendance-actor", "attendance-member", "attendance-twice"):   # KICK-dKeptSession-17 S3
+        acts = next(r for r in data.get("attendance", []) if r.get("value") == "confirm-acts")
+        if case == "attendance-actor":
+            acts["actor"] = {"item.build.unit-pass": "owner"}
+        elif case == "attendance-member":
+            acts["adds"].append("driver:owner")
+        else:
+            data["attendance"].append(dict(acts))
     elif case == "disposition-alias":
         next(r for r in data["disposition-alias"] if r.get("word") == "defer")["means"] = "postpone"
     elif case in ("computed-actor", "computed-unserved"):
@@ -2089,8 +2203,26 @@ def main(argv):
         return 1 if refusals else 0
     if argv[:1] == ["seed"]:   # TOOL-dPlacedRequest-8 S4: an item's declared seed, resolved to paths
         return run_seed_command(kit_dir, argv[1:])
+    if argv == ["--steps"]:   # KICK-dKeptSession-9 S9: each step's tag and state, the contract a sibling reads
+        try:
+            steps = read_steps(kit_dir)
+        except LoopError as e:
+            print("loop: %s" % e)
+            return 1
+        for s in steps:
+            print("%s\t%s" % (s["tag"], s["state"]))
+        return 0
+    if argv == ["--mail-kinds"]:   # KICK-dKeptSession-5 S3: the mailbox's closed kind set, one per line
+        try:
+            kinds = read_mail_kinds(kit_dir)
+        except LoopError as e:
+            print("loop: %s" % e)
+            return 1
+        for kind in kinds:
+            print(kind)
+        return 0
     if argv not in (["--check"], ["--scopes"]) and plant not in PLANTS:
-        print("usage: python loop_lib.py --check | --scopes | --selftest | --fixture --plant <%s> | --grade-site <%s> "
+        print("usage: python loop_lib.py --check | --steps | --mail-kinds | --scopes | --selftest | --fixture --plant <%s> | --grade-site <%s> "
               "<entry>... | seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]" % (
             "|".join(PLANTS), "|".join(DECLARATION_SITES)), file=sys.stderr)
         return 2
@@ -2197,7 +2329,11 @@ def main(argv):
     probe_lines, probe_refusals = check_probe_outcomes(read_item_rows(data, where))   # TOOL-dPlacedRequest-7 S8
     for line in probe_lines:
         print(line)
-    item_refusals = item_refusals + seed_refusals + map_refusals + probe_refusals
+    # KICK-dKeptSession-17 S3: the attendance rows, each member one of the closed owner interactions
+    attendance_lines, attendance_refusals = check_attendance_rows(data.get("attendance", []))
+    for line in attendance_lines:
+        print(line)
+    item_refusals = item_refusals + seed_refusals + map_refusals + probe_refusals + attendance_refusals
     print("loop: witness classes %s · refused %s" % (" ".join(data["witnesses"]["classes"]),
                                                       " ".join(data["witnesses"]["refused"])))
     for a in data.get("witness-alias", []):

@@ -367,6 +367,7 @@ guard = [
   "{prefix}/check-spec-tokens.py",
   "{prefix}/policy/budgets.py",
   "{prefix}/policy/policy.py",
+  "{prefix}/policy/presets.py",
 ]
 chunk = "selftests"
 ceiling = 350
@@ -400,6 +401,7 @@ guard = [
   "{prefix}/memory-tree/",
   "{prefix}/policy/budgets.py",
   "{prefix}/policy/policy.py",
+  "{prefix}/policy/presets.py",
 ]
 chunk = "selftests"
 ceiling = 300

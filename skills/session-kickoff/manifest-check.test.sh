@@ -1614,6 +1614,13 @@ check_eq "K2 AC2 the stdout names every miss" "4" "$(grep -c '^UNVERIFIED — ' 
 # AC6, the miss half: the stored annotations are skipped, the four misses are found again.
 run_card "K2 AC6 --card --check over an annotated card prints the misses and exits 1" "$CWT" 1 "UNVERIFIED — TOOL-zCardFixture-1 · line" --card --check --session "$K2A"
 check_eq "K2 AC6 --card --check reports each miss once, never its own annotation lines" "4" "$(grep -c '^UNVERIFIED — ' "$CARD_OUT")"
+# KICK-dKeptSession-13 S2: a `## pointers` section lacking a POINTER_LINES word is refused by that
+# word, one POINTERS line per word; the card is restored byte for byte after the arm.
+cp "$K2CARD" "$TMP/k2card.pointers.bak"
+printf '## pointers\nrecords — r\nitem — i\nbudget — b\nmail — m\n' >> "$K2CARD"
+run_card "K13 --card --check names the pointers word the section lacks and exits 1" "$CWT" 1 "POINTERS — the '## pointers' section has no 'forks —' line, which POINTER_LINES lists; --card --pointers --build <slug> --session" --card --check --session "$K2A"
+check_eq "K13 --card --check prints one POINTERS line per missing word" "1" "$(grep -c '^POINTERS — ' "$CARD_OUT")"
+cp "$TMP/k2card.pointers.bak" "$K2CARD"
 
 # The refusals: each leaves the card byte-identical. `run_card` feeds /dev/null, so every body
 # goes through the pipe form.
@@ -2393,7 +2400,11 @@ run "C12 a CR byte in the manifest is named" "$R" 1 "the manifest carries a CR b
 # R7's refusal of a route to an ended build (AC9) and a terminal follow run twice leaving one record
 # (AC13); and TOOL-dPlacedRequest-33's three, the publish under RUN_CLAIMS off writing no ref and under
 # it on writing one the feed names (its AC1, AC2), no conf, no driver and a driver refusal each named
-# unwritten (its S2), and a driver that never answers bounded (its AC3).
+# unwritten (its S2), and a driver that never answers bounded (its AC3). KICK-dKeptSession-13's five
+# `pointers-` plants run the pointers and boundary verbs over the fixture's stub loop kit, the failing case
+# a crossing that leaves the ref's `item —` unchanged (its AC1 to AC3, AC6, AC7, AC11). KICK-dKeptSession-26's
+# five `budget-` plants run the `budget —` line over the fixture's stub `budget.py`, the failing case a
+# stored card whose `## pointers` lacks `budget —` passing `--card --check` (its AC1 to AC4).
 # A plant counts only when it exits 0 and printed a held line. The fixture is gov's and ships
 # to no adopter (the deployer registry exempts it), so a copy of this suite with no fixture beside
 # its checker says so and runs no fixture arm.
@@ -2504,7 +2515,38 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # list ran 8, so 26 more ok rows, and its liveness check_eq; S2's upper-cased USERNAME arm, one
 # run_card and one check_eq. Counted off the block; no suite ran in the pass, each plant was run
 # alone by direct CLI.
-FLOOR_ASSERTIONS=408
+# +4: RAISED by KICK-dKeptSession-12 S6 — the four plants it adds to `--list` (fixture-stale,
+# fixture-run, worktree-named, replay-order), one ok row each from the loop above; no suite ran in
+# the pass, each plant was run alone by direct CLI.
+# +5: RAISED by KICK-dKeptSession-13 S9 — the five plants it adds to `--list` (pointers-render,
+# pointers-boundary, pointers-at-transitions, pointers-cap, pointers-replay), one ok row each from the
+# loop above; no suite ran in the pass, each plant was run alone by direct CLI.
+# +2: RAISED by the red-fix arming KICK-dKeptSession-13's POINTERS refusal (the K13 run_card and its count).
+# +1: RAISED by KICK-dKeptSession-37 — the plant it adds to `--list` (fixture-run-cli), one ok row from
+# the loop above; no suite ran in the pass, the plant was run alone by direct CLI.
+# +2: RAISED by KICK-dKeptSession-38 — the two plants it adds to `--list` (fixture-cli-path-differs,
+# fixture-cli-unknown), one ok row each from the loop above; no suite ran in the pass, each plant was
+# run alone by direct CLI.
+# +5: RAISED by KICK-dKeptSession-26 S4 — the five plants it adds to `--list` (budget-open, budget-spent,
+# budget-unfrozen, budget-omitted, budget-no-kit), one ok row each from the loop above; no suite ran in
+# the pass, each plant was run alone by direct CLI.
+# +6: RAISED by KICK-dKeptSession-15 S6 — the six plants it adds to `--list` (position-act,
+# position-awaiting, position-disagrees, position-skips, lead-compact, lead-resume), one ok row each from
+# the loop above; no suite ran in the pass, each plant was run alone by direct CLI.
+# +5: RAISED by KICK-dKeptSession-14 S7 — the five plants it adds to `--list` (fill-fresh-past,
+# fill-under, fill-compact, fill-replay, fill-slow), one ok row each from the loop above; no suite ran in
+# the pass, each plant was run alone by direct CLI.
+# +3: RAISED by KICK-dKeptSession-5 S13 — the three plants it adds to `--list` (mail-open, mail-none,
+# mail-off), one ok row each from the loop above; K13's plant gains its `mail — m` line, its one row as
+# before. No suite ran in the pass, each plant was run alone by direct CLI.
+# +1: RAISED by KICK-dKeptSession-10 — the plant it adds to `--list` (mail-boundary), one ok row from the
+# loop above; no suite ran in the pass, the plant was run alone by direct CLI.
+# +1: RAISED by KICK-dKeptSession-21 — the plant it adds to `--list` (mail-notice-boundary), one ok row
+# from the loop above; no suite ran in the pass, the plant was run alone by direct CLI.
+# +1: RAISED by KICK-dKeptSession-56 — the plant it adds to `--list` (fixture-cli-short), one ok row from
+# the loop above, beside KICK-dKeptSession-38's two; no suite ran in the pass, the plant was run alone by
+# direct CLI.
+FLOOR_ASSERTIONS=444
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

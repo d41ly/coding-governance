@@ -22244,222 +22244,14 @@ memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-a
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	tools/runlog/selftest.py:355-356	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	tools/workflows/kit.toml:62-65	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	tools/workflows/unattended-build.template.js:2078	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-1.md	check_policy.py:1753	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-1.md	check_policy.py:737	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-1.md	check_policy.py:876	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-1.md	policy.py:143	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-1.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-1.md	tools/policy/policy.py:1132	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-1.md	tools/policy/policy.py:1132-1169	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-1.md	tools/roles/roles_lib.py:373	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-11.md	tools/unattended/lib-unattended.sh:132	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-11.md	tools/unattended/unattended.sh:12868	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-11.md	tools/unattended/unattended.test.sh:3734	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-12.md	manifest-check.sh:719-725	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-12.md	skills/session-kickoff/manifest-check.sh:411-415	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-12.md	skills/session-kickoff/manifest-check.sh:721	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-13.md	catalogue.toml:628-632	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-13.md	skills/session-kickoff/manifest-check.sh:216	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-13.md	skills/session-kickoff/manifest-check.sh:517	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-13.md	tools/memory-tree/tree_lib.py:406	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-13.md	tools/memory-tree/tree_lib.py:471	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-13.md	tools/unattended/unattended.sh:4458	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-14.md	catalogue.toml:616-626	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-14.md	tools/runlog/extract.py:1204	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-14.md	tools/runlog/extract.py:1229-1233	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-14.md	tools/runlog/runlog.py:497	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-15.md	manifest-check.sh:719-725	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-15.md	skills/session-kickoff/manifest-check.sh:719-725	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-15.md	skills/session-kickoff/manifest-check.sh:721	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-16.md	catalogue.toml:1470-1473	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-16.md	check_policy.py:265	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-16.md	check_policy.py:737	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-16.md	policy.py:116	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-16.md	policy.py:116-120	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-16.md	policy.py:1429	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-16.md	policy.py:991-1031	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-18.md	tools/unattended/unattended.sh:1066	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-18.md	tools/unattended/unattended.sh:4183-4192	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-19.md	check_policy.py:538	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-19.md	policy.py:991-1012	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-19.md	policy.py:991-1031	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-19.md	tools/memory-tree/design_lib.py:592	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-2.md	policy.py:199	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-2.md	policy.py:710	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-2.md	tools/unattended/unattended.sh:9517	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-20.md	policy.py:199	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-20.md	policy.py:710	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-20.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-20.md	tools/policy/policy.py:1132	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-20.md	tools/policy/policy.py:1132-1169	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-21.md	skills/session-kickoff/manifest-check.sh:228	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-21.md	tools/hooks/scratch-guard.js:1545	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-21.md	tools/process-monitor/procmon-hook.js:89-96	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-21.md	tools/unattended/run-lease.js:173	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-21.md	tools/unattended/run-lease.js:179	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-21.md	tools/unattended/unattended.sh:480	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-22.md	tools/roles/handoff.py:307	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-22.md	tools/unattended/unattended.sh:2151	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-22.md	tools/unattended/unattended.sh:2419	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-22.md	tools/unattended/unattended.sh:8254	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-22.md	unattended.sh:8254	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-24.md	tools/unattended/unattended.sh:2180	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-25.md	tools/unattended/unattended.sh:14538	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-27.md	tools/memory-tree/row_grammar.py:1475	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-28.md	tools/playbook/render_playbook.py:347	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-28.md	tools/playbook/render_playbook.py:347-378	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-28.md	tools/unattended/unattended.sh:2890	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-28.md	tools/unattended/unattended.sh:3796	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-3.md	tools/govkit/entries/playbook.kit.toml:134-139	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-3.md	tools/playbook/render_playbook.py:470-500	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-3.md	tools/playbook/render_playbook.py:565	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	BUILD-METHOD M3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	tools/runlog/extract.py:1209	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	tools/runlog/extract.py:818-821	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-35.md	tools/unattended/unattended.sh:6316	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-36.md	govkit.py:1144-1160	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-36.md	tools/govkit/govkit.py:1144	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-36.md	tools/lib/resolve_kit_dir.py:23	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-37.md	manifest-check.sh:413-414	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-37.md	skills/session-kickoff/manifest-check.sh:416-428	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-38.md	skills/session-kickoff/manifest-check.sh:414-415	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-39.md	tools/memory-tree/tree_lib.py:406	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-39.md	tree_lib.py:406	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-4.md	adopt-policy.sh:91-104	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-4.md	govkit.py:1233-1249	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-4.md	govkit.py:13144-13151	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-4.md	govkit.py:13223-13229	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-4.md	kit.toml:32-33	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-4.md	policy.py:1313	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-4.md	tools/govkit/govkit.py:13089	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	catalogue.toml:223	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/codebase-map/map_lib.py:149	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/hooks/format-guard.js:248	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/hooks/scratch-guard.js:1615	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/memory-tree/gen_build_index.py:2615-2626	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/runlog/runlog.py:210	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/unattended/gate-guard.js:173-177	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/unattended/kit.toml:12	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/unattended/stop-guard.js:113	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	unattended.sh:162	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	unattended.sh:318	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	unattended.sh:323	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-45.md	tools/runlog/extract.py:185	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-45.md	tools/runlog/extract.py:185-198	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-45.md	tools/runlog/runlog.py:246	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-45.md	tools/runlog/selftest.py:348-349	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-46.md	tools/runlog/runlog.py:300	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-46.md	tools/runlog/selftest.py:1514-1520	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-46.md	tools/runlog/selftest.py:1516-1521	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-47.md	tools/runlog/extract.py:818-821	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-47.md	tools/runlog/extract.py:818-837	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-49.md	policy.py:886-903	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-5.md	skills/session-kickoff/manifest-check.sh:228	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-5.md	skills/session-kickoff/manifest-check.sh:630-655	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-5.md	tools/govkit/govkit.py:2968-2975	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-5.md	tools/unattended/lib-unattended.sh:1186	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-5.md	tools/unattended/unattended.sh:2396	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-5.md	tools/unattended/unattended.sh:2396-2467	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-5.md	tools/unattended/unattended.sh:480	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-50.md	check_policy.py:23-25	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-50.md	kit.toml:39-52	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-50.md	tools/policy/check_policy.py:316	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-50.md	tools/policy/kit.toml:39-52	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-54.md	budgets.py:270	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-54.md	budgets.py:356-366	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-54.md	policy.py:213-216	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-54.md	policy.py:695-698	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-54.md	tools/policy/budgets.py:270	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-54.md	tools/policy/policy.py:695-698	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	gate-guard.js:173-177	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	gen_build_index.py:1716	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	govkit.py:1170-1183	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	govkit.py:1177-1183	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	manifest-check.sh:414	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	policy.py:132	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	resolve-python.test.sh:168-184	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	skills/session-kickoff/manifest-check.sh:414	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	tools/check-spec-tokens.py:530	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	tools/lib/resolve_kit_dir.py:23	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	tools/runlog/selftest.py:355-356	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	tools/unattended/gate-guard.js:173-177	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	tools/unattended/unattended.sh:262	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	unattended.sh:13690-13760	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	unattended.sh:228-265	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-57.md	BUILD-METHOD M6	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-58.md	tools/policy/budgets.py:252	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	BUILD-METHOD M3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	check_policy.py:1230	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	extract.py:157-158	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	extract.py:176	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	gen_build_index.py:1716	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	manifest-check.sh:422	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	manifest-check.test.sh:1093	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	policy-mirror.js:111	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	scratch-guard.js:667	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	selftest.py:348-349	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	skills/session-kickoff/manifest-check.sh:419	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	tools/memory-tree/check-memory-hygiene.sh:2474	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	tools/runlog/extract.py:185	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	tools/runlog/extract.py:881-882	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	tools/runlog/extract.py:991	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	tools/unattended/lib-unattended.sh:348	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	tools/unattended/unattended.sh:183	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	unattended.sh:183	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	unattended.test.sh:8964	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-63.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-63.md	gen_build_index.py:202-203	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-63.md	policy.py:810-813	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-63.md	tools/check-spec-tokens.py:288	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-63.md	tools/check-spec-tokens.py:637	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-63.md	tools/memory-tree/gen_build_index.py:202-203	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-63.md	tools/run-gates/post-merge.sh:86	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-63.md	tools/runlog/selftest.py:348	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	tools/check-spec-tokens.py:1543-1576	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	tools/memory-tree/gen_build_index.py:1717	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	tools/runlog/extract.py:176	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	tools/runlog/model.py:623	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	tools/runlog/selftest.py:355-356	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	tools/unattended/adopt-unattended.sh:649	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	tools/unattended/kit.toml:47-50	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	tools/unattended/unattended.test.sh:6398	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	tools/workflows/unattended-build.js:2078	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	tools/workflows/unattended-build.template.js:2078	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md	tools/workflows/unattended-build.test.sh:1353	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/check-spec-tokens.py:1468	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/check-spec-tokens.py:1543-1579	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/check-spec-tokens.test.sh:199-207	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/lib/resolve-python.test.sh:213	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/runlog/extract.py:991	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/runlog/selftest.py:355-356	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/unattended/kit.toml:47-50	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/workflows/kit.toml:115-116	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/workflows/kit.toml:62-65	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/workflows/kit.toml:96	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-7.md	tools/unattended/unattended.sh:2204	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-7.md	tools/unattended/unattended.sh:6316	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-8.md	agent-cap.js:112-117	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-8.md	tools/hooks/agent-cap.js:2278	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-8.md	tools/hooks/agent-cap.js:465	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-8.md	tools/hooks/scratch-guard.js:1113	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-8.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	extract.py:1231	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	extract.py:48	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	extract.py:770-773	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	runlog.py:220	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/lib/resolve-python.test.sh:172	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/policy/budgets.py:304	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/policy/catalogue.toml:241-244	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/runlog/extract.py:1204	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/runlog/extract.py:1204-1239	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/runlog/record.py:176	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/runlog/runlog.py:217	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dLandedOwners/prompts/2026-11-19-prompt-TOOL-dLandedOwners-4-3-spec-writer.md	tools/policy/check_policy.py:20-21	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 memory/builds/dLandedVerdict/README.md	drift_report.py:298-303	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dLandedVerdict/build/2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md	drift_report.py:298-303	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -37274,6 +37066,12 @@ memory/builds/dWitnessedBar/build/2026-10-25-build-TOOL-dWitnessedBar-96-deviati
 memory/builds/dWitnessedBar/build/2026-10-25-build-TOOL-dWitnessedBar-97-deviation-971.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/build/2026-10-26-build-TOOL-dWitnessedBar-1-reground-returns.md	tools/run-gates/measure_legs.py:116-153	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/build/2026-11-05-build-TOOL-dWitnessedBar-1-parents-crosscheck.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-7.md	HYGIENE check 13	1	3dfd6aab7f0e68ef3531b33d90f6f3ce36801cc6	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-31
+memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-7.md	HYGIENE check 15	1	3dfd6aab7f0e68ef3531b33d90f6f3ce36801cc6	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-31
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md	HYGIENE check 13	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md	HYGIENE check 15	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md	HYGIENE check 13	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md	HYGIENE check 15	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
 memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	tools/unattended/stop-guard.js:111	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-owner-review-stop.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md	BUILD-METHOD M2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -37805,9 +37603,3 @@ tools/workflows/tier2-review.test.sh	p.js:9	1	9e21ac760dc0a43d6ed007396922722cce
 tools/workflows/tier2-review.test.sh	security.js:1	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh32-pathless.js:3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh36-mid.js:2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-7.md	HYGIENE check 13	1	3dfd6aab7f0e68ef3531b33d90f6f3ce36801cc6	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-31
-memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-7.md	HYGIENE check 15	1	3dfd6aab7f0e68ef3531b33d90f6f3ce36801cc6	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-31
-memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md	HYGIENE check 13	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
-memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md	HYGIENE check 15	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
-memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md	HYGIENE check 13	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
-memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md	HYGIENE check 15	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32

@@ -7,6 +7,7 @@
     python budget.py target --build <slug> --item <item>
     python budget.py ending --build <slug> [--explain]
     python budget.py origin --build <slug>
+    python budget.py state --build <slug>
     python budget.py --fixture --plant <case>
     python budget.py --selftest
 
@@ -104,7 +105,10 @@ then one `loop: budget · no draw id · <row>` line per draw row read with no dr
 own draw (TOOL-dDeclaredLoop-75 S2, S7). `origin` prints `loop: budget · origin · <slug|none>`, exit 0, the build
 `derive_patch_origin` answers, the one whose budget a patch build draws on; the unattended driver asks
 it of each live claim before a patch build draws, and refuses the draw where another live run is a
-patch of the same origin (TOOL-dDeclaredLoop-67 S35). After a draw appended to a transition log record,
+patch of the same origin (TOOL-dDeclaredLoop-67 S35). `state` prints `budget_state`'s one line, `open
+<spent>/<total>`, `spent` or `unfrozen <spent>/<total>`, bare, exit 0, and refuses as `origin` does; the
+kickoff engine's card prints it as its `budget —` line (TOOL-dDeclaredLoop-104, KICK-dKeptSession-26 S6).
+After a draw appended to a transition log record,
 `draw` reads `git check-attr merge` on that record once, and where it answers anything but `union`
 prints, after the verdict, `loop: budget · notice · <record> merges as <answer>, not union: add
 <root>/builds/*/build/*-transition-*.md merge=union to .gitattributes`, the root the module reads (S34):
@@ -249,7 +253,9 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                              "the first module with no loop_lib beside it, then with the "
                              "memory-tree kit's tree_lib unlocatable, blocked from import, unparseable, raising "
                              "at import and lacking both names the loop_lib reads, then a module calling each "
-                             "conf reader the loop_lib declares, in three spellings"}
+                             "conf reader the loop_lib declares, in three spellings",
+          "state-answers": "three builds, one frozen at its exit from designing with one draw, one under "
+                           "flow.rework-budget = 0 and one never frozen, each read by state and by budget_state"}
 #: The pre-claim plants (TOOL-dPlacedRequest-14 AC1 to AC6), each over a placement fixture, a bare scratch
 #: remote, the unattended driver's `--request-draw` and `placement.py` run as processes.
 REQUEST_PLANTS = {"placement-loop": "one recorded request placed, its check refusing each time: four re-placements "
@@ -1083,6 +1089,23 @@ def run_budget_plant(case):
                 rc, out = run_verb(["value"], repo)
                 check(owed in out and rc == (2 if owed == BUDGET_KEY else 0), "value %s read %r, exit %d" % (
                     value, out.strip(), rc))
+        elif case == "state-answers":   # KICK-dKeptSession-26 AC6 (S6): each of budget_state's three answers
+            for name in ("open", "spent", "unfrozen"):
+                repo = top / name
+                repo.mkdir()
+                write_budget_plant(repo, case)
+                if name == "open":   # frozen at one unit, 4+2, then one draw
+                    write_transition(repo, FX_BUILD, "designing", "item.design.exit", "recorded", "HEAD", {}, {})
+                    record_draw(FX_BUILD, "fix-pass", FX_UNIT, repo)
+                elif name == "spent":
+                    write_fixture_files(repo, {".governance/policy.toml": "[flow]\nrework-budget = 0\n"})
+                    run_fixture_git(repo, "add", "-A")
+                    run_fixture_git(repo, "commit", "-q", "-m", "a spent budget")
+                rc, out = run_verb(["state", "--build", FX_BUILD], repo)
+                owed = budget_state(FX_BUILD, repo)
+                print("%s: fixture · state-answers · %s · budget_state %s" % (SAY, name, owed))
+                check(rc == 0 and out.strip() == owed and owed.split(" ")[0] == name,
+                      "the %s build's state read %r, exit %d, where budget_state answers %r" % (name, out.strip(), rc, owed))
         elif case == "no-own-conf-read":   # TOOL-dDeclaredLoop-76 AC1: this module's own file, no scratch tree
             own = pathlib.Path(__file__)
             try:
@@ -1898,6 +1921,11 @@ def main(argv):
             ap.add_argument("--build", required=True)
             print("%s: budget · origin · %s" % (SAY, derive_patch_origin(ap.parse_args(argv[1:]).build, root) or "none"))
             return 0
+        if argv[:1] == ["state"]:   # KICK-dKeptSession-26 S6: the one line the card's `budget —` prints
+            ap = argparse.ArgumentParser(prog="budget.py state", description="the state of a build's rework budget")
+            ap.add_argument("--build", required=True)
+            print(budget_state(ap.parse_args(argv[1:]).build, root))
+            return 0
         if argv[:1] == ["ending"]:
             ap = argparse.ArgumentParser(prog="budget.py ending", description="the ending a spent budget takes")
             ap.add_argument("--build", required=True)
@@ -1920,7 +1948,7 @@ def main(argv):
     except (ValueError, OSError) as e:
         print("%s: budget · refused · %s" % (SAY, e))
         return 2
-    print("usage: python budget.py draw --build <slug> | --request <key> --rows <file> | --request-text <file> --rows <file> --cause <%s> --item <item> | value | target --build <slug> --item <item> | ending --build <slug> [--explain] | origin --build <slug> | --fixture --plant <%s> "
+    print("usage: python budget.py draw --build <slug> | --request <key> --rows <file> | --request-text <file> --rows <file> --cause <%s> --item <item> | value | target --build <slug> --item <item> | ending --build <slug> [--explain] | origin --build <slug> | state --build <slug> | --fixture --plant <%s> "
           "| --selftest" % ("|".join(CAUSES), "|".join(PLANTS)), file=sys.stderr)
     return 2
 

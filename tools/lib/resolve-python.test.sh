@@ -402,6 +402,9 @@ out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$FD" 2>&1); rc=$?; out=${ou
 # of a hard-won predicate with no parity gate is precisely what this arm exists to police.
 #
 # Each row is:  <marker-stem>|<canonical file>|<prefix excluded from the copy population>
+# The hooks kit's directory is resolved ahead of the rows, since two of them name its scratch-guard.js
+# as their canonical (KICK-dKeptSession-62 S20); part 2j below reads the same variable.
+SG_HOOKS_DIR=$(resolve_kit_dir "$REALPY" hooks scratch-guard.js "$HERE") || exit 2
 PARITY_ROWS="
 resolve_python|$CANON|$KIT_REL/resolve-python
 kickoff_region|$ROOT/$UNATTENDED_DIR/check-unattended.sh|$UNATTENDED_DIR/check-unattended
@@ -442,6 +445,8 @@ selection_row|$ROOT/$RUNGATES_DIR/verdict_flow.py|$RUNGATES_DIR/verdict_flow
 gov_ref_sh|$ROOT/$KIT_REL/gov-ref.sh|$KIT_REL/gov-ref
 gov_feed_sh|$ROOT/$KIT_REL/gov-feed.sh|$KIT_REL/gov-feed
 home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
+extract_route_units_js|$ROOT/$SG_HOOKS_DIR/scratch-guard.js|$SG_HOOKS_DIR/scratch-guard
+card_file_rel_js|$ROOT/$SG_HOOKS_DIR/scratch-guard.js|$SG_HOOKS_DIR/scratch-guard
 history_store_py|$ROOT/$KIT_REL/history_store.py|$KIT_REL/history_store
 history_store_sh|$ROOT/$KIT_REL/history-store.sh|$KIT_REL/history-store
 template_cache_sh|$ROOT/$KIT_REL/template-cache.sh|$KIT_REL/template-cache
@@ -534,6 +539,9 @@ owned_work_sh|$ROOT/$KIT_REL/owned-scratch.sh|$KIT_REL/owned-scratch
 # gov_ref_sh (TOOL-dPlacedRequest-11 S1, S2) is the one compare-and-swap writer of a governance ref
 # and its parented commit: the unattended driver's claim write and post-merge's bar-red ref each carry
 # it inline, and part 2p below holds the canonical to its failed-build contract.
+# extract_route_units_js and card_file_rel_js (KICK-dKeptSession-62 S20, S21) are the card's route
+# reader and the card file's path, canonical in the hooks kit's scratch-guard.js: the unattended kit's
+# mail-notice.js carries both inline, never its readCard, which spawns a bash (KICK-dKeptSession-44 S9).
 # history_store_py and history_store_sh (TOOL-dQuietDisk-1 S10) are the history verdict store and its
 # `cat-file --batch` reader, and their bash face: the unattended kit's and the memory-tree kit's
 # history_store.py are the module whole, and the unattended kit's lib-unattended.sh carries the face.
@@ -1169,8 +1177,8 @@ check_rb_row "an empty uname line did not run, and an absent Git bash is named" 
 # longer equals the canonical's order, which the truth table above holds: the landing merge of
 # dWitnessedBar over dPlacedRequest kept the arm on its own list and filed the port as an ask. WHAT
 # THIS DOES NOT CHECK: the `test -f` each candidate runs, which the hooks kit's own suite drives with
-# a stub bash first on PATH, and the canonical's Git-first order.
-SG_HOOKS_DIR=$(resolve_kit_dir "$REALPY" hooks scratch-guard.js "$HERE") || exit 2
+# a stub bash first on PATH, and the canonical's Git-first order. SG_HOOKS_DIR is resolved above the
+# parity rows (KICK-dKeptSession-62 S20).
 rb_sg=$(cd "$RB" && PATH="$RB/D1:$RB/D2" GOV_BASH=GB "$NODE" -e '
 const cp = require("child_process"), path = require("path");
 const root = path.dirname(process.env.PATH.split(path.delimiter)[0]), tried = [];
