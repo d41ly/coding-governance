@@ -1,6 +1,6 @@
 # KICK-dKeptSession-80 — the run branch reconciled with origin/main at 525f3ab97 in one merge commit, each conflict resolved by its kind
 
-**Status:** INPROGRESS · rev-2 · 2026-11-24 · node d · Tier-2 · base 0a39514a · streams tooling · order 38 · advances KICK-dKeptSession-29
+**Status:** CLOSED · rev-2 · 2026-11-24 · node d · Tier-2 · base 0a39514a · streams tooling · order 38 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-23-build-KICK-dKeptSession-80-1-acceptance-ledger.md](../build/2026-11-23-build-KICK-dKeptSession-80-1-acceptance-ledger.md) | journal | — |
 | [2026-11-23-build-KICK-dKeptSession-80-close-bar-attribution.md](../build/2026-11-23-build-KICK-dKeptSession-80-close-bar-attribution.md) | research | — |
 | [2026-11-23-build-KICK-dKeptSession-80-close-debts.md](../build/2026-11-23-build-KICK-dKeptSession-80-close-debts.md) | research | KICK-dKeptSession-69 |
 | [2026-11-23-build-KICK-dKeptSession-80-widen-4.md](../build/2026-11-23-build-KICK-dKeptSession-80-widen-4.md) | widen | — |
