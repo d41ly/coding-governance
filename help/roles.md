@@ -468,7 +468,7 @@ of a return that is no valid refusal, and 2 when a reader it asks refuses.
   checkout that holds the script. Where neither sits in a checkout, no grant can be read, so the bar
   runners and the suites are refused there with or without `roles.json`.
 - A role agent's polling wait: a `tail` that follows a file, a `sleep` inside a `while`
-  or `until` loop, or a `sleep` of 5 s or more.
+  or `until` loop, in PowerShell a `for` or `foreach` one too, or a `sleep` of 5 s or more.
 - In a session routed to a live build, a final message that leaves out the `agent` or `returned`
   line of an agent its turn dispatched or received. It is refused once per turn end, and the
   refusal prints the lines to paste, derived for it by `handoff.py agents`; where it cannot derive

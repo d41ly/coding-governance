@@ -772,7 +772,10 @@ and `command -v` end the command, which runs no script; a shell's `-c` and `env 
 scanned once, past any arguments its cluster takes. The same arm refuses a role agent's polling
 wait, read by `checkPollWait` over the same simple commands with the shell's reserved words (`do`,
 `then`, `if`, `while`, `until` and the rest) stepped for these rows alone: the background command's
-exit notification is the wait. A gate row refusing the same command wins.
+exit notification is the wait. A gate row refusing the same command wins. In PowerShell the inside of a
+block is read as a command of its own (`TOOL-dBoundRoles-93`), so a gate or a `sleep` in a glued
+`{...}` is seen, and a loop is told by `while`, `until`, `for` or `foreach` before a parenthesis, in
+any case.
 `checkRoleGate` reads the role index at the checkout root of three starts in turn: the payload `cwd`,
 `CLAUDE_PROJECT_DIR`, then the directory of each candidate's launched script resolved against the
 payload `cwd` (`TOOL-dBoundRoles-8`), so a gate run by absolute path from outside every checkout reads the
@@ -786,7 +789,7 @@ polling rows are unarmed, and one witness line names the three starts. The rows:
 | G2 runner | the bar runner, the self-test runner, the unattended gates runner or the pass-leg runner `pass-legs.sh`, by basename, any form | never |
 | G3 suite | a `*.test.sh` or `*selftest.py` script, or a script carrying `--selftest` | it carries `--render`, `--list` or `--help`, or it is an allowlisted G1 leg |
 | P1 tail follow | a `tail` carrying `--follow`, `--follow=<x>`, or a single-dash cluster holding `f` or `F` | never |
-| P2 sleep in a loop | a `sleep` in a command that also holds a `while` or `until` loop | never |
+| P2 sleep in a loop | a `sleep` in a command that also holds a `while` or `until` loop, or, in PowerShell, a `for` or `foreach` loop | never |
 | P3 sleep at or over 5 s | a `sleep` of `POLL_SLEEP_FLOOR_S` (5) seconds or more, summed as GNU `sleep` sums, or of a duration that does not read | never |
 
 The allowlist is the role index's `gates` list for that type, which the roles kit renders from the
@@ -802,9 +805,11 @@ to return the need and verify with a fixture or a probe of your own code.
 an assembled path or a `$(…)` inside quotes passes it, and so does a scoped variant of a leg that
 adds an argument the leg does not carry, or an option missing from the rule table that takes an
 argument. The polling rows do not see a poll through a script, an interpreter, a function or an
-alias, a `sleep` under 5 s in a `for` loop, a `sleep` under a shorter `timeout` (graded on its own
+alias, a `sleep` under 5 s in a Bash `for` loop, a `sleep` under a shorter `timeout` (graded on its own
 duration), a file named like a follow option without `--`, or PowerShell's own wait cmdlets; they do
-not read `run_in_background`, so a backgrounded poll is refused too. It stops forgetting, not evasion, and the push-boundary bar
+not read `run_in_background`, so a backgrounded poll is refused too, and a PowerShell loop keyword
+spelled in a comment refuses a short `sleep` beside it. No PowerShell brace without a partner, block inside
+quotes or block a here-string holds is read as a block. It stops forgetting, not evasion, and the push-boundary bar
 is still the guarantee. The main loop, which carries no `agent_type`, is never refused.
 
 **What the field measurement found** (`TOOL-dBoundRoles-8`, gap-orient-09). A field count of typed
@@ -828,7 +833,9 @@ command, and `scanWriteOperands` reads the operands `scanCommandHeads` leaves, t
 target-directory option of `cp`, `mv` and `install` included. A trailing `2>/dev/null`, a comment or
 the next line's command is no operand; a redirect in a `bash -c` body and an unquoted substitution are
 read; a duplication, a process substitution, a comparison in `[[ ]]` or `(( ))` and an escaped arrow are
-no target. The tool's name says whether the command is PowerShell, where the last two are redirects.
+no target. The tool's name says whether the command is PowerShell, where the last two are redirects and
+the inside of a block is read as a command of its own, the block standing for no word of the command that
+holds it (`TOOL-dBoundRoles-93`): `{cp a q}` writes `q` and never a brace, while `${d}/x` and `@{}` stay whole.
 It reads, beside the shapes the write-target guard below always read:
 
 - the file operands of `sed -i` and `sed --in-place`, and of `perl -i`;
@@ -875,7 +882,8 @@ list does not name; a `sed`, `perl`, `git` or interpreter that does not head its
 its paths placed against the payload `cwd`; and a transcript an agent rewrites, since it lives
 outside the repository. Of the operands and redirects: one inside a quoted `$( )` or backticks; an
 operand after an escaped separator, or after an unquoted substitution whose parentheses do not balance;
-a PowerShell operand built in parentheses, and a PowerShell alias or cmdlet the list does not name; a
+a PowerShell operand built in parentheses, a PowerShell block with an unpartnered brace, in quotes or
+in a here-string, and a PowerShell alias or cmdlet the list does not name; a
 target directory glued to a longer option cluster (`-vtDIR`) or an abbreviated `--target-directory`; and
 the `-d` form of `install`, of which the last operand is read. A comparison in more than one nested
 parenthesis level, one across lines, and an unquoted arrow inside `${ }` read as redirects, so they

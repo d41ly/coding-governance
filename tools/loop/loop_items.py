@@ -139,6 +139,9 @@ PLANTS = {
                          "that role's row, then of an item acting as role:adopter.gov-builder, which is refused",
     "declaration-join": "those overlays at once, a declaration resolved for every composed item",
     "declaration-refused": "the declaration of an item while item.test.select, which item.test.verdict needs, is excluded",
+    "declaration-role-refused": "the declaration of gov's item.test.select, a repository role tagged at a gov role's slot",
+    "declaration-root": "the declaration of a repository item from the loop kit's directory, with --root and without, "
+                        "and with --root in no git work tree",
     "declaration-unarmed": "the declaration of gov's item.test.select and of a repository item, the schema removed",
 }
 #: Each selftest case: the case, its owed exit, and the opening and needle of the line it owes.
@@ -175,6 +178,8 @@ CASES = (("check", 0, "loop: items composed", "row(s)"),
          ("declaration-actor", 0, "loop: fixture · declaration · exit 1", "role.gov-builder holds"),
          ("declaration-join", 0, "loop: fixture · declaration · exit 0", "declaration(s) resolved"),
          ("declaration-refused", 0, "loop: fixture · declaration · exit 1", "the item composition does not read"),
+         ("declaration-role-refused", 0, "loop: fixture · declaration · exit 1", "the role composition does not read"),
+         ("declaration-root", 0, "loop: fixture · declaration · exit 1", "sits in no git work tree"),
          ("declaration-unarmed", 0, "loop: fixture · declaration · exit 1", "no [[item]] row declares"))
 #: The render probe a plant runs in its scratch: the item rows `read_kind_rows` composes, or the `gov:item`
 #: lines of `render_delta_report`, argv[1] the scratch's playbook kit.
@@ -760,15 +765,18 @@ def derive_role_item(tag, actor):
             "routes": {"done": "item.build.exit"}}
 
 
-def run_scratch_declaration(top, argv):
-    """`(exit, stdout, stderr)` of the scratch's own loop kit in `top`, with the memory-tree kit's git leaks unset:
-    `loop_lib.py declaration --item <tag> --json --root <top>` where `argv` is a tag, else `DECLARATION_PROBE`."""
+def run_scratch_declaration(top, argv, cwd=None, root=None):
+    """`(exit, stdout, stderr)` of the scratch's own loop kit, with the memory-tree kit's git leaks unset: `loop_lib.py
+    declaration --item <tag> --json --root <root>` where `argv` is a tag, else `DECLARATION_PROBE`. It runs in `cwd`;
+    it and `root` are `top` where absent, and an empty `root` leaves the option out (TOOL-dBoundRoles-93)."""
     from loop_witness import read_clean_env
     kit = top / pathlib.Path(derive_definition_rel()).parent
     argv = (["-c", DECLARATION_PROBE, str(kit)] if argv is None else
-            [str(kit / "loop_lib.py"), "declaration", "--item", argv, "--json", "--root", str(top)])
-    p = subprocess.run([sys.executable, "-B", *argv], cwd=str(top), capture_output=True, text=True, encoding="utf-8",
-                       errors="replace", env=read_clean_env(PYTHONIOENCODING="utf-8"), timeout=300)
+            [str(kit / "loop_lib.py"), "declaration", "--item", argv, "--json",
+             *(["--root", str(top if root is None else root)] if root != "" else [])])
+    p = subprocess.run([sys.executable, "-B", *argv], cwd=str(cwd or top), capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", env=read_clean_env(PYTHONIOENCODING="utf-8"),
+                       timeout=300)
     return p.returncode, p.stdout.strip(), p.stderr.strip()
 
 
@@ -778,8 +786,8 @@ def run_declaration_plant(top, case):
     bad, gov = [], {r["tag"]: r for r in tomllib.loads((top / derive_definition_rel()).read_text(
         encoding="utf-8"))["item"]}
 
-    def check_declared(tag, owed, *needles):
-        rc, out, err = run_scratch_declaration(top, tag)
+    def check_declared(tag, owed, *needles, **run):
+        rc, out, err = run_scratch_declaration(top, tag, **run)
         got = json.loads(out) if rc == 0 else {}
         source = got.get("source") or {}
         line = err.split("\n")[0] if rc else "%s · %s · allowance %s from %s · outcomes %s · inputs %s from %s · " \
@@ -791,9 +799,9 @@ def run_declaration_plant(top, case):
             bad.append("the declaration of %s exited %d, owed %d, no JSON beside a refusal and a line naming %s" % (
                 tag, rc, owed, " and ".join(map(repr, needles))))
 
+    shipped = SHIP_ITEM + " · role:gov-builder · allowance product from role:gov-builder · outcomes done ·"
     if case == "declaration-repo":
-        check_declared(SHIP_ITEM, 0, SHIP_ITEM + " · role:gov-builder · allowance product from role:gov-builder · "
-                       "outcomes done ·")
+        check_declared(SHIP_ITEM, 0, shipped)
     elif case == "declaration-inputs":
         check_declared("item.test.select", 0, ADDED_INPUT, *gov["item.test.select"]["inputs"])
     elif case == "declaration-actor":
@@ -804,6 +812,14 @@ def run_declaration_plant(top, case):
         check_declared(CLASH_ITEM, 1, REPO_ROLE + "gov-builder", "role.gov-builder holds")
     elif case == "declaration-refused":
         check_declared("item.test.verdict", 1, "the item composition does not read")
+    elif case == "declaration-role-refused":
+        check_declared("item.test.select", 1, "the role composition does not read")
+    elif case == "declaration-root":
+        kit = top / pathlib.Path(derive_definition_rel()).parent
+        check_declared(SHIP_ITEM, 0, shipped, cwd=kit, root=kit)
+        check_declared(SHIP_ITEM, 0, shipped, cwd=kit, root="")
+        with tempfile.TemporaryDirectory(prefix="li-") as bare:
+            check_declared(SHIP_ITEM, 1, "sits in no git work tree", root=bare)
     elif case == "declaration-unarmed":
         check_declared("item.test.select", 0, "item.test.select · %s · " % gov["item.test.select"]["actor"],
                        *gov["item.test.select"]["inputs"])
@@ -880,11 +896,13 @@ def write_fixture_plant(top, case, pins, bad):
         "amended-cycle": render_patch_row("merge-after-verdict", "amends", "item.test.merge", add={"needs": [FLOOR_ITEM]}),
     }.get(case)
     declared = {
-        "declaration-repo": ("ship",), "declaration-unarmed": ("ship",), "declaration-inputs": ("inputs",),
+        "declaration-repo": ("ship",), "declaration-unarmed": ("ship",), "declaration-root": ("ship",),
+        "declaration-role-refused": ("slot",), "declaration-inputs": ("inputs",),
         "declaration-actor": ("ship", "actor", "clash"), "declaration-join": ("ship", "inputs", "actor")}.get(case, ())
     parts = {
         "ship": lambda: render_item_row(derive_role_item(SHIP_ITEM, "role:gov-builder")),
         "clash": lambda: render_item_row(derive_role_item(CLASH_ITEM, REPO_ROLE + "gov-builder")),
+        "slot": lambda: render_item_row(dict(TRIAGER, tag="role.%s.gov-builder" % ADOPTER)).replace("[[item]]", "[[role]]", 1),
         "inputs": lambda: render_patch_row("select-fed", "amends", "item.test.select", add={"inputs": [ADDED_INPUT]}),
         "actor": lambda: render_item_row({
             "tag": "item.build.%s.pass-triaged" % ADOPTER, "actor": REPO_ROLE + TRIAGER["name"],

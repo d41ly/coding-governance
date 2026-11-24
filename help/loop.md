@@ -1087,7 +1087,10 @@ version, so after a bump an input still pinned at the old version is refused unt
   first install's state, where the render composes no item and refuses nothing). The rest run the
   `declaration` command below in place of `check` and exit 0 when each run answers as owed:
   `declaration-repo`, `declaration-inputs`, `declaration-actor`, `declaration-join` (a declaration for
-  every composed item, the two counts printed), `declaration-refused` and `declaration-unarmed`.
+  every composed item, the two counts printed), `declaration-refused`, `declaration-role-refused` (a
+  role overlay the role composition refuses), `declaration-root` (the repository found from a directory
+  under it and from the working directory, and one in no git work tree refused) and
+  `declaration-unarmed`.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
   ```bash

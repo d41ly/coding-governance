@@ -1593,6 +1593,12 @@ run_role_bash "W9-AC4 F4 sleep 1d -> deny naming P3" 2 "any;;P3 sleep at or over
 run_role_bash "W9-AC4 F5 sleep infinity -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder Bash 'sleep infinity'
 run_role_bash "W9-AC4 F6 sleep 4.9, under the floor -> allow, stderr EMPTY" 0 empty gov-builder Bash 'sleep 4.9'
 run_role_bash "W9-AC4 F7 sleep 4s, under the floor -> allow, stderr EMPTY" 0 empty gov-builder Bash 'sleep 4s'
+# ---- TOOL-dBoundRoles-93: a PowerShell block is a command of its own, and the gate and polling arms read --
+# ---- PowerShell's quoting. With the block scan cut the first row reds; with the tool cut from checkRoleGate's
+# ---- scanCommandHeads call the second, and from its checkPollWait call the third. --------------------------
+run_role_bash "BR93-AC2 PowerShell: the bar in a glued block -> deny naming G2" 2 "any;;G2 runner" gov-builder PowerShell "if (\$c) {bash kit/$RUN_GATES/run-gates.sh}"
+run_role_bash "BR93-AC8 PowerShell: the bar after a quoted path ending in a backslash -> deny naming G2" 2 "any;;G2 runner" gov-builder PowerShell "ls \"C:\\x\\\"; bash kit/$RUN_GATES/run-gates.sh"
+run_role_bash "BR93-AC8 PowerShell: sleep 30 after the same word -> deny naming P3" 2 "any;;P3 sleep at or over 5 s" gov-builder PowerShell 'ls "C:\x\"; sleep 30'
 # ---- AC3: the anchor — a cwd under no checkout falls back to CLAUDE_PROJECT_DIR; against a ---------
 # ---- checkRoleGate reading the payload cwd alone, the first row exits 0 and the third says nothing -
 run_role_bash "O-AC3 cwd under no checkout, CLAUDE_PROJECT_DIR the fixture -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh" "$SG_NOREPO" "$SG_CWD_WT"
@@ -1675,7 +1681,7 @@ for sg92_c in M m I F C D x V; do
   scan_targets "BR92-AC1 perl -${sg92_c}i: the i is -$sg92_c's value" '' "perl -${sg92_c}i -e 1 x.py"
 done
 scan_targets "BR92-AC1 perl -pi is in place" 'x.py:perl -i' 'perl -pi -e 1 x.py'
-scan_targets "BR92-AC1 a bare -I takes the next word, and the -pi after it is in place" 'x.py:perl -i' 'perl -I lib -pi -e 1 x.py'
+scan_targets "BR92-AC1 a bare -I takes the next word, and the -pi after it is in place" 'x.py:perl -i' 'perl -I lib -pi s/a/b/ x.py'
 scan_targets "BR92-AC2 sed -i --: the script is no file" 'out.txt:sed -i' 'sed -i -- s/a/b/ out.txt'
 scan_targets "BR92-AC2 perl -pi --: the script is no file" 'out.txt:perl -i' 'perl -pi -- s/a/b/ out.txt'
 scan_targets "BR92-AC2 sed -i -e --: the first word after it is a file" 'out.txt:sed -i' 'sed -i -e s/a/b/ -- out.txt'
@@ -1726,6 +1732,30 @@ scan_targets "BR86 target directory: --target-directory <dir>" 'd:cp destination
 scan_targets "BR86 target directory: --target-directory=<dir>" 'd:cp destination' 'cp --target-directory=d a'
 scan_targets "BR86 target directory: rsync's -t is none" 'd:rsync destination' 'rsync -t a d'
 scan_targets "BR86 substitution: an operand after one is read" 'd:cp destination' 'cp $(echo a) d'
+# ---- TOOL-dBoundRoles-93: a PowerShell block. Against the scan at base a spaced block reads its brace and a --
+# ---- glued one reads nothing or keeps it; with the block made a separator, Set-Content loses its operand; ----
+# ---- with the `$`, the `@` or the backtick step cut from scanScriptBlocks, that row's operand splits. Then ---
+# ---- the -c body's escaped quote, red where readWordText keeps the backslash, and the parts of the -----------
+# ---- PowerShell reading, each red under its own cut: the block comment, the copy `>&1`, the open quote. ------
+scan_targets "BR93-AC1 block: a spaced sed -i" 'q:sed -i' '{ sed -i s/a/b/ q }' '' PowerShell
+scan_targets "BR93-AC1 block: an if's perl -pi" 'q:perl -i' 'if ($c) { perl -pi -e s/a/b/ q }' '' PowerShell
+scan_targets "BR93-AC1 block: a glued sed -i" 'q:sed -i' '{sed -i s/a/b/ q}' '' PowerShell
+scan_targets "BR93-AC1 block: a spaced cp" 'q:cp destination' '{ cp a q }' '' PowerShell
+scan_targets "BR93-AC1 block: a glued cp" 'q:cp destination' '{cp a q}' '' PowerShell
+scan_targets "BR93-AC1 block: a glued redirect" 'q:redirect' '{echo a >q}' '' PowerShell
+scan_targets "BR93-AC1 block: an operand after one is read" 'q:Set-Content' 'Set-Content -Value {a} q' '' PowerShell
+scan_targets "BR93-AC1 no block: a braced variable" '${d}/x:cp destination' 'cp a ${d}/x' '' PowerShell
+scan_targets "BR93-AC1 no block: a hash literal" '@{}:cp destination' 'cp a @{}' '' PowerShell
+scan_targets "BR93-AC1 no block: a stash name" 'stash@{0}:cp destination' 'cp a stash@{0}' '' PowerShell
+scan_targets "BR93-AC1 no block: braces behind backticks" '`{0`}:cp destination' 'cp a `{0`}' '' PowerShell
+scan_targets "BR93-AC7 a -c body's escaped quotes: an in-place operand" 'q.py:sed -i' 'bash -c "sed -i s/a/b/ \"q.py\""'
+scan_targets "BR93-AC7 a -c body's escaped quotes: a redirect's word" 'q r:redirect' 'bash -c "echo x > \"q r\""'
+scan_targets "BR93-AC8 PowerShell: a block comment over lines holds no redirect" '' '<# x
+y > f
+#> ls' '' PowerShell
+scan_targets "BR93-AC8 PowerShell: a command after a block comment" 'q:touch' '<# c #> touch q' '' PowerShell
+scan_targets "BR93-AC8 PowerShell: *>&1 is a copy" 'd:mkdir' 'mkdir d *>&1' '' PowerShell
+scan_targets "BR93-AC8 no tool: a quote left open takes the rest" 'C:\x\:cp destination' 'cp a "C:\x\"'
 sg7_k=$(HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
   node -e 'console.log(require(process.argv[1]).checkCommand(process.argv[2],process.env).bad.map((b)=>b.kind+":"+b.why).join(";"))' "$HOOK" "sed -i 's/a/b/' ~/x" 2>&1)
 [ "$sg7_k" = 'home:sed -i' ] && { echo "ok   BR7-AC8 home-sed: checkCommand reads sed -i on ~/x as a home finding"; pass=$((pass+1)); } \
@@ -1851,6 +1881,11 @@ check_program_rows() {
 # ---- A new spelling is one row here and owes both runs. Against the scanner at base every spelling of ---
 # ---- the closing review's B1 fails its deny run or its admit run, but the backslash-continued cp, which -
 # ---- base reads and a walk ended at any newline loses, and the quoted arrow, the near-miss. --------------
+# ---- TOOL-dBoundRoles-93's rows red one part each: the write-inside rows with the recursive push of -------
+# ---- scanCommandHeads cut, `cp $(echo $(echo a)) @` with the pop of scanSubstitutions cut, the arithmetic --
+# ---- row with the `$((` bounds made a plain body's, the sudo, xargs and git mv rows with a head-only test in
+# ---- scanWriteOperands, the grep rows with a dequoted compare, and the two PowerShell rows with the ---------
+# ---- backslash rule of buildCommandView and the `tool: undefined` of a -c body cut. ------------------------
 scan_shell_spellings() {
   cat > "$TMP/sw86.js" <<'SW86'
 const [hook, top, product, outside] = process.argv.slice(2)
@@ -1884,12 +1919,25 @@ const rows = [
   ['deny', 'gov-researcher', 'Bash', '((echo x) > @; (true))'],
   ['deny', 'gov-researcher', 'PowerShell', '((echo x > @))'],
   ['deny', 'gov-researcher', 'PowerShell', 'x *>@'],
+  ['deny', 'gov-researcher', 'Bash', 'x=$(touch @)'],
+  ['deny', 'gov-researcher', 'Bash', 'echo $(echo x > @)'],
+  ['deny', 'gov-researcher', 'Bash', 'cat <(touch @)'],
+  ['deny', 'gov-researcher', 'Bash', '$(echo $(touch @))'],
+  ['deny', 'gov-researcher', 'Bash', 'cp $(echo $(echo a)) @'],
+  ['deny', 'gov-researcher', 'Bash', 'sudo cp a @'],
+  ['deny', 'gov-researcher', 'Bash', 'xargs touch @'],
+  ['deny', 'gov-researcher', 'Bash', 'git mv a @'],
+  ['deny', 'gov-researcher', 'PowerShell', 'ls "C:\\x\\"; touch @'],
+  ['deny', 'gov-researcher', 'PowerShell', `bash -c 'echo "a\\"b"; touch @'`],
   ['admit', 'gov-researcher', 'Bash', 'echo "a->@"'],
   ['admit', 'gov-researcher', 'Bash', 'echo a \\> @'],
   ['admit', 'gov-researcher', 'Bash', '[[ a > @ ]]'],
   ['admit', 'gov-researcher', 'Bash', 'if [[ a > @ ]]; then :; fi'],
   ['admit', 'gov-researcher', 'Bash', '(( a > @ ))'],
   ['admit', 'gov-researcher', 'Bash', 'ls 2>&1 # a > @'],
+  ['admit', 'gov-researcher', 'Bash', 'echo $(( 3>2 ))'],
+  ['admit', 'gov-researcher', 'Bash', "grep -n 'install' @"],
+  ['admit', 'gov-researcher', 'Bash', 'grep -n "install" @'],
 ]
 const run = (cmd, type, tool) => g.checkShellWrites(cmd, { tool_name: tool, cwd: top, agent_type: type, session_id: 'sgtest-o1' }, {})
 for (const [verdict, role, tool, spelling] of rows) {
@@ -1962,10 +2010,17 @@ const polls = [
   ['coproc cat x', null],
   ['function sleep { :; }', null],
   ['sleep 1', null],
+  // TOOL-dBoundRoles-93: PowerShell's loops and blocks. With the loop reading cut the P2 rows read null, or
+  // P3 at base; with the block scan cut the P3 row reads null and the last one P3.
+  ['while ($true) { sleep 1 }', 'P2', 'PowerShell'],
+  ['do { sleep 1 } until ($x)', 'P2', 'PowerShell'],
+  ['for (;;) { sleep 1 }', 'P2', 'PowerShell'],
+  ['{sleep 30}', 'P3', 'PowerShell'],
+  ['if ($c) { sleep 1 }', null, 'PowerShell'],
 ]
-for (const [cmd, row] of polls) {
-  const got = g.checkPollWait(cmd)
-  put(row ? Boolean(got && got.row.startsWith(`${row} `)) : got === null, `polling: ${JSON.stringify(cmd)} -> ${row}`, got && got.row)
+for (const [cmd, row, tool] of polls) {
+  const got = g.checkPollWait(cmd, tool)
+  put(row ? Boolean(got && got.row.startsWith(`${row} `)) : got === null, `polling${tool ? `, ${tool}` : ''}: ${JSON.stringify(cmd)} -> ${row}`, got && got.row)
 }
 console.log(`rows ${rows}`)
 SW87
@@ -2509,8 +2564,11 @@ n=$((pass+fail))
 # SHELL_RESERVED_WORDS, the 2 named-coproc rows and the 7 polling rows), counted by hand under the same rule.
 # 622 = 591 + the 31 rows TOOL-dBoundRoles-92 added (13 for AC1, 3 for AC2, 2 for AC3, and 13 for AC4, 11
 # scan_targets rows and 2 run_read rows), counted by hand under the same rule.
+# 673 = 622 + the 51 rows TOOL-dBoundRoles-93 added (3 run_role_bash rows, 17 scan_targets rows, the 26 rows
+# its 13 spellings print, one per run, and 5 polling rows), counted by hand under the same rule; the row whose
+# command it replaced adds none.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=622
+FLOOR_ASSERTIONS=673
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

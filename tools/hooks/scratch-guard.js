@@ -158,8 +158,9 @@
  * agent's polling wait, read by `checkPollWait` with the shell's reserved words stepped, `coproc` and
  * `function` with the name each takes among them (TOOL-dBoundRoles-87): P1 tail
  * follow, a `tail` carrying a follow option; P2 sleep in a loop, a `sleep` in a command holding a
- * `while` or `until` loop; P3 sleep at or over 5 s, a `sleep` of `POLL_SLEEP_FLOOR_S` or more, or
- * of a duration that does not read. A shell comment is read by no row. A gate row refusing the same command wins, and the background
+ * `while` or `until` loop, or a PowerShell `for` or `foreach` one (TOOL-dBoundRoles-93); P3 sleep at or
+ * over 5 s, a `sleep` of `POLL_SLEEP_FLOOR_S` or more, or of a duration that does not read. A shell
+ * comment is read by no row, but for a PowerShell loop keyword in one. A gate row refusing the same command wins, and the background
  * command's exit notification is the wait. The index is read at the checkout root of the payload `cwd`, else of
  * `CLAUDE_PROJECT_DIR`, else of the directory of a candidate's launched script, resolved against the
  * payload `cwd` (TOOL-dBoundRoles-8 S1), so a gate run by absolute path from outside every checkout
@@ -176,9 +177,11 @@
  * the match is textual, so a gate reached through an interpreter, an alias, a function, an
  * assembled path, a `$(…)` inside quotes, a scoped variant of a leg with an extra argument, or an
  * option missing from the table that takes an argument passes it. The polling rows do not see a
- * poll through a script, an interpreter, a function or an alias, a short `sleep` in a `for` loop, a
+ * poll through a script, an interpreter, a function or an alias, a short `sleep` in a Bash `for` loop, a
  * `sleep` under a shorter `timeout`, a file named like a follow option without `--`, or PowerShell's
- * own wait cmdlets, and they refuse a backgrounded poll too. It stops forgetting, not evasion, and
+ * own wait cmdlets, and they refuse a backgrounded poll too, and a short `sleep` beside a PowerShell loop
+ * keyword spelled in a comment. Of PowerShell's blocks (TOOL-dBoundRoles-93) no arm reads as a block a brace
+ * with no partner, a block inside quotes, or one a here-string holds. It stops forgetting, not evasion, and
  * the push-boundary bar is still the guarantee.
  *
  * THE FIFTH CHECK: THE SHELL-WRITE ARM (TOOL-dBoundRoles-7). On a Bash or PowerShell payload
@@ -189,7 +192,8 @@
  * `python -` / `node` heredoc, each `+++ b/` and `rename to` path of a `git apply` patch, and the
  * shapes checkCommand reads, a redirect through scanRedirects and the operands of a write word through
  * scanWriteOperands, each from its own simple command (TOOL-dBoundRoles-86), its leading reserved words
- * stepped as the polling rows step them (TOOL-dBoundRoles-87) — places it against the
+ * stepped as the polling rows step them (TOOL-dBoundRoles-87), a PowerShell block a command of its own
+ * (TOOL-dBoundRoles-93) — places it against the
  * payload `cwd`, and judges one in the session's repository with checkRouted on a synthetic `Write` of it, so the route arm, the role arm
  * and step 6b class it exactly as they class an `Edit`. Where the agent's work order, the first
  * `user` record of its transcript, hands an `### allowance` block in its `## Task` section
@@ -207,8 +211,8 @@
  * payload `cwd`; and a transcript an agent rewrites, since it lives outside the repository. Of the
  * redirects and operands (TOOL-dBoundRoles-86): one inside a quoted `$( )` or backticks; an operand
  * after an escaped separator (`a\&b`), or after an unquoted substitution whose parentheses do not
- * balance; a PowerShell operand built in parentheses, and a PowerShell alias or cmdlet the list does not
- * name; a target directory glued to a longer cluster (`-vtDIR`) or an abbreviated `--target-directory`;
+ * balance; a PowerShell operand built in parentheses, a PowerShell block the role-gate arm's ceiling leaves
+ * unread, and a PowerShell alias or cmdlet the list does not name; a target directory glued to a longer cluster (`-vtDIR`) or an abbreviated `--target-directory`;
  * and the `-d` form of `install`, of which the last operand is read. Three spellings refuse rather than
  * escape, quoting being the remedy: a comparison in more than one nested parenthesis level, one across
  * lines, and an unquoted arrow inside `${ }`. A word like `install` or `touch` heading no command but unquoted in one (`grep -n install x`) still reads
@@ -519,6 +523,28 @@ function scanSubstitutions(view, tool) {
       if (at === 0 || !'$<>'.includes(view[at - 1])) continue
       while (spans.length && spans[spans.length - 1].from > at) spans.pop()
       spans.push({ from: at - 1, to: i + 1, body: view[at - 1] === '$' && view[at + 1] === '(' ? [at, i + 1] : [at + 1, i] })
+    }
+  }
+  return spans
+}
+
+/**
+ * The outermost PowerShell blocks of <view>, left to right, each `{ from, to }` with its braces
+ * (TOOL-dBoundRoles-93 S1). A pair opened by `${` or `@{` is a word's own and is left out, a block nested in
+ * one is not; a brace behind a backtick, or with no partner, opens and closes nothing.
+ */
+function scanScriptBlocks(view) {
+  const open = []
+  const spans = []
+  for (let i = 0; i < view.length; i++) {
+    const ch = view[i]
+    if (ch === '`') i++
+    else if (ch === '{') open.push(i)
+    else if (ch === '}' && open.length) {
+      const at = open.pop()
+      if (at > 0 && '$@'.includes(view[at - 1])) continue
+      while (spans.length && spans[spans.length - 1].from > at) spans.pop()
+      spans.push({ from: at, to: i + 1 })
     }
   }
   return spans
@@ -2389,7 +2415,10 @@ function scanLauncherOptions(a, k, rule, depth, out, opts) {
  * too (TOOL-dBoundRoles-86) each output redirect is an entry of its own, `{ redirect }`, the word as
  * scanRedirects read it; each unquoted `$( )`, `<( )` and `>( )` of scanSubstitutions is scanned as a
  * command of its own at the same depth and stands in the outer command as one word; and an ordinary
- * entry carries `raw`, its argv words with their quotes kept.
+ * entry carries `raw`, its argv words with their quotes kept. In every mode, where the tool is PowerShell
+ * (TOOL-dBoundRoles-93), the inside of each block of scanScriptBlocks is scanned as a command of its own at
+ * the same depth and the block is blanked out of the command that holds it, so a redirect word, an operand
+ * and a head each stop at a block; a substitution inside one is read by the block's scan alone.
  */
 function scanCommandHeads(cmd, depth = 0, opts = {}) {
   const ps = opts.tool === 'PowerShell'
@@ -2399,15 +2428,20 @@ function scanCommandHeads(cmd, depth = 0, opts = {}) {
   view = view.replace(/(^|[\s;&|()<>])#[^\n]*/g, (w, p) => p + ' '.repeat(w.length - p.length))
   view = ps ? view.replace(/`\r?\n/g, buildBlank) : view.replace(/\\(?:\r?\n|[\s\S])/g, (w) => (w.endsWith('\n') ? buildBlank(w) : w))
   const out = []
-  if (opts.inline) {
-    let masked = ''
-    let from = 0
-    for (const u of scanSubstitutions(view, opts.tool)) {
-      out.push(...scanCommandHeads(cmd.slice(...u.body), depth, opts))
-      masked += view.slice(from, u.from) + '_'.repeat(u.to - u.from)
-      from = u.to
-    }
-    view = masked + view.slice(from)
+  const subs = opts.inline ? scanSubstitutions(view, opts.tool) : []
+  let masked = ''
+  let from = 0
+  for (const u of subs) {
+    masked += view.slice(from, u.from) + '_'.repeat(u.to - u.from)
+    from = u.to
+  }
+  view = masked + view.slice(from)
+  const blocks = ps ? scanScriptBlocks(view) : []
+  // a substitution inside a block is read by the block's own scan, so a text is scanned once per level
+  for (const u of subs) if (!blocks.some((b) => b.from < u.from && u.to < b.to)) out.push(...scanCommandHeads(cmd.slice(...u.body), depth, opts))
+  for (const b of blocks) {
+    out.push(...scanCommandHeads(cmd.slice(b.from + 1, b.to - 1), depth, opts))
+    view = view.slice(0, b.from) + ' '.repeat(b.to - b.from) + view.slice(b.to)
   }
   const red = scanRedirects(cmd, view, opts.tool)
   view = red.view
@@ -2502,11 +2536,14 @@ function deriveSleepSeconds(words) {
  * The polling rows (TOOL-aTrimmedWait-6): `{ row, c }` for the first simple command of <cmd>, its
  * reserved words stepped, that is P1 a `tail` with a follow option, P2 a `sleep` in a command holding
  * a `while` or `until` loop, or P3 a `sleep` of POLL_SLEEP_FLOOR_S or more, or of a duration that
- * does not read; else null. <tool>, the tool's name, is scanCommandHeads' `opts.tool`.
+ * does not read; else null. <tool>, the tool's name, is scanCommandHeads' `opts.tool`. A PowerShell block
+ * is scanned apart from its loop, so there a `while`, `until`, `for` or `foreach` before a parenthesis, in
+ * any case, is a loop too, read from the view (TOOL-dBoundRoles-93).
  */
 function checkPollWait(cmd, tool) {
   const cs = scanCommandHeads(cmd, 0, { reserved: true, tool })
-  const loop = cs.some((c) => c.reserved.includes('while') || c.reserved.includes('until'))
+  const loop = cs.some((c) => c.reserved.includes('while') || c.reserved.includes('until')) ||
+    (tool === 'PowerShell' && /(?:^|[\s;&|(){}])(?:while|until|for|foreach)\s*\(/i.test(buildCommandView(cmd, tool)))
   for (const c of cs) {
     const b = buildBaseName(c.head)
     const rest = c.argv.slice(1)
@@ -2523,7 +2560,7 @@ function renderPollDeny(type, c, row) {
   return (
     `BLOCKED by scratch-guard: a role agent does not poll. Agent type ${type} ran \`${c.text}\`, which is row ${row}.\n\n` +
     'A command started with run_in_background notifies this agent when it exits, so that notification is the wait. ' +
-    `A pause under ${POLL_SLEEP_FLOOR_S} s outside a while or until loop is admitted.\n`
+    `A pause under ${POLL_SLEEP_FLOOR_S} s outside a while or until loop is admitted; a PowerShell for or foreach loop counts too.\n`
   )
 }
 
