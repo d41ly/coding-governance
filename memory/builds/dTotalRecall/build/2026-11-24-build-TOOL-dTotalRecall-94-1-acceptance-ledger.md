@@ -22,7 +22,7 @@ The two censuses over the build folder, both run in the background at once (DERI
 | `has_deviation` (DERIVED 2026-11-24) | 89 | 147 | 147 | 0 |
 | `has_deviation_90` (DERIVED 2026-11-24) | 89 | 147 | 72 | 72 |
 
-Both censuses read the same unit set and the same file counts, and 17 units agree under `has_deviation_90`. Each took
+Both censuses read the same unit set and the same file counts, and 17 units agree under `has_deviation_90` (DERIVED 2026-11-24). Each took
 238 s beside the other, and `scan_foreign` took 22 s (DERIVED 2026-11-24, by `time`). An empty folder prints no census
 line (DERIVED 2026-11-24, that run).
 
