@@ -1308,12 +1308,13 @@ else
 fi
 
 n=$((pass+fail))
-# 188 is the base, every assertion but those of the terms below, the arms of each unit before them included. A
-# shrink-only pin on the EXECUTED count (TOOL-dBoundRoles-62): an arm stranded past an early exit leaves the suite
-# green with no floor. Base and terms are DERIVED by reading each assertion call site from source, one per execution,
-# so a site in a loop counts once per item of its literal list, and every helper here asserts once per call. No arm
-# of this suite skips: a missing kit is a FAIL. The close's run is the executed observation. It does NOT CHECK that
-# an executed arm can fail.
+# 187 (TOOL-dBoundRoles-43), the base: that unit owed the suite a floor and pinned none, so TOOL-dBoundRoles-62
+# counted it, every assertion but those of the terms below. A shrink-only pin on the EXECUTED count: an arm stranded
+# past an early exit leaves the suite green with no floor. Base and terms are DERIVED by reading each assertion call
+# site from source, one per execution, so a site in a loop counts once per item of its literal list, and every helper
+# here asserts once per call. No arm of this suite skips: a missing kit is a FAIL. The close's run is the executed
+# observation. It does NOT CHECK that an executed arm can fail.
+# +1 for spec 13 handed whole to the guard (TOOL-dBoundRoles-50).
 # +6 for the entry guard, the check order, the one block reader and the derived exemption (TOOL-dBoundRoles-58).
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
 FLOOR_ASSERTIONS=194
