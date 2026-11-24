@@ -21,7 +21,7 @@ hold-code: host-owner-action
 held-from: VERIFYING
 parked-surfaced: yes
 keepalive-reaped: yes
-refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
+refreshed-at: 3d6c1702afb6c2e86638785950d80657a187192c · park · 310 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: f5b1d8b588bbefaf605c1950c05f783c86872502
 phase: VERIFYING
@@ -651,3 +651,9 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T19:44:51Z dispatch · item 43b67400 TOOL-dBoundRoles-93 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/loop/loop_items.py tools/govkit/registry.toml tools/gate-legs.json tools/run-gates/selftest-budgets.txt help/roles.md help/loop.md memory/guides/SESSION-KICKOFF.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-93-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-93-deviation-931.md
 
 2026-11-24T19:44:54Z brief · item TOOL-dBoundRoles-93 · reason c0a7be26038c memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-93-build-brief.md
+
+2026-11-24T23:07:16Z decision · item the nine Red-fix commits outside the lane's limits · reason options: the owner rewrites or squashes the branch; the owner changes the limit at its source so a change inside a generated region is no spec edit, and rules on be10c468; another landing route. Refused: a pushed history is never rewritten, and a run never moves the grader its own commits break
+
+2026-11-24T23:07:22Z decision · item may the run merge origin/main into its branch for the reconcile --prepare asks for · reason options: yes, the lander's own next step; no, and the build is held. Refused: the owner's rule says never to merge main into this branch by hand
+
+2026-11-24T23:07:28Z decision · item does the one --close run with GATE_FULL=1 GATE_SELFTESTS=1 · reason options: yes, the owed flagged bar; no, the plain bar. Refused: the owner has not answered and the run never sets it on its own account

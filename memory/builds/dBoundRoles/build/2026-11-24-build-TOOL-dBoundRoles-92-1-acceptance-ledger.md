@@ -39,3 +39,4 @@ at base `d0f4c6560` and added the engine-span arm's placeholder fill (deviation 
 - seen-red — `loop position fixtures` — red `a6f9ddc6b` — green `a6f9ddc6b` — a refusal tail pattern that never matches: refusal-typed MISSED
 - seen-red — `policy fixtures` — red `a6f9ddc6b` — green `a6f9ddc6b` — the catalogue maximum raised to 5: retries-attempts-join reads two wrong
 - seen-red — `unattended-build self-test` — red `a6f9ddc6b` — green `a6f9ddc6b` — the handed blocks emptied in the unit harness, DBR92 AC5 red
+- seen-red — `check-wiring self-test` — red `a6f9ddc6b` — green `a6f9ddc6b` — the return-check arm of the roles wiring cut, both BR92 AC17 rows red

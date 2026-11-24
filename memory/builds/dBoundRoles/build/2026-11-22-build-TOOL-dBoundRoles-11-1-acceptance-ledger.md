@@ -24,3 +24,4 @@ line declares, their RED-first observations and the legs that line lists are owe
 - AC7 — `options:` — `grep -n "options:" SPEC-TEMPLATE.template.md` in `tools/memory-tree/` names `tools/memory-tree/SPEC-TEMPLATE.template.md@a8bddd0d:574`, the section 8 paragraph headed **The fork record.**, rendered into `memory/TEMPLATE-SPEC.md` by `adopt-memory-tree.sh --render`; `grep -n "owner-question"` names `tools/roles/agents/gov-spec-writer.agent.md@e20dff81:52` and `tools/roles/agents/gov-builder.agent.md@f2204de2:30`, one line in each.
 - seen-red — `roles adopter self-test` — red `3c9b6ad0e` — green `3c9b6ad0e` — a ratification answered by the key, arm 41 AC5 red
 - seen-red — `marker contracts` — red `a6f9ddc6b` — green `a6f9ddc6b` — the record predicate of plan_state answering true for every span, the suite exits 1
+- seen-red — `memory-hygiene self-test` — red `a6f9ddc6b` — green `a6f9ddc6b` — the registry reader matching no tag line, the fork-record S2 row red
