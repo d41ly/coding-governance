@@ -8048,11 +8048,6 @@
       "file": "tools/process-monitor/reap.py"
     },
     {
-      "id": "check_name_ledger",
-      "kind": "function",
-      "file": "tools/policy/policy.py"
-    },
-    {
       "id": "check_names",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -9471,6 +9466,11 @@
       "id": "check_shipped_verb",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_shrink_list",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "check_shrink_row",
@@ -27161,6 +27161,11 @@
       "id": "read_shipped_survivors",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "read_shrink_base",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_side",
@@ -45268,11 +45273,6 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
-      "id": "write_name_ledger",
-      "kind": "function",
-      "file": "tools/policy/policy.py"
-    },
-    {
       "id": "write_nest_pair",
       "kind": "function",
       "file": "tools/workflows/check-verifier-fanout.test.sh"
@@ -46056,6 +46056,16 @@
       "id": "write_shims",
       "kind": "function",
       "file": "tools/govkit/shims.py"
+    },
+    {
+      "id": "write_shrink_file",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "write_shrink_list",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "write_skill",

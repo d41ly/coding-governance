@@ -1,6 +1,6 @@
 # KICK-dKeptSession-89 — the four names the first reconcile dropped from policy.py defined again at the tip, so the landing's merge-loss check clears
 
-**Status:** INPROGRESS · rev-1 · 2026-11-24 · node d · Tier-1 · base 271522b2 · streams tooling · order 39 · advances KICK-dKeptSession-29
+**Status:** CLOSED · rev-1 · 2026-11-24 · node d · Tier-1 · base 271522b2 · streams tooling · order 39 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-24-build-KICK-dKeptSession-89-1-acceptance-ledger.md](../build/2026-11-24-build-KICK-dKeptSession-89-1-acceptance-ledger.md) | journal | — |
 | [2026-11-24-build-KICK-dKeptSession-89-widen-10.md](../build/2026-11-24-build-KICK-dKeptSession-89-widen-10.md) | widen | — |
 | [2026-11-24-prompt-KICK-dKeptSession-89-1-spec-writer.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-89-1-spec-writer.md) | journal | — |
 | [2026-11-24-prompt-KICK-dKeptSession-89-2-builder.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-89-2-builder.md) | journal | — |

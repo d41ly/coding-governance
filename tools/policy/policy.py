@@ -1303,9 +1303,9 @@ def derive_unnamed_keys(rows, design):
 
 def check_unnamed_list(repo, kit, design):
     """-> ((name, why) findings, note) for the `unnamed-keys` population at `repo` against `kit`'s
-    catalogue joined to `design`, through `check_name_ledger`: the one grade `lists --check` and the
+    catalogue joined to `design`, through `check_shrink_list`: the one grade `lists --check` and the
     gate arm both call (KICK-dKeptSession-69 S6)."""
-    return check_name_ledger(repo, kit, UNNAMED_POPULATION, derive_unnamed_keys(load_catalogue(Path(kit)), design),
+    return check_shrink_list(repo, kit, UNNAMED_POPULATION, derive_unnamed_keys(load_catalogue(Path(kit)), design),
                              UNNAMED_WHY)
 
 
@@ -1358,10 +1358,10 @@ def derive_unpurposed(rows, namespaces):
 
 def check_unpurposed_list(repo, kit):
     """-> ((name, why) findings, note) for the `unpurposed-namespaces` population at `repo` against
-    `kit`'s catalogue's derived namespaces less its `[[namespace]]` rows, through `check_name_ledger`:
+    `kit`'s catalogue's derived namespaces less its `[[namespace]]` rows, through `check_shrink_list`:
     the one grade `lists --check` and the gate arm both call (KICK-dKeptSession-69 S6)."""
     names = derive_unpurposed(load_namespaces(kit), derive_policy_namespaces(load_catalogue(Path(kit))))
-    return check_name_ledger(repo, kit, UNPURPOSED_POPULATION, names, UNPURPOSED_WHY)
+    return check_shrink_list(repo, kit, UNPURPOSED_POPULATION, names, UNPURPOSED_WHY)
 
 
 # ---- the legacy policy homes (TOOL-dGroundRules-7) ----------------------------------------------
@@ -1482,10 +1482,20 @@ def check_legacy_graded(repo, kit, population=LEGACY_POPULATION):
     return found is not None and Path(repo, found[1].home).is_file()
 
 
-def check_name_ledger(repo, kit, population, derived, unlisted):
+def read_shrink_base(repo, ll, reg):
+    """The base compare of the ledger population the registration `reg` names, through the factory
+    `ll`'s `compare_to_base` -> its `(findings, why)` unchanged, `findings` None where nothing is
+    compared. Its ValueError is a Refusal at the registration's home."""
+    try:
+        return ll.compare_to_base(repo, reg)
+    except ValueError as exc:  # its rename read, a git that did not answer
+        raise Refusal(reg.home, 0, f"the base compare did not run: {exc}") from None
+
+
+def check_shrink_list(repo, kit, population, derived, unlisted):
     """-> ((name, why) findings, note) for the plain-name ledger `population` at `repo` against the
     `derived` names, through the baseline ledger factory's calls for its registration
-    (KICK-dKeptSession-69 S6), the three findings the shrink-list factory made. The home's first line
+    (KICK-dKeptSession-69 S6). The home's first line
     where it is not the header `render_header` renders, and each row `read_ledger` refuses, as `(the
     row, its render)`; both ways through `compare_counts`, each derived name at count 1, a derived name
     the list lacks as `(name, unlisted)` and a listed name no longer derived as stale; under the
@@ -1512,10 +1522,7 @@ def check_name_ledger(repo, kit, population, derived, unlisted):
             out.append((key[0], "stale: drain it with `lists --write`"))
         else:
             out.append((key[0], f"{finding}: measured {have}, the list holds {want}"))
-    try:
-        findings, why = ll.compare_to_base(repo, reg)
-    except ValueError as exc:  # its rename read, a git that did not answer
-        raise Refusal(reg.home, 0, f"the base compare did not run: {exc}") from None
+    findings, why = read_shrink_base(repo, ll, reg)
     if findings is None:
         return out, f"no base compare: {why}; only the derivation is compared"
     for name, key in findings:
@@ -1524,7 +1531,14 @@ def check_name_ledger(repo, kit, population, derived, unlisted):
     return out, f"{len(declared)} row(s) at {reg.home}, graded against the base ({why})"
 
 
-def write_name_ledger(repo, kit, population, derived):
+def write_shrink_file(repo, ll, reg, declared, keep):
+    """Rewrite the home of the plain-name ledger population the registration `reg` names, through the
+    factory `ll`'s `write_rows`: the rows of `declared` whose name is in `keep`, sorted by key, each
+    row's value as read."""
+    ll.write_rows(repo, reg, {k: declared[k] for k in sorted(declared) if k[0] in keep})
+
+
+def write_shrink_list(repo, kit, population, derived):
     """Drain the plain-name ledger `population` at `repo` onto the `derived` names through the
     factory's `write_rows`: each listed name still derived keeps its count, sha and disposition, and
     the rest leave, so the list shrinks by this verb and grows by none (KICK-dKeptSession-69 S6). It
@@ -1541,7 +1555,7 @@ def write_name_ledger(repo, kit, population, derived):
     if malformed:
         raise Refusal(reg.home, 0, f"{ll.render_malformed(malformed[0])}; a rewrite would drop it, so nothing is written")
     keep = set(derived)
-    ll.write_rows(repo, reg, {k: declared[k] for k in sorted(declared) if k[0] in keep})
+    write_shrink_file(repo, ll, reg, declared, keep)
     return sorted(k[0] for k in declared if k[0] not in keep)
 
 
@@ -1716,10 +1730,7 @@ def check_legacy_homes(repo, kit):
             refused.append(f"undeclared site {' '.join(key)}: a home holds it and the list lacks it, which no write adds")
         else:
             reports.append(f"{finding} {' '.join(key)}: measured {have}, the list holds {want}")
-    try:
-        findings, why = ll.compare_to_base(repo, reg)
-    except ValueError as exc:  # its rename read, a git that did not answer
-        raise Refusal(reg.home, 0, f"the base compare did not run: {exc}") from None
+    findings, why = read_shrink_base(repo, ll, reg)
     if findings is None:
         notes.append(f"no base compare: {why}; only the derivation is compared")
     else:
@@ -2162,14 +2173,14 @@ def cmd_lists(argv):
         if design is None:
             print(f"policy lists: {UNNAMED_LIST} · not graded · {unnamed_why}")
         else:
-            removed = write_name_ledger(top, KIT, UNNAMED_POPULATION, derive_unnamed_keys(load_catalogue(KIT), design))
+            removed = write_shrink_list(top, KIT, UNNAMED_POPULATION, derive_unnamed_keys(load_catalogue(KIT), design))
             print(f"policy lists: wrote {UNNAMED_LIST} · drained {len(removed)}: {', '.join(removed) or 'none'}")
         if held:
             print(f"policy lists: wrote {LEGACY_LIST} · {len(rows)} row(s)")
         else:
             print(f"policy lists: {LEGACY_LIST} · not written · {LEGACY_WITHHELD}")
         if graded[UNPURPOSED_POPULATION]:
-            removed = write_name_ledger(top, KIT, UNPURPOSED_POPULATION,
+            removed = write_shrink_list(top, KIT, UNPURPOSED_POPULATION,
                                         derive_unpurposed(load_namespaces(KIT), derive_policy_namespaces(load_catalogue(KIT))))
             print(f"policy lists: wrote {UNPURPOSED_LIST} · drained {len(removed)}: {', '.join(removed) or 'none'}")
         else:

@@ -22,7 +22,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `catalogue.toml` | the schema: one `[[key]]` row per key, then one `[[namespace]]` row, `name` and `purpose`, per policy namespace that declares its purpose (KICK-dKeptSession-16) |
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
 | `unscanned-readers.txt` | AUTHORED: one row `<key> <path> <reason>` per catalogue key whose consumer sits outside the code reader coverage scans, printed on every run and never counted as read (TOOL-dLandedOwners-3); gov's own, withheld from installs by a `project-owned` rule in `kit.toml` |
-| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, the namespaces' `load_namespaces`, `derive_policy_namespaces`, `check_namespaces`, `derive_unpurposed` and `check_unpurposed_list`, the reader join's `load_design`, `derive_unnamed_keys` and `check_unnamed_list`, the inlined `resolve_compare_base`, `resolve_kit_dir` and `GIT_ENV_LEAKS`, the one blob reader `read_blob_at`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes`, `check_legacy_homes` and `write_legacy_homes`, the ledger factory's loader `load_ledger` and the lists' registration reader `read_legacy_registration`, the plain-name populations' grade `check_name_ledger` and drain `write_name_ledger` (KICK-dKeptSession-69), the census tree's `derive_census_tree` over the registry search `derive_registry_tree`, and the ledger lists' one grading rule `check_legacy_graded`, and the `lists` (`cmd_lists`, and `cmd_derive_list` for `--derive` and `--marks`), `scaffold`, `get`, `check`, `mirror` and `settings` verbs |
+| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, the namespaces' `load_namespaces`, `derive_policy_namespaces`, `check_namespaces`, `derive_unpurposed` and `check_unpurposed_list`, the reader join's `load_design`, `derive_unnamed_keys` and `check_unnamed_list`, the inlined `resolve_compare_base`, `resolve_kit_dir` and `GIT_ENV_LEAKS`, the one blob reader `read_blob_at`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes`, `check_legacy_homes` and `write_legacy_homes`, the ledger factory's loader `load_ledger` and the lists' registration reader `read_legacy_registration`, the plain-name populations' grade `check_shrink_list` and drain `write_shrink_list` (KICK-dKeptSession-69), the census tree's `derive_census_tree` over the registry search `derive_registry_tree`, and the ledger lists' one grading rule `check_legacy_graded`, and the `lists` (`cmd_lists`, and `cmd_derive_list` for `--derive` and `--marks`), `scaffold`, `get`, `check`, `mirror` and `settings` verbs |
 | `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI, and `readLandedRevision(top)`, the landed revision's full sha as the shim's `landed` prints it |
 | `policy-shim.sh` | the helper's shell half: the landed revision, and the reader under a resolved launcher |
 | `guard.py` | the minimal guard: `guard.py --staged`, the verdict over an agent's staged change to a guarded path |
@@ -144,7 +144,7 @@ owner-silence rule that declines a raise is a later build's reader.
   otherwise prints `policy lists: legacy-homes.txt · not graded · <why>` (TOOL-dGroundRules-76).
   It grades the two ledger populations of plain names the same way, each at its home under the
   memory tree and each only where `check_legacy_graded` answers true for it, through
-  `check_name_ledger` (KICK-dKeptSession-69): `unnamed-keys`, at `memory/project/unnamed-keys.txt`,
+  `check_shrink_list` (KICK-dKeptSession-69): `unnamed-keys`, at `memory/project/unnamed-keys.txt`,
   the catalogue keys no clause on their owner build's row of the design view names
   (KICK-dKeptSession-19), the design read once by `load_design` through the memory-tree kit's
   `design_lib`, and `unpurposed-namespaces`, at `memory/project/unpurposed-namespaces.txt`, the
@@ -163,7 +163,7 @@ owner-silence rule that declines a raise is a later build's reader.
   a row no home yields leaves and every other row keeps its count, sha and disposition. It writes
   neither list, exit 1, while the legacy list holds a derived key it lacks, a row the list at the base
   lacks with no `widened` disposition, or a malformed row.
-  It drains the two plain-name populations through `write_name_ledger`, each where its rule holds:
+  It drains the two plain-name populations through `write_shrink_list`, each where its rule holds:
   every listed name still derived keeps its count, sha and disposition, and the rest leave,
   printing `policy lists: wrote <file> · drained <n>: <names>`; neither is ever created by it.
 - `python <prefix>/policy/policy.py lists --derive <population>` — for `legacy-homes`, print one `<conf> TAB <key> TAB 1`
@@ -239,8 +239,8 @@ by one `[[ledger]]` table in gov's govkit registry beside `legacy-homes`: key ki
 <population>` and its leg `policy check`. Each row is the name, the count `1`, the sha it was seeded
 at and its disposition, under the factory's header. They are gov's own for the legacy list's reason:
 the unnamed keys derive from gov's design view, which no adopter declares, and both derive from
-gov's catalogue, so no kit ships either and an install never grades one. `check_name_ledger` grades
-a population and `write_name_ledger` drains it, through the factory's `read_ledger`,
+gov's catalogue, so no kit ships either and an install never grades one. `check_shrink_list` grades
+a population and `write_shrink_list` drains it, through the factory's `read_ledger`,
 `compare_counts`, `compare_to_base` and `write_rows`, each where `check_legacy_graded` holds for
 that population. A name enters a list only by the factory's `seed` at an absent home or its widen
 route; `lists --write` adds none. `.gitattributes` routes each home to `merge=rows`.
