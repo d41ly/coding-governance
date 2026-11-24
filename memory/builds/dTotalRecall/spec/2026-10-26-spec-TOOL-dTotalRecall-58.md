@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-58 — the census keep marker is honoured only under the tool root, so no pass writes it into a pinned instrument
 
-**Status:** DEFERRED · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-session.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-session.md) | log | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-58-reground-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-58-reground-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-58-reground-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-58-reground-spec-writer.md) | log | — |
+| [2026-11-24-prompt-TOOL-dTotalRecall-58-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-58-build-brief.md) | journal | — |
 | [2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-54 TOOL-dTotalRecall-59 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-60 |
 
 <!-- /gen:spec-records -->
