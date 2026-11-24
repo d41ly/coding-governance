@@ -2557,6 +2557,7 @@ tag = "leg.gov.ratchet-never-gains"
 tests = ["feature.memory-tree-hygiene"]
 purpose = "refuses a population's growth past its base"
 argv = ["python3", "{prefix}/memory-tree/ratchet.py", "never-gains"]
+reads = { base = "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).", history = "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)." }
 chunk = "declarations"
 subject = "repo"
 ceiling = 300
@@ -2613,6 +2614,7 @@ tag = "leg.gov.ratchet-seed-laundering"
 tests = ["feature.memory-tree-hygiene"]
 purpose = "refuses a baseline row re-dated or re-seeded"
 argv = ["python3", "{prefix}/memory-tree/ratchet.py", "seed-laundering"]
+reads = { base = "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).", history = "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)." }
 chunk = "declarations"
 subject = "repo"
 ceiling = 300
@@ -2627,6 +2629,7 @@ tag = "leg.gov.ratchet-rename"
 tests = ["feature.memory-tree-hygiene"]
 purpose = "refuses a renamed file's rows left uncarried"
 argv = ["python3", "{prefix}/memory-tree/ratchet.py", "rename"]
+reads = { base = "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).", history = "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)." }
 chunk = "declarations"
 subject = "repo"
 ceiling = 300

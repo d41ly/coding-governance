@@ -2333,8 +2333,13 @@ def run_fixture(plant: str | None) -> tuple[list[str], int]:
     PASS and exit 0 where that exits 1 with one red, naming the kept script's marked line."""
     if plant is not None and plant not in PLANTS:
         return [f"{SAY}: refused · no plant {plant!r}: the plants are {', '.join(PLANTS)}"], 2
+    from contextlib import ExitStack
+    from deviation_join import set_env_aside   # noqa: E402  the kit's fixture helper
+    from tree_lib import GIT_ENV_LEAKS
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="rk-"))
-    try:
+    # TOOL-dTotalRecall-76 S10: a caller's exported remote names none of the fixture's, so it is held out
+    with set_env_aside((*GIT_ENV_LEAKS, "GOV_REMOTE", "GOV_DEFAULT_BRANCH")), ExitStack() as done:
+        done.callback(remove_tree, tmp)
         typed = build_fixture(tmp, plant)
         head = [f"{SAY}: fixture {plant or 'green'}"]
         if plant in ("new-row", "new-purpose"):
@@ -2391,8 +2396,6 @@ def run_fixture(plant: str | None) -> tuple[list[str], int]:
                              "in a build folder's script is red by line, its keep row standing"]
             rc = 0 if ok else 1
         return head + lines, rc
-    finally:
-        remove_tree(tmp)
 
 
 def run_captured(argv: list[str], root, head: list[str]) -> tuple[list[str], int]:

@@ -1371,7 +1371,8 @@ def run_fixture(plant) -> tuple:
     from deviation_join import remove_tree, set_env_aside   # noqa: E402  the kit's fixture helpers
     top = pathlib.Path(tempfile.mkdtemp(prefix="rc-"))
     try:
-        with set_env_aside(tree_lib.GIT_ENV_LEAKS):
+        # TOOL-dTotalRecall-76 S10: a caller's exported remote names none of the fixture's, so it is held out too
+        with set_env_aside((*tree_lib.GIT_ENV_LEAKS, "GOV_REMOTE", "GOV_DEFAULT_BRANCH")):
             memory = FIXTURE_MEMORY_ROOTS.get(plant, "memory")
             root = write_fixture(top, plant, memory)
             home = root / memory / "project" / f"{POPULATION}.txt"

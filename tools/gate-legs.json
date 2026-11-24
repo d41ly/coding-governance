@@ -5227,6 +5227,10 @@
       "{prefix}/memory-tree/ratchet.py",
       "never-gains"
     ],
+    "reads": {
+      "base": "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).",
+      "history": "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)."
+    },
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300,
@@ -5319,6 +5323,10 @@
       "{prefix}/memory-tree/ratchet.py",
       "seed-laundering"
     ],
+    "reads": {
+      "base": "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).",
+      "history": "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)."
+    },
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300,
@@ -5342,6 +5350,10 @@
       "{prefix}/memory-tree/ratchet.py",
       "rename"
     ],
+    "reads": {
+      "base": "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).",
+      "history": "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)."
+    },
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300,
