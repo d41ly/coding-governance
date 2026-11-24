@@ -1,6 +1,6 @@
 # KICK-dKeptSession-69 — the run branch reconciled with origin/main in one merge commit, one list factory kept, and the run's own reds cleared
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base e7ab8c81 · streams tooling · order 9 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-4 · 2026-11-24 · node d · Tier-2 · base e7ab8c81 · streams tooling · order 9 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -25,6 +25,8 @@
 | [2026-11-22-prompt-KICK-dKeptSession-69-spec-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-69-spec-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-80-node-a-handoff-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-80-node-a-handoff-brief.md) | research | KICK-dKeptSession-80 |
 | [2026-11-24-prompt-KICK-dKeptSession-69-1-spec-writer.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-69-1-spec-writer.md) | journal | — |
+| [2026-11-24-prompt-KICK-dKeptSession-69-2-builder.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-69-2-builder.md) | journal | — |
+| [2026-11-24-prompt-KICK-dKeptSession-69-close-brief.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-69-close-brief.md) | research | — |
 | [2026-11-24-prompt-KICK-dKeptSession-69-divergence-2-brief.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-69-divergence-2-brief.md) | research | — |
 | [2026-11-24-prompt-KICK-dKeptSession-80-node-a-bootstrap.md](../prompts/2026-11-24-prompt-KICK-dKeptSession-80-node-a-bootstrap.md) | research | KICK-dKeptSession-80 |
 | [2026-11-23-review-KICK-dKeptSession-69-closing-diff-review-round1.md](../reviews/2026-11-23-review-KICK-dKeptSession-69-closing-diff-review-round1.md) | diff-review | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 KICK-dKeptSession-67 |
@@ -44,9 +46,11 @@ which clears the reds this run's own units left, so main's hooks pass over it.
 - **S1** — The reconcile commit (F-merge). The main loop runs `git merge --no-ff --no-commit
   origin/main` in the run worktree. The builder resolves the conflicts by S2, S3 and S7 and makes S4
   to S6 and S8 to S11 in that worktree, and commits nothing. The main loop then commits the merge with
-  this spec, its records and the trailer `Pass: KICK-dKeptSession-69`, through `git commit` with the
-  hooks running. A refused commit goes back to the builder; the merge is never committed with a hook
-  skipped. Observed by AC1, AC2.
+  this spec, its records and the trailer `Pass: none`, through `git commit` with the hooks running, for
+  the reason KICK-dKeptSession-80 rev-2 §4 "Two commits" gives. That merge is `ad02f1a6a`. The unit's
+  closing pass commit comes after it, carries `Pass: KICK-dKeptSession-69`, and holds the completed
+  acceptance ledger and the CLOSED flip. A refused commit goes back to the builder; neither commit is
+  made with a hook skipped. Observed by AC1, AC2.
 - **S2** — The three generated outputs are re-rendered, never hand-merged: `.governance/policy.json`,
   `help/reference/policy.md` and `memory/map/generated/symbols.json`. Each conflicted file is first
   checked out from main's side, to clear its markers, then rewritten by S4's regeneration. Observed
@@ -354,7 +358,7 @@ Every other path `git diff --name-only HEAD origin/main` lists arrives as the me
 - **Register the moved lists in the policy kit's `kit.toml`, shipped.** Every adopter would carry a
   population to seed whose rows derive from gov's catalogue, the same in every install (§8 F2).
 - **Commit the merge, then regenerate in a follow-up commit.** The merge's hooks would grade it before
-  its outputs are fresh, and the brief allows one commit.
+  its outputs are fresh.
 - **Hand-merge the generated outputs.** No hand can reproduce a render's bytes.
 - **Ship KICK-dKeptSession-4's edit as a new step row** (§8 F3).
 
@@ -376,18 +380,22 @@ Every other path `git diff --name-only HEAD origin/main` lists arrives as the me
 
 ## 6. Acceptance criteria
 
-Each criterion is observed in the run worktree, after the main loop's reconcile commit unless it says
-"staged", which reads the resolved merge before that commit.
+Each criterion is observed in the run worktree and names what it reads. "Staged" reads the resolved
+merge before its commit. "The run head" is the run branch's `HEAD` the close reads at. A criterion
+naming neither reads the reconcile commit, `ad02f1a6a`, whose merged tree this unit's ledger answers.
 
 - **AC1** — Staged: `git ls-files -u` prints nothing, and `git grep -n '^<<<<<<< ' --` over the
   thirteen files prints nothing.
   Red when: a conflict is left unmerged or a marker is committed.
-- **AC2** — `git rev-parse HEAD^2` prints `8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e`, `git rev-parse
-  HEAD^1` prints the run head the merge started from, and `git log -1 --format=%B | grep -c '^Pass:
-  KICK-dKeptSession-69$'` prints `1`.
-  Red when: the reconcile is a rebase, a squash or a commit without the trailer.
-- **AC3** — `python tools/run-gates/regen.py --check` exits 0, and `python tools/policy/policy.py
-  mirror --check` prints `policy: mirror fresh`.
+- **AC2** — `git rev-parse ad02f1a6a^2` prints `8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e`, `git
+  rev-parse --short=8 ad02f1a6a^1` prints `e7ab8c81`, the run head the merge started from, and `git log
+  -1 --format=%B ad02f1a6a | grep -c '^Pass: none$'` prints `1`. Read after the closing pass commit,
+  `git log --first-parent --format=%B ad02f1a6a..HEAD | grep -c '^Pass: KICK-dKeptSession-69$'` prints
+  `1`.
+  Red when: the reconcile is a rebase, a squash or a merge of another tip, the merge names a pass, or
+  the commits after it carry the unit's trailer on none or on more than one.
+- **AC3** — At the run head, `python tools/run-gates/regen.py --check` exits 0, and `python
+  tools/policy/policy.py mirror --check` prints `policy: mirror fresh`.
   Red when: a generated output is hand-merged or left at one side's bytes.
 - **AC4** — `python tools/playbook/positional.py check` exits 0, `python
   tools/playbook/writing_practice.py check pinned-facts` prints `pinned-facts: green · 0 red`, and
@@ -416,35 +424,42 @@ Each criterion is observed in the run worktree, after the main loop's reconcile 
   lists as main's.
   Red when: a home is unarmed, a list is not graded in gov's tree, or the ledger omits a printed name.
   figure: the difference is DERIVED at observation.
-- **AC8** — `python tools/policy/check_policy.py` exits 0, and its `arm_reader_join` and
-  `arm_purposes` lines name the populations.
+- **AC8** — In the output of `python tools/policy/check_policy.py`, the `arm_reader_join` and
+  `arm_purposes` lines each read `0 finding(s)` and name their population. The exit is not read: at
+  `ad02f1a6a` it is 1 over the seven `arm_reader_coverage` findings that `8b8b1374` prints too, which
+  the ledger's AC16 answer records as INHERITED.
   Red when: an arm still reads a kit-dir list, which is absent, and reds or announces nothing.
-- **AC9** — The fixture cases `reader-join`, `purposes-new` and `purposes-drain` hold
-  in the policy fixtures leg, read from its run record at the close.
+  figure: the seven are PINNED 2026-11-22 by the ledger's two runs of that arm, one per tree.
+- **AC9** — At the run head, `python tools/policy/check_policy.py --fixture reader-join`, `python
+  tools/policy/check_policy.py --fixture purposes-new` and `python tools/policy/check_policy.py --fixture
+  purposes-drain` each exit 0 and print `0 wrong`.
   Red when: a case still writes the unnamed-keys list into its kit copy's directory, as at `e7ab8c81`.
-  permission: the leg runs at the close, never in this pass.
+  permission: `policy fixtures` is a held leg, subject `kit`, which the bar runs only under
+  `GATE_SELFTESTS`, a flag the owner holds and no boundary sets. The close reads the cases themselves.
 - **AC10** — `grep -c 'memory/project/unnamed-keys.txt' help/policy.md` and `grep -c
   'memory/project/unpurposed-namespaces.txt' help/policy.md` each print at least `1`, and `grep -c
   'tools/policy/unnamed-keys.txt\|tools/policy/unpurposed-namespaces.txt' help/policy.md` prints `0`.
   Red when: the page still names the kit-dir lists, as at `e7ab8c81`.
-- **AC11** — `python3 tools/gate-lint/sh_hygiene.py --location-probes
+- **AC11** — At the run head, `python3 tools/gate-lint/sh_hygiene.py --location-probes
   memory/project/location-probe-waivers.txt . ':!memory/'` exits 0, and `python3
   tools/gate-lint/sh_hygiene.py --stage-commits memory/project/stage-commit-sites.txt . ':!*.test.sh'
-  ':!memory/'` exits 0. `git diff HEAD^2 HEAD -- memory/project/location-probe-waivers.txt
-  memory/project/stage-commit-sites.txt` prints nothing.
+  ':!memory/'` exits 0. `git diff ad02f1a6a^2 ad02f1a6a --
+  memory/project/location-probe-waivers.txt memory/project/stage-commit-sites.txt` prints nothing.
   Red when: a probe is waived or a site registered instead of fixed; at `e7ab8c81` both name
   `card-store.fixture.sh`.
-- **AC12** — `python3 tools/gate-lint/sh_hygiene.py --spawn-idioms memory/project/spawn-idiom-sites.txt
-  . ':!*.test.sh' ':!memory/'` exits 0, printing `pure-fn-subst` × 2 for `manifest-check.sh` and
-  `cat-file` × 11 for the scratch-guard suite, and `git diff HEAD^2 HEAD --
-  memory/project/spawn-idiom-sites.txt` prints nothing.
+- **AC12** — At the run head, `python3 tools/gate-lint/sh_hygiene.py --spawn-idioms
+  memory/project/spawn-idiom-sites.txt . ':!*.test.sh' ':!memory/'` exits 0, printing
+  `pure-fn-subst` × 2 for `manifest-check.sh` and `cat-file` × 11 for the scratch-guard suite, and `git
+  diff ad02f1a6a^2 ad02f1a6a -- memory/project/spawn-idiom-sites.txt` prints nothing.
   Red when: a row is raised to fit the count; at `e7ab8c81` the counts are 5 and 20, the brief's
   reading.
-- **AC13** — `python tools/run-gates/py_reads.py` exits 0 and prints no `py-reads: RED` line.
+  figure: 2 and 11 are PINNED 2026-11-24 from that file's two rows; 5 and 20 PINNED 2026-11-22.
+- **AC13** — At the run head, `python tools/run-gates/py_reads.py` exits 0 and prints no `py-reads:
+  RED` line.
   Red when: a guard misses a module its closure walks; at `e7ab8c81` it prints `RED guard` lines
   naming `presets.py`.
-- **AC14** — `git ls-tree HEAD tools/govkit/steps/kickoff_facts_to_overlay.py` prints the blob
-  `bf63aab8aafdcfe3cf645325f945ee97305c73b3`, and `python tools/govkit/upgrade_steps.py frozen` exits
+- **AC14** — At the run head, `git ls-tree HEAD tools/govkit/steps/kickoff_facts_to_overlay.py` prints
+  the blob `bf63aab8aafdcfe3cf645325f945ee97305c73b3`, and `python tools/govkit/upgrade_steps.py frozen` exits
   0.
   Red when: the program keeps KICK-dKeptSession-4's line, which reds the leg naming it.
 - **AC15** — Each plant `python -I tools/govkit/steps/kickoff_facts_to_overlay.py --fixture --plant
@@ -452,21 +467,21 @@ Each criterion is observed in the run worktree, after the main loop's reconcile 
   tools/policy/policy.py scaffold` also exits 0, and piped into `grep -c '^preset = '` prints `0`.
   Red when: a plant fails over the empty policy file and bare `scaffold` still exits 2.
   cost: sixteen plants, each its own scratch repository, minutes in all.
-- **AC16** — `python tools/drift-audit/drift_report.py --check` exits 0 with no `RATCHET WEAKENED`
-  line on stderr, and AC8's run prints no `arm_reader_coverage` finding. Any pre-commit leg red at the
-  commit has a ledger line naming INHERITED or its fix.
+- **AC16** — At the run head, `python tools/drift-audit/drift_report.py --check` exits 0 with no
+  `RATCHET WEAKENED` line on stderr. Any pre-commit leg red at the reconcile commit has a ledger line
+  naming INHERITED or its fix.
   Red when: a red read OWN at `8b8b1374` is attributed instead of fixed.
   fixture: a detached scratch worktree of `8b8b1374`, made only where a leg stays red.
-- **AC17** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger, piped into `grep -c "two bare runs
-  read stdout only"` and into `grep -c "ships to adopters"`, prints `1` each, and `git diff --name-only
-  HEAD^1 HEAD --` over the specs of KICK-dKeptSession-4, -16 and -19 and their acceptance ledgers
-  prints nothing.
+- **AC17** — With `L` the path S12 names, this unit's acceptance ledger, `tr -s ' \r\n' ' ' < "$L" |
+  grep -c "two bare runs read stdout only"` prints `1`, and `tr -s ' \r\n' ' ' < "$L" | grep -c "ships
+  to adopters"` prints `1`. `git diff --name-only ad02f1a6a^1 ad02f1a6a --` over the specs of
+  KICK-dKeptSession-4, -16 and -19 and their acceptance ledgers prints nothing.
   Red when: a superseded passage goes unquoted, or a CLOSED unit's record is written.
-- **AC18** — `git ls-files memory/project/unnamed-keys.txt memory/project/unpurposed-namespaces.txt`
-  prints both paths, so check 3's population holds both homes. `bash
+- **AC18** — At the run head, `git ls-files memory/project/unnamed-keys.txt
+  memory/project/unpurposed-namespaces.txt` prints both paths, so check 3's population holds both homes. `bash
   tools/memory-tree/check-memory-hygiene.sh --only 3` then exits 0 and prints no failure line for
   memory hygiene's check 3. `grep '^PROJECT_REGISTRY_EXTRA=' .memory-tree.conf | tr ' "' '\n\n' | grep -cx -e
-  unnamed-keys.txt -e unpurposed-namespaces.txt` prints `2`. AC9's run record holds no
+  unnamed-keys.txt -e unpurposed-namespaces.txt` prints `2`. AC9's three runs print no
   `guard-trace · WRONG` line naming either home.
   Red when: a home is seeded with no `PROJECT_REGISTRY_EXTRA` word, which check 3 prints among its
   unexpected entries, the reading the builder's divergence made at `e7ab8c81`.
@@ -526,6 +541,11 @@ New arm: tools/policy/check_policy.py · covers AC7 AC9 · `reader-join`, `purpo
   `run_reader_join` and the built tree spells neither; §4 and AC18 name memory hygiene's check 3 in
   words, not by its output spelling; from the brief
   `2026-11-22-prompt-KICK-dKeptSession-69-5-spec-writer`.
+- rev-4 · 2026-11-24 · S1 · §4 · AC2 · AC3 · AC8 · AC9 · AC11 · AC12 · AC13 · AC14 · AC16 · AC17 · AC18 · the
+  criteria read what was built: `ad02f1a6a` with `Pass: none` and a closing pass commit, each commit
+  named, AC8's two arm lines without the exit, AC9's cases run one at a time, AC16 without the clause
+  its INHERITED one contradicts, AC17 as two commands; §4's rejected follow-up commit drops its
+  one-commit ground; from the brief `2026-11-24-prompt-KICK-dKeptSession-69-divergence-2-brief`.
 
 ## 10. Reuse audit
 

@@ -22,7 +22,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 120 | 2026-11-23 | active | 0 |
 | [dFurnishedOrders](builds/dFurnishedOrders/README.md) | DEFERRED | d | 2026-10-21 | tooling | 61 | 2026-11-05 | active | 0 |
 | [dIndexedDesign](builds/dIndexedDesign/README.md) | DEFERRED | d | 2026-10-21 | tooling | 53 | 2026-11-05 | active | 0 |
-| [dKeptSession](builds/dKeptSession/README.md) | DEFERRED | d | 2026-10-21 | kickoff | 81 | 2026-11-24 | active | 0 |
+| [dKeptSession](builds/dKeptSession/README.md) | INPROGRESS | d | 2026-10-21 | kickoff | 81 | 2026-11-24 | active | 1 |
 | [dLandedVerdict](builds/dLandedVerdict/README.md) | DEFERRED | d | 2026-08-19 | tooling | 2 | 2026-11-13 | active | 0 |
 | [dLinkedLibrary](builds/dLinkedLibrary/README.md) | DEFERRED | d | 2026-10-21 | tooling | 102 | 2026-11-05 | active | 0 |
 | [dMindYourWords](builds/dMindYourWords/README.md) | DEFERRED | d | 2026-10-21 | tooling | 52 | 2026-11-03 | active | 0 |
