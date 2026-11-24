@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-58 — the 35 minors of auditing units 45 to 51: criteria passable on a correct build, one typed set and one block reader at spawn, one extents record at render, the H1 parity's consumers, and AMENDED answers naming a revision
 
-**Status:** DEFERRED · rev-7 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 32 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-7 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 32 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -21,6 +21,7 @@
 | [2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-spec-writer.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md) | journal | TOOL-dBoundRoles-43 TOOL-dBoundRoles-50 TOOL-dBoundRoles-56 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-11-23-prompt-TOOL-dBoundRoles-58-2-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-58-2-spec-writer.md) | journal | — |
+| [2026-11-24-prompt-TOOL-dBoundRoles-58-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-58-build-brief.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief.md) | journal | TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-10-26-review-TOOL-dBoundRoles-52-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-52-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 |
 
