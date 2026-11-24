@@ -23,7 +23,7 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 4b5054df2ea652d443ff5eda27ec2b0590b870d7 · handoff · 22 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 21e3f97977e1588d52f46ef7b8714831f0494e07
+witness: 04608f915bfc7a6c9bcfb90a83bbde71833c3f4e
 phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -622,3 +622,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T15:24:44Z dispatch · item 21e3f979 TOOL-dBoundRoles-89 · reason tools/roles/agents/gov-orienter.agent.md .claude/agents/gov-orienter.md .claude/roles.json tools/roles/handoff.py tools/roles/README.md tools/loop/placement.py tools/run-gates/selftest-budgets.txt help/roles.md help/loop.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-89-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-89-deviation-891.md
 
 2026-11-24T15:24:46Z brief · item TOOL-dBoundRoles-89 · reason 8293f831689a memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-89-build-brief.md
+
+2026-11-24T15:58:13Z dispatch · item 04608f91 TOOL-dBoundRoles-90 · reason tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-unit.js tools/workflows/unattended-build.test.sh tools/workflows/README.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/roles/SKILL.template.md .claude/skills/build/SKILL.md help/roles.md tools/run-gates/selftest-budgets.txt memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-90-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-24-build-TOOL-dBoundRoles-90-deviation-901.md
+
+2026-11-24T15:58:15Z brief · item TOOL-dBoundRoles-90 · reason 7dac506834cf memory/builds/dBoundRoles/prompts/2026-11-24-prompt-TOOL-dBoundRoles-90-build-brief.md
