@@ -897,13 +897,24 @@ CENSUS_NAMES = ("slug-grammar", "alias-compare", "cause-writer")
 
 def read_kept_reason(line: str, census: str) -> str | None:
     """The reason `line`'s keep marker gives for `census` (`KEPT_MARKER_RE`), or None where it carries none for
-    that census: the one reader of the marker, called by `scan_readers` here, `record_kinds.py`'s
-    `check_alias_compares` and `record_causes.py`'s `check_cause_writers`. It reads line text, so it does
-    not check that the lead opens a comment in that line's language. An empty reason reads as none."""
+    that census: the one reader of the marker, called by `scan_readers` and `check_marker_domain` here,
+    `record_kinds.py`'s `check_alias_compares` and `record_causes.py`'s `check_cause_writers`. It reads line
+    text, so it does not check that the lead opens a comment in that line's language. An empty reason reads
+    as none."""
     for m in KEPT_MARKER_RE.finditer(line):
         if m.group("census") == census and m.group("reason").strip():
             return m.group("reason").strip()
     return None
+
+
+def check_marker_domain(path: str, text: str, census: str) -> list[tuple[int, str]]:
+    """TOOL-dTotalRecall-58: `[(line number, finding)]`, one per line of `text` carrying `census`'s keep marker
+    (`read_kept_reason`), for `text` the whole of `path`, a build folder's file. The alias and cause censuses
+    call it in their build-folder walks, whose files they keep by a path-keyed row alone. It does not check
+    that `path` sits in a build folder, which is the calling walk's, nor another census's marker."""
+    return [(n, f"{census} {path}:{n}: carries the `{census}` census marker; the marker is the tool root's; a build "
+                "folder's script is kept by its path-keyed row, since its bytes are not this build's")
+            for n, ln in enumerate(text.splitlines(), 1) if read_kept_reason(ln, census)]
 
 
 def derive_census_tool_rel() -> str:

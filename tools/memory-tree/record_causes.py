@@ -48,7 +48,8 @@ folders' scripts (TOOL-dTotalRecall-50 S1), every tracked
 binding window by both tests, so a file's own binding is never a hit; each census file is the instrument of
 a `CAUSE_WRITER_PINNED` row or is kept by its path-keyed row of `tree_lib.CENSUS_KEPT_PATHS`
 (TOOL-dTotalRecall-55 S2), held outside its bytes because no pass may edit it, and its count line counts them
-apart. A row cannot outlive its hit (S4): a row whose file the build-folder walk reads and which spells no
+apart. A line of any of those files carrying the `cause-writer` census marker is red by line, whatever keeps
+the file, outside that count line's reds (`id_grammar.check_marker_domain`, TOOL-dTotalRecall-58 S1). A row cannot outlive its hit (S4): a row whose file the build-folder walk reads and which spells no
 Serves literal past its binding window is red, named `CENSUS_KEPT_PATHS` and its path: drain the row. A
 row may name only a build folder's file (`tree_lib.KEPT_PATH_DOMAIN`, TOOL-dTotalRecall-57 S1): a table
 holding any other row is red naming it, an editable file being kept by its census marker, and the walk then
@@ -120,7 +121,7 @@ PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "non
           "bulleted-cause", "bulleted-twice", "script-cause-prefixed", "script-cause-bare", "script-causeless",
           "backfill-selection", "backfill-refusals", "kept-instrument-not-legacy", "pinned-writer-drained",
           "departures-pinned", "literal-without-cause", "duplicate-cause", "unmarked-writer", "kept-row-drained",
-          "kept-row-editable")
+          "kept-row-editable", "marker-in-build-script")
 #: TOOL-dTotalRecall-47 S1: the causes check's absent-cause rule, the one finding `--backfill` selects;
 #: TOOL-dTotalRecall-53 S4: it names its remedy, and stays the one spelling the backfill selects by
 ABSENT_CAUSE = "names no Caused-by, and its kind is no root; run record_causes.py --backfill"
@@ -630,9 +631,11 @@ def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED, kept=tree_lib.CENSUS_K
     each pinned row is printed with its ask id and the records its glob reads, and is red where its
     instrument is untracked or spells `Caused-by` past the window, or its ask is not filed. A `kept` row whose
     file the walk reads and which spells no Serves literal past the window is red, drained (S4); then the
-    build folders' own count line. A `kept` table holding a row outside `tree_lib.KEPT_PATH_DOMAIN` is one red
+    build folders' own count line. Each line of those files carrying this census's marker is red, whatever
+    row keeps the file and outside that count line's reds (TOOL-dTotalRecall-58 S1). A `kept` table holding a row outside `tree_lib.KEPT_PATH_DOMAIN` is one red
     naming the row, and the walk reads every hit unkept (TOOL-dTotalRecall-57 S1)."""
     import record_kinds   # noqa: E402  the tool root and the code census's one walk
+    from id_grammar import check_marker_domain   # noqa: E402  the build-folder walk's marker refusal
     tool_rel = record_kinds.derive_tool_rel(record_kinds.derive_kit_rel())
     try:
         paths = [p for p in record_kinds.read_code_paths(root, tool_rel) if not CAUSE_WRITER_TEST_RE.search(p)]
@@ -695,8 +698,11 @@ def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED, kept=tree_lib.CENSUS_K
     b_kept = b_pinned = b_red = 0
     serving = set()   # S4: the walked files spelling a Serves literal past their binding window
     for path in build_paths:
-        body = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace").splitlines()
-        past = body[tree_lib.BIND_HEAD_LINES:]
+        text = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace")
+        for n, finding in check_marker_domain(path, text, CAUSE_WRITER_CENSUS):   # TOOL-dTotalRecall-58 S1
+            lines.append(f"{CAUSE_WRITER_CENSUS} · {path}:{n} · red · marker in a build folder")
+            reds.append(finding)
+        past = text.splitlines()[tree_lib.BIND_HEAD_LINES:]
         if any(SERVES_LITERAL in ln for ln in past):
             serving.add(path)
         if path not in serving or any(CAUSE_LITERAL in ln for ln in past):
@@ -812,8 +818,9 @@ def write_missing_causes(root) -> tuple:
 FIXTURE_UNIT = "TOOL-fRoot-1"
 FIXTURE_CLAIM = "TOOL-fClaim-1"
 #: TOOL-dTotalRecall-50 AC2 AC3: the pinned plants, their instrument, its row and the ask the row names, filed
-#: in fRoot's BACKLOG.md; the drained plant's instrument spells the cause past its binding window
-PINNED_PLANTS = ("pinned-writer-drained", "departures-pinned")
+#: in fRoot's BACKLOG.md; the drained plant's instrument spells the cause past its binding window, and
+#: TOOL-dTotalRecall-58 AC1's carries the census marker on its Serves literal's line
+PINNED_PLANTS = ("pinned-writer-drained", "departures-pinned", "marker-in-build-script")
 PINNED_INSTRUMENT = f"memory/builds/fRoot/build/2026-01-01-build-{FIXTURE_UNIT}-deviations.py"
 PINNED_ASK = "TOOL-fRoot-2"
 FIXTURE_PINNED = ((PINNED_INSTRUMENT, DEPARTURES_GLOB, PINNED_ASK),)
@@ -932,7 +939,10 @@ def write_fixture(top, plant) -> pathlib.Path:
     elif plant in PINNED_PLANTS:   # TOOL-dTotalRecall-50 AC2 AC3: a pinned instrument, its filed ask, a record
         import backlog   # noqa: E402  the ask door's row renderers
         from gov_record import render_backlog_text   # noqa: E402  the ask door's file layout
-        write_file(PINNED_INSTRUMENT, render_pinned_instrument(plant == "pinned-writer-drained"))
+        text = render_pinned_instrument(plant == "pinned-writer-drained")
+        if plant == "marker-in-build-script":   # TOOL-dTotalRecall-58 AC1: its last line is its Serves literal's
+            text = f"{text.rstrip()}  # census: kept {CAUSE_WRITER_CENSUS} pinned instrument\n"
+        write_file(PINNED_INSTRUMENT, text)
         write_file(PINNED_BACKLOG, render_backlog_text(
             None, "fRoot", backlog.render_ask_row(PINNED_ASK, "2026-01-02", "THE PLANTED INSTRUMENT WRITES NO CAUSE.",
                                                   clauses=[("accept", "its records carry the line")]),
@@ -1036,8 +1046,16 @@ def check_pinned_plant(root, plant) -> tuple:
     naming the row drained, and the second, its instrument written causeless and its ask row deleted from
     PINNED_BACKLOG, exits 1 naming the ask not filed and the row not drained. The departures plant passes
     when the first run, under FIXTURE_PINNED, exits 0, and the second, the row cut, exits 1 naming
-    PINNED_RECORD under causes."""
+    PINNED_RECORD under causes. The marker plant (TOOL-dTotalRecall-58 AC1) runs the first alone and passes when
+    it exits 1 with one red, naming the instrument's Serves literal's line."""
     first, rc1 = run_check(root, FIXTURE_PINNED)
+    if plant == "marker-in-build-script":
+        at = f"{CAUSE_WRITER_CENSUS} {PINNED_INSTRUMENT}:{tree_lib.BIND_HEAD_LINES + 1}: "
+        red = [ln for ln in first if ln.startswith(f"{SAY}: RED ")]
+        ok = rc1 == 1 and len(red) == 1 and red[0].startswith(f"{SAY}: RED {at}")
+        return [f"{SAY}: fixture {plant} · check 1 · {ln}" for ln in first] + [
+            f"{SAY}: fixture {plant} · {'PASS' if ok else 'FAIL'} · check 1 exit {rc1} · a census marker in a "
+            "build folder's script is red by line, its pinned row standing"], ok
     if plant == "pinned-writer-drained":
         pathlib.Path(root, PINNED_INSTRUMENT).write_bytes(render_pinned_instrument(False).encode("utf-8"))
         backlog = pathlib.Path(root, PINNED_BACKLOG)
