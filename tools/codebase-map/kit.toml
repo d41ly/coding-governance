@@ -159,7 +159,7 @@ enforces = ["practice.derive"]
 
 [gate_leg.gov]
 argv = ["python3", "{prefix}/codebase-map/check_gate_coverage.py"]
-guard = ["{prefix}/codebase-map/", ".codebase-map.conf", "{prefix}/memory-tree/coverage_join.py"]
+guard = ["{prefix}/codebase-map/", ".codebase-map.conf", "{prefix}/memory-tree/coverage_join.py", "{prefix}/memory-tree/backlog.py", "{prefix}/memory-tree/id_grammar.py", "{prefix}/memory-tree/legacy_ledger.py", "{prefix}/memory-tree/tree_lib.py"]
 chunk = "declarations"
 ceiling = 180
 

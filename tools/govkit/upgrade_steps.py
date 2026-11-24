@@ -131,6 +131,39 @@ import tempfile
 import time
 import tomllib
 from typing import NamedTuple
+import contextlib
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
 
 HERE = pathlib.Path(__file__).resolve().parent
 # Run as a program, this module is `__main__`; registering it under its own name means govkit,
@@ -1016,8 +1049,7 @@ def derive_introduced(root, landed_ref: str, files: list[str], table: str,
     if not (landed_ref and want and files):
         return found
     declared, walked = set(files), list(files)
-    cat = subprocess.Popen(["git", "-C", str(root), "cat-file", "--batch"],
-                           stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    cat = build_blob_batch(root)
     try:
         if registry:
             reg_rel, tr = registry
@@ -1065,8 +1097,7 @@ def derive_introduced(root, landed_ref: str, files: list[str], table: str,
             if not want:
                 break
     finally:
-        cat.stdin.close()
-        cat.wait()
+        cat.remove_process()
     return found
 
 
@@ -1182,7 +1213,7 @@ def read_git_dir(target: pathlib.Path) -> pathlib.Path | None:
     under `build_step_env` as `read_target_repositories` runs it (TOOL-dSafePassage-76 S1); None where
     git names none, a target outside any repository."""
     # ponytail: a target whose git directory moves mid-process reads the old one; no step moves it
-    with tempfile.TemporaryDirectory(prefix="gk-gitdir-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-gitdir-") as td:
         p = subprocess.run(["git", "-C", str(target), "rev-parse", "--absolute-git-dir"], env=build_step_env(td),
                            stdin=subprocess.DEVNULL, capture_output=True)
     out = p.stdout.decode("utf-8", "replace").strip()
@@ -1588,7 +1619,7 @@ def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
     `.gitmodules` maps the name to, or the name and `, by name` where none does (S22). Every git
     call runs under `build_step_env`'s environment; one that fails, or a `Refusal` `read_config`
     raises, returns the call and git's exit as a string, never an empty population."""
-    with tempfile.TemporaryDirectory(prefix="gk-repos-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-repos-") as td:
         env = build_step_env(td)
 
         def run_repo_git(cwd, *args, ok=(0,), reads: str = "") -> str:
@@ -1723,7 +1754,7 @@ def read_target_local_config(target, refused) -> list[tuple[str, str, str | None
     (TOOL-dSafePassage-42 S8). A git dir under the target is passed relative to it, so its origin
     reads `.git/...`. A read that fails returns git's exit and stderr as a string."""
     root, rows = pathlib.Path(target).resolve(), []
-    with tempfile.TemporaryDirectory(prefix="gk-cfg-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-cfg-") as td:
         def read(d: pathlib.Path, via: str) -> bool:
             gd = d.relative_to(root).as_posix() if d.is_relative_to(root) else d.as_posix()
             p = subprocess.run(["git", "-C", str(target), f"--git-dir={gd}", "config", "--list", "--show-scope",
@@ -1861,7 +1892,7 @@ def run_step_isolated(row: StepRow, phase: str, target, gov_root, to: str | None
                       f"or run the step attended")
     gov_root = pathlib.Path(gov_root).resolve()
     ctx = derive_step_context(row, target, gov_root, to if phase == "down" else None)
-    with tempfile.TemporaryDirectory(prefix="gk-step-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-step-") as td:
         for d in ("home", "tmp", STEP_HOOKS_DIR):
             (pathlib.Path(td) / d).mkdir()
         try:
@@ -1938,7 +1969,7 @@ def check_needs_target(row: StepRow, tree, gov_root) -> str:
         print(f"isolation: {row.id} · attended · it declares needs-target = true, so nothing ran")
         return "attended"
     canaries = pathlib.Path(tree) / CANARY_DIR
-    shutil.rmtree(canaries, ignore_errors=True)
+    remove_tree(canaries)
     write_target_plants(tree, canaries)
     failed = None
     for phase in ("up", "witness"):
@@ -2691,20 +2722,74 @@ def blob_at(root, commit: str, path: str, batch=None) -> bytes | None:
     say "these bytes came from <commit>" about bytes that came from whatever the operator had
     checked out and half-edited at the time.
 
-    THE ONE revision-blob reader (TOOL-dSafePassage-26 S14). `batch` is an open
-    `git cat-file --batch` process a caller reading many blobs passes, `derive_introduced` among
-    them, so a history walk asks one process rather than spawning one `git show` per blob.
+    THE ONE revision-blob reader (TOOL-dSafePassage-26 S14). `batch` is a `BlobBatch` from
+    `build_blob_batch` that a caller reading many blobs passes, `derive_introduced` and `update`
+    among them, so a run asks one `git cat-file --batch` process rather than spawning one
+    `git show` per blob. TOOL-dQuietDisk-16 S2: a `missing` or `ambiguous` reply is None, as the
+    spawn is; an end of stream or a header that does not parse answers through the spawn and
+    marks the handle dead, so a dead process never reads as a missing blob, and a name holding a
+    newline or a CR, which the line-framed protocol cannot carry, is a spawn too, as
+    `BatchReader.read_reply` sends it: the batch reads a name ending in a CR as the name without it,
+    so it would answer one file's bytes for another file's name (TOOL-dQuietDisk-37 S9).
     """
-    if batch is None:
-        out = subprocess.run(["git", "-C", str(root), "show", f"{commit}:{path}"],
-                             capture_output=True, check=False)
-        return out.stdout if out.returncode == 0 else None
-    batch.stdin.write(f"{commit}:{path}\n".encode("utf-8"))
-    batch.stdin.flush()
-    head = batch.stdout.readline().split()
-    if len(head) < 3:
-        return None  # `<name> missing`: no such blob at that commit
-    return batch.stdout.read(int(head[2]) + 1)[:-1]
+    name = f"{commit}:{path}"
+    if batch is not None and not batch.dead and "\n" not in name and "\r" not in name:
+        proc = batch.init_process()
+        try:
+            proc.stdin.write(f"{name}\n".encode("utf-8"))
+            proc.stdin.flush()
+            line = proc.stdout.readline()
+        except (OSError, ValueError):
+            line = b""
+        if line.rstrip(b"\n").endswith((b" missing", b" ambiguous")):
+            return None  # no such blob at that commit, or a commit naming more than one object
+        head = line.split()
+        if len(head) == 3 and head[2].isdigit():
+            size = int(head[2])
+            try:
+                data = proc.stdout.read(size + 1)
+            except (OSError, ValueError):
+                data = b""
+            if len(data) == size + 1:
+                return data[:-1]
+        batch.dead = True
+    out = subprocess.run(["git", "-C", str(root), "show", name], capture_output=True, check=False)
+    return out.stdout if out.returncode == 0 else None
+
+
+class BlobBatch:
+    """TOOL-dQuietDisk-16 S1. One `git -C <root> cat-file --batch` process `blob_at` reads through,
+    started on the first request and stopped by `remove_process()`. `dead` is set by `blob_at` on
+    an end of stream or a bad header, and every later request on the handle is a spawn."""
+
+    def __init__(self, root):
+        self.root = root
+        self.dead = False
+        self._proc = None
+
+    def init_process(self) -> subprocess.Popen:
+        """The process, started on the first call, so a run refused before its first read starts
+        none; it inherits the caller's environment, as the spawn branch's `git show` does."""
+        if self._proc is None:
+            self._proc = subprocess.Popen(["git", "-C", str(self.root), "cat-file", "--batch"],
+                                          stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        return self._proc
+
+    def remove_process(self) -> None:
+        """Close the process's stdin and wait for it; a no-op on a handle never started."""
+        if self._proc is None:
+            return
+        try:
+            self._proc.stdin.close()
+        except OSError:
+            pass  # a process already gone leaves a pipe that refuses the close
+        self._proc.wait()
+        self._proc.stdout.close()
+
+
+def build_blob_batch(root) -> BlobBatch:
+    """TOOL-dQuietDisk-16 S1. A `BlobBatch` over gov's object store at `root`, no process yet."""
+    return BlobBatch(root)
 
 
 def write_atomic(dest, text: str) -> None:
@@ -2953,7 +3038,7 @@ def run_isolation_fixture(plant: str | None) -> int:
               and k.upper() not in ("GIT_CONFIG_GLOBAL", "GIT_CONFIG_NOSYSTEM")]:
         del os.environ[k]
     try:
-        with tempfile.TemporaryDirectory(prefix="gk-iso-", ignore_cleanup_errors=True) as td:
+        with build_scratch_dir(prefix="gk-iso-") as td:
             return run_isolation_case(pathlib.Path(td), plant)
     finally:
         g.update(saved)
@@ -3410,7 +3495,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             # same size, new mtime: git cannot tell it changed without the clean filter
             (deep / "a.txt").write_text("b\n", encoding="utf-8", newline="\n")
             os.utime(deep / "a.txt", (1, 1))
-        shutil.rmtree(canaries, ignore_errors=True)
+        remove_tree(canaries)
         canaries.mkdir()
         if kind in ("config-malformed", "gitmodules-malformed"):
             broken = target / ".git" / "modules" / "sub" / "config" if kind == "config-malformed" else target / ".gitmodules"
@@ -3930,7 +4015,7 @@ def run_walk_fixture(plant: str | None) -> int:
     """`fixture walk [--plant <case>]` (S9): AC1 to AC5 over a scratch gov and target under the temp
     root. An unmet expectation prints `walk: FAILED`; otherwise the exit is the walk's own,
     `fail-k`'s and `attended`'s 1 by design."""
-    with tempfile.TemporaryDirectory(prefix="gk-walk-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-walk-") as td:
         tmp = pathlib.Path(td)
         gov, sha = build_walk_gov(tmp, plant)
         env = build_fixture_env()
@@ -4222,7 +4307,7 @@ def run_lock_fixture(plant: str) -> int:
     """`fixture lock --plant <case>` (S9): AC7 and AC8, each take a child process calling govkit's
     `take_write_lock` over a scratch target whose lock the plant wrote. An unmet expectation prints
     `lock: FAILED`; otherwise the exit is the take's, the refusing plants' 1 by design."""
-    with tempfile.TemporaryDirectory(prefix="gk-lock-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-lock-") as td:
         tmp = pathlib.Path(td)
         t = tmp / "t"
         gk = load_govkit()
@@ -4496,7 +4581,7 @@ def run_update_fixture(plant: str | None) -> int:
     this checkout's `govkit.py`, `upgrade_steps.py` and the process-monitor census, a `demo` kit, and
     at B the steps `fx/s1` and `fx/s2`; a target installed at A is moved to B. An unmet expectation
     prints `update: FAILED`; otherwise the exit is `update`'s, `update-fail`'s 1 by design."""
-    with tempfile.TemporaryDirectory(prefix="gk-upd-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-upd-") as td:
         tmp = pathlib.Path(td)
         fails: list[str] = []
         gov, targets, sha_a, sha_b, env = build_update_gov(
@@ -4720,7 +4805,7 @@ def run_rollback_fixture(plant: str | None) -> int:
             print("rollback: FAILED · callers · a planted second caller does not read red")
             return 1
         return rc
-    with tempfile.TemporaryDirectory(prefix="gk-rb-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-rb-") as td:
         tmp = pathlib.Path(td)
         gov, sha = build_walk_gov(tmp, plant)
         env = build_fixture_env()
@@ -5027,7 +5112,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
     unmet expectation prints `rollback-update: FAILED`; otherwise the exit is `update`'s, and 1 for
     a refusing plant whose refusal held. `retired-step` (TOOL-dSafePassage-76) lands `fx/s2` at B,
     retires it at C, and rolls back to B, which passes, then to A, which refuses."""
-    with tempfile.TemporaryDirectory(prefix="gk-rbu-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-rbu-") as td:
         tmp = pathlib.Path(td)
         fails: list[str] = []
         schema = plant in ROLLBACK_UPDATE_SCHEMA_PLANTS

@@ -566,6 +566,26 @@ def derive_seed_prefix(root):
         return tools.as_posix()
 
 
+def resolve_seed_arg(arg, root, troot):
+    """One seed argument with its `{prefix}` resolved (TOOL-aFlattenedSeed-1 S3). An argument spelled
+    `{prefix}/<home>/<file>` names a file of the kit gov homes at `<home>`, found through
+    `resolve_kit_dir`, so a kit an adopter installed flat, with no `<home>` directory, still resolves;
+    the path is relative to `root`, or absolute where none exists. Any other argument, or a kit no
+    install holds, resolves the token against `troot` through `resolve_prefix_token`."""
+    parts = str(arg).split("/")
+    if len(parts) == 3 and parts[0] == "{prefix}":
+        try:
+            kit = resolve_kit_dir(parts[1], parts[2], pathlib.Path(__file__).absolute().parent)
+        except LookupError:
+            kit = None
+        if kit is not None:
+            try:
+                return pathlib.Path(os.path.relpath(kit / parts[2], str(root))).as_posix()
+            except ValueError:
+                return (kit / parts[2]).as_posix()
+    return resolve_prefix_token(arg, troot)
+
+
 def resolve_seed_head(argv):
     """-> (argv, refusal): a seed argv's head as `regen.py`'s `run_command` maps it (TOOL-dWitnessedBar-51
     S32). `python` or `python3` runs as `sys.executable`, never a PATH lookup that can reach the MS-Store
@@ -583,11 +603,11 @@ def resolve_seed_head(argv):
 def run_seed_argv(argv, root):
     """-> (stdout, reason) of one seed run at `root` under `SEED_TIMEOUT`: `reason` is "" for a live
     result, else `exit <n>`, `timed out`, `dead probe`, a line of its stdout opening `DEAD_PROBE_LEAD`, or
-    `refused: <why>` where `resolve_seed_head` finds no bash. Each argument's `{prefix}` is resolved
-    through `resolve_prefix_token` against `derive_seed_prefix`, and the head through `resolve_seed_head`."""
+    `refused: <why>` where `resolve_seed_head` finds no bash. Each argument resolves through
+    `resolve_seed_arg`, and the head through `resolve_seed_head`."""
     env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
     troot = derive_seed_prefix(root)
-    argv, refusal = resolve_seed_head([resolve_prefix_token(a, troot) for a in argv])
+    argv, refusal = resolve_seed_head([resolve_seed_arg(a, root, troot) for a in argv])
     if refusal:
         return "", "refused: %s" % refusal
     try:

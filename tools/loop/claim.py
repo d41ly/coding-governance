@@ -79,6 +79,7 @@ from loop_parents import read_policy_kit  # noqa: E402
 from loop_witness import FIXTURE_REMOTE, read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
 
 SAY = "claim"
+RATIFY_KEY = "patch.ratify"  # passed by name, so the policy check's reader scan sees the read
 #: The claims namespace on the remote, shared interface I23, and this node's cache of it, which
 #: `write_gov_ref` sets on every write and the driver's fetch fills.
 CLAIM_NS, CACHE_NS = "refs/gov/claims", "refs/gov/remote/claims"
@@ -215,7 +216,7 @@ def read_claim_policy(root, *keys):
 def check_patch_ratified(root, slug):
     """`auto` under `patch.ratify` = `auto`; under `owner`, `ratified` where the newest disposition record of
     `slug` naming `CLAIM_ITEM` disposes `ratified`, `rejected` where it disposes that, else `held`."""
-    if str(read_claim_policy(root, "patch.ratify")["patch.ratify"]) != "owner":
+    if str(read_claim_policy(root, RATIFY_KEY)[RATIFY_KEY]) != "owner":
         return "auto"
     from adapt import read_disposition_release
     found = read_disposition_release(root, slug, CLAIM_ITEM, set())

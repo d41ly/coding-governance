@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# **Serves:** journal TOOL-dWitnessedBar-1
 """The dWitnessedBar landing replay (owner: "Yes, replay it", 2026-11-22), after dPlacedRequest's recipe.
 
     python <this file> plan            # print each offender's parts; writes no object

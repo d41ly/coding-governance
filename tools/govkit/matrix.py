@@ -975,7 +975,15 @@ def main() -> int:
         shapes += 1
         gained_ids = ["agent-cap", "settings-merge", "check-wiring"]
         ga = tmp.resolve() / "gov-aged"
-        cl = git(tmp.resolve(), "-c", "core.autocrlf=false", "clone", "-q", "--local", str(ROOT), str(ga))
+        # --shared (TOOL-dQuietDisk-8 S2): the clone reads gov's objects through objects/info/alternates
+        # rather than hardlinking the store, and its two commits below land in its own; `tmp` removes it.
+        # S3: sparse, leaving out memory/builds/, which this shape's apply and update --write printed the
+        # same output without; so it clones --no-checkout and checks out HEAD itself, autocrlf pinned.
+        cl = git(tmp.resolve(), "-c", "core.autocrlf=false", "clone", "-q", "--local", "--shared", "--no-checkout",
+                 str(ROOT), str(ga))
+        for _argv in (("sparse-checkout", "set", "--no-cone", "/*", "!/memory/builds/"),
+                      ("-c", "core.autocrlf=false", "checkout", "-q", "HEAD")):
+            cl = cl if cl.returncode else git(ga, *_argv)
         reg = ga / PFX / KIT_NAMES["govkit"] / "registry.toml"
         reg_now = reg.read_bytes() if reg.is_file() else b""
         aged = reg_now.decode("utf-8")

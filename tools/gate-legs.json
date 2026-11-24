@@ -67,7 +67,11 @@
     "guard": [
       "{prefix}/codebase-map/",
       ".codebase-map.conf",
-      "{prefix}/memory-tree/coverage_join.py"
+      "{prefix}/memory-tree/coverage_join.py",
+      "{prefix}/memory-tree/backlog.py",
+      "{prefix}/memory-tree/id_grammar.py",
+      "{prefix}/memory-tree/legacy_ledger.py",
+      "{prefix}/memory-tree/tree_lib.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -288,7 +292,8 @@
       "memory/project/encoding-posture-sites.txt",
       ".",
       "{prefix}",
-      "skills"
+      "skills",
+      ":!memory"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -315,7 +320,8 @@
       "memory/project/encoding-stdout-sites.txt",
       ".",
       "{prefix}",
-      "skills"
+      "skills",
+      ":!memory"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -342,7 +348,8 @@
       "memory/project/encoding-js-sites.txt",
       ".",
       "{prefix}",
-      "skills"
+      "skills",
+      ":!memory"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -1987,6 +1994,33 @@
     ]
   },
   {
+    "name": "cleanup posture (a tree removal that swallows its error)",
+    "tag": "leg.gov.cleanup-posture-a-tree-removal-that-swallows-its-error",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "catches a tree removal that swallows its error",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/encoding_posture.py",
+      "--cleanup",
+      "memory/project/cleanup-sites.txt",
+      ".",
+      "{prefix}",
+      "skills",
+      ".githooks"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "enforces": [
+      "practice.portable.temp-files"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
     "name": "hook destinations self-test",
     "tag": "leg.gov.hook-destinations-self-test",
     "tests": [
@@ -2185,10 +2219,10 @@
       "{prefix}/policy/budgets.py",
       "{prefix}/policy/policy.py",
       "{prefix}/memory-tree/backlog.py",
-      "{prefix}/policy/presets.py",
-      "{prefix}/memory-tree/design_lib.py",
+      "{prefix}/memory-tree/coverage_join.py",
       "{prefix}/memory-tree/legacy_ledger.py",
-      "{prefix}/memory-tree/coverage_join.py"
+      "{prefix}/policy/presets.py",
+      "{prefix}/memory-tree/design_lib.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -2217,10 +2251,10 @@
       "{prefix}/policy/budgets.py",
       "{prefix}/policy/policy.py",
       "{prefix}/memory-tree/backlog.py",
-      "{prefix}/policy/presets.py",
-      "{prefix}/memory-tree/design_lib.py",
+      "{prefix}/memory-tree/coverage_join.py",
       "{prefix}/memory-tree/legacy_ledger.py",
-      "{prefix}/memory-tree/coverage_join.py"
+      "{prefix}/policy/presets.py",
+      "{prefix}/memory-tree/design_lib.py"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -2529,7 +2563,8 @@
       "{prefix}/hooks/kit.toml",
       "{prefix}/settings-merge.py",
       "{prefix}/codebase-map/kit.toml",
-      "{prefix}/process-monitor/census.py"
+      "{prefix}/process-monitor/census.py",
+      "{prefix}/lib/template_cache.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -2579,6 +2614,29 @@
     "enforces": [
       "practice.portable.launch",
       "practice.portable.interpreter-floor"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "history-store selftest",
+    "tag": "leg.gov.history-store-selftest",
+    "purpose": "self-tests the history verdict store and its batch reader",
+    "argv": [
+      "python3",
+      "{prefix}/lib/history_store.py",
+      "--selftest"
+    ],
+    "guard": [
+      "{prefix}/lib/history_store.py",
+      "{prefix}/lib/history-store.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 120,
+    "enforces": [
+      "practice.gate"
     ],
     "stage": [
       "step.test"
@@ -2879,7 +2937,11 @@
       "{prefix}/codebase-map/",
       "{prefix}/lib/",
       "{prefix}/lexicon/",
-      "{prefix}/memory-tree/coverage_join.py"
+      "{prefix}/memory-tree/coverage_join.py",
+      "{prefix}/memory-tree/backlog.py",
+      "{prefix}/memory-tree/id_grammar.py",
+      "{prefix}/memory-tree/legacy_ledger.py",
+      "{prefix}/memory-tree/tree_lib.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3210,10 +3272,10 @@
       "{prefix}/policy/budgets.py",
       "{prefix}/policy/policy.py",
       "{prefix}/memory-tree/backlog.py",
-      "{prefix}/policy/presets.py",
-      "{prefix}/memory-tree/design_lib.py",
+      "{prefix}/memory-tree/coverage_join.py",
       "{prefix}/memory-tree/legacy_ledger.py",
-      "{prefix}/memory-tree/coverage_join.py"
+      "{prefix}/policy/presets.py",
+      "{prefix}/memory-tree/design_lib.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3773,7 +3835,9 @@
     ],
     "guard": [
       "{prefix}/lib/lib-selftest.sh",
-      "{prefix}/lib/lib-selftest.test.sh"
+      "{prefix}/lib/lib-selftest.test.sh",
+      "{prefix}/lib/template-cache.sh",
+      "{prefix}/lib/template_cache.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3877,6 +3941,7 @@
       "{prefix}/check-line-length.sh",
       "{prefix}/memory-tree/check-memory-hygiene.sh",
       "{prefix}/memory-tree/gen_build_index.py",
+      "{prefix}/memory-tree/history_store.py",
       "{prefix}/roles/check_roles.py",
       "{prefix}/playbook/render_playbook.py",
       "{prefix}/playbook/instruction_units.py",

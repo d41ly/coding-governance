@@ -147,14 +147,17 @@ def scan_bash(script="", host=""):
 
 def parse_leg_names(text: str) -> set:
     """The leg names a leg manifest's text declares: the `name` of each `{name: ...}` row of its
-    top-level list. ValueError when the text is not JSON or its top level is not a list. The kit's
-    one manifest parser (TOOL-aNimbleMend-8): `gotchas.py#load_leg_names` reads a working-tree
-    manifest through it and the commit grader a blob at a commit."""
+    top-level list, or of the list under a top-level object's `legs` key, the shape an adopter's
+    documented manifest takes (TOOL-aWrappedRoster-1). ValueError when the text is not JSON or holds
+    neither shape. The kit's one manifest parser (TOOL-aNimbleMend-8): `gotchas.py#load_leg_names`
+    reads a working-tree manifest through it and the commit grader a blob at a commit."""
     import json
 
     rows = json.loads(text)
+    if isinstance(rows, dict):
+        rows = rows.get("legs")
     if not isinstance(rows, list):
-        raise ValueError("the top level is not a list of leg rows")
+        raise ValueError("the top level is neither a list of leg rows nor an object whose `legs` is one")
     return {r["name"] for r in rows if isinstance(r, dict) and isinstance(r.get("name"), str)}
 
 

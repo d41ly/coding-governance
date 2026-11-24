@@ -1820,6 +1820,30 @@ allowed = ["offer", "attended"]
 default = "offer"
 owner = "dShippedRelease"
 
+[[key]]
+name = "install.baseline"
+allowed = ["reuse", "run"]
+default = "reuse"
+summary = "Whether govkit apply's two reads of your runner, before and after it writes, reuse each leg your runner's reuse cache holds green for unchanged inputs, or execute every leg as before; a runner with no observed_reused template reads as run."
+usage = 'install.baseline = "run"'
+owner = "dQuietDisk"
+
+[[key]]
+name = "tests.history-verdicts"
+allowed = ["stored", "regraded"]
+default = "stored"
+summary = "Whether a history leg keeps each item's verdict in a store under the git common dir, keyed by the commit and blob ids the item reads and by the grading code's bytes, so a run grades only what is new, or regrades all of history on every run."
+usage = 'tests.history-verdicts = "regraded"'
+owner = "dQuietDisk"
+
+[[key]]
+name = "tests.fixture-templates"
+allowed = ["shared", "per-case"]
+default = "shared"
+summary = "Whether a self-test that opts into the template cache builds each base repository once per run, keyed by its builder and its inputs, and gives each case a shared clone of it, or builds and copies a fixture per case as before the cache."
+usage = 'tests.fixture-templates = "per-case"'
+owner = "dQuietDisk"
+
 [[namespace]]
 name = "bar"
 purpose = "How the merge bar treats a red leg: whether a red bar or pass leg may be fixed inline with no spec, its record written after."

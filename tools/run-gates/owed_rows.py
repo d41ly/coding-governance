@@ -42,6 +42,39 @@ import subprocess
 import sys
 import tempfile
 import tomllib
+import contextlib
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
 
 HERE = pathlib.Path(os.path.abspath(__file__)).parent
 
@@ -396,7 +429,7 @@ def run_selftest() -> int:
             print("".join(f"      {ln}\n" for ln in lines), end="")
     finally:
         # git writes its objects read-only, which a bare rmtree on win32 leaves behind.
-        shutil.rmtree(scratch, onexc=lambda f, q, _e: (os.chmod(q, 0o700), f(q)))
+        remove_tree(scratch)
     if failed:
         print(f"FAIL — {failed} of {len(cases)} owed-rows fixtures failed")
         return 1

@@ -30,6 +30,147 @@ import sys
 import tempfile
 import time
 import types
+import atexit
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
+# >>> owned_work_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# THE OWNED ROOT A PROCESS SITS IN: the nearest of `path` and its parents named `gate-work.*` and
+# holding an `owner` file, a bar's `$WORK` or a suite's own root (TOOL-dQuietDisk-9 S2).
+def resolve_owned_work(path):
+    """The owned `gate-work.*` directory at or above `path`, a pathlib.Path, or None."""
+    here = pathlib.Path(path).absolute()
+    for d in (here, *here.parents):
+        if d.name.startswith("gate-work.") and (d / "owner").is_file():
+            return d
+    return None
+# <<< owned_work_py
+
+# >>> owned_tempdir_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A PYTHON SUITE'S OWNED ROOT (TOOL-dQuietDisk-9 S2, S9). Nested in an owned root, a bar's or another
+# suite's, it takes that temp dir and makes nothing. Otherwise it sweeps each dead `py:` owner's root
+# of this repository, or of a common dir that names no directory, makes `gate-work.*` with an owner
+# line and `tmp`, points `tempfile` and the `TMPDIR`, `TEMP` and `TMP` its children read there, and
+# removes the whole root at exit. A kill leaves the root with its owner, for the next suite to sweep.
+def read_pid_alive(pid) -> bool:
+    """False only when `pid` is provably gone; any error reads as alive, so a sweep can only keep."""
+    if os.name == "nt":
+        # Never `os.kill` here: signal 0 on Windows is CTRL_C_EVENT, sent to the pid's console group.
+        try:
+            import ctypes
+            k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            k32.OpenProcess.restype = ctypes.c_void_p
+            handle = k32.OpenProcess(0x1000, False, int(pid))  # PROCESS_QUERY_LIMITED_INFORMATION
+            if not handle:
+                return ctypes.get_last_error() != 87  # ERROR_INVALID_PARAMETER: no such process
+            try:
+                code = ctypes.c_ulong()
+                if not k32.GetExitCodeProcess(ctypes.c_void_p(handle), ctypes.byref(code)):
+                    return True
+                return code.value == 259  # STILL_ACTIVE
+            finally:
+                k32.CloseHandle(ctypes.c_void_p(handle))
+        except (OSError, AttributeError, ValueError):
+            return True
+    try:
+        os.kill(int(pid), 0)
+    except ProcessLookupError:
+        return False
+    except (OSError, ValueError):
+        return True
+    return True
+
+
+def scan_dead_scratch(ambient, common) -> list:
+    """Removes each `gate-work.*` directly under `ambient` whose owner names a dead `py:` pid and
+    `common`, or an absolute common dir that names no directory; an empty `common` removes nothing.
+    Returns the roots removed, and says one stderr line per root it sweeps."""
+    removed = []
+    if not common:
+        return removed
+    try:
+        names = sorted(os.listdir(ambient))
+    except OSError:
+        return removed
+    for name in names:
+        root = os.path.join(ambient, name)
+        if not name.startswith("gate-work.") or not os.path.isdir(root):
+            continue
+        try:
+            with open(os.path.join(root, "owner"), encoding="utf-8") as fh:
+                fields = fh.readline().rstrip("\r\n").split("\t")
+        except (OSError, UnicodeDecodeError):
+            continue
+        pid = fields[0][3:] if fields[0].startswith("py:") else ""
+        if len(fields) < 2 or not (pid.isascii() and pid.isdigit()):
+            continue
+        if fields[1] != common and (not os.path.isabs(fields[1]) or os.path.isdir(fields[1])):
+            continue
+        if read_pid_alive(int(pid)):
+            continue
+        print(f"owned-scratch: sweeping the scratch of a dead suite (pid {pid}): {root}", file=sys.stderr)
+        if remove_tree(root):
+            removed.append(root)
+    return removed
+
+
+def init_owned_tempdir() -> str:
+    """The temp dir this process's scratch lands in, owned and removed at exit; see the block's head."""
+    ambient = tempfile.gettempdir()
+    if resolve_owned_work(ambient) is not None:
+        tempfile.tempdir = ambient
+        return ambient
+    try:
+        got = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                             capture_output=True, text=True, encoding="utf-8", errors="replace",
+                             check=False, stdin=subprocess.DEVNULL)
+        common = got.stdout.strip() if got.returncode == 0 else ""
+    except OSError:
+        common = ""
+    scan_dead_scratch(ambient, common)
+    root = tempfile.mkdtemp(prefix="gate-work.", dir=ambient)
+    atexit.register(remove_tree, root)
+    staged = os.path.join(root, f"owner.{os.getpid()}.tmp")
+    with open(staged, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(f"py:{os.getpid()}\t{common}\t{int(time.time())}\n")
+    os.replace(staged, os.path.join(root, "owner"))
+    tmp = os.path.join(root, "tmp")
+    os.mkdir(tmp)
+    tempfile.tempdir = tmp
+    for name in ("TMPDIR", "TEMP", "TMP"):
+        os.environ[name] = tmp
+    return tmp
+# <<< owned_tempdir_py
+
 
 
 def derive_install_prefix() -> str:
@@ -713,6 +854,18 @@ def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
 
 sys.path.insert(0, str(HERE))
 from fixture_target import build_scratch_gov, build_target  # noqa: E402 — TOOL-dSafePassage-5 S12, -26 S19: the factories
+
+# TOOL-dQuietDisk-11 S1/S2: one suite template cache per run, loaded by path from gov's lib dir.
+# `main` binds it once its scratch root exists; a `build_target` call whose `(deploy, files)` text
+# recurs at another call, with a `deploy` built from module constants alone, passes
+# `template=TEMPLATES`, so each recurring target is built once and cloned per call. Left at `None`
+# (a helper driven outside `main`), and under the switch's `per-case`, every call builds as before.
+_template_cache_spec = importlib.util.spec_from_file_location(
+    "template_cache", resolve_kit_dir("lib", "template_cache.py", HERE) / "template_cache.py")
+template_cache = importlib.util.module_from_spec(_template_cache_spec)
+_template_cache_spec.loader.exec_module(template_cache)
+TemplateCache = template_cache.TemplateCache
+TEMPLATES = None
 
 
 DEPLOY_FULL = f"""gov_source = "local"
@@ -1476,7 +1629,8 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
 
     # AC1 — adopt records the owned row, then `apply --resume` must leave its bytes and role alone.
     lacking = "alpha = 1\n\nif __name__ == '__main__':\n    print('hello')\n"
-    t = build_target(tmp / "own", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"))
+    t = build_target(tmp / "own", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"),
+                     template=TEMPLATES)
     (t / PFX / "demo").mkdir(parents=True)
     (t / "docs").mkdir()
     for f in ("use.py", "seed.txt", "tpl.md"):
@@ -1529,7 +1683,8 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
 
     # DEPL-aRepatriatedFork-21 S2, closing review round 1 residual (e). A FIRST apply over an owning
     # target has no receipt row to carry, so it builds one; the row carries every key adopt's does.
-    f1 = build_target(tmp / "first", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"))
+    f1 = build_target(tmp / "first", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"),
+                      template=TEMPLATES)
     (f1 / PFX / "demo").mkdir(parents=True)
     (f1 / PFX / "demo" / "run.py").write_text(lacking, encoding="utf-8", newline="\n")
     settle(f1, "the target's own program")
@@ -1541,7 +1696,7 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
           and frow.get("oid") == (adopted or {}).get("oid"), json.dumps(frow) + p.stdout[-600:])
 
     # AC4 — no [[own]] rows: gov's run.py lands as `engine` and no owned skip is printed.
-    n = build_target(tmp / "non", SAFE_DEPLOY)
+    n = build_target(tmp / "non", SAFE_DEPLOY, template=TEMPLATES)
     run_govkit("apply", "--target", str(n))
     (n / "docs").mkdir()
     (n / "docs" / "tpl.md").write_text("tpl\n", encoding="utf-8", newline="\n")
@@ -1950,7 +2105,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
                               capture_output=True, text=True, encoding="utf-8", env=env)
 
     def build_target17(g: pathlib.Path, tag: str) -> pathlib.Path:
-        t = build_target(tmp / f"{tag}-t", SAFE_DEPLOY)
+        t = build_target(tmp / f"{tag}-t", SAFE_DEPLOY, template=TEMPLATES)
         p = run_gov17(g, "apply", "--target", str(t))
         check(f"[aRF-17] the {tag} fixture installs, or every arm over it grades nothing",
               p.returncode == 0, p.stdout[-900:] + p.stderr[-600:])
@@ -2590,7 +2745,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     old = "".join(f"line {i}\n" for i in range(20))
     g, a1 = build_gov17("sp", kit_cf, {"prog.py": old, "other.py": old})
     write_gov17(g, kit_cf, {"prog.py": "".join(f"mid {i}\n" for i in range(20))}, "A2")
-    t = build_target(tmp / "sp-t", SAFE_DEPLOY)
+    t = build_target(tmp / "sp-t", SAFE_DEPLOY, template=TEMPLATES)
     (t / PFX / "demo").mkdir(parents=True)
     (t / PFX / "demo" / "prog.py").write_bytes(old.replace("line 7\n", "line seven\n").encode())
     (t / PFX / "demo" / "other.py").write_bytes(
@@ -2688,7 +2843,7 @@ def measure_mode_carry(tmp: pathlib.Path, source: str, arms: set) -> dict:
                               capture_output=True, text=True, encoding="utf-8", env=e)
 
     def build_levelled_target(g: pathlib.Path, tag: str) -> pathlib.Path:
-        t = build_target(tmp / f"{tag}-t", SAFE_DEPLOY)
+        t = build_target(tmp / f"{tag}-t", SAFE_DEPLOY, template=TEMPLATES)
         p = run_gov(g, "apply", "--target", str(t))
         add_result("LIVE", f"[aLC-1] the {tag} fixture installs", p.returncode == 0,
                    p.stdout[-900:] + p.stderr[-600:])
@@ -3859,7 +4014,8 @@ def check_requires_vintage(tmp: pathlib.Path) -> None:
     g = tmp / "rv-gov"
     a = build_steps_gov(g, {f"{gkn}/registry.toml": reg, "demo/kit.toml": 'id = "demo"\n' + body,
                             "demo/a.txt": "a\n"})
-    t = build_target(tmp / "rv-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+    t = build_target(tmp / "rv-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                     template=TEMPLATES)
 
     def run_gk(*args: str) -> subprocess.CompletedProcess:
         return subprocess.run([sys.executable, str(g / PFX / gkn / "govkit.py"), *args],
@@ -3932,7 +4088,8 @@ def check_gained_prune_vintage(tmp: pathlib.Path) -> None:
     descs = {f"{k}/kit.toml": f'id = "{k}"\n' + VINTAGE_KIT_BODY.replace('"demo"', f'"{k}"') for k in kits}
     g = tmp / "gp-gov"
     a = build_steps_gov(g, {f"{gkn}/registry.toml": reg % '"demo"', **descs, **{f"{k}/a.txt": "a\n" for k in kits}})
-    t = build_target(tmp / "gp-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+    t = build_target(tmp / "gp-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                     template=TEMPLATES)
     govkit = [sys.executable, str(g / PFX / gkn / "govkit.py")]
     p = subprocess.run(govkit + ["apply", "--target", str(t), "--kits", "demo"], capture_output=True, text=True,
                        encoding="utf-8", env=STEPS_ENV)
@@ -3986,7 +4143,7 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
                               cwd=str(t), capture_output=True, text=True, encoding="utf-8").stdout.strip()
 
     def build_capped(tag: str, conf: bytes) -> pathlib.Path:
-        t = build_target(tmp / tag, None)
+        t = build_target(tmp / tag, None, template=TEMPLATES)
         (t / ".governance").mkdir(exist_ok=True)
         (t / ".governance" / "policy.toml").write_bytes(scaffold.replace(b"\r\n", b"\n"))
         (t / ".agent-cap.conf").write_bytes(conf)
@@ -4022,7 +4179,7 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
     check("[dSP-1 AC11] a down after the up leaves a BOM-led CRLF conf and the policy file byte-identical",
           down.returncode == 0 and read_tree(t) == pre
           and not (t / ".governance" / "steps" / "agent-cap").exists(), down.stdout + down.stderr)
-    t = build_target(tmp / "fs-ac17", None)
+    t = build_target(tmp / "fs-ac17", None, template=TEMPLATES)
     down = run_step("down", t)
     status = run_gov_git(t, "status", "--porcelain")
     check("[dSP-17 AC5] a down on a target that never held the conf, with no image, exits 0 and writes nothing",
@@ -4098,7 +4255,7 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
     check("[dSP-1 S6] a conf that is not UTF-8: the up exits 1 naming it and writes no byte",
           up.returncode == 1 and ".agent-cap.conf: not UTF-8" in up.stderr and read_tree(t) == pre,
           up.stdout + up.stderr)
-    t = build_target(tmp / "fs-badpol", None)
+    t = build_target(tmp / "fs-badpol", None, template=TEMPLATES)
     (t / ".governance").mkdir(exist_ok=True)
     (t / ".governance" / "policy.toml").write_bytes(b"[runtime\n")
     (t / ".agent-cap.conf").write_bytes(b"FANOUT_CAP=2\n")
@@ -4155,7 +4312,7 @@ def check_review_rounds_step(tmp: pathlib.Path) -> None:
                               cwd=str(t), capture_output=True, text=True, encoding="utf-8").stdout.strip()
 
     def build_bounded(tag: str, conf: bytes) -> pathlib.Path:
-        t = build_target(tmp / tag, None)
+        t = build_target(tmp / tag, None, template=TEMPLATES)
         (t / ".unattended.conf").write_bytes(conf)
         settle(t, "a target with a round bound")
         return t
@@ -4535,7 +4692,7 @@ def check_staged_copies(tmp: pathlib.Path) -> None:
     # TOOL-dSafePassage-99 S3: a staged copy's own `load_govkit()` writes the copy's engine to the
     # module table, and `govkit_module()` still answers the one engine at GOVKIT afterwards.
     held99 = govkit_module()
-    shutil.rmtree(tmp / "dsp99-copy", ignore_errors=True)
+    remove_tree(tmp / "dsp99-copy")
     spec99 = importlib.util.spec_from_file_location("us99_copy", build_staged_copy(
         tmp / "dsp99-copy", (HERE / "upgrade_steps.py").read_text(encoding="utf-8")))
     us99_copy = importlib.util.module_from_spec(spec99)
@@ -5385,7 +5542,7 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
     anchor94 = 'except (OSError, subprocess.SubprocessError):\n            return "did not run"'
     sentinel94 = "dsp95-sentinel"
     steps94 = types.ModuleType("dsp94_upgrade_steps")
-    shutil.rmtree(tmp / "dsp94-narrowed", ignore_errors=True)  # TOOL-dSafePassage-96: a reused tmp stages afresh
+    remove_tree(tmp / "dsp94-narrowed")  # TOOL-dSafePassage-96: a reused tmp stages afresh
     try:
         spec94 = importlib.util.spec_from_file_location("dsp94_upgrade_steps", build_staged_copy(
             tmp / "dsp94-narrowed", src94.replace(anchor94, 'except ValueError:\n            return "did not run"', 1)))
@@ -5438,7 +5595,7 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
 
     def read_stub_tail(resolve_src: str | None) -> str:
         # TOOL-dSafePassage-94: no shape runs the last one's bytecode, which the stub's loader writes
-        shutil.rmtree(stub92 / "__pycache__", ignore_errors=True)
+        remove_tree(stub92 / "__pycache__")
         if resolve_src is None:
             stand94.unlink(missing_ok=True)
         else:
@@ -5661,7 +5818,7 @@ def check_step_walk() -> None:
     clock = "        now, now_boot = time.time(), read_boot_clock()\n        rows, _counts = census.scan_processes()\n"
     late = "        rows, _counts = census.scan_processes()\n        now, now_boot = time.time(), read_boot_clock()\n"
     src = us_py.read_text(encoding="utf-8")
-    with tempfile.TemporaryDirectory(prefix="gk-judge-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-judge-") as td:
         jd = build_staged_copy(pathlib.Path(td), src.replace(clock, late))
         pm = govkit_module().resolve_kit_dir("process-monitor", "census.py", HERE)
         (pathlib.Path(td) / pm.name).mkdir()
@@ -5931,6 +6088,213 @@ def check_step_rollback() -> None:
                   needle in refused if needle else refused == "", refused or "passed")
 
 
+def check_kit_attestations(tmp: pathlib.Path) -> None:
+    """TOOL-dQuietDisk-37 S1, the review's M1: `derive_kit_attestations` against a record the RUNNER
+    wrote. One scratch gov holds `demo`, whose `kit` leg requires `dep`, `dep`, and a `run-gates`
+    home carrying the runner and `held_halves.py`; one fixture bar under `GATE_SELFTESTS=1` writes
+    `gate-selftest-last`. The manifest row carries `purpose`, a declarative key, so the first line
+    reds when either side hashes the whole row and the other leaves the key out: two copies of one
+    expression, with this the one comparison of them. Every later line is graded only where the
+    restored fixture attests again, so none passes on a fixture that never attested."""
+    G = govkit_module()
+    g = tmp / "kit-attest"
+    gk, rg = g / PFX / KIT_NAMES["govkit"], g / PFX / KIT_NAMES["run-gates"]
+    for d in (gk, rg, g / PFX / "demo", g / PFX / "dep"):
+        d.mkdir(parents=True)
+    for name in ("govkit.py", "upgrade_steps.py", "adopters.toml"):
+        shutil.copy2(GOVKIT.parent / name, gk / name)
+    # held_halves.py imports its verdict grammar from profile_bar.py, so the sibling travels with it.
+    for name in ("run-gates.sh", "gate-profiles.txt", "gate-fingerprint.sh", "held_halves.py", "profile_bar.py"):
+        shutil.copy2(KIT_DIRS["run-gates"] / name, rg / name)
+    (gk / "registry.toml").write_text(
+        '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
+        + "".join(f'[[entry]]\nid = "{e}"\ndescriptor = "{{prefix}}/{h}/kit.toml"\n\n'
+                  for e, h in (("demo", "demo"), ("dep", "dep"), ("run-gates", KIT_NAMES["run-gates"])))
+        + '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n', encoding="utf-8", newline="\n")
+    tail = 'version_from = { none = "fixture" }\n\n[adopt]\nargv = []\nmutates_index = false\n'
+    (g / PFX / "demo" / "kit.toml").write_text(
+        'id = "demo"\nhome = "demo"\nrequires = ["dep"]\n' + tail
+        + '\n[[files]]\ninclude = ["a.sh"]\nrole = "engine"\n\n[[gate_leg]]\nname = "demo"\n'
+        f'argv = ["bash", "{PFX}demo/a.sh"]\nguard = []\nsubject = "kit"\n', encoding="utf-8", newline="\n")
+    (g / PFX / "dep" / "kit.toml").write_text(
+        'id = "dep"\nhome = "dep"\nrequires = []\n' + tail + '\n[[files]]\ninclude = ["a.sh"]\nrole = "engine"\n',
+        encoding="utf-8", newline="\n")
+    (rg / "kit.toml").write_text(f'id = "run-gates"\nhome = "{KIT_NAMES["run-gates"]}"\nrequires = []\n' + tail,
+                                 encoding="utf-8", newline="\n")
+    for e in ("demo", "dep"):
+        (g / PFX / e / "a.sh").write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8", newline="\n")
+    (g / PFX / "gate-legs.json").write_text(json.dumps(
+        [{"name": "demo", "argv": ["bash", f"{PFX}demo/a.sh"], "guard": [], "subject": "kit",
+          "purpose": "the fixture leg whose row hash leaves this key out"}], indent=2) + "\n",
+        encoding="utf-8", newline="\n")
+    pin = ("-c", "core.autocrlf=false", "-c", "core.hooksPath=", "-c", "commit.gpgsign=false",
+           "-c", "user.name=t", "-c", "user.email=t@e")
+    git(g, "init", "-q", "--template=", "--object-format=sha1", "-b", "main")
+    git(g, *pin, "add", "-A")
+    git(g, *pin, "commit", "-qm", "base")
+    (g / "README.md").write_text("fixture\n", encoding="utf-8", newline="\n")
+    git(g, *pin, "add", "README.md")
+    git(g, *pin, "commit", "-qm", "readme")
+    revs = subprocess.run(["git", "-C", str(g), "rev-list", "--reverse", "HEAD"], capture_output=True,
+                          encoding="utf-8", text=True, check=False).stdout.split()
+    first, head = (revs + ["", ""])[:2] if len(revs) == 2 else ("", "")
+    # The bar's environment: no inherited GATE_ name, and no git location or pathspec variable, so it
+    # answers about this fixture and never about an outer run or repository.
+    env = {k: v for k, v in os.environ.items()
+           if not k.startswith("GATE_") and not (k.startswith("GIT_") and not k.startswith("GIT_CONFIG"))}
+    env.update(GATE_SELFTESTS="1", GATE_FULL="1", GATE_PROFILE="minimal", GATE_TURNSTILE="0", GATE_WALL="0",
+               PYTHONDONTWRITEBYTECODE="1")
+    try:
+        bar = subprocess.run(G.resolve_shell_argv(["bash", f"{PFX}{KIT_NAMES['run-gates']}/run-gates.sh"]),
+                             cwd=str(g), env=env, capture_output=True, text=True, encoding="utf-8",
+                             errors="replace", timeout=600, check=False)
+        said, rc = bar.stdout + bar.stderr, bar.returncode
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        said, rc = str(exc), -1
+    record = g / ".git" / "gate-selftest-last" / hashlib.sha1(b"demo").hexdigest()[:16]
+    saved = record.read_bytes() if record.is_file() else b""
+    rec = dict(ln.split("\t", 1) for ln in saved.decode("utf-8", "replace").splitlines() if "\t" in ln)
+    sources = sorted(f"{PFX}{e}/a.sh" for e in ("demo", "dep"))
+
+    def read_demo_attestation(to_commit: str = "") -> dict | None:
+        return next((a for a in G.derive_kit_attestations(g, to_commit or head) if a.get("kit") == "demo"), None)
+
+    att = read_demo_attestation() if saved and head else None
+    check("[dQD-37] S1 the runner's own record attests demo, whose row carries `purpose`, and its legs row is the record's",
+          rc == 0 and rec.get("sha") == head and att is not None and [x.get("row") for x in att["legs"]] == [rec.get("row")],
+          f"bar exit {rc}, record {rec!r}, attestation {att!r}; the bar said:\n{said[-3000:]}")
+    listed = subprocess.run(["git", "-C", str(g), "ls-tree", "-r", "HEAD"], capture_output=True, encoding="utf-8", text=True,
+                            check=False).stdout.splitlines()
+    oids = {ln.split("\t", 1)[1]: ln.split()[2] for ln in listed if "\t" in ln}
+    digest = hashlib.sha256("".join(f"{s}\t{oids.get(s)}\n" for s in sources).encode("utf-8")).hexdigest()
+    check("[dQD-37] S1 the digest is the SHA-256 of demo's and dep's ls-tree lines, and the legs entry holds the record's sha",
+          att is not None and [s for s, _o in att["sources"]] == sources and att["digest"] == digest
+          and [x.get("sha") for x in att["legs"]] == [head], f"{att!r} want digest {digest}")
+
+    def check_unattested(label: str, broken) -> None:
+        try:
+            got = broken()
+        finally:
+            record.parent.mkdir(parents=True, exist_ok=True)
+            record.write_bytes(saved)
+            git(g, "reset", "-q", "--hard", head)
+        check(f"[dQD-37] S1 {label}, demo is not attested", att is not None and got is None
+              and read_demo_attestation() is not None, f"under the break {got!r}")
+
+    def write_moved_source(e: str):
+        (g / PFX / e / "a.sh").write_text("#!/usr/bin/env bash\n# moved\nexit 0\n", encoding="utf-8", newline="\n")
+        git(g, *pin, "commit", "-qm", f"move {e}", "--", f"{PFX}{e}/a.sh")
+        return read_demo_attestation(subprocess.run(["git", "-C", str(g), "rev-parse", "HEAD"], capture_output=True,
+                                                    encoding="utf-8", text=True, check=False).stdout.strip())
+
+    check_unattested("with no record file", lambda: (record.unlink(missing_ok=True), read_demo_attestation())[1])
+    check_unattested("with the record's row forty zeros", lambda: (record.write_bytes(
+        saved.replace(f"row\t{rec.get('row', '')}".encode(), b"row\t" + b"0" * 40)), read_demo_attestation())[1])
+    check_unattested("with a demo source moved after the record's sha", lambda: write_moved_source("demo"))
+    check_unattested("with a dep source moved after the record's sha", lambda: write_moved_source("dep"))
+    got7 = G.derive_kit_attestations(g, first) if first else None
+    check("[dQD-37] S1 at a to_commit that is the fixture's first commit and not HEAD, the answer is []",
+          att is not None and bool(first) and first != head and got7 == [], f"{got7!r}")
+
+
+def check_blob_batch(tmp: pathlib.Path) -> None:
+    """TOOL-dQuietDisk-37 S10, the review's L1 and L3: `blob_at`'s batch branches, each asked with
+    and without a `BlobBatch` over one scratch repository holding a committed `a`. A missing path and
+    an ambiguous commit prefix are None and keep the handle live; an `ambiguous` reply, which no
+    `<commit>:<path>` name reaches on git 2.54, comes from a stand-in process; a killed process
+    answers through the spawn and marks the handle dead; a name holding a newline or a CR never
+    reaches the batch, whose line framing would read `a` followed by a CR as `a`."""
+    us = govkit_module().upgrade_steps
+    repo = tmp / "blob-batch"
+    repo.mkdir(parents=True)
+    pin = ("-c", "core.autocrlf=false", "-c", "core.hooksPath=", "-c", "commit.gpgsign=false",
+           "-c", "user.name=t", "-c", "user.email=t@e")
+    git(repo, "init", "-q", "--object-format=sha1", "-b", "main")
+    (repo / "a").write_bytes(b"the bytes of a\n")
+    git(repo, *pin, "add", "a")
+    git(repo, *pin, "commit", "-qm", "a")
+    want = subprocess.run(["git", "-C", str(repo), "show", "HEAD:a"], capture_output=True, check=False).stdout
+
+    class SpyBatch(us.BlobBatch):
+        """A real handle that records whether `blob_at` ever started its process."""
+        started = False
+
+        def init_process(self) -> subprocess.Popen:
+            self.started = True
+            return super().init_process()
+
+    class StandInBatch(us.BlobBatch):
+        """A handle whose process answers every name `<name> ambiguous`, the reply git gives a bare prefix."""
+
+        def init_process(self) -> subprocess.Popen:
+            if self._proc is None:
+                self._proc = subprocess.Popen(
+                    [sys.executable, "-c", "import sys\nfor ln in sys.stdin.buffer:\n"
+                     "    sys.stdout.buffer.write(ln.rstrip(b'\\n') + b' ambiguous\\n'); sys.stdout.buffer.flush()\n"],
+                    stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            return self._proc
+
+    handles: list = []
+    try:
+        b1 = us.BlobBatch(repo)
+        handles.append(b1)
+        got = (us.blob_at(repo, "HEAD", "nope"), us.blob_at(repo, "HEAD", "nope", b1))
+        again = us.blob_at(repo, "HEAD", "a", b1)
+        check("[dQD-37] S10 a missing path is None both ways, and the handle stays live and answers a's bytes next",
+              bool(want) and got == (None, None) and not b1.dead and again == want, f"{got!r} dead={b1.dead} next={again!r}")
+
+        # Two commits sharing a 4-hex prefix, found by hashing what git would store and written as is.
+        tree = subprocess.run(["git", "-C", str(repo), "rev-parse", "HEAD^{tree}"], capture_output=True,
+                              encoding="utf-8", text=True, check=False).stdout.strip()
+        seen: dict = {}
+        pair = None
+        for i in range(100000):
+            body = (f"tree {tree}\nauthor t <t@e> 0 +0000\ncommitter t <t@e> 0 +0000\n\nm{i}\n").encode()
+            oid = hashlib.sha1(b"commit %d\0" % len(body) + body).hexdigest()
+            if oid[:4] in seen:
+                pair = (seen[oid[:4]], body)
+                break
+            seen[oid[:4]] = body
+        if pair is None:
+            check("[dQD-37] S10 two commits sharing a 4-hex prefix were found within the 100000-try bound", False)
+        else:
+            wrote = {subprocess.run(["git", "-C", str(repo), "hash-object", "-t", "commit", "-w", "--stdin"],
+                                    input=body, capture_output=True, check=False).stdout.decode().strip()[:4]
+                     for body in pair}
+            prefix = wrote.pop() if len(wrote) == 1 else ""
+            b2 = us.BlobBatch(repo)
+            handles.append(b2)
+            got = (us.blob_at(repo, prefix, "a"), us.blob_at(repo, prefix, "a", b2)) if prefix else ("unwritten",)
+            check("[dQD-37] S10 a commit prefix naming two commits is None both ways, and the handle stays live",
+                  got == (None, None) and not b2.dead and us.blob_at(repo, "HEAD", "a", b2) == want,
+                  f"prefix={prefix!r} {got!r} dead={b2.dead}")
+
+        b3 = StandInBatch(repo)
+        handles.append(b3)
+        got3 = us.blob_at(repo, "HEAD", "a", b3)
+        check("[dQD-37] S10 an `ambiguous` reply is None, and the handle stays live",
+              got3 is None and not b3.dead and b3._proc is not None, f"{got3!r} dead={b3.dead}")
+
+        b4 = us.BlobBatch(repo)
+        handles.append(b4)
+        proc = b4.init_process()
+        proc.kill()
+        proc.wait()
+        got4 = us.blob_at(repo, "HEAD", "a", b4)
+        check("[dQD-37] S10 after the handle's process is killed the next read answers git show's bytes, and the handle is dead",
+              got4 == want and b4.dead, f"{got4!r} dead={b4.dead}")
+
+        for label, path in (("a newline", "a\nb"), ("a CR", "a\r")):
+            spy = SpyBatch(repo)
+            handles.append(spy)
+            got = (us.blob_at(repo, "HEAD", path), us.blob_at(repo, "HEAD", path, spy))
+            check(f"[dQD-37] S9 a name holding {label} is None both ways, and a spy handle never started its process",
+                  got == (None, None) and not spy.started, f"{got!r} started={spy.started}")
+    finally:
+        for h in handles:
+            h.remove_process()
+
+
 def check_receipt_schema(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-3 AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC14 — the receipt's schema 4: the
     back-fill pinned below 3, who writes 4, the step `govkit/receipt-schema-4`, and the `steps`
@@ -5948,7 +6312,7 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
         return json.loads(derive_receipt_path(t).read_text(encoding="utf-8"))
 
     def build_installed(tag: str) -> tuple[pathlib.Path, subprocess.CompletedProcess]:
-        t = build_target(tmp / tag, DEPLOY_FULL)
+        t = build_target(tmp / tag, DEPLOY_FULL, template=TEMPLATES)
         p = run("apply", "--target", str(t), "--kits", kit)
         settle(t, "the install")
         return t, p
@@ -6411,6 +6775,7 @@ def check_source_mode(tmp: pathlib.Path) -> None:
 
 
 def main() -> int:
+    init_owned_tempdir()
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
     # blew the 600 s ceiling. Off for the whole suite; the probe's own arms drive the function
@@ -6426,6 +6791,9 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
+        # TOOL-dQuietDisk-11 S1: the run's one cache, its root the face's own order and this root last.
+        global TEMPLATES
+        TEMPLATES = TemplateCache(root=tmp / "templates")
 
         # TOOL-aRepatriatedFork-11 S3/S4. Needs no git and no verb, so it runs first and cheaply.
         check_fragment_wiring(tmp)
@@ -6456,7 +6824,13 @@ def main() -> int:
         check("that refusal names the path", str(notrepo.name) in p.stderr, p.stderr)
 
         # --- plan refuses a target carrying no descriptor, and says who writes one.
-        bare = build_target(tmp / "a", None)
+        bare = build_target(tmp / "a", None, template=TEMPLATES)
+        # TOOL-dQuietDisk-11 S4: the liveness arm. A suite that passes no cache, or a cache whose
+        # `shared` clone never reached this call, leaves the target without the clone's alternates.
+        check("[dQuietDisk-11] a recurring target is a clone of its template",
+              TEMPLATES is not None
+              and (bare / ".git" / "objects" / "info" / "alternates").is_file() == (TEMPLATES.mode == "shared"),
+              f"TEMPLATES={TEMPLATES!r} mode={getattr(TEMPLATES, 'mode', None)!r}")
         p = run("plan", "--target", str(bare))
         check("plan refuses a target with no deploy.toml", p.returncode == 2)
         check("that refusal refuses to GUESS an answer",
@@ -6464,7 +6838,7 @@ def main() -> int:
 
         # --- plan over a real descriptor lists writes and WRITES NOTHING. The on-disk effect is the
         # --- assertion: a read-only verb that leaves a byte behind is the whole risk of this verb.
-        full = build_target(tmp / "b", DEPLOY_FULL)
+        full = build_target(tmp / "b", DEPLOY_FULL, template=TEMPLATES)
         before = sorted(q.relative_to(full).as_posix() for q in full.rglob("*") if q.is_file())
         p = run("plan", "--target", str(full), "--kits", "memory-tree")
         after = sorted(q.relative_to(full).as_posix() for q in full.rglob("*") if q.is_file())
@@ -6569,6 +6943,8 @@ def main() -> int:
         check_review_rounds_step(tmp / "drr")
         check_inherited_red_step(tmp / "dir")
         check_receipt_schema(tmp / "drs")
+        check_kit_attestations(tmp / "dka")
+        check_blob_batch(tmp / "dbb")
         check_steps_recordable()
         check_step_isolation(tmp / "dsi")
         check_step_walk()
@@ -6581,7 +6957,7 @@ def main() -> int:
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
         # adopter, so these arms measure the LAND path rather than somebody else's adopter.
-        ap = build_target(tmp / "d", DEPLOY_FULL)
+        ap = build_target(tmp / "d", DEPLOY_FULL, template=TEMPLATES)
         p = run("apply", "--target", str(ap), "--kits", "check-wiring")
         check("apply exits 0 over a clean target", p.returncode == 0, p.stdout + p.stderr)
         check("apply landed the flat destination its descriptor DECLARES, not a kit-relative default",
@@ -6643,7 +7019,7 @@ def main() -> int:
         # Before precedence existed, gov's filled module landed byte-identical in the target and the
         # receipt called it `engine`. The arm asserts the BYTES, not just the role: a role that is
         # right about the wrong file is the failure this replaces.
-        cm = build_target(tmp / "u1a", DEPLOY_FULL)
+        cm = build_target(tmp / "u1a", DEPLOY_FULL, template=TEMPLATES)
         p = run("apply", "--target", str(cm), "--kits", "codebase-map,memory-tree")
         rec = json.loads((cm / ".governance" / "install.json").read_text(encoding="utf-8"))
         govroot = GOV_ROOT
@@ -6765,7 +7141,7 @@ def main() -> int:
 
         # AC10 — the playbook lands BYTES. It sits first in the default selection and, tagged
         # project-owned, landed nothing at all while its placeholder hole probed two absent paths.
-        pb = build_target(tmp / "u1b", DEPLOY_FULL)
+        pb = build_target(tmp / "u1b", DEPLOY_FULL, template=TEMPLATES)
         # THE APPLY'S OWN VERDICT IS PART OF THE ARM. This call DISCARDED the CompletedProcess, so
         # when `apply` refused, the refusal that named the cause was thrown away and the arm reported
         # the empty directory listing instead. Measured on the post-merge bar of the aFusedCharter
@@ -6942,7 +7318,7 @@ def main() -> int:
         # --- output: four fragment lines in B carry it too). A-absent is the stop still accepted.
         _rb11gk = govkit_module()
         _rb11src = f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js"
-        _rb11a = build_target(tmp / "rq11a", DEPLOY_FULL)
+        _rb11a = build_target(tmp / "rq11a", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
         settle(_rb11a, "the first apply")
         _rb11hk = idx_of(_rb11src)
@@ -6974,7 +7350,7 @@ def main() -> int:
         check("[dRB-12] AC2 a third identical apply over fixture A exits 1",
               _rb11pa3.returncode == 1, f"rc {_rb11pa3.returncode} · {_rb11pa3.stdout[-900:]}")
 
-        _rb11n = build_target(tmp / "rq11n", DEPLOY_FULL)
+        _rb11n = build_target(tmp / "rq11n", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(_rb11n), "--kits", "settings-merge")
         settle(_rb11n, "the first apply")
         (_rb11n / ".claude").mkdir(exist_ok=True)
@@ -7058,7 +7434,7 @@ def main() -> int:
         # --- rows, and the next apply of either was refused as foreign. Every figure is read from the
         # --- receipt the narrower apply read, so nothing here pins a row count. The carry is keyed
         # --- on the claim: keyed on the selection, it also kept the prior `(govkit)` attributes row.
-        _rb12 = build_target(tmp / "rq12", DEPLOY_FULL)
+        _rb12 = build_target(tmp / "rq12", DEPLOY_FULL, template=TEMPLATES)
         _rb12rp = _rb12 / ".governance" / "install.json"
         _rb12three = "agent-cap,settings-merge,kickoff-manifest"
         _rb12keeps = "govkit apply — receipt KEEPS "
@@ -7570,7 +7946,7 @@ def main() -> int:
         # zeros and whose every hash was rewritten to nonsense, exited 0. `check` contained exactly
         # one filesystem test — on the receipt's own path — and never opened the file list, never
         # read the sidecar it writes, and called no hash function.
-        ev = build_target(tmp / "u5a", DEPLOY_FULL)
+        ev = build_target(tmp / "u5a", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(ev), "--kits", "check-wiring")
         pc = run("check", "--target", str(ev))
         # DEPL-dBackdatedFixture-3. THE EXPECTATION COMES FROM THE DESCRIPTOR (DEPL-aTetheredConvoy-5
@@ -7596,7 +7972,7 @@ def main() -> int:
               pc.stdout + pc.stderr)
 
         # AC2 — one modified engine file is a finding naming the path and BOTH hashes.
-        ev2 = build_target(tmp / "u5b", DEPLOY_FULL)
+        ev2 = build_target(tmp / "u5b", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(ev2), "--kits", "check-wiring")
         tgt = ev2 / PFX / "check-wiring.sh"
         tgt.write_bytes(tgt.read_bytes() + b"\n# drift\n")
@@ -7609,7 +7985,7 @@ def main() -> int:
         # AC5 — provenance at check time, plus the DEAD PROBE half. A loop that resolved zero of a
         # non-zero population measured nothing, and reporting that as clean is the failure direction
         # this repo names.
-        ev3 = build_target(tmp / "u5c", DEPLOY_FULL)
+        ev3 = build_target(tmp / "u5c", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(ev3), "--kits", "check-wiring")
         rp = ev3 / ".governance" / "install.json"
         rec = json.loads(rp.read_text(encoding="utf-8"))
@@ -7624,7 +8000,7 @@ def main() -> int:
 
         # AC4 — the sidecar and the receipt are asserted against EACH OTHER. The sidecar is the
         # artifact a target verifies with bash alone and nothing in this repo read it before.
-        ev4 = build_target(tmp / "u5d", DEPLOY_FULL)
+        ev4 = build_target(tmp / "u5d", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(ev4), "--kits", "check-wiring")
         sp = ev4 / ".governance" / "install.sums"
         lines = sp.read_text(encoding="utf-8").splitlines()
@@ -7637,7 +8013,7 @@ def main() -> int:
               and "the receipt carries" in pc.stdout, pc.stdout)
 
         # THE WHOLE HOLE, end to end. This is the fixture that exited 0 before this unit.
-        ev5 = build_target(tmp / "u5e", DEPLOY_FULL)
+        ev5 = build_target(tmp / "u5e", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(ev5), "--kits", "check-wiring")
         rp = ev5 / ".governance" / "install.json"
         rec = json.loads(rp.read_text(encoding="utf-8"))
@@ -7709,7 +8085,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The [[outcome]] evaluator: six descriptors declared these blocks and ZERO code read them,
         # so an exit code shared by six unrelated branches was the whole report. A fixture asserts a
         # MEANING now, which is what the acceptance layer needs and could not have.
-        cmt = build_target(tmp / "u5g", DEPLOY_FULL)
+        cmt = build_target(tmp / "u5g", DEPLOY_FULL, template=TEMPLATES)
         pa = run("apply", "--target", str(cmt), "--kits", "memory-tree")
         check("a declared outcome is reported by its MEANING, not as a bare integer",
               "seed-and-stop" in pa.stdout or "refused-foreign-tree" in pa.stdout
@@ -7740,7 +8116,7 @@ user_skills = "/tmp/gk-fake-skills"
               _pi12.stdout)
         check("[-12] and that report does not claim an accepted stop that never happened",
               "stopped at an accepted outcome" not in _pi12.stdout, _pi12.stdout)
-        _no12 = build_target(tmp / "u12b", DEPLOY_FULL)
+        _no12 = build_target(tmp / "u12b", DEPLOY_FULL, template=TEMPLATES)
         _pn12 = run("apply", "--target", str(_no12), "--write")
         check("[-12] the same fixture WITHOUT the key still runs that kit's adopter",
               (_no12 / ".memory-tree.conf").is_file() and "DECLINED" not in _pn12.stdout,
@@ -8261,7 +8637,7 @@ user_skills = "/tmp/gk-fake-skills"
                               'dedupe_key = "name"\ncommand = ["true"]\nrun_all_env = {}\n'
                               'observed_ran = ["a{name}"]\nobserved_failed = ["b{name}"]'),
                              "only 'json-array' is implemented")):
-            bt = build_target(tmp / ("u4r%d" % (abs(hash(bad)) % 9999)), None)
+            bt = build_target(tmp / ("u4r%d" % (abs(hash(bad)) % 9999)), None, template=TEMPLATES)
             (bt / ".governance").mkdir(exist_ok=True)
             (bt / ".governance" / "deploy.toml").write_text(
                 f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["check-wiring"]\n'
@@ -8272,6 +8648,79 @@ user_skills = "/tmp/gk-fake-skills"
                   needle in pa.stdout + pa.stderr, pa.stdout + pa.stderr)
             check("and nothing was installed on that refusal: " + needle[:20],
                   not (bt / ".governance" / "install.json").exists(), "")
+
+        # ---- TOOL-dQuietDisk-18 AC1 to AC5. BOTH READS THROUGH THE TARGET'S REUSE CACHE. The stub
+        # ---- runner logs the `GATE_REUSE` it was handed and prints its first call's lines, then its
+        # ---- later calls', each from a file under `.git` so the tracked tree is the same in every
+        # ---- case. A leg reused before must read as green: bypass `derive_leg_state` and the
+        # ---- all-reused baseline refuses as a DEAD PROBE, and `a`'s red after is no longer refused.
+        STUB18 = ('n=$(cat .git/stub.n 2>/dev/null || echo 0); echo $((n+1)) > .git/stub.n\n'
+                  '[ -n "${GATE_REUSE:-}" ] && echo "GATE_REUSE=$GATE_REUSE" >> .git/stub.log\n'
+                  'if [ "$n" = 0 ]; then cat .git/stub.before; else cat .git/stub.after; fi\n')
+
+        def build_reuse_target18(name: str, before: list, after: list, reused: bool = True,
+                                 policy: str = "") -> pathlib.Path:
+            g = runner_target(name, extra='observed_reused = ["GATE reuse {name}"]\n' if reused else "")
+            (g / PFX / "runner.sh").write_text(STUB18, encoding="utf-8", newline="\n")
+            if policy:
+                (g / ".governance" / "policy.toml").write_text(policy, encoding="utf-8", newline="\n")
+            git(g, "add", "-A"); git(g, "commit", "-qm", "stub runner")
+            for _k, _ls in (("before", before), ("after", after)):
+                (g / ".git" / f"stub.{_k}").write_text("".join(f"{_l}\n" for _l in _ls),
+                                                     encoding="utf-8", newline="\n")
+            return g
+
+        def run_reuse_apply18(g: pathlib.Path) -> tuple:
+            _p = run("apply", "--target", str(g), "--kits", "check-wiring")
+            _lg = g / ".git" / "stub.log"
+            return _p, _p.stdout + _p.stderr, _lg.read_text(encoding="utf-8") if _lg.is_file() else ""
+
+        _c18 = {"rb": (["GATE reuse a"], ["GATE reuse a"], True, ""),
+                "ob": (["GATE ok    a"], ["GATE ok    a"], True, ""),
+                "ac2": (["GATE reuse a", "GATE ok    b"], ["GATE reuse a", "GATE FAIL  b"], True, ""),
+                "ac3": (["GATE reuse a"], ["GATE FAIL  a"], True, ""),
+                "run": (["GATE ok    a"], ["GATE ok    a"], True, 'install.baseline = "run"\n'),
+                "bad": (["GATE ok    a"], ["GATE ok    a"], True,
+                        'policy-file.on-invalid = "refuse"\ninstall.baseline = "maybe"\n'),
+                "notm": (["GATE ok    a"], ["GATE ok    a"], False, "")}
+        _t18 = {_k: build_reuse_target18(f"u18{_k}", *_v) for _k, _v in _c18.items()}
+        import concurrent.futures as _cf18
+        with _cf18.ThreadPoolExecutor(4) as _ex18:
+            _r18 = dict(zip(_t18, _ex18.map(run_reuse_apply18, _t18.values())))
+        _p18, _o18, _l18 = _r18["rb"]
+        check("[dQuietDisk-18] AC1 both reads run with GATE_REUSE=1 under the default `reuse`",
+              _l18 == "GATE_REUSE=1\nGATE_REUSE=1\n", _l18)
+        check("[dQuietDisk-18] AC1 ...printing the argv line and the reuse line",
+              "the baseline will RUN, from this target's own" in _o18
+              and "the baseline will RUN, reusing" in _o18, _o18)
+        check("[dQuietDisk-18] AC3 an all-reused baseline is no DEAD PROBE, and the apply passes",
+              _p18.returncode == 0 and "DEAD PROBE" not in _o18, _o18)
+        _rcp18 = {_k: _t18[_k] / ".governance" / "install.json" for _k in ("rb", "ob")}
+        _d18 = (json.loads(_rcp18["rb"].read_text(encoding="utf-8"))
+                if _rcp18["rb"].is_file() else {})
+        check("[dQuietDisk-18] AC4 the receipt records a reused leg as green, before and after",
+              (_d18.get("baseline") or {}).get("legs") == {"a": "green"}
+              and _d18.get("after") == {"a": "green"}, str(_d18.get("baseline")) + str(_d18.get("after")))
+        check("[dQuietDisk-18] AC4 ...and is the same bytes as the receipt of a stub that printed ok",
+              all(_f.is_file() for _f in _rcp18.values())
+              and _rcp18["rb"].read_bytes() == _rcp18["ob"].read_bytes(), _r18["ob"][1])
+        _p18, _o18, _l18 = _r18["ac2"]
+        check("[dQuietDisk-18] AC2 a leg green before and red after is refused, the reused leg is not",
+              _p18.returncode != 0 and "leg 'b' was green before this install and is red after" in _o18
+              and not any("leg 'a'" in _ln and "REUSED after" not in _ln for _ln in _o18.splitlines()),
+              _o18)
+        _p18, _o18, _l18 = _r18["ac3"]
+        check("[dQuietDisk-18] AC3 a leg reused before and red after is refused",
+              _p18.returncode != 0 and "leg 'a' was green before this install and is red after" in _o18,
+              _o18)
+        for _k, _needle in (("run", "install.baseline = 'run'"), ("bad", "install.baseline could not be read"),
+                            ("notm", "declares no observed_reused")):
+            _p18, _o18, _l18 = _r18[_k]
+            # The reason is graded ON the mode line, never over the whole output.
+            _ml18 = [_ln for _ln in _o18.splitlines() if "the baseline reads in the `run` mode" in _ln]
+            check(f"[dQuietDisk-18] AC5 `{_k}` reads as run on one line, completes, and passes no GATE_REUSE",
+                  _p18.returncode == 0 and _l18 == "" and len(_ml18) == 1 and _needle in _ml18[0],
+                  _o18 + _l18)
 
         # ===== unit 6: the merged region =====
         NLc = chr(10)
@@ -8389,7 +8838,7 @@ user_skills = "/tmp/gk-fake-skills"
         # --- CLI it never wrote (DEPL-dGaugedVintage-3). The kit declares no forked rule now, so a
         # --- fresh target receives all three. The INCOMPLETE report that existed for that state is
         # --- graded over the synthetic `demo` fork in the DEPL-dCarriedReceipt-10 block below.
-        inc = build_target(tmp / "incomplete", DEPLOY_FULL)
+        inc = build_target(tmp / "incomplete", DEPLOY_FULL, template=TEMPLATES)
         p = run("apply", "--target", str(inc), "--kits", "memory-recall,memory-tree")
         out = p.stdout + p.stderr
         _mr = inc / PFX / KIT_NAMES["memory-recall"]
@@ -8995,7 +9444,7 @@ user_skills = "/tmp/gk-fake-skills"
               "a graded join on a function's closing line is reported as an escape")
 
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
-        for_ = build_target(tmp / "e", DEPLOY_FULL)
+        for_ = build_target(tmp / "e", DEPLOY_FULL, template=TEMPLATES)
         (for_ / PFX).mkdir(parents=True, exist_ok=True)
         (for_ / PFX / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n",
                                                         encoding="utf-8")
@@ -9009,7 +9458,8 @@ user_skills = "/tmp/gk-fake-skills"
         # --- TOOL-aRepatriatedFork-24 AC8: a foreign kit at the INTAKE'S OWN prefix. The probe asked
         # --- only at gov's prefix and the root, so a `scripts/` intake over a `scripts/` install read
         # --- as a clean target and the apply went ahead. Red against `2143b6d6`'s probe.
-        for_s = build_target(tmp / "e24", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1))
+        for_s = build_target(tmp / "e24", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1),
+                             template=TEMPLATES)
         (for_s / "scripts").mkdir(parents=True, exist_ok=True)
         (for_s / "scripts" / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n",
                                                           encoding="utf-8")
@@ -9026,7 +9476,8 @@ user_skills = "/tmp/gk-fake-skills"
         # --- over a foreign kit at GOV'S canonical prefix. The per-entry probe dropped the old pair's
         # --- canonical rung, so this target read as clean and apply installed a second copy.
         # --- Red against `7de665e5`'s probe.
-        for_c = build_target(tmp / "e24c", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1))
+        for_c = build_target(tmp / "e24c", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1),
+                             template=TEMPLATES)
         (for_c / PFX).mkdir(parents=True, exist_ok=True)
         (for_c / PFX / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n", encoding="utf-8")
         p = run("apply", "--target", str(for_c), "--kits", _sel24)
@@ -9041,7 +9492,7 @@ user_skills = "/tmp/gk-fake-skills"
         # --- POSITIVE on-disk assertion rather than deleted — an arm that asserts a refusal string
         # --- is the classic one that keeps passing after the string merely moves, so its
         # --- replacement has to observe an effect. The full behaviour is in the unit 6 block above.
-        p = run("apply", "--target", str(build_target(tmp / "f", DEPLOY_FULL)),
+        p = run("apply", "--target", str(build_target(tmp / "f", DEPLOY_FULL, template=TEMPLATES)),
                 "--kits", "pytest-parallel-guardrails")
         check("a merged rule now LANDS rather than refusing", p.returncode == 0, p.stdout)
         check("and it reports the mode it used, on disk",
@@ -9053,7 +9504,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("that refusal calls it a stated non-goal", "stated non-goal" in p.stderr, p.stderr)
 
         # --- --resume needs an install to resume.
-        p = run("apply", "--target", str(build_target(tmp / "g", DEPLOY_FULL)),
+        p = run("apply", "--target", str(build_target(tmp / "g", DEPLOY_FULL, template=TEMPLATES)),
                 "--kits", "check-wiring", "--resume")
         check("--resume refuses with no receipt", p.returncode == 2)
         check("that refusal says there is no install to resume",
@@ -9062,7 +9513,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ================= intake =================
         # AC12: given a prepared answer stream, intake writes a descriptor `apply` accepts with no
         # further prompting. The arm is the CHAIN, not the file: intake then apply, no hand editing.
-        ik = build_target(tmp / "h", None)
+        ik = build_target(tmp / "h", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik), "--kits", "check-wiring")
         check("intake exits 0 when the selection needs no answers", p.returncode == 0,
               p.stdout + p.stderr)
@@ -9072,7 +9523,7 @@ user_skills = "/tmp/gk-fake-skills"
               p.stdout + p.stderr)
 
         # --- intake refuses to invent an answer, and NAMES the ones it wants.
-        ik2 = build_target(tmp / "i", None)
+        ik2 = build_target(tmp / "i", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik2), "--kits", "kickoff-manifest")
         check("intake refuses when an answer is missing", p.returncode == 2)
         check("intake names the missing answers", "manifest_path" in p.stderr, p.stderr)
@@ -9098,7 +9549,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The pre-unit behaviour emitted the literal `tools` whatever was supplied, so the one
         # committed non-default descriptor in the fleet was a file the tool that owns it could not
         # have written. Each arm below fails against that draft.
-        ik3 = build_target(tmp / "i3", None)
+        ik3 = build_target(tmp / "i3", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik3), "--kits", "gate-lint",
                 "--answer", "prefix=scripts")
         check("intake with --answer prefix= exits 0", p.returncode == 0, p.stdout + p.stderr)
@@ -9108,7 +9559,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("the run reports the prefix and names its source",
               'prefix "scripts" (from --answer)' in p.stdout, p.stdout)
 
-        ik4 = build_target(tmp / "i4", None)
+        ik4 = build_target(tmp / "i4", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik4), "--kits", "gate-lint")
         check("an OMITTED prefix still defaults to tools",
               'prefix = "tools"' in (ik4 / ".governance" / "deploy.toml").read_text(
@@ -9118,7 +9569,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # An EMPTY value is the default, never an empty prefix: `prefix = ""` would resolve every
         # destination to a bare relative path, which is a silent mis-install rather than a refusal.
-        ik5 = build_target(tmp / "i5", None)
+        ik5 = build_target(tmp / "i5", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik5), "--kits", "gate-lint", "--answer", "prefix=")
         check("an EMPTY --answer prefix= falls back to tools",
               'prefix = "tools"' in (ik5 / ".governance" / "deploy.toml").read_text(
@@ -9131,7 +9582,7 @@ user_skills = "/tmp/gk-fake-skills"
         # [gate_runner] block is emitted from a seed whose {prefix} and {kit} tokens resolve here,
         # so a draft that fixes only the `prefix = ` line writes a descriptor declaring one prefix
         # whose runner paths spell another. Observed as a staged break before this arm was written.
-        ik6 = build_target(tmp / "i6", None)
+        ik6 = build_target(tmp / "i6", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik6), "--kits", "run-gates",
                 "--answer", "prefix=scripts")
         check("intake emits a [gate_runner] under a non-default prefix", p.returncode == 0,
@@ -9151,7 +9602,7 @@ user_skills = "/tmp/gk-fake-skills"
         # re-stamp. So ONE `.gitattributes` row froze a target's `gov_commit` forever, and every
         # kit selection carrying an lf_pin produces exactly such a row. Reproduced on a real target
         # before the fix: `update --write` exited 1 and `gov_commit` never moved.
-        ap = build_target(tmp / "u2pins", None)
+        ap = build_target(tmp / "u2pins", None, template=TEMPLATES)
         p = run("intake", "--target", str(ap), "--kits", "push-main")
         check("[-2] intake accepts push-main", p.returncode == 0, p.stdout + p.stderr)
         p = run("apply", "--target", str(ap), "--kits", "push-main")
@@ -9351,7 +9802,7 @@ user_skills = "/tmp/gk-fake-skills"
         EDIT = "committed\nAN OPERATOR EDIT\n"
 
         # ---- AC1: `update --write` over a pinned path named with a SPACE.
-        _sp = build_target(tmp / "gs25a", DEPLOY_FULL)
+        _sp = build_target(tmp / "gs25a", DEPLOY_FULL, template=TEMPLATES)
         check("[-25] AC1 fixture: apply installs cleanly before anything is dirtied",
               run("apply", "--target", str(_sp)).returncode == 0, "")
         settle(_sp, "applied")
@@ -9376,7 +9827,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # ---- AC2: `apply` over a pinned path carrying a NON-ASCII byte. A DIFFERENT VERB and a
         # ---- different route into the same guard, which is why it is not the same fixture.
-        _na = build_target(tmp / "gs25b", DEPLOY_FULL)
+        _na = build_target(tmp / "gs25b", DEPLOY_FULL, template=TEMPLATES)
         _bad = _na / "memory" / "caf\u00e9.md"
         _bad.parent.mkdir(parents=True, exist_ok=True)
         _bad.write_text("committed\n", encoding="utf-8", newline="\n")
@@ -10288,7 +10739,7 @@ user_skills = "/tmp/gk-fake-skills"
         # destroyed by every re-apply, silently, with the descriptor reading exactly as intended.
         with tempfile.TemporaryDirectory() as td3:
             tmp3 = pathlib.Path(td3)
-            t = build_target(tmp3, None)
+            t = build_target(tmp3, None, template=TEMPLATES)
             run("intake", "--target", str(t), "--kits", "drift-audit")
             first = run("apply", "--target", str(t), "--kits", "drift-audit,memory-tree")
             owned = t / PFX / KIT_NAMES["drift-audit"] / "drift_signals.py"
@@ -10392,7 +10843,7 @@ user_skills = "/tmp/gk-fake-skills"
             # preview agreed with it. Asserted as a SUBSET relation on the preview's write set: the
             # declared single kit's rows are a strict subset of what the registry default writes,
             # which is a property no re-baselining of a row count can accidentally satisfy.
-            t3 = build_target(tmp3 / "declared", DEPLOY_FULL)
+            t3 = build_target(tmp3 / "declared", DEPLOY_FULL, template=TEMPLATES)
             pl3 = run("plan", "--target", str(t3))
             check("a target's own `kits` list is honoured by a no---kits plan", pl3.returncode == 0,
                   pl3.stdout + pl3.stderr)
@@ -10644,7 +11095,7 @@ user_skills = "/tmp/gk-fake-skills"
                 # second apply there can refuse for the pre-existing-kits reason instead of the
                 # merged-region one — and the arm would then pass or fail on fixture order rather
                 # than on the behaviour it names. `plan` above is read-only, so it can share `t2`.
-                tm = build_target(tmp3 / f"merged-{kit}", DEPLOY_FULL)
+                tm = build_target(tmp3 / f"merged-{kit}", DEPLOY_FULL, template=TEMPLATES)
                 ap = run("apply", "--target", str(tm), "--kits", kit)
                 check(f"{kit}: ...and apply refuses over it",
                       "no verb here can write a gov-owned region" in ap.stdout + ap.stderr,
@@ -10654,7 +11105,7 @@ user_skills = "/tmp/gk-fake-skills"
             # KEYED ON codebase-map, NOT ON playbook. The playbook's two rules are `seed` and LAND,
             # so it skips nothing to name — this arm was reading the role the landed-zero-bytes
             # defect wore. codebase-map's `map_extractors.py` is a real project-owned skip.
-            t3 = build_target(tmp3 / "skips", DEPLOY_FULL)
+            t3 = build_target(tmp3 / "skips", DEPLOY_FULL, template=TEMPLATES)
             sk = run("apply", "--target", str(t3), "--kits", "codebase-map,memory-tree")
             check("apply names each skipped rule, its role and its destination",
                   f"SKIPPED [project-owned] {PFX}{KIT_NAMES['codebase-map']}/map_extractors.py" in sk.stdout,
@@ -10887,7 +11338,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- AC2: a NORMAL repo whose selection declares NO lf_pin. check-wiring is the kit for
         # ---- the mirror-image reason: the path form works fine here, so the only thing this arm
         # ---- can be measuring is that the probe left `if pins:`.
-        n2 = build_target(tmp / "ac2", None)
+        n2 = build_target(tmp / "ac2", None, template=TEMPLATES)
         run("intake", "--target", str(n2), "--kits", "check-wiring")
         run("apply", "--target", str(n2), "--kits", "check-wiring")
         settle(n2, "the install")
@@ -10973,7 +11424,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The loop does not sleep-and-hope: it WATCHES for the lock to appear and only then starts
         # the second run, and if three attempts never catch the first run holding it, the arm FAILS
         # rather than reporting a green it did not earn.
-        cc = build_target(tmp / "ac5", None)
+        cc = build_target(tmp / "ac5", None, template=TEMPLATES)
         run("intake", "--target", str(cc), "--kits", "memory-tree")
         run("apply", "--target", str(cc), "--kits", "memory-tree")
         settle(cc, "the install")
@@ -11057,7 +11508,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # The target installs at whatever gov's HEAD is, so it is built HERE — between B and D —
         # which is how its receipt comes to record the MIDDLE vintage with history on both sides.
-        t7 = build_target(tmp / "ac7", None)
+        t7 = build_target(tmp / "ac7", None, template=TEMPLATES)
         gov_run(gv, "intake", "--target", str(t7), "--kits", "demo")
         gov_run(gv, "apply", "--target", str(t7), "--kits", "demo")
         settle(t7, "the demo install")
@@ -11173,7 +11624,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- compares the INDEX BLOB against the oid the receipt recorded, so it excuses gov's own
         # ---- staging and nothing else. The negative half below is what makes that a carve-out and
         # ---- not a hole, and it is the reason this is asserted as a PAIR.
-        _oa = build_target(tmp / "owner-a", None)
+        _oa = build_target(tmp / "owner-a", None, template=TEMPLATES)
         run("intake", "--target", str(_oa), "--kits", "memory-tree")
         _poa = run("apply", "--target", str(_oa), "--kits", "memory-tree")
         _oarec = json.loads((_oa / ".governance" / "install.json").read_text(encoding="utf-8"))
@@ -11278,7 +11729,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ----
         # ---- BOTH VERBS ARE ARMED, because a `plan` that cheerfully previews escaping writes is its
         # ---- own defect: the preview is what an operator approves.
-        _tv = build_target(tmp / "traversal", None)
+        _tv = build_target(tmp / "traversal", None, template=TEMPLATES)
         (_tv / ".governance").mkdir(parents=True, exist_ok=True)
         (_tv / ".governance" / "deploy.toml").write_text(
             'prefix = "../../PWNED"\n', encoding="utf-8", newline="\n")
@@ -11332,7 +11783,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ----
         # ---- THE PAIR IS THE POINT: the character grader admits the drive letter, and the ESCAPE
         # ---- grader still reds a drive-lettered destination. Two guards, two jobs, asserted apart.
-        _dvt = build_target(tmp / "drive-win", None)
+        _dvt = build_target(tmp / "drive-win", None, template=TEMPLATES)
         (_dvt / ".governance").mkdir(parents=True, exist_ok=True)
         (_dvt / ".governance" / "deploy.toml").write_text(
             f'prefix = "{PFX[:-1]}"\n\n[answers]\nmanifest_path = "docs/MANIFEST.md"\n'
@@ -11378,7 +11829,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- and stopping there would have left the CLASS open at a site that fails SILENTLY,
         # ---- which is exactly the rule this build had already broken once in the same round.
         def build_gr_target(tag: str, runner_file: str) -> pathlib.Path:
-            _t = build_target(tmp / f"gr-{tag}", None)
+            _t = build_target(tmp / f"gr-{tag}", None, template=TEMPLATES)
             (_t / ".governance").mkdir(parents=True, exist_ok=True)
             (_t / ".governance" / "deploy.toml").write_text(
                 f'prefix = "{PFX[:-1]}"\n\n[gate_runner]\nkind = "manifest"\n'
@@ -11576,7 +12027,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- `attributes` row whose file is on disk, the literal form could elect it, and that row
         # ---- is now one the shadow refusal DOES cover -- so the arm would have graded the ruling
         # ---- against the one row the ruling no longer applies to.
-        _ob = build_target(tmp / "owner-b", None)
+        _ob = build_target(tmp / "owner-b", None, template=TEMPLATES)
         run("intake", "--target", str(_ob), "--kits", "memory-tree")
         run("apply", "--target", str(_ob), "--kits", "memory-tree")
         settle(_ob, "the install")
@@ -11663,7 +12114,7 @@ user_skills = "/tmp/gk-fake-skills"
             return "(no row)"
 
         MTR = f"{PFX}{KIT_NAMES['memory-tree']}/README.md"
-        i7 = build_target(tmp / "id7", DEPLOY_FULL)
+        i7 = build_target(tmp / "id7", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(i7), "--kits", "memory-tree")
         settle(i7, "the install")
         c7 = clone_crlf(i7, "id7-clone")
@@ -11846,7 +12297,7 @@ user_skills = "/tmp/gk-fake-skills"
             Run through the SCRATCH gov's own copy of the engine, which is the seam that acts —
             a break staged into this repo's `govkit.py` does not reach a copy taken before it.
             """
-            t = build_target(tmp / name, None)
+            t = build_target(tmp / name, None, template=TEMPLATES)
             for verb in ("intake", "apply"):
                 subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), verb,
                                 "--target", str(t), "--kits", "demo"], capture_output=True)
@@ -11989,7 +12440,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- `merged` arm patched out of S9, that row's `commit`-without-`gov_oid` tripped the
         # ---- exactly-one branch and the WHOLE run refused before any row was classified — on the
         # ---- first update against any target that ever applied such a rule.
-        t11 = build_target(tmp / "id11", None)
+        t11 = build_target(tmp / "id11", None, template=TEMPLATES)
         run("intake", "--target", str(t11), "--kits", "push-main")
         run("apply", "--target", str(t11), "--kits", "push-main")
         settle(t11, "the push-main install")
@@ -12051,7 +12502,7 @@ user_skills = "/tmp/gk-fake-skills"
             guarantee under test is the one that survives a commit, and an uncommitted edit never
             reaches the classifier at all.
             """
-            t = build_target(tmp / name, DEPLOY_FULL)
+            t = build_target(tmp / name, DEPLOY_FULL, template=TEMPLATES)
             run("apply", "--target", str(t), "--kits", "check-wiring")
             # BOTH identities from the SAME vintage, or the fixture is `-7` S9's corruption rather
             # than an older install, and every run below refuses before it classifies. The SAME
@@ -13009,7 +13460,8 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- printed. The summary clause is derived from the same table now.
         _gp = fork_gov("plan", fork_kit())
         _tp = build_target(tmp / "fork-plan-t",
-                          f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+                          f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                           template=TEMPLATES)
         _pp = run_in_gov(_gp, "plan", "--target", str(_tp), "--kits", "demo")
         _prows = _extract_plan_rows(_pp.stdout)
         check("[-10] AC5 plan exits 0 over a descriptor carrying a forked rule",
@@ -13039,7 +13491,8 @@ user_skills = "/tmp/gk-fake-skills"
 
         def fork_target(g: pathlib.Path, name: str) -> pathlib.Path:
             t = build_target(tmp / name,
-                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                             template=TEMPLATES)
             p = t / PFX / "demo" / "forked-one.py"
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text(FORK_TARGET_BYTES, encoding="utf-8", newline="\n")
@@ -13083,7 +13536,8 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- never on the kit id, so this fixture grades the same branch.
         _gi = fork_gov("incomplete", fork_kit())
         _ti = build_target(tmp / "fork-incomplete-t",
-                          f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+                          f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                           template=TEMPLATES)
         _ip = run_in_gov(_gi, "apply", "--target", str(_ti), "--kits", "demo")
         _io = _ip.stdout + _ip.stderr
         check("[dGV-3] apply reports an entry INCOMPLETE when its forked files are absent",
@@ -13306,7 +13760,8 @@ user_skills = "/tmp/gk-fake-skills"
             later arms are grading a broken install. The local delta is an EDIT AFTER the install, which is
             the state the three-way exists for.
             """
-            t = build_target(tmp / name, f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+            t = build_target(tmp / name, f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                             template=TEMPLATES)
             (t / PFX / "demo").mkdir(parents=True, exist_ok=True)
             (t / PFX / "demo" / "rendered.txt").write_text(
                 "the adopter rendered this\n", encoding="utf-8", newline="\n")
@@ -14123,7 +14578,8 @@ user_skills = "/tmp/gk-fake-skills"
                   '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n')
         _g88 = build_rename_gov("inplace", _kit88, "pinned", {"keep.txt": "one\ntwo\nthree\nfour\n"})
         _gk88 = _g88 / "pinned" / KIT_NAMES["govkit"]
-        _t88 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-t")
+        _t88 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-t",
+                            template=TEMPLATES)
         _ap88 = subprocess.run([sys.executable, str(_gk88 / "govkit.py"), "apply", "--target", str(_t88),
                                 "--kits", "demo"], capture_output=True, text=True, encoding="utf-8", errors="replace")
         settle(_t88, "the install")
@@ -14166,7 +14622,8 @@ user_skills = "/tmp/gk-fake-skills"
         # place, and other.txt is renamed onto the adopter's own file, so the kit is rolled back. The
         # in-place row is snapshotted at its one path, so the order restores it once.
         _g91 = build_rename_gov("inplace-held", _kit88, "pinned", {"keep.txt": "one\ntwo\n", "other.txt": "other\n"})
-        _t91 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-held-t")
+        _t91 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-held-t",
+                            template=TEMPLATES)
         _ap91 = subprocess.run([sys.executable, str(_g91 / "pinned" / KIT_NAMES["govkit"] / "govkit.py"), "apply",
                                 "--target", str(_t91), "--kits", "demo"],
                                capture_output=True, text=True, encoding="utf-8", errors="replace")
@@ -14192,7 +14649,8 @@ user_skills = "/tmp/gk-fake-skills"
         # the two names must still be one file. A hard link stands in for a symlink: NTFS makes one
         # without a privilege, and `samefile` answers both alike.
         _g93 = build_rename_gov("link", _kit88, "pinned", {"keep.txt": "one\ntwo\nthree\nfour\n"})
-        _t93 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-link-t")
+        _t93 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-link-t",
+                            template=TEMPLATES)
         _ap93 = run_in_gov(_g93, "apply", "--target", str(_t93), "--kits", "demo", root="pinned")
         _keep93, _link93 = (_t93 / "pinned" / "demo" / n for n in ("keep.txt", "linked.txt"))
         try:
@@ -15540,7 +15998,8 @@ user_skills = "/tmp/gk-fake-skills"
         # this unit's widening and no arm would have noticed. `build_target` + the real `apply`, with
         # no `settle` behind it, is that state exactly: gov's block staged, nothing committed.
         _t24p = build_target(tmp / "v24-postapply",
-                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                             template=TEMPLATES)
         _a24p = run_in_gov(_gp, "apply", "--target", str(_t24p), "--kits", "demo")
         check("[-24] AC2 LIVENESS the post-apply fixture installed green and left gov's block "
               "STAGED rather than committed",
@@ -16802,7 +17261,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- Graded on the POPULATION rather than through a second `update` run, because the
         # ---- population IS the fix and a run would also have to clear `-7` S4 and the lock to say
         # ---- anything -- a fixture that cannot reach the case is how this build lost two rounds.
-        _mgt = build_target(tmp / 'merged-dirty', None)
+        _mgt = build_target(tmp / 'merged-dirty', None, template=TEMPLATES)
         (_mgt / 'pyproject.toml').write_text('[tool.x]\nk = 1\n', encoding='utf-8', newline='\n')
         settle(_mgt, 'a target owning a pyproject')
         run('intake', '--target', str(_mgt), '--kits', 'pytest-parallel-guardrails')
@@ -16837,7 +17296,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- TWO KITS, THE ESCAPE IN THE LAST ONE, and the assertion is the PROPERTY rather than
         # ---- the message: after the refusal the target holds no gov-written file at all. Measured
         # ---- with the hoist reverted, the same fixture left 33 dirty paths behind.
-        _h3t = build_target(tmp / 'h3-order', None)
+        _h3t = build_target(tmp / 'h3-order', None, template=TEMPLATES)
         (_h3t / '.governance').mkdir(parents=True, exist_ok=True)
         (_h3t / '.governance' / 'deploy.toml').write_text(
             f'gov_source = "local"\nprefix = "{PFX[:-1]}"\n'
@@ -17006,7 +17465,7 @@ user_skills = "/tmp/gk-fake-skills"
                   f"got {GK9.outcome_accepted(_rc, _oc5, _dec)!r}")
         check("[-5] R2 LIVENESS the truth table covers both verdicts",
               len({w for _r, _o, _d, w, _x in _k5truth}) == 2, "the table only asserts one answer")
-        __import__("shutil").rmtree(str(_k5r), ignore_errors=True)
+        remove_tree(str(_k5r))
 
         # ---- DEPL-dRetiredFork-6. THE CONTRIBUTION CLASSIFIER ----------------------------------
         # NAMES ARE NAMESPACED `_k6*` BECAUSE THEY ARE NOT IN A FUNCTION OF THEIR OWN.
@@ -17112,7 +17571,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-5] S3 run_kit_check routes its exit code through classify_outcome",
               "classify_outcome(" in _rkc,
               "the probe is still dead code for `check`")
-        _sh5 = __import__("shutil"); _sh5.rmtree(str(_r5), ignore_errors=True)
+        remove_tree(str(_r5))
 
         # ---- DEPL-dRetiredFork-4 S3. A PATHSPEC LARGER THAN THE COMMAND LINE --------------------
         # The argv form died at 32 KiB with WinError 206, AFTER apply's write loop — leaving files
@@ -17156,7 +17615,7 @@ user_skills = "/tmp/gk-fake-skills"
             print("skip [-4] S3 the argv form did not die on this host: its command-line limit is "
                   "above the fixture size, so the RED half is unexercised HERE. It was observed on "
                   "the reporting platform, and the stdin form is asserted above either way.")
-        _sh4 = __import__("shutil"); _sh4.rmtree(_d4, ignore_errors=True)
+        remove_tree(_d4)
 
         check("[-5] D1/M4 the announcement map covers exactly the declared `target` sites",
               set(_D1_ANNOUNCED) == set(_tgt_sites),

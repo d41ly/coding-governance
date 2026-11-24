@@ -66,6 +66,7 @@ foreign-prefix parity (every self-test at three prefixes)	3750		one reading 2494
 gotchas selftest	90		worst of 10 readings 54s, x1.5
 govkit selftest	1600		worst of 7 readings 1065s, x1.5
 held-halves selftest	60		measured 1.3s on node a 2026-10-11 by direct invocation, x1.5 floored at this file 60s minimum
+history-store selftest	60		PINNED estimate from a proxy, not a --selftest reading: the timed section 6 probes of TOOL-dQuietDisk-1, 5.0s for AC1 to AC7 and 1.4s for AC8 on node d 2026-11-22, 6.4s x1.5 floored at 60; the pass ran no --selftest. Re-price from the first measured run. TOOL-dQuietDisk-1
 hook destinations self-test	510		worst of 4 readings 335s, x1.5
 install-prefix self-test	1180		worst of 11 readings 783s, x1.5
 instruction edits selftest	160		one reading alone over the tree by the main loop at 51cd8b402, 103s, x1.5 floored at 60 (PLAY-dOrderedCharter-77 S14)

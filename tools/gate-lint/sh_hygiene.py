@@ -278,7 +278,7 @@ PROBE_CLASSES = [
 #: unconditional, counted off the arms.
 #: RAISED 163 -> 177 by TOOL-dSettledStage-4: the 13 new stage fixture rows and the one new boundary
 #: row, 14 executed, every one unconditional, counted off the arms.
-FLOOR_ASSERTIONS = 177
+FLOOR_ASSERTIONS = 179
 
 
 def check_substitution(text: str) -> bool:
@@ -455,13 +455,14 @@ _HOME_TOLD: set = set()
 def remove_home_graded(root: pathlib.Path, rels: list[str]) -> list[str]:
     """`rels` less the files gov installed here at its own bytes (TOOL-dHomeGraded-1 S2). Those are
     gov's code, graded on gov's bar against gov's registries; grading them here against this tree's
-    declaration lists sites nobody in this tree wrote. Said once per root, with the count."""
+    declaration lists sites nobody in this tree wrote. Said once per root, with the count, on stderr:
+    a `--measure` run's stdout is a ledger seed's rows (TOOL-aFlattenedSeed-2)."""
     home = derive_home_graded(root)
     kept = [rel for rel in rels if rel not in home]
     if len(kept) != len(rels) and str(root) not in _HOME_TOLD:
         _HOME_TOLD.add(str(root))
         print(f"sh-hygiene: {len(home)} file(s) .governance/install.json installed at gov's own bytes "
-              f"are gov's to grade and are not graded here; an edited one is")
+              f"are gov's to grade and are not graded here; an edited one is graded", file=sys.stderr)
     return kept
 
 
@@ -1423,9 +1424,11 @@ def measure_code_lines(text: str) -> int:
     return sum(1 for line in text.split("\n") if line.strip() and not line.lstrip().startswith("#"))
 
 
-def run_site_scan(args: list[str], measure: bool, scan_file, shape: tuple, title: str) -> int:
+def run_site_scan(args: list[str], measure: bool, scan_file, shape: tuple, title: str, home: str) -> int:
     """`--path-literals` or `--quoting` `[registry] [root] [pathspec ...]`: 0 clean, 1 findings, 2 refusal.
-    Under `measure` the registry positional is absent and each `(path, class)` count prints instead."""
+    Under `measure` the registry positional is absent and each `(path, class)` count prints instead.
+    With no registry argument the run reads `derive_default_registry(root, home)`, the ledger's home,
+    as an adopter's leg row names none (TOOL-aFlattenedSeed-3)."""
     if measure:
         args = ["", *args]
     root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
@@ -1433,7 +1436,8 @@ def run_site_scan(args: list[str], measure: bool, scan_file, shape: tuple, title
         print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
         return 2
     try:
-        declared, malformed = resolve_declaration(args[0] if args and args[0] else None, shape)
+        default = None if measure or (args and args[0]) else derive_default_registry(root, home)
+        declared, malformed = resolve_declaration(args[0] if args and args[0] else default, shape)
         sources = read_shell_sources(root, args[2:])
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
@@ -1453,8 +1457,7 @@ def run_site_scan(args: list[str], measure: bool, scan_file, shape: tuple, title
         for (rel, key), count in sorted(measured.items()):
             print(f"{rel}\t{key}\t{count}")
         return 0
-    if not args or not args[0]:
-        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print_registry_posture(args[:1] if args and args[0] else [], default)
     print(f"sh-hygiene: {title} — {len(sources)} tracked shell source(s) scanned, "
           f"{sum(measured.values())} site(s) in {len(measured)} key(s)")
     explained = {key: f"{key[0]}: {count} `{key[1]}` site(s) and no registry row declares them — "
@@ -1485,9 +1488,11 @@ def run_shell_role_scan(args: list[str], measure: bool) -> int:
         return 2
     declared: dict[tuple[str], int] = {}
     malformed: list[str] = []
+    # TOOL-aFlattenedSeed-3: no ledger argument reads the population's home, as an adopter's row names none.
+    default = None if measure or (args and args[0]) else derive_default_registry(root, "shell-role.txt")
     try:
-        if args and args[0]:
-            path = pathlib.Path(args[0])
+        if args and args[0] or default:
+            path = pathlib.Path(args[0] if args and args[0] else default)
             if not path.is_file():
                 raise OSError(f"no ledger at {path} — the argument was SUPPLIED and does not resolve to a file")
             rows, refused = read_rows(path, 1, verbatim=(0,))
@@ -1507,6 +1512,7 @@ def run_shell_role_scan(args: list[str], measure: bool) -> int:
         for (rel,), count in sorted(measured.items()):
             print(f"{rel}\t{count}")
         return 0
+    print_registry_posture(args[:1] if args and args[0] else [], default)
     print(f"sh-hygiene: shell role — {len(sources)} tracked shell source(s), {sum(measured.values())} code line(s)")
     problems = list(malformed)
     for finding, (rel,), have, want in compare_counts(measured, declared, "shrink-only"):
@@ -2373,6 +2379,14 @@ def run_selftest() -> int:
                  homed[0], (1, False, True, True), say=True)
             test("home-graded: the same file edited here is graded again",
                  homed[1], (1, True, True, False), say=True)
+            # TOOL-aFlattenedSeed-2: under `--measure`, stdout is a seed's rows, so the note rides stderr.
+            (tree / "kit.sh").write_bytes(site)
+            _HOME_TOLD.clear()
+            out, err = io.StringIO(), io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                run_shell_role_scan([str(tree)], True)
+            test("home-graded: a --measure run's stdout holds rows only, the note on stderr",
+                 (out.getvalue().splitlines(), "gov's own bytes" in err.getvalue()), (["own.sh\t2"], True), say=True)
             # DEFAULT REGISTRY (TOOL-dHomeGraded-1 S7): with no argument, a run from the root reads
             # `<MEMORY_ROOT>/project/temp-name-sites.txt` when it exists, and its row declares the site.
             (tree / ".governance" / "install.json").unlink()
@@ -2391,6 +2405,19 @@ def run_selftest() -> int:
             finally:
                 os.chdir(here)
             test("default registry: no argument reads <MEMORY_ROOT>/project/temp-name-sites.txt and is green",
+                 (code, "reads the default registry" in said.getvalue()), (0, True), say=True)
+            # TOOL-aFlattenedSeed-3: `--shell-role` with an empty registry argument, an adopter's row, reads
+            # its home under <MEMORY_ROOT>/project/ too, so a seeded ledger is graded rather than ignored.
+            (tree / "records" / "project" / "shell-role.txt").write_text("own.sh\t2\tabcdef12\tseeded\n",
+                                                                       encoding="utf-8")
+            os.chdir(tree)
+            try:
+                said = io.StringIO()
+                with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
+                    code = run_shell_role_scan(["", "."], False)
+            finally:
+                os.chdir(here)
+            test("default registry: --shell-role with no ledger reads <MEMORY_ROOT>/project/shell-role.txt",
                  (code, "reads the default registry" in said.getvalue()), (0, True), say=True)
     finally:
         os.environ.update(held)
@@ -2413,11 +2440,12 @@ def main(argv: list[str]) -> int:
     if "--temp-names" in argv:
         return run_temp_scan([arg for arg in argv[1:] if arg != "--temp-names"])
     measure = "--measure" in argv
-    for flag, title, scan_file, shape in (("--path-literals", "path literal", scan_path_literal_file, PATH_KEY_SHAPE),
-                                          ("--quoting", "quoting", scan_quoting_file, QUOTING_KEY_SHAPE)):
+    for flag, title, scan_file, shape, home in (
+            ("--path-literals", "path literal", scan_path_literal_file, PATH_KEY_SHAPE, "path-literal-sites.txt"),
+            ("--quoting", "quoting", scan_quoting_file, QUOTING_KEY_SHAPE, "quoting-sites.txt")):
         if flag in argv:
             return run_site_scan([a for a in argv[1:] if a not in (flag, "--measure")], measure, scan_file,
-                                 shape, title)
+                                 shape, title, home)
     if "--shell-role" in argv:
         return run_shell_role_scan([a for a in argv[1:] if a not in ("--shell-role", "--measure")], measure)
     if "--stage-commits" in argv:

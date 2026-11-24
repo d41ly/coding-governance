@@ -135,6 +135,8 @@ from probe import ProbeRefused, read_build_records, resolve_git_paths  # noqa: E
 from request import KEY_HEX, derive_request_content_key  # noqa: E402
 
 SAY = "placement"
+PLACEMENT_KEY = "placement"  # the two keys, passed by name so the policy check's reader scan sees each read
+CHECK_KEY = "placement.check"
 #: A request's content key, as `request.py` derives it.
 REQUEST_KEY = re.compile(r"[0-9a-f]{%d}" % KEY_HEX)
 #: A block's keys, in the order they are written; `reenters` only where a caller passed an item.
@@ -465,8 +467,8 @@ def run_observation_probes(root, store, key, subjects):
 
 def write_placement(args, root, store):
     """The `place` verb: one block written by the value of `placement`, or the owner item printed."""
-    value = read_placement_policy(root, "placement", "probe.observations")
-    mode, observe = value["placement"], value["probe.observations"]
+    value = read_placement_policy(root, PLACEMENT_KEY, "probe.observations")
+    mode, observe = value[PLACEMENT_KEY], value["probe.observations"]
     fields = read_scout_return(args.ret) if args.ret else {}
     if mode == "owner-places" and not args.owner:
         for k in RETURN_KEYS:
@@ -809,7 +811,7 @@ def check_placement(root, common, store, key):
     if not blocks:
         return 1, ["%s: refused — no placement · %s" % (SAY, key)]
     block = blocks[-1]
-    value = read_placement_policy(root, "placement.check", "probe.observations")
+    value = read_placement_policy(root, CHECK_KEY, "probe.observations")
     fact = None
     if block.get("observations", "0") not in ("0", "") and value["probe.observations"] == "verify-before-place" \
             and read_probe_verdict(store, key) is None:
@@ -821,7 +823,7 @@ def check_placement(root, common, store, key):
         raise PlacementRefused(str(e)) from None
     failed = ([fact] if fact else []) + failed
     word, build = block.get("disposition", "-"), block.get("build", NO_VALUE)
-    recorded = value["placement.check"] == "record"
+    recorded = value[CHECK_KEY] == "record"
     if not failed or recorded:
         block.update({k: v for k, v in (("scenarios", chosen), ("facts", evaluated)) if v is not None})
     if failed:

@@ -48,3 +48,4 @@ TOOL-dFairHearing-32	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 TOOL-dFairHearing-37	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 TOOL-dFairHearing-39	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 TOOL-dPlacedRequest-100	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+TOOL-dQuietDisk-11	1	b305e9c76a790481fe14ca2d0428e69a7a5f723d	widened:2026-11-22-build-TOOL-dQuietDisk-11-widen-24

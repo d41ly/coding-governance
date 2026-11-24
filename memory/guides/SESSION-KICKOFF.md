@@ -3,7 +3,7 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-23T16:41:04+02:00 @ 95a4a1188a65ed95efba0d40c5624b38b8e2b3c1
+last-audit: 2026-11-24T04:23:00+02:00 @ 9ab869b7da52d47708620cdde24dfaf5949df18f
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 95a4a1188a65ed95efba0d40c5624b38b8e2b3c1
@@ -75,7 +75,7 @@ bash tools/unattended/run-unattended-gates.sh --pooled   # DoD for tools/unatten
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # bug-class checklist + by-design block for THIS diff; the review harness acquires it on the diff kind
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality?
 python tools/govkit/govkit.py epoch --base <base>   # a kit whose shipped bytes moved since <base> and whose version did not: run after a commit that touches a kit. TOOL-aRepatriatedFork-15
-python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3
+python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills ":!memory"   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3
 ```
 
 The repo HAS a codebase map (`memory/map/`), so the kickoff skill's map steps are live. No
@@ -197,8 +197,8 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
-- The bar owns its scratch (TOOL-dDerivedDocket-25): every leg's `TMPDIR` is the runner's own
-  `gate-work.*/tmp`, gone on exit; a SIGKILLed bar's is swept by the next once its pid is dead.
+- The bar owns its scratch (TOOL-dDerivedDocket-25): every leg's temp dirs are the runner's own
+  `gate-work.*/tmp`, gone on exit; a dead bar's is swept by the next, even if its repo is gone.
   `TMPDIR entries <n>` prints the ambient count, which now grows only from older bars or another
   repository's. The measured cost is in the run-gates kit README.
 - A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is

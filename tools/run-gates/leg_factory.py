@@ -63,6 +63,149 @@ HERE = pathlib.Path(os.path.abspath(__file__)).parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 import regen  # noqa: E402 - this kit's own descriptor reader and token resolver, standard library only
+import atexit
+import contextlib
+import time
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
+# >>> owned_work_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# THE OWNED ROOT A PROCESS SITS IN: the nearest of `path` and its parents named `gate-work.*` and
+# holding an `owner` file, a bar's `$WORK` or a suite's own root (TOOL-dQuietDisk-9 S2).
+def resolve_owned_work(path):
+    """The owned `gate-work.*` directory at or above `path`, a pathlib.Path, or None."""
+    here = pathlib.Path(path).absolute()
+    for d in (here, *here.parents):
+        if d.name.startswith("gate-work.") and (d / "owner").is_file():
+            return d
+    return None
+# <<< owned_work_py
+
+# >>> owned_tempdir_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A PYTHON SUITE'S OWNED ROOT (TOOL-dQuietDisk-9 S2, S9). Nested in an owned root, a bar's or another
+# suite's, it takes that temp dir and makes nothing. Otherwise it sweeps each dead `py:` owner's root
+# of this repository, or of a common dir that names no directory, makes `gate-work.*` with an owner
+# line and `tmp`, points `tempfile` and the `TMPDIR`, `TEMP` and `TMP` its children read there, and
+# removes the whole root at exit. A kill leaves the root with its owner, for the next suite to sweep.
+def read_pid_alive(pid) -> bool:
+    """False only when `pid` is provably gone; any error reads as alive, so a sweep can only keep."""
+    if os.name == "nt":
+        # Never `os.kill` here: signal 0 on Windows is CTRL_C_EVENT, sent to the pid's console group.
+        try:
+            import ctypes
+            k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            k32.OpenProcess.restype = ctypes.c_void_p
+            handle = k32.OpenProcess(0x1000, False, int(pid))  # PROCESS_QUERY_LIMITED_INFORMATION
+            if not handle:
+                return ctypes.get_last_error() != 87  # ERROR_INVALID_PARAMETER: no such process
+            try:
+                code = ctypes.c_ulong()
+                if not k32.GetExitCodeProcess(ctypes.c_void_p(handle), ctypes.byref(code)):
+                    return True
+                return code.value == 259  # STILL_ACTIVE
+            finally:
+                k32.CloseHandle(ctypes.c_void_p(handle))
+        except (OSError, AttributeError, ValueError):
+            return True
+    try:
+        os.kill(int(pid), 0)
+    except ProcessLookupError:
+        return False
+    except (OSError, ValueError):
+        return True
+    return True
+
+
+def scan_dead_scratch(ambient, common) -> list:
+    """Removes each `gate-work.*` directly under `ambient` whose owner names a dead `py:` pid and
+    `common`, or an absolute common dir that names no directory; an empty `common` removes nothing.
+    Returns the roots removed, and says one stderr line per root it sweeps."""
+    removed = []
+    if not common:
+        return removed
+    try:
+        names = sorted(os.listdir(ambient))
+    except OSError:
+        return removed
+    for name in names:
+        root = os.path.join(ambient, name)
+        if not name.startswith("gate-work.") or not os.path.isdir(root):
+            continue
+        try:
+            with open(os.path.join(root, "owner"), encoding="utf-8") as fh:
+                fields = fh.readline().rstrip("\r\n").split("\t")
+        except (OSError, UnicodeDecodeError):
+            continue
+        pid = fields[0][3:] if fields[0].startswith("py:") else ""
+        if len(fields) < 2 or not (pid.isascii() and pid.isdigit()):
+            continue
+        if fields[1] != common and (not os.path.isabs(fields[1]) or os.path.isdir(fields[1])):
+            continue
+        if read_pid_alive(int(pid)):
+            continue
+        print(f"owned-scratch: sweeping the scratch of a dead suite (pid {pid}): {root}", file=sys.stderr)
+        if remove_tree(root):
+            removed.append(root)
+    return removed
+
+
+def init_owned_tempdir() -> str:
+    """The temp dir this process's scratch lands in, owned and removed at exit; see the block's head."""
+    ambient = tempfile.gettempdir()
+    if resolve_owned_work(ambient) is not None:
+        tempfile.tempdir = ambient
+        return ambient
+    try:
+        got = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                             capture_output=True, text=True, encoding="utf-8", errors="replace",
+                             check=False, stdin=subprocess.DEVNULL)
+        common = got.stdout.strip() if got.returncode == 0 else ""
+    except OSError:
+        common = ""
+    scan_dead_scratch(ambient, common)
+    root = tempfile.mkdtemp(prefix="gate-work.", dir=ambient)
+    atexit.register(remove_tree, root)
+    staged = os.path.join(root, f"owner.{os.getpid()}.tmp")
+    with open(staged, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(f"py:{os.getpid()}\t{common}\t{int(time.time())}\n")
+    os.replace(staged, os.path.join(root, "owner"))
+    tmp = os.path.join(root, "tmp")
+    os.mkdir(tmp)
+    tempfile.tempdir = tmp
+    for name in ("TMPDIR", "TEMP", "TMP"):
+        os.environ[name] = tmp
+    return tmp
+# <<< owned_tempdir_py
+
 SAY = "leg-factory"
 # `purpose := at most 60 characters` (TOOL-dWitnessedBar-19 S2, §8 F3), CHARACTERS and never bytes.
 # Moved whole from govkit (TOOL-dWitnessedBar-11 §8 F8): read by the `purpose` arm and by `new`.
@@ -988,7 +1131,7 @@ def run_selftest():
     scratch = pathlib.Path(tempfile.mkdtemp(prefix="legf-"))
     try:
         for case, plant, verb, want_rc, want, never in cases:
-            shutil.rmtree(scratch / "t", ignore_errors=True)
+            remove_tree(scratch / "t")
             top = scratch / "t"
             write_fixture(top)
             rc0, out0 = run_write(top)
@@ -1011,7 +1154,7 @@ def run_selftest():
             print(f"arm FAIL  {case} — wanted rc={want_rc} and a line holding {want!r}, got rc={rc}")
             print("".join(f"      {ln}\n" for ln in lines), end="")
         # AC5: `new` writes a declaration the gate takes, and refuses one it would not, writing nothing.
-        shutil.rmtree(scratch / "t", ignore_errors=True)
+        remove_tree(scratch / "t")
         top = scratch / "t"
         write_fixture(top)
         run_write(top)
@@ -1045,7 +1188,7 @@ def run_selftest():
         trig_failed, trig_ran = check_precommit_trigger(scratch / "trigger")
         failed += trig_failed
     finally:
-        shutil.rmtree(scratch, ignore_errors=True)
+        remove_tree(scratch)
     total = len(cases) + 3 + trig_ran
     if failed:
         print(f"FAIL — {failed} of {total} leg-factory fixtures failed")
@@ -1085,6 +1228,7 @@ def main(argv=None):
             g.add_argument(flag, action="store_const", dest="verb", const=fn or "selftest")
         a = ap.parse_args(argv)
         if a.verb == "selftest":
+            init_owned_tempdir()
             return run_selftest()
         verb = a.verb
     try:
