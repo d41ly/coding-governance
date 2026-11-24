@@ -7,7 +7,7 @@
     python loop_lib.py --selftest                 # every plant, each held to the exit and line it owes
     python loop_lib.py --grade-site <site> <entry>...   # grade one declaration site's witness entries
     python loop_lib.py seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]   # its seed's paths
-    python loop_lib.py declaration --item <item tag> --json   # one item's declaration, as one line of JSON
+    python loop_lib.py declaration --item <item tag> --json [--root <dir>]   # one composed item's declaration
 
 The definition holds the gov steps as `[[step]]` rows and one `[[workflow]]` row per workflow of the roles
 kit: its build order, the step its work sits in and, where it differs from that step's own word, the reach
@@ -58,7 +58,8 @@ resolve, the inputs print `unarmed` and every scope line too; the loop kit decla
 Each item declares one actor of one kind (TOOL-dDeclaredLoop-9): `<kind>:<name>`, the kind in
 `ACTOR_KINDS`, or the bare `executor` or `owner`. A non-role item carries its own `inputs`, `allowance`
 and `returns`. A `role:<slot>` item, the slot a role file's stem, takes each absent one from its role:
-`read_role_defaults` reads the roles kit's catalogue through its `roles_lib.load_roles`, the kit found
+`read_role_defaults` reads the roles kit's catalogue through its `roles_lib.load_roles`, or, handed a
+repository, that repository's composed roles through `roles_lib.compose_roles`, the kit found
 by `resolve_kit_dir` and imported inside the function, and `resolve_item_declaration` gives the item
 its role's `reads`, `writes` and `return`, the role's typed return template (TOOL-dBoundRoles-2), naming
 each field's source. `check_item_declarations`
@@ -67,11 +68,16 @@ item's explicit field equal to its role's (a copy), and a role item's explicit `
 `none`. A slot the catalogue lacks prints `pending`, and every role item `unarmed` where the roles
 kit does not resolve; neither is a refusal, and the loop kit declares no edge to that kit. Every
 item's `witness` is graded by `check_witness_classes` beside the steps', and joins the actor list.
-`declaration --item <tag> --json` prints one item's declaration as one line of sorted JSON, for the roles kit's
-work-order renderer, which runs it as a subprocess (TOOL-dBoundRoles-3 §8 F5, F6): `resolve_item_declaration`'s
-`inputs`, `allowance`, `returns` and `source` for the row, beside its `tag`, `actor`, `step`, `outcomes` as
-`read_outcome_set` resolves them, and `witness`. It reads the rows through `read_items`, so a definition that does
-not hold exits 1 as one line, and so does an item no row declares, naming the tag; both on stderr.
+`declaration --item <tag> --json [--root <dir>]` prints one item's declaration as one line of sorted JSON, for the
+roles kit's work-order renderer, which runs it as a subprocess (TOOL-dBoundRoles-3 §8 F5, F6):
+`resolve_item_declaration`'s `inputs`, `allowance`, `returns` and `source` for the row, beside its `tag`, `actor`,
+`step`, `outcomes` as `derive_outcome_set` derives them, and `witness`. Gov's definition is checked through
+`read_items`, then the row is the one `loop_items.py`'s `read_composed_items` answers for the repository `--root` or
+the working directory sits in (TOOL-dBoundRoles-91): gov's rows where the composition is unarmed. A role actor is
+resolved to its slot by the roles kit's `derive_repository_slot`, so `role:adopter.<name>` takes the composed role
+whose slot is `<name>`, and `derive_composed_declaration` is the one function from row to object. A definition that
+does not hold, a refused composition of the items or the roles, an item no composed row declares, an `adopter.`
+actor at a slot another tag holds, and a directory in no git work tree each exit 1 as one line on stderr.
 
 A role item also declares its code seed (TOOL-dPlacedRequest-8): `seed`, what its work order's `code`
 slot is computed from, one of the `widens` order of the item kind's schema row `seed` in
@@ -182,7 +188,9 @@ That a `map` sits on a role item, or that an unfolded namespace has a node: a ma
 and the slot that renders it is dFurnishedOrders'.
 Stdlib only, but for
 `read_actor_base` and `read_builds_dir`, which import the memory-tree kit's compare base and its conf
-reader inside the function, `read_role_defaults`, which imports the roles kit's library there, and
+reader inside the function, `read_role_defaults`, which imports the roles kit's library there, as
+`derive_composed_declaration` does once a catalogue is read, `run_declaration_command`, which imports
+`loop_items.py` there since that module imports this one, and
 `read_driver_conf`, which sources the unattended driver's `.unattended.conf` in the bash `loop_witness.py`'s
 `resolve_bash` finds, imported inside the function (TOOL-dDeclaredLoop-70), and `resolve_item_seed`,
 which imports the memory-tree kit's `parse_spec_h1` and runs the unattended driver there, so a reader
@@ -1489,11 +1497,13 @@ def check_program(data, where, layers, stages=()):
     return program
 
 
-def read_role_defaults(kit_dir):
-    """`(roles, "")`, the roles kit's catalogue as its `roles_lib.load_roles` reads it, the kit found
-    from `kit_dir` through `resolve_kit_dir` and its library imported inside the function, as
-    `read_builds_dir` reaches the memory-tree kit; or `(None, why)` where the kit does not resolve, its
-    library does not import or its catalogue does not read."""
+def read_role_defaults(kit_dir, root=None):
+    """`(roles, "")`, the roles kit's catalogue as its `roles_lib.load_roles` reads it, or, where `root` is
+    handed, the roles composed in the repository there, `roles_lib.compose_roles(root)`'s
+    (TOOL-dBoundRoles-91 S3); the kit found from `kit_dir` through `resolve_kit_dir` and its library
+    imported inside the function, as `read_builds_dir` reaches the memory-tree kit; or `(None, why)` where
+    the kit does not resolve, its library does not import or its catalogue does not read. LoopError naming
+    the first line of a role composition that refuses."""
     try:
         roles_dir = resolve_kit_dir("roles", "roles_lib.py", kit_dir)
         if str(roles_dir) not in sys.path:
@@ -1502,9 +1512,14 @@ def read_role_defaults(kit_dir):
     except (LookupError, ImportError) as e:
         return None, str(e)
     try:
-        return roles_lib.load_roles(roles_dir), ""
+        if root is None:
+            return roles_lib.load_roles(roles_dir), ""
+        roles, _notes, refusals = roles_lib.compose_roles(root, kit_dir=roles_dir)
     except roles_lib.RolesError as e:
         return None, str(e)
+    if refusals:
+        raise LoopError(roles_dir.as_posix(), "the role composition does not read: %s" % refusals[0])
+    return roles, ""
 
 
 def resolve_item_declaration(item, roles):
@@ -1528,6 +1543,27 @@ def resolve_item_declaration(item, roles):
             out[field], source[field] = value, actor
     out["source"] = source
     return out
+
+
+def derive_composed_declaration(row, roles, members, where):
+    """The object the `declaration` verb prints for one composed `[[item]]` `row` (TOOL-dBoundRoles-91):
+    `resolve_item_declaration`'s result, the row's role actor read at the slot the roles kit's
+    `derive_repository_slot` derives, so each role field's source names that slot, beside the row's `tag`,
+    `actor`, `step`, `outcomes`, `derive_outcome_set`'s over `members`, and `witness`. LoopError naming
+    `where` for outcomes that do not hold, and for an `adopter.` actor whose slot `roles`, the composed
+    catalogue, holds under another tag. `roles` None is no roles kit, so its fields read `unarmed`."""
+    outcomes, actor, taken = derive_outcome_set(row, members, where), row.get("actor"), row
+    if roles is not None and isinstance(actor, str) and actor.startswith("role:"):
+        from roles_lib import derive_repository_slot  # read_role_defaults found it, or there is no catalogue
+        named = "role." + actor[len("role:"):]
+        slot = derive_repository_slot(named)
+        held = roles.get(slot, {}).get("tag")
+        if named.startswith("role.adopter.") and held is not None and held != named:
+            raise LoopError(where, "the item %s actor %s names the slot %s, which %s holds" % (
+                row.get("tag"), actor, slot, held))
+        taken = dict(row, actor="role:" + slot)
+    return dict(resolve_item_declaration(taken, roles), tag=row.get("tag"), actor=actor, step=row.get("step"),
+                outcomes=outcomes, witness=row.get("witness"))
 
 
 def check_item_declarations(items, roles, why):
@@ -1876,37 +1912,55 @@ def run_seed_command(kit_dir, args):
 
 
 def run_declaration_command(kit_dir, args):
-    """`declaration --item <item tag> --json`: one line of sorted JSON, `resolve_item_declaration`'s result for the
-    row, its role's defaults read through `read_role_defaults`, beside the row's `tag`, `actor`, `step`, `outcomes`
-    as `read_outcome_set` resolves them, and `witness` (TOOL-dBoundRoles-3 §8 F5, F6), exit 0. The roles kit's
-    work-order renderer runs it as a subprocess. Exit 1 on stderr naming the tag for an item no row declares, or
-    on a definition that does not hold; 2 on a usage error."""
+    """`declaration --item <item tag> --json [--root <dir>]`: one line of sorted JSON, `derive_composed_declaration`'s
+    object for the composed row (TOOL-dBoundRoles-3 §8 F5, F6; TOOL-dBoundRoles-91), exit 0. The repository is the
+    git toplevel of `--root`, the working directory where absent: its rows are `read_composed_items`', once gov's
+    definition holds through `read_items`, and its roles `read_role_defaults`'. The roles kit's work-order renderer
+    runs it as a subprocess. Exit 1 on stderr naming the tag for an item no composed row declares, the directory in
+    no git work tree, or the line of a definition, a composition or a declaration that does not hold; 2 on a usage
+    error."""
     import json
-    tag, as_json, rest = None, False, list(args)
-    while rest:
+    import os
+    import subprocess
+    opts, as_json, rest, ok = {"--item": None, "--root": None}, False, list(args), True
+    while rest and ok:
         if rest[0] == "--json" and not as_json:
             as_json, rest = True, rest[1:]
-        elif rest[0] == "--item" and len(rest) >= 2 and tag is None and rest[1]:
-            tag, rest = rest[1], rest[2:]
+        elif len(rest) >= 2 and rest[0] in opts and opts[rest[0]] is None and rest[1]:
+            opts[rest[0]], rest = rest[1], rest[2:]
         else:
-            tag = None
-            break
-    if tag is None or not as_json:
-        print("usage: python loop_lib.py declaration --item <item tag> --json", file=sys.stderr)
+            ok = False
+    tag, at = opts["--item"], opts["--root"] or "."
+    if not ok or tag is None or not as_json:
+        print("usage: python loop_lib.py declaration --item <item tag> --json [--root <dir>]", file=sys.stderr)
         return 2
+    # An inherited GIT_DIR never retargets this read. loop_witness.py's read_clean_env is not asked: the verb
+    # needs no module of this kit but loop_items.py.
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
     try:
-        rows = {r.get("tag"): r for r in read_items(kit_dir)}
-        if tag not in rows:
+        p = subprocess.run(["git", "-C", at, "rev-parse", "--show-toplevel"], stdin=subprocess.DEVNULL,
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
+        top = p.stdout.strip() if p.returncode == 0 else ""
+    except OSError:
+        top = ""
+    if not top:
+        print("loop: declaration · %s sits in no git work tree" % pathlib.Path(at).absolute().as_posix(),
+              file=sys.stderr)
+        return 1
+    root = pathlib.Path(top)
+    try:
+        read_items(kit_dir)   # gov's definition holds before any composed row is read
+        from loop_items import read_composed_items   # it imports this module, so here and not at the top
+        row = {r.get("tag"): r for r in read_composed_items(root)}.get(tag)
+        if row is None:
             print("loop: declaration · no [[item]] row declares %s" % tag, file=sys.stderr)
             return 1
-        outcomes = read_outcome_set(kit_dir, tag)
-    except LoopError as e:
+        data, where = read_definition(kit_dir)
+        roles, _why = read_role_defaults(kit_dir, root)
+        got = derive_composed_declaration(row, roles, check_loop(data, where)["dispositions"], where)
+    except ValueError as e:   # LoopError, and the copy of it loop_items raises where this file runs as __main__
         print("loop: %s" % e, file=sys.stderr)
         return 1
-    row = rows[tag]
-    roles, _why = read_role_defaults(kit_dir)
-    got = dict(resolve_item_declaration(row, roles), tag=tag, actor=row.get("actor"), step=row.get("step"),
-               outcomes=outcomes, witness=row.get("witness"))
     print(json.dumps(got, sort_keys=True, ensure_ascii=False))
     return 0
 
@@ -2137,7 +2191,7 @@ def main(argv):
     if argv not in (["--check"], ["--scopes"]) and plant not in PLANTS:
         print("usage: python loop_lib.py --check | --scopes | --selftest | --fixture --plant <%s> | --grade-site <%s> "
               "<entry>... | seed <item tag> [--build <slug>] [--unit <id>] [--question <text>] | "
-              "declaration --item <item tag> --json" % (
+              "declaration --item <item tag> --json [--root <dir>]" % (
             "|".join(PLANTS), "|".join(DECLARATION_SITES)), file=sys.stderr)
         return 2
     if plant in SEED_PLANTS:   # TOOL-dPlacedRequest-8 AC4 to AC6: the resolver in a scratch repository

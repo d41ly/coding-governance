@@ -160,14 +160,16 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +3 for arm 37's heading, fact and framing lines after a carriage return (TOOL-dBoundRoles-60).
 # +7 for the arms of units TOOL-aOrientedCast-15, TOOL-aGuardedEffort-1 and TOOL-aGuardedEffort-2, five in
 # arm 6, and of PLAY-dOrderedCharter-21, two in arm 10, whose arm lines moved no floor (TOOL-dBoundRoles-64).
-FLOOR_ASSERTIONS=245
+# +2 for arm 46's declaration of its patched item, for the repository role and for gov's (TOOL-dBoundRoles-91).
+FLOOR_ASSERTIONS=247
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
 # from the loop definition, so every fixture holds a copy of the loop kit beside its roles kit, at the
-# home `loop`, where the library's resolver probes. The source is the loop kit beside this one.
+# home `loop`, where the library's resolver probes. The source is the loop kit beside this one. `loop_items.py` is
+# with it, as an install holds it: the declaration verb reads its item through it (TOOL-dBoundRoles-91).
 LOOP_SRC="$HERE/../loop"
-[ -f "$LOOP_SRC/loop_lib.py" ] && [ -f "$LOOP_SRC/loop.toml" ] || { echo "adopt-roles.test: no loop kit beside this one at $LOOP_SRC, so no fixture can place its workflows"; exit 2; }
+[ -f "$LOOP_SRC/loop_lib.py" ] && [ -f "$LOOP_SRC/loop_items.py" ] && [ -f "$LOOP_SRC/loop.toml" ] || { echo "adopt-roles.test: no loop kit beside this one at $LOOP_SRC, so no fixture can place its workflows"; exit 2; }
 LAYERS_SRC="$HERE/../playbook"
 [ -f "$LAYERS_SRC/layers.toml" ] || { echo "adopt-roles.test: no layer register beside this kit at $LAYERS_SRC, so no fixture can join a role's layer"; exit 2; }
 FX=""; FXK="$KREL"; FXL=""; FXP=""
@@ -183,7 +185,7 @@ build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at 
   _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$FXL" "$FX/$FXP" "$FX/$_chd" || return 2
   git init -q "$FX" || return 2
   cp -R "$HERE"/. "$FX/$FXK"/ && cp "$ADOPTER" "$FX/$FXK/adopt-roles.sh" || return 2
-  cp "$LOOP_SRC/loop_lib.py" "$LOOP_SRC/loop.toml" "$FX/$FXL"/ || return 2
+  cp "$LOOP_SRC/loop_lib.py" "$LOOP_SRC/loop_items.py" "$LOOP_SRC/loop.toml" "$FX/$FXL"/ || return 2
   cp "$LAYERS_SRC/layers.toml" "$FX/$FXP"/ || return 2
   # TOOL-dBoundRoles-2 §4 Migration: each script a shipped role's `never` entry names, copied from this
   # repository's tool root to the same path under the fixture's, so the fixture holds the enforcers a
@@ -2712,14 +2714,16 @@ check_arm "arm 45 AC2 ...and over gov-orienter with its reads key indented fails
 # ---- in the checker and gov's rows composed through the verb to themselves (ac3); the out-of-shape role
 # ---- (ac4); a core role's write class patched, its return patched, the cycle row gov-prompt-writer and a
 # ---- fixture cycle row `driver` superseded (ac5); the actor patch without the template, by the verb and by
-# ---- the loop kit's item check, then with it (ac6); an excluded role an item acts as, an excluded leg a
+# ---- the loop kit's item check, then with it, the handoff renderer reading that item's declaration for the
+# ---- repository role and refusing gov's (ac6, TOOL-dBoundRoles-91); an excluded role an item acts as, an excluded leg a
 # ---- grant names, and a role left idle by an exclusion, then taken out with it (ac7); a scenario's rows
 # ---- composed for a build alone and its activation of both kinds admitted (ac11). Then, over the adopter's
 # ---- own fixture, which holds no review-harness kit: the scaffold leaves the unheld harness out of the
 # ---- index with its note, and an index planted naming it reds `--check` (ac8). The failing cases, owed at
 # ---- the close and not observed by the pass that wrote this, each staged by removing its check: the
 # ---- composers reading gov's rows alone (ac2, ac11), `check_core_fields` returning nothing (ac5 writes and
-# ---- cycle), `check_actor_patch` returning nothing (ac6), `check_role_acts` returning nothing (ac7 idle),
+# ---- cycle), `check_actor_patch` returning nothing (ac6), `handoff.read_item_declaration` comparing the actor
+# ---- unnormalised (ac6-held-declared), `check_role_acts` returning nothing (ac7 idle),
 # ---- `derive_harness_paths` listing an unheld harness again (ac8), and the `schema` keys dropped from the
 # ---- kinds register (ac11 activatable). WHAT IT DOES NOT CHECK: an overlay row the composition marks
 # ---- `stale` or `orphaned`; a repository role spawned as an agent type, which renders none; or the role
@@ -2863,6 +2867,15 @@ orienter = next(
         encoding="utf-8").splitlines() if ln.startswith("return:"))
 patch = ('\n[[item]]\ntag = "item.entry.adopter.orient-triaged"\nedges = "amends=item.entry.orient@%s"\n'
          'actor = "role:adopter.triager"\n' % ipins.get("item.entry.orient"))
+DECL = """import pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import handoff, roles_lib
+try:
+    got = handoff.read_item_declaration(sys.argv[2], sys.argv[3], pathlib.Path.cwd())
+except roles_lib.RolesError as e:
+    sys.exit(str(e))
+print(got["actor"], got["source"]["returns"])
+"""
 item_file = fx.parent / "fx46-item.json"
 item_file.write_text(json.dumps({"item": {"tag": "item.entry.orient", "actor": "role:adopter.triager"},
                                  "original": "role:gov-orienter"}), encoding="utf-8")
@@ -2874,6 +2887,11 @@ for name, ret, want in (("ac6-lacking", RET, 1), ("ac6-held", orienter, 0)):
     say(name + "-verb", rc == want and (lacks in out) == (want == 1), out)
     say(name + "-item", (lacks in lout) == (want == 1)
         and "loop: patch item.entry.adopter.orient-triaged on item.entry.orient · actor" in lout, lout)
+    if name == "ac6-held":   # TOOL-dBoundRoles-91 AC7: the declaration the renderer reads of the patched item
+        for tail, slot in (("declared", "triager"), ("gov", "gov-orienter")):
+            rc, out = run("-c", DECL, str(RK), "item.entry.orient", slot)
+            say("%s-%s" % (name, tail), (rc, out.strip()) == (0, "role:adopter.triager role:triager")
+                if slot == "triager" else rc == 1 and "is the item of role:adopter.triager, not role:" in out, out)
     reset()
 # AC7: an excluded role an active item names; an excluded leg a role's gates names; the matrix arm
 legs = json.loads((tool / "gate-legs.json").read_text(encoding="utf-8"))
@@ -2914,7 +2932,7 @@ reset()
 PY
 ); A46=${A46//$'\r'/}
 _l46=(); [ -z "$A46" ] || mapfile -t _l46 <<< "$A46"
-check_arm "arm 46 the composed fixture printed its twenty verdict lines" "$([ "${#_l46[@]}" = 20 ] && echo 1 || echo 0)"
+check_arm "arm 46 the composed fixture printed its twenty-two verdict lines" "$([ "${#_l46[@]}" = 22 ] && echo 1 || echo 0)"
 for _ln in "${_l46[@]}"; do
   _w=${_ln#* }
   check_arm "arm 46 ${_ln%% *} (TOOL-dBoundRoles-20)" "${_w%% *}"

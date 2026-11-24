@@ -271,9 +271,11 @@ and writes nothing, and only the shape is checked (TOOL-dBoundRoles-17). A marke
 order it answers on a `**Answers:** <work order path> task-sha=<12hex>` line beside its `**Serves:**`
 line, the value `roles_lib.derive_answers_value` writes, and the catalogue checker grades both as R16.
 THE WORK ORDER PER ITEM (TOOL-dBoundRoles-3): with `--item <tag>` the render reads the item's declaration
-from the loop kit, running its `loop_lib.py declaration --item <tag> --json` in a subprocess under a bound,
-the kit found by `resolve_kit_dir("loop", "loop_lib.py", ...)`, and refuses with exit 1, writing nothing, a
-tag the loop does not declare, an item whose actor is not `role:<the --role slot>`, and no loop kit. The
+from the loop kit, running its `loop_lib.py declaration --item <tag> --json --root <the repository>` in a
+subprocess under a bound, the kit found by `resolve_kit_dir("loop", "loop_lib.py", ...)`, so the row it reads is
+the repository's composed one, its overlay's items, patches and roles included (TOOL-dBoundRoles-91). It refuses
+with exit 1, writing nothing, a tag no composed row declares, a composition that refuses, an item whose actor names
+another slot than `--role`'s, `role:adopter.<name>` naming the slot `<name>`, and no loop kit. The
 task then closes, after the `reads` blocks, with the five blocks of `roles_lib.WORK_ORDER_BLOCKS`: `### item`
 (the tag, its step and its outcome set), `### inputs` (each of the item's inputs handed as content, one
 sub-block each on a level-3 `### <field tag>` heading with its fact line two lines below, an optional one

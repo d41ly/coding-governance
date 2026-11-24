@@ -12053,6 +12053,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "derive_composed_declaration",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "derive_composition_lines",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -34618,6 +34623,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "run_declaration_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_items.py"
+    },
+    {
       "id": "run_declared_python",
       "kind": "function",
       "file": "tools/codebase-map/gen_map.py"
@@ -36984,6 +36994,11 @@
     },
     {
       "id": "run_scratch_check",
+      "kind": "function",
+      "file": "tools/loop/loop_items.py"
+    },
+    {
+      "id": "run_scratch_declaration",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
     },
