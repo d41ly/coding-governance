@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-60 — the round-1 audit of units 52 to 58, its 37 minors: criteria that can fail and can pass, arms observed where their code lives, one read-key parse, floors moved with their arms, and write sets that name every file a pass writes
 
-**Status:** DEFERRED · rev-9 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-9 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -21,6 +21,7 @@
 | [2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-brief.md) | journal | TOOL-dBoundRoles-58 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 |
 | [2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-43-leg-rename-brief.md) | journal | TOOL-dBoundRoles-43 TOOL-dBoundRoles-50 TOOL-dBoundRoles-56 TOOL-dBoundRoles-58 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-11-23-prompt-TOOL-dBoundRoles-60-2-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dBoundRoles-60-2-spec-writer.md) | journal | — |
+| [2026-11-24-prompt-TOOL-dBoundRoles-60-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-60-build-brief.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-60-spec-fix-brief.md) | journal | TOOL-dBoundRoles-58 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-10-26-review-TOOL-dBoundRoles-59-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-59-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-59 |
 
