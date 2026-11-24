@@ -75,3 +75,22 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Run no gate leg, no suite, no bar. Verify with a fixture or a probe of the code you changed.
 - A change the spec did not state is a deviation record in `build/`, `2026-11-24-build-TOOL-dBoundRoles-92-deviation-921.md`; its
   values are `report` and `author-recorded`.
+
+## The second pass
+
+The first pass (run `wf_f7fdf94b-3a6`) built the unit whole and handed it back uncommitted, since it needed `help/loop.md`,
+outside the declared set. The declaration now holds that page. This pass commits that work and nothing of it is rebuilt.
+
+- Apply `u92/TOOL-dBoundRoles-92.patch` and `u92/TOOL-dBoundRoles-92-help-loop.patch` of the scratch directory with `git apply
+  --index`, both of which applied at `7d79d4c7d`; the only commit between it and this pass's base is a records commit, so a
+  conflict can be in generated files and this unit's records alone: resolve it by re-rendering them. Then read the applied
+  diff against the spec, and commit with `u92/TOOL-dBoundRoles-92-message.txt`.
+- `.governance/policy.json` is not in the patch: the main loop commits its mirror on the run's branch after the merge.
+- The spec's S14 names a landed policy value the reader answers `owner` to, and none exists: your stub arm, recorded in
+  your deviation record, stands as a mechanical departure.
+- One more item, recorded in the same deviation record: the arm over the kickoff engine's own spans in
+  `tools/hooks/scratch-guard.test.sh`, its AC9 rows, feeds the span `git symbolic-ref refs/remotes/<remote>/HEAD` to the hook
+  as written, and since TOOL-dBoundRoles-86 the shell reading of `<remote>/HEAD` is a redirect to `/HEAD`, so the row exits
+  2 where it wants 0. The hook reads the command as the shell would; the fix is the arm's, which must fill each
+  placeholder of the form `<word>` with a plain word before it feeds the span. Keep the row set and its count as they
+  are, say it in the arm's comment, and probe the arm's rows: red before, green after.
