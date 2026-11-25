@@ -48,6 +48,30 @@ FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.S)
 # `Red-fix: <leg name>`, one leg per trailer line, and `routed_commits.py` reads it through this name.
 RED_FIX_TRAILER = "Red-fix"
 
+CR = chr(13)   # one carriage return; see check_marker_line()
+
+# TOOL-dFramedEntrypoint-6 — records render inside the SPEC they serve. The pair sits between a
+# spec's status header and its first numbered section, which is the one place in a spec that hygiene
+# check 12 does not look: its section-equality compare collects `## ` headings and this is not one,
+# and its empty-body walk has not started. Measured on a scratch clone before the unit was written.
+# An eleventh `## ` section would have needed a new canon AND a dated cutoff, and would have left
+# every landed spec without the region. The generator writes the pair and `routed_commits.py` reads
+# it, so it lives here (TOOL-aTemperedLane-1 S4).
+SPEC_RECORDS_OPEN = "<!-- gen:spec-records -->"
+SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
+
+
+def check_marker_line(line: str, mark: str) -> bool:
+    """The ONE spelling of "is this line exactly this marker", CR-stripped.
+
+    R2-L2 (closing review round 2). This predicate had FOUR live spellings in `gen_build_index.py` — two
+    nested `_is` helpers, `_marker_index`'s inline compare, and `slot_violations`' own — inside a module
+    whose comments forbid two answers to one question. They agreed, which is why nothing caught it;
+    the cost of four copies is that the NEXT edit makes them disagree, and this build already spent
+    two rounds on exactly that between that file and the driver.
+    """
+    return (line[:-1] if line.endswith(CR) else line) == mark
+
 
 # The one bash rule, carried inline once for the kit (TOOL-dWitnessedBar-57 S7): `row_grammar.py`'s
 # `resolve_shell_ere` and `corpus_ids.py`'s `resolve_bash` import its `scan_bash` from here, and
