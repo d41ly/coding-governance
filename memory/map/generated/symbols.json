@@ -23803,6 +23803,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "read_guard_value",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
+    },
+    {
       "id": "read_guarded_paths",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
@@ -35521,6 +35526,11 @@
       "id": "run_guard_plant",
       "kind": "function",
       "file": "tools/loop/guard.py"
+    },
+    {
+      "id": "run_guard_run_policy",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_guards",

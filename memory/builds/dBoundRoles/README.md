@@ -89,7 +89,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 73 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** CLOSED · 73 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
@@ -173,10 +173,10 @@ ids TOOL-dBoundRoles-86 TOOL-dBoundRoles-87 TOOL-dBoundRoles-88 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-91 — the declaration verb cuts a work order from the composed item kind](spec/2026-11-24-spec-TOOL-dBoundRoles-91.md) | 45 | 2 | CLOSED | rev-1 | 2026-11-24 |
 | [TOOL-dBoundRoles-92 — the closing review's round-1 minors folded, and the reviewers step row declares the atomic resume unit 43 owed](spec/2026-11-24-spec-TOOL-dBoundRoles-92.md) | 46 | 2 | CLOSED | rev-1 | 2026-11-24 |
 | [TOOL-dBoundRoles-93 — the closing review's round-2 mediums: a PowerShell block is read as its own command, and the arms and leg guards the fold left out](spec/2026-11-24-spec-TOOL-dBoundRoles-93.md) | 47 | 2 | CLOSED | rev-1 | 2026-11-24 |
-| [TOOL-dBoundRoles-95 — under `policy-file.guard = owner-only` the policy guard admits no live run's own write of the policy file](spec/2026-11-25-spec-TOOL-dBoundRoles-95.md) | 48 | 2 | INPROGRESS | rev-1 | 2026-11-25 |
+| [TOOL-dBoundRoles-95 — under `policy-file.guard = owner-only` the policy guard admits no live run's own write of the policy file](spec/2026-11-25-spec-TOOL-dBoundRoles-95.md) | 48 | 2 | CLOSED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 601 bound to this build, across 4 record folder(s).
+Records: 603 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

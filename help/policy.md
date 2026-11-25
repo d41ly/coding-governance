@@ -207,8 +207,13 @@ reader coverage: budgets.enforce (owner dGroundRules, landed at 3708a705) has no
 An agent that could commit any change to the policy file could loosen any rule, so the policy file has
 one door, a guard on every commit that changes it, a check on every push that lands it, and a floor
 the guard protects. The owner ruled on 2026-11-12 that no file is owner-only to a run working under
-its build's mandate, so a live unattended run's branch is admitted throughout, and every change it
-makes is recorded.
+its build's mandate, so a live unattended run's branch is admitted to the guarded files, and every
+change it makes is recorded. On 2026-11-25 the owner narrowed that for the policy file alone: while
+`policy-file.guard` reads `owner-only`, its default, a live run's own change to `.governance/policy.toml`
+is refused, and you commit it from a terminal. `agents-with-reason` and `agents-within-mandate` open the
+file to a live run. The key is read from the landed revision, so a run opens nothing by switching it on
+its branch, nor by moving its default, since an unset key is `owner-only` here whatever the catalogue
+says. Where no landed revision reads, the run's write is refused too.
 
 **The door: `policy_edit.py`.** The harness refuses an agent's Edit, Write, MultiEdit or NotebookEdit
 of `.governance/policy.toml`, naming this command; it writes the file, writes the change record and
@@ -217,8 +222,10 @@ stages both:
 - `python tools/loop/policy_edit.py set <key> <value> --build <slug> --unit <id>` sets one key. Its <!-- usage: script:tools/loop/policy_edit.py#set 46041bd3 -->
   value is checked against the key's catalogue row, and a `floor` member against the four members.
   It writes when the owner proves themselves, standard error an interactive terminal and then the
-  word `yes` typed at its prompt, or when the branch is a live run's branch, which needs no prompt.
-  Otherwise it prints the proposal and exits 1, writing nothing.
+  word `yes` typed at its prompt, or when the branch is a live run's branch and the landed
+  `policy-file.guard` is `agents-with-reason` or `agents-within-mandate`, which needs no prompt.
+  Otherwise, on a live run's branch under `owner-only` too, it prints the proposal, names why and exits
+  1, writing nothing. Run the `set` command it prints from a terminal.
 - `python tools/loop/policy_edit.py raise <cap> <new> --build <slug> --unit <id> --argument <text>` <!-- usage: script:tools/loop/policy_edit.py#raise 9a04e39d -->
   is the agent's door for one measured-file cap, below, and needs no proof.
 - `python tools/loop/policy_edit.py propose <key> <value>` writes nothing: it prints the row diff <!-- usage: script:tools/loop/policy_edit.py#propose 25930781 -->
@@ -251,14 +258,16 @@ with one line saying so, as `policy-file.on-missing-expansion` says.
   the rule that judges it. In order:
   1. **The guard's own switch.** A change to `policy-file.guard`, `policy-file.proof`, any `floor`
      member, or the list of guarded paths is refused, naming `floor.guard-self`, for every agent commit
-     off a live run's branch, whatever `policy-file.guard` reads.
+     off a live run's branch, whatever `policy-file.guard` reads. On a live run's branch the list may
+     change; one of those keys may only under `agents-with-reason` or `agents-within-mandate`.
   2. **Every change recorded.** Each changed key needs a staged change record naming its row, and a
      change to the list one naming `kit.policy`; a missing one is refused, naming the key.
-  3. **The value of `policy-file.guard`.** Under `owner-only`, the default, and under
-     `agents-within-mandate`, which the ruling widened to the same, an agent's commit is admitted in
-     the shapes below: one cap raised, the mirror's render, or a live run's branch. Under
-     `agents-with-reason` a commit changing the policy file alone is also admitted when it adds a row
-     to `memory/DECISIONS.md`.
+  3. **The value of `policy-file.guard`.** Under every value an agent's commit is admitted in the
+     shapes below: one cap raised, the mirror's render, the role renders, or a live run's branch. Under
+     `owner-only`, the default, a live run's branch admits no change to the policy file itself; under
+     `agents-within-mandate` and `agents-with-reason` it does. Under `agents-with-reason` a commit
+     changing the policy file alone is also admitted, off a run's branch too, when it adds a row to
+     `memory/DECISIONS.md`.
 
   The verdict prints `loop-guard: admitted · <rule>`, or `loop-guard: refused · <path> · <why>` per
   reason with the remedy; the minimal guard's own `policy-guard:` lines pass through.
@@ -303,16 +312,26 @@ with one line saying so, as `policy-file.on-missing-expansion` says.
   after staging with `the staged bytes are not its working-tree bytes`, and a tree with no roles kit
   with `no roles kit to re-render it`. A render staged beside one of the four `.governance/` files
   leaves this shape and is refused with them.
-- **An agent's commit on a live run's branch is admitted.** Any change to the guarded files that the
-  shapes above would refuse is admitted when the branch being committed on is the `run-branch:` of
-  an unattended run's run-state file, `builds/<slug>/RUN.md`, committed at `HEAD`, and that file's
+- **An agent's commit on a live run's branch is admitted, the policy file apart.** Any change to the
+  other guarded files that the shapes above would refuse is admitted when the branch being committed
+  on is the `run-branch:` of an unattended run's run-state file, `builds/<slug>/RUN.md`, committed at `HEAD`, and that file's
   `phase:` at `HEAD` is not one of the `PHASES_TERMINAL` phases the unattended driver at `HEAD`
   declares. The guard reads `HEAD`, never the staged run-state file, so a commit cannot admit itself.
   It prints `policy-guard: admitted · <paths> · the run-branch of <run-state file>, phase <PHASE>`,
   and asks for no decision row: every commit on a run branch is already joined to a specced unit.
-  When no live run names the branch, the refusal lines below are followed by one
-  `policy-guard: not a live run's branch · <why>` line per reason: a detached `HEAD`, no run-state
-  file at `HEAD` naming the branch, no driver declaring the terminal set, or a terminal phase.
+  A change that holds `.governance/policy.toml` is admitted this way only where `policy-file.guard`, as
+  landed, is `agents-with-reason` or `agents-within-mandate`. Under `owner-only` it is refused whole,
+  the other files beside it too: commit those apart, and leave the policy file to the owner's terminal.
+  When no run admits the commit, the refusal lines below are followed by one
+  `policy-guard: no run admits it · <why>` line per reason: a detached `HEAD`, no run-state
+  file at `HEAD` naming the branch, no driver declaring the terminal set, a terminal phase, or the
+  live run's own line, `policy-file.guard = owner-only leaves .governance/policy.toml to the owner, who
+  commits it from a terminal`, with why the key reads so.
+- **A landing step's write of the policy file is the owner's too.** An upgrade step that writes
+  `.governance/policy.toml`, run by the landing's walk or by `govkit update`, writes the working tree.
+  Under `owner-only` a run cannot commit that write on its branch, and the push check refuses the
+  landing's own commit of it as `policy-unrecorded`. Commit it from a terminal, its change record and
+  `Gov-Policy:` trailer beside it; the step's next run finds nothing to write.
 - **Everything else is refused**, each reason on its own `policy-guard: refused · <path> · <why>`
   line: a lowered cap, two caps changed, a cap added or removed, a class row such as
   `memory/builds/*/spec/` (it names no one file), `budgets.enforce` or `budgets.pinned`, any other
@@ -330,12 +349,20 @@ with one line saying so, as `policy-file.on-missing-expansion` says.
   wrapper that gives an agent's commit a terminal, a line removed from the list in one commit and the
   file changed in the next, a commit made in another clone, a cherry-pick or a rebase (no pre-commit
   runs), the guard file deleted from the working tree, and a run-state file committed naming the
-  agent's own branch with a live phase, which admits every commit after it, all pass it. It reads
+  agent's own branch with a live phase, which admits every commit after it, all pass it. So do the
+  guard's or the reader's code edited in the working tree, or the catalogue, whose rows decide whether
+  the landed file is valid and so whether an older revision answers; the landed revision moved
+  by hand, by `GOV_REMOTE` or `GOV_DEFAULT_BRANCH` in the agent's environment or by `git update-ref` on
+  the tracking ref; a merge taking an old parent's file whole, which brings back a value the owner once
+  wrote; a level an agent wrote while the key read another value, which stays after the owner sets
+  `owner-only` again; and, where the landed value opens the file, a run that sets the key back to
+  `owner-only` beside a low level. It reads
   the phase a run-state file records, not the one the unattended kit derives, so a run that has
   landed reads live until a terminal phase is committed. The hook binds once it is on
   `main` in the primary checkout, whose hooks every worktree runs. The push gate does not re-check
-  who made a change. A live run may switch a floor member off, or change `policy-file.guard` or
-  `policy-file.proof`: only its change record and the push check below witness it. A change to the
+  who made a change. Where the landed value opens the file, a live run may switch a floor member off, or
+  change `policy-file.guard` or `policy-file.proof`: only its change record and the push check below
+  witness it. A change to the
   list of guarded paths alone stages no guarded path, so the hook never calls the verdict for it.
 
 **The push check.** The pre-push hook, on a push to the default branch the remote already holds, runs
@@ -375,11 +402,11 @@ prints a member's value:
 |---|---|---|
 | `verdict-before-move` | a binding verdict runs before the default branch moves | the pre-push hook's `gate RED` refusal: the push goes through printing `floor: verdict-before-move off`, and no green record is written |
 | `record-changes` | every policy change and stage transition recorded | the verdict's record step, the push check, and the loop kit's transition check |
-| `guard-self` | the guard protects its own switch off a live run's branch | the verdict's first step |
+| `guard-self` | the guard protects its own switch off a live run's branch, and on one under `owner-only` | the verdict's first step |
 | `no-actor-witness` | no stage witness reads a fact the acting agent typed | the loop kit's two refusals of an actor witness no list row names |
 
-Switching a member `off` is a change to the guard's own switch, so off a live run's branch it is the
-owner's, committed from a terminal.
+Switching a member `off` is a change to the guard's own switch, so off a live run's branch, and on one
+while `policy-file.guard` reads `owner-only`, it is the owner's, committed from a terminal.
 
 ## The keys the file holds today
 

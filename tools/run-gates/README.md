@@ -1162,7 +1162,8 @@ An unsigned tag, an unknown key, a bad signature (git's `Signature verification 
 message changed after it was signed, TOOL-dWitnessedBar-56 S15) or another principal reads `NONE`; the
 key unset reads `NONE`, `no signer table`; a verify that cannot run, `ssh-keygen` absent included, an
 `ls-remote` or `fetch` that fails and a refused policy read are `DEAD PROBE`. The key is owner-only: the loop guard refuses
-an agent's change to it off a live run's branch, as it does `verdict.remote.pin`. Each node's operator
+an agent's change to it off a live run's branch, and on one under `policy-file.guard = owner-only`, the
+default (TOOL-dBoundRoles-95), as it does `verdict.remote.pin`. Each node's operator
 registers the node's public key with the owner. SOURCE: `check_pin_source` in `remote_verdict.py`, the
 one source rule `remote-ci` applies too, over the same three keys, so a candidate that rewrites the
 leg manifest reads `HELD`. Under `verdict.remote.pin-scope = workflow` a peer read is `HELD` naming the

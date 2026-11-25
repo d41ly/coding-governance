@@ -569,8 +569,9 @@ THE FLOOR (TOOL-dBoundRoles-23): `roles_lib.EFFORT_FLOOR` is `medium`, beside `E
 refuses, naming the level, its source, the floor and the owner, who sets the key instead: the house file
 (R12, `load_policy`'s `check_level`, every profile's levels included), a role's declared `effort` (R2), and
 a stage row's own `effort` at resolve. WHAT THE FLOOR DOES NOT CHECK: whose commit wrote a policy-file level.
-The guard admits a live run's change on that run's branch under every `policy-file.guard` value, and a floor
-reading provenance from the file alone cannot tell it from the owner's; closing that path is the guard's.
+The policy guard answers that at the commit: under `owner-only` it refuses a live run's change to the policy
+file (TOOL-dBoundRoles-95), within the limits its header lists. A level an agent wrote while the key read
+another value stays after the owner sets `owner-only` again, and the floor reads it as the owner's.
 
 The keys are read through the policy kit's one reader, `policy.py get <key> --json`, run by
 `roles_lib.read_policy_setting` in the repository at its landed revision, so an uncommitted edit of

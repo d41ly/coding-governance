@@ -15,20 +15,25 @@ agent's commit. It wraps dGroundRules-6's minimal guard, the policy kit's `guard
    parent sides. Empty: exit 0.
 2. Owner-only, under every value of `floor.guard-self` and of `policy-file.guard`: a staged change of a
    leaf `OWNER_ONLY_KEYS` holds, `verdict.remote.pin` or `verdict.peer.signers`, is refused naming the key unless the minimal
-   guard's `check_run_mandate` admits the branch, the owner's 2026-11-12 ruling (TOOL-dWitnessedBar-6).
+   guard's `check_run_mandate` admits the policy file on the branch, the owner's 2026-11-12 ruling
+   (TOOL-dWitnessedBar-6) as his 2026-11-25 answer narrows it (TOOL-dBoundRoles-95): on a live run's
+   branch only while `policy-file.guard`, as landed, is `agents-with-reason` or `agents-within-mandate`.
    Then guard-self, at `floor.guard-self` `on`: a staged change of the list file, or of a leaf of
    `policy-file.guard`, `policy-file.proof` or `floor`, is refused naming the key and `floor.guard-self`
-   unless the minimal guard's `check_run_mandate` admits the branch: the live run's admission precedes
-   it, the owner's 2026-11-12 ruling. No value of `policy-file.guard` admits such a change off a live
-   run's branch.
+   unless the minimal guard's `check_run_mandate` admits that path, the list file or the policy file, on
+   the branch: the live run's admission precedes it, the list under every value and a leaf under the
+   same two. No value of `policy-file.guard` admits such a change off a live run's branch.
 3. Record, at `floor.record-changes` `on`: each changed leaf needs a staged change record whose `Unit` is
    the leaf's row tag, `policy.<row name>` or a family tag such as `policy.budgets`, and a staged
    change of the list file one whose `Unit` is `kit.policy`. Each missing one is refused, naming it.
-4. The value's rule, `resolve("policy-file.guard")` at the landed revision, never the staged file, so a
-   commit cannot loosen the rule that judges it. `owner-only` and `agents-within-mandate` admit where
+4. The value's rule, the minimal guard's `read_guard_value` at the landed revision, never the staged
+   file, so a commit cannot loosen the rule that judges it; an unset key is `owner-only`, whatever the
+   catalogue's default says, and a reader that does not answer is not judged. Every value admits where
    the minimal guard, run as a subprocess so its exit cannot end this one mid-step, exits 0: one cap
-   raised with its RAISED line and decision row, the mirror's render, or a live run's branch.
-   `agents-with-reason` also admits a change touching the policy file alone with a decision row.
+   raised with its RAISED line and decision row, the mirror's render, the role renders, or a live run's
+   branch, whose change to the policy file itself it admits under `agents-within-mandate` and
+   `agents-with-reason` and refuses under `owner-only` (TOOL-dBoundRoles-95). `agents-with-reason` also
+   admits a change touching the policy file alone with a decision row, on a run's branch and off it.
 5. Each refusal prints `loop-guard: refused · <path> · <why>` and the remedy; an admission prints
    `loop-guard: admitted · <rule>`; the minimal guard's own lines pass through.
 
@@ -91,8 +96,9 @@ scenario did when every one held, else 3. `--selftest` runs every plant through 
 Exit: 0 admitted or clean, 1 refused, 2 when a reader, a kit or git does not answer: deny by default.
 
 WHAT THIS DOES NOT CHECK: a change to the list file alone, which stages no listed path, so the
-pre-commit block never calls the verdict; a run's own switch of the floor, which only its change record
-and the push arm witness; a pty wrapper giving an agent a terminal (SA-1), `git commit --no-verify` and
+pre-commit block never calls the verdict; a run's own switch of the floor where the landed
+`policy-file.guard` opens the file to it, which only its change record and the push arm witness; what
+the minimal guard's header lists as passing the run admission; a pty wrapper giving an agent a terminal (SA-1), `git commit --no-verify` and
 `git push --no-verify`; that a change record's argument is true; and a commit or merge adding the
 policy file that no parent holds, which the push arm skips (§8 F11) and the verdict refuses off a live
 run's branch. Only an octopus merge, a re-merge conflicting on the policy file or a git without
@@ -127,14 +133,16 @@ LIST_TAG = "kit.policy"
 ZERO_SHA = re.compile(r"0{40}|0{64}")
 #: the leaves the guard's own switch holds, each a key path prefix
 SELF_KEYS = (("policy-file", "guard"), ("policy-file", "proof"), ("floor",))
-#: the leaves only the owner, or a live run on its own branch, may change (TOOL-dWitnessedBar-6 S9): the
+#: the leaves only the owner may change, or a live run on its own branch while `policy-file.guard`, as landed,
+#: opens the policy file to it (TOOL-dWitnessedBar-6 S9, TOOL-dBoundRoles-95): the
 #: off-node backends' pin, which decides the files a remote or peer verdict may stand on, and the peer
 #: signer list, whose keys alone may sign a peer verdict (TOOL-dWitnessedBar-43 S2); a set is one leaf
 OWNER_ONLY_KEYS = (("verdict", "remote", "pin"), ("verdict", "peer", "signers"))
 #: a change record's name, the change kind's grammar under any memory root
 CHANGE_NAME = re.compile(r"(?:^|/)builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-[A-Za-z]+-[A-Za-z0-9]+-\d+-change-\d+\.md$")
 REMEDY = ("loop-guard: the owner commits from a terminal, or an agent writes through the loop kit's policy_edit.py: "
-          "`set` on a live run's branch, `raise` for one measured-file cap; every change carries its change record.")
+          "`raise` for one measured-file cap, or `set` on a live run's branch where policy-file.guard, as landed, is "
+          "agents-with-reason or agents-within-mandate; every change carries its change record.")
 
 
 # ------------------------------------------------------------------------------------------ shared reads
@@ -264,21 +272,25 @@ def check_staged():
                   if any(k[:len(s)] == s for s in SELF_KEYS)]
     if selfs and floor["guard-self"] == "off":
         print("floor: guard-self off · reported · %s" % ", ".join(n for _p, n in selfs))
-    elif selfs:
-        admission, _whys = mguard.check_run_mandate()
-        if admission is None:
-            refused += [(p, "%s: the guard's own switch, refused under floor.guard-self for every agent commit off a "
-                            "live run's branch, whatever policy-file.guard reads" % n) for p, n in selfs]
-        else:
-            print("%s: admitted · guard-self · %s · the run-branch of %s" % (SAY, ", ".join(n for _p, n in selfs),
-                                                                         admission))
-    # Step 2, owner-only: under every floor and guard value, the run admission before it.
+    else:
+        # Each path is judged alone, so the list is admitted as it was beside a leaf that is refused.
+        for path in sorted({p for p, _n in selfs}):
+            names = [n for p, n in selfs if p == path]
+            admission, whys = mguard.check_run_mandate([path])
+            if admission is None:
+                refused += [(path, "%s: the guard's own switch, refused under floor.guard-self for every agent commit off "
+                                   "a live run's branch, whatever policy-file.guard reads%s" % (
+                                       n, " · " + "; ".join(whys) if path == mguard.POLICY else "")) for n in names]
+            else:
+                print("%s: admitted · guard-self · %s · the run-branch of %s" % (SAY, ", ".join(names), admission))
+    # Step 2, owner-only: under every floor and guard value, the run admission of the policy file before it.
     owners = [policy.render_dotted(k) for k in sorted(changes or {}) if k in OWNER_ONLY_KEYS]
     if owners:
-        admission, _whys = mguard.check_run_mandate()
+        admission, whys = mguard.check_run_mandate([mguard.POLICY])
         if admission is None:
             refused += [(mguard.POLICY, "%s: owner-only, refused for every agent commit off a live run's branch, "
-                                        "whatever policy-file.guard and floor.guard-self read" % n) for n in owners]
+                                        "whatever policy-file.guard and floor.guard-self read · %s" % (
+                                            n, "; ".join(whys))) for n in owners]
         else:
             print("%s: admitted · owner-only · %s · the run-branch of %s" % (SAY, ", ".join(owners), admission))
     # Step 3: every change recorded.
@@ -300,11 +312,10 @@ def check_staged():
     else:
         refused += [(p, "%s: write it through policy_edit.py, or the memory-tree kit's change door" % why)
                     for p, why in missing]
-    # Step 4: the value's rule, read at the landed revision.
-    try:
-        value = policy.resolve("policy-file.guard").value
-    except policy.Refusal as e:
-        print("%s: cannot judge · %s" % (SAY, e))
+    # Step 4: the value's rule, read at the landed revision by the minimal guard's one read of the key.
+    value, why = mguard.read_guard_value("policy-file.guard")
+    if value is None:
+        print("%s: cannot judge · %s" % (SAY, why))
         return 2
     p = subprocess.run([sys.executable, mguard.__file__, "--staged"], capture_output=True, text=True,
                        encoding="utf-8", errors="replace")
@@ -316,9 +327,10 @@ def check_staged():
     if p.returncode and value == "agents-with-reason" and set(touched) == {mguard.POLICY} and mguard.check_decisions_row():
         rule = "policy-file.guard = agents-with-reason · the policy file alone, with its decision row"
     elif p.returncode:
-        refused += [(path, "policy-file.guard = %s admits an agent's write only as one cap raised with its RAISED line "
-                           "and decision row, the mirror's render%s, or a live run's branch" % (
-                               value, ", the policy file alone with a decision row" if value == "agents-with-reason" else ""))
+        refused += [(path, "policy-file.guard = %s admits an agent's write only as %s" % (value, "; ".join(
+            ["one cap raised with its RAISED line and decision row", "the mirror's render"]
+            + (["the policy file alone with a decision row"] if value == "agents-with-reason" else [])
+            + (["a live run's branch"] if path != mguard.POLICY or value in mguard.RUN_WRITABLE else []))))
                     for path in sorted(touched)]
     # Step 5: the verdict.
     for path, why in refused:
@@ -594,16 +606,22 @@ PLANTS = {
     "raise-no-record": "the cap raised by hand with its RAISED line and decision row, no change record",
     "raise-lowered": "the cap set to 90 by hand",
     "floor-off-agent": "floor.no-actor-witness off staged under each guard value on a branch no run names",
-    "floor-off-run": "owner-only on a live run's branch: a floor member off and a list line dropped, with and without records",
+    "floor-off-run": "agents-within-mandate on a live run's branch: a floor member off and a list line dropped, with and "
+                     "without records",
     "other-write-owner-only": "review.max-rounds set with a change record under owner-only",
     "with-reason-admitted": "agents-with-reason: a key set with its record and a decision row",
     "with-reason-no-row": "agents-with-reason: a key set with its record and no decision row",
     "mandate-live": "agents-within-mandate on a live run's branch",
+    "with-reason-live": "agents-with-reason on a live run's branch: a key set with its record and no decision row",
     "mandate-none": "agents-within-mandate on a branch no run names",
     "pin-owner-only": "verdict.remote.pin under agents-with-reason, recorded with its decision row, on a branch no run names",
     "signers-owner-only": "verdict.peer.signers under agents-with-reason, recorded with its decision row, on a branch no "
                           "run names",
-    "owner-only-live": "owner-only on a live run's branch",
+    "owner-only-live": "owner-only on a live run's branch: a key, a floor member and verdict.remote.pin, each with its "
+                       "record, a list line dropped beside .governance/deploy.toml, a cap raised, and a conflicted "
+                       "merge concluded with main's side, then with a third text",
+    "run-switched-guard": "a commit of the run sets policy-file.guard to agents-within-mandate, then a key set with its "
+                          "record and decision row",
     "push-no-trailer": "a commit changing the policy file with no Gov-Policy: line, graded by --push-range",
     "push-merge-carries-trailered": "a --no-ff merge taking a side's trailered, recorded policy change whole",
     "push-merge-resolution-edit": "a merge resolution setting review.max-rounds, with trailer and record, then neither",
@@ -664,7 +682,8 @@ PLANTS = {
                                   "recorded change, then a merge resolution editing it with neither",
     "proof-signed-refuse": "policy_edit.py set policy-file.proof signed under refuse",
     "proof-signed-fallback": "policy_edit.py set policy-file.proof signed under fallback-reported",
-    "set-run-live": "policy_edit.py set on a live run's branch, a key then a floor member",
+    "set-run-live": "owner-only: policy_edit.py set on a live run's branch, then raise",
+    "set-run-open": "agents-within-mandate: policy_edit.py set on a live run's branch, a key then a floor member",
     "floor-readers": "an unlisted actor witness and an unrecorded transition, under the floor on, then off",
     "write-guarded-rollback": "policy_edit.py's write_guarded, in process, its os.replace spied: a record refused, "
                               "a rename interrupted, a callable over its prior bytes",
@@ -771,11 +790,14 @@ def run_guard_plant(case, top):
 
     guard_value = {"with-reason-admitted": "agents-with-reason", "with-reason-no-row": "agents-with-reason",
                    "mandate-live": "agents-within-mandate", "mandate-none": "agents-within-mandate",
+                   "floor-off-run": "agents-within-mandate", "set-run-open": "agents-within-mandate",
+                   "with-reason-live": "agents-with-reason",
                    "pin-owner-only": "agents-with-reason", "signers-owner-only": "agents-with-reason"}.get(case)
     expansion = 'on-missing-expansion = "fallback-reported"\n' if case == "proof-signed-fallback" else ""
     head = "[policy-file]\n%s%s" % ('guard = "%s"\n' % guard_value if guard_value else "", expansion)
     list_rel = write_guard_plant(top, head if (guard_value or expansion) else "")
-    if case in ("floor-off-run", "mandate-live", "owner-only-live", "set-run-live"):
+    if case in ("floor-off-run", "mandate-live", "with-reason-live", "owner-only-live", "run-switched-guard",
+                "set-run-live", "set-run-open"):
         write_live_run(top)
     raised = (mguard.POLICY, lambda t: t.replace('"%s" = 100\n' % FX_CAP, '# RAISED 100 -> 120, 2026-11-15, %s, '
                                                  'measured 118 bytes\n"%s" = 120\n' % (FX_UNIT, FX_CAP)))
@@ -809,13 +831,58 @@ def run_guard_plant(case, top):
         out.append(("without them, the floor's record", out[-1][1], 1, "no staged change record names policy.floor",
                     out[-1][4]))
     elif case in ("other-write-owner-only", "with-reason-admitted", "with-reason-no-row", "mandate-live",
-                  "mandate-none", "owner-only-live"):
+                  "mandate-none", "with-reason-live"):
         write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
         write_fixture_record(top, "policy.review.max-rounds")
         if case == "with-reason-admitted":
             write_staged(top, {mguard.DECISIONS: add_text("- %s · review.max-rounds 3 -> 4: the fixture\n" % FX_UNIT)})
-        owed = 0 if case in ("with-reason-admitted", "mandate-live", "owner-only-live") else 1
+        owed = 0 if case in ("with-reason-admitted", "mandate-live", "with-reason-live") else 1
         run_scenario("judged", me + ["--staged"], owed, "loop-guard: admitted" if not owed else "policy-file.guard")
+    elif case == "owner-only-live":
+        # TOOL-dBoundRoles-95: each scenario staged alone on the live run's branch, its needle the step that judges it
+        held = "policy-file.guard = owner-only leaves %s to the owner, who commits it from a terminal" % mguard.POLICY
+        for name, tag, text, needle in (
+                ("a key", "policy.review.max-rounds", FX_REVIEW, held),
+                ("a floor member", "policy.floor", '\n[floor]\nno-actor-witness = "off"\n',
+                 "floor.no-actor-witness: the guard's own switch"),
+                ("verdict.remote.pin", "policy.verdict.remote.pin", FX_PIN, "verdict.remote.pin: owner-only")):
+            write_staged(top, {mguard.POLICY: add_text(text)})
+            write_fixture_record(top, tag)
+            run_scenario(name, me + ["--staged"], 1, needle)
+            if needle != held:
+                out.append(("%s, the owner's terminal" % name, out[-1][1], 1, held, out[-1][4]))
+            run_reset()
+        write_staged(top, {list_rel: lambda t: t.replace(".governance/deploy.toml\n", ""),
+                           ".governance/deploy.toml": add_text('planted = "a line"\n')})
+        write_fixture_record(top, LIST_TAG)
+        run_scenario("a list line dropped beside the answers", me + ["--staged"], 0,
+                     "admitted · guard-self · the guarded paths list")
+        run_reset()
+        run_scenario("the raise written", edit + ["raise", FX_CAP, "120", *who, "--argument", "the fixture"], 0, "Gov-Policy:")
+        write_staged(top, {mguard.DECISIONS: add_text(FX_ROW)})
+        run_scenario("the raise judged", me + ["--staged"], 0, "loop-guard: admitted")
+        run_reset()
+        for branch, text in ((FX_BRANCH, FX_REVIEW), ("main", FX_REVIEW.replace("4", "5"))):
+            run_fixture_git(top, "checkout", "-q", branch)
+            write_staged(top, {mguard.POLICY: add_text(text)})
+            run_fixture_git(top, "commit", "-q", "-m", "review rounds on %s" % branch)
+        run_fixture_git(top, "checkout", "-q", FX_BRANCH)
+        rc, _said = read_git(top, "merge", "--no-ff", "--no-commit", "main")
+        if rc != 1:
+            raise OSError("the live run's conflicted merge exited %d, not 1" % rc)
+        run_fixture_git(top, "checkout", "--theirs", "--", mguard.POLICY)
+        run_fixture_git(top, "add", "--", mguard.POLICY)
+        run_scenario("a merge, main's side", me + ["--staged"], 0, "")
+        write_staged(top, {mguard.POLICY: lambda t: t.replace("max-rounds = 5", "max-rounds = 7")})
+        write_fixture_record(top, "policy.review.max-rounds")
+        run_scenario("a merge, a third text", me + ["--staged"], 1, held)
+    elif case == "run-switched-guard":
+        write_staged(top, {mguard.POLICY: add_text('\n[policy-file]\nguard = "agents-within-mandate"\n')})
+        run_fixture_git(top, "commit", "-q", "-m", "the run's own switch")
+        write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
+        write_fixture_record(top, "policy.review.max-rounds")
+        write_staged(top, {mguard.DECISIONS: add_text("- %s · review.max-rounds 3 -> 4: the fixture\n" % FX_UNIT)})
+        run_scenario("judged", me + ["--staged"], 1, "policy-file.guard = owner-only leaves %s to the owner" % mguard.POLICY)
     elif case in ("pin-owner-only", "signers-owner-only"):
         key, text = (("verdict.remote.pin", FX_PIN) if case == "pin-owner-only" else
                      ("verdict.peer.signers", FX_SIGNERS))
@@ -1231,6 +1298,14 @@ def run_guard_plant(case, top):
         run_scenario("set signed", edit + ["set", "policy-file.proof", "signed", *who], 2 if refuse else 1,
                      "point.instruction.signed-proof" if refuse else "the catalogue default tty-cli")
     elif case == "set-run-live":
+        target = pathlib.Path(top, mguard.POLICY)
+        before = target.read_bytes()
+        run_scenario("a key", edit + ["set", "review.max-rounds", "4", *who], 1, "policy-file.guard = owner-only")
+        out.append(("a key, nothing written", out[-1][1], 1, "nothing written", out[-1][4]))
+        out.append(("a key, the file's bytes", out[-1][1], 1, "" if target.read_bytes() == before else "bytes unchanged",
+                    out[-1][4]))
+        run_scenario("a raise", edit + ["raise", FX_CAP, "120", *who, "--argument", "the fixture"], 0, "Gov-Policy:")
+    elif case == "set-run-open":
         run_scenario("a key", edit + ["set", "review.max-rounds", "4", *who], 0, "Proof: none — run mandate")
         run_fixture_git(top, "commit", "-q", "-m", "review rounds raised on the run's branch")
         run_scenario("a floor member", edit + ["set", "floor.guard-self", "off", *who], 0, "Proof: none — run mandate")
@@ -1374,7 +1449,7 @@ def run_fixture(case):
 def run_selftest():
     """Every plant through `run_selftest_cases`: each owes its last scenario's exit and the all-held line."""
     owed = {"raise-no-record": 1, "raise-lowered": 1, "floor-off-agent": 1, "floor-off-run": 1,
-            "other-write-owner-only": 1, "with-reason-no-row": 1, "mandate-none": 1, "pin-owner-only": 1, "signers-owner-only": 1,
+            "owner-only-live": 1, "run-switched-guard": 1, "other-write-owner-only": 1, "with-reason-no-row": 1, "mandate-none": 1, "pin-owner-only": 1, "signers-owner-only": 1,
             "push-no-trailer": 1,
             "proof-signed-refuse": 2, "proof-signed-fallback": 1, "push-merge-resolution-edit": 1,
             "push-merge-revert-to-unchanged-side": 1, "push-merge-conflict-elsewhere": 1,

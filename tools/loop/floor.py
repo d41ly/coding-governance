@@ -19,8 +19,9 @@ Each member's reader prints `floor: <member> off` and reports instead of refusin
 pre-push hook's `gate RED` refusal (`verdict-before-move`); the guard's step 3, its push arm and the
 transition check (`record-changes`); the guard's step 2 (`guard-self`); and the two refusals of an
 actor witness no list row names (`no-actor-witness`). A member is switched `off` only by a staged change
-the guard's step 2 lets through: the owner's terminal commit, or a live run's commit carrying its
-change record.
+the guard's step 2 lets through: the owner's terminal commit, or, where the landed `policy-file.guard`
+is `agents-with-reason` or `agents-within-mandate`, a live run's commit carrying its change record;
+under `owner-only` a live run's is refused (TOOL-dBoundRoles-95).
 
 `get` exits 0 printing `on` or `off`, and 2 printing `floor: refused · <why>` for a member outside the
 four or a `[floor]` table that does not hold.

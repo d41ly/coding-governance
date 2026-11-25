@@ -110,7 +110,14 @@ and reads `mirror --check` fresh at the new HEAD. The live run's three (PLAY-dOr
 the deploy and instructions edits on a branch `run/t` whose committed run-state record and driver
 decide: `guard-run-live` exits 0 in either `run-branch` spelling, `guard-run-terminal` exits 1 on
 `LANDED`, `ABORTED` and a removed driver, and `guard-run-other-branch` exits 1 on a branch no record
-at HEAD names, a record only staged, and a detached HEAD. The rendered-paths shape's six
+at HEAD names, a record only staged, and a detached HEAD; none stages the policy file. The policy file's
+own three on that branch (TOOL-dBoundRoles-95), a tracking ref naming the landed file: `guard-run-policy`
+exits 1 on the file alone under either `run-branch` spelling, beside `.governance/deploy.toml`, deleted,
+retyped, renamed away and added, with `policy-file.guard` switched in the commit or in an earlier one of
+the run, with the catalogue's default moved by the run over a valid and an invalid landed file, and with no
+landed revision; `guard-run-policy-open` exits 0 under each value that opens the file and, under
+`owner-only`, on the argued raise; `guard-run-policy-merge` exits 0 on a merge taking the branch's side and 1
+on a third text. The rendered-paths shape's six
 (TOOL-dBoundRoles-6 S2) commit a `.claude/roles.json` the list names and stage one change of it, the
 renderer a stub beside the kit copy exiting as its `rc` file says: `guard-render-admitted` exits 0 on a
 stub exiting 0; `guard-render-drift` exits 1 naming the stub's drift line; `guard-render-unstaged` exits
@@ -2700,6 +2707,7 @@ GUARD_FILES = ("guard.py", "guarded-paths.txt", *READER_FILES)  # the reader: th
 GUARD_MIRROR = ("guard-mirror-render", "guard-mirror-beside-catalogue", "guard-mirror-branch-green")
 GUARD_INPUTS = ("guard-mirror-beside-conf", "guard-mirror-inputs-join")  # TOOL-dGroundRules-25 S19, S21
 GUARD_RUN = ("guard-run-live", "guard-run-terminal", "guard-run-other-branch")  # PLAY-dOrderedCharter-84
+GUARD_RUN_POLICY = ("guard-run-policy", "guard-run-policy-open", "guard-run-policy-merge")  # TOOL-dBoundRoles-95
 # TOOL-dBoundRoles-6 S2: the rendered-paths shape over the role index the list names, judged against a
 # stub renderer the guard finds where `resolve_kit_dir` probes, beside the kit copy; its exit is a file.
 GUARD_RENDER = ("guard-render-admitted", "guard-render-drift", "guard-render-unstaged", "guard-render-deleted",
@@ -2953,6 +2961,160 @@ def run_guard_case(name):
                                     absent=absent: rc == want and all(n in o for n in present)
                                     and not any(n in o for n in absent), cwd=repo))
             run_fixture_git(repo, "reset", "-q", "--hard")
+    finally:
+        remove_repo(repo)
+    return print_checks(name, checks)
+
+
+def run_guard_run_policy(name):
+    """The GUARD_RUN_POLICY cases (TOOL-dBoundRoles-95): `guard.py --staged` over build_guard_repo on the live
+    run's branch `run/t`, the tracking ref at a landed policy file that sets no `policy-file.guard`, each
+    scenario over a reset of both. `guard-run-policy` stages a change of the policy file in each shape, then
+    after a commit of the run moving the key or the catalogue's default, and with no landed revision, exit 1
+    each; `guard-run-policy-open` lands each value that opens the file, exit 0, then the argued raise under
+    `owner-only`, exit 0 by its own line; `guard-run-policy-merge` concludes a conflicted merge with the
+    branch's side, exit 0, then with a third text, exit 1. Each moved default is read back through
+    `policy.py get` first, so the plant is seen to move what the reader prints."""
+    repo, kit = build_guard_repo()
+    env = {**os.environ, "GOV_REMOTE": "", "GOV_DEFAULT_BRANCH": ""}
+    guard = [sys.executable, str(kit / "guard.py"), "--staged"]
+    tracking, run_rel = f"refs/remotes/{FIXTURE_REMOTE}/main", "memory/builds/tRun/RUN.md"
+    driver_rel = "vendor/gov/run/unattended.sh"
+    opened = '\n[policy-file]\nguard = "{}"\n'
+    admitted = f"policy-guard: admitted · {POLICY_REL} · the run-branch of {run_rel}, phase BUILDING"
+    leaves = f"leaves {POLICY_REL} to the owner, who commits it from a terminal"
+    held = f"policy-guard: no run admits it · {run_rel}, phase BUILDING, names this branch, and policy-file.guard "
+    # A landed file `validate` passes: GUARD_POLICY's cap names no census row, so it reads by its last valid one.
+    valid, unset = f"[runtime]\n{FLIGHT}", f"(not set in {POLICY_REL} at "
+    closed = [f"refused · {POLICY_REL} · ", f"{held}= owner-only {leaves}", "committed from a terminal."]
+    checks = []
+
+    def write_record(branch):
+        Path(repo, run_rel).parent.mkdir(parents=True, exist_ok=True)
+        Path(repo, run_rel).write_text(f"## Run facts\nphase: BUILDING\nrun-branch: {branch}\n", encoding="utf-8", newline="\n")
+        run_fixture_git(repo, "add", "--", run_rel)
+        run_fixture_git(repo, "commit", "-q", "-m", f"the run-state record names {branch}")
+
+    def write_landed(text):
+        run_fixture_git(repo, "checkout", "-q", "--detach", tracking)
+        write_policy(repo, text)
+        run_fixture_git(repo, "commit", "-q", "-am", "a landed policy file")
+        run_fixture_git(repo, "update-ref", tracking, "HEAD")
+        run_fixture_git(repo, "checkout", "-q", "run/t")
+
+    def write_staged(text=GUARD_POLICY.replace(FLIGHT, "agents-in-flight = 6\n")):
+        write_policy(repo, text)
+        run_fixture_git(repo, "add", "--", POLICY_REL)
+
+    def write_commit(text=None):
+        if text is not None:
+            write_policy(repo, text)
+        run_fixture_git(repo, "commit", "-q", "-am", "the run's own commit")
+
+    def write_moved_default():
+        write_edit(kit / policy.CATALOGUE, lambda t: t.replace('"agents-within-mandate"]\ndefault = "owner-only"',
+                                                               '"agents-within-mandate"]\ndefault = "agents-within-mandate"'))
+        write_commit()
+
+    def add_get(scenario, value):
+        checks.append(check_get(f"{scenario}, the reader", repo, ["policy-file.guard"],
+                                lambda rc, o, e: rc == 0 and o == f"{value}\n", env=env, kit=kit))
+
+    def add_judged(scenario, want, needles):
+        checks.append(check_run(scenario, "guard.py --staged", guard, lambda rc, o, e: rc == want
+                                and all(n in o for n in needles), cwd=repo, env=env))
+
+    def run_reset():
+        run_fixture_git(repo, "reset", "-q", "--hard", base)
+        run_fixture_git(repo, "clean", "-qfd", "--", POLICY_FILE[0])
+        run_fixture_git(repo, "update-ref", tracking, landed)
+
+    try:
+        run_fixture_git(repo, "checkout", "-q", "-b", "run/t")
+        write_landed(valid)
+        landed = run_fixture_git(repo, "rev-parse", tracking)
+        Path(repo, driver_rel).parent.mkdir(parents=True, exist_ok=True)
+        Path(repo, driver_rel).write_text('PHASES_TERMINAL="LANDED ABORTED"\n', encoding="utf-8", newline="\n")
+        run_fixture_git(repo, "add", "--", driver_rel)
+        write_record("refs/heads/run/t")
+        base = run_fixture_git(repo, "rev-parse", "HEAD")
+        if name == "guard-run-policy":
+            write_staged()
+            add_judged("the policy file alone", 1, [*closed, unset])
+            run_reset()
+            write_record("run/t")
+            write_staged()
+            add_judged("run-branch with no refs/heads/", 1, closed)
+            run_reset()
+            write_staged()
+            Path(repo, DEPLOY_REL).write_text('deployer = "planted"\n', encoding="utf-8", newline="\n")
+            run_fixture_git(repo, "add", "--", DEPLOY_REL)
+            add_judged("beside the answers", 1, [*closed, f"refused · {DEPLOY_REL} · ", f"apart from {POLICY_REL}"])
+            run_reset()
+            run_fixture_git(repo, "rm", "-q", "--", POLICY_REL)
+            add_judged("deleted", 1, closed)
+            run_reset()
+            blob = run_fixture_git(repo, "rev-parse", f"HEAD:{POLICY_REL}")
+            run_fixture_git(repo, "update-index", "--cacheinfo", f"120000,{blob},{POLICY_REL}")
+            add_judged("retyped", 1, closed)
+            run_reset()
+            run_fixture_git(repo, "mv", POLICY_REL, f"{POLICY_FILE[0]}/moved.toml")
+            add_judged("renamed away", 1, closed)
+            run_reset()
+            run_fixture_git(repo, "rm", "-q", "--", POLICY_REL)
+            write_commit()
+            write_staged()
+            add_judged("added", 1, [*closed, "added, not a cap raised"])
+            for value in ("agents-with-reason", "agents-within-mandate"):
+                run_reset()
+                write_staged(valid + opened.format(value))
+                add_judged(f"{value} in the same commit", 1, closed)
+                run_reset()
+                write_commit(valid + opened.format(value))
+                write_staged(valid.replace("= 4", "= 6") + opened.format(value))
+                add_judged(f"{value} after a commit of the run", 1, closed)
+            run_reset()
+            write_moved_default()
+            add_get("the default moved", "agents-within-mandate")
+            write_staged()
+            add_judged("the default moved", 1, [*closed, unset])
+            run_reset()
+            write_landed(valid + opened.format("nobody"))
+            write_moved_default()
+            add_get("the default moved, the landed file invalid", "agents-within-mandate")
+            write_staged()
+            add_judged("the default moved, the landed file invalid", 1, [*closed, "is invalid"])
+            run_reset()
+            run_fixture_git(repo, "update-ref", "-d", tracking)
+            write_staged()
+            add_judged("no landed revision", 1, [f"refused · {POLICY_REL} · ", f"{held}does not read, so it {leaves}", tracking])
+        if name == "guard-run-policy-open":
+            for value in ("agents-with-reason", "agents-within-mandate"):
+                write_landed(valid + opened.format(value))
+                write_staged()
+                add_judged(value, 0, [admitted])
+                run_reset()
+            for rel, edit in (RAISED, ROW):
+                write_edit(Path(repo, rel), edit)
+                run_fixture_git(repo, "add", "--", rel)
+            add_judged("the argued raise", 0, [f'policy-guard: admitted · budgets."{BIG_FILE}" 100 -> 120'])
+        if name == "guard-run-policy-merge":
+            run_fixture_git(repo, "checkout", "-q", "-b", "side")
+            write_commit(GUARD_POLICY.replace(SMALL, '"small.md" = 60\n'))
+            run_fixture_git(repo, "checkout", "-q", "run/t")
+            write_commit(GUARD_POLICY.replace(SMALL, '"small.md" = 55\n'))
+            try:
+                run_fixture_git(repo, "merge", "-q", "side")
+            except subprocess.CalledProcessError:
+                pass  # the conflict is the point; MERGE_HEAD says whether it happened
+            merging = bool((policy.run_git(repo, "rev-parse", "-q", "--verify", "MERGE_HEAD") or "").strip())
+            checks.append(("merge", "a conflicted merge of side is in progress", merging,
+                           "MERGE_HEAD " + ("resolves" if merging else "does not resolve")))
+            run_fixture_git(repo, "checkout", "--theirs", "--", POLICY_REL)
+            run_fixture_git(repo, "add", "--", POLICY_REL)
+            add_judged("merge, the branch's side", 0, [])
+            write_staged(GUARD_POLICY.replace(SMALL, '"small.md" = 70\n'))
+            add_judged("merge, a third text", 1, closed)
     finally:
         remove_repo(repo)
     return print_checks(name, checks)
@@ -5781,6 +5943,7 @@ CASES = [
     ("mirror-landed-parity", None, run_mirror_landed_parity),
     *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR, *GUARD_INPUTS, *GUARD_RUN,
                                           *GUARD_RENDER]),  # outcome cases: guard.py --staged
+    *((g, None, run_guard_run_policy) for g in GUARD_RUN_POLICY),  # a live run's own write of the policy file
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
     ("legacy-homes-main-dropped", None, run_legacy_main_dropped),  # the base is the merge-base, not the tip
     ("legacy-homes-present", None, run_legacy_present),  # gov's registry registers the list at its home, and no kit holds it

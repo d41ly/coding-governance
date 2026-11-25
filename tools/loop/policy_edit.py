@@ -12,8 +12,10 @@ an integer and `off` a string.
 against the map row and the four members, and `policy-file.proof` through the guard's
 `check_expansion_value` first. It writes when the proof holds: standard error an interactive terminal,
 then the typed confirmation `yes` on standard input; or the branch a live run's branch, as the minimal
-guard's `check_run_mandate` reads it at HEAD, which asks no confirmation. Otherwise it prints the
-proposal and exits 1, writing nothing. The terminal proof stops forgetting, not evasion: a pty wrapper
+guard's `check_run_mandate` reads it at HEAD, while `policy-file.guard`, as landed, is
+`agents-with-reason` or `agents-within-mandate`, which asks no confirmation (TOOL-dBoundRoles-95).
+Otherwise, a live run's branch under `owner-only` included, it prints the proposal and exits 1, writing
+nothing. The terminal proof stops forgetting, not evasion: a pty wrapper
 giving an agent a terminal passes it, the threat the owner accepted (SA-1).
 
 `raise` is the agent's door for one measured-file cap and needs no proof, only the four conditions the
@@ -307,7 +309,7 @@ def run_set(top, args):
         if sys.stdin.readline().strip() != CONFIRM:
             return ["%s: not confirmed · nothing written" % SAY], 1
     else:
-        admission, whys = plan["mguard"].check_run_mandate()
+        admission, whys = plan["mguard"].check_run_mandate([plan["rel"]])
         if admission is None:
             return proposal + ["%s: not proven · standard error is no terminal and %s · nothing written · %s" % (
                 SAY, "; ".join(whys), TERMINAL_ROUTE)], 1
