@@ -23,8 +23,8 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 3d6c1702afb6c2e86638785950d80657a187192c · park · 310 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 4d3b2f17264627d8068dd11809fbe38d58753d97
-phase: VERIFYING
+witness: 7350603584eee24c8f5b73e7a32cff6d5005e435
+phase: SPECCING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
@@ -661,3 +661,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T23:11:59Z hold · item host-owner-action · reason until owner · reaped efe49660 · resume none(owner)
 
 2026-11-24T23:18:04Z resume · item dBoundRoles · reason held · keepalive aa062219 · manual
+
+2026-11-25T09:18:41Z rescope · item add TOOL-dBoundRoles-95 · reason the owner's 'Close it before landing' on TOOL-dBoundRoles-23 F6: the policy guard admits no live run's own write of the policy file under owner-only
