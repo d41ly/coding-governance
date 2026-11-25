@@ -111,13 +111,15 @@ the deploy and instructions edits on a branch `run/t` whose committed run-state 
 decide: `guard-run-live` exits 0 in either `run-branch` spelling, `guard-run-terminal` exits 1 on
 `LANDED`, `ABORTED` and a removed driver, and `guard-run-other-branch` exits 1 on a branch no record
 at HEAD names, a record only staged, and a detached HEAD; none stages the policy file. The policy file's
-own three on that branch (TOOL-dBoundRoles-95), a tracking ref naming the landed file: `guard-run-policy`
+own four on that branch (TOOL-dBoundRoles-95), a tracking ref naming the landed file: `guard-run-policy`
 exits 1 on the file alone under either `run-branch` spelling, beside `.governance/deploy.toml`, deleted,
 retyped, renamed away and added, with `policy-file.guard` switched in the commit or in an earlier one of
-the run, with the catalogue's default moved by the run over a valid and an invalid landed file, and with no
-landed revision; `guard-run-policy-open` exits 0 under each value that opens the file and, under
+the run, with the catalogue's default moved by the run over a valid and an invalid landed file, with the cap
+census and then a catalogue row moved by the run so that a landed `owner-only` reads invalid over an older
+opened revision (TOOL-dBoundRoles-96), and with no landed revision; `guard-run-policy-open` exits 0 under each value that opens the file and, under
 `owner-only`, on the argued raise; `guard-run-policy-merge` exits 0 on a merge taking the branch's side and 1
-on a third text. The rendered-paths shape's six
+on a third text; `guard-run-policy-reader` (TOOL-dBoundRoles-96) exits 1 on each output of a stub reader that
+is no answer, and reads no value from a reader that does not start. The rendered-paths shape's six
 (TOOL-dBoundRoles-6 S2) commit a `.claude/roles.json` the list names and stage one change of it, the
 renderer a stub beside the kit copy exiting as its `rc` file says: `guard-render-admitted` exits 0 on a
 stub exiting 0; `guard-render-drift` exits 1 naming the stub's drift line; `guard-render-unstaged` exits
@@ -244,6 +246,7 @@ import sys
 import tempfile
 import time
 import tomllib
+import unittest.mock
 from collections import namedtuple
 from pathlib import Path
 
@@ -2707,7 +2710,8 @@ GUARD_FILES = ("guard.py", "guarded-paths.txt", *READER_FILES)  # the reader: th
 GUARD_MIRROR = ("guard-mirror-render", "guard-mirror-beside-catalogue", "guard-mirror-branch-green")
 GUARD_INPUTS = ("guard-mirror-beside-conf", "guard-mirror-inputs-join")  # TOOL-dGroundRules-25 S19, S21
 GUARD_RUN = ("guard-run-live", "guard-run-terminal", "guard-run-other-branch")  # PLAY-dOrderedCharter-84
-GUARD_RUN_POLICY = ("guard-run-policy", "guard-run-policy-open", "guard-run-policy-merge")  # TOOL-dBoundRoles-95
+GUARD_RUN_POLICY = ("guard-run-policy", "guard-run-policy-open", "guard-run-policy-merge",  # TOOL-dBoundRoles-95
+                    "guard-run-policy-reader")  # TOOL-dBoundRoles-96
 # TOOL-dBoundRoles-6 S2: the rendered-paths shape over the role index the list names, judged against a
 # stub renderer the guard finds where `resolve_kit_dir` probes, beside the kit copy; its exit is a file.
 GUARD_RENDER = ("guard-render-admitted", "guard-render-drift", "guard-render-unstaged", "guard-render-deleted",
@@ -2970,11 +2974,13 @@ def run_guard_run_policy(name):
     """The GUARD_RUN_POLICY cases (TOOL-dBoundRoles-95): `guard.py --staged` over build_guard_repo on the live
     run's branch `run/t`, the tracking ref at a landed policy file that sets no `policy-file.guard`, each
     scenario over a reset of both. `guard-run-policy` stages a change of the policy file in each shape, then
-    after a commit of the run moving the key or the catalogue's default, and with no landed revision, exit 1
-    each; `guard-run-policy-open` lands each value that opens the file, exit 0, then the argued raise under
+    after a commit of the run moving the key, the catalogue's default, the cap census or a catalogue row the
+    landed file sets, and with no landed revision, exit 1 each; `guard-run-policy-open` lands each value that opens the file, exit 0, then the argued raise under
     `owner-only`, exit 0 by its own line; `guard-run-policy-merge` concludes a conflicted merge with the
-    branch's side, exit 0, then with a third text, exit 1. Each moved default is read back through
-    `policy.py get` first, so the plant is seen to move what the reader prints."""
+    branch's side, exit 0, then with a third text, exit 1; `guard-run-policy-reader` (TOOL-dBoundRoles-96)
+    overwrites the kit copy's `policy.py` with a stub printing each output that is no answer, exit 1 each, then
+    reads the key under an interpreter that does not start. Each moved default, census and row is read back
+    through `policy.py get` first, so the plant is seen to move what the reader prints."""
     repo, kit = build_guard_repo()
     env = {**os.environ, "GOV_REMOTE": "", "GOV_DEFAULT_BRANCH": ""}
     guard = [sys.executable, str(kit / "guard.py"), "--staged"]
@@ -3016,9 +3022,11 @@ def run_guard_run_policy(name):
                                                                '"agents-within-mandate"]\ndefault = "agents-within-mandate"'))
         write_commit()
 
-    def add_get(scenario, value):
-        checks.append(check_get(f"{scenario}, the reader", repo, ["policy-file.guard"],
-                                lambda rc, o, e: rc == 0 and o == f"{value}\n", env=env, kit=kit))
+    def add_get(scenario, value, source=None):
+        args = ["policy-file.guard", *(["--json"] if source else [])]
+        checks.append(check_get(f"{scenario}, the reader", repo, args, lambda rc, o, e: rc == 0 and (
+            (json.loads(o)["value"], json.loads(o)["source"]) == (value, source) if source else o == f"{value}\n"),
+            env=env, kit=kit))
 
     def add_judged(scenario, want, needles):
         checks.append(check_run(scenario, "guard.py --staged", guard, lambda rc, o, e: rc == want
@@ -3084,6 +3092,24 @@ def run_guard_run_policy(name):
             add_get("the default moved, the landed file invalid", "agents-within-mandate")
             write_staged()
             add_judged("the default moved, the landed file invalid", 1, [*closed, "is invalid"])
+            # TOOL-dBoundRoles-96: a landed owner-only over an older opened revision, made invalid by the run's own
+            # edit of a file that decides validity, so the reader falls back to the opened one.
+            cap = next(c.name for c in budgets.read_cap_census(repo).values() if not c.family)
+            for what, newest, rel, edit, why in (
+                    ("the census moved", f"\n[budgets]\n{json.dumps(cap)} = 100\n", budgets.CENSUS,
+                     lambda t: "[[cap]]\n".join(r for r in t.split("[[cap]]\n") if f'name = "{cap}"\n' not in r),
+                     "names no row of the cap census"),
+                    ("the catalogue row moved", "\n[review]\nmax-rounds = 4\n", policy.CATALOGUE,
+                     lambda t: t.replace('name = "review.max-rounds"\n', 'name = "review.max-planted"\n'), "is invalid")):
+                run_reset()
+                write_landed(valid + opened.format("agents-within-mandate"))
+                write_landed(valid + opened.format("owner-only") + newest)
+                add_get(f"before {what}", "owner-only", "file")
+                write_edit(kit / rel, edit)
+                write_commit()
+                add_get(what, "agents-within-mandate", "last-valid")
+                write_staged()
+                add_judged(what, 1, [*closed, "is invalid", why])
             run_reset()
             run_fixture_git(repo, "update-ref", "-d", tracking)
             write_staged()
@@ -3115,6 +3141,25 @@ def run_guard_run_policy(name):
             add_judged("merge, the branch's side", 0, [])
             write_staged(GUARD_POLICY.replace(SMALL, '"small.md" = 70\n'))
             add_judged("merge, a third text", 1, closed)
+        if name == "guard-run-policy-reader":
+            answer = {"value": "agents-within-mandate", "source": "file", "reason": "planted"}
+            for said in ("no json", "[]", "{}", *(json.dumps({**answer, **wrong}) for wrong in (
+                    {"value": [answer["value"]]}, {"source": 1}, {"reason": 1}))):
+                (kit / "policy.py").write_text(f"print({said!r})\n", encoding="utf-8", newline="\n")
+                write_staged()
+                add_judged(f"the reader prints {said}", 1, [f"refused · {POLICY_REL} · ",
+                                                            f"{held}does not read, so it {leaves}"])
+                run_reset()
+            spec = importlib.util.spec_from_file_location("planted_guard", kit / "guard.py")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            try:
+                with unittest.mock.patch.object(sys, "executable", str(kit / "no-such-python")):
+                    answered = module.read_guard_value("policy-file.guard")
+            except OSError as exc:
+                answered = exc, "uncaught"
+            checks.append(("the reader does not start", "read_guard_value", answered[0] is None
+                           and answered[1].startswith("policy.py did not start: "), repr(answered)))
     finally:
         remove_repo(repo)
     return print_checks(name, checks)

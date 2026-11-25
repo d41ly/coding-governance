@@ -91,7 +91,9 @@ allowed values and every check.
   - `last-valid` (the default): every key reads the newest earlier commit whose file was present and
     valid, the whole file and never one key, with source `last-valid` and a reason naming the
     invalid commit, the line, the problem and the valid commit. With no valid commit before it, the
-    read refuses, naming the line.
+    read refuses, naming the line. One key is excepted: the guard, deciding whether an
+    agent's write of the policy file is admitted, reads `policy-file.guard` as `owner-only` here, never an
+    earlier commit's value.
   - `refuse`: every read refuses, naming the invalid file's line.
 
   A missing file is not invalid: every key reads its default. A key the file does not set reads its
@@ -213,7 +215,12 @@ change it makes is recorded. On 2026-11-25 the owner narrowed that for the polic
 is refused, and you commit it from a terminal. `agents-with-reason` and `agents-within-mandate` open the
 file to a live run. The key is read from the landed revision, so a run opens nothing by switching it on
 its branch, nor by moving its default, since an unset key is `owner-only` here whatever the catalogue
-says. Where no landed revision reads, the run's write is refused too.
+says. Where no landed revision reads, the run's write is refused too. While the landed file reads invalid
+the key is `owner-only` as well, whatever an older revision set and whoever made the file invalid: a run
+that takes out a catalogue or cap census row the file still sets closes the file to itself. The refusal
+names the invalid line and its problem. The way out is the row put back, or the policy file committed by
+you from a terminal. A run under an opened key that retires a capped file commits the policy file's row
+out first and the census row after.
 
 **The door: `policy_edit.py`.** The harness refuses an agent's Edit, Write, MultiEdit or NotebookEdit
 of `.governance/policy.toml`, naming this command; it writes the file, writes the change record and
@@ -350,8 +357,7 @@ with one line saying so, as `policy-file.on-missing-expansion` says.
   file changed in the next, a commit made in another clone, a cherry-pick or a rebase (no pre-commit
   runs), the guard file deleted from the working tree, and a run-state file committed naming the
   agent's own branch with a live phase, which admits every commit after it, all pass it. So do the
-  guard's or the reader's code edited in the working tree, or the catalogue, whose rows decide whether
-  the landed file is valid and so whether an older revision answers; the landed revision moved
+  guard's or the reader's code edited in the working tree; the landed revision moved
   by hand, by `GOV_REMOTE` or `GOV_DEFAULT_BRANCH` in the agent's environment or by `git update-ref` on
   the tracking ref; a merge taking an old parent's file whole, which brings back a value the owner once
   wrote; a level an agent wrote while the key read another value, which stays after the owner sets

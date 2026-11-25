@@ -476,7 +476,9 @@ its directory put first on `sys.path` so its `guard` is never this kit's file of
   the list of guarded paths under every value, the policy file only where the landed `policy-file.guard`
   is `agents-with-reason` or `agents-within-mandate`. Under `owner-only` a live run's own change to the
   policy file is refused but for the raised cap, and the owner commits it from a terminal
-  (TOOL-dBoundRoles-95); the value is the minimal guard's `read_guard_value`, one reading for each step.
+  (TOOL-dBoundRoles-95); the value is the minimal guard's `read_guard_value`, one reading for each step,
+  and a landed file that reads invalid is `owner-only` there, whatever an older revision set
+  (TOOL-dBoundRoles-96).
   The help page's section "Who may change the policy file" is the user's statement.
 - `policy_edit.py`: the policy file's one write path, `set`, `raise` and `propose`, each write through
   the guarded write, the block `guarded_write_py` it carries inline, writing the file and its change

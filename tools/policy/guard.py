@@ -20,9 +20,9 @@ at HEAD whose `phase` there is outside the `PHASES_TERMINAL` set an unattended d
 declares, with no decision row asked; but a touched set holding the policy file only where
 `policy-file.guard` at the landed revision is a `RUN_WRITABLE` value (TOOL-dBoundRoles-95, the owner's
 2026-11-25 answer, which narrows the 2026-11-12 ruling for that file alone). Under `owner-only`, an
-unset key or a reader that does not answer, a live run's own write of it is refused, whole where other
-guarded paths stand beside it. Exit 0 admitted, 1 refused naming every failed condition and why no run
-admits it, 2 when git cannot say what is staged.
+unset key, a landed file that reads invalid or a reader that does not answer, a live run's own write of
+it is refused, whole where other guarded paths stand beside it. Exit 0 admitted, 1 refused naming every
+failed condition and why no run admits it, 2 when git cannot say what is staged.
 
 It reads `policy-file.guard` alone, for the run admission alone, at the landed revision and through
 this kit's `policy.py get` run as a subprocess; `policy-file.proof` it does not read, and it imports no
@@ -36,8 +36,7 @@ pre-commit; this file deleted from the working tree, since the hook resolves the
 run-state file committed naming the agent's own branch with a live phase, which admits the commit
 after it, though never its own, since the guard reads HEAD; and renders staged over a role
 catalogue edited in the working tree and left unstaged, since `--check` reads the working tree; this
-file's or the reader's code edited in the working tree, or the catalogue, whose rows decide whether the
-landed file is valid and so whether an older revision answers; the landed revision moved by hand, by
+file's or the reader's code edited in the working tree; the landed revision moved by hand, by
 `GOV_REMOTE` or `GOV_DEFAULT_BRANCH` in the agent's environment or by `git update-ref` on the tracking
 ref; a merge taking an old parent's blob whole, which brings back a value the owner once wrote; a value
 an agent wrote while the key read another value, which stays after the owner sets `owner-only` again;
@@ -331,11 +330,12 @@ def read_run_fact(text, key):
 def read_guard_value(key):
     """The policy key `key` as an admission reads it (TOOL-dBoundRoles-95) -> (value, why): the value the
     LANDED policy file sets, read once per process by this kit's `policy.py get <key> --json` as a
-    subprocess, so the guard imports no reader. An unset key is `owner-only`, whatever the catalogue's
-    default says, since the reader takes the catalogue from the working tree and a run could move it: so
-    is any source but `file` and `last-valid`, and a reason resting on the catalogue default, as a
-    last valid revision that sets no key does. A reader that refuses, does not start or prints another
-    shape is (None, its first standard error line, or its exit), which admits nothing."""
+    subprocess, so the guard imports no reader. Source `file`, the valid landed text's own leaf, answers
+    that value; every other source is `owner-only` (TOOL-dBoundRoles-96), since the reader takes the
+    catalogue and the cap census from the working tree, where a run could move them: an unset key,
+    whatever its default, and, while the landed file reads invalid, the `last-valid` value of an older
+    revision, the reader's reason naming the invalid line. A reader that refuses, does not start or
+    prints another shape is (None, its first standard error line, or its exit), which admits nothing."""
     argv = [sys.executable, "-B", str(Path(__file__).absolute().parent / "policy.py"), "get", key, "--json"]
     try:
         p = subprocess.run(argv, stdin=subprocess.DEVNULL, capture_output=True, text=True, encoding="utf-8",
@@ -349,7 +349,7 @@ def read_guard_value(key):
         except (ValueError, TypeError, KeyError):
             value = source = reason = None
         if isinstance(value, str) and isinstance(source, str) and isinstance(reason, str):
-            landed = source in ("file", "last-valid") and "the catalogue default" not in reason
+            landed = source == "file"
             return (value if landed else "owner-only"), reason
     err = p.stderr.replace("\r", "").strip().split("\n")[0]
     return None, err or f"policy.py get {key} exited {p.returncode} and printed no value"
