@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-116 — a blob-pinned record read returns a key only where the blob is that record's
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 44
+**Status:** INPROGRESS · rev-2 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 44
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-dTotalRecall-116-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-116-1-builder-return.md) | journal | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-116-build-2-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-116-build-2-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-116-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-116-build-brief.md) | journal | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-116-divergence-fold-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-116-divergence-fold-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -23,9 +26,12 @@ any blob whole, and a superseded record's text passes under another key. This un
 - **S1** — `tools/memory-tree/record_find.py#read_section`, given a blob: a key with no row of the served view and no
   indexed record row at that blob is refused, naming the key. Observed by AC1.
 - **S2** — Given a blob and a known key: the index's record row of the key at that blob, else a row the blob's own text
-  defines, else the file-name key of a path git's history holds that blob at, through the new `check_blob_path`; with
-  none, a FindError naming the key and the blob. The whole-blob fallback goes (§4). Observed by AC2 and AC3.
-- **S3** — The returned `path` is the path the row was read at, never the empty string (§4). Observed by AC1 and AC3.
+  defines, else the file-name key of a path of the served view that git's history holds that blob at, through the new
+  `check_blob_path`; with none, a FindError naming the key and the blob. The whole-blob fallback goes (§4). Observed by
+  AC2 and AC3.
+- **S3** — The returned `path` is the path the row was read at: for a blob the index holds under the key, a path the index
+  holds that blob at, the served view's own first; for any other, the served path its row was extracted at; never
+  the empty string (§4). Observed by AC3 and AC6.
 - **S4** — Three plants of `record_find.py`, `blob-unknown-key`, `blob-foreign-text` and `blob-foreign-record`, each
   expecting exit 2, and their arms in `tools/memory-tree/check-memory-hygiene.test.sh` beside `unheld-blob`, which stays
   green. The module docstring says what an unverified blob is refused for. Observed by AC4.
@@ -37,6 +43,8 @@ any blob whole, and a superseded record's text passes under another key. This un
 - The containment of `#<tag>` in its record, M5, which is `TOOL-dTotalRecall-121`'s.
 - A key whose record left the tree, addressed at an old blob no index row holds: it is refused as unknown. Today's
   fallback answered it with whatever the blob held.
+- A moved record read by its file name at an unindexed blob only its old path held: the history asked is the served
+  view's path alone, so it is refused. A move that kept the bytes is read, its blob indexed at the new path.
 - A change of the address grammar, the supersession read or the budget.
 
 ### Edges
@@ -68,10 +76,12 @@ case asks git where the blob has been.
 sha, text = read_git_blob(root, blob)
 held = con.execute(…).fetchone()                     # the index's record row, as today
 secs = [...]                                         # as today
-path = rows[0]["path"] if rows else ""
+path = next((r["path"] for r in rows if r["blob"] == sha), "")   # S3: where the served view holds this blob
 if held is not None and not path:                    # S3: a blob another tree of this node holds
-    got = con.execute("SELECT path FROM path_row WHERE blob=? ORDER BY path LIMIT 1", (sha,)).fetchone()
-    path = got[0] if got else ""
+    got = [p for (p,) in con.execute("SELECT DISTINCT path FROM path_row WHERE blob=? AND kind='record'", (sha,))]
+    if not got:
+        raise FindError(f"blob {sha} stands at no path the index holds")
+    path = min(got, key=lambda p: (pathlib.PurePosixPath(p).stem != key, p))
 if held is None and not rows:                        # S1
     raise FindError(f"key {key} names no record of the served view, and blob {sha} holds no indexed row of it")
 if held is None:                                     # S2: the index does not hold the blob under this key
@@ -87,10 +97,22 @@ if held is None:                                     # S2: the index does not ho
         raise FindError(f"blob {sha} is no version of {key}")
 ```
 
-`check_blob_path(root, sha, path)` is true where `git log --all --reflog -m -1 --format=%H --find-object=<sha> --
-<path>` prints a commit: the blob stood at that path in some commit this clone holds, an amended one included. It ran
+**The path rule, one rule for every answer.** A key stands in several files as a rule: 1284 of 16160 (DERIVED 2026-11-25, the
+first pass's read of the index). `rows[0]` names the first of them whatever blob was asked, so `TOOL-cSpliceWarden-6` at
+the blob of `memory/DECISIONS.md` and at its `BACKLOG.md`'s came back under its spec's path with the other file's line
+(DERIVED 2026-11-25, `read_section` over HEAD), a path `resolve_edge` and `gov_tag.py show` print as `path:line`. So an indexed
+blob answers with a path that holds it. An unindexed one answers with the served path its row was extracted at, which
+is the key's file today and no claim that the blob stood there: an id key at another record's old blob is admitted
+below, and the archive's old blob of an id that `memory/DECISIONS.md` defines too reads `memory/DECISIONS.md`. The empty `got` is
+not reachable while `tag_index.py#remove_unheld_rows` drops path and blob rows together; it refuses and never
+answers empty.
+
+`check_blob_path(root, sha, path)` is true where `git --literal-pathspecs log --all --reflog -m -1 --format=%H
+--find-object=<sha> -- <path>` prints a commit: the blob stood at that path in some commit this clone holds, an amended one included. It ran
 in about 2 s over this repository's whole history (PINNED 2026-11-25, node d), and only a stem key at an unindexed
-blob reaches it. A refused git is a FindError naming it, never a yes.
+blob reaches it. A refused git is a FindError naming it, never a yes. `--literal-pathspecs` is in the call because the
+path is a file's name and never a pattern: a record name holding `*`, `?` or `[` would otherwise match its neighbours and
+certify a blob only a neighbour held. It is git's own option, so it stands before the verb, as `design_lib.py` spells it.
 
 An id key needs no such read: another record's blob that defines the id is a version of that id's text, which is
 what the address asks for.
@@ -130,7 +152,7 @@ Minted: `check_blob_path` in `record_find.py` (python-function, verb `check`); t
 - observability — the refusal names the key and the blob's full sha.
 - risks — a clone whose reflog has expired refuses an amended-away blob it still holds; the address cannot be
   verified there.
-- testing — AC1 to AC5 by the pass; §7's arms by the main loop.
+- testing — AC1 to AC6 by the pass; §7's arms by the main loop.
 - migration — none: the tree's pinned addresses are read through the same branch, and an address that was right stays.
 - user docs — N/A, no page states the fallback.
 
@@ -154,6 +176,11 @@ Minted: `check_blob_path` in `record_find.py` (python-function, verb `check`); t
   S4), the suite's `FLOOR_ASSERTIONS` stands above its value at `acbb74bb` by the assertions added, and its `shell-role`
   row holds the measured count of `python tools/gate-lint/sh_hygiene.py --shell-role --measure . ':!memory/'`.
   Red when: an arm lands and the floor or the row stands.
+- **AC6** — When a probe over a fixture repository whose `DEC-tFix-1` is defined in `memory/DECISIONS.md` and in an archived
+  decisions file calls `read_section` with the id at each file's own blob, each returned `path` is that file and each
+  `line` is that file's; and once the archived file is edited and committed, the id at its former blob reads the path
+  `memory/DECISIONS.md` and the former text.
+  Red when: the path is `rows[0]`'s whatever blob was asked. Today both blobs return one path.
 
 ## 7. Gates
 
@@ -175,6 +202,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 · the
 ## 9. Revision log
 
 - rev-1 · 2026-11-25 · initial draft, from the closing review's H2.
+- rev-2 · 2026-11-25 · S2 S3 §3 §4 AC6 · the first pass's divergence folded: one path rule, an indexed blob's own path and
+  an unindexed blob's served one, the moved record's refusal, `--literal-pathspecs`; from
+  `2026-11-25-prompt-TOOL-dTotalRecall-116-divergence-fold-brief`.
 
 ## 10. Reuse audit
 
