@@ -663,3 +663,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T23:03:47Z dispatch · item ace443fc TOOL-dTotalRecall-100 · reason memory/builds/dTotalRecall/build memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-100.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-100-1-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md
 
 2026-11-25T00:47:39Z rescope · item add TOOL-dTotalRecall-114 · reason the close's first bar over the reconciled branch is red on 23 legs, most of which no pass leg graded; their repairs are one minors batch, the reds record 2026-11-25-build-TOOL-dTotalRecall-100-close-bar-reds (DERIVED 2026-11-25)
+
+2026-11-25T01:22:04Z brief · item TOOL-dTotalRecall-114 · reason 32f728a8fcbe memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-114-build-brief.md
