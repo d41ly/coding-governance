@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-2 — a build finds an already-named path through a partial index, and reads no parse ledger without a blob
 
-**Status:** SPECCED · rev-4 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 2
+**Status:** INPROGRESS · rev-4 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
