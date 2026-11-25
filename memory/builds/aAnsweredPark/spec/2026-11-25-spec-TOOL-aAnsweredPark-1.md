@@ -281,7 +281,7 @@ and never hand-edited.
   `item.parked.2026-11-24t23-07-22z` and `item.parked.2026-11-24t23-07-28z`. So the build answers
   `awaiting` until each has its record, by the unchanged rung of `derive_answer`.
   Red when: a row of another kind is returned, or a decision with no record is missing.
-  cost: seconds for the function; the whole engine took 51 s there on node a.
+  cost: seconds for the function; the whole engine took 51 s there on node a, PINNED 2026-11-25.
   fixture: a shared clone under `%TEMP%`, removed after. The whole engine of this tree answers
   `invalid-input` over that commit, since its overlay rows are older than this tree's item schema, so
   the function is the observation.

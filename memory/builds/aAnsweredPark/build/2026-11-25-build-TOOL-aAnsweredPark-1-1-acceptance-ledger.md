@@ -21,3 +21,5 @@ line below is a direct CLI call or a `python -c` probe of the changed code.
 
 Every leg section 7 of the spec names, and the RED-first observation of the two arms `parked-decisions` and
 `parked-kinds` on the staged breaks its two arm lines name. Neither was observed in this pass.
+- seen-red — `loop position fixtures` — red `ace7f1eec` — green `ace7f1eec` — `parked-decisions`: the base engine's interrupt loop put back reds `answered` and `one-second` and, its tag unprinted, the other five; settled fixed true reds all but `answered`; the tag compare dropped reds `other-row`; the word test dropped reds `other-word`; the Reason test dropped reds `no-reason`
+- seen-red — `loop position fixtures` — red `ace7f1eec` — green `ace7f1eec` — `parked-kinds`: the base engine's interrupt loop and unconditional hold put back red `no-question` and `hold-resumed`; the hold branch removed reds `hold-live`; the passed test fixed false reds `hold-passed`
