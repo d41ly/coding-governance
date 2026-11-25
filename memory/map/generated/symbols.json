@@ -4570,6 +4570,11 @@
     {
       "id": "build_scratch_dir",
       "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
     {
@@ -31271,6 +31276,11 @@
       "id": "remove_tree",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "remove_tree",

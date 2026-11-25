@@ -14233,7 +14233,7 @@ memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.m
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	478 MB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	54 MB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	83 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	92 specs	1	289db6c05abcd0c77990322eb6199391b9e1ba17	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-25
+memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	99 specs	1	acbb74bb38af4c6b6408cf356ca91fe02d9d3277	widened:2026-11-25-build-TOOL-dTotalRecall-115-widen-27
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-4-spec-writer.md	1 MB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-4-spec-writer.md	30 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-4-spec-writer.md	33 KB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

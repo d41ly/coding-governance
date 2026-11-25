@@ -28,7 +28,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dQuietDisk](builds/dQuietDisk/README.md) | DEFERRED | d | 2026-11-20 | tooling | 52 | 2026-11-23 | active | 0 |
 | [dRankedPlan](builds/dRankedPlan/README.md) | DEFERRED | d | 2026-10-21 | tooling | 83 | 2026-11-05 | active | 0 |
 | [dShippedRelease](builds/dShippedRelease/README.md) | DEFERRED | d | 2026-10-21 | deployer | 145 | 2026-11-12 | active | 0 |
-| [dTotalRecall](builds/dTotalRecall/README.md) | DEFERRED | d | 2026-10-21 | tooling | 114 | 2026-11-25 | active | 0 |
+| [dTotalRecall](builds/dTotalRecall/README.md) | SPECCED | d | 2026-10-21 | tooling | 121 | 2026-11-25 | active | 0 |
 | [dWellOiledMachine](builds/dWellOiledMachine/README.md) | DEFERRED | d | 2026-10-21 | tooling | 134 | 2026-11-23 | active | 0 |
 | [dWitnessedBar](builds/dWitnessedBar/README.md) | DEFERRED | d | 2026-10-21 | tooling | 117 | 2026-11-24 | active | 0 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 | 2026-08-08 | dormant | 1 |
