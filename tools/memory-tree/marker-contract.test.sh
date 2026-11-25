@@ -225,7 +225,7 @@ for r in "r_check $K region" "r_unatt $U region" "r_splice $U splice"; do
 done
 # exactly ONE CR, both sides: awk's `sub(/\r$/,"")` removes one, and the Python predicate must too —
 # `rstrip("\r")` would remove all of them, which is a divergence no fixture on this host can show.
-grep -q 'line\[:-1\] if line.endswith(CR) else line' "$KIT_MT/gen_build_index.py" || {
+grep -q 'line\[:-1\] if line.endswith(CR) else line' "$KIT_MT/tree_lib.py" || {
   echo "FAIL [CR tolerance @source] the Python marker predicate no longer strips exactly one CR"; st=1; }
 # and the behavioural half, for the one reader whose CR handling this host CAN observe
 printf 'head\r\n%s\r\nbody\r\n%s\r\ntail\r\n' "$O" "$C" > "$T/case.md"

@@ -7905,7 +7905,7 @@
     {
       "id": "check_marker_line",
       "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "check_marker_repaired",
@@ -16323,6 +16323,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "extract_outside_records",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "extract_pack",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -22356,6 +22361,11 @@
       "id": "read_blob_at",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_blob_batch",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "read_blob_fact",

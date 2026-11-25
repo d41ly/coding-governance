@@ -1,11 +1,12 @@
 # TOOL-aTemperedLane-1 — the Red-fix lane's L3 reads a spec change confined to the `gen:spec-records` region as no spec edit
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-aTemperedLane-1-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-aTemperedLane-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aTemperedLane-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aTemperedLane-1-brief.md) | research | TOOL-aTemperedLane-2 |
 
 <!-- /gen:spec-records -->

@@ -76,12 +76,22 @@ Every commit carrying the trailer is graded against four limits, and a finding r
 |---|---|
 | `L1 size` | at most 3 product paths and at most 60 lines over them, added plus deleted; a binary path is over |
 | `L2 guarded policy file` | no path the policy kit's `guarded-paths.txt` lists; with no policy kit, no path under `.governance/` |
-| `L3 spec edit` | no path under any build's `spec/` folder |
+| `L3 spec edit` | no path under any build's `spec/` folder, except a change confined to the spec's `gen:spec-records` region, as below |
 | `L4 new surface` | no product path added; a rename counts as a deletion and an addition |
 
 The two figures of `L1` are the constants `RED_FIX_MAX_PATHS` and `RED_FIX_MAX_LINES` of
 `routed_commits.py`, read on 2026-11-12. A fix that needs more than the limits allow is a unit, and
 takes a spec.
+
+The index generator writes one record row into a spec whenever a record is added, so `L3` leaves
+that row alone. A spec's change is no spec edit when all of these hold:
+
+- the commit modifies the spec in place: it is not added, deleted or renamed, and its mode is unchanged;
+- before and after, the spec holds exactly one `gen:spec-records` marker pair, each marker a whole
+  line, the open one first;
+- every byte outside the region is unchanged, the two marker lines included.
+
+Any other generated region, and any other change under `spec/`, is refused as before.
 
 Grade one commit before you push it with
 `python tools/memory-tree/routed_commits.py --red-fix-limits <rev>`. It exits 0 inside the limits, <!-- usage: script:tools/memory-tree/routed_commits.py f60a87d3 -->
@@ -195,6 +205,10 @@ With the key `off` both still print, and both can still red.
   each read as it stands.
 - The limits do not see whether the change is a fix, a new surface made inside an existing file, a
   deleted path, a record outside `spec/`, or a guarded list the fix commit itself shortened.
+- `L3` does not see what a fix commit writes between two unchanged `gen:spec-records` marker lines.
+  The index generator's `--check` grades the region at the graded tip and never per commit, so a
+  hand-written line there that a later commit removes is seen by nothing. Nor does `L3` see where the
+  pair sits: a pair an earlier commit widened widens what a fix commit may write.
 - The join does not check that the record is the fix's direct child, that `Rerun` or `Red line` is
   true, or that the leg was red. Nor whether a merge's resolution changed a file, or whether a
   path-less commit should carry the trailer at all: nothing refuses it at commit time.
