@@ -15164,4 +15164,5 @@ memory/map/features/row-grammar.md	137 rows	1	9e21ac760dc0a43d6ed007396922722cce
 memory/map/features/runlog.md	100,000 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/features/unattended-mandate.md	2 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/generated/CARDS.md	1024 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	72 specs	1	f5b1d8b588bbefaf605c1950c05f783c86872502	widened:2026-11-24-build-TOOL-dBoundRoles-93-widen-18
+memory/builds/dBoundRoles/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	73 specs	1	cd70b7cc1aedc2eb5d420ca0e7fedb6ff2119b00	widened:2026-11-25-build-TOOL-dBoundRoles-95-widen-21
+memory/builds/dBoundRoles/spec/2026-11-25-spec-TOOL-dBoundRoles-95.md	4 calls	1	cd70b7cc1aedc2eb5d420ca0e7fedb6ff2119b00	widened:2026-11-25-build-TOOL-dBoundRoles-95-widen-22

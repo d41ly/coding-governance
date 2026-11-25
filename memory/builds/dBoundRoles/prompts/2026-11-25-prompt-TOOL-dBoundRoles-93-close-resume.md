@@ -66,7 +66,7 @@ green at `origin/main` by a raised pin, and this build adds four offenders, so i
 | `drift-audit records` | one more armed cutoff than `drift-pins.txt`, and `PLAY-dClosedLoop-1` cited by a `purpose-source` of `tools/playbook/namespaces.toml` |
 | `python reads (a name never bound, an import outside its guard)` | five unread parameters |
 | `shell hygiene (a fork spent on builtin work)`, `shell hygiene (a backslashed path handed to bash)`, `portability (shell lines only shrink)` | rows of `spawn-idiom-sites.txt`, `quoting-sites.txt` and `shell-role.txt` |
-| `memory hygiene` | check 15 rows for the moved hook, and check 25 over three live specs of dConvergedCharter, dTotalRecall and dWellOiledMachine that list its old path |
+| `memory hygiene` | the rows of check 15 for the moved hook, and check 25 over three live specs of dConvergedCharter, dTotalRecall and dWellOiledMachine that list its old path |
 | `spec tokens (a spec's own names resolve)` | live specs of aOrientedCast and aScoutedSeam whose legs now include the two suites whose guards TOOL-dBoundRoles-93 widened |
 
 The earlier briefs call the dead-path and lexicon reds inherited. They are not: `origin/main` is clean on both. The
