@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-2 — a build finds an already-named path through a partial index, and reads no parse ledger without a blob
 
-**Status:** SPECCED · rev-2 · 2026-11-25 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -55,7 +55,7 @@ overlay with no blob reads no ledger. No row and no verdict changes.
   Rollout step and named by its stderr line.
 - **hands-off** `TOOL-aPrunedIndex-3` — `path_row_named`, which unit 3's AC5, AC9 and section 4 plans rest
   on.
-- **hands-off** `TOOL-aPrunedIndex-4` — the `named-probe` row, one of the six unit 4's AC8 times.
+- **hands-off** `TOOL-aPrunedIndex-4` — the `named-probe` row, one of the five unit 4's AC8 times.
 - **consumes-from** external — the owner's word in the building session before this code first opens
   the live index.
 
@@ -225,3 +225,6 @@ none
   3), 8 and 11 (`read_step_count` is the counter), 9 (the uncounted first run and the 1.1 bound), 12 (the
   plant's row moves to `tags bundle selftest`), 13 and 17 (the killed build and AC7), 14 (the legs that open
   the live index).
+- rev-3 · 2026-11-26 · §3 · TOOL-aPrunedIndex-3's revision on finding 16 of
+  `2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1` leaves five rows for unit 4's AC8
+  to time.

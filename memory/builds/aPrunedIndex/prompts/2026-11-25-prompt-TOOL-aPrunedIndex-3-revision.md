@@ -2,6 +2,12 @@
 
 **Serves:** research TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-4
 
+## The prompt
+
+> Keep until --gc (Recommended)
+
+The owner's answer in the building session, 2026-11-25, to the question quoted whole under the last heading below.
+
 ## The brief
 
 ### Goal
@@ -15,6 +21,8 @@ in them.
 
 ### Items
 3. A build's sweep deletes only rows that the trees and the dirty rows of gone worktrees it drops held and nothing else holds; `build_overlay` is unchanged in what it deletes; `--gc` keeps the full sweep. [planned TOOL-aPrunedIndex-3]
+
+Also, in units 1, 3 and 4, section 4's files touched name the acceptance ledger, the journal record under `memory/builds/aPrunedIndex/build/` with one line per criterion, where it is not named yet: hygiene check 23 refuses a CLOSED Tier-2 spec without one.
 
 ### Acceptance
 `check`'s output on one index is byte-equal before and after. A plant pads a fixture's index with dead versions and reds on
