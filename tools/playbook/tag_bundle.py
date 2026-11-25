@@ -48,7 +48,7 @@ REGIONS_NOT_INSTALLED = ("not-installed: dTotalRecall's span extractors feed it;
 
 def read_node_spans(con, path) -> list[tuple]:
     """`(first, last)` of every node the index defines in `path`."""
-    rows = con.execute(ti.VIEW_ROWS + f" WHERE p.path=? AND p.kind IN ({','.join('?' * len(ti.DEFINE_KINDS))})",
+    rows = con.execute(ti.POINT_ROWS + f" WHERE p.path=? AND p.kind IN ({','.join('?' * len(ti.DEFINE_KINDS))})",
                        (path, *ti.DEFINE_KINDS)).fetchall()
     return [(line, ti.read_text_of(con, blob, ex, kind, line)[0]) for _t, _p, line, kind, blob, ex in rows]
 
@@ -380,11 +380,12 @@ bundle-mode-values|0|mode values: manifest --inline rc=2, inline bare rc=2, inli
 bundle-unregistered-type|1|type-registered: rc=1, named memory/notes/site.md:1 and relates-to; with part-of=practice.land: rc=0
 bundle-dangling-target|1|target-resolves: rc=1, named memory/notes/site.md:1 and instructs=practice.nosuch; with instructs=practice.land: rc=0
 bundle-empty-sections|0|empty sections: instructions searched-empty, regions not-installed naming its fallback
+dead-versions|0|reads cost their own version's rows
 """
 
 
 def run_selftest() -> int:
-    """The `tags bundle selftest` leg: every bundle plant, each row's exit and line."""
+    """The `tags bundle selftest` leg: every tag plant `SELFTEST_ROWS` names, each row's exit and line."""
     failed, runs = 0, {}
     rows = [r.split("|") for r in SELFTEST_ROWS.splitlines() if r.strip()]
     for plant, rc, want in rows:
@@ -395,15 +396,15 @@ def run_selftest() -> int:
         p = runs[plant]
         out = p.stdout + p.stderr
         if p.returncode == int(rc) and want in out:
-            print(f"arm ok    bundle plant {plant}")
+            print(f"arm ok    tag plant {plant}")
             continue
         failed += 1
-        print(f"arm FAIL  bundle plant {plant} — wanted rc={rc} + {want}, got rc={p.returncode}")
+        print(f"arm FAIL  tag plant {plant} — wanted rc={rc} + {want}, got rc={p.returncode}")
         print("".join(f"      {ln}\n" for ln in out.splitlines()), end="")
     if failed:
-        print(f"FAIL — {failed} of {len(rows)} bundle plant rows failed")
+        print(f"FAIL — {failed} of {len(rows)} tag plant rows failed")
         return 1
-    print(f"PASS — the bundle plants, {len(rows)} rows")
+    print(f"PASS — the tag plants, {len(rows)} rows")
     return 0
 
 

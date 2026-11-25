@@ -321,7 +321,9 @@ not read again (PLAY-dOrderedCharter-44). Each version's rows stand apart (PLAY-
 worktrees whose extractor bytes differ share the file, so `blob_row`, `path_row` and `blob_parsed` carry
 the version, a build never deletes another version's rows, and every read is joined to the reading
 worktree's own `{extractor: version}` map, so a worktree is served only rows its own extractors wrote. A
-tree is fresh under `tree_built(tree, versions)`, `versions` the first 12 hex of the SHA-256 of that map's
+read of the whole view starts from that worktree's versions and reaches `path_row` through the SQL index
+`path_row_version`, so stored versions it does not derive cost it nothing; a read of one tag or one path
+starts from that name's own index (TOOL-aPrunedIndex-1). A tree is fresh under `tree_built(tree, versions)`, `versions` the first 12 hex of the SHA-256 of that map's
 sorted `extractor=version` lines and a `conf=<key>` line. The key is the conf's `MEMORY_ROOT` and `CHARTER`
 hashed, since they decide which path is the charter and which are guides: every `path_row` carries it, every
 read joins the reading worktree's own key, and a conf edit, committed or not, is served its own names

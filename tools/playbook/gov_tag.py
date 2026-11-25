@@ -430,7 +430,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
           "positional-spec-revbump", "positional-bulk-move", "positional-archived", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
-          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows")
+          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "dead-versions")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -729,6 +729,24 @@ def remove_index(root) -> None:
     ti.load_index(root, reset=True).close()
 
 
+def read_step_count(con, read) -> tuple:
+    """(the virtual-machine steps of `read()`, its result), counted on a second run: the progress handler
+    fires while a statement compiles too, and the first run takes that cost (TOOL-aPrunedIndex-1)."""
+    read()
+    steps = 0
+
+    def count():
+        nonlocal steps
+        steps += 1
+        return 0
+    con.set_progress_handler(count, 1)
+    try:
+        result = read()
+    finally:
+        con.set_progress_handler(None, 1)
+    return steps, result
+
+
 def run_plant(root, top, plant, sets) -> int:
     say = lambda *a: print("tags: plant " + plant + " · " + " ".join(map(str, a)))  # noqa: E731
 
@@ -1021,6 +1039,85 @@ def run_plant(root, top, plant, sets) -> int:
         say(f"two parsed {parsed[0]} blobs on the tree one built; served {served[0]} rows of one's version,",
             f"and one serves {served[1]}")
         return 0 if parsed[0] and not served[0] and served[1] else 1
+    # TOOL-aPrunedIndex-1: a whole-view read costs its own version's rows, a tag read its own tag's. What it does
+    # not check: wall time, disk reads, and a planner holding `sqlite_stat` tables
+    if plant == "dead-versions":
+        import contextlib
+        import io
+        tag, row = "layer.memory", "INSERT INTO path_row VALUES (?,?,?,?,?,?,?,?)"
+        write_commit(root, {"memory/guides/ALPHA.md": GUIDE + f"\nsee `{tag}`\n"}, "cite a declared tag")
+
+        def read_building(act):  # -> (what `act` returns, its stderr's building lines)
+            buf = io.StringIO()
+            with contextlib.redirect_stderr(buf):
+                out = act()
+            return out, [ln for ln in buf.getvalue().splitlines() if ln.startswith("tag-index — building:")]
+        _parsed, first = read_building(lambda: run_verb(root, "rebuild", None, sets=sets))
+        ctx = ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml")
+        con = ti.load_index(root)
+        try:
+            ti.load_view(con, root, ctx)
+            reads = {
+                "read_defined": lambda: ti.read_defined(con),
+                "definitions": lambda: ti.read_rows(con, ti.DEFINE_KINDS),
+                "like": lambda: ti.read_rows(con, ti.DEFINE_KINDS, like="layer.%"),
+                "namespace state": lambda: {ns: n for ns, n in ti.derive_namespace_state(con, ctx).items() if n},
+                "span population": lambda: ti.read_population(con, ctx, namespaces=["layer"])[0],
+            }
+            before = {name: read_step_count(con, read) for name, read in reads.items()}
+            con.execute("DROP INDEX IF EXISTS path_row_version")
+            bare = read_step_count(con, reads["read_defined"])[0]
+            con.executescript(ti.SCHEMA)
+            con.execute("BEGIN IMMEDIATE")  # the dead pad: every stored row under 40 versions nothing derives
+            own = con.execute("SELECT * FROM path_row").fetchall()
+            con.executemany(row, [(p, b, ex, f"dead{n}-{v}", *rest) for n in range(40) for p, b, ex, v, *rest in own])
+            padded = con.execute("SELECT COUNT(*) FROM path_row").fetchone()[0]
+            con.execute("COMMIT")
+            say(f"path rows: {len(own)} before the dead pad, {padded} after")
+            ok = bool(own) and padded == 41 * len(own)
+            after = {name: read_step_count(con, read) for name, read in reads.items()}
+            for name, (steps, got) in before.items():
+                held = bool(got) and after[name][1] == got and after[name][0] <= 2 * steps
+                ok = ok and held
+                say(f"{name}: {steps} steps before, {after[name][0]} after;", "held" if held else "FAILED")
+            con.execute("DROP INDEX IF EXISTS path_row_version")
+            scan = read_step_count(con, reads["read_defined"])[0]
+            held = scan > 2 * bare and scan > 2 * after["read_defined"][0]
+            ok = ok and held
+            say(f"read_defined with no version index: {bare} steps before the dead pad, {scan} after;",
+                "held" if held else "FAILED")
+            con.close()
+            con, reopened = read_building(lambda: ti.load_index(root))
+            back = con.execute("SELECT 1 FROM sqlite_master WHERE type='index' AND name='path_row_version'").fetchone()
+            rows = con.execute("SELECT COUNT(*) FROM path_row").fetchone()[0]
+            stamp = con.execute("PRAGMA user_version").fetchone()[0]
+            held = bool(back) and rows == padded and stamp == ti.INDEX_SCHEMA
+            ok = ok and held
+            say(f"reopened: the version index {'back' if back else 'MISSING'}, {rows} path rows, stamp {stamp};",
+                "held" if held else "FAILED")
+            con.close()
+            con, again = read_building(lambda: ti.load_index(root))
+            held = [len(first), len(reopened), len(again)] == [0, 1, 0] and "path_row_version" in reopened[0]
+            ok = ok and held
+            say(f"building lines: {len(first)} at the first build, {len(reopened)} at the reopen,",
+                f"{len(again)} on the complete file;", "held" if held else "FAILED")
+            ti.load_view(con, root, ctx)
+            steps, got = read_step_count(con, lambda: ti.read_rows(con, ("tag",), tag=tag))
+            _tag, path, line, kind, blob, ex = got[0]
+            con.execute("BEGIN IMMEDIATE")  # last, since these rows alone would carry `scan` past twice `bare`
+            con.executemany(row, [(path, blob, ex, ctx["versions"][ex], ctx["conf"], f"layer.pad-{n}", kind, line)
+                                  for n in range(500)])
+            con.execute("COMMIT")
+            more, same = read_step_count(con, lambda: ti.read_rows(con, ("tag",), tag=tag))
+            held = same == got and more <= 2 * steps
+            ok = ok and held
+            say(f"one tag: {steps} steps before 500 rows of its own version, {more} after;",
+                "held" if held else "FAILED")
+        finally:
+            con.close()
+        if ok:
+            say("reads cost their own version's rows")
+        return 0 if ok else 1
     # PLAY-dOrderedCharter-70's four: a TOML row placed on its own line, a staged rename, and a conf edit
     if plant == "toml-row":
         rows = [r[:4] for r in ti.derive_tag_rows(TOML_ROWS, "practice")]

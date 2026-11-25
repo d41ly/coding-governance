@@ -48,6 +48,10 @@ rebuilt in place, never deleted, so a session reading it keeps it, printing
 delete it. Deleting the file costs one rebuild. Two worktrees whose
 extractor code differs keep their rows side by side in the one file, and each is served only the rows
 its own extractor code wrote, so switching between them re-parses nothing.
+An open that finds an SQL index missing from the file builds it once, under the write lock, printing
+`tag-index — building: <names>, once, under the write lock`: seconds on a small file, some minutes on a
+large one. `python tools/playbook/gov_tag.py where doc.build-method`, run by hand before the first merge
+bar, builds it outside any gate's time limit.
 When two commands write the index at once, the second queues behind the first for up to 600 seconds,
 longer than a full build, and reuses a tree the first built while it waited instead of building it
 again; past that wait it exits 2 saying the index is locked.

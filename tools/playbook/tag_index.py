@@ -29,9 +29,12 @@ EACH VERSION'S ROWS STAND APART (PLAY-dOrderedCharter-51). Every worktree shares
 can carry different extractor bytes, so a build never deletes a row of another version: the rows of two
 versions of one extractor over one blob sit side by side. A worktree's `{extractor: version}` map is its
 own, and every read is joined to it through the temp table `view_version`, so a worktree is served only
-rows its own extractor bytes wrote. A tree is fresh under `tree_built(tree, versions)`, `versions` the
-digest of that map and of the conf key (`derive_versions_digest`). `gov_tag.py --gc` collects the versions
-and conf keys no live worktree derives; a plain build collects none.
+rows its own extractor bytes wrote. A read of the whole view starts from that table and reaches `path_row`
+through the SQL index `path_row_version`, so it visits the reading worktree's rows alone, however many
+versions are stored; a read of one tag or one path starts from its own index (TOOL-aPrunedIndex-1). A tree is
+fresh under `tree_built(tree, versions)`, `versions` the digest of that map and of the conf key
+(`derive_versions_digest`). `gov_tag.py --gc` collects the versions and conf keys no live worktree derives; a
+plain build collects none.
 
 THE CONF KEYS WHAT A PATH NAMES (PLAY-dOrderedCharter-70 S8). `MEMORY_ROOT` and `CHARTER` decide which
 path is `doc.charter` and which are guides, so `derive_conf_key` folds both into `path_row`'s `conf`, into
@@ -105,6 +108,7 @@ CREATE TABLE IF NOT EXISTS path_row(path TEXT, blob TEXT, extractor TEXT, versio
                                     conf TEXT NOT NULL, tag TEXT, kind TEXT, line INTEGER);
 CREATE INDEX IF NOT EXISTS path_row_key ON path_row(path, blob);
 CREATE INDEX IF NOT EXISTS path_row_tag ON path_row(tag);
+CREATE INDEX IF NOT EXISTS path_row_version ON path_row(extractor, version);
 CREATE TABLE IF NOT EXISTS dirty_path(worktree TEXT, path TEXT, blob TEXT, PRIMARY KEY(worktree, path));
 CREATE TABLE IF NOT EXISTS tree_built(tree TEXT NOT NULL, versions TEXT NOT NULL, built_at TEXT NOT NULL,
                                       PRIMARY KEY(tree, versions));
@@ -640,8 +644,9 @@ def load_index(root, reset=False) -> sqlite3.Connection:
     file, and SQLite's lock serialises the writers. A file holding tables under a `user_version` other than
     INDEX_SCHEMA, or any file under `reset`, has every table dropped and created again in place inside one
     `BEGIN IMMEDIATE` transaction, never unlinked, so a reader holding the file keeps it (S16); a stale
-    stamp prints one line saying so. The connection runs in autocommit, and every write block takes the write
-    lock first with `BEGIN IMMEDIATE` (TOOL-aQueuedIndex-1)."""
+    stamp prints one line saying so, and so does a file holding `path_row` that lacks an SQL index SCHEMA
+    creates, which this open builds (TOOL-aPrunedIndex-1 S7). The connection runs in autocommit, and every
+    write block takes the write lock first with `BEGIN IMMEDIATE` (TOOL-aQueuedIndex-1)."""
     db = derive_index_path(root)
     db.parent.mkdir(parents=True, exist_ok=True)
     try:
@@ -665,6 +670,10 @@ def load_index(root, reset=False) -> sqlite3.Connection:
                 raise
             if old != INDEX_SCHEMA:
                 print(f"tag-index — rebuilt: schema {old} to {INDEX_SCHEMA}", file=sys.stderr)
+        stored = {name for (name,) in con.execute("SELECT name FROM sqlite_master")}
+        missing = [name for name in re.findall(r"CREATE INDEX IF NOT EXISTS (\w+)", SCHEMA) if name not in stored]
+        if "path_row" in stored and missing:
+            print(f"tag-index — building: {', '.join(missing)}, once, under the write lock", file=sys.stderr)
         con.executescript(SCHEMA)
         con.execute(f"PRAGMA user_version = {INDEX_SCHEMA}")
     except (sqlite3.Error, OSError) as exc:
@@ -957,16 +966,23 @@ def load_view(con, root, ctx, tree=None, overlay=True) -> dict:
 
 
 #: the path rows a worktree is served: its view's paths, at its own extractor versions (PLAY-dOrderedCharter-51 S3)
-#: and under its own conf key (PLAY-dOrderedCharter-70 S8)
-VIEW_JOIN = ("FROM path_row p JOIN view_path v ON p.path=v.path AND p.blob=v.blob "
-             "JOIN view_version w ON p.extractor=w.extractor AND p.version=w.version "
+#: and under its own conf key (PLAY-dOrderedCharter-70 S8). The CROSS JOIN fixes the order: the reading worktree's
+#: versions first, then `path_row` through `path_row_version`, never a scan of every version (TOOL-aPrunedIndex-1)
+VIEW_JOIN = ("FROM view_version w CROSS JOIN path_row p ON p.extractor=w.extractor AND p.version=w.version "
+             "JOIN view_path v ON p.path=v.path AND p.blob=v.blob "
              "JOIN view_conf c ON p.conf=c.conf")
-VIEW_ROWS = "SELECT p.tag, p.path, p.line, p.kind, p.blob, p.extractor " + VIEW_JOIN
+#: the same rows for a read that names one tag or one path, which SQLite serves from that name's own index
+POINT_JOIN = ("FROM path_row p JOIN view_path v ON p.path=v.path AND p.blob=v.blob "
+              "JOIN view_version w ON p.extractor=w.extractor AND p.version=w.version "
+              "JOIN view_conf c ON p.conf=c.conf")
+_VIEW_COLUMNS = "SELECT p.tag, p.path, p.line, p.kind, p.blob, p.extractor "
+VIEW_ROWS = _VIEW_COLUMNS + VIEW_JOIN
+POINT_ROWS = _VIEW_COLUMNS + POINT_JOIN
 
 
 def read_rows(con, kinds, tag=None, like=None):
     """The served view's path rows of `kinds`, optionally of one tag or a LIKE pattern."""
-    q = VIEW_ROWS + f" WHERE p.kind IN ({','.join('?' * len(kinds))})"
+    q = (VIEW_ROWS if tag is None else POINT_ROWS) + f" WHERE p.kind IN ({','.join('?' * len(kinds))})"
     args = list(kinds)
     if tag is not None:
         q += " AND p.tag=?"
@@ -1050,7 +1066,8 @@ def read_view_file_names(con) -> set:
 
 
 def read_defined(con) -> set:
-    return {t for (t,) in con.execute(f"SELECT DISTINCT p.tag {VIEW_JOIN} "
+    # the set drops repeats: a SQL DISTINCT would answer in tag order, through every version's rows
+    return {t for (t,) in con.execute(f"SELECT p.tag {VIEW_JOIN} "
                                       "WHERE p.kind IN ('doc','section','tag','retired')")}
 
 

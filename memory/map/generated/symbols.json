@@ -27508,6 +27508,11 @@
       "file": "tools/loop/composition.py"
     },
     {
+      "id": "read_step_count",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "read_step_spawn_sites",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"

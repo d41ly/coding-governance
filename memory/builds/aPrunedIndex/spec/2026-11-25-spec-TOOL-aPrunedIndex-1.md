@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-1 — a read of the served rows starts from the reading worktree's own extractor versions
 
-**Status:** INPROGRESS · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-25-build-TOOL-aPrunedIndex-1-chain-rounds.md](../build/2026-11-25-build-TOOL-aPrunedIndex-1-chain-rounds.md) | journal | — |
 | [2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md](../build/2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md) | research | TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 |
+| [2026-11-26-build-TOOL-aPrunedIndex-1-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-aPrunedIndex-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md) | research | TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 |
 | [2026-11-25-prompt-TOOL-aPrunedIndex-3-revision.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-3-revision.md) | research | TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-4 |
 | [2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md](../reviews/2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 |
