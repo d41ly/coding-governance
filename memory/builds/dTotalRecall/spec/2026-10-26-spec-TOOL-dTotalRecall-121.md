@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-121 — the closing review's minors: the record door's names and stage, sessionless claims, hyphenated slugs, section containment, unrun plants, the floor and the map replay's byte term
 
-**Status:** INPROGRESS · rev-2 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 49
+**Status:** INPROGRESS · rev-3 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 49
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,8 +8,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-dTotalRecall-121-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-121-1-builder-return.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md) | journal | TOOL-dTotalRecall-120 |
+| [2026-11-25-prompt-TOOL-dTotalRecall-121-build-2-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-121-build-2-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-121-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-121-build-brief.md) | journal | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-121-divergence-fold-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-121-divergence-fold-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -40,16 +43,19 @@ already built: two guides that misstate the feed check `TOOL-dTotalRecall-115` c
 - **S8** — M8, finding 15. The suite runs the three census plants, and a join there reds where a `PLANTS` member of
   `build_records.py`, `record_causes.py`, `record_find.py` or `shape_run.py` is on no live line of the suite (§4 "The
   join"). Observed by AC8.
-- **S9** — M9, finding 16. `FLOOR_ASSERTIONS` of the suite is pinned to the count a whole run prints, skips carried by
-  `n_skip`, with its comment line. Observed by AC9.
+- **S9** — M9, finding 16. The pass raises `FLOOR_ASSERTIONS` of the suite by the arms it adds, counted by reading, as units 116
+  to 120 did. The pin to the count a whole run prints, skips carried by `n_skip`, with its comment line, is the close's,
+  after the last suite edit (§4 "S9 — the floor"). Observed by AC9.
 - **S10** — M10, finding 20, the class-level fix. `tools/workflows/replay_scorer.py` decides the first act by a closed
   reading of each call, prints `term bytes: unarmed` where every run reads zero, and `derive_map_verdict` refuses `win`
   there (§4 "The byte term"). Observed by AC10.
 - **S11** — L1, finding 18. `tools/playbook/adopt-playbook.sh` runs `cardinality-refused`, and `prose-pass`, which the join
   finds unrun too, and gains S8's join over `edge_grammar.py`'s plants (§4 "The join"). Observed by AC11.
-- **S12** — The `shell-role` rows of `gov-claim.sh`, `adopt-playbook.sh` and the suite take the measured count through
-  `ratchet.py widen`, unit `TOOL-dTotalRecall-121`, each read at the pass, since `TOOL-dTotalRecall-120` moves the
-  suite's after this revision. A row whose measure did not move is left. Observed by AC12.
+- **S12** — The `shell-role` rows of `adopt-playbook.sh` and the suite, and `gov-claim.sh`'s where its measure moved, are widened
+  through `ratchet.py widen`, unit `TOOL-dTotalRecall-121`, and each row's count is then set by hand to the measure, since the
+  verb raises a held key by one; a `Decided:` trailer names the rows so set, as `TOOL-dTotalRecall-116`'s commit does. The
+  suite's row stands at 3752 under a measure of 3756 at `1ea35c769` (DERIVED 2026-11-25, the row and its measure), four lines
+  `TOOL-dTotalRecall-120` left unraised, which this unit's count takes. Observed by AC12.
 - **S13** — The `--feed` entry of `tools/unattended/VERBS.template.md` and section 7 of `tools/unattended/STOPS.template.md` say what
   `check_feed` walks and names for record events since `TOOL-dTotalRecall-115` (§4 "The feed sentences"), and
   `memory/guides/UNATTENDED-VERBS.md` and `memory/guides/UNATTENDED-STOPS.md` are installed from them by `bash
@@ -150,13 +156,17 @@ written by `build_records.write_record` from its line's parsed fields, then edit
 | Plant | Edit | Check |
 |---|---|---|
 | `equal` | none | exit 0, `green` |
-| `malformed` | a required field's line deleted | exit 1, the record and the field |
+| `malformed` | a required field's line given twice | exit 1, the record and the field |
 | `cause-none` | `Caused-by` names no review | exit 1, the record |
 | `cause-two` | a second build holds a review of that stem | exit 1, both paths |
 | `review-no-line` | the review's line deleted | exit 1, `gives no parsed line` |
 | `review-refused-line` | the review's line misspelled | exit 1, `gives no parsed line` |
 | `field-differs` | one field's value moved | exit 1, the record, the field and both values |
 | `field-absent` | the record lacks an optional field its line carries | exit 1, the field and `absent` |
+
+The twice-given line is the one edit the malformed branch alone reds: a deleted field also reds the field compare, or for
+`Caused-by` the cause branch, so that plant exited 1 with its own branch cut, where this one prints `Round is given
+twice` and exits 0 with it cut (DERIVED 2026-11-25, a probe over both).
 
 Each prints `check_shape_runs`' lines, then `shape-run: fixture <plant> · exit <n>`, and exits with that code. The fixture
 environment and removal are `deviation_join.py`'s. A host with no git prints `SKIP`, which the suite counts in `n_skip`.
@@ -175,9 +185,11 @@ its PASS line and exits 0 (DERIVED, the same).
 
 ### S9 — the floor
 
-`TOOL-dTotalRecall-116` and `-119` raised it by reading, `-117` added no assertion, and `-120` raises it after this revision; it
-stands at 837 (DERIVED 2026-11-25, the suite at `20e9bd298`) and is read again at the pass. After the last suite edit the main loop runs the
-suite whole once and hands the printed count; the pass sets the floor to it and its comment names the commit, the node
+`TOOL-dTotalRecall-116`, `-119` and `-120` raised it by reading, `-117` added no assertion, and it stands at 842 (DERIVED 2026-11-25, the
+suite at `1ea35c769`). The pass raises it by its own arms, thirty-seven over the draft, to 879 (DERIVED 2026-11-25, counted by
+reading), with a raise comment in the form of those units' and `OWED: observed at the close`. No pass can do more: the
+last suite edit is this pass's own, and the commit that makes it closes the spec. At the close the main loop runs the
+suite whole once, sets the floor to the printed count and `n_skip` together, and writes the comment naming the commit, the node
 and `n_skip`, in the form of the suite's `TOOL-aHastenedSweep-7` line.
 
 ### The byte term
@@ -188,22 +200,36 @@ and `n_skip`, in the form of the suite's `TOOL-aHastenedSweep-7` line.
 READ_PROGRAMS = SEARCH_PROGRAMS | {"cat", "head", "tail", "sed", "wc", "cd", "echo"}
 GIT_READS = GIT_SEARCHES | {"diff", "show", "log", "blame", "status", "cat-file", "rev-parse"}
 NON_ACTING_TOOLS = frozenset({"ToolSearch"})
-DUP_REDIRECT = re.compile(r"[0-9]*>&[0-9-]")           # `2>&1`: the segment reader would split on its `&`
-FILE_REDIRECT = re.compile(r"[0-9]*>{1,2}(.*)", re.S)  # a word opening a redirect, its target the rest or the next word
+SAFE_REDIRECT = re.compile(r"[0-9]*>&[0-9-]|[0-9&*]*>>?[ \t]*(?:/dev/null|\$null)(?![\w./-])")   # `2>&1` and the null device
+QUOTED_SPAN = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"|\\.", re.S)   # what a shell takes whole, so its `>` is text
 ```
 
 `derive_segment_program(ex, words)` is the program walk `measure_call_searches` holds today, moved out and called by
 both, answering the program and, for git, its subcommand. `check_read_call(ex, name, tool_input)` is True for a runlog
-`read` tool, a search tool or a `NON_ACTING_TOOLS` member, and for a shell call whose segments, after `DUP_REDIRECT` is
-cut from the command, each run a `READ_PROGRAMS` program or a `GIT_READS` subcommand, hold no file redirect but one to
-`/dev/null` or `$null`, and, for `sed`, no word matching `-[A-Za-z]*i` or `--in-place`. `measure_bytes_before_act` breaks
-at the first call it answers False for.
+`read` tool, a search tool or a `NON_ACTING_TOOLS` member, and for a shell call that redirects to no file and whose every
+segment runs a `READ_PROGRAMS` program or a `GIT_READS` subcommand, `sed` with no word matching `-[A-Za-z]*i` or
+`--in-place`. `measure_bytes_before_act` breaks at the first call it answers False for.
+
+```python
+bare = SAFE_REDIRECT.sub(" ", ex._remove_heredocs(command))
+if ">" in QUOTED_SPAN.sub("q", bare):                      # a redirect to a file, wherever it stands in its word
+    return False
+segments = [words for words, _sep in ex.extract_segments(bare) if words]
+```
+
+**The redirect is read off the command, not off its words.** A pattern over words saw only a word that opens a redirect,
+so `echo x>f`, `cat a b>out` and `ls *> f` read as reads, and it could not tell `grep '>' f` from a write, since
+`extract_segments` gives a quoted word bare. One read of the command with quoted spans and heredoc bodies out catches a
+redirect glued behind its word, admits a quoted `>` and admits `&>/dev/null`, and it is one line shorter than the
+word walk. Over sixteen reads and fifteen acts, each form this section names among them, it answered every one right
+(DERIVED 2026-11-25, a probe over the patched scorer), so no read listed here is refused.
 
 `measure_map_experiment` adds `figures["armed"]`, False where every run of both arms read zero; then the bytes line reads
 `term bytes: unarmed · every lens run read 0 before its first act`, and `derive_map_verdict` returns
 `("unarmed", ["bytes"])` in place of `win`, so the last line is `verdict unarmed bytes`. A set that loses a term still
-loses. Not read, each said in the docstring: a quoted word that opens with `>`, read as a redirect; `sed`'s `w` command; a
-`find -exec`; and a call nested in `bash -c`.
+loses. Not read, each said in the docstring: a `>` in an unquoted comment or an unquoted comparison, read as a redirect; a
+quoted null device, read as a file; a quote a comment leaves open, and PowerShell's own quoting, whose spans may pair
+wrongly; `sed`'s `w` command; a `find -exec`; and a call nested in `bash -c`.
 
 ### The feed sentences
 
@@ -260,7 +286,7 @@ prefix now enters the key as itself where it entered as nothing, and equals no r
 
 Minted: `FIELD_KEY`, `check_field_keys` and `add_to_index` in `build_records.py`; `PLANTS`, `build_fixture` and `run_fixture`
 in `shape_run.py`; `FIXTURE_PLANTS` in `edge_grammar.py`; `READ_PROGRAMS`, `GIT_READS`, `NON_ACTING_TOOLS`,
-`DUP_REDIRECT`, `FILE_REDIRECT`, `derive_segment_program` and `check_read_call` in `replay_scorer.py`; plant names. Every
+`SAFE_REDIRECT`, `QUOTED_SPAN`, `derive_segment_program` and `check_read_call` in `replay_scorer.py`; plant names. Every
 function is a python-function cell with the verb its name opens.
 
 ### Files touched (estimate)
@@ -344,16 +370,20 @@ function is a python-function cell with the verb its name opens.
   `unmarked-writer`, each prints its PASS line, and the suite's join, run as its inline text over a scratch copy with one
   of the three arms cut, names that plant.
   Red when: the join reads a comment line, or a member passes unnamed.
-- **AC9** — When the suite's last raise comment is read, it names the count, the commit, the node and `n_skip` of one whole
-  run, and `FLOOR_ASSERTIONS` equals that count and `n_skip` together.
-  Red when: the floor stands under the observed count.
-  permission: the whole run is the main loop's, which hands the printed line in a brief.
-  figure: PINNED at that run.
+- **AC9** — When `grep -n 'by TOOL-dTotalRecall-121' tools/memory-tree/check-memory-hygiene.test.sh` runs after the pass, it prints one raise
+  line whose lower figure is the floor the pass found and whose upper is `FLOOR_ASSERTIONS`, the difference the assertions the
+  pass's diff adds, skips included, counted by reading. That is the pass's half. At the close, the suite's last raise comment names
+  the count, the commit, the node and `n_skip` of one whole run, and `FLOOR_ASSERTIONS` equals that count and `n_skip` together.
+  Red when: the floor stands while arms land, or at the close it stands under the observed count.
+  permission: the close's half is the main loop's, and the pass's ledger records it owed there.
+  figure: the pass's is DERIVED by reading, the close's PINNED at its run.
 - **AC10** — When a probe writes a transcript of `git diff a..b` (its result 500 bytes, PINNED), `sed -n 1,5p a.py | head`, a `ToolSearch`, the
   map-transcript's two searches, a `Read`, then `sed -i s/a/b/ a.py` and a `Read`, `measure_bytes_before_act` sums every
-  result before the `sed -i` (500 PINNED in the probe); and `derive_map_verdict` over the boundary figures answers
+  result before the `sed -i` (500 PINNED in the probe); the same transcript with the pipe replaced by `sed -n 1,5p a.py>b.py` sums the
+  first result alone; `check_read_call` answers False for `echo x>f`, `cat a b>out` and `ls *> f`, and True for `grep -rn 'a->b' src`,
+  `cat a &>/dev/null` and `git diff a..b 2>&1`; and `derive_map_verdict` over the boundary figures answers
   `("win", [])` armed and `("unarmed", ["bytes"])` with `armed` False.
-  Red when: the shell `git diff` is the act. Today the measure reads zero.
+  Red when: the shell `git diff` is the act, a glued redirect is a read, or a quoted `>` is an act. Today the measure reads zero.
 - **AC11** — When `python tools/playbook/edge_grammar.py --fixture --plant cardinality-refused` and `--plant prose-pass` run,
   each exits 0 with its line, `grep -cE '^(cardinality-refused|prose-pass)[|]' tools/playbook/adopt-playbook.sh` prints 2
   (DERIVED, S11), and the join over a scratch copy with one row cut names that plant.
@@ -383,13 +413,13 @@ function is a python-function cell with the verb its name opens.
 S13 and S15 are prose, which no arm reads past the pair compares of the legs above. S14's arm stands: the `record causes` leg is
 red on today's line, and the `door-header` cases red a key that loses a field.
 
-New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC3 · the `door-header` literal over the name, duplicate and index-lock cases, and `ask-door`'s index-lock case, red on today's door · none
-New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 · three claim arms beside the lease block (both absent, holder named and caller absent, holder absent and caller named), red on today's compare · `FLOOR_ASSERTIONS`, the three carried by `n_skip` with that block
-New arm: tools/memory-tree/gen_build_index.py · covers AC4 · `test_slug_claims` runs the hyphenated slug through both verbs over a remote whose policy reads `in-slug`, red on today's pre-check · none
-New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 AC7 · the `section-outside` plant and the shape-run plants, red on today's pick and on each branch cut · `FLOOR_ASSERTIONS`
-New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC6 AC8 AC9 · the selftest call, the three census plants and the join, red on an arm cut · `FLOOR_ASSERTIONS`, pinned to the observed count
-New arm: tools/workflows/replay_scorer.py · covers AC10 · `map-transcript` opens with the `git diff`, the `sed -n` pipe and the `ToolSearch` and acts on the `sed -i`, and `map-verdict` adds the unarmed set, red on today's loop · none, the declared arm count stands
-New arm: tools/playbook/adopt-playbook.sh · covers AC11 · the two rows and the join, red on a row cut · none
+New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC3 · the `door-header` literal over the name, duplicate and index-lock cases, and `ask-door`'s over its index-lock case · red on today's door, which writes the forged name and the doubled one and prints `wrote` over a failed stage · none, literals of standing assertions
+New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 · three claim arms beside the lease block: both absent, and holder absent with caller named, each red on today's compare; holder named with caller absent, green today, red on the rejected fix of finding 3 staged, an absent caller admitted · `FLOOR_ASSERTIONS`, the three carried by `n_skip` with that block
+New arm: tools/memory-tree/gen_build_index.py · covers AC4 · `test_slug_claims` runs the hyphenated slug through both verbs over a remote whose policy reads `in-slug` · red on today's pre-check, which refuses the dash · none
+New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 AC7 · the `section-outside` plant, red on today's pick; each red shape-run plant, red on its own branch cut from `check_shape_runs`, and `equal`, red on a compare staged to red an equal field · `FLOOR_ASSERTIONS`
+New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC6 AC8 · the selftest call, red on a name added to `PLANTS` and to no table; the three census plants, red on `read_open_literals` staged to answer one file-wide cause; the join, red on any one of the three arms cut · `FLOOR_ASSERTIONS`
+New arm: tools/workflows/replay_scorer.py · covers AC10 · `map-transcript` opens with the `git diff`, the `sed -n` pipe and the `ToolSearch` and acts on the `sed -i`, red on today's loop, its glued redirect red on a word-opening pattern staged; `map-verdict`'s unarmed set, red on today's verdict, and its losing unarmed set, red on the unarmed answer moved ahead of the lost terms · none, the declared arm count stands
+New arm: tools/playbook/adopt-playbook.sh · covers AC11 · `cardinality-refused`, red on the `cardinality: refused` line cut from `edge_grammar.py`; `prose-pass`, red on `read_trailer_edges` staged to refuse a prose value; the join, red on either row cut · none
 
 ## 8. Open questions
 
@@ -414,6 +444,12 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC11 · the two rows and the
 - rev-2 · 2026-11-25 · S12 S13 S14 S15 §1 §3 §4 §5 §7 AC13 AC14 AC15 · two leftovers of built units taken, the feed guides and the
   Serves reader; the README claim corrected and the floor and shell-role counts read at the pass; from
   `2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief`.
+- rev-3 · 2026-11-25 · S9 S12 §4 §7 AC9 AC10 · the first pass's five points folded: the `malformed` edit, the floor by reading with its
+  pin at the close, a break per arm, the redirect read off the command, the shell-role counts set by hand. The pass's
+  `u121/draft.patch` stands as it is but for the `malformed` tuple of `shape_run.py#build_fixture`, the two redirect constants,
+  the loop and docstring of `check_read_call`, and a glued-redirect case in `map-transcript`; what it never held, the floor, the
+  widens, the installed guides, the map and the ledger, is the next pass's; from
+  `2026-11-25-prompt-TOOL-dTotalRecall-121-divergence-fold-brief`.
 
 ## 10. Reuse audit
 

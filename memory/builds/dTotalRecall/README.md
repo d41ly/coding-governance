@@ -200,10 +200,10 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113 TOOL-dTotalRecall-114 TOOL-dTota
 | [TOOL-dTotalRecall-118 — the memory re-measure counts a search of the whole root, and its suite runs its plants again](spec/2026-10-26-spec-TOOL-dTotalRecall-118.md) | 46 | 2 | CLOSED | rev-1 | 2026-11-25 |
 | [TOOL-dTotalRecall-119 — the orphan walk reads the claim refs a clone really holds](spec/2026-10-26-spec-TOOL-dTotalRecall-119.md) | 47 | 2 | CLOSED | rev-1 | 2026-11-25 |
 | [TOOL-dTotalRecall-120 — the causes leg grades everything once its legacy population is drained](spec/2026-10-26-spec-TOOL-dTotalRecall-120.md) | 48 | 2 | CLOSED | rev-2 | 2026-11-25 |
-| [TOOL-dTotalRecall-121 — the closing review's minors: the record door's names and stage, sessionless claims, hyphenated slugs, section containment, unrun plants, the floor and the map replay's byte term](spec/2026-10-26-spec-TOOL-dTotalRecall-121.md) | 49 | 2 | INPROGRESS | rev-2 | 2026-11-25 |
+| [TOOL-dTotalRecall-121 — the closing review's minors: the record door's names and stage, sessionless claims, hyphenated slugs, section containment, unrun plants, the floor and the map replay's byte term](spec/2026-10-26-spec-TOOL-dTotalRecall-121.md) | 49 | 2 | INPROGRESS | rev-3 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 953 bound to this build, across 4 record folder(s).
+Records: 956 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -322,13 +322,13 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-25-prompt-TOOL-dTotalRecall-121-build-brief.md`, `2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md` and 425 more under prompts/ |
+| briefs | `2026-11-25-prompt-TOOL-dTotalRecall-121-divergence-fold-brief.md`, `2026-11-25-prompt-TOOL-dTotalRecall-121-build-brief.md` and 427 more under prompts/ |
 | reviews | `2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES) and 8 more under reviews/ |
 | deviation | `2026-11-25-build-TOOL-dTotalRecall-119-deviation-1017.md`, `2026-11-25-build-TOOL-dTotalRecall-117-deviation-1016.md` and 152 more under build/ |
 | red-fix | `2026-11-24-build-TOOL-dTotalRecall-60-red-fix-26.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md` and 24 more under build/ |
 | widen | `2026-11-25-build-TOOL-dTotalRecall-120-widen-31.md`, `2026-11-25-build-TOOL-dTotalRecall-119-widen-30.md` and 28 more under build/ |
 | research | `2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md`, `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md` and 112 more under build/ |
-| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-120-2-builder-return.md` and 190 more under build/ |
+| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-121-1-builder-return.md` and 191 more under build/ |
 | open asks | `BACKLOG.md`, 16 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->
