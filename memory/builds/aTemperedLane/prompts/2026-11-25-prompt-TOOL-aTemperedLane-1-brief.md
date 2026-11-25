@@ -68,6 +68,9 @@ guarded list as it stood at the commit's first parent.
 - A kit version bump: the lander's mint moves it.
 
 ### Limitations
+- The owner took the L2 rule with one gap named, and every statement of the rule (spec, docstring,
+  help page, kit README row) states it: a path unlisted in one commit, fixed in the next and
+  relisted later passes.
 - Work only in this worktree; never write to `branch/unattended-dboundroles-62c3df`.
 - `routed_commits.py` runs no repository code from a graded commit and stays stdlib and git.
 - The predicate is not widened to admit a commit that is refused for another reason.
@@ -92,6 +95,12 @@ four limits; TOOL-dGroundRules-6 reads the list at HEAD, which is the parent at 
 > A: L2 reads the guarded list as it stood at the commit's first parent; working-tree list where the
 > parent has none. What A stops checking: a path the list gained after the commit, or in it.
 — agent, 2026-11-25, the option the owner chose
+
+> Owner's answer on which L2 rule lands: "A, list at parent (Recommended)". As I put it to the owner:
+> "Grade each commit by the guarded list as it stood at its first parent. No agent-file exemption.
+> Gap: a path unlisted in one commit, fixed in the next and relisted later would pass." The owner
+> took it with that gap named; state the gap where the rule is stated.
+— agent, 2026-11-25, the starting session
 
 ## Owner confirmation
 

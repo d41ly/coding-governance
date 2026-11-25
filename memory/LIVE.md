@@ -15,7 +15,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | 9 | 2026-11-22 | active | 0 |
 | [aOrientedCast](builds/aOrientedCast/README.md) | OPEN | a | 2026-10-11 | tooling+kickoff+playbook | 33 | 2026-11-10 | active | 0 |
 | [aShelvedLeg](builds/aShelvedLeg/README.md) | DEFERRED | a | 2026-11-10 | tooling | 3 | 2026-11-11 | active | 0 |
-| [aTemperedLane](builds/aTemperedLane/README.md) | OPEN | a | 2026-11-25 | tooling | 2 | 2026-11-25 | active | 0 |
+| [aTemperedLane](builds/aTemperedLane/README.md) | SPECCED | a | 2026-11-25 | tooling | 2 | 2026-11-25 | active | 0 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 | 2026-11-22 | active | 0 |
 | [dBoundRoles](builds/dBoundRoles/README.md) | DEFERRED | d | 2026-10-21 | tooling | 76 | 2026-11-21 | active | 0 |
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | DEFERRED | d | 2026-10-21 | tooling | 56 | 2026-11-04 | active | 0 |

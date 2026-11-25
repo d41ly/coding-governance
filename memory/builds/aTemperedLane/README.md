@@ -4,7 +4,6 @@ node: a
 opened: 2026-11-25
 streams: tooling
 roster: TOOL
-status: OPEN
 ids: TOOL-aTemperedLane-1 TOOL-aTemperedLane-2
 ---
 
@@ -49,25 +48,31 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-11-25 · streams tooling
+**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-11-25 · streams tooling
 ids TOOL-aTemperedLane-1 TOOL-aTemperedLane-2
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aTemperedLane-1 — the Red-fix lane's L3 reads a spec change confined to the `gen:spec-records` region as no spec edit](spec/2026-11-25-spec-TOOL-aTemperedLane-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-25 |
+| [TOOL-aTemperedLane-2 — limit L2 reads the guarded list at the commit's first parent](spec/2026-11-25-spec-TOOL-aTemperedLane-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aTemperedLane-1 TOOL-aTemperedLane-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aTemperedLane-1` | no |
+| 2 | `TOOL-aTemperedLane-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
