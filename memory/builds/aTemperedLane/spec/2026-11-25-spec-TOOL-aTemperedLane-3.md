@@ -1,6 +1,6 @@
 # TOOL-aTemperedLane-3 — the closing review's three mediums and two lows: one false claim corrected and pinned, four coverage gaps given arms
 
-**Status:** SPECCED · rev-1 · 2026-11-25 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 3
+**Status:** INPROGRESS · rev-1 · 2026-11-25 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
