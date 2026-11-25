@@ -1,12 +1,14 @@
 # TOOL-dTotalRecall-119 — the orphan walk reads the claim refs a clone really holds
 
-**Status:** SPECCED · rev-1 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 47
+**Status:** INPROGRESS · rev-1 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 47
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-11-25-prompt-TOOL-dTotalRecall-119-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-119-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
