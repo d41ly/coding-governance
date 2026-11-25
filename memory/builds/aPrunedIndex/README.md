@@ -6,7 +6,6 @@ streams: tooling
 roster: TOOL
 ids: TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4
 spec-audit: 2026-11-25
-status: OPEN
 ---
 
 # aPrunedIndex — the tag check costs what its own worktree's rows cost
@@ -54,25 +53,35 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-11-25 · streams tooling
+**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-11-25 · streams tooling
 ids TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aPrunedIndex-1 — a read of the served rows starts from the reading worktree's own extractor versions](spec/2026-11-25-spec-TOOL-aPrunedIndex-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-25 |
+| [TOOL-aPrunedIndex-2 — a build finds an already-named path through a partial index, and reads no parse ledger without a blob](spec/2026-11-25-spec-TOOL-aPrunedIndex-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-11-25 |
+| [TOOL-aPrunedIndex-3 — a build's and an overlay's sweep touch only the rows that the trees and edits they let go of held](spec/2026-11-25-spec-TOOL-aPrunedIndex-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-25 |
+| [TOOL-aPrunedIndex-4 — `--gc` skips a worktree that predates the tag registry, and still refuses one it cannot read](spec/2026-11-25-spec-TOOL-aPrunedIndex-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aPrunedIndex-1` | no |
+| 2 | `TOOL-aPrunedIndex-2` | no |
+| 3 | `TOOL-aPrunedIndex-3` | no |
+| 4 | `TOOL-aPrunedIndex-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
