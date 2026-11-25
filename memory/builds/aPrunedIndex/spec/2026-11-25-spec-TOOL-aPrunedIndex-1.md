@@ -123,7 +123,7 @@ times and plans below were read on 2026-11-25 with SQLite 3.53.4, warm. They are
 
 `tools/playbook/edge_grammar.py#read_tag_rows` makes one tag read per edge target that is a tag. This tree
 holds 430 such targets (PINNED, 2026-11-25, counted through `read_tree_edges`). One join for every read
-would add about 70 s to that leg, whose ceiling is 180 s. `POINT_JOIN` is today's text, and its plan is
+would add about 70 s to that leg, whose ceiling is 180 s. `POINT_JOIN` is today's text, and its plan is (PINNED, 2026-11-25)
 unchanged on the copy that holds the index. A LIKE read is no point read, because `path_row_tag` cannot
 serve it.
 
@@ -157,21 +157,21 @@ names it.
    the bare count, which proves the dead rows reach the read, and twice the count of step 2, which proves
    the index is what hides them. It closes the connection and opens the file through `load_index`. The
    index must be back, the `path_row` count unchanged and the stamp `INDEX_SCHEMA`.
-4. It fills the view again and counts one tag read. It writes 500 rows of the reading version at a path of
+4. It fills the view again and counts one tag read. It writes 500 rows of the reading version at a path of (PINNED, 2026-11-25)
    the view under other tags, and counts again. The second count must be at most twice the first and the
    tag's row the same.
 
 Step 4 comes last because its rows alone would carry step 3's count past twice the first. Around those steps
 the plant reads stderr three times: at the `rebuild` that first creates the fixture's file, at step 3's
 reopen after the drop, and at one more `load_index` of the file step 3 left complete. The three carry 0, 1
-and 0 lines opening `tag-index — building:`, and the one names `path_row_version`.
+and 0 lines opening `tag-index — building:`, and the one names `path_row_version`. (PINNED, 2026-11-25)
 
 It prints one line per count, one for the three stderr reads, and a last line ending
 `reads cost their own version's rows` only when every condition holds. It exits 0 then, and 1 otherwise.
 
 The counts of a prototype run in this sequence on the `none` fixture, 16 path rows before the pad, are
 PINNED from 2026-11-25 with SQLite 3.53.4. Each cell is the count before the pad, then after it. The bare
-column is `read_defined` with the index dropped. The plant took 8 to 22 s on a machine running other bars.
+column is `read_defined` with the index dropped. The plant took 8 to 22 s on a machine running other bars. (PINNED, 2026-11-25)
 
 | Code | `read_defined` | definitions | LIKE | namespace state | bare | one tag, own pad |
 |---|---|---|---|---|---|---|
@@ -199,7 +199,7 @@ as before it, so AC6 greps it.
 
 `tools/playbook/tag_index.py#load_index` runs `SCHEMA` at every open and each statement is
 `IF NOT EXISTS`, so the first open after landing builds the index in place. The diagnosis measured this
-index and unit 2's together at about 205 s under the write lock and 1 GB, on the 12.6 GB copy. A second
+index and unit 2's together at about 205 s under the write lock and 1 GB, on the 12.6 GB copy. A second (PINNED, 2026-11-25)
 opener waits. Two openers of one 3,000,000-row file without the index both returned with it, the second
 after 3.9 s (PINNED, 2026-11-25). `BUSY_TIMEOUT` is 600 s. The rebuild of a stale stamp splits `SCHEMA` on
 `;`, and the statement holds none. An older worktree's `--rebuild` drops the index with its table, and the
@@ -228,7 +228,7 @@ extractor versions, as any first command after such an edit does. `--rebuild` is
 drops every table. On the building node the go section 3 states comes first, and until then the building
 worktree runs nothing that section 3 lists. A node that skips the step still converges: a leg that reaches
 its ceiling loses one index build and the next opener starts it again. The legs section 3 lists have
-ceilings from 180 s to 420 s.
+ceilings from 180 s to 420 s. (PINNED, 2026-11-25)
 
 ### Files touched (estimate)
 
@@ -246,14 +246,14 @@ ceilings from 180 s to 420 s.
 ### Alternatives rejected
 
 - An index on `(extractor, version, tag)`, which would serve the tag read as well. It loses the row order
-  inside a version, and the whole-view read of the definitions took 1.622 s against 0.163 s on a copy of
+  inside a version, and the whole-view read of the definitions took 1.622 s against 0.163 s on a copy of (PINNED, 2026-11-25)
   the same rows, warm. A cold disk makes those lookups dearer still.
 - `INDEXED BY path_row_version` in place of the order. The plan is the same, and a reader whose index an
   older worktree's `--rebuild` dropped would refuse instead of reading slowly.
 - One join for every read, for the table above.
 - The plant's row in the tag resolver's plant table of `tools/playbook/adopt-playbook.sh`. The leg that runs
-  it, `playbook render selftest`, has a 300 s ceiling, and the review's nine timed plants, at a mean of 4.5
-  s, put its 95 rows at about 430 s. `tags bundle selftest` has the same ceiling, one reading of 22 s alone,
+  it, `playbook render selftest`, has a 300 s ceiling, and the review's nine timed plants, at a mean of 4.5 (PINNED, 2026-11-25)
+  s, put its 95 rows at about 430 s. `tags bundle selftest` has the same ceiling, one reading of 22 s alone, (PINNED, 2026-11-25)
   and one run per plant however many rows read it. It is an exempt leg of `tools/govkit/registry.toml`, and
   `playbook render selftest` is a leg the kit ships, so this build's plants run on gov's bar alone. An
   adopter holds the plants and runs one by hand through `gov_tag.py --fixture --plant`.
@@ -266,7 +266,7 @@ ceilings from 180 s to 420 s.
 - security: N/A — no new input, grant or write path. The index file stays derived and uncommitted.
 - perf / scale: a whole-view read costs the view's rows. A write to `path_row` maintains one more index.
 - error / empty / loading states: an empty view returns nothing, as today. A first open that cannot take
-  the lock within 600 s, or whose disk fills, raises the `cannot be opened` refusal that exists. On a full
+  the lock within 600 s, or whose disk fills, raises the `cannot be opened` refusal that exists. On a full (PINNED, 2026-11-25)
   disk every row stands and a finished index is kept, as section 4's Migration says.
 - observability: S7's line on stderr when an open builds an index. No line of `check` moves.
 - risks: the first open holds the write lock for minutes on a large file, and a leg that meets it can reach
@@ -301,7 +301,7 @@ ceilings from 180 s to 420 s.
   Red when: a join serves a row more or less, a tie changes a printed line, or the unit's CPU seconds are
   not below BASE's in each pair.
   cost: about 4 GB of scratch disk and, from the diagnosis, some 10 minutes.
-  fixture: a padded copy of the clean 270 MB copy the building session's scratch holds, made for this
+  fixture: a padded copy of the clean 270 MB copy the building session's scratch holds, made for this (PINNED, 2026-11-25)
   criterion. Each source is loaded under the worktree's own `tag_index.py` path with
   `derive_index_path` answering the copy, so both derive one version and read one set of rows.
   figure: DERIVED at observation time.

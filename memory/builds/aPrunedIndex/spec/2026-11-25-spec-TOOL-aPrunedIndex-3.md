@@ -18,7 +18,7 @@
 ## 1. Goal
 
 Every build of an unbuilt tree ends by scanning the whole of `path_row`, `blob_row` and `blob_parsed`
-for rows nothing holds. On the 12.6 GB copy two such sweeps took 537 s of one check, and the rows they
+for rows nothing holds. On the 12.6 GB copy two such sweeps took 537 s of one check, and the rows they (PINNED, 2026-11-25)
 scan are mostly those of dead extractor versions (PINNED, the diagnosis, 2026-11-25). After this unit a
 build looks only at the rows that the trees and the gone worktrees' edits it lets go of held. An overlay
 clears none of those three tables, as today. The rows only a replaced edit held wait for `--gc`, which
@@ -98,7 +98,7 @@ over `tools/` found no other. `build_overlay` replaces its worktree's dirty rows
 (`tools/playbook/tag_index.py@4b10fce5d:875-876`) and sweeps nothing.
 
 Today's `tools/playbook/tag_index.py#build_overlay` reads each file twice. It hashes the path in its entries loop, takes the write lock, which
-can wait 600 s, and only then reads the bytes it parses. A save in between stores one text under another
+can wait 600 s, and only then reads the bytes it parses. A save in between stores one text under another (PINNED, 2026-11-25)
 text's blob, and a failed read stores the blob as parsed with no rows. Today the next build of an unbuilt
 tree clears such rows once the edit is replaced. Under S3 they would stay, and no later run would parse the
 blob again, so S4 closes the gap that made them.
@@ -257,8 +257,8 @@ view must raise a `TagError` naming ALPHA, the three tables' counts and the dirt
 the bytes must be recorded with a `blob_parsed` row and no refusal. It prints one line per step. It exits 0,
 with a last line ending `only replaced edits left, and nothing lost`, only when every condition holds.
 
-A prototype was green on 2026-11-26, with both SQL indexes in its `SCHEMA`. Steps 1 to 14 took 30 s and all
-17 took 85 s, on a busy machine. It was red on each of fifteen breaks:
+A prototype was green on 2026-11-26, with both SQL indexes in its `SCHEMA`. Steps 1 to 14 took 30 s and all (PINNED, 2026-11-25)
+17 took 85 s, on a busy machine. It was red on each of fifteen breaks: (PINNED, 2026-11-25)
 
 | Break | First step that reds |
 |---|---|
@@ -294,7 +294,7 @@ rolls back, and that count after the pad must exceed twice the one before it, wh
 rows a sweep can walk. The last line ends `a sweep costs what was released`.
 
 The prototype's counts are PINNED from 2026-11-26. The full sweep alone read 469, then 5,029, and the
-plant took 6 s.
+plant took 6 s. (PINNED, 2026-11-25)
 
 | Code | before the pad | after it |
 |---|---|---|
@@ -320,8 +320,8 @@ None. No stored table or key moves. The first build by this code clears what it 
 
 One step follows unit 1's: the worktrees of the node that run bars are brought onto this code. A worktree on
 older code still runs the full sweep inside the write lock when it builds an unbuilt tree, and every check
-takes that lock at its overlay, with no edit to record too, and waits up to `BUSY_TIMEOUT`, 600 s. The
-diagnosis measured two such sweeps at 537 s, and the leg's ceiling is 420 s. On 2026-11-26 100 of the node's
+takes that lock at its overlay, with no edit to record too, and waits up to `BUSY_TIMEOUT`, 600 s. The (PINNED, 2026-11-25)
+diagnosis measured two such sweeps at 537 s, and the leg's ceiling is 420 s. On 2026-11-26 100 of the node's (PINNED, 2026-11-25)
 104 worktrees held the old sweep (PINNED, the count of `2026-11-26-review-TOOL-aPrunedIndex-1-2-3-spec-audit-round1`). So
 the leg fits its ceiling on a machine whose other writers run this code, and until the active worktrees do,
 a check beside an older build can still be killed waiting. No row and no verdict is wrong in either state.
@@ -356,7 +356,7 @@ a check beside an older build can still be killed waiting. No row and no verdict
 - perf / scale: a sweep costs one seek per released pair and one per row it clears. The file grows by one
   file's rows per replaced edit, in all three tables, until a `--gc`. Section 4 sizes one edit, and the rate of
   them is unmeasured. A whole-view read walks those of its own version alone, and drops them in its join.
-- error / empty / loading states: an empty set returns at once. The write lock, its 600 s wait and its
+- error / empty / loading states: an empty set returns at once. The write lock, its 600 s wait and its (PINNED, 2026-11-25)
   refusal are unchanged, and a failed block rolls back whole. A changed file that cannot be read refuses
   before the write block, naming the file.
 - observability: N/A — no line of `check` or of `--gc` moves.
@@ -376,7 +376,7 @@ a check beside an older build can still be killed waiting. No row and no verdict
   Red when: `build_overlay` releases the pairs it replaces, so `left` is zero at step 8, or the pair filter
   is absent, so `lost` is non-zero at step 1, or no set comes from a gone worktree, so `left` is non-zero
   at step 6.
-  cost: 85 s for the prototype, on a machine running other bars.
+  cost: 85 s for the prototype, on a machine running other bars. (PINNED, 2026-11-25)
 - **AC2** — When `python tools/playbook/gov_tag.py --fixture --plant released-cost` runs, the sweep's
   second count is at most twice its first, each saw a delete on all three tables, the full sweep's own
   count more than doubled over the pad, and it exits 0.
@@ -393,7 +393,7 @@ a check beside an older build can still be killed waiting. No row and no verdict
   Red when: the unit's sweep clears a row the check is served, so a line of the output moves, or its
   seconds inside the sweep are no lower than BASE's.
   cost: about 4 GB of scratch disk and, from the diagnosis, some 15 minutes.
-  fixture: the clean 270 MB copy the building session's scratch holds, padded with 12 dead versions for
+  fixture: the clean 270 MB copy the building session's scratch holds, padded with 12 dead versions for (PINNED, 2026-11-25)
   this criterion. Each source is loaded under the worktree's own `tag_index.py` path with
   `derive_index_path` answering the copy, so both derive one version and read one set of rows.
   figure: DERIVED at observation time.
@@ -424,7 +424,7 @@ a check beside an older build can still be killed waiting. No row and no verdict
   Red when: the overlay releases the pair it replaces, or the build runs the full sweep, so the connection
   is served nothing.
 - **AC9** — When `gov_tag.py check` runs twice with the unit's source over a private copy of the 12.6 GB index
-  on which both SQL indexes stand, the second run finishes below 420 s of wall. Before the first run the
+  on which both SQL indexes stand, the second run finishes below 420 s of wall. Before the first run the (PINNED, 2026-11-25)
   HEAD and compare-base trees are unbuilt and no `blob_parsed` row stands at the unit's version, so it parses
   every blob. Before the second the two trees' `tree_path` and `tree_built` rows at that digest are taken out
   again, so it builds both trees and its summary prints 0 blobs parsed. The unit's record names, for each
@@ -432,7 +432,7 @@ a check beside an older build can still be killed waiting. No row and no verdict
   load of the machine.
   Red when: a read, a name probe or a sweep still walks the dead versions, so the second run passes the
   ceiling, or the second run's summary counts a parsed blob, so the two runs timed one workload.
-  cost: 12.6 GB of scratch disk, about 205 s for the two indexes, and from the diagnosis about 122 s for the
+  cost: 12.6 GB of scratch disk, about 205 s for the two indexes, and from the diagnosis about 122 s for the (PINNED, 2026-11-25)
   second run, which skipped 15,106 blobs as fresh. The first run's cost has no measured basis.
   fixture: the 12.6 GB copy the building session's scratch holds, copied once more or restored after, with
   `derive_index_path` answering it as in AC4.
@@ -487,7 +487,7 @@ New arm: tools/playbook/tag_bundle.py · covers AC2 · the `released-cost` row; 
 - rev-4 · 2026-11-26 · §1 §2 §3 §4 §5 §6 §7 §10 S4 S6 AC1 AC6 AC9 AC10 AC11 · folded
   `2026-11-26-review-TOOL-aPrunedIndex-1-2-3-spec-audit-round1`: findings 8 and 12 (the overlay keys an
   edit by the bytes it parses and refuses a file it cannot read, with steps 15 to 17 and AC10), 1 (AC9 states
-  both workloads, and which one 420 s binds), 3 (AC11 reads both plants' rows), 4 (the owner's go with its
+  both workloads, and which one 420 s binds), 3 (AC11 reads both plants' rows), 4 (the owner's go with its (PINNED, 2026-11-25)
   conditions, stated once in section 3), 6 (AC6 reads the docstrings), 7 (the owner's go is taken, not handed
   off), 13 (the wait behind older worktrees, in Rollout, in the risks and in AC9), 15 (the growth figure, its
   denominator and all three tables).

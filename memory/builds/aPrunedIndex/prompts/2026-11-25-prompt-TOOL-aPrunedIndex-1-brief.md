@@ -4,7 +4,7 @@
 
 ## The prompt
 
-> Find why `python tools/playbook/gov_tag.py check` is slow and make it reliably fit its 420 s ceiling, without raising the ceiling and without changing any verdict.
+> Find why `python tools/playbook/gov_tag.py check` is slow and make it reliably fit its 420 s ceiling, without raising the ceiling and without changing any verdict. (PINNED, 2026-11-25)
 
 The sentence is the opening task of the building session, written by the session that started it
 (`local_7d7a756d-b405-4fbc-b780-41bb67de56c2`).
@@ -12,7 +12,7 @@ The sentence is the opening task of the building session, written by the session
 ## The brief
 
 ### Goal
-`gov_tag.py check` reliably fits its 420 s ceiling on the node's shared tag index with every verdict unchanged, because rows
+`gov_tag.py check` reliably fits its 420 s ceiling on the node's shared tag index with every verdict unchanged, because rows (PINNED, 2026-11-25)
 of extractor versions the reading worktree does not derive stop costing it anything.
 
 ### Items
@@ -39,7 +39,7 @@ collection in a plain build. No run of `--gc`, VACUUM or a deletion on either li
 ### Limitations
 The index is shared by every worktree of the node, and other sessions run bars against it: nothing in this build opens the
 live index with the new code before the owner says so in the building session, since the first open adds two SQL indexes
-(about 205 s of write lock and 1 GB, measured on the copy). A fixture uses its own scratch repository. `tools/loop/position.py`
+(about 205 s of write lock and 1 GB, measured on the copy). A fixture uses its own scratch repository. `tools/loop/position.py` (PINNED, 2026-11-25)
 and `tools/memory-tree/routed_commits.py` are not edited. An edit to `tag_index.py` is a new extractor version, so the units
 land together.
 
@@ -53,7 +53,7 @@ Recall terms used: tag index shared worktree gc dead versions path_row tree_buil
 
 ## Drawn from the session
 
-> On a clean index (270 MB) the unmodified check takes 85 s.
+> On a clean index (270 MB) the unmodified check takes 85 s. (PINNED, 2026-11-25)
 — agent, 2026-11-25, the run over a private fresh index
 
 > the planner ignores the new version index unless told to start from the version list

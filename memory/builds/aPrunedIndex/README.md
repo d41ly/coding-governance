@@ -12,8 +12,8 @@ spec-audit: 2026-11-25
 
 ## The problem this build exists to solve
 
-The bar leg `tags (the resolver's checks)` timed out at its 420 s ceiling in at least four landing bars on 2026-11-25 and
-blocked two sessions' pushes. On a clean index of 270 MB the unmodified check took 85 s. The node's shared index is 12.6 GB:
+The bar leg `tags (the resolver's checks)` timed out at its 420 s ceiling in at least four landing bars on 2026-11-25 and (PINNED, 2026-11-25)
+blocked two sessions' pushes. On a clean index of 270 MB the unmodified check took 85 s. The node's shared index is 12.6 GB: (PINNED, 2026-11-25)
 it stores 35 versions of the citations extractor where the node's worktrees derive 6, and nothing retires the others. Each
 read scans every version's rows, each name probe of a build walks them, and each build's sweep walks them again. The
 measurements are in `build/2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md`.

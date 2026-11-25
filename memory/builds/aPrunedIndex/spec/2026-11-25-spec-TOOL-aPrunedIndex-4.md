@@ -95,7 +95,7 @@ The rule was run over the real tree first, with no index opened. On 2026-11-25, 
 worktrees and skipped four: `blissful-khayyam-69a7df`, `deterministic-attended-workflows-943570`,
 `deterministic-reuse-workflows-f70c33` and `full-repo-bar-tests-2591de`. Those are the four the
 diagnosis names. It found none unreadable, and 6 live versions of the citations extractor. The run
-took 123 s.
+took 123 s. (PINNED, 2026-11-25)
 
 ### Mechanism
 
@@ -153,7 +153,7 @@ The disk test comes first, so a worktree holding a registry costs no extra git c
    `run_gc` must exit 0, print no skipped line, leave 0 dead rows, and leave the rows of `wt3` as they
    were and above 0.
 4. It deletes the registry of `wt3` from disk. `run_gc` must exit 0, print exactly one skipped line,
-   which names `wt3`, leave 0 rows of its version, and leave the dump of `root` equal to step 1's.
+   which names `wt3`, leave 0 rows of its version, and leave the dump of `root` equal to step 1's. (PINNED, 2026-11-25)
 5. It calls `run_gc` with the kit path `tools/nokit`, which no worktree holds. It must raise a
    `TagError` naming the `tools/nokit` registry path, and the rows of `root`, above 0, must not move.
 
@@ -168,7 +168,7 @@ It prints one line per step. Its last line is printed only when every condition 
 and 1 otherwise.
 
 A prototype of this plant, over a patched `read_live_versions` held in scratch, ran green on
-2026-11-25, step 6 included, whose conf key held 16 rows. These breaks of it each turned a step red:
+2026-11-25, step 6 included, whose conf key held 16 rows. These breaks of it each turned a step red: (PINNED, 2026-11-25)
 
 | break | first step that reds |
 |---|---|
@@ -176,7 +176,7 @@ A prototype of this plant, over a patched `read_live_versions` held in scratch, 
 | skip on absence from disk alone | 2, collected with `wt4` unreadable |
 | skip on absence from HEAD alone | 3, the live rows of `wt3` collected |
 | no refusal on an empty live set | 5, the rows of `root` collected |
-| no refusal on an absent or non-file conf | 6, the 16 rows of `wt4`'s conf key collected |
+| no refusal on an absent or non-file conf | 6, the 16 rows of `wt4`'s conf key collected (PINNED, 2026-11-25) |
 
 ### Migration
 
@@ -233,14 +233,14 @@ plant, `gc-predates`, and one output line, `tag-index — skipped:`, which no ce
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/playbook/gov_tag.py --fixture --plant gc-predates` runs, `run_gc` in its
-  step 4 exits 0, prints one `tag-index — skipped:` line naming `wt3`, and leaves 0 rows of that
+  step 4 exits 0, prints one `tag-index — skipped:` line naming `wt3`, and leaves 0 rows of that (PINNED, 2026-11-25)
   version and an equal dump of the live worktree. The plant exits 0.
   Red when: the skip is removed, so `--gc` refuses on `wt3`.
-  cost: 19 s to 35 s for the prototype, on a machine running other bars.
+  cost: 19 s to 35 s for the prototype, on a machine running other bars. (PINNED, 2026-11-25)
 - **AC2** — When `gc-predates` runs step 2, `--gc` refuses naming `wt4`, and the rows of the dead
   version are above 0 and unmoved.
   Red when: the skip tests the disk alone, so the deleted registry reads as predating.
-- **AC3** — When `gc-predates` runs step 3, `--gc` prints no skipped line, and leaves 0 rows of the
+- **AC3** — When `gc-predates` runs step 3, `--gc` prints no skipped line, and leaves 0 rows of the (PINNED, 2026-11-25)
   dead version and every row of `wt3`.
   Red when: the skip tests HEAD alone, so the uncommitted registry is not read.
 - **AC4** — When `gc-predates` runs step 5, `--gc` refuses naming the `tools/nokit` registry path, and
@@ -264,13 +264,13 @@ plant, `gc-predates`, and one output line, `tag-index — skipped:`, which no ce
   key and the rows are collected, or stands outside the `try`, so the last is a traceback naming no
   worktree.
 - **AC8** — When the main loop times `tags bundle selftest` alone once, after the last unit of the build is
-  built, its wall is below the leg's 300 s `ceiling` of `tools/gate-legs.json`. The budget row carries 1.5
+  built, its wall is below the leg's 300 s `ceiling` of `tools/gate-legs.json`. The budget row carries 1.5 (PINNED, 2026-11-25)
   times that reading, floored at 60, and names it, and the evidence row is written from it by
   `derive-ceilings.py --write`.
   Red when: the five plants take the leg to its ceiling, so it is killed before it reports an arm.
   permission: a pass runs no self-test leg, so this reading is the main loop's, at the close.
-  cost: the leg read 22 s before this build. The plants' prototypes took 8 to 22 s for `dead-versions`, 3 to
-  5 s for `named-probe` and 17 to 35 s for `gc-predates`, on a machine running other bars; unit 3 names the
+  cost: the leg read 22 s before this build. The plants' prototypes took 8 to 22 s for `dead-versions`, 3 to (PINNED, 2026-11-25)
+  5 s for `named-probe` and 17 to 35 s for `gc-predates`, on a machine running other bars; unit 3 names the (PINNED, 2026-11-25)
   seconds of its two.
   figure: DERIVED at observation time.
 - **AC9** — When a Python probe imports `tag_bundle` from `tools/playbook` and prints the lines of

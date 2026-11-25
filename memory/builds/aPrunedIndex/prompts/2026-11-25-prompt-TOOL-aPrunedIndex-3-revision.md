@@ -42,7 +42,7 @@ collection in a plain build. No run of `--gc`, VACUUM or a deletion on either li
 ### Limitations
 The index is shared by every worktree of the node, and other sessions run bars against it: nothing in this build opens the
 live index with the new code before the owner says so in the building session, since the first open adds two SQL indexes
-(about 205 s of write lock and 1 GB, measured on the copy). A fixture uses its own scratch repository. `tools/loop/position.py`
+(about 205 s of write lock and 1 GB, measured on the copy). A fixture uses its own scratch repository. `tools/loop/position.py` (PINNED, 2026-11-25)
 and `tools/memory-tree/routed_commits.py` are not edited. An edit to `tag_index.py` is a new extractor version, so the units
 land together.
 
@@ -64,4 +64,4 @@ Asked: May this session open the live shared tag index with the new code?
 Answer: Yes, once built (Recommended)
 
 The second was shown as: once all four units are built and measured on private copies, when the closing review is clean and
-before the bar; two SQL indexes, about 205 s of write lock and about 1 GB, once on the machine; no `--gc`, vacuum or delete.
+before the bar; two SQL indexes, about 205 s of write lock and about 1 GB, once on the machine; no `--gc`, vacuum or delete. (PINNED, 2026-11-25)

@@ -136,7 +136,7 @@ prototype of steps 1 to 3 over the `none` fixture's 6 pairs read these counts on
 ### Migration
 
 The first open after landing builds this index and unit 1's. The diagnosis measured the pair at about
-205 s under the write lock and 1 GB on the 12.6 GB copy, and `BUSY_TIMEOUT` is 600 s, so a waiting
+205 s under the write lock and 1 GB on the 12.6 GB copy, and `BUSY_TIMEOUT` is 600 s, so a waiting (PINNED, 2026-11-25)
 writer outlasts it. An edit to `tag_index.py` is a new extractor version, so each worktree also
 re-parses once. Unit 1's Rollout step builds both indexes outside any leg. Each CREATE INDEX commits
 alone, so an opener killed in this one keeps unit 1's, rolls this one back with no row changed, and leaves
@@ -198,7 +198,7 @@ Recall terms used: tag index path_row parsed sentinel blob_parsed ledger probe p
   Red when: SQLite serves the probe from another index on a file of that size.
   cost: about 4 GB of scratch disk and some minutes; the two slow passes may be stopped at ten minutes
   each and recorded as that floor.
-  fixture: a padded copy of the clean 270 MB copy the building session's scratch holds, made for this
+  fixture: a padded copy of the clean 270 MB copy the building session's scratch holds, made for this (PINNED, 2026-11-25)
   criterion.
   figure: DERIVED at observation time.
 - **AC6** — When `grep -c path_row_named` runs over `tools/playbook/tag_index.py` and
