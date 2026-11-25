@@ -7905,7 +7905,7 @@
     {
       "id": "check_marker_line",
       "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "check_marker_repaired",
@@ -16323,6 +16323,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "extract_outside_records",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "extract_pack",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -20443,6 +20448,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "parse_guarded_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "parse_header",
       "kind": "function",
       "file": "tools/gate-lint/legacy_ledger.py"
@@ -22356,6 +22366,11 @@
       "id": "read_blob_at",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_blob_batch",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "read_blob_fact",
@@ -25596,6 +25611,11 @@
       "id": "read_page_lines",
       "kind": "function",
       "file": "tools/govkit/docs_leg.py"
+    },
+    {
+      "id": "read_parent_lists",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "read_parity",
@@ -32396,6 +32416,11 @@
       "id": "resolve_grammar_name",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "resolve_guarded_path",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "resolve_harness_path",

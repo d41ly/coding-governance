@@ -225,3 +225,4 @@ memory/builds/dTrackedAtlas/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb
 memory/builds/dQuietDisk/README.md	bound	1	1ae661ab4f9565e39c66d7c658e3e11c981eb56e	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-1
 memory/builds/aWrappedRoster/README.md	bound	1	e33de0de688484ec474d932a3c0aa1354bcb4ebe	seeded
 memory/builds/aFlattenedSeed/README.md	bound	1	b2eec4b653aea1b6581df3d3b6a1c4114d775003	seeded
+memory/builds/aTemperedLane/README.md	bound	1	75d5f43700d813c2218c4de3a9204c5da5499e20	seeded
