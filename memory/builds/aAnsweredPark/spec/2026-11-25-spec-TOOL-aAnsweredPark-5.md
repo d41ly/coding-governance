@@ -30,7 +30,7 @@ one limit the review found, and the acceptance ledger stops contradicting itself
 - **S4** — The hold's phases (L1). `FX_PARKED` gains the `parked-kinds` variants `hold-specced` and
   `hold-no-phase`, each owing `act` with none. Observed by AC3.
 - **S5** — The ledger (L2). The acceptance ledger of TOOL-aAnsweredPark-1 says its two arms were seen
-  red afterwards, leaves only the section 7 legs owed, and carries its two seen-red lines inside its
+  red afterwards, leaves only the legs of section 7 owed, and carries its two seen-red lines inside its
   evidence block, where their reader looks. Observed by AC5.
 - **S6** — What names the variants follows them: the two `PLANTS` texts, the comment over `FX_PARKED`,
   the docstring of `run_parked_plant`, the fixture bullet of `help/loop.md`, and the

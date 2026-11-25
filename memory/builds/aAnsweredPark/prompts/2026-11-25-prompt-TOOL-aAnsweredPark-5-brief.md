@@ -25,7 +25,7 @@ state the one limit the review found.
 4. L1: two hold variants, `phase: SPECCING` and no phase fact, each with `hold-code` and `hold-until: owner`,
    owing `act` with none.
 5. L2: the acceptance ledger of TOOL-aAnsweredPark-1 says its two arms were seen red afterwards, and only the
-   section 7 legs stay owed.
+   legs of section 7 stay owed.
 
 ### Acceptance
 Each new variant of `position.py --fixture --plant parked-decisions` and `parked-kinds` holds on the engine as
