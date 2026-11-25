@@ -1,11 +1,12 @@
 # TOOL-aAnsweredPark-1 — an owner decision settles by its own answer record, and only an open decision or a live hold interrupts
 
-**Status:** INPROGRESS · rev-2 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-aAnsweredPark-1-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-aAnsweredPark-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aAnsweredPark-1-1-spec-writer.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-1-spec-writer.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aAnsweredPark-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-brief.md) | research | — |
 | [2026-11-25-prompt-TOOL-aAnsweredPark-1-divergence.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-divergence.md) | research | — |

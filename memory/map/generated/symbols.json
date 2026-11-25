@@ -25418,6 +25418,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "read_newest_dispositions",
+      "kind": "function",
+      "file": "tools/loop/adapt.py"
+    },
+    {
       "id": "read_newest_unit",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
@@ -25476,6 +25481,11 @@
       "id": "read_one_signal",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "read_open_decisions",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "read_open_passes",
@@ -37071,6 +37081,11 @@
       "id": "run_parity_plant",
       "kind": "function",
       "file": "tools/govkit/shims.py"
+    },
+    {
+      "id": "run_parked_plant",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "run_parse",

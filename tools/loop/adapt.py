@@ -227,18 +227,26 @@ def read_flow_layer(root, build, kind):
     return rows + excluded
 
 
+def read_newest_dispositions(root, build, named=()):
+    """{tag: record} of `build`: per `Item`, the newest well-formed tracked disposition record whose stem is
+    not in `named`, newest by the stem's date and then `n`. A value is `read_disposition`'s whole record."""
+    read_memory_tree("build_records.py")
+    from build_records import read_disposition, read_records
+    newest = {}
+    for r in read_records(root, {"MEMORY_ROOT": resolve_memory_root(root)}, "disposition", read_disposition):
+        if r["build"] != build or r["malformed"] or r["id"] in named:
+            continue
+        held = newest.setdefault(r.get("Item", "").strip("`"), r)
+        if (r["id"][:10], r["n"] or 0) > (held["id"][:10], held["n"] or 0):
+            newest[r["Item"].strip("`")] = r
+    return newest
+
+
 def read_disposition_release(root, build, tag, named):
     """`(stem, word)` of the newest disposition record of `build` whose `Item` is `tag` and whose stem is not
     in `named`, or None."""
-    read_memory_tree("build_records.py")
-    from build_records import read_disposition, read_records
-    found = [r for r in read_records(root, {"MEMORY_ROOT": resolve_memory_root(root)}, "disposition", read_disposition)
-             if r["build"] == build and not r["malformed"] and r.get("Item", "").strip("`") == tag
-             and r["id"] not in named]
-    if not found:
-        return None
-    newest = max(found, key=lambda r: (r["id"][:10], r["n"] or 0))
-    return newest["id"], newest.get("Disposition", "").strip("`")
+    newest = read_newest_dispositions(root, build, named).get(tag)
+    return (newest["id"], newest.get("Disposition", "").strip("`")) if newest else None
 
 
 # ------------------------------------------------------------------------------------------ the class

@@ -25,14 +25,15 @@ change is absent (TOOL-dDeclaredLoop-28); the witnesses its
 moves name through `composition.derive_carried_witnesses`, so a witness under a renamed item reads under
 its successor;
 the acceptance records through `build_records.read_records` with `read_acceptance`; the run-state file's
-facts and parked rows; the remote-tracking tip of the default branch. No status header, README status
+facts and parked `decision` rows, and the disposition records that answer them, through `adapt.py`'s
+`read_newest_dispositions`; the remote-tracking tip of the default branch. No status header, README status
 word or `phase:` fact decides a step.
 
 Each unit's M2 state comes from the unattended driver's `--plan` rows, handed over in the environment
 variable `GOV_POSITION_STATES`, TAB-separated lines: `unit <id> <state>` per row in build order, MISSING
 rows included, `ask <id>` for the first undecided ask, `parent <slug> <derived phase>` per `parents:`
-build, `bound <seconds>` for the driver's `RESUME_STALE_BOUND`, and `owed <PARK_KINDS_OWED>
-<PARK_ACTS_OWED>`, the two space-joined sets. Where the variable is unset or empty, this runs the driver's
+build, and `bound <seconds>` for the driver's `RESUME_STALE_BOUND`; any other line, the driver's `owed`
+line among them, is not read. Where the variable is unset or empty, this runs the driver's
 `--plan <slug>` with it set empty, which prints those lines in place of its `next:` line, so the driver
 keeps the one M2 classifier and the call is not circular.
 
@@ -77,12 +78,26 @@ ref's `read —` line ends `fetched <n>s ago · from FETCH_HEAD|reflog|clone`, o
 ` · core.logAllRefUpdates=false` where the repository's setting reads false (TOOL-dDeclaredLoop-75 S34), and each
 skipped `FETCH_HEAD` follows it as `read — <name> · skipped — empty`, `no line for <branch> of <remote>`
 or `unreadable`), `terminal` (the state is a `[states]` terminal, or every unit is deployed
-and no ask stands), `awaiting` on an owed parked entry or an unpassed hold, `blocked` on a `parents:`
+and no ask stands), `awaiting` on an open owner decision or a live hold, `blocked` on a `parents:`
 build neither recorded nor derived `LANDED` whose cause holds the build's step, `act` with a next item, `awaiting` on an undecided ask, and
 `stuck` naming the step's unwitnessed exit. Line output is §4's six line kinds; `--json` the same fields
 as one object, each unit carrying `acceptance_armed`, false exactly where its line ends `· acceptance
 unarmed` (TOOL-dDeclaredLoop-67 S50); `--next-line` the `next:` shape `render_next_line` picks from `NEXT_SHAPES`. Exit 0 for
 every answer but `invalid-input`, which exits 2.
+
+THE OWNER DECISION (TOOL-aAnsweredPark-1). Two things interrupt as `owner-decision`: a parked `decision` row
+of the run-state file that no record of its own settles, and a hold, `hold-code` with an unpassed
+`hold-until`, while the `phase` fact reads `HELD`. This replaces the interrupt wording of
+TOOL-dDeclaredLoop-7, which counted every owed kind: a `rescope`, `handoff`, `abort`, `override` or `waiver`
+row raises nothing. A newly parked decision stops the run, the whole build answering `awaiting`, until it is
+answered. The answer is written as `build_records.py new disposition --build <slug> --unit <id> --item <tag>
+--disposition answered --channel <channel> --reason "<the owner's words>"` and tracked, staged being
+enough; the tag is `item.parked.` and the row's timestamp, lowercased, each `:` written `-`, the second row
+of one timestamp, in file order, ending `.2`, the third `.3`, and the open row's `interrupt —` line prints
+it. An agent types the record, so the quoted words in its `Reason` are the evidence, which nothing here
+verifies. The newest well-formed record of the tag decides: the word exactly `answered` and a `Reason` that
+is not blank settle the row, and anything else leaves it open, so a later record of another word re-opens
+it. Each record that decided a row is a `read —` line.
 
 THE ITEM BOUNDARY, I12 (KICK-dKeptSession-13 S1). `derive_item_boundary(repo, slug, pointer, pos=None)`
 reads one position, or the `pos` its caller already derived, and returns the build's current item where
@@ -145,9 +160,9 @@ file under its scratch top, so no setting of the machine's reaches it (TOOL-dDec
 through `loop_lib.run_selftest_cases`.
 
 WHAT THIS DOES NOT CHECK: a witness reader for any item outside the three kinds above, which lands with
-the build that arms the item; a settling row for a parked entry, which the driver's grammar does not
-have yet, so every owed entry stands; the mailbox on every call but `--mail-interrupts`, printed
-`unarmed`; a list read from the cache after a failed fetch, listed unmarked; that a `gates-run` fact names a
+the build that arms the item; that a record settling a parked decision quotes the owner; the mailbox on
+every call but `--mail-interrupts`, printed `unarmed`; a list read from the cache after a failed fetch,
+listed unmarked; that a `gates-run` fact names a
 green bar rather than the last bar run; a fetch run with `--no-write-fetch-head`, which leaves no
 `FETCH_HEAD` and so reads by the reflog where the ref moved, and as stale where it did not; a
 `FETCH_HEAD` whose URL git spelled otherwise than `derive_fetch_url` spells the configured URL, its
@@ -203,12 +218,17 @@ NEXT_SHAPES = {"live-unit": "<id> (READY - build it)",
                "everything-terminal": "none - every tracked spec is terminal",
                "other": "none - <answer>: <reason>"}
 UNIT_ID = re.compile(r"[A-Za-z]+-[A-Za-z0-9]+-\d+")
-PARKED_ROW = re.compile(r"^[0-9][0-9-]*T[0-9:]*Z (\S+) · item (\S+)")
+#: A parked `decision` row of the run-state file: its timestamp and its item's first word.
+DECISION_ROW = re.compile(r"^([0-9][0-9-]*T[0-9:]*Z) decision · item (\S+)")
 #: `--plant`'s cases and what each owes.
 PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 3's step",
           "typed-status": "unit 2's header typed CLOSED, no pass commit: designed, never built",
           "idempotent": "item 1 witnessed by a recorded move naming it: next is item 2, and the key moves with an input",
-          "owner-decision": "an owed decision park, unsettled: awaiting",
+          "owner-decision": "a decision park no record answers: awaiting, its answer tag printed",
+          "parked-decisions": "a parked decision and its answer record in seven variants: answered acts; unanswered, "
+                              "untracked, another row's, another word's and no Reason await; three rows of one "
+                              "second settle apart",
+          "parked-kinds": "the five other row kinds: act; a hold: awaiting in phase HELD alone, act once passed",
           "parent-unlanded": "parents: names a build with no landed move and no derived LANDED: blocked",
           "terminal": "the newest recorded move enters landed: terminal",
           "stale-remote": "a remote whose tracking tip's newest reflog entry predates the bound: stale-remote, read from reflog",
@@ -280,7 +300,33 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
 FX_SLUG = "tPos"
 FX_IDS = ["TOOL-tPos-1", "TOOL-tPos-2", "TOOL-tPos-3"]
 FX_ASK = "TOOL-tAsk-1"
-FX_OWED = ("decision abort override waiver handoff", "retire supersede defer")
+#: `parked-decisions` and `parked-kinds` (TOOL-aAnsweredPark-1): per variant its name, the phase, the hold's two
+#: facts, the parked rows, each record `(tag, word, reason)` in writing order, whether they are staged, and the
+#: answer and the open tags owed, a hold's whole subject standing for its tag. The tags are literals, an oracle
+#: apart from the engine's own derivation.
+FX_DECISION = "2026-01-01T00:00:00Z decision · item which-way · reason the fixture's decision"
+FX_TAG = "item.parked.2026-01-01t00-00-00z"
+FX_ANSWER = (FX_TAG, "answered", "the owner: go left")
+FX_HOLD = "hold-code: host-owner-action\nhold-until: %s\n"
+FX_PARKED = {
+    "parked-decisions": (
+        ("unanswered", "BUILDING", "", (FX_DECISION,), (), True, "awaiting", [FX_TAG]),
+        ("answered", "BUILDING", "", (FX_DECISION,), (FX_ANSWER,), True, "act", []),
+        ("untracked", "BUILDING", "", (FX_DECISION,), (FX_ANSWER,), False, "awaiting", [FX_TAG]),
+        ("other-row", "BUILDING", "", (FX_DECISION,),
+         (("item.parked.2026-01-01t00-00-01z", "answered", "the owner: go left"),), True, "awaiting", [FX_TAG]),
+        ("other-word", "BUILDING", "", (FX_DECISION,), (FX_ANSWER, (FX_TAG, "withdrawn", "the owner: not yet")), True,
+         "awaiting", [FX_TAG]),
+        ("no-reason", "BUILDING", "", (FX_DECISION,), ((FX_TAG, "answered", None),), True, "awaiting", [FX_TAG]),
+        ("one-second", "BUILDING", "", (FX_DECISION,) * 3,
+         (FX_ANSWER, (FX_TAG + ".3", "answered", "the owner: go right")), True, "awaiting", [FX_TAG + ".2"])),
+    "parked-kinds": (
+        ("no-question", "BUILDING", "", tuple("2026-01-01T00:00:00Z %s · reason the fixture's row" % r for r in (
+            "rescope · item defer %s" % FX_IDS[2], "handoff · item which-way", "abort · item which-way",
+            "override · item which-way", "waiver · item which-way")), (), True, "act", []),
+        ("hold-resumed", "BUILDING", FX_HOLD % "owner", (), (), True, "act", []),
+        ("hold-live", "HELD", FX_HOLD % "owner", (), (), True, "awaiting", ["hold host-owner-action · until owner"]),
+        ("hold-passed", "HELD", FX_HOLD % "after 2026-01-01T00:00:00Z", (), (), True, "act", []))}
 #: The hand-over's bound, in seconds.
 FX_BOUND = 5400
 #: The frontier plants' A, B and C, of the build's step, and D, the next step's root, as shipped.
@@ -362,7 +408,7 @@ def read_handover(repo, slug):
             said = [ln for ln in (p.stdout + p.stderr).splitlines() if ln.strip()]
             raise ValueError("the driver's --plan %s refused: %s" % (slug, said[-1] if said else "exit %d" % p.returncode))
         text = p.stdout
-    out = {"units": [], "ask": None, "parents": {}, "bound": None, "owed": ((), ())}
+    out = {"units": [], "ask": None, "parents": {}, "bound": None}
     for ln in text.splitlines():
         f = ln.rstrip("\r").split("\t")
         if f[0] == "unit" and len(f) == 3:
@@ -373,8 +419,6 @@ def read_handover(repo, slug):
             out["parents"][f[1]] = f[2]
         elif f[0] == "bound" and len(f) == 2 and f[1].isdigit():
             out["bound"] = int(f[1])
-        elif f[0] == "owed" and len(f) == 3:
-            out["owed"] = (tuple(f[1].split()), tuple(f[2].split()))
     return out
 
 
@@ -641,20 +685,41 @@ def derive_dependency_hold(coordination, early_build, reach, confirmed):
     return cause, cause != "confirmed"
 
 
-def derive_interrupts(text, handover, owed, parents_open, claims, now, remote_absent=False):
+def read_open_decisions(root, build, text):
+    """`(open, records)`: `open` the `(item, tag)` of each decision row of `text` no record settles, in file
+    order; `records` the path of each record that decided a row. `text` is the run-state file's text; no
+    record is read where it holds no decision row."""
+    rows, seen = [], {}
+    for ln in text.splitlines():
+        m = DECISION_ROW.match(ln.rstrip("\r"))
+        if m:
+            stamp, item = m.groups()
+            n = seen[stamp] = seen.get(stamp, 0) + 1
+            rows.append((item, "item.parked.%s%s" % (stamp.lower().replace(":", "-"), ".%d" % n if n > 1 else "")))
+    if not rows:
+        return [], []
+    from adapt import read_newest_dispositions   # it imports loop_transition, as this module does, so here
+    newest = read_newest_dispositions(root, build)
+    still, records = [], []
+    for item, tag in rows:
+        r = newest.get(tag)
+        if r:
+            records.append(r["path"])
+        if not r or r.get("Disposition", "").strip("`") != "answered" or not r.get("Reason", "").strip():
+            still.append((item, tag))
+    return still, records
+
+
+def derive_interrupts(text, handover, owed, decisions, parents_open, claims, now, remote_absent=False):
     """The interrupts in `[position]`'s order: owner decisions, the mailbox, invalidated witnesses, an
     absent remote, dependency gates, the undecided ask. `text` is the run-state file's text, `owed` the
-    policy kit's `read_run_fact` where that file exists, `parents_open` one row per parent not landed,
+    policy kit's `read_run_fact` where that file exists, `decisions` the open rows `read_open_decisions`
+    answers, a hold read only while the `phase` fact reads `HELD` (TOOL-aAnsweredPark-1), `parents_open` one row per parent not landed,
     its `parent`, `reach`, `cause`, `value` and `holds` (KICK-dKeptSession-7 S2), each a `dependency`
     interrupt carrying them and the subject `<parent> · <reach> · <cause> (deps.coordination: <value>)`,
     `remote_absent` the remote reading absent, `remote · none` (TOOL-dDeclaredLoop-56 S36)."""
-    out = []
-    kinds, acts = handover["owed"]
-    for ln in text.splitlines():
-        m = PARKED_ROW.match(ln.rstrip("\r"))
-        if m and (m.group(1) in kinds or (m.group(1) == "rescope" and m.group(2) in acts)):
-            out.append({"kind": "owner-decision", "subject": "%s · item %s" % m.groups()})
-    code = owed(text, "hold-code") if owed else None
+    out = [{"kind": "owner-decision", "subject": "decision · item %s · answer %s" % d} for d in decisions]
+    code = owed(text, "hold-code") if owed and (owed(text, "phase") or "").strip() == "HELD" else None
     until = (owed(text, "hold-until") or "") if owed else ""
     if code:
         m = re.fullmatch(r"after (\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ)", until.strip())
@@ -843,6 +908,8 @@ def derive_position_into(pos, repo, slug, definition):
         pos["read"].append("%s@%s" % (run.relative_to(repo).as_posix(), read_blob_id(run)))
         owed = read_policy_kit()[1].read_run_fact
         pos["refusals"] = read_refusals(text)
+    decisions, answers = read_open_decisions(repo, slug, text)
+    pos["read"] += ["%s@%s" % (p, read_blob_id(repo / p)) for p in answers]
     gates = (owed(text, "gates-run") or "").split() if owed else []
     gates_tip = None
     if len(gates) == 2:
@@ -951,7 +1018,8 @@ def derive_position_into(pos, repo, slug, definition):
                                              read_confirmation)
         parents_open.append({"parent": p, "reach": reach, "cause": cause, "value": keys["deps.coordination"] or "unread",
                              "holds": held and at_build})
-    pos["interrupts"] = derive_interrupts(text, handover, owed, parents_open, pos["claims"], now, remote_claim is None)
+    pos["interrupts"] = derive_interrupts(text, handover, owed, decisions, parents_open, pos["claims"], now,
+                                          remote_claim is None)
     pos["answer"], pos["reason"] = derive_answer(pos, tables["terminal"],
                                                  remote_claim is None or remote_claim["verdict"] == "fresh",
                                                  every_deployed and bool(units), nxt, exit_item)
@@ -1012,7 +1080,7 @@ def render_spec(uid, status):
 
 def render_handover(units, ask=None, parents=None):
     """The hand-over text a fixture plants where the driver does not run."""
-    lines = ["bound\t%d" % FX_BOUND, "owed\t%s\t%s" % FX_OWED] + ["unit\t%s\t%s" % u for u in units]
+    lines = ["bound\t%d" % FX_BOUND] + ["unit\t%s\t%s" % u for u in units]
     lines += ["ask\t%s" % ask] if ask else []
     lines += ["parent\t%s\t%s" % p for p in (parents or {}).items()]
     return "\n".join(lines) + "\n"
@@ -1119,7 +1187,7 @@ def write_position_plant(top, case, root, policy=None):
     elif case == "bad-transition":
         write_move("planning", "landed", "item.plan.input")
     if case == "owner-decision":
-        run_facts += "\n## Parked\n\n2026-01-01T00:00:00Z decision · item which-way · reason the fixture's owed decision\n"
+        run_facts += "\n## Parked\n\n%s\n" % FX_DECISION
     write_fixture_files(repo, {"memory/builds/%s/RUN.md" % FX_SLUG: run_facts})
     run_fixture_git(repo, "add", "-A")
     run_fixture_git(repo, "commit", "-q", "-m", "run state")
@@ -1323,7 +1391,8 @@ def check_plant(case, pos, rc, repo):
             "typed-status": lambda: steps[1] == "designed",
             "idempotent": lambda: pos["next"] and pos["next"]["item"] == "item.build.unit-lease"
             and any(n.startswith("item.build.base@") and c["verdict"] == "fresh" for n, c in claims.items()),
-            "owner-decision": lambda: pos["answer"] == "awaiting" and "which-way" in kinds.get("owner-decision", ""),
+            "owner-decision": lambda: pos["answer"] == "awaiting"
+            and "interrupt — owner-decision · decision · item which-way · answer %s" % FX_TAG in lines,
             "parent-unlanded": lambda: pos["answer"] == "blocked" and "tPar" in pos["reason"],
             "terminal": lambda: pos["answer"] == "terminal",
             "stale-remote": lambda: pos["answer"] == "stale-remote" and ref_line.endswith(" · from reflog"),
@@ -1486,6 +1555,46 @@ def check_mail_plant(case, repo, definition, handover):
     return misses
 
 
+def run_parked_plant(case, repo, definition, handover):
+    """The misses of a `FX_PARKED` plant (TOOL-aAnsweredPark-1): per variant, the working copy of the run-state
+    file rewritten, its records written by the memory-tree kit's door and staged where the variant stages
+    them, one position derived, and the records removed. Each record is asserted read under its tag, or unread
+    where unstaged, so no variant holds by finding nothing."""
+    read_memory_tree("build_records.py")
+    from adapt import read_newest_dispositions
+    from build_records import write_disposition
+    run_path = repo / ("memory/builds/%s/RUN.md" % FX_SLUG)
+    base, misses = run_path.read_text(encoding="utf-8"), []
+    for variant, phase, hold, rows, records, staged, answer, tags in FX_PARKED[case]:
+        text = base.replace("phase: BUILDING\n", "phase: %s\n" % phase, 1) + hold
+        write_fixture_files(repo, {run_path.relative_to(repo).as_posix(): text + "".join(
+            ["\n## Parked\n\n"] + [r + "\n" for r in rows])})
+        paths = [write_disposition(repo, FX_SLUG, FX_IDS[0], tag, word, "terminal", reason, today="2026-01-01")
+                 for tag, word, reason in records]
+        if staged and paths:
+            run_fixture_git(repo, "add", "--", *paths)
+        newest = read_newest_dispositions(repo, FX_SLUG)
+        pos = derive_plant_position(repo, definition, handover)
+        lines = render_position_lines(pos)
+        got = [i["subject"].split(" · answer ")[-1] for i in pos["interrupts"] if i["kind"] == "owner-decision"]
+        print("%s: fixture · %s · %s · %s · %s" % (SAY, case, variant, pos["answer"], " ".join(got) or "none"))
+        if (pos["answer"], got) != (answer, tags):
+            misses.append("%s answered %s with %r, owed %s with %r" % (variant, pos["answer"], got, answer, tags))
+        for tag, (path, word) in {t: (p, w) for (t, w, _r), p in zip(records, paths)}.items():
+            held = newest.get(tag, {})
+            if not (repo / path).is_file() or (held.get("path"), held.get("Disposition")) != (
+                    (path, word) if staged else (None, None)):
+                misses.append("%s read the record of %s as %r" % (variant, tag, held))
+            listed = any(ln.startswith("read — %s@" % path) for ln in lines)
+            if listed != (staged and tag.startswith(FX_TAG)):
+                misses.append("%s: the record of %s %s a read line" % (variant, tag, "is" if listed else "is not"))
+        if staged and paths:
+            run_fixture_git(repo, "rm", "-q", "--cached", "--", *paths)
+        for path in paths:
+            (repo / path).unlink()
+    return misses
+
+
 def run_dependency_plant(case, top, repo, definition, handover, root):
     """The misses of a dependency plant (KICK-dKeptSession-7 AC1 to AC6, AC9): positions derived over `repo`
     under the hand-over `handover` for a Build item, and with every unit `THIN` for a Design item, each
@@ -1645,6 +1754,8 @@ def run_plant(case):
             misses, rc = run_refusal_plant(case, repo, definition, handover), 0
         elif case.startswith("mail-"):
             misses, rc = check_mail_plant(case, repo, definition, handover), 0
+        elif case in FX_PARKED:
+            misses, rc = run_parked_plant(case, repo, definition, handover), 0
         elif case.startswith("deps-"):
             misses, rc = run_dependency_plant(case, top, repo, definition, handover, root), 0
         else:

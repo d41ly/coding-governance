@@ -765,8 +765,8 @@ holds no outcome to replay.
 
 Each unit's M2 state is the unattended driver's: `--plan` hands its rows over in
 `GOV_POSITION_STATES` with the first undecided ask, each parent's derived phase, `RESUME_STALE_BOUND`
-and the owed park sets, and the engine run standalone asks `--plan` with the variable set empty, which
-answers with those lines in place of `next:`. A unit is `designed` on a READY spec, `built` on a pass
+and the owed park sets, which the engine does not read, and the engine run standalone asks `--plan`
+with the variable set empty, which answers with those lines in place of `next:`. A unit is `designed` on a READY spec, `built` on a pass
 commit an acceptance record names, or, while the `acceptance` computed witness's writer has the
 `ROUTE_STAND_IN` form, on its pass commit alone where no record names it, its `unit —` line then
 ending `· acceptance unarmed` (TOOL-dDeclaredLoop-45), `tested` on the `gates-run` tip containing it, `deployed` on the
@@ -781,6 +781,15 @@ mailbox` lines, `read_mail_interrupts` reading `mailbox.reads` through the polic
 mailbox through the transition guard's one launch, `read_mail_rows`, with `--local` appended under
 `local`; the kickoff engine's boundary verb runs it after a crossing, and every other call keeps the
 `unarmed` mailbox line.
+
+The `owner-decision` interrupts are the parked `decision` rows `read_open_decisions` finds no answer for,
+and a hold while the `phase` fact reads `HELD` (TOOL-aAnsweredPark-1), which replaces the interrupt wording of
+TOOL-dDeclaredLoop-7, where every owed kind counted. A row is answered by its own disposition record, read
+through `adapt.py`'s `read_newest_dispositions`: `Item` the tag `item.parked.<timestamp>` the interrupt
+prints, ending `.2` on the second row of one timestamp, `Disposition` `answered` and a `Reason`, the newest tracked one of the tag deciding. A newly parked
+decision stops the run until it is answered. The record is written by `build_records.py new disposition`, and
+an agent types it, so the quoted words in its `Reason` are the evidence.
+
 `--fixture --plant <case>` runs one of `PLANTS` over a scratch repository and bare remote, the `FX_DRIVER`
 plants over the unattended driver, and `--selftest` runs every case through `run_selftest_cases`; it is gov's
 `loop position fixtures` leg.
