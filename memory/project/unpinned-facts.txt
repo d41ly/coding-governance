@@ -8294,7 +8294,6 @@ memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.
 memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md	34 units	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md	40 units	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md	20 units	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md	1 MB	1	c344bdc4069b1edaefdc59a77b051863055ba155	widened:2026-11-22-build-TOOL-dTotalRecall-8-widen-1
 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md	140 legs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md	213 rows	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md	24 rows	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -14226,7 +14225,7 @@ memory/builds/dTotalRecall/build/2026-11-05-build-TOOL-dTotalRecall-1-reground-r
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	1 MB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	1,000 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	1,436 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	100 specs	1	146df78025b4f87a6a9449fe3225b5472f69a168	widened:2026-11-25-build-TOOL-dTotalRecall-122-widen-33
+memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	101 specs	1	fbe06249e7d0ab90b087f9c06d3fa45fa2d07741	widened:2026-11-25-build-TOOL-dTotalRecall-123-widen-35
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	30 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	32,768 B	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	33 KB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

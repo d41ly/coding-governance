@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-37 — only the four rendered workflow scripts are `linguist-generated`, held equal to the kits' render rows both ways
 
-**Status:** DEFERRED · rev-6 · 2026-11-23 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 4 · advances TOOL-dTotalRecall-27 TOOL-dTotalRecall-109
+**Status:** DEFERRED · rev-7 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 4 · advances TOOL-dTotalRecall-27 TOOL-dTotalRecall-109
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-11-22-prompt-TOOL-dTotalRecall-37-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-37-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-37-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-37-reground-spec-writer.md) | journal | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md) | journal | TOOL-dTotalRecall-8 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 |
 | [2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-38 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-36 TOOL-dTotalRecall-39 TOOL-dTotalRecall-43 |
 
 <!-- /gen:spec-records -->
@@ -22,25 +23,25 @@
 ## 1. Goal
 
 The round-1 spec audit (`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md`)
-confirmed finding **id 16 at HIGH**, its item **H2**, alone in that item. `TOOL-dTotalRecall-8` §4
-"Bounds" registers gov's generated code as `tools/workflows/*.js` in `.gitattributes`, and its Bounds
-table excludes every `linguist-generated` path from the code record. That glob matches all fourteen
-tracked `.js` files of the workflows kit (PINNED 2026-11-22, `git ls-files 'tools/workflows/*.js' | wc -l`
-at `8b8b1374` and at `0b3c2b3f9`). Four are the `.template.js` sources and six are hand-written:
+confirmed finding **id 16 at HIGH**, its item **H2**, alone in that item: `TOOL-dTotalRecall-8` registered
+gov's generated code as `tools/workflows/*.js` in `.gitattributes`, and its Bounds table excludes every
+`linguist-generated` path from the code record. That glob matches all fourteen tracked `.js` files of
+the workflows kit (PINNED 2026-11-25, `git ls-files 'tools/workflows/*.js' | wc -l` at `fbe06249`). Four are the `.template.js` sources and six are hand-written:
 `check-review-join.js`, `check-verifier-fanout.js`, `check-workflow-syntax.js`,
 `orient-counterfactual.js`, `spec-audit-optin.js` and `unattended-unit.js`. Only four are renders,
 each the `to` of a `role = "rendered"` row of `tools/workflows/kit.toml` (`{kit}/unattended-build.js`,
 `{kit}/tier2-review.js`, `{kit}/drift-audit-code.js`, `{kit}/drift-audit-state.js`). The code record
 would hold no definition, call or edge of the workflow sources, and every reader of it would answer
-wrongly about them. This unit names the four renders alone and adds a parity arm that holds the
-attribute set equal to the kits' render outputs, both ways. It repairs `TOOL-dTotalRecall-8`.
+wrongly about them. `TOOL-dTotalRecall-8` rev-10, the redesigned record, writes no registration and
+leaves it here: this unit names the four renders alone and adds a parity arm that holds the attribute
+set equal to the kits' render outputs, both ways. It repairs `TOOL-dTotalRecall-8`.
 
 ## 2. Scope (IN)
 
 - **S1** — `.gitattributes` names `linguist-generated` on the four rendered paths, one line each:
   `tools/workflows/tier2-review.js`, `tools/workflows/unattended-build.js`,
-  `tools/workflows/drift-audit-code.js` and `tools/workflows/drift-audit-state.js`, in place of the
-  `tools/workflows/*.js` registration `TOOL-dTotalRecall-8` wrote. The existing
+  `tools/workflows/drift-audit-code.js` and `tools/workflows/drift-audit-state.js`, the first
+  `linguist-generated` lines of the file. The existing
   `tools/workflows/*.js text eol=lf` pin is a different attribute and stays as it is. Observed by AC1
   and AC2.
 - **S2** — The parity arm, `check_generated_attributes(root, descs, r)` in `tools/govkit/govkit.py`, run
@@ -61,8 +62,8 @@ attribute set equal to the kits' render outputs, both ways. It repairs `TOOL-dTo
   `tools/govkit/govkit.py#eol_population` (one `git ls-files -z`, one `git check-attr --stdin -z`)
   for any one attribute, which `eol_population` then returns for `eol`. Observed by AC5.
 - **S4** — The code record holds the workflow sources. At the pass tip,
-  `tools/playbook/code_record.py` derives rows for the four `.template.js` files and the six
-  hand-written scripts and none for the four renders. Observed by AC4.
+  `tools/playbook/code_record.py` holds an `f` line for each of the four `.template.js` files and the
+  six hand-written scripts and none for the four renders. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -75,8 +76,8 @@ attribute set equal to the kits' render outputs, both ways. It repairs `TOOL-dTo
 
 ### Edges
 
-- **consumes-from** `TOOL-dTotalRecall-8` — the Bounds row reading `linguist-generated` and the
-  `.gitattributes` registration this unit narrows to the four renders. Neither is built (deviation 83)
+- **consumes-from** `TOOL-dTotalRecall-8` — the Bounds row reading `linguist-generated`, and the record
+  `--dump` prints, which AC4 reads
 
 ## 4. Design
 
@@ -95,14 +96,13 @@ lands: its row in `kit.toml` makes the arm red until the line is added.
 
 ### The arm's two sets, at base
 
-| Set | Members at base `8b8b1374` |
+| Set | Members at base `fbe06249` |
 |---|---|
 | non-Markdown render outputs | the four `.js` renders above; every other rendered row's `to` is a `.md` (DERIVED, `grep -A2 'role = "rendered"' tools/*/kit.toml`) |
-| `linguist-generated` under the tool root | none (`git grep -c linguist 8b8b1374 -- .gitattributes` printed nothing, PINNED 2026-11-22) |
+| `linguist-generated` under the tool root | none (`git grep -c linguist fbe06249 -- .gitattributes` printed nothing, PINNED 2026-11-25) |
 
-At the pass base `TOOL-dTotalRecall-8` has written its glob, so the arm reads the fourteen paths
-(PINNED 2026-11-22, as §1) and names the ten that are not renders, which is the arm's red case on the
-real tree.
+At the pass base no line carries the attribute, so the arm names the four renders as `rendered but not
+linguist-generated`, which is its red case on the real tree; AC3 stages the glob for the other side.
 
 ### The value the arm reads
 
@@ -162,11 +162,9 @@ py.function` answered OK for each on 2026-11-22.
   that path as `rendered but not linguist-generated`; restored, it prints neither.
   Red when: the arm compares one direction only.
   fixture: a scratch copy under `%TEMP%`; the pass makes it.
-- **AC4** — When a `python -c` probe with `sqlite3` reads the index file that `derive_index_path` in
-  `tools/playbook/tag_index.py` names, after `python code_record.py --check` runs from
-  `tools/playbook/` at the pass tip, the `code_row` table holds a row named `renderShapeLine` for the blob `git rev-parse`
-  gives `tools/workflows/tier2-review.template.js` at HEAD, and no row for the blob of
-  `tools/workflows/tier2-review.js`.
+- **AC4** — When `python code_record.py --dump --tree HEAD` runs from `tools/playbook/` at the pass tip,
+  its text holds the `f` line of `tools/workflows/tier2-review.template.js` with a `d` line named
+  `renderShapeLine` under it, and no `f` line of `tools/workflows/tier2-review.js`.
   Red when: the template's definitions are absent, or the render's are counted beside them.
 - **AC5** — When a `python -c` probe imports `tools/govkit/govkit.py` at the pass tip,
   `eol_population(root)` equals `read_attr_population(root, "eol")` on gov's tree, and
@@ -218,6 +216,9 @@ AC4's.
   53 can build its own arm for that row at its re-ground. RESOLVED (agent, 2026-11-22, delegated):
   (a), M3, the one option that builds nothing without a reader. widens: none · relaxes: none
   Superseded 2026-11-22: the retirement became a deferral to ask TOOL-dTotalRecall-109, beside TOOL-dTotalRecall-8's, so this unit stays parked with the code record it repairs.
+  Superseded 2026-11-25: the owner ruled the record redesigned, and `TOOL-dTotalRecall-8` rev-10 states
+  it under a bound a probe met (deviation 84), so S1 to S4 have their reader again and all stand; this
+  unit parks with that one if its built record loses (its §8 F1).
 
 ## 9. Revision log
 
@@ -229,10 +230,14 @@ AC4's.
 - rev-6 · 2026-11-23 · §3 · the Edges block no longer hands off to TOOL-dTotalRecall-53, per
   `2026-11-23-prompt-TOOL-dTotalRecall-53-reground-brief`: that unit's S20 and S32 ride with this unit under
   ask TOOL-dTotalRecall-109 (its §8 F3), so it consumes nothing here. No other text moved.
+- rev-7 · 2026-11-25 · §1 · S1, S4 · §3 Edges · §4 · AC4 · §8 F4 · §10 · re-grounded at `fbe06249` per
+  `2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief`: `TOOL-dTotalRecall-8` rev-10 writes no
+  registration, so the lines are the file's first and the arm's red case is the four unmarked renders;
+  AC4 reads the record's text in place of a table rev-10 drops; F4 says the unit stands again.
 
 ## 10. Reuse audit
 
-The seams extended, read at `0b3c2b3f9`: govkit's descriptor reader
+The seams extended, read at `fbe06249`: govkit's descriptor reader
 `tools/govkit/govkit.py#read_descriptors` and its `tools/govkit/govkit.py#selfcheck`, which grade every
 descriptor already; `tools/govkit/govkit.py#rule_sources` and `tools/govkit/govkit.py#resolve_dests`,
 the one spelling of where a rule's source lands; the ctx of
