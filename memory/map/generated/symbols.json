@@ -7448,6 +7448,16 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "check_generated_attribute_arms",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_generated_attributes",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "check_generated_output",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -13876,6 +13886,11 @@
       "id": "derive_holder_where",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_home_ctx",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_home_globs",
@@ -23776,6 +23791,11 @@
       "id": "read_attendance",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "read_attr_population",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "read_attribution",

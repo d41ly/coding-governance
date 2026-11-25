@@ -763,3 +763,13 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-25T18:42:22Z draw · re-dispatch · TOOL-dTotalRecall-8 · 86/186 · 20261125T184222Z-09cbff
 
 2026-11-25T18:42:22Z dispatch · item 2c58c6eb TOOL-dTotalRecall-8 · reason tools/playbook/kinds.toml memory/builds/dTotalRecall/build
+
+2026-11-25T19:32:44Z brief · item TOOL-dTotalRecall-37 · reason edcd03b73c98 memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-37-build-brief.md
+
+2026-11-25T19:45:02Z dispatch · item d25e5c29 TOOL-dTotalRecall-37 · reason memory/map/generated tools/govkit/govkit.py tools/govkit/selftest.py tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-37.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-37-1-acceptance-ledger.md
+2026-11-25T19:53:22Z draw · re-dispatch · TOOL-dTotalRecall-37 · 87/186 · 20261125T195322Z-cee0da
+
+2026-11-25T19:53:22Z dispatch · item d25e5c29 TOOL-dTotalRecall-37 · reason .gitattributes
+2026-11-25T20:08:44Z draw · re-dispatch · TOOL-dTotalRecall-37 · 88/186 · 20261125T200844Z-b22000
+
+2026-11-25T20:08:44Z dispatch · item d25e5c29 TOOL-dTotalRecall-37 · reason memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-37-deviation-1020.md

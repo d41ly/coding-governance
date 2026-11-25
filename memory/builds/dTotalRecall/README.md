@@ -88,7 +88,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 101 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 101 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14
 ids TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27 TOOL-dTotalRecall-28
 ids TOOL-dTotalRecall-29 TOOL-dTotalRecall-30 TOOL-dTotalRecall-31 TOOL-dTotalRecall-32 TOOL-dTotalRecall-33 TOOL-dTotalRecall-34 TOOL-dTotalRecall-35 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42
@@ -106,7 +106,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113 TOOL-dTotalRecall-114 TOOL-dTota
 | [TOOL-dTotalRecall-13 — the shared extraction primitive in `tools/lib`, which the map and the lexicon each call](spec/2026-10-26-spec-TOOL-dTotalRecall-13.md) | 2 | 2 | CLOSED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-8 — the core `code` record, one text per tree derived per blob into the one index and re-timed before it is built](spec/2026-10-26-spec-TOOL-dTotalRecall-8.md) | 3 | 2 | CLOSED | rev-10 | 2026-11-25 |
 | [TOOL-dTotalRecall-18 — the kind registry completed: every column declared, readers and writers rendered, the pockets witnessed, and `journal` renamed `log`](spec/2026-10-26-spec-TOOL-dTotalRecall-18.md) | 4 | 2 | CLOSED | rev-7 | 2026-11-22 |
-| [TOOL-dTotalRecall-37 — only the four rendered workflow scripts are `linguist-generated`, held equal to the kits' render rows both ways](spec/2026-10-26-spec-TOOL-dTotalRecall-37.md) | 4 | 2 | INPROGRESS | rev-7 | 2026-11-25 |
+| [TOOL-dTotalRecall-37 — only the four rendered workflow scripts are `linguist-generated`, held equal to the kits' render rows both ways](spec/2026-10-26-spec-TOOL-dTotalRecall-37.md) | 4 | 2 | CLOSED | rev-7 | 2026-11-25 |
 | [TOOL-dTotalRecall-16 — the registry's `purpose` field, and every existing node's purpose reviewed as `memory.map-purpose` says](spec/2026-10-26-spec-TOOL-dTotalRecall-16.md) | 5 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [TOOL-dTotalRecall-25 — the stream-plan kind, registered so the planner that writes it and the pick that reads it descend from one row](spec/2026-10-26-spec-TOOL-dTotalRecall-25.md) | 6 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader](spec/2026-10-26-spec-TOOL-dTotalRecall-5.md) | 7 | 2 | CLOSED | rev-12 | 2026-11-22 |
@@ -205,7 +205,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113 TOOL-dTotalRecall-114 TOOL-dTota
 | [TOOL-dTotalRecall-123 — the map replay run again: more runs per arm, a noise term more runs tighten, and the verdict rule fixed before the first run](spec/2026-10-26-spec-TOOL-dTotalRecall-123.md) | 51 | 2 | OPEN | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 987 bound to this build, across 4 record folder(s).
+Records: 989 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -328,11 +328,11 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 | the units | the units table above |
 | briefs | `2026-11-25-prompt-TOOL-dTotalRecall-8-spec-writer.md`, `2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md` and 435 more under prompts/ |
 | reviews | `2026-11-25-review-TOOL-dTotalRecall-115-closing-diff-review-round2.md` (CLEAN WITH FIXES), `2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md` (CLEAN WITH FIXES) and 9 more under reviews/ |
-| deviation | `2026-11-25-build-TOOL-dTotalRecall-8-deviation-84.md`, `2026-11-25-build-TOOL-dTotalRecall-8-deviation-1019.md` and 155 more under build/ |
+| deviation | `2026-11-25-build-TOOL-dTotalRecall-8-deviation-84.md`, `2026-11-25-build-TOOL-dTotalRecall-8-deviation-1019.md` and 156 more under build/ |
 | red-fix | `2026-11-25-build-TOOL-dTotalRecall-8-red-fix-30.md`, `2026-11-25-build-TOOL-dTotalRecall-8-red-fix-29.md` and 28 more under build/ |
 | widen | `2026-11-25-build-TOOL-dTotalRecall-8-widen-40.md`, `2026-11-25-build-TOOL-dTotalRecall-8-widen-39.md` and 37 more under build/ |
 | research | `2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md`, `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md` and 112 more under build/ |
-| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-8-1-builder-return.md` and 197 more under build/ |
+| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-8-1-builder-return.md` and 198 more under build/ |
 | open asks | `BACKLOG.md`, 13 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->

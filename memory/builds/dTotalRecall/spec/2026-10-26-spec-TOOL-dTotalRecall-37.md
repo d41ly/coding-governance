@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-37 — only the four rendered workflow scripts are `linguist-generated`, held equal to the kits' render rows both ways
 
-**Status:** INPROGRESS · rev-7 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 4 · advances TOOL-dTotalRecall-27 TOOL-dTotalRecall-109
+**Status:** CLOSED · rev-7 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 4 · advances TOOL-dTotalRecall-27 TOOL-dTotalRecall-109
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-36 TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-10-26-build-TOOL-dTotalRecall-37-deviation-371.md](../build/2026-10-26-build-TOOL-dTotalRecall-37-deviation-371.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-37-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-37-reground-return.md) | research | — |
+| [2026-11-25-build-TOOL-dTotalRecall-37-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-37-1-acceptance-ledger.md) | log | — |
+| [2026-11-25-build-TOOL-dTotalRecall-37-deviation-1020.md](../build/2026-11-25-build-TOOL-dTotalRecall-37-deviation-1020.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-11-22-prompt-TOOL-dTotalRecall-37-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-37-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-37-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-37-reground-spec-writer.md) | journal | — |

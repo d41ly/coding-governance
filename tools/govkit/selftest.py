@@ -1914,6 +1914,43 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
           (r4.stdout + r4.stderr)[-1500:])
 
 
+def check_generated_attribute_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
+    """TOOL-dTotalRecall-37 AC3: selfcheck's generated-attribute parity, each side staged in a COPY of gov
+    and silent once restored. A one-direction compare passes one of the two plants. The unresolved
+    `to` token shares the first run; its line is its own."""
+    ga = gcopy / ".gitattributes"
+    kt = gcopy / PFX / KIT_NAMES["workflows"] / "kit.toml"
+    keep = {f: f.read_bytes() for f in (ga, kt)}
+    wf = f"{PFX}{KIT_NAMES['workflows']}/"
+    by_none, unmarked = "is linguist-generated but rendered by no kit", "is rendered but not linguist-generated"
+
+    def write_staged(f: pathlib.Path, new: bytes, label: str) -> None:
+        check(f"[dTR-37] {label} LIVENESS the staged edit matched", new != keep[f], f"no match in {f.name}")
+        f.write_bytes(new)
+
+    write_staged(ga, keep[ga] + f"\n{wf}*.js linguist-generated\n".encode(), "generated-glob")
+    write_staged(kt, keep[kt].replace(b'to = "{kit}/drift-audit-state.js"', b'to = "{nosuch}/state.js"', 1),
+                 "render-token")
+    out = run_selfcheck(gcopy)
+    check("[dTR-37 AC3] generated-glob: a hand-written script the glob marks is named",
+          out.returncode != 0 and f"'{wf}unattended-unit.js' {by_none}" in out.stdout,
+          (out.stdout + out.stderr)[-1500:])
+    check("[dTR-37] render-token: a rendered `to` whose token gov cannot resolve is named, never dropped",
+          "to '{nosuch}/state.js', whose token(s) {nosuch} gov cannot resolve" in out.stdout,
+          (out.stdout + out.stderr)[-1500:])
+    kt.write_bytes(keep[kt])
+    write_staged(ga, keep[ga].replace(f"{wf}tier2-review.js linguist-generated".encode(), b"", 1), "render-unmarked")
+    out = run_selfcheck(gcopy)
+    check("[dTR-37 AC3] render-unmarked: the render that lost its line is named",
+          out.returncode != 0 and f"'{wf}tier2-review.js' {unmarked}" in out.stdout,
+          (out.stdout + out.stderr)[-1500:])
+    ga.write_bytes(keep[ga])
+    out = run_selfcheck(gcopy)
+    check("[dTR-37 AC3] ...and restored, neither side prints",
+          out.returncode == 0 and by_none not in out.stdout and unmarked not in out.stdout,
+          (out.stdout + out.stderr)[-1500:])
+
+
 def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
     """TOOL-dWitnessedBar-54 S3, TOOL-dWitnessedBar-62 S1 to S3 and S22 — a `[[generated]]` row's `when`
     has three readers: run-gates' `regen.check_when` through `build_items`, the unattended kit's
@@ -8362,6 +8399,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         check_halved_install_arms(gcopy, _run_selfcheck)
         check_benched_probe_arms(gcopy, _run_selfcheck)
+        check_generated_attribute_arms(gcopy, _run_selfcheck)
         # --- PLAY-dOrderedCharter-70 S10: a shipped engine file planted with one row citing gov's records.
         rf = gcopy / PFX / KIT_NAMES["playbook"] / "README.md"
         rkeep = rf.read_bytes()
