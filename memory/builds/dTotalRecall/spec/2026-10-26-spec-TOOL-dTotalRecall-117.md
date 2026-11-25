@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-25-build-TOOL-dTotalRecall-117-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-117-1-acceptance-ledger.md) | log | — |
+| [2026-11-25-build-TOOL-dTotalRecall-117-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-117-1-builder-return.md) | journal | — |
 | [2026-11-25-build-TOOL-dTotalRecall-117-deviation-1016.md](../build/2026-11-25-build-TOOL-dTotalRecall-117-deviation-1016.md) | deviation | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-117-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-117-build-brief.md) | journal | — |
 
