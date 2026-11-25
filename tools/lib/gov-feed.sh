@@ -208,11 +208,14 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # against the log, numbers its rows from one more than the larger of the counter and the log's last
 # `seq`, closes a torn last byte, appends every row in one write and writes the counter once.
 # `add_feed_event`'s builder is its append-once read, `derive_feed_row`; a record range's is
-# `derive_record_rows`. `check_feed`'s record arm compares, per ref, the keys the walk derives up to
-# the newest `record` line whose commit any branch or remote-tracking branch reaches with the feed's
-# keys as SETS, `missing` and `extra`. WHAT THIS DOES NOT CHECK: records outside MEMORY_ROOT; a
-# landing pushed past the lander until a later landing's walk appends it; a default branch rewritten
-# under force, whose walk from an older commit can list commits the feed holds.
+# `derive_record_rows`, which leaves out every row whose ref, blob and commit a `record` line already
+# holds, so a merge landing, whose walk re-lists commits the start does not dominate, appends each key
+# once (TOOL-dTotalRecall-115). `check_feed`'s record arm walks from every `record` commit of the ref
+# any branch or remote-tracking branch reaches, and compares the keys that walk derives with the feed's
+# keys as SETS, `missing` and `extra`, and prints `duplicate` for a key a second line holds.
+# WHAT THIS DOES NOT CHECK: records outside MEMORY_ROOT; a landing pushed past the lander until a
+# later landing's walk appends it; a planted line naming a side branch's commit, which makes that
+# branch's record commits read `missing`.
 # A staging name beside <dest> that nobody can know before it is written: <dest>.<SRANDOM twice>.tmp, or
 # mktemp -u's where bash has no SRANDOM; 1 when neither names one. The run-gates runner carries the same line.
 derive_temp_path() { if [ -n "${SRANDOM:-}" ]; then printf -v "$1" '%s.%s%s.tmp' "$2" "$SRANDOM" "$SRANDOM"; else printf -v "$1" '%s' "$(mktemp -u "$2.XXXXXXXX" 2>/dev/null)"; [ -n "${!1}" ]; fi; }
@@ -322,13 +325,18 @@ derive_record_events() { # ref · tip · [from] -> `ref TAB record TAB blob TAB 
       if ((c SUBSEP b) in seen) next
       seen[c, b] = 1; printf "%s\trecord\t%s\t%s\n", ref, b, c }'
 }
-# The record range's builder: the walk from the newest `record` line of <ref>, in file order.
-derive_record_rows() { # ref · tip · feed log -> derive_record_events' rows from that line's commit, the whole history where none
-  local from=""
+# The record range's builder: the walk from the newest `record` line of <ref>, in file order, less every key the log holds.
+derive_record_rows() { # ref · tip · feed log -> derive_record_events' rows the log does not hold, walked from that line's commit, the whole history where none
+  local from="" rows
   if [ -f "$3" ]; then
     from=$(awk -F'\t' -v ref="$1" '{ sub(/\r$/, "") } NF == 6 && $2 == ref && $3 == "record" { c = $5 } END { print c }' "$3" 2>/dev/null) || return 1
   fi
-  derive_record_events "$1" "$2" ${from:+"$from"}
+  rows=$(derive_record_events "$1" "$2" ${from:+"$from"}) || return 1
+  [ -n "$rows" ] || return 0
+  FEED_FILE="$3" awk -F'\t' '
+    BEGIN { f = ENVIRON["FEED_FILE"]; while ((getline ln < f) > 0) { sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") == 6 && x[3] == "record") k[x[2] SUBSEP x[4] SUBSEP x[5]] = 1 } }
+    !(($1 SUBSEP $3 SUBSEP $4) in k)' <<<"$rows"
 }
 add_record_events() { # ref · tip -> 0 always; the record events of every commit after the feed's newest one of <ref> to <tip> appended once
   local ref="$1" c d r rc=0
@@ -382,7 +390,7 @@ add_feed_sightings() { # cache prefix -> 0 always; every unseen commit of a cach
   return 0
 }
 check_feed() {       # cache prefix · [feed file, the node's by default] -> one line per finding and rc 1, or rc 0
-  local pre="${1%/}/" f="${2:-}" dv au rc=0 rf root rr g tip dr
+  local pre="${1%/}/" f="${2:-}" dv au rc=0 rf root rr g tips dr
   if [ -z "$f" ]; then
     [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
     f="${GOVFEED_DIR%$'\r'}/gov-feed.log"
@@ -403,6 +411,7 @@ check_feed() {       # cache prefix · [feed file, the node's by default] -> one
       while ((getline ln < f) > 0) {
         sub(/\r$/, "", ln)
         if (split(ln, x, "\t") != 6) { print "torn " ln; bad = 1; continue }
+        if (x[3] == "record") continue
         k = x[4] SUBSEP x[5]
         if ((x[2] in last) && last[x[2]] == k) { print "duplicate " x[2] " " x[5]; bad = 1; continue }
         last[x[2]] = k
@@ -420,8 +429,8 @@ check_feed() {       # cache prefix · [feed file, the node's by default] -> one
         if (off != "") { print "order " g " " off; bad = 1 }
       }
       exit bad }' || rc=1
-  # THE RECORD ARM (TOOL-dTotalRecall-24 S6): per ref carrying `record` lines, the walk up to the
-  # newest such line whose commit a branch or remote-tracking branch reaches, compared as sets.
+  # THE RECORD ARM (TOOL-dTotalRecall-24 S6): per ref carrying `record` lines, the walk from
+  # every such line's commit a branch or remote-tracking branch reaches, compared as sets.
   [ -f "$f" ] || return "$rc"
   rf=$(awk -F'\t' '{ sub(/\r$/, "") } NF == 6 && $3 == "record" && !($2 in s) { s[$2] = 1; print $2 }' "$f" 2>/dev/null)
   [ -n "$rf" ] || return "$rc"
@@ -431,22 +440,24 @@ check_feed() {       # cache prefix · [feed file, the node's by default] -> one
   fi
   rr=$(git rev-list --branches --remotes 2>/dev/null)
   for g in $rf; do
-    tip=$(printf '%s\n' "$rr" | FEED_FILE="$f" awk -F'\t' -v ref="$g" '
+    tips=$(FEED_FILE="$f" awk -F'\t' -v ref="$g" '
       { sub(/\r$/, ""); r[$0] = 1 }
-      END { f = ENVIRON["FEED_FILE"]; t = "-"
+      END { f = ENVIRON["FEED_FILE"]
             while ((getline ln < f) > 0) { sub(/\r$/, "", ln)
-              if (split(ln, x, "\t") == 6 && x[2] == ref && x[3] == "record" && (x[5] in r)) t = x[5] }
-            print t }')
+              if (split(ln, x, "\t") == 6 && x[2] == ref && x[3] == "record" && (x[5] in r) && !(x[5] in t)) {
+                t[x[5]] = 1; print x[5] } } }' <<<"$rr")
     dr=""
-    if [ "$tip" != - ] && ! dr=$(derive_record_events "$g" "$tip"); then
-      printf 'unread %s walk %s\n' "$g" "$tip"; rc=1; continue
+    if [ -n "$tips" ] && ! dr=$(derive_record_events "$g" --stdin <<<"$tips"); then
+      printf 'unread %s walk\n' "$g"; rc=1; continue
     fi
     printf '%s\n' "$dr" | FEED_FILE="$f" awk -F'\t' -v ref="$g" '
       { sub(/\r$/, "") } NF == 4 { d[$3 SUBSEP $4] = 1; dc[$3 SUBSEP $4] = $4; o[++n] = $3 SUBSEP $4 }
       END { f = ENVIRON["FEED_FILE"]; bad = 0
             while ((getline ln < f) > 0) { sub(/\r$/, "", ln)
               if (split(ln, x, "\t") != 6 || x[2] != ref || x[3] != "record") continue
-              k = x[4] SUBSEP x[5]; got[k] = 1
+              k = x[4] SUBSEP x[5]
+              if (k in got) { print "duplicate " ref " " x[5]; bad = 1; continue }
+              got[k] = 1
               if (!(k in d) && !(("extra " x[5]) in said)) { said["extra " x[5]] = 1; print "extra " ref " " x[5]; bad = 1 } }
             for (i = 1; i <= n; i++) if (!(o[i] in got) && !(("missing " dc[o[i]]) in said)) {
               said["missing " dc[o[i]]] = 1; print "missing " ref " " dc[o[i]]; bad = 1 }

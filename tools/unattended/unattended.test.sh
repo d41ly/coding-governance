@@ -18522,15 +18522,17 @@ if in_shard 8; then
 # the lander's call, `add_record_events refs/heads/main <pushed>`. It prints one `key=value` line per
 # observation and the arms below assert them. The staged reds run inside it: a hand commit landed past
 # the lander whose event is absent (AC4), a copy whose range builder ignores the feed's newest record
-# commit and re-walks the whole history (AC2), a copy whose walk keeps one event per file (AC8), and
-# an off-history `record` line (AC3). WHAT THIS BLOCK DOES NOT DRIVE: the lander's own success
-# branches, which the push-main suite lands through (AC7); the lock's contention on a record range.
+# commit and its keys and re-walks the whole history (AC2), a copy whose walk keeps one event per file
+# (AC8), an off-history `record` line (AC3), and a copy whose key test is `1`, over a merge landing
+# (TOOL-dTotalRecall-115). WHAT THIS BLOCK DOES NOT DRIVE: the lander's own success branches, which the
+# push-main suite lands through (AC7); the lock's contention on a record range; a merge's own resolution.
 # ==================================================================================================
 rr_d=$(mktemp -d)
 rr_kit="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$MT_KIT_DIR"
 awk '/^# >>> gov_feed_sh/{f=1} f{print} /^# <<< gov_feed_sh/{exit}' "$SCRIPT" > "$rr_d/block.sh"
-cp "$rr_d/block.sh" "$rr_d/whole.sh"; cp "$rr_d/block.sh" "$rr_d/perfile.sh"
-mutate "$rr_d/whole.sh" 's/^  derive_record_events "\$1" "\$2" \${from:+"\$from"}$/  derive_record_events "$1" "$2"/'
+cp "$rr_d/block.sh" "$rr_d/whole.sh"; cp "$rr_d/block.sh" "$rr_d/perfile.sh"; cp "$rr_d/block.sh" "$rr_d/keyless.sh"
+mutate "$rr_d/whole.sh" 's/ \${from:+"\$from"}) || return 1$/) || return 1/; s/^    !((\$1 SUBSEP \$3 SUBSEP \$4) in k)/    1/'
+mutate "$rr_d/keyless.sh" 's/^    !((\$1 SUBSEP \$3 SUBSEP \$4) in k)/    1/'
 mutate "$rr_d/perfile.sh" '/^      if ((c SUBSEP b) in seen) next$/d'
 rr_out=$( (
   unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GOVFEED_DIR
@@ -18595,6 +18597,25 @@ rr_out=$( (
   echo "ac8=$(awk -F'\t' -v c="$c8" '$5 == c { print $4 }' "$F" | sed "s/^$(git rev-parse "$c8:memory/builds/xRec/s1.md")$/shared/" | sort | tr '\n' ' ')"
   o=$(check_feed refs/gov/remote/); echo "ac8.check=$? $(grep -c '^duplicate ' <<<"$o")"
   echo "ac8.perfile=$( ( . "$rr_d/perfile.sh"; derive_record_events refs/heads/main "$c8" "$c8^" ) | grep -c .)"
+  # ---- TOOL-dTotalRecall-115: a branch forked before the last fed commit, merged --no-ff and landed, then a
+  # ---- second landing, whose walk starts at the branch's commit and re-lists m1; the same call again; the
+  # ---- keyless copy over the second landing (staged); one line of the feed copied to its end.
+  nm=$(grep -c . "$F"); mc=""
+  run_rr_git checkout -q -b rr-side; printf 'sb\n' > memory/builds/xRec/sb.md; run_rr_git add -A; run_rr_git commit -qm side
+  run_rr_git checkout -q main; printf 'm1\n' > memory/builds/xRec/m1.md; run_rr_git add -A; run_rr_git commit -qm m1
+  run_rr_git push -q origin HEAD:refs/heads/main; add_record_events refs/heads/main HEAD
+  check_feed refs/gov/remote/ >/dev/null; mc="$?"
+  run_rr_git merge -q --no-ff rr-side -m merge; run_rr_git push -q origin HEAD:refs/heads/main; add_record_events refs/heads/main HEAD
+  check_feed refs/gov/remote/ >/dev/null; mc="$mc $?"
+  printf 'n\n' > memory/builds/xRec/n.md; run_rr_git add -A; run_rr_git commit -qm after-merge; run_rr_git push -q origin HEAD:refs/heads/main
+  cp "$F" "$rr_d/mg.log"; cp "${F%.log}.seq" "$rr_d/mg.seq"
+  ( . "$rr_d/keyless.sh"; add_record_events refs/heads/main HEAD ); echo "mg.keyless=$(cut -f2,4,5 "$F" | sort | uniq -d | grep -c .)"
+  cp "$rr_d/mg.log" "$F"; cp "$rr_d/mg.seq" "${F%.log}.seq"
+  add_record_events refs/heads/main HEAD; check_feed refs/gov/remote/ >/dev/null; echo "mg.check=$mc $?"
+  add_record_events refs/heads/main HEAD; echo "mg.keys=$(( $(grep -c . "$F") - nm )) $(cut -f2,4,5 "$F" | sort | uniq -d | grep -c .)"
+  cp "$F" "$rr_d/mg.log"; sed -n 1p "$rr_d/mg.log" >> "$F"; k=$(sed -n 1p "$F" | cut -f5)
+  o=$(check_feed refs/gov/remote/); echo "mg.copied=$? $(grep -c "^duplicate refs/heads/main $k$" <<<"$o") $(grep -c . <<<"$o")"
+  cp "$rr_d/mg.log" "$F"
   # ---- AC10: a root that is no plain relative path.
   n10=$(grep -c . "$F"); printf 'MEMORY_ROOT=../x\n' > .memory-tree.conf
   add_record_events refs/heads/main HEAD 2>"$rr_d/ac10.err"
@@ -18636,7 +18657,7 @@ same "AC1 ...the door-made one naming its record's blob" "$(read_rr_field ac1.c1
 same "AC1 ...the hand-made one naming its record's blob" "$(read_rr_field ac1.c2)" "ok"
 same "AC1 ...and none for the commit outside MEMORY_ROOT" "$(read_rr_field ac1.c3)" "0"
 same "AC2 the same call again appends nothing" "$(read_rr_field ac2.again)" "4"
-same "AC2 RED: a builder ignoring the feed's newest record commit re-appends the history (staged)" "$(read_rr_field ac2.whole)" "8"
+same "AC2 RED: a builder ignoring the feed's newest record commit and its keys re-appends the history (staged)" "$(read_rr_field ac2.whole)" "8"
 same "AC2 a landing another clone made and this one fetched joins before its own" "$(read_rr_field ac2.fetched)" "before"
 same "AC3 an uncommitted record write is in no event" "$(read_rr_field ac3.uncommitted)" "0"
 same "AC3 ...and the feed checks clean" "$(read_rr_field ac3.check)" "0"
@@ -18646,6 +18667,10 @@ same "AC4 ...and once the next landing walks it the check is clean" "$(read_rr_f
 same "AC8 two deletions and two identical files are one - event and one shared-blob event" "$(read_rr_field ac8)" "- shared "
 same "AC8 ...and the check names no duplicate" "$(read_rr_field ac8.check)" "0 0"
 same "AC8 RED: a walk keeping one event per file prints four (staged)" "$(read_rr_field ac8.perfile)" "4"
+same "DTR115 AC1 a merge landing and the one after it append one line per key, and the same call again none" "$(read_rr_field mg.keys)" "3 0"
+same "DTR115 AC1 ...and the check exits 0 after each landing" "$(read_rr_field mg.check)" "0 0 0"
+same "DTR115 AC1 RED: a builder whose key test is 1 appends one key twice over the second landing (staged)" "$(read_rr_field mg.keyless)" "1"
+same "DTR115 AC2 a copied line prints one duplicate and nothing else" "$(read_rr_field mg.copied)" "1 1 1"
 same "AC10 a root of ../x appends nothing and prints one NOTE" "$(read_rr_field ac10.add)" "0 1"
 same "AC10 ...and the check names it unread" "$(read_rr_field ac10.check)" "1 1"
 same "S3 a walk git refuses appends nothing and prints one NOTE" "$(read_rr_field s3.walk)" "0 1"
@@ -25666,7 +25691,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # region-eight `same` (S5 2, S6 1, S3 3), each unconditional and outside any loop, off the diff's own
 # lines, the floors read at the build base c3ba5199. No skip branch. No suite ran, and its RED-first
 # observation is the close's.
-FLOOR_ASSERTIONS=4223
+# RAISED 4223 -> 4228 by TOOL-dTotalRecall-115 on 2026-11-25: the record-feed block's merge landing, 4
+# region-eight `same` (AC1 3, AC2 1) and its keyless copy's `mutate`, each unconditional and outside any
+# loop, off the diff's own lines. No skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4228
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25971,7 +25999,8 @@ FLOOR_SHARD_7=311
 # RAISED 1423 -> 1429 by KICK-dKeptSession-64: the same 6 region-eight ack-batch order-and-exits assertions, see FLOOR_ASSERTIONS.
 # RAISED 1429 -> 1434 by KICK-dKeptSession-65: the same 5 region-eight sent-ack skip and strict-fetch assertions, see FLOOR_ASSERTIONS.
 # RAISED 1434 -> 1440 by KICK-dKeptSession-79: the same 6 region-eight hook-and-marker assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1440
+# RAISED 1440 -> 1445 by TOOL-dTotalRecall-115: the same 5 region-eight merge-landing assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1445
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

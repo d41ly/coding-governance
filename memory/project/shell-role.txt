@@ -54,7 +54,7 @@ tools/lexicon/adopt-lexicon.sh	473	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seed
 tools/lib/envelope.sh	12	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/extract-arms.sh	57	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/extract-arms.test.sh	56	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/lib/gov-feed.sh	413	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
+tools/lib/gov-feed.sh	421	3a1f4ba1d8b4dbed164c6c2dc705d6f1bb1d98be	widened:2026-11-25-build-TOOL-dTotalRecall-115-widen-28
 tools/lib/gov-ref.sh	50	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
 tools/lib/health-log.sh	35	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/history-store.sh	61	d9c6b61ae11133aabe0688eba33821d925bdd480	widened:2026-11-22-build-TOOL-dQuietDisk-28-widen-8
@@ -90,7 +90,7 @@ tools/policy/adopt-policy.test.sh	69	d4f64934ca1b987434214ea8412f2f1950416afa	wi
 tools/policy/policy-shim.sh	205	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/process-monitor/adopt-process-monitor.sh	274	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/process-monitor/adopt-process-monitor.test.sh	347	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/push-main.sh	1596	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
+tools/push-main.sh	1604	3a1f4ba1d8b4dbed164c6c2dc705d6f1bb1d98be	widened:2026-11-25-build-TOOL-dTotalRecall-115-widen-28
 tools/push-main.test.sh	1702	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
 tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	203	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/roles/adopt-roles.sh	283	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
@@ -106,7 +106,7 @@ tools/run-gates/gate-fingerprint.sh	24	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	
 tools/run-gates/lib-attribute.sh	28	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/lib-verdict.sh	10	99c65d5e352d061e856a81d01d00f3454294071c	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
 tools/run-gates/pass-legs.sh	314	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/run-gates/post-merge.sh	725	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
+tools/run-gates/post-merge.sh	733	3a1f4ba1d8b4dbed164c6c2dc705d6f1bb1d98be	widened:2026-11-25-build-TOOL-dTotalRecall-115-widen-28
 tools/run-gates/profile_bar.test.sh	315	99c65d5e352d061e856a81d01d00f3454294071c	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
 tools/run-gates/run-gates.evidence.test.sh	2459	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
 tools/run-gates/run-gates.gov.test.sh	853	d7c4a67399ed2dbeaad06ad17bf622a158816295	widened:2026-11-21-build-TOOL-dWitnessedBar-90-widen-25
@@ -141,8 +141,8 @@ tools/unattended/run-unattended-gates.sh	364	85a1c45076fd9093f1b9a08a2d720c8146a
 tools/unattended/runlog-writer.test.sh	738	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/stall-recorder.test.sh	350	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/stop-guard.test.sh	618	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/unattended/unattended.sh	12207	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
-tools/unattended/unattended.test.sh	17581	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
+tools/unattended/unattended.sh	12215	3a1f4ba1d8b4dbed164c6c2dc705d6f1bb1d98be	widened:2026-11-25-build-TOOL-dTotalRecall-115-widen-28
+tools/unattended/unattended.test.sh	17602	3a1f4ba1d8b4dbed164c6c2dc705d6f1bb1d98be	widened:2026-11-25-build-TOOL-dTotalRecall-115-widen-28
 tools/workflows/check-protocol-parity.test.sh	712	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
 tools/workflows/check-review-join.sh	408	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/check-review-join.test.sh	533	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
@@ -154,4 +154,4 @@ tools/workflows/unattended-build.test.sh	2878	85a1c45076fd9093f1b9a08a2d720c8146
 tools/lib/template-cache.sh	81	f40895118614da5291bbeefa1701f88caaca8aa3	widened:2026-11-22-build-TOOL-dQuietDisk-37-widen-22
 tools/lib/owned-scratch.sh	39	3470633ba7207796277d51f89fca8329073ba9d3	widened:2026-11-22-build-TOOL-dQuietDisk-9-widen-15
 tools/hooks/actions-free.fixture.sh	133	d4f64934ca1b987434214ea8412f2f1950416afa	widened:2026-11-24-build-KICK-dKeptSession-80-widen-8
-tools/memory-tree/gov-claim.sh	811	289db6c05abcd0c77990322eb6199391b9e1ba17	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-26
+tools/memory-tree/gov-claim.sh	819	3a1f4ba1d8b4dbed164c6c2dc705d6f1bb1d98be	widened:2026-11-25-build-TOOL-dTotalRecall-115-widen-28

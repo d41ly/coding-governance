@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-115 — the change feed appends a record event once across a merge landing, and its check reads every logged commit as a tip
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 43
+**Status:** CLOSED · rev-1 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 43
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-dTotalRecall-115-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-115-1-acceptance-ledger.md) | log | — |
 | [2026-11-25-build-TOOL-dTotalRecall-115-widen-27.md](../build/2026-11-25-build-TOOL-dTotalRecall-115-widen-27.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-115-widen-28.md](../build/2026-11-25-build-TOOL-dTotalRecall-115-widen-28.md) | widen | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-115-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-115-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-115-spec-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-115-spec-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-115-spec-writer.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-115-spec-writer.md) | log | — |

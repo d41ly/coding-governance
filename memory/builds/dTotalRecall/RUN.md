@@ -686,3 +686,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-25T03:26:06Z rescope · item add TOOL-dTotalRecall-120 · reason promoted from the closing diff review round 1, item H6 of 2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1
 
 2026-11-25T03:26:13Z rescope · item add TOOL-dTotalRecall-121 · reason promoted from the closing diff review round 1, item M1-M10+L1 of 2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1
+
+2026-11-25T04:20:35Z brief · item TOOL-dTotalRecall-115 · reason a25d6dd83e51 memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-115-build-brief.md
+
+2026-11-25T04:26:42Z dispatch · item 3a1f4ba1 TOOL-dTotalRecall-115 · reason tools/lib/gov-feed.sh tools/push-main.sh tools/run-gates/post-merge.sh tools/unattended/unattended.sh tools/memory-tree/gov-claim.sh tools/unattended/unattended.test.sh memory/project/shell-role.txt memory/map/generated memory/builds/dTotalRecall/build memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-115.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-115-1-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md
