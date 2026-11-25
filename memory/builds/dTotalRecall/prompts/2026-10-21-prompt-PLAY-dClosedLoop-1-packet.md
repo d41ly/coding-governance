@@ -69,7 +69,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `7976ba6b4fab5878d28c79c7d97c5528709a74ec`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `bbf59966602dd4da74b810d23e33f6082a043da1`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -78,7 +78,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `07486a8f869c92de1d96ccb74f9d9ccdb3c819cc`
+- rendered at: `cc26d21927a4f1c60d66de0019d939943a04bd21`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
