@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-123 — the map replay run again: more runs per arm, a noise term more runs tighten, and the verdict rule fixed before the first run
 
-**Status:** OPEN · rev-1 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 51 · advances TOOL-dTotalRecall-111
+**Status:** INPROGRESS · rev-1 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 51 · advances TOOL-dTotalRecall-111
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-25-build-TOOL-dTotalRecall-123-widen-35.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-widen-35.md) | widen | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-123-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
