@@ -5,8 +5,8 @@
 
 `FLOOR_INVARIANTS` is the floor's four members, I11's spelling: `verdict-before-move` (a binding verdict
 runs before the default branch moves), `record-changes` (every policy change and stage transition
-recorded), `guard-self` (the guard protects its own switch off a live run's branch) and
-`no-actor-witness` (no stage witness reads actor-typed state).
+recorded), `guard-self` (the guard protects its own switch off a live run's branch, and on one under `owner-only`)
+and `no-actor-witness` (no stage witness reads actor-typed state).
 
 `read_floor(repo, rev=None)` reads the `[floor]` table at the landed revision, or at `rev`, through the
 policy kit's `read_revision`, found through `read_policy_kit`; the key's catalogue default is derived,
