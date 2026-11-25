@@ -27,6 +27,7 @@ check-arms selftest	kit	selftests
 check-wiring self-test	kit	selftests
 cleanup posture (a tree removal that swallows its error)	repo	product
 cleanup skill wiring	repo	wiring
+code record	repo	product
 codebase-map adopter e2e	kit	e2e
 codebase-map coverage + freshness	repo	declarations
 codebase-map gate coverage	repo	declarations

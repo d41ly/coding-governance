@@ -95,7 +95,6 @@ maintain.security-review
 maintain.tiers
 memory.code-budget
 memory.code-enrich
-memory.code-languages
 memory.code-roles
 memory.default-load
 memory.map-budget

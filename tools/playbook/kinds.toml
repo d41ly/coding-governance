@@ -129,7 +129,7 @@ population = "{prefix}/memory-tree/record-kinds.toml"
 factory = "python {prefix}/memory-tree/record_kinds.py new"
 gate = "record-kinds"
 summary = "A kind of record the memory tree holds."
-usage = "python {prefix}/memory-tree/record_kinds.py new <name> --tag record.<name> --writer <door> --check <leg> --home <glob> --layer <tag> --lifecycle <value> --purpose <text> (--reader <key>... | --readers-none <reason>) (--field <Key>... | --form fence --validator <module>:<function>)"
+usage = "python {prefix}/memory-tree/record_kinds.py new <name> --tag record.<name> --writer <door> --check <leg> --home <glob> --layer <tag> --lifecycle <value> --purpose <text> (--reader <key>... | --readers-none <reason>) (--field <Key>... | --form fence --validator <module>:<function> | --form generated)"
 
 [[kind]]
 tag = "kind.stage"

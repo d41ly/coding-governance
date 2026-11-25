@@ -42,6 +42,7 @@ build-method size	3.5	2	a	2026-09-24	runner
 charter size	5.2	1	a	2026-09-06	runner
 check-arms selftest	15.7	2	a	2026-09-24	runner
 check-wiring self-test	751.8	2	a	2026-09-24	runner
+code record	36.7	1	a	2026-11-25	check_code_record called in process over HEAD 2c58c6eb3, cold at a new version, 105 worktrees listed, TOOL-dTotalRecall-8 on node a 2026-11-25; the warm run read 5.8
 codebase-map adopter e2e	56.7	2	a	2026-09-24	runner
 codebase-map coverage + freshness	7.6	1	a	2026-11-13	runner
 codebase-map coverage + freshness	5.3	1	d	2026-11-22	runner

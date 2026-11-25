@@ -1568,6 +1568,63 @@ def test_dossier_staleness_from_git(tmp: Path):
         "a whole history touching no claimed path is not a clean all-fresh answer"
 
 
+def test_anchored_dossier_staleness(tmp: Path):
+    """TOOL-dTotalRecall-8 S12: a dossier anchoring `a.py::f` is stale when f's body changes and fresh when
+    another definition of the same file does, over a REAL git fixture; a key HEAD does not define answers
+    None, which `main` turns into exit 1. Staged red by reading anchors at path granularity: the change
+    beside f then stales it."""
+    import os
+    import subprocess
+
+    import map_diff as md
+
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+               GIT_CONFIG_NOSYSTEM="1")
+
+    def run_git(*a):
+        r = subprocess.run(["git", "-C", str(tmp), *a], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
+        return r.stdout.strip()
+
+    def write_commit(rel, text):
+        (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp / rel).write_text(text, encoding="utf-8", newline="\n")
+        run_git("add", "-A")
+        run_git("commit", "-qm", rel)
+        return run_git("rev-parse", "HEAD")
+
+    run_git("init", "--template=", "-q")
+    run_git("config", "user.email", "t@t")
+    run_git("config", "user.name", "t")
+    run_git("config", "commit.gpgsign", "false")
+    body = "def f():\n    return {}\n\n\ndef g():\n    return {}\n"
+    write_commit("a.py", body.format(1, 1))
+    refreshed = write_commit("map/features/x.md", "x\n")
+    text = DOSSIER.replace('globs = ["src/x/**"]', 'globs = ["a.py"]\nsymbols = ["a.py::f"]')
+    f = m.parse_dossier(DOSSIER.replace('feature = "x"', 'feature = "foundation"'), IDS, source="f")
+
+    def measure(dossier_text=text):
+        tree = m.MapTree(foundation=f, dossiers=(m.parse_dossier(dossier_text, IDS, source="t"),),
+                         baseline=EMPTY_BASE)
+        commits, scope = md.read_commit_paths(tmp, None)
+        anchors = md.read_anchor_hashes(tmp, commits, tree, "map")
+        return m.measure_dossier_staleness(commits, tree, "map", scope=scope, anchors=anchors)[0], anchors
+
+    row, anchors = measure()
+    assert not row["stale"] and list(anchors) == ["x"], (row, anchors)
+    write_commit("a.py", body.format(1, 2))
+    row, _ = measure()
+    assert row["refreshed"] == refreshed and row["behind"] == 1 and not row["stale"], f"g alone moved: {row}"
+    plain, _ = measure(text.replace('\nsymbols = ["a.py::f"]', ""))
+    assert plain["stale"], f"an unanchored dossier still reads at path granularity: {plain}"
+    write_commit("a.py", body.format(2, 2))
+    assert measure()[0]["stale"], "f's body moved and the anchored dossier read fresh"
+    _row, gone = measure(text.replace("a.py::f", "a.py::gone"))
+    assert gone["x"][0] == {"a.py::gone": None}, gone
+    expect_maperror(text.replace("a.py::f", "a.py"), "paths.symbols")
+
+
 def test_record_roots_split_code_from_records(tmp: Path):
     """TOOL-aMendedFleet-86 S2-S4: RECORD_ROOTS partitions the digest's population, over a REAL git
     fixture because a root is live only when `git ls-files` names a path under it. One code file and
@@ -2027,6 +2084,11 @@ def main() -> int:
         failures += check(
             "stale dossiers: ancestry, whole and by range, map-root excluded (aMendedFleet-37)",
             lambda: test_dossier_staleness_from_git(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "stale dossiers: an anchored dossier reads its definitions' hashes (dTotalRecall-8)",
+            lambda: test_anchored_dossier_staleness(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(

@@ -235,3 +235,28 @@ guard = [
 ]
 chunk = "selftests"
 ceiling = 300
+
+# THE CODE RECORD'S FRESHNESS (TOOL-dTotalRecall-8 S13). Gov's guard is the closure `py_reads.py --guards "code
+# record"` prints, by its directories; an adopter's row carries none, since its whole tree is what it grades.
+[[gate_leg]]
+name = "code record"
+tag = "leg.playbook-render.code-record"
+tests = ["feature.playbook"]
+purpose = "holds HEAD's code record equal to its re-derivation"
+argv = ["python3", "{prefix}/playbook/code_record.py", "--check"]
+subject = "repo"
+enforces = ["principle.p32"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "product"
+ceiling = 157
+guard = [
+  "{prefix}/playbook/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
+]

@@ -107,8 +107,6 @@ SID_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{1
 LABEL_RE = re.compile(r"[A-Za-z0-9._:-]{1,64}")
 # A driver call's slug is read by the kit's ONE slug grammar, `rl.SLUG_RE`, the driver's own spelling.
 VERB_RE = re.compile(r"--[a-z][a-z-]{1,30}")
-ENV_ASSIGN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=.*", re.S)
-HEREDOC_RE = re.compile(r"<<-?[ \t]*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
 NOTIFICATION_RE = re.compile(r"<task-notification>(.*?)</task-notification>", re.S)
 TOOL_USE_ID_RE = re.compile(r"<tool-use-id>([A-Za-z0-9_-]{1,80})</tool-use-id>")
 STATUS_RE = re.compile(r"<status>([a-z_]{1,20})</status>")
@@ -130,9 +128,6 @@ GIT_NAMES = frozenset({"git", "git.exe"})
 GIT_OPTS_WITH_ARG = frozenset({"-C", "-c", "--git-dir", "--work-tree", "--namespace",
                                "--config-env"})
 GIT_CLASSES = {"commit": "git-commit", "merge": "git-merge", "push": "git-push"}
-WRAPPERS = frozenset({"sudo", "command", "exec", "time", "nice", "env", "nohup"})
-INTERPRETERS = frozenset({"bash", "sh", "zsh", "dash", "python", "python3", "py", "node", "pwsh",
-                          "powershell"})
 TEST_TAILS = (".test.sh", ".test.py", ".test.js")
 TEST_NAMES = frozenset({"selftest.py", "selftest.sh", "pytest"})
 SHELL_TOOLS = frozenset({"Bash", "PowerShell"})
@@ -143,11 +138,6 @@ TOOL_CLASSES = {"Read": "read", "Grep": "read", "Glob": "read", "LS": "read", "N
 # Among a shell command's segments, the class is the FIRST of these that any segment names: a push
 # that follows a commit in one `&&` chain is a push.
 SHELL_PRIORITY = ("driver", "git-push", "git-merge", "git-commit", "bar", "test")
-SEPARATORS = ("&&", "||", "|&", "|", ";", "&", "\n", "(", ")")
-# The characters a separator can start with. The tokenizer tries the separator list only at these, so
-# an ordinary character costs one set lookup rather than one `startswith` per separator. Profiled over
-# the largest local session, trying the whole list at every character cost more than parsing the JSON.
-SEPARATOR_HEADS = frozenset(sep[0] for sep in SEPARATORS)
 REPO_KEY_HEX = 16
 STATE_DIR_NAME = "runlog"
 SESSIONS_DIR = "sessions"
@@ -211,10 +201,6 @@ def _derive_status(value) -> int | None:
 
 def _derive_hash(text: str) -> bytes:
     return hashlib.sha256(text.strip().encode("utf-8", "surrogatepass")).digest()[:16]
-
-
-def _derive_basename(word: str) -> str:
-    return word.replace("\\", "/").rsplit("/", 1)[-1]
 
 
 def _check_inside(path: pathlib.Path, root: pathlib.Path) -> bool:
@@ -409,6 +395,23 @@ def _read_json_file(path, coverage) -> dict | None:
 
 # ---------------------------------------------------------------------------------- classification
 
+# >>> invocation_segments -- canonical copy: invocation_segments.py in the gov lib dir (byte-identical; gated)
+ENV_ASSIGN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=.*", re.S)
+HEREDOC_RE = re.compile(r"<<-?[ \t]*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
+WRAPPERS = frozenset({"sudo", "command", "exec", "time", "nice", "env", "nohup"})
+INTERPRETERS = frozenset({"bash", "sh", "zsh", "dash", "python", "python3", "py", "node", "pwsh",
+                          "powershell"})
+SEPARATORS = ("&&", "||", "|&", "|", ";", "&", "\n", "(", ")")
+# The characters a separator can start with. The tokenizer tries the separator list only at these, so
+# an ordinary character costs one set lookup rather than one `startswith` per separator. Profiled over
+# the largest local session, trying the whole list at every character cost more than parsing the JSON.
+SEPARATOR_HEADS = frozenset(sep[0] for sep in SEPARATORS)
+
+
+def _derive_basename(word: str) -> str:
+    return word.replace("\\", "/").rsplit("/", 1)[-1]
+
+
 def _remove_heredocs(command: str) -> str:
     """Drop every heredoc body, delimiter line included. A body is text, never a command."""
     if "<<" not in command:
@@ -502,6 +505,34 @@ def extract_segments(command: str) -> list:
     return segs
 
 
+def _derive_program(words: list) -> int | None:
+    """The index of the word a segment RUNS: past env assignments and wrappers, and past an
+    interpreter and its options, so `bash -x run.sh` runs `run.sh` and `grep x run.sh` runs grep.
+    None when the segment runs inline code (`-c`) or nothing at all."""
+    i = 0
+    while i < len(words):
+        word = words[i]
+        if ENV_ASSIGN_RE.fullmatch(word) or word in WRAPPERS:
+            i += 1
+        elif word == "timeout":
+            i += 2 if i + 1 < len(words) and words[i + 1][:1].isdigit() else 1
+        else:
+            break
+    if i >= len(words):
+        return None
+    if _derive_basename(words[i]).lower().removesuffix(".exe") not in INTERPRETERS:
+        return i
+    j = i + 1
+    while j < len(words) and words[j].startswith("-"):
+        if words[j] == "-c":
+            return None
+        if words[j] == "-m" and j + 1 < len(words):
+            return j + 1
+        j += 1
+    return j if j < len(words) else i
+# <<< invocation_segments
+
+
 def _derive_git_subcommand(args: list) -> tuple:
     i = 0
     while i < len(args):
@@ -541,33 +572,6 @@ def _check_destructive(sub, args) -> bool:
     if sub == "update-ref":
         return "-d" in a
     return False
-
-
-def _derive_program(words: list) -> int | None:
-    """The index of the word a segment RUNS: past env assignments and wrappers, and past an
-    interpreter and its options, so `bash -x run.sh` runs `run.sh` and `grep x run.sh` runs grep.
-    None when the segment runs inline code (`-c`) or nothing at all."""
-    i = 0
-    while i < len(words):
-        word = words[i]
-        if ENV_ASSIGN_RE.fullmatch(word) or word in WRAPPERS:
-            i += 1
-        elif word == "timeout":
-            i += 2 if i + 1 < len(words) and words[i + 1][:1].isdigit() else 1
-        else:
-            break
-    if i >= len(words):
-        return None
-    if _derive_basename(words[i]).lower().removesuffix(".exe") not in INTERPRETERS:
-        return i
-    j = i + 1
-    while j < len(words) and words[j].startswith("-"):
-        if words[j] == "-c":
-            return None
-        if words[j] == "-m" and j + 1 < len(words):
-            return j + 1
-        j += 1
-    return j if j < len(words) else i
 
 
 def _derive_segment(words: list) -> tuple:

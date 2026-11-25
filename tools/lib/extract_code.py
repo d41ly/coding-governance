@@ -1,14 +1,18 @@
 # extract_code.py — the CANONICAL `extract_code` block (TOOL-dTotalRecall-13): definitions and
 # imports read from source text, the working tree, the staging index or a revision, and the
-# identifier lexer, one module holding every tokenizer. This lib dir ships nothing, so the block
-# between the markers travels INLINE, byte-identical, as the lexicon kit's and the codebase-map kit's
-# own `extract_code.py`; the `extract_code` row of the resolver test's PARITY_ROWS reds a copy that
-# drifts. Edit the block here, then copy it whole into both.
+# identifier lexer, one module holding every tokenizer, and a blob's ranges and call sites
+# (TOOL-dTotalRecall-8). This lib dir ships nothing, so the block between the markers travels INLINE,
+# byte-identical, as the lexicon kit's, the codebase-map kit's and the playbook kit's own
+# `extract_code.py`; the `extract_code` row of the resolver test's PARITY_ROWS reds a copy that
+# drifts. Edit the block here, then copy it whole into each.
 # >>> extract_code — canonical copy: extract_code.py in gov's lib dir (byte-identical; gated)
 import ast
+import collections
+import hashlib
 import os
 import re
 import subprocess
+import warnings
 
 
 #: The shipped `probe` pattern sets. Each one MUST have a frozen sentinel fixture in the lexicon
@@ -400,7 +404,12 @@ def parse_shell_defs(src: str):
     NOT AN INTERPRETER. It tokenizes and locates; it never evaluates, never expands and never runs
     what it reads. TOOL-aSurfacedLexicon-14.
     """
-    toks = scan_shell_tokens(src)
+    return [(name, ln) for name, ln, _at, _body in read_shell_sites(scan_shell_tokens(src))], [], []
+
+
+def read_shell_sites(toks: list) -> list:
+    """`[(name, line, name index, body index)]` for each definition `parse_shell_defs`'s four forms find in
+    a shell token stream, the indices into `toks`: the one walk its list and `extract_ranges` read."""
     out, k, m = [], 0, len(toks)
     while k < m:
         kind, text, ln = toks[k]
@@ -410,18 +419,18 @@ def parse_shell_defs(src: str):
             if j + 1 < m and toks[j][1] == "(" and toks[j + 1][1] == ")":
                 j += 2
             if j < m and toks[j][0] == "op" and toks[j][1] in "{(":
-                out.append((toks[k + 1][1], toks[k + 1][2]))
+                out.append((toks[k + 1][1], toks[k + 1][2], k + 1, j))
                 k = j + 1
                 continue
         elif kind == "word" and _SH_NAME.match(text) and k + 2 < m \
                 and toks[k + 1][1] == "(" and toks[k + 2][1] == ")":
             j = k + 3
             if j < m and toks[j][0] == "op" and toks[j][1] in "{(":
-                out.append((text, ln))
+                out.append((text, ln, k, j))
                 k = j + 1
                 continue
         k += 1
-    return out, [], []
+    return out
 
 
 # ---- TOOL-aGradedDialect-3: the TypeScript reader -----------------------------------------
@@ -2169,4 +2178,183 @@ def read_defs_at(root, state, paths=None, cache=None, *, armed=None, sets=None, 
             got = None
         cache[key] = got if got else ([], [], [])
     return {rel: (key[0], cache[key]) for key, rel in want}
+
+
+# ---- TOOL-dTotalRecall-8: definitions with their ranges, and the call sites inside them --------
+
+#: A shell file another sources: the last `*.sh` name of a `.` or `source` command's first argument.
+_SH_SOURCE = re.compile(r"^[ \t]*(?:\.|source)[ \t]+[^\n;|&]*?([\w.-]+\.sh)\b", re.M)
+
+
+def derive_range_hash(lines: list, line: int, end_line: int) -> str:
+    """The first 12 hex of the SHA-1 of source lines `line` to `end_line`, one-based and inclusive."""
+    text = "\n".join(lines[line - 1:end_line]) + "\n"
+    return hashlib.sha1(text.encode("utf-8", "surrogatepass")).hexdigest()[:12]
+
+
+def extract_ranges(src: str, ext: str):
+    """What one blob's text defines and calls, or `None` for an extension with no range reader here. A dict:
+
+    `defs`     `[(qualified name, "function" or "class", line, end_line, body hash)]` in source order, a nested
+               definition's name joining its parents with `.`, the hash `derive_range_hash`'s over the range;
+    `calls`    `[(the enclosing definition's qualified name or "", callee as spelled, line)]`;
+    `imports`  `[(local name, module, imported name)]`, a shell file's the files it sources;
+    `bases`    `{class: [base as spelled]}`, and `assigns` `[(scope, name, callee)]`, a name assigned from a
+               call, both what resolving a Python method needs;
+    `argv`     the list and tuple literals of a Python file holding a string, each member its string, or
+               `$<dotted name>` for a name, or `$` for another expression.
+
+    Python is `ast`; shell and JavaScript (and `ts`, `tsx`) are the tokenizers above, a range running from the
+    name's line to the line its body closes on. A site is every call's spelled name (Python), every word
+    that could name a function (shell) and every applied name (JavaScript): which definition one reaches is
+    the caller's to resolve, over a tree. RAISES what `ast.parse` or the tokenizer raises.
+    """
+    src = src.removeprefix("\ufeff").replace("\r\n", "\n")
+    if ext == "py":
+        return _read_py_ranges(src.replace("\r", "\n"))
+    if ext == "sh":
+        return _read_sh_ranges(src)
+    if ext in ("js", "mjs", "cjs", "ts", "tsx"):
+        return _read_ts_ranges(src, ext == "tsx")
+    return None
+
+
+def _read_py_ranges(src: str) -> dict:
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")  # a string escape's warning is the file's, never this reader's
+        tree = ast.parse(src)
+    lines = src.split("\n")
+    out = {"defs": [], "calls": [], "imports": [], "bases": {}, "assigns": [], "argv": []}
+
+    def read_dotted(node):
+        parts = []
+        while isinstance(node, ast.Attribute):
+            parts.append(node.attr)
+            node = node.value
+        if isinstance(node, ast.Name):
+            return ".".join([node.id, *reversed(parts)])
+        return ".".join(["?", *reversed(parts)]) if parts else None
+
+    def scan_node(node, scope):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            name = f"{scope}.{node.name}" if scope else node.name
+            is_class = isinstance(node, ast.ClassDef)
+            out["defs"].append((name, "class" if is_class else "function", node.lineno, node.end_lineno,
+                                derive_range_hash(lines, node.lineno, node.end_lineno)))
+            if is_class:
+                out["bases"].setdefault(name, [b for b in map(read_dotted, node.bases) if b])
+            for deco in node.decorator_list:  # evaluated where the definition stands, outside its own range
+                scan_node(deco, scope)
+            for child in ast.iter_child_nodes(node):
+                if child not in node.decorator_list:
+                    scan_node(child, name)
+            return
+        if isinstance(node, ast.Call):
+            callee = read_dotted(node.func)
+            if callee:
+                out["calls"].append((scope, callee, node.lineno))
+        elif isinstance(node, ast.Import):
+            for a in node.names:
+                top = a.name if a.asname else a.name.split(".")[0]
+                out["imports"].append((a.asname or top, top, ""))
+        elif isinstance(node, ast.ImportFrom):
+            for a in node.names:
+                out["imports"].append((a.asname or a.name, "." * node.level + (node.module or ""), a.name))
+        elif isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name) \
+                and isinstance(node.value, ast.Call):
+            callee = read_dotted(node.value.func)
+            if callee:
+                out["assigns"].append((scope, node.targets[0].id, callee))
+        elif isinstance(node, (ast.List, ast.Tuple)):
+            words = [e.value if isinstance(e, ast.Constant) and isinstance(e.value, str)
+                     else "$" + (read_dotted(e) or "") for e in node.elts]
+            if any(not w.startswith("$") for w in words):
+                out["argv"].append(words)
+        for child in ast.iter_child_nodes(node):
+            scan_node(child, scope)
+
+    scan_node(tree, "")
+    return out
+
+
+def _scan_owned(spans: list, sites: list, lines: list) -> tuple:
+    """`(defs, calls)` from `spans`, `[(name, kind, line, end_line, first index, last index)]` in token order,
+    and `sites`, `[(index, name, line)]` in token order: each name qualified by the spans holding it, each
+    site given the innermost span holding it. One pass over both, a stack of the spans still open."""
+    defs, calls, opened, at = [], [], [], 0
+    for i, name, line in [*sites, (float("inf"), "", 0)]:
+        while at < len(spans) and spans[at][4] <= i:
+            own, kind, first, last, begin, close = spans[at]
+            while opened and opened[-1][1] < begin:
+                opened.pop()
+            qual = f"{opened[-1][0]}.{own}" if opened else own
+            defs.append((qual, kind, first, last, derive_range_hash(lines, first, last)))
+            opened.append((qual, close))
+            at += 1
+        while opened and opened[-1][1] < i:
+            opened.pop()
+        if name:
+            calls.append((opened[-1][0] if opened else "", name, line))
+    return defs, calls
+
+
+def _read_sh_ranges(src: str) -> dict:
+    toks = scan_shell_tokens(src)
+    spans, named = [], set()
+    for name, line, name_at, body in read_shell_sites(toks):
+        named.add(name_at)
+        opener, closer = toks[body][1], "}" if toks[body][1] == "{" else ")"
+        depth, end = 0, body
+        while end < len(toks):
+            if toks[end][0] == "op":
+                depth += (toks[end][1] == opener) - (toks[end][1] == closer)
+                if not depth:
+                    break
+            end += 1
+        end = min(end, len(toks) - 1)
+        spans.append((name, "function", line, max(line, toks[end][2]), name_at, end))
+    sites = [(i, text, ln) for i, (kind, text, ln) in enumerate(toks)
+             if kind == "word" and i not in named and _SH_NAME.match(text)]
+    defs, calls = _scan_owned(spans, sites, src.split("\n"))
+    return {"defs": defs, "calls": calls, "imports": [(m, m, "") for m in _SH_SOURCE.findall(src)],
+            "bases": {}, "assigns": [], "argv": []}
+
+
+def _read_ts_ranges(src: str, jsx: bool) -> dict:
+    applied, conts, lits = set(), set(), {}
+    toks = scan_ts_tokens(src, jsx, applied, conts, lits)
+    funcs, types_, _owned = parse_ts_source(src, jsx)
+    want, classes = collections.Counter(funcs + types_), set(types_)
+    spans, m = [], len(toks)
+    for i, (kind, text, ln) in enumerate(toks):
+        if kind != "word" or not want.get((text, ln)):
+            continue
+        want[(text, ln)] -= 1
+        if (text, ln) in classes:
+            body = next((j for j in range(i, m) if toks[j][1] in ("{", ";")), None)
+        else:
+            j = i + 1
+            if j < m and toks[j][1] == "<":
+                j = read_ts_angle_end(toks, j) or j
+            if j < m and toks[j][1] == "(":
+                body = read_ts_body_start(toks, j)
+            else:
+                eq = j if check_ts_arrow(toks, j + 1) else read_ts_type_end(toks, j + 1, "=")
+                if eq is not None and eq + 1 in lits:  # its value was a silent literal, and the arrow the walk
+                    continue                           # above read is the NEXT statement's: no definition here
+                body = read_ts_arrow_body(toks, eq + 1) if eq is not None else None
+        if body is None or body >= m:
+            end = i + 1
+        elif toks[body][1] == "{":
+            end = read_ts_brace_end(toks, body)
+        else:
+            end = max(read_ts_expr_end(toks, body, conts, lits), i + 1)
+        spans.append((text, "class" if (text, ln) in classes else "function", ln,
+                      max(ln, toks[min(end, m) - 1][2]), i, end - 1))
+    starts = {s[4] for s in spans}
+    sites = [(i - 1, toks[i - 1][1], toks[i - 1][2]) for i in sorted(applied)
+             if i and i - 1 not in starts and toks[i - 1][0] == "word" and _TS_NAME.match(toks[i - 1][1])]
+    defs, calls = _scan_owned(spans, sites, src.split("\n"))
+    return {"defs": defs, "calls": calls, "bases": {}, "assigns": [], "argv": [],
+            "imports": [(mod, mod, "") for mod, _line in _probe_defs(src, "js-regex")[2]]}
 # <<< extract_code

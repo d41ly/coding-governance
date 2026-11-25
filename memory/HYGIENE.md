@@ -836,7 +836,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 
 <!-- gen:record-kinds -->
 
-54 kinds · 26 purposes pending
+55 kinds · 26 purposes pending
 
 | Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |
 |---|---|---|---|---|---|---|---|
@@ -894,6 +894,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 | `stream-plan` | `record.stream-plan` | `memory/builds/*/build/*-stream-plan-*.md` | `hand` | — | — | `record-kinds` | a build's units grouped into ordered streams, written by dIndexedDesign's planner, read by dWellOiledMachine's pick |
 | `ask` | `record.ask` | `memory/builds/*/BACKLOG.md` | `gov_record.py new ask` | — | — | `memory hygiene` | the ask kind's acceptance at filing; its writers are the items that file asks, each filing stating its acceptance |
 | `shape-run` | `record.shape-run` | `memory/builds/*/build/*-build-*-shape-run-*.md` | `gov_record.py new shape-run` | — | — | `shape-run records (each record equals its review line)` | one review exit's review-shape line as typed fields, compared back to that line by shape_run.py |
+| `code` | `record.code` | `<git-common-dir>/gov/index-s*.db` | `generator:{prefix}/playbook/code_record.py` | — | — | `code record` | what a tree's code defines, calls, invokes and registers, derived per blob and cached by tree hash |
 
 <!-- /gen:record-kinds -->
 

@@ -338,6 +338,14 @@ What the render gate does with the list of instruction files not yet rendered fr
 instructions.legacy = "refuse"
 ```
 
+## `memory.code-languages`
+<!-- usage: policy:memory.code-languages f7fa6adb -->
+Which extractors the code record reads a tree with: builtin takes Python, shell and JavaScript definitions and calls and every other file at file level, builtin+ctags adds the definitions of every other language from the ctags on PATH, and ctags takes every language's definitions from it, the built-in extractors still giving calls; under either ctags value a missing ctags stops the run.
+
+```text
+memory.code-languages = "builtin+ctags"
+```
+
 ## `memory.load-budget`
 <!-- usage: policy:memory.load-budget 263be443 -->
 The bytes the default load's memory share may take at session start, the card and the auto-memory index each measured against it as its own figure on the card's memory cell, a k being 1,000 bytes.
@@ -430,7 +438,7 @@ Whether a self-test that opts into the template cache builds each base repositor
 tests.fixture-templates = "per-case"
 ```
 
-## Not yet summarised (206)
+## Not yet summarised (205)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -607,7 +615,6 @@ tests.fixture-templates = "per-case"
 - `memory.default-load`
 - `memory.code-budget`
 - `memory.code-roles`
-- `memory.code-languages`
 - `memory.code-enrich`
 - `memory.mirror`
 - `memory.project-map`

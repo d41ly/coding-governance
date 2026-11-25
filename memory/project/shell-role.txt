@@ -66,7 +66,7 @@ tools/lib/python-floor.sh	24	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/refuse-wrong-shell.sh	119	60ca5ed4d6d66b8c8f0715ee8b1d6d4ee6cab066	widened:2026-11-20-build-TOOL-dWitnessedBar-62-widen-5
 tools/lib/render-doc.sh	205	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/resolve-python.sh	133	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/lib/resolve-python.test.sh	1654	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
+tools/lib/resolve-python.test.sh	1655	2c58c6eb37c6059bc33ff2c051f321334eded792	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-37
 tools/lib/resolve-remote.sh	33	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/loop/adopt-loop.sh	147	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-recall/adopt-memory-recall.sh	239	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
@@ -84,7 +84,7 @@ tools/memory-tree/marker-contract.test.sh	346	85a1c45076fd9093f1b9a08a2d720c8146
 tools/memory-tree/merge-rows.sh	153	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-tree/merge-rows.test.sh	1578	99c65d5e352d061e856a81d01d00f3454294071c	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
 tools/memory-tree/transition-audit.test.sh	483	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/playbook/adopt-playbook.sh	445	5daf07165fd8c427667ee0f3e020c2a030fd55e8	widened:2026-11-25-build-TOOL-dTotalRecall-121-widen-32
+tools/playbook/adopt-playbook.sh	450	2c58c6eb37c6059bc33ff2c051f321334eded792	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-37
 tools/policy/adopt-policy.sh	238	d4f64934ca1b987434214ea8412f2f1950416afa	widened:2026-11-24-build-KICK-dKeptSession-80-widen-8
 tools/policy/adopt-policy.test.sh	69	d4f64934ca1b987434214ea8412f2f1950416afa	widened:2026-11-24-build-KICK-dKeptSession-80-widen-8
 tools/policy/policy-shim.sh	205	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded

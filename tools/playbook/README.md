@@ -429,3 +429,48 @@ trailers since the compare base, and is the `edges` leg of the `tags` pack. It d
 `from`, since no source namespace is registered; an `id#tag` target resolves through the section
 reader `record show` runs, memory-tree's `record_find.read_section` (TOOL-dTotalRecall-9 S5), and `gov_tag.py
 show <id>#<tag>` prints the same section; a `serves` id no spec defines is counted, check 21's verdict.
+
+## The code record
+
+`code_record.py` derives what a tree's code defines, calls, invokes and registers (TOOL-dTotalRecall-8), one text
+per tree, read from the blobs git tracks and cached in the one index file beside the tag index. It is the core's
+answer to "who calls this" and "what does this file define"; the codebase map's `symbols.json` stays the
+optional map's own.
+
+```bash
+python <prefix>/playbook/code_record.py --check                    # the leg `code record`: the cached text re-derived
+python <prefix>/playbook/code_record.py --dump [--tree <rev>]      # the text itself
+python <prefix>/playbook/code_record.py neighbourhood <path>...    # definitions, callers, callees, tests, siblings
+python <prefix>/playbook/code_record.py --time [--tree <rev>]      # one cold derivation: seconds, bytes, facts
+python <prefix>/playbook/code_record.py --fixture adopter          # the adopter-scale repository, then --time there
+```
+
+The text is UTF-8, LF-ended, its paths sorted, a TAB between cells. An ordinal is a line's place, from 0, among the
+`f` and `d` lines, so an `f` line's is its module's own:
+
+```
+code-record 1	<extractors>	<languages>
+f	<path>                                 a code file
+i	<module>[:<name>,…] …                  its imports, for a shell file the files it sources
+d	<depth>[C]	<name>	<line>-<end>	<hash12>   a definition, C a class, its depth under its file
+c	<ordinal> …                            calls out of the f or d line above
+m	<name> …                               mentions out of it
+x	<ordinal> …                            files it invokes
+r	<leg or kit>	<ordinal>                  a registry edge
+a	<language>	<ambiguous>/<sites>          that language's edges ship as mentions
+s	<path>	<reason>                        a skipped input
+```
+
+A Python call resolves through its enclosing definitions, its module, its imports and, for a method, the class it
+is called on and that class's bases; one that reaches nothing is a mention where some Python definition carries its
+name. A shell word or a JavaScript call resolves in its own file, then in the files it sources, then in its kit,
+and one with two candidates at the first level holding any is ambiguous: past 10% of a language's sites, that
+language's edges all ship as mentions and an `a` line says so. A reader in Python calls `derive_code_record(root)`,
+whose `code_row`, `code_file`, `code_edge` and `code_meta` also answer what the text leaves to the listing: tests,
+kits and a call's line.
+
+`memory.code-languages` says which extractors read the tree; under a ctags value a missing ctags is exit 2 naming
+the key. `linguist-vendored` and `linguist-generated` paths are left out by the tree's own `.gitattributes`, and
+binary, LFS, oversized and unparsed files leave an `s` line. A derivation past its time ceiling prints `degraded`,
+exits 2 and is never cached; its reader uses `git grep`. A cached text that differs from its derivation is red, and
+deleting the index costs one rebuild.

@@ -447,6 +447,7 @@ gov_ref_sh|$ROOT/$KIT_REL/gov-ref.sh|$KIT_REL/gov-ref
 gov_feed_sh|$ROOT/$KIT_REL/gov-feed.sh|$KIT_REL/gov-feed
 home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
 extract_code|$ROOT/$KIT_REL/extract_code.py|$KIT_REL/extract_code
+invocation_segments|$ROOT/$KIT_REL/invocation_segments.py|$KIT_REL/invocation_segments
 slug_legacy_py|$ROOT/$MEMTREE_DIR/id_grammar.py|$MEMTREE_DIR/id_grammar
 slug_legacy_sh|$ROOT/$MEMTREE_DIR/check-memory-hygiene.sh|$MEMTREE_DIR/check-memory-hygiene
 extract_route_units_js|$ROOT/$SG_HOOKS_DIR/scratch-guard.js|$SG_HOOKS_DIR/scratch-guard
@@ -544,8 +545,11 @@ owned_work_sh|$ROOT/$KIT_REL/owned-scratch.sh|$KIT_REL/owned-scratch
 # and its parented commit: the unattended driver's claim write and post-merge's bar-red ref each carry
 # it inline, and part 2p below holds the canonical to its failed-build contract.
 # extract_code (TOOL-dTotalRecall-13 S3) is the shared extraction primitive: the definition extractors,
-# their tokenizers, the state reader and the map's identifier lexer. The lexicon kit's and the
-# codebase-map kit's extract_code.py are each that block whole, beside a comment header of their own.
+# their tokenizers, the state reader, the map's identifier lexer and the range extractor
+# (TOOL-dTotalRecall-8). The lexicon kit's, the codebase-map kit's and the playbook kit's extract_code.py
+# are each that block whole, beside a comment header of their own. invocation_segments
+# (TOOL-dTotalRecall-8 S5) is a shell command split into segments and the word each one runs: runlog's
+# extract.py, its first reader, and the playbook kit's code_record.py each carry it inline.
 # slug_legacy_py and slug_legacy_sh (TOOL-dTotalRecall-5 S8) are the slug grammar's legacy shape, one
 # constant per language, canonical in the memory-tree kit's id_grammar.py and hygiene script: a reader
 # in a kit that does not require memory-tree carries it inline for the tree where that kit is absent,

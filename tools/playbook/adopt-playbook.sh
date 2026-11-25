@@ -581,3 +581,13 @@ PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf load-set arm(s) failed"; exit 1; fi
 echo "PASS — the load sets' plants"
 fi
+
+# THE CODE RECORD'S ARMS (TOOL-dTotalRecall-8, its New arm line). `code_record.py --selftest` runs every fixture
+# of that spec's acceptance but the adopter-scale one over its own scratch repositories: definitions, calls,
+# mentions, the ambiguity test, invocations and registry edges, the neighbourhood, the cache, the ceiling, the
+# bounds and the ctags pack. Its blobs are read through memory-tree and its one key through the policy kit.
+_uk=; check_sibling_kit memory-tree tree_lib.py || _uk=memory-tree
+check_sibling_kit policy policy.py || _uk=${_uk:-policy}
+if [ -n "$_uk" ]; then echo "UNARMED — the code record's arms: no $_uk kit in this install"; else
+"$PY_BIN" "$HERE/code_record.py" --selftest || exit 1
+fi

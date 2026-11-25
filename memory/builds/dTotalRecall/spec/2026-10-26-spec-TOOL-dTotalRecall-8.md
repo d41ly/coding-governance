@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-8 — the core `code` record, one text per tree derived per blob into the one index and re-timed before it is built
 
-**Status:** INPROGRESS · rev-10 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 3 · closes TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 TOOL-dTotalRecall-109 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-10 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 3 · closes TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 TOOL-dTotalRecall-109 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0219@1b6fec50 whole
 **Carries:** node:record-kind.code
@@ -24,8 +24,11 @@
 | [2026-11-22-build-TOOL-dTotalRecall-8-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-reground-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-8-widen-1.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-widen-1.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-8-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-8-1-acceptance-ledger.md) | log | — |
+| [2026-11-25-build-TOOL-dTotalRecall-8-deviation-1019.md](../build/2026-11-25-build-TOOL-dTotalRecall-8-deviation-1019.md) | deviation | — |
 | [2026-11-25-build-TOOL-dTotalRecall-8-deviation-84.md](../build/2026-11-25-build-TOOL-dTotalRecall-8-deviation-84.md) | deviation | — |
 | [2026-11-25-build-TOOL-dTotalRecall-8-widen-36.md](../build/2026-11-25-build-TOOL-dTotalRecall-8-widen-36.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-8-widen-37.md](../build/2026-11-25-build-TOOL-dTotalRecall-8-widen-37.md) | widen | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |

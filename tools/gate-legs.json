@@ -1551,6 +1551,37 @@
     ]
   },
   {
+    "name": "code record",
+    "tag": "leg.playbook-render.code-record",
+    "tests": [
+      "feature.playbook"
+    ],
+    "purpose": "holds HEAD's code record equal to its re-derivation",
+    "argv": [
+      "python3",
+      "{prefix}/playbook/code_record.py",
+      "--check"
+    ],
+    "guard": [
+      "{prefix}/playbook/",
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 157,
+    "enforces": [
+      "principle.p32"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
     "name": "policy check",
     "tag": "leg.policy-kit.policy-check",
     "tests": [

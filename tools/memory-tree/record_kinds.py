@@ -8,7 +8,8 @@
                                                 --check <leg> --home <glob>
                                                 --layer <tag> --lifecycle <value> --purpose <text>
                                                 (--reader <key>... | --readers-none <reason>)
-                                                (--field <Key>... | --form fence --validator <module>:<function>)
+                                                (--field <Key>... | --form fence --validator <module>:<function>
+                                                 | --form generated)
     python <prefix>/memory-tree/record_kinds.py --purpose-review [--from <path>] [--write [--ask <id>]]
     python <prefix>/memory-tree/record_kinds.py --print-purpose-pending   # the purpose-pending seed
     python <prefix>/memory-tree/record_kinds.py --seed-legacy       # the record-kinds-legacy seed, both slices
@@ -126,7 +127,7 @@ under `review`, `purpose-pending` under `ledger`, `none-found` under `derive`, n
 Exit 0 green, 1 a red, 2 a refusal: a registry that does not parse, or a verb's malformed arguments.
 `new` appends the row and re-renders that region from the registry, so the two move together; it
 exits 2 and writes nothing on a duplicate name, a tag that is not `record.<name>`, an empty
-writer, no `--home`, a `--form` other than `fields`, its default, or `fence`, a `fields` row with no
+writer, no `--home`, a `--form` other than `fields`, its default, `fence` or `generated`, a `fields` row with no
 `--field` or with a `--validator`, a `fence` row with a `--field` or with no `--validator` or one that
 does not resolve, a check no leg carries, no `--layer` or one that is no
 `layer.<name>` tag, no `--lifecycle` or one outside `LIFECYCLES`, no `--reader` and no
@@ -212,7 +213,8 @@ GIT_OWN = ("HEAD", "ORIG_HEAD", "FETCH_HEAD", "MERGE_HEAD", "CHERRY_PICK_HEAD", 
 UNARMED = "unarmed"
 FORMS = ("fields", "header", "rows", "generated", "fence")
 SCHEMA_KEYS = ("form", "fields", "source", "validator")
-NEW_FORMS = ("fields", "fence")   # the forms `new` writes (TOOL-dTotalRecall-25 S7)
+GRADED_FORMS = ("fields", "fence")   # the forms whose records this check grades one by one
+NEW_FORMS = (*GRADED_FORMS, "generated")   # the forms `new` writes (TOOL-dTotalRecall-25 S7, -8 S11)
 #: a `fence` row's `schema.validator`: a bare module of this kit's directory and a function at its top level
 VALIDATOR_RE = re.compile(r"(?P<module>[A-Za-z_][A-Za-z0-9_]*):(?P<function>[A-Za-z_][A-Za-z0-9_]*)")
 #: a record's machine half, the regex the codebase map's `parse_dossier` reads a dossier's with, carried as
@@ -1386,7 +1388,7 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
                 reds.append(f"row {name}: `{UNARMED}` is no non-empty string: name the writer that will arm the kind")
             elif name not in typed_kinds:
                 reds.append(f"row {name}: `{UNARMED}` on an untyped row: only a typed kind's empty home reads unarmed")
-            elif schema.get("form") not in NEW_FORMS:
+            elif schema.get("form") not in GRADED_FORMS:
                 reds.append(f"row {name}: `{UNARMED}` on a {schema.get('form')!r} row: only a `fields` or `fence` "
                             f"row carries the key")
             elif held:
@@ -1498,9 +1500,10 @@ def render_row(row: dict) -> str:
 
 
 def add_record_kind(root, a, kit_rel: str | None = None) -> int:
-    """`new`: one conforming `fields` or `fence` row appended to the registry and the HYGIENE template's view
-    re-rendered from it, so the gate reads the two in step; or exit 2 naming each refusal and writing
-    nothing. A `fence` row takes `--validator` and no `--field`, a `fields` row the reverse; a member of
+    """`new`: one conforming `fields`, `fence` or `generated` row appended to the registry and the HYGIENE
+    template's view re-rendered from it, so the gate reads the two in step; or exit 2 naming each refusal and
+    writing nothing. A `fence` row takes `--validator` and no `--field`, a `fields` row the reverse, a
+    `generated` row neither; a member of
     `tree_lib.TYPED_RECORD_KINDS` gets the factory's `KINDS.<name>.required` as its `source` and the typed
     name as its `id-rule` (TOOL-dTotalRecall-25 S7)."""
     from tree_lib import TYPED_RECORD_KINDS
@@ -1528,6 +1531,9 @@ def add_record_kind(root, a, kit_rel: str | None = None) -> int:
             bad.append("--validator <module>:<function> is required on a `fence` row, the check its records take")
         else:
             bad += [f"--{why}" for fn, why in [resolve_validator(a.validator)] if fn is None]
+    elif form == "generated":   # its generator's own check grades it, so no field and no validator (TOOL-dTotalRecall-8)
+        bad += [f"--{flag} is refused on a `generated` row: its writer's own check grades the record"
+                for flag, given in (("field", a.field), ("validator", a.validator)) if given]
     else:
         if a.validator:
             bad.append("--validator is refused on a `fields` row: only a `fence` row names a validator")
@@ -1568,7 +1574,7 @@ def add_record_kind(root, a, kit_rel: str | None = None) -> int:
             print(f"{SAY}: refused · {b}")
         return 2
     typed = a.name in TYPED_RECORD_KINDS   # the two cells `check_record_kinds` and `read_bindings` hold it to
-    schema = {"form": form, "fields": [] if form == "fence" else list(a.field)}
+    schema = {"form": form, "fields": list(a.field) if form == "fields" else []}
     if typed:
         schema["source"] = f"{{prefix}}/{pathlib.PurePosixPath(kit_rel).name}/build_records.py:KINDS.{a.name}.required"
     if form == "fence":
@@ -2036,7 +2042,8 @@ PLANTS = ("writer-missing", "check-unknown", "source-drift", "factory-kind-unrow
           "unarmed-reason", "unarmed-with-record", "unarmed-untyped", "home-slash", "home-directory", "shared-home",
           "homeless-record", "owner-graded", "bad-field-key", "stream-name-twice", "stream-foreign-unit",
           "stream-two-fences", "unarmed-on-disallowed-form", "awk-regex-alias", "alias-constant", "homeless-empty",
-          "unkept-build-alias", "marker-in-kept-script", "alias-row-drained", "alias-row-outside-domain")
+          "unkept-build-alias", "marker-in-kept-script", "alias-row-drained", "alias-row-outside-domain",
+          "form-generated")
 #: TOOL-dTotalRecall-56 S1: `unkept-build-alias`'s build-folder script, its raw compare below the binding head and
 #: no row for its path, since its fixture holds no `census-kept-paths.txt`
 FIXTURE_BUILD_ALIAS = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-07-build-TOOL-{FIXTURE_BUILD}-1-probe.py"
@@ -2329,7 +2336,8 @@ def run_fixture(plant: str | None) -> tuple[list[str], int]:
     `new-row` and `new-purpose` run `new` with every flag first, and `pipe-cell` prints the region line of the
     piped row. `review` prints the purpose review alone; `review-write` writes it under the closed ask, then
     the open one, and prints each reviewed node's purpose; the `value-*` writes print theirs, and
-    `value-ledger` runs the population's seed before the check. `marker-in-kept-script` grades its own check,
+    `value-ledger` runs the population's seed before the check. `form-generated` runs `new` three times, the
+    two refusals then the row it appends. `marker-in-kept-script` grades its own check,
     PASS and exit 0 where that exits 1 with one red, naming the kept script's marked line."""
     if plant is not None and plant not in PLANTS:
         return [f"{SAY}: refused · no plant {plant!r}: the plants are {', '.join(PLANTS)}"], 2
@@ -2355,6 +2363,19 @@ def run_fixture(plant: str | None) -> tuple[list[str], int]:
             head, rc = run_captured(argv, tmp, head)
             return head + [f"{SAY}: fixture bad-field-key · new exit {rc} · registry "
                            f"{'unchanged' if reg.read_bytes() == before else 'changed'}"], rc
+        if plant == "form-generated":   # TOOL-dTotalRecall-8 S11: a field and an unknown form refused, then the row
+            reg = pathlib.Path(tmp, derive_kit_rel(), REGISTRY)
+            before = reg.read_bytes()
+            bare = [a for i, a in enumerate(FIXTURE_NEW) if not (a == "--field" or FIXTURE_NEW[i - 1] == "--field")]
+            for why, argv in (("field", bare + ["--form", "generated", "--field", "X"]), ("bogus", bare + ["--form", "bogus"])):
+                _out, rc = run_captured(argv, tmp, [])
+                head.append(f"{SAY}: fixture form-generated · {why} · exit {rc} · registry "
+                            f"{'unchanged' if reg.read_bytes() == before else 'changed'}")
+            head, rc = run_captured(bare + ["--form", "generated"], tmp, head)
+            if rc:
+                return head, rc
+            row = next((r for r in read_record_kinds(tmp) or [] if r.get("name") == "widget"), {})
+            head.append(f"{SAY}: fixture form-generated · widget · {json.dumps(row.get('schema'))}")
         review = ["--purpose-review", "--from", FIXTURE_FROM]
         if plant == "review":
             return run_captured(review, tmp, head)
@@ -2491,6 +2512,9 @@ def run_selftest() -> int:
                                            and "research 3 graded 0 legacy 1 other-kind" in ln for ln in ls),
              "pipe-cell": test_pipe_cell,
              "new-purpose": lambda ls: f"{SAY}: fixture new-purpose · widget · source owner" in ls,
+             "form-generated": lambda ls: all(f"{SAY}: fixture form-generated · {s}" in ls for s in (
+                 "field · exit 2 · registry unchanged", "bogus · exit 2 · registry unchanged",
+                 'widget · {"form": "generated", "fields": []}')),
              "review": test_review, "review-write": test_review_write,
              "value-derive": test_value_pending(NONE_FOUND, False),
              "value-ledger": lambda ls: (test_value_pending(PURPOSE_PENDING, True)(ls)

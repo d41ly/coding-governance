@@ -848,12 +848,18 @@ class Dossier:
     source: str = "<dossier>"
     #: The optional `stage` key, the build stages the feature serves; graded here for shape alone.
     stage: tuple[str, ...] | None = None
+    #: The optional `[paths]` key `symbols`, each `<path>::<qualified name>`: the definitions its prose describes.
+    symbols: tuple[str, ...] = ()
 
 
 def _require_str_list(value: object, what: str, source: str) -> tuple[str, ...]:
     if not isinstance(value, list) or not all(isinstance(v, str) and v for v in value):
         raise MapError(f"{source}: {what} must be a list of non-empty strings")
     return tuple(value)
+
+
+#: a dossier's symbol anchor, `<path>::<qualified name>`, forward slashes only (TOOL-dTotalRecall-8 S12)
+SYMBOL_KEY_RE = re.compile(r"[^:\\\s][^:\\\n]*::[^:\s]+")
 
 
 def parse_dossier(
@@ -908,8 +914,12 @@ def parse_dossier(
     claims = {k: _require_str_list(claims_raw[k], f"claims.{k}", source) for k in inventory_ids}
 
     paths = data["paths"]
-    if not isinstance(paths, dict) or set(paths) != {"globs"}:
-        raise MapError(f"{source}: [paths] must be a table with exactly one key: globs")
+    if not isinstance(paths, dict) or "globs" not in paths or set(paths) - {"globs", "symbols"}:
+        raise MapError(f"{source}: [paths] must be a table with the key globs and no other but symbols")
+    symbols = _require_str_list(paths.get("symbols", []), "paths.symbols", source)
+    unkeyed = [s for s in symbols if not SYMBOL_KEY_RE.fullmatch(s)]
+    if unkeyed:
+        raise MapError(f"{source}: paths.symbols are <path>::<qualified name> keys: {unkeyed}")
     globs = _require_str_list(paths["globs"], "paths.globs", source)
     with_backslash = [g for g in globs if "\\" in g]
     if with_backslash:
@@ -931,6 +941,7 @@ def parse_dossier(
         decisions=decisions,
         claims=claims,
         globs=globs,
+        symbols=symbols,
         source=source,
         stage=_require_str_list(data["stage"], "stage", source) if "stage" in data else None,
     )
@@ -1550,6 +1561,13 @@ def attribute_paths(
     return result
 
 
+def read_refreshed(commits: list, map_rel: str, feature: str) -> str | None:
+    """The newest commit of ``commits``, `(sha, parents, touched paths)` newest first, touching the feature's
+    dossier; None where no commit carries it."""
+    dossier = f"{map_rel.strip('/')}/features/{feature}.md"
+    return next((sha for sha, _, ps in commits if dossier in ps), None)
+
+
 def measure_dossier_staleness(
     commits: list[tuple[str, tuple[str, ...], tuple[str, ...]]],
     tree: MapTree,
@@ -1557,6 +1575,7 @@ def measure_dossier_staleness(
     *,
     keyed_attributors: tuple[tuple[re.Pattern[str], str], ...] = (),
     scope: frozenset[str] | None = None,
+    anchors: dict[str, tuple[dict, dict]] | None = None,
 ) -> list[dict]:
     """One record per FEATURE dossier: is its prose older than the code it claims?
 
@@ -1572,6 +1591,11 @@ def measure_dossier_staleness(
     refreshing one dossier must never stale another. A merge commit carries no paths here (the
     log prints none for it), so a change made only in a conflict resolution is not seen.
 
+    ``anchors`` is ``{feature: ({symbol key: body hash at HEAD}, {the same at the dossier's own last
+    commit})}`` for each dossier with `symbols`, `map_diff.read_anchor_hashes`'s. Such a dossier is stale
+    only when an anchored definition's hash differs between the two, whatever else its paths did, and
+    in range scope only when the range moved a path it claims too (TOOL-dTotalRecall-8 S12).
+
     ``refreshed`` is None for a dossier no commit carries yet; the caller leaves it out rather
     than reading it as stale or fresh. FOUNDATION.md is not measured: its globs name shared
     substrate rather than one feature."""
@@ -1586,7 +1610,7 @@ def measure_dossier_staleness(
     rows: list[dict] = []
     for d in tree.dossiers:
         dossier = f"{prefix}features/{d.feature}.md"
-        refreshed = next((sha for sha, _, ps in commits if dossier in ps), None)
+        refreshed = read_refreshed(commits, map_rel, d.feature)
         # Topological order puts every descendant first, so a commit is an ancestor of
         # `refreshed` exactly when some commit already known to be one names it as a parent.
         seen = {refreshed} if refreshed else set()
@@ -1595,8 +1619,12 @@ def measure_dossier_staleness(
                 seen.update(parents)
         touches = [sha for sha, _, _ in commits if d.feature in touched_by.get(sha, ())]
         behind = [sha for sha in touches if sha not in seen]
+        stale = bool(behind)
+        if anchors and d.feature in anchors:
+            now, then = anchors[d.feature]
+            stale = now != then and (scope is None or stale)
         rows.append({"feature": d.feature, "dossier": dossier, "refreshed": refreshed,
-                     "stale": bool(behind), "behind": len(behind),
+                     "stale": stale, "behind": len(behind),
                      "newest": behind[0] if behind else None, "touched": len(touches)})
     return rows
 

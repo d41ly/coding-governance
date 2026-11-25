@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 230 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 183 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 231 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 183 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -27,6 +27,7 @@ Inventories: gate-legs: 230 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · 
 | `check-wiring self-test` | baseline |
 | `cleanup posture (a tree removal that swallows its error)` | gate-lint |
 | `cleanup skill wiring` | branch-reconcile |
+| `code record` | playbook |
 | `codebase-map adopter e2e` | codebase-map |
 | `codebase-map coverage + freshness` | codebase-map |
 | `codebase-map gate coverage` | codebase-map |

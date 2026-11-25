@@ -164,7 +164,6 @@ policy:maintain.security-review	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seede
 policy:maintain.tiers	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.code-budget	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.code-enrich	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:memory.code-languages	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.code-roles	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.default-load	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.map-budget	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

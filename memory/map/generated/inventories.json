@@ -20,6 +20,7 @@
       "check-wiring self-test",
       "cleanup posture (a tree removal that swallows its error)",
       "cleanup skill wiring",
+      "code record",
       "codebase-map adopter e2e",
       "codebase-map coverage + freshness",
       "codebase-map gate coverage",

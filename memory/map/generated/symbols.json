@@ -93,6 +93,16 @@
       "file": "tools/loop/claim.py"
     },
     {
+      "id": "CodeRecord",
+      "kind": "class",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
+      "id": "CodeRecordError",
+      "kind": "class",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "Conf",
       "kind": "class",
       "file": "tools/memory-tree/id_grammar.py"
@@ -3088,6 +3098,11 @@
       "file": "tools/lexicon/canon.py"
     },
     {
+      "id": "build_code_fixture",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "build_commit",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -3171,6 +3186,11 @@
       "id": "build_dense",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "build_derivation",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "build_diff_lines",
@@ -4001,6 +4021,11 @@
       "id": "build_open_asks_cited_by_source",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "build_ordinals",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "build_orient_repo",
@@ -6578,6 +6603,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_code_record",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "check_cold23",
       "kind": "function",
       "file": "tools/roles/adopt-roles.test.sh"
@@ -7846,6 +7876,11 @@
       "id": "check_interface_notice",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_interpreter",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "check_invariant",
@@ -10368,6 +10403,11 @@
       "file": "tools/loop/termination.py"
     },
     {
+      "id": "check_test_path",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "check_time_classes",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -10478,6 +10518,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "check_ts_arrow",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "check_ts_body",
       "kind": "function",
       "file": "tools/codebase-map/extract_code.py"
@@ -10491,6 +10536,11 @@
       "id": "check_ts_body",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "check_ts_body",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "check_ts_generic",
@@ -10508,6 +10558,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "check_ts_generic",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "check_ts_generic_close",
       "kind": "function",
       "file": "tools/codebase-map/extract_code.py"
@@ -10521,6 +10576,11 @@
       "id": "check_ts_generic_close",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "check_ts_generic_close",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "check_ts_generic_fn_type",
@@ -10538,6 +10598,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "check_ts_generic_fn_type",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "check_ts_member_annotation",
       "kind": "function",
       "file": "tools/codebase-map/extract_code.py"
@@ -10551,6 +10616,11 @@
       "id": "check_ts_member_annotation",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "check_ts_member_annotation",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "check_ts_reading",
@@ -10573,6 +10643,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "check_ts_returned",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "check_ts_tag_start",
       "kind": "function",
       "file": "tools/codebase-map/extract_code.py"
@@ -10588,6 +10663,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "check_ts_tag_start",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "check_ts_type_position",
       "kind": "function",
       "file": "tools/codebase-map/extract_code.py"
@@ -10601,6 +10681,11 @@
       "id": "check_ts_type_position",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "check_ts_type_position",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "check_two_writers",
@@ -12868,6 +12953,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "derive_code_record",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "derive_code_slot_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -14053,6 +14143,11 @@
       "file": "tools/playbook/record_extract.py"
     },
     {
+      "id": "derive_kit",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "derive_kit_attestations",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -14171,6 +14266,11 @@
       "id": "derive_landed_revision",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_language",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "derive_last_move",
@@ -14893,6 +14993,11 @@
       "file": "tools/codebase-map/replay-phrases.py"
     },
     {
+      "id": "derive_preorder",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "derive_present_layers",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -15006,6 +15111,26 @@
       "id": "derive_quarantine_rows",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "derive_range_hash",
+      "kind": "function",
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "derive_range_hash",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "derive_range_hash",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "derive_range_hash",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "derive_reach",
@@ -16325,6 +16450,11 @@
     {
       "id": "derive_tool_rel",
       "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
+      "id": "derive_tool_rel",
+      "kind": "function",
       "file": "tools/playbook/instruction_units.py"
     },
     {
@@ -16923,6 +17053,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "ext_of",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "extract",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -17158,6 +17293,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "extract_facts",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "extract_families",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
@@ -17226,6 +17366,11 @@
       "id": "extract_ids",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "extract_invocations",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "extract_item",
@@ -17368,6 +17513,26 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "extract_ranges",
+      "kind": "function",
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "extract_ranges",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "extract_ranges",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "extract_ranges",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "extract_reader",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -17435,6 +17600,16 @@
     {
       "id": "extract_segments",
       "kind": "function",
+      "file": "tools/lib/invocation_segments.py"
+    },
+    {
+      "id": "extract_segments",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
+      "id": "extract_segments",
+      "kind": "function",
       "file": "tools/runlog/extract.py"
     },
     {
@@ -17496,6 +17671,11 @@
       "id": "extract_text",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "extract_text",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "extract_unit",
@@ -19860,6 +20040,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/playbook/core.py"
     },
     {
@@ -20336,6 +20521,11 @@
       "id": "measure_code_lines",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "measure_code_record",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "measure_commitment",
@@ -21508,6 +21698,11 @@
       "file": "tools/loop/policy_edit.py"
     },
     {
+      "id": "parse_code_record",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "parse_conf",
       "kind": "function",
       "file": "tools/govkit/steps/conf_to_policy.py"
@@ -21601,6 +21796,11 @@
       "id": "parse_fact_bullets",
       "kind": "function",
       "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "parse_facts",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "parse_file",
@@ -21923,6 +22123,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "parse_shell_defs",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "parse_slug_grammar",
       "kind": "function",
       "file": "tools/memory-tree/id_grammar.py"
@@ -22003,6 +22208,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "parse_ts_defs",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "parse_ts_source",
       "kind": "function",
       "file": "tools/codebase-map/extract_code.py"
@@ -22018,6 +22228,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "parse_ts_source",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "parse_tsx_defs",
       "kind": "function",
       "file": "tools/codebase-map/extract_code.py"
@@ -22031,6 +22246,11 @@
       "id": "parse_tsx_defs",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "parse_tsx_defs",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "parse_unarmed_branch",
@@ -22283,6 +22503,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "print_degraded",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "print_detail",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -22481,6 +22706,11 @@
       "id": "print_name_hits",
       "kind": "function",
       "file": "tools/run-gates/py_reads.py"
+    },
+    {
+      "id": "print_neighbourhood",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "print_note",
@@ -23398,6 +23628,11 @@
       "file": "tools/run-gates/remote_verdict.py"
     },
     {
+      "id": "read_anchor_hashes",
+      "kind": "function",
+      "file": "tools/codebase-map/map_diff.py"
+    },
+    {
       "id": "read_anchor_mode",
       "kind": "function",
       "file": "tools/playbook/record_extract.py"
@@ -23731,6 +23966,11 @@
       "id": "read_blob_batch",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "read_blob_batch",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "read_blob_fact",
@@ -24343,6 +24583,16 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_code_config",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
+      "id": "read_code_inputs",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "read_code_lines",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -24558,6 +24808,11 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "read_ctags_defs",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "read_cutoff_key",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -24666,6 +24921,11 @@
       "id": "read_defs_at",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "read_defs_at",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "read_defs_at_sha",
@@ -25726,6 +25986,11 @@
       "id": "read_held",
       "kind": "function",
       "file": "tools/govkit/steps/inherited_red.py"
+    },
+    {
+      "id": "read_held_facts",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "read_held_gates",
@@ -28093,6 +28358,11 @@
       "file": "skills/session-kickoff/card-store.fixture.sh"
     },
     {
+      "id": "read_refreshed",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
+    },
+    {
       "id": "read_refs",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -28161,6 +28431,11 @@
       "id": "read_registry_at",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "read_registry_edges",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "read_registry_entries",
@@ -28908,6 +29183,26 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_shell_sites",
+      "kind": "function",
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_shell_sites",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_shell_sites",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "read_shell_sites",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "read_shell_sources",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -29306,6 +29601,11 @@
       "id": "read_state_listing",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "read_state_listing",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "read_stats",
@@ -29903,6 +30203,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "read_ts_angle_end",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "read_ts_arrow_body",
       "kind": "function",
       "file": "tools/codebase-map/extract_code.py"
@@ -29916,6 +30221,11 @@
       "id": "read_ts_arrow_body",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "read_ts_arrow_body",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "read_ts_block_kind",
@@ -29933,6 +30243,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "read_ts_block_kind",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "read_ts_body_start",
       "kind": "function",
       "file": "tools/codebase-map/extract_code.py"
@@ -29946,6 +30261,11 @@
       "id": "read_ts_body_start",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "read_ts_body_start",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "read_ts_brace_end",
@@ -29963,6 +30283,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "read_ts_brace_end",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "read_ts_expr_end",
       "kind": "function",
       "file": "tools/codebase-map/extract_code.py"
@@ -29976,6 +30301,11 @@
       "id": "read_ts_expr_end",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "read_ts_expr_end",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "read_ts_fixtures",
@@ -29998,6 +30328,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "read_ts_jsx_defs",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "read_ts_mode",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -30018,6 +30353,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "read_ts_paren_end",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "read_ts_readers",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -30036,6 +30376,11 @@
       "id": "read_ts_type_end",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "read_ts_type_end",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "read_turnstile",
@@ -30376,6 +30721,11 @@
       "id": "read_worktree_blobs",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "read_worktree_blobs",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "read_worktree_head",
@@ -31503,6 +31853,11 @@
       "file": "tools/unattended/history_store.py"
     },
     {
+      "id": "remove_unheld_code_rows",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "remove_unheld_recall_rows",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -32373,6 +32728,11 @@
       "file": "tools/loop/factories.py"
     },
     {
+      "id": "render_code_record",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "render_command",
       "kind": "function",
       "file": "tools/settings-merge.py"
@@ -32571,6 +32931,11 @@
       "id": "render_fact_expectation",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_facts",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "render_family_view",
@@ -34213,6 +34578,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "resolve_calls",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
       "id": "resolve_caps",
       "kind": "function",
       "file": "tools/policy/budgets.py"
@@ -34438,6 +34808,11 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "resolve_extractor",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "resolve_extractor_module",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -34646,6 +35021,11 @@
       "id": "resolve_introducing_commit",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "resolve_invocations",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "resolve_item_declaration",
@@ -36581,6 +36961,11 @@
       "id": "resolve_transcript_path",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_tree",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "resolve_tree_engine_dir",
@@ -40520,6 +40905,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/playbook/code_record.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/playbook/positional.py"
     },
     {
@@ -42218,9 +42608,19 @@
       "file": "tools/lib/extract_code.py"
     },
     {
+      "id": "scan_shell_tokens",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
+    },
+    {
       "id": "scan_sibling_path",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "scan_sites",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "scan_skill_copies",
@@ -42376,6 +42776,11 @@
       "id": "scan_ts_tokens",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "scan_ts_tokens",
+      "kind": "function",
+      "file": "tools/playbook/extract_code.py"
     },
     {
       "id": "scan_turns",
@@ -43506,6 +43911,11 @@
       "id": "test_all_miss_fixture",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_anchored_dossier_staleness",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_app_alias",
@@ -46601,6 +47011,11 @@
       "id": "write_close_commit",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_code_rows",
+      "kind": "function",
+      "file": "tools/playbook/code_record.py"
     },
     {
       "id": "write_command",

@@ -1574,6 +1574,8 @@ owner = "dFurnishedOrders"
 name = "memory.code-languages"
 allowed = ["builtin", "builtin+ctags", "ctags"]
 default = "builtin"
+summary = "Which extractors the code record reads a tree with: builtin takes Python, shell and JavaScript definitions and calls and every other file at file level, builtin+ctags adds the definitions of every other language from the ctags on PATH, and ctags takes every language's definitions from it, the built-in extractors still giving calls; under either ctags value a missing ctags stops the run."
+usage = 'memory.code-languages = "builtin+ctags"'
 owner = "dTotalRecall"
 
 [[key]]
