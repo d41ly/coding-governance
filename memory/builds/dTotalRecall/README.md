@@ -205,7 +205,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113 TOOL-dTotalRecall-114 TOOL-dTota
 | [TOOL-dTotalRecall-123 — the map replay run again: more runs per arm, a noise term more runs tighten, and the verdict rule fixed before the first run](spec/2026-10-26-spec-TOOL-dTotalRecall-123.md) | 51 | 2 | INPROGRESS | rev-3 | 2026-11-26 |
 <!-- /gen:build-units -->
 
-Records: 999 bound to this build, across 4 record folder(s).
+Records: 1000 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -332,7 +332,7 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 | red-fix | `2026-11-25-build-TOOL-dTotalRecall-8-red-fix-30.md`, `2026-11-25-build-TOOL-dTotalRecall-8-red-fix-29.md` and 28 more under build/ |
 | widen | `2026-11-25-build-TOOL-dTotalRecall-8-widen-40.md`, `2026-11-25-build-TOOL-dTotalRecall-8-widen-39.md` and 37 more under build/ |
 | research | `2026-11-26-build-TOOL-dTotalRecall-123-map-replay-manifest.json`, `2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md` and 113 more under build/ |
-| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-8-1-builder-return.md` and 202 more under build/ |
+| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-8-1-builder-return.md` and 203 more under build/ |
 | open asks | `BACKLOG.md`, 13 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->

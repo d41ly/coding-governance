@@ -11,6 +11,7 @@
 | [2026-11-25-build-TOOL-dTotalRecall-123-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-1-builder-return.md) | journal | — |
 | [2026-11-25-build-TOOL-dTotalRecall-123-2-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-2-builder-return.md) | journal | — |
 | [2026-11-25-build-TOOL-dTotalRecall-123-3-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-3-acceptance-ledger.md) | log | — |
+| [2026-11-25-build-TOOL-dTotalRecall-123-3-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-3-builder-return.md) | journal | — |
 | [2026-11-25-build-TOOL-dTotalRecall-123-widen-35.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-widen-35.md) | widen | — |
 | [2026-11-26-build-TOOL-dTotalRecall-123-deviation-1021.md](../build/2026-11-26-build-TOOL-dTotalRecall-123-deviation-1021.md) | deviation | — |
 | [2026-11-26-build-TOOL-dTotalRecall-123-map-replay-manifest.json](../build/2026-11-26-build-TOOL-dTotalRecall-123-map-replay-manifest.json) | research | — |

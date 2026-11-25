@@ -11,7 +11,7 @@ DIVERGENCE: spec section 4 "The record of the relaxation", and nothing else in t
 
 I tried two corrections in C:/Temp/rf2, each with the repository's commit hooks on (DERIVED 2026-11-25):
 
-(a) `Departs from` kept, `Follow-through: amends cl-dClosedLoop-0228@fcc9ca71`, and `After` carrying the whole amended clause text. Check 30 passes. The amended text then makes spec 17's frozen `Carries: cl-dClosedLoop-0228@fcc9ca71 whole` stale, and the hook refused the commit with `HYGIENE check 29 FAILED ... TOOL-dTotalRecall-123.md is INPROGRESS while dTotalRecall's coverage is red: stale cl-dClosedLoop-0228`. This route also needs spec 17's `Carries` hash re-stamped, which section 3 puts out of scope, and this unit cannot carry the clause by section 8 F3. (DERIVED 2026-11-25, the pass)
+(a) `Departs from` kept, `Follow-through: amends cl-dClosedLoop-0228@fcc9ca71`, and `After` carrying the whole amended clause text. Check 30 passes. The amended text then makes spec 17's frozen `Carries: cl-dClosedLoop-0228@fcc9ca71 whole` stale, and the hook refused the commit with `the hygiene gate, its check-29 FAILED ... TOOL-dTotalRecall-123.md is INPROGRESS while dTotalRecall's coverage is red: stale cl-dClosedLoop-0228`. This route also needs spec 17's `Carries` hash re-stamped, which section 3 puts out of scope, and this unit cannot carry the clause by section 8 F3. (DERIVED 2026-11-25, the pass)
 
 (b) `Departs from: `TOOL-dTotalRecall-17@rev-3`` with a section tail, every other field as specified, `Follow-through` still the ask. The whole pass committed with rc=0: check 29 and check 30 both clean, 2389 deviation records read. (DERIVED 2026-11-25, the pass)
 
