@@ -23,8 +23,8 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 3d6c1702afb6c2e86638785950d80657a187192c · park · 310 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: a911378eb2944bfe3d56f495aca7f530674fa6b0
-phase: SPECCING
+witness: 06c0dd3f87aa090e4d33ee640aee504ee63205a4
+phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
@@ -669,3 +669,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-25T09:58:41Z brief · item TOOL-dBoundRoles-95 · reason 88c4deac094f memory/builds/dBoundRoles/prompts/2026-11-25-prompt-TOOL-dBoundRoles-95-build-brief.md
 
 2026-11-25T11:41:49Z rescope · item add TOOL-dBoundRoles-96 · reason the security review of TOOL-dBoundRoles-95, H1, M1, L1 and L2 (findings 2 to 7), batched into one unit under the owner's 'Close it before landing'
+
+2026-11-25T12:21:52Z dispatch · item 06c0dd3f TOOL-dBoundRoles-96 · reason tools/policy/guard.py tools/policy/check_policy.py tools/policy/README.md tools/loop/guard.py tools/loop/floor.py tools/loop/README.md tools/run-gates/selftest-budgets.txt help/policy.md memory/builds/dBoundRoles/build/2026-11-25-build-TOOL-dBoundRoles-96-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-25-build-TOOL-dBoundRoles-96-deviation-961.md
+
+2026-11-25T12:21:58Z brief · item TOOL-dBoundRoles-96 · reason fd92bc569ff7 memory/builds/dBoundRoles/prompts/2026-11-25-prompt-TOOL-dBoundRoles-96-build-brief.md

@@ -19,3 +19,10 @@ RED-first observation through its own suite, and the legs of section 7, are owed
 - AC9 — `check_push_range` — its source equals that of the blob `be997d5a` by `inspect.getsource`, and `push-no-trailer` exited 1.
 - AC10 — `grep -n "2026-11-25" help/policy.md` — it, the `RUN_WRITABLE` search and the `owner-only` search each printed the corrected line, and the old prefix is printed by no file under `tools`, `help` or `.githooks`.
 - AC11 — `TOOL-dBoundRoles-23` — deviation record 951 names it, and the `loop guard fixtures` and `policy fixtures` rows moved. OWED at the close: `python tools/policy/policy.py mirror --check` after the mirror's own commit, which the main loop makes.
+- seen-red — `policy fixtures` — red `a911378eb` — green `a911378eb` — the paths test of check_run_mandate answering true for every set, then false for every set, then for the policy file alone: guard-run-policy, then guard-run-live, then guard-run-policy red
+- seen-red — `policy fixtures` — red `a911378eb` — green `a911378eb` — a live run admitted while a merge is being concluded: the third text of guard-run-policy-merge red
+- seen-red — `policy fixtures` — red `a911378eb` — green `a911378eb` — the key read at HEAD, then a default source taken, then a last-valid one resting on the default, then a refused reader admitted: guard-run-policy red on each
+- seen-red — `policy fixtures` — red `a911378eb` — green `a911378eb` — each member of RUN_WRITABLE cut: guard-run-policy-open red on each
+- seen-red — `loop guard fixtures` — red `a911378eb` — green `a911378eb` — the owner-only step handed an empty set: owner-only-live red; the key read at HEAD: run-switched-guard red
+- seen-red — `loop guard fixtures` — red `a911378eb` — green `a911378eb` — the run admission refused under every value: mandate-live, with-reason-live and set-run-open red
+- seen-red — `loop guard fixtures` — red `a911378eb` — green `a911378eb` — policy_edit.py set handing an empty set: set-run-live red
