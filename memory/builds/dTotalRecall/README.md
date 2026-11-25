@@ -88,7 +88,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 91 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 92 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14
 ids TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27 TOOL-dTotalRecall-28
 ids TOOL-dTotalRecall-29 TOOL-dTotalRecall-30 TOOL-dTotalRecall-31 TOOL-dTotalRecall-32 TOOL-dTotalRecall-33 TOOL-dTotalRecall-34 TOOL-dTotalRecall-35 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42
@@ -193,13 +193,14 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113 TOOL-dTotalRecall-114
 | [TOOL-dTotalRecall-98 — the restore lists every deleted record with rename detection off, so a record deleted beside a near-copy is put back](spec/2026-10-26-spec-TOOL-dTotalRecall-98.md) | 40 | 2 | CLOSED | rev-2 | 2026-11-24 |
 | [TOOL-dTotalRecall-99 — the tip scan is graded only on a full read: it exits 0, counts the records it read against the folder, and its `by` lines sum to the live records](spec/2026-10-26-spec-TOOL-dTotalRecall-99.md) | 40 | 2 | CLOSED | rev-2 | 2026-11-25 |
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | CLOSED | rev-2 | 2026-11-25 |
+| [TOOL-dTotalRecall-114 — the close's first bar: each red of the merged tree is repaired at its cause, converted where a conversion is short and widened through its ledger where the need is real](spec/2026-10-26-spec-TOOL-dTotalRecall-114.md) | 42 | 2 | INPROGRESS | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 904 bound to this build, across 4 record folder(s).
+Records: 905 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dTotalRecall-100 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99.
+Ids no `spec-audit` record has ever named: TOOL-dTotalRecall-100 TOOL-dTotalRecall-114 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99.
 
 Ids whose spec moved past its audited revision: TOOL-dTotalRecall-1@rev-1 TOOL-dTotalRecall-10@rev-1 TOOL-dTotalRecall-11@rev-1 TOOL-dTotalRecall-12@rev-1 TOOL-dTotalRecall-13@rev-1 TOOL-dTotalRecall-14@rev-1 TOOL-dTotalRecall-15@rev-1 TOOL-dTotalRecall-16@rev-1 TOOL-dTotalRecall-17@rev-1
 TOOL-dTotalRecall-18@rev-1 TOOL-dTotalRecall-19@rev-1 TOOL-dTotalRecall-2@rev-1 TOOL-dTotalRecall-20@rev-1 TOOL-dTotalRecall-21@rev-1 TOOL-dTotalRecall-22@rev-1 TOOL-dTotalRecall-23@rev-1 TOOL-dTotalRecall-24@rev-1 TOOL-dTotalRecall-25@rev-1 TOOL-dTotalRecall-26@rev-1 TOOL-dTotalRecall-3@rev-1
@@ -213,7 +214,7 @@ TOOL-dTotalRecall-86@rev-1 TOOL-dTotalRecall-87@rev-1 TOOL-dTotalRecall-88@rev-1
 
 <!-- gen:build-coverage -->
 
-Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 92 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 26
 - carried in parts: 0 (none)
@@ -222,23 +223,23 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 - stale: 0 (none)
 - ambiguous: 0 (none)
 - owned nodes no spec names: none
-- specs derived from no clause: `spec/2026-10-26-spec-TOOL-dTotalRecall-100.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-36.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-37.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-38.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-39.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-40.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-41.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-44.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-45.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-46.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-47.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-48.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-49.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-52.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-53.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-56.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-57.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-58.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-59.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-60.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-61.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-62.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-64.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-65.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-66.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-67.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-68.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-69.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-70.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-72.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-73.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-74.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-76.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-77.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-78.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-80.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-81.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-82.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-83.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-84.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-85.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-86.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-87.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-88.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-89.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-90.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-91.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-92.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-93.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-94.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-95.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-96.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-97.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-98.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-99.md` (PLAY-dClosedLoop-2)
+- specs derived from no clause: `spec/2026-10-26-spec-TOOL-dTotalRecall-100.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-114.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-36.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-37.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-38.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-39.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-40.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-41.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-44.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-45.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-46.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-47.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-48.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-49.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-52.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-53.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-56.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-57.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-58.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-59.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-60.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-61.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-62.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-64.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-65.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-66.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-67.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-68.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-69.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-70.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-72.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-73.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-74.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-76.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-77.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-78.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-80.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-81.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-82.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-83.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-84.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-85.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-86.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-87.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-88.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-89.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-90.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-91.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-92.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-93.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-94.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-95.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-96.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-97.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-98.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-99.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0221, cl-dClosedLoop-0222, cl-dClosedLoop-0232, cl-dClosedLoop-0233, cl-dClosedLoop-0236
 <!-- /gen:build-coverage -->
 
@@ -287,6 +288,7 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 | 39 | `TOOL-dTotalRecall-92` | no |
 | 40 | `TOOL-dTotalRecall-98`, `TOOL-dTotalRecall-99` | no |
 | 41 | `TOOL-dTotalRecall-100` | no |
+| 42 | `TOOL-dTotalRecall-114` | no |
 
 A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
@@ -303,7 +305,7 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-25-prompt-TOOL-dTotalRecall-114-spec-writer.md`, `2026-11-25-prompt-TOOL-dTotalRecall-114-spec-brief.md` and 411 more under prompts/ |
+| briefs | `2026-11-25-prompt-TOOL-dTotalRecall-114-spec-writer.md`, `2026-11-25-prompt-TOOL-dTotalRecall-114-spec-brief.md` and 412 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-24-build-TOOL-dTotalRecall-87-deviation-1014.md`, `2026-11-24-build-TOOL-dTotalRecall-65-deviation-1012.md` and 149 more under build/ |
 | red-fix | `2026-11-24-build-TOOL-dTotalRecall-60-red-fix-26.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md` and 24 more under build/ |
