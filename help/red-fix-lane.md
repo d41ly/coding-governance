@@ -75,13 +75,18 @@ Every commit carrying the trailer is graded against four limits, and a finding r
 | Limit | Bound |
 |---|---|
 | `L1 size` | at most 3 product paths and at most 60 lines over them, added plus deleted; a binary path is over |
-| `L2 guarded policy file` | no path the policy kit's `guarded-paths.txt` lists; with no policy kit, no path under `.governance/` |
+| `L2 guarded policy file` | no path the policy kit's `guarded-paths.txt` lists at the commit's first parent, as below; with no policy kit, no path under `.governance/` |
 | `L3 spec edit` | no path under any build's `spec/` folder, except a change confined to the spec's `gen:spec-records` region, as below |
 | `L4 new surface` | no product path added; a rename counts as a deletion and an addition |
 
 The two figures of `L1` are the constants `RED_FIX_MAX_PATHS` and `RED_FIX_MAX_LINES` of
 `routed_commits.py`, read on 2026-11-12. A fix that needs more than the limits allow is a unit, and
 takes a spec.
+
+`L2` reads the list that was in force when the commit was made: the one in the tree of its first
+parent, at the path the list has in the working tree. So a line the commit itself removes still
+guards. Where that parent holds no list, the commit has no parent, or the list lies outside the
+repository, `L2` reads the working tree's list.
 
 The index generator writes one record row into a spec whenever a record is added, so `L3` leaves
 that row alone. A spec's change is no spec edit when all of these hold:
@@ -204,7 +209,13 @@ With the key `off` both still print, and both can still red.
   the run graded was clean, nor a ledger edited by hand or a manifest edited in the working tree,
   each read as it stands.
 - The limits do not see whether the change is a fix, a new surface made inside an existing file, a
-  deleted path, a record outside `spec/`, or a guarded list the fix commit itself shortened.
+  deleted path, or a record outside `spec/`.
+- `L2` grades by the first parent's list, so it does not see a path the list gained after the commit
+  or in it, whenever the commit lands, nor a path an earlier commit took off the list: a path unlisted
+  in one commit, fixed in the next and relisted later passes. Nor does it see an edit of the list
+  alone, since the list does not name itself, or the list's file mode, a symbolic link there being
+  read as its target text. Where the list has moved, a parent holding none at its present path is
+  graded by the working tree's list, which the graded run controls.
 - `L3` does not see what a fix commit writes between two unchanged `gen:spec-records` marker lines.
   The index generator's `--check` grades the region at the graded tip and never per commit, so a
   hand-written line there that a later commit removes is seen by nothing. Nor does `L3` see where the

@@ -1,11 +1,12 @@
 # TOOL-aTemperedLane-2 — limit L2 reads the guarded list at the commit's first parent
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-aTemperedLane-2-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-aTemperedLane-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aTemperedLane-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aTemperedLane-1-brief.md) | research | TOOL-aTemperedLane-1 |
 
 <!-- /gen:spec-records -->

@@ -20448,6 +20448,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "parse_guarded_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "parse_header",
       "kind": "function",
       "file": "tools/gate-lint/legacy_ledger.py"
@@ -25606,6 +25611,11 @@
       "id": "read_page_lines",
       "kind": "function",
       "file": "tools/govkit/docs_leg.py"
+    },
+    {
+      "id": "read_parent_lists",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "read_parity",
@@ -32406,6 +32416,11 @@
       "id": "resolve_grammar_name",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "resolve_guarded_path",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "resolve_harness_path",
