@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-123 — the map replay run again: more runs per arm, a noise term more runs tighten, and the verdict rule fixed before the first run
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 51 · advances TOOL-dTotalRecall-111
+**Status:** INPROGRESS · rev-2 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 51 · advances TOOL-dTotalRecall-111
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,8 +8,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-dTotalRecall-123-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-1-builder-return.md) | journal | — |
 | [2026-11-25-build-TOOL-dTotalRecall-123-widen-35.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-widen-35.md) | widen | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-123-build-2-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-2-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-123-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-brief.md) | journal | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-123-divergence-fold-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-divergence-fold-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -41,17 +44,19 @@ follows is the difference.
 - **S3** — The arm `map-noise` in `run_selftest`, the figure key in `map-verdict`, the docstrings, the module docstring and
   the README paragraph. Observed by AC1, AC2, AC3 and AC4.
 - **S4** — The deviation record the build's fork rule asks of §8 F1's `relaxes:`, filed through `gov_record.py new deviation`
-  in the pass commit (§4 "The record of the relaxation"). Observed by AC5.
-- **S5** — The manifest before the runs. The main loop commits
-  `memory/builds/dTotalRecall/build/<date>-build-TOOL-dTotalRecall-123-map-replay-manifest.json` with `known`, `arms` and an
-  empty `candidates`, its `dispatched` filled from the count it takes (§8 F2), after the scorer's pass commit and before
-  the first clone. Only `candidates` and `map` move afterwards. Observed by AC6.
+  in the pass commit (§4 "The record of the relaxation"). Observed by AC5 and AC9.
+- **S5** — The manifest before the runs. The pass commit adds
+  `memory/builds/dTotalRecall/build/<date>-build-TOOL-dTotalRecall-123-map-replay-manifest.json` with `known`, `arms`, an empty
+  `candidates`, `map` null and each `dispatched` at §8 F2's default, 15 (DERIVED, §4's table). Until the first clone is made
+  the main loop may change that count in a commit of its own. From the first clone on, only `candidates` and `map` move, the
+  main loop writing them at the verdict commit. Observed by AC6 and AC10.
 - **S6** — The runs, the main loop's: that count of harness calls per arm for each of the three audits, in new clones under
   the next free `<n>` (§4 "The runs"). No run of the first experiment is pooled into this one. Observed by AC6 and AC7.
 - **S7** — The verdict record,
   `memory/builds/dTotalRecall/build/<date>-build-TOOL-dTotalRecall-123-map-replay-verdict.md`, opened by
   `gov_record.py new research` with `--unit TOOL-dTotalRecall-123` and the other flags and the shape of spec 17 S6, and its
-  routes (§4 "The routes"). Observed by AC7 and AC8.
+  routes (§4 "The routes"). It, the filled manifest and the header's flip to `CLOSED` are the main loop's, in one verdict
+  commit. Observed by AC7 and AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -162,8 +167,8 @@ expected spend is the table's.
 
 ### The verdict rule, fixed before the first run
 
-This section, S1's code and the manifest's `dispatched` are committed before the first clone exists, and none moves until
-the verdict record lands. The instance is run over the complete manifest, and its last line is the verdict:
+This section, S1's code and the manifest's `dispatched` are committed before the first clone exists, and none moves from
+then until the verdict record lands. The instance is run over the complete manifest, and its last line is the verdict:
 
 - `verdict lose <terms>` where the rise is below `noise` plus 5, or the searches' fall is below 1, or the bytes' rise is
   above the map's bytes.
@@ -173,7 +178,7 @@ the verdict record lands. The instance is run over the complete manifest, and it
 ### The routes
 
 The record opens as spec 17 S6's does, with `**Verdict:** win`, `**Verdict:** lose` or `**Verdict:** unarmed` and the terms. Then
-come the manifest and the commit that added it, the run count, each clone's name, `HEAD` and status before its call, every
+come the manifest and the orchestrating sha that held it, the run count, each clone's name, `HEAD` and status before its call, every
 re-run with its cause, each term's figures, the second experiment's own variances and the map's bytes. Then, under Routing:
 
 - **`win`** — the main loop re-opens units 14, 15 and 26, each re-grounded before its pass. The record names the three asks
@@ -229,7 +234,10 @@ None: no committed manifest is re-scored, and the first one still parses. Revert
 
 ### Rollout
 
-The builder lands S1 to S4. The main loop then does S5 to S7, and the unit closes on the verdict record.
+The pass lands S1 to S5 in one commit: the scorer, its arms, the deviation record and the manifest, `candidates` empty. Its
+header STAYS `INPROGRESS` there, and its ledger answers AC1 to AC5 and AC10, with AC6 to AC8 owed to the main loop and AC9 to
+the close. The main loop then makes S6's runs and S7's verdict commit, which answers AC6 to AC8 in the ledger and flips the
+header to `CLOSED`, as TOOL-dTotalRecall-17 stayed `INPROGRESS` at `30c21c834` and closed at `cb97caf03`.
 
 ### Files touched (estimate)
 
@@ -258,7 +266,8 @@ The builder lands S1 to S4. The main loop then does S5 to S7, and the unit close
 - risks — at five runs a true rise of ten loses more often than it wins, the line being 14.78 at the first spread. That spread
   is an estimate from two runs per cell. The harness may have moved since the first experiment, which is one more reason
   none of its runs is pooled.
-- testing — AC1 to AC5 by the pass; AC6 to AC8 by the main loop; §7's arms by the main loop at the close.
+- testing — AC1 to AC5 and AC10 by the pass; AC6 to AC8 by the main loop at the verdict commit; AC9 and §7's arms at the
+  close.
 - migration — none.
 - user docs — `tools/workflows/README.md`; no page under `help/` states the replay.
 
@@ -277,17 +286,17 @@ The builder lands S1 to S4. The main loop then does S5 to S7, and the unit close
   six pairs returns 15.46 to two places.
   Red when: the noise does not enter the line, or the margin does not.
   figure: PINNED here, DERIVED 2026-11-25 from that record's counts.
-- **AC4** — When `grep -nE 'twin (difference|runs)|"twin"' tools/workflows/replay_scorer.py tools/workflows/README.md` runs, it
-  prints nothing, and the README's `map-replay` paragraph names the noise, its factor and the count rule.
-  Red when: a docstring or the README states the old line.
-- **AC5** — When `python memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py --policy report` runs
-  after the pass commit, the new deviation record is listed unrefused, and a `grep -l` of this build's folder for
-  `Bound:** the twin runs' difference as the recall term's noise` names that one file.
-  Red when: the `relaxes:` mark of §8 F1 joins nobody.
-- **AC6** — When the commit that added the manifest is read, its `candidates` is empty and both `dispatched` are three times
-  one count of at least two; that commit is an ancestor of the orchestrating sha every `run.log` line names, by
-  `git merge-base --is-ancestor`; and `dispatched` at the verdict commit is unchanged.
-  Red when: the count is written or moved after a run.
+- **AC4** — When `grep -nE "twin difference|twin runs'|\"twin\"" tools/workflows/replay_scorer.py tools/workflows/README.md` runs,
+  it prints nothing, and the README's `map-replay` paragraph names the noise, its factor and the count rule.
+  Red when: a docstring or the README states the old line. The `review-twin runs=` line of `tier2-review.js`'s twin runs is
+  no hit.
+- **AC5** — When a probe calls `deviation_join.py#read_record` over the new deviation record, its `malformed` is empty and its
+  `bound` is §8 F1's `relaxes:` value; and `grep -rlE "^- \*\*Bound:\*\* the twin runs' difference as the recall term's noise$"
+  memory/builds/dTotalRecall/build/` names that one file.
+  Red when: a field is refused, or no record or two carry the bound.
+- **AC6** — When the manifest is read at the one orchestrating sha every `run.log` line names, its `candidates` is empty and
+  both `dispatched` are three times one count of at least two; and `dispatched` at the verdict commit is the same.
+  Red when: the count is written or moved after the first clone.
   permission: the main loop's.
 - **AC7** — When `python tools/workflows/replay_scorer.py --experiment <manifest>` runs over the complete manifest, it exits 0.
   The verdict record quotes its lines, opens its verdict with `**Verdict:**`, and lists one clone per declared call with an empty
@@ -300,6 +309,17 @@ The builder lands S1 to S4. The main loop then does S5 to S7, and the unit close
   specs of units 14, 15 and 26 from the manifest's commit to the verdict commit lists none.
   Red when: a run retires or re-opens a unit by itself, or files spec 17's three asks again.
   permission: the main loop's.
+- **AC9** — When `python memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py --report dTotalRecall`
+  runs on the prepared merge, as the build README's close rule has it, the entry of §8 F1's mark reads `relaxes [the twin runs'
+  difference as the recall term's noise] joins` and the new record's stem.
+  Red when: the `relaxes:` mark joins nobody.
+  cost: past ten minutes on node a, where the instrument's `--policy report` did not return within 600 s (DERIVED 2026-11-25,
+  `2026-11-25-build-TOOL-dTotalRecall-123-1-builder-return`).
+  permission: the close's.
+- **AC10** — When the pass commit's manifest is read, `candidates` is empty, `map` is null and both `dispatched` are 15; and
+  `python tools/workflows/replay_scorer.py --experiment <manifest>` exits 2 naming `map None: not a source of a non-empty map`.
+  Red when: the manifest is absent from the pass commit, or it can be scored before a run.
+  figure: PINNED here, DERIVED §4's table at five runs per arm.
 
 ## 7. Gates
 
@@ -321,9 +341,9 @@ and that a run was not re-run for its figure, which the record's re-run list sta
   RESOLVED (agent, 2026-11-25, delegated): (b). widens: none · relaxes: the twin runs' difference as the recall term's noise
 - **F2 — How many runs per arm?** The owner's words name no number. Options: (a) five, resolving a rise near ten in 30 calls (DERIVED 2026-11-25, §4's table);
   (b) eighteen, near five in 108; (c) a count picked after a figure is read, which the fixed rule refuses. The brief has the
-  main loop take the owner's answer, or five where none came by the manifest's commit. `dispatched` holds either, so no line
-  of this spec or of the code moves with it.
-  RESOLVED (agent, 2026-11-25, delegated): (a) unless the owner names another count before that commit. widens: none · relaxes: none
+  main loop take the owner's answer, or five where none came before the first clone. `dispatched` holds either, so no line of
+  the code moves with it.
+  RESOLVED (agent, 2026-11-25, delegated): (a) unless the owner names another count before that clone. widens: none · relaxes: none
 - **F3 — Which binding line does this unit carry?** Options: (a) `**Derived:**` naming `PLAY-dClosedLoop-2`, as `TOOL-dTotalRecall-122`
   §8 F1; (b) a part of cl-dClosedLoop-0228, which unit 17 carries whole. (b) fails the carries join.
   RESOLVED (agent, 2026-11-25, delegated): (a), the one survivor. widens: none · relaxes: none
@@ -332,6 +352,10 @@ and that a run was not re-run for its figure, which the record's re-run list sta
 
 - rev-1 · 2026-11-25 · initial draft, from `2026-11-25-prompt-TOOL-dTotalRecall-17-replay-rerun-brief`, spec 17 at rev-3, its
   verdict record and the scorer read at `fbe06249`.
+- rev-2 · 2026-11-25 · S4 S5 S7 · §4 · §5 · AC4 AC5 AC6 AC9 AC10 · §8 · per `2026-11-25-prompt-TOOL-dTotalRecall-123-divergence-fold-brief`,
+  re-read at `b4d582a2d`: AC4's grep leaves the twin-run line alone, AC5 reads the build records by `read_record`, the departures
+  join is AC9 at the close, the manifest with `map` null joins the pass commit under AC10, and the header stays `INPROGRESS`
+  until the verdict commit. No estimator, line or count moved.
 
 ## 10. Reuse audit
 

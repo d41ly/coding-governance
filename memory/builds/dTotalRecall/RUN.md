@@ -773,3 +773,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-25T20:08:44Z draw · re-dispatch · TOOL-dTotalRecall-37 · 88/186 · 20261125T200844Z-b22000
 
 2026-11-25T20:08:44Z dispatch · item d25e5c29 TOOL-dTotalRecall-37 · reason memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-37-deviation-1020.md
+
+2026-11-25T21:06:59Z brief · item TOOL-dTotalRecall-123 · reason 5802519c2c45 memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-brief.md
+
+2026-11-25T21:15:46Z dispatch · item b4d582a2 TOOL-dTotalRecall-123 · reason memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/build memory/map/generated tools/workflows/README.md tools/workflows/replay_scorer.py tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-123.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-123-1-acceptance-ledger.md
