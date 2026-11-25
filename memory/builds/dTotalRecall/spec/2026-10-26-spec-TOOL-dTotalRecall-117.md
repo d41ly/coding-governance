@@ -12,6 +12,7 @@
 | [2026-11-25-build-TOOL-dTotalRecall-117-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-117-1-builder-return.md) | journal | — |
 | [2026-11-25-build-TOOL-dTotalRecall-117-deviation-1016.md](../build/2026-11-25-build-TOOL-dTotalRecall-117-deviation-1016.md) | deviation | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-117-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-117-build-brief.md) | journal | — |
+| [2026-11-25-review-TOOL-dTotalRecall-115-closing-diff-review-round2.md](../reviews/2026-11-25-review-TOOL-dTotalRecall-115-closing-diff-review-round2.md) | diff-review | TOOL-dTotalRecall-115 TOOL-dTotalRecall-116 TOOL-dTotalRecall-118 TOOL-dTotalRecall-119 TOOL-dTotalRecall-120 TOOL-dTotalRecall-121 TOOL-dTotalRecall-21 |
 
 <!-- /gen:spec-records -->
 

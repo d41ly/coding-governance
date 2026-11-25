@@ -15,6 +15,7 @@
 | [2026-11-25-prompt-TOOL-dTotalRecall-115-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-115-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-115-spec-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-115-spec-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-115-spec-writer.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-115-spec-writer.md) | log | — |
+| [2026-11-25-review-TOOL-dTotalRecall-115-closing-diff-review-round2.md](../reviews/2026-11-25-review-TOOL-dTotalRecall-115-closing-diff-review-round2.md) | diff-review | TOOL-dTotalRecall-116 TOOL-dTotalRecall-117 TOOL-dTotalRecall-118 TOOL-dTotalRecall-119 TOOL-dTotalRecall-120 TOOL-dTotalRecall-121 TOOL-dTotalRecall-21 |
 
 <!-- /gen:spec-records -->
 

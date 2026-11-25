@@ -738,3 +738,8 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-25T11:37:57Z draw · re-dispatch · TOOL-dTotalRecall-121 · 81/186 · 20261125T113757Z-dbe9f6
 
 2026-11-25T11:37:57Z dispatch · item 5daf0716 TOOL-dTotalRecall-121 · reason tools/memory-tree/build_records.py tools/memory-tree/gov_record.py tools/memory-tree/gov-claim.sh tools/memory-tree/gen_build_index.py tools/memory-tree/record_find.py tools/memory-tree/record_kinds.py tools/memory-tree/shape_run.py tools/memory-tree/check-memory-hygiene.test.sh tools/playbook/edge_grammar.py tools/playbook/adopt-playbook.sh tools/workflows/replay_scorer.py tools/memory-tree/README.md tools/workflows/README.md tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md memory/project/shell-role.txt memory/map/generated memory/builds/dTotalRecall/build tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-121.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-121-2-acceptance-ledger.md
+2026-11-25T12:57:12Z draw · review-round · dTotalRecall · 82/186 · 20261125T125712Z-bd7af2
+
+2026-11-25T12:57:19Z review · item dTotalRecall · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 0 · round-minors 11 · CONVERGED · highs 8 · minors 24 · to units · disposition promote
+
+2026-11-25T13:00:27Z rescope · item add TOOL-dTotalRecall-122 · reason promoted from the closing diff review round 2, items M1-M9+L1+L2 of 2026-11-25-review-TOOL-dTotalRecall-115-closing-diff-review-round2
