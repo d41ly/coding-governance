@@ -23,8 +23,8 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 3d6c1702afb6c2e86638785950d80657a187192c · park · 310 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 7350603584eee24c8f5b73e7a32cff6d5005e435
-phase: SPECCING
+witness: a4c3cddbc2cafcc65c255ab93d40bf9fa39d90c3
+phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dboundroles-62c3df
@@ -663,3 +663,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-24T23:18:04Z resume · item dBoundRoles · reason held · keepalive aa062219 · manual
 
 2026-11-25T09:18:41Z rescope · item add TOOL-dBoundRoles-95 · reason the owner's 'Close it before landing' on TOOL-dBoundRoles-23 F6: the policy guard admits no live run's own write of the policy file under owner-only
+
+2026-11-25T09:58:33Z dispatch · item a4c3cddb TOOL-dBoundRoles-95 · reason tools/policy/guard.py tools/policy/check_policy.py tools/policy/catalogue.toml tools/policy/README.md tools/loop/guard.py tools/loop/policy_edit.py tools/loop/floor.py tools/loop/README.md tools/roles/roles_lib.py tools/roles/README.md tools/hooks/scratch-guard.js tools/run-gates/README.md tools/run-gates/selftest-budgets.txt .githooks/pre-commit .governance/policy.json help/policy.md help/roles.md help/verdict-backends.md help/reference/policy.md memory/builds/dBoundRoles/build/2026-11-25-build-TOOL-dBoundRoles-95-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-25-build-TOOL-dBoundRoles-95-deviation-951.md
+
+2026-11-25T09:58:41Z brief · item TOOL-dBoundRoles-95 · reason 88c4deac094f memory/builds/dBoundRoles/prompts/2026-11-25-prompt-TOOL-dBoundRoles-95-build-brief.md
