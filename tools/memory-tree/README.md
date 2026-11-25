@@ -450,8 +450,9 @@ python <prefix>/memory-tree/record_causes.py --fixture --plant legacy|causeless|
 The causes check reds a tracked Markdown record with no `<path> -` row of the `record-kinds-legacy`
 population's `causes` slice whose kind is no root and which carries no resolving `Caused-by`; a typed kind whose row
 declares no `Caused-by` (a card, a probe, a flake record) is graded on its Serves units instead. The
-orphan check walks from the roots, each build whose `README.md` is tracked and each whose claim ref
-`refs/gov/claims/<slug>` is held, through the README's `ids:` and each record's cause, and reds a new
+orphan check walks from the roots, each build whose `README.md` is tracked and each whose claim this
+clone's cache holds at `refs/gov/remote/claims/<slug>`, where the claim CLI's fetch and its own writes put it
+(the check fetches nothing), through the README's `ids:` and each record's cause, and reds a new
 record no root reaches, so two records caused by each other are both orphans. The population is gov's
 own, a `[[ledger]]` table of govkit's registry keyed by path, section and check, whose `causes` slice
 was seeded with today's records (`legacy_ledger.py seed --population record-kinds-legacy`, the

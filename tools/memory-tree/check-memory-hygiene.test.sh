@@ -3776,6 +3776,7 @@ out=$("$_PY" "$HERE/record_causes.py" --fixture --plant orphan 2>&1)   # AC7
 hit 'record causes: orphans · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-cycle-a.md'
 hit 'record causes: orphans · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-cycle-b.md'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant claim-root 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'
+hit 'record causes: fixture claim-root · claim · refs/gov/remote/claims/fClaim'   # TOOL-dTotalRecall-119 AC2: the CLI's cache ref
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant none 2>&1)   # AC8's none
 hit 'record causes: record-kinds-legacy · 2 record row(s) (-), 0 section row(s) · memory.legacy-anchors none'; miss 'findings causes'
 # --- TOOL-dTotalRecall-36 AC6 — the writer census: a code file under the fixture's tool root spelling a Serves
@@ -5808,7 +5809,9 @@ done
 # absent. Counted by reading; OWED: observed at the close.
 # RAISED 830 -> 836 by TOOL-dTotalRecall-116 on 2026-11-25: the three blob plants' refusal and exit lines, two
 # assertions each, top-level and never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=836
+# RAISED 836 -> 837 by TOOL-dTotalRecall-119 on 2026-11-25: the claim-root plant's cache ref line, one top-level
+# hit, never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=837
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

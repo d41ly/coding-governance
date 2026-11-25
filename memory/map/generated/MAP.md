@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 230 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 181 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 230 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 182 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -402,6 +402,7 @@ Inventories: gate-legs: 230 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · 
 | `fixture-inherits-ambient-machine-state.md` | unattended |
 | `fixture-lacks-a-gate-the-consumer-has.md` | govkit |
 | `fixture-passes-by-finding-nothing.md` | baseline |
+| `fixture-plants-a-state-no-writer-makes.md` | memory-tree-hygiene |
 | `fixture-removes-the-path-under-test.md` | run-gates |
 | `floor-left-below-the-arms-it-guards.md` | run-gates-turnstile |
 | `fold-text-is-unreviewed-surface.md` | build-method |

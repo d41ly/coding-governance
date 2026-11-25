@@ -80,6 +80,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [fixture-inherits-ambient-machine-state](fixture-inherits-ambient-machine-state.md) | class | 16 |  | a hermetic-looking fixture silently reads machine-global config, so it passes everywhere it was written and fails where it was not |
 | [fixture-lacks-a-gate-the-consumer-has](fixture-lacks-a-gate-the-consumer-has.md) | class | 4 |  | a runbook's fixture passes because it lacks a commit-time gate the consumer runs, and the consumer refuses the step the fixture let through |
 | [fixture-passes-by-finding-nothing](fixture-passes-by-finding-nothing.md) | class | 6 | yes | a test arm whose fixture never triggers the rule passes, and proves nothing |
+| [fixture-plants-a-state-no-writer-makes](fixture-plants-a-state-no-writer-makes.md) | class | 6 |  | a fixture writes by hand the ref, file or row its reader reads, in a place no production writer fills, so the arm is green over a state no real tree reaches and the reader selects nothing there |
 | [fixture-removes-the-path-under-test](fixture-removes-the-path-under-test.md) | class | 1 |  | a fixture stabilised by DELETING a dependency stops the branch under test from executing, so both A/B arms run the other code twice and agree |
 | [floor-left-below-the-arms-it-guards](floor-left-below-the-arms-it-guards.md) | class | 3 |  | a suite's assertion floor not raised when arms land leaves those arms stranded, so deleting them keeps the suite green |
 | [fold-text-is-unreviewed-surface](fold-text-is-unreviewed-surface.md) | class | 8 |  | a review round's fixes are folded into fresh prose nobody has reviewed, and that prose is where the next round's findings are |
@@ -197,6 +198,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-181 record(s): 178 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+182 record(s): 179 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

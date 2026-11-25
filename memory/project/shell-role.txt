@@ -73,7 +73,7 @@ tools/memory-recall/adopt-memory-recall.sh	239	85a1c45076fd9093f1b9a08a2d720c814
 tools/memory-recall/recall-opened.test.sh	100	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-tree/adopt-memory-tree.sh	638	7ccc1b50be28cb8b726022dc5a8409d861c948af	widened:2026-11-21-build-TOOL-dWitnessedBar-108-widen-27
 tools/memory-tree/check-memory-hygiene.sh	2203	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
-tools/memory-tree/check-memory-hygiene.test.sh	3750	270795c1b71a986b04a5cb60751138f2f441e9db	widened:2026-11-25-build-TOOL-dTotalRecall-116-widen-29
+tools/memory-tree/check-memory-hygiene.test.sh	3751	8c4aa9c784dbacd43938cb63d68a4fa5c6f184f3	widened:2026-11-25-build-TOOL-dTotalRecall-119-widen-30
 tools/memory-tree/check-method-carriers.sh	223	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-tree/check-method-carriers.test.sh	81	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-tree/check-verdict-epoch.sh	339	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded

@@ -27,7 +27,8 @@ typed kind whose row's `schema.fields` hold no `Caused-by`, written by its paren
 on its Serves units instead, each of which must resolve. A legacy record is never red.
 
 THE ORPHAN CHECK (`check_orphans`). The roots are each build whose `README.md` is tracked, and each whose
-claim ref `refs/gov/claims/<slug>` this repository holds. A unit id is reached when its README's `ids:`
+claim `refs/gov/claims/<slug>` of the remote this clone's cache holds, at `refs/gov/remote/claims/<slug>`
+(`gen_build_index.CLAIM_CACHE_NS`, TOOL-dTotalRecall-119). A unit id is reached when its README's `ids:`
 names it, or, for a claim-rooted build, when its slug is the claim's; a record is reached when its cause
 is, its `Caused-by` target or, for a legacy record, its Serves units, the walk a fixed point from the
 roots outward, so two new records caused by each other are reached by neither and both are orphans. A
@@ -93,7 +94,9 @@ names who really wrote it; the edge grammar of a header's targets, which `edge_g
 whether a census file that spells `Caused-by` writes the line at run time, since the census grades spelling;
 whether a census marker's lead opens a comment in its line's language, or still sits on an open literal;
 whether a pinned row's glob names the records its instrument really writes; its ask's liveness past HEAD;
-whether the keep registry is registered at all, under which fields, or stands at either home.
+whether the keep registry is registered at all, under which fields, or stands at either home; a claim this
+clone's cache does not hold, since the orphan check fetches nothing: a clone that fetched no claim has no claim
+root.
 
 THE BACKFILL (`write_missing_causes`, TOOL-dTotalRecall-47). `--backfill` keeps the causes check's findings
 whose rule is the absent cause (`ABSENT_CAUSE`), so it selects what the check reds and never a copy of the
@@ -206,7 +209,6 @@ SCRIPT_PLANTS = {
     "script-causeless": {"probe.sh": "# **Serves:** log {unit}\necho probe\n",  # census: kept cause-writer fixture: a record head its fixture plants
                          "atlas.html": "**Serves:** research {unit}\n<p>an atlas</p>\n"},  # census: kept cause-writer fixture: a record head its fixture plants
 }
-CLAIM_NS = "refs/gov/claims/"
 #: TOOL-dTotalRecall-49 S2 S3: the kept reason of a literal whose one output is a pinned instrument's bytes,
 #: which the as-built view's renderer marks (its path, spelled in parts: the install-prefix ban reads a kit
 #: path, is where the fixture plants it); the census reds the reason where DESIGN_VIEW is no legacy record
@@ -529,9 +531,12 @@ def check_causes(root, g=None) -> list:
 
 
 def read_claim_slugs(root) -> set:
-    """The slugs of the build claim refs `refs/gov/claims/<slug>` this repository holds, never an ask counter."""
-    p = run_git(root, "for-each-ref", "--format=%(refname)", CLAIM_NS)
-    return {r[len(CLAIM_NS):] for r in p.stdout.splitlines() if r.startswith(CLAIM_NS) and "/" not in r[len(CLAIM_NS):]}
+    """The slugs of the build claims this clone's cache holds, `gen_build_index.CLAIM_CACHE_NS`, which the claim
+    CLI's fetch and its own writes fill; never an ask counter's nested name."""
+    import gen_build_index   # noqa: E402  the cache namespace's one spelling
+    ns = gen_build_index.CLAIM_CACHE_NS + "/"
+    p = run_git(root, "for-each-ref", "--format=%(refname)", ns)
+    return {r[len(ns):] for r in p.stdout.splitlines() if r.startswith(ns) and "/" not in r[len(ns):]}
 
 
 def read_rooted_units(g) -> tuple:
@@ -1197,10 +1202,24 @@ def write_fixture(top, plant, memory="memory") -> pathlib.Path:
     run_commit(f"record-causes fixture: {plant}")
     if plant == "kept-row-untracked":   # TOOL-dTotalRecall-66 AC1: the kept script, never added to git
         write_file(KEPT_SCRIPT, KEPT_HIT)
-    if plant == "claim-root":
-        p = run_git(root, "update-ref", f"{CLAIM_NS}fClaim", run_git(root, "rev-parse", "HEAD").stdout.strip())
-        if p.returncode:
-            raise ValueError(f"the fixture's claim ref refused: {p.stderr.strip()}")
+    if plant == "claim-root":   # TOOL-dTotalRecall-119 S2: minted by the claim CLI, on a remote of the fixture's own
+        import gen_build_index   # noqa: E402  the claim CLI's one caller
+        remote = pathlib.Path(top, "r.git")
+        for at, args in ((top, ("init", "-q", "--bare", "--template=", str(remote))),
+                         (root, ("remote", "add", "fixture", str(remote))),
+                         (root, ("push", "-q", "fixture", "HEAD:refs/heads/main")),
+                         (remote, ("symbolic-ref", "HEAD", "refs/heads/main"))):
+            p = run_git(at, *args)
+            if p.returncode:
+                raise ValueError(f"the fixture's git {args[0]} refused: {p.stderr.strip()}")
+        try:
+            rc, said = gen_build_index.run_claim_cli(str(root), "slug", "fClaim", "--claimant", "a" * 12)
+        except gen_build_index.Problem as exc:
+            raise ValueError(f"the fixture's claim: {exc}") from None
+        if rc:
+            raise ValueError(f"the fixture's claim, exit {rc}: {said}")
+        held = run_git(root, "for-each-ref", "--format=%(refname)", "refs/gov/").stdout.split()
+        print(f"{SAY}: fixture {plant} · claim · {' '.join(held)}")
     return root
 
 

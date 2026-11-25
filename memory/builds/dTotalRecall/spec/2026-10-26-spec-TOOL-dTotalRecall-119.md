@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-119 — the orphan walk reads the claim refs a clone really holds
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 47
+**Status:** CLOSED · rev-1 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 47
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-dTotalRecall-119-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-119-1-acceptance-ledger.md) | log | — |
+| [2026-11-25-build-TOOL-dTotalRecall-119-deviation-1017.md](../build/2026-11-25-build-TOOL-dTotalRecall-119-deviation-1017.md) | deviation | — |
+| [2026-11-25-build-TOOL-dTotalRecall-119-widen-30.md](../build/2026-11-25-build-TOOL-dTotalRecall-119-widen-30.md) | widen | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-119-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-119-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

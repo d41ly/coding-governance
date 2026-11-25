@@ -374,6 +374,7 @@
       "fixture-inherits-ambient-machine-state.md",
       "fixture-lacks-a-gate-the-consumer-has.md",
       "fixture-passes-by-finding-nothing.md",
+      "fixture-plants-a-state-no-writer-makes.md",
       "fixture-removes-the-path-under-test.md",
       "floor-left-below-the-arms-it-guards.md",
       "fold-text-is-unreviewed-surface.md",

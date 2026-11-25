@@ -180,9 +180,9 @@ check-memory-hygiene.sh: the memory tree's structural gate, its per-class size c
 - gate-legs 24: `memory hygiene`, `memory hygiene (the pass checks)`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`, `routed commits name a specced unit`, `routed-commits selftest`, `ratchet (never gains)`, `ratchet (both ways)`, `ratchet (unarmed)`, `ratchet (populated)`, `ratchet (seed laundering)`, `ratchet (rename)`, `ratchet (keys, not a scalar)`, `ratchet (key shape)`
 - kits 1
 - git-hooks 2
-- gotcha-classes 22
+- gotcha-classes 23
 - globs 11
-- cut 40 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 41 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-tree-merge-driver
 
