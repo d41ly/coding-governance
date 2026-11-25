@@ -86,8 +86,10 @@ one line per node, in git's allowed-signers form with no options field:
 
 The first field is the node's tag, its `GOV_NODE`. The rest is the node's public key, the first two
 fields of its `.pub` file. Each node's operator sends that public key to the owner, and the owner
-sets the list from a terminal, or through the loop kit's `policy_edit.py set` on a live run's
-branch. The loop guard refuses an agent's change to the list anywhere else.
+sets the list from a terminal. An agent may set it through the loop kit's `policy_edit.py set` on a live
+run's branch only where the landed `policy-file.guard` is `agents-with-reason` or
+`agents-within-mandate`. Under `owner-only`, the default, the loop guard refuses a run's change to the
+list, and it refuses an agent's change anywhere else whatever the key reads.
 
 The reader takes the list at the landed revision, never from the commit being judged, so a landing
 node cannot register its own key by editing what it lands. It runs `git verify-tag` against the
@@ -145,9 +147,10 @@ per pinned file, sorted by path. `remote_verdict.py pin` prints those lines and 
 `verdict.remote.pin = "<id>"` line the owner would set at HEAD. It writes nothing. Until a pin is
 set, `remote-ci` reads `HELD` with the reason `no pin`.
 
-The pin is the owner's. Set it from a terminal, or through the loop kit's `policy_edit.py set
-verdict.remote.pin <id>` on a live run's branch. The loop guard refuses an agent's change to the pin
-anywhere else, whatever `policy-file.guard` reads.
+The pin is the owner's, set from a terminal. On a live run's branch an agent may set it, through the loop
+kit's `policy_edit.py set verdict.remote.pin <id>`, only where the landed `policy-file.guard` is
+`agents-with-reason` or `agents-within-mandate`. Under `owner-only`, the default, the loop guard refuses
+a run's change to the pin, and it refuses an agent's change anywhere else whatever the key reads.
 
 ## What it does not check
 

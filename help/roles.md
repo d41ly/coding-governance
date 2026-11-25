@@ -263,7 +263,9 @@ refuses the render, naming the key.
   is refused, naming the level, where it came from, the floor and the key to set instead: the house
   file's `[effort]` and `[effort.profiles.<name>]` tables (an R12 defect), a role file's `effort` (an
   R2 defect), and a stage row's own `effort` when it resolves. The floor cannot tell your commit from
-  a live run's own change to the policy file, which the guard admits on that run's branch.
+  another's; the policy guard does that at the commit. Under `owner-only` it refuses a live run's own
+  change to the policy file, so you commit a level from a terminal. A level an agent wrote while the key
+  read another value stays after you set `owner-only` again: read the file when you close the key.
 - **Change the gates a role may run:** a role's `gates` field lists the only gate legs its agent may
   run, and a `[gates]` row of the house file applies only to a role carrying no such field.
   `gov-spec-writer` and `gov-builder` carry theirs as fields, so a house row does not change them.

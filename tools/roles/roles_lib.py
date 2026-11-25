@@ -749,9 +749,10 @@ def check_effort_floor(level, source, root=None):
     the file there; under any other value RolesError names the guard and its value. Every other source is a
     RolesError naming the level, its source, the floor and the owner as the remedy's actor.
 
-    WHAT THIS DOES NOT CHECK: whose commit wrote a policy-file level. The guard's run admission lands a live
-    run's change under every `policy-file.guard` value, and a floor reading provenance from the file alone
-    cannot tell it from the owner's; that path is the guard's to close (§8 F6)."""
+    WHAT THIS DOES NOT CHECK: whose commit wrote a policy-file level. The policy guard answers that at the
+    commit: under `owner-only` it refuses a live run's change to the policy file (TOOL-dBoundRoles-95), within
+    the limits its own header lists. A level an agent wrote while the key read another value reads here as
+    the owner's once the key is `owner-only` again."""
     if level not in EFFORT_LEVELS or EFFORT_LEVELS.index(level) >= EFFORT_LEVELS.index(EFFORT_FLOOR):
         return
     remedy = ("only the owner sets a lower level, as a %s* key in the guarded policy file %s"

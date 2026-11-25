@@ -239,7 +239,7 @@ verdict.remote.pin-scope = "dispatch-closure"
 
 ## `verdict.remote.pin`
 <!-- usage: policy:verdict.remote.pin fc4016ee -->
-The pin the remote-ci backend's source check compares against: one object id, git hash-object --stdin over one &lt;path&gt; &lt;blob id&gt; line per file verdict.remote.pin-scope names, sorted by path, each ending LF, which the run-gates kit's remote_verdict.py pin prints at HEAD. The owner's: set from a terminal or by policy_edit.py set on a live run's branch, and the loop guard refuses an agent's change to it anywhere else. Unset, remote-ci reads HELD, no pin.
+The pin the remote-ci backend's source check compares against: one object id, git hash-object --stdin over one &lt;path&gt; &lt;blob id&gt; line per file verdict.remote.pin-scope names, sorted by path, each ending LF, which the run-gates kit's remote_verdict.py pin prints at HEAD. The owner's: set from a terminal, or by policy_edit.py set on a live run's branch where the landed policy-file.guard is agents-with-reason or agents-within-mandate, and the loop guard refuses an agent's change to it anywhere else. Unset, remote-ci reads HELD, no pin.
 
 ```text
 verdict.remote.pin = "1fe706824a048fd582f17ef18b4ec6b2d9898d46"
@@ -247,7 +247,7 @@ verdict.remote.pin = "1fe706824a048fd582f17ef18b4ec6b2d9898d46"
 
 ## `verdict.peer.signers`
 <!-- usage: policy:verdict.peer.signers 6c292dc2 -->
-Which node keys may sign a peer-node verdict: one allowed-signers line per node, its node tag, its SSH key type and its base64 public key, with no options field. The peer-node reader reads it at the landed revision, verifies the refs/gov/verdict/&lt;sha&gt; tag with git verify-tag against it, and lets the verdict stand only when the signing key's node tag is the tag's node line and not the reading node's own. The owner's: set from a terminal or by policy_edit.py set on a live run's branch, and the loop guard refuses an agent's change to it anywhere else. Unset, every peer-node read is NONE, no signer table.
+Which node keys may sign a peer-node verdict: one allowed-signers line per node, its node tag, its SSH key type and its base64 public key, with no options field. The peer-node reader reads it at the landed revision, verifies the refs/gov/verdict/&lt;sha&gt; tag with git verify-tag against it, and lets the verdict stand only when the signing key's node tag is the tag's node line and not the reading node's own. The owner's: set from a terminal, or by policy_edit.py set on a live run's branch where the landed policy-file.guard is agents-with-reason or agents-within-mandate, and the loop guard refuses an agent's change to it anywhere else. Unset, every peer-node read is NONE, no signer table.
 
 ```text
 verdict.peer.signers = ["b ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA01XHzWJLfi5hyD6zkT39tg7Apyf1k93ZQ2h2VvlYuK"]

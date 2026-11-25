@@ -17,11 +17,16 @@ a hand edit, a deletion, a rename or no roles kit refuses (TOOL-dBoundRoles-6 S2
 the list does not name, an adopter's own or a role added after its line, is not guarded. A change the verdict refuses is still admitted on
 a live run's branch (PLAY-dOrderedCharter-84): HEAD's branch is the `run-branch` of a run-state file
 at HEAD whose `phase` there is outside the `PHASES_TERMINAL` set an unattended driver at HEAD
-declares, with no decision row asked. Exit 0 admitted, 1 refused naming every failed condition and
-why no live run admits it, 2 when git cannot say what is staged.
+declares, with no decision row asked; but a touched set holding the policy file only where
+`policy-file.guard` at the landed revision is a `RUN_WRITABLE` value (TOOL-dBoundRoles-95, the owner's
+2026-11-25 answer, which narrows the 2026-11-12 ruling for that file alone). Under `owner-only`, an
+unset key or a reader that does not answer, a live run's own write of it is refused, whole where other
+guarded paths stand beside it. Exit 0 admitted, 1 refused naming every failed condition and why no run
+admits it, 2 when git cannot say what is staged.
 
-It enforces the defaults of `policy-file.guard` and `policy-file.proof`, owner-only outside a live
-unattended run's branch, and the TTY proof, WITHOUT READING EITHER KEY: it imports no policy reader. The owner's proof is the pre-commit hook's,
+It reads `policy-file.guard` alone, for the run admission alone, at the landed revision and through
+this kit's `policy.py get` run as a subprocess; `policy-file.proof` it does not read, and it imports no
+policy reader. The owner's proof is the pre-commit hook's,
 a committer at a terminal, checked before this runs; this file judges the commit that lacks it.
 
 IT STOPS FORGETTING, NOT EVASION. These pass it: `git commit --no-verify`; a pty wrapper giving an
@@ -30,10 +35,17 @@ file changed in the next; a commit made on another clone; a cherry-pick or a reb
 pre-commit; this file deleted from the working tree, since the hook resolves the kit there; and a
 run-state file committed naming the agent's own branch with a live phase, which admits the commit
 after it, though never its own, since the guard reads HEAD; and renders staged over a role
-catalogue edited in the working tree and left unstaged, since `--check` reads the working tree. The
-push-time bar does not re-judge authorship.
+catalogue edited in the working tree and left unstaged, since `--check` reads the working tree; this
+file's or the reader's code edited in the working tree, or the catalogue, whose rows decide whether the
+landed file is valid and so whether an older revision answers; the landed revision moved by hand, by
+`GOV_REMOTE` or `GOV_DEFAULT_BRANCH` in the agent's environment or by `git update-ref` on the tracking
+ref; a merge taking an old parent's blob whole, which brings back a value the owner once wrote; a value
+an agent wrote while the key read another value, which stays after the owner sets `owner-only` again;
+and, where the landed value opens the file, a run that sets `policy-file.guard` back to `owner-only`
+beside another change. The push-time bar does not re-judge authorship.
 """
 import difflib
+import functools
 import json
 import re
 import subprocess
@@ -53,9 +65,12 @@ RENDER_AGENTS = ".claude/agents/"
 RENDERER = ("roles", "render_agents.py")
 DECISIONS = "memory/DECISIONS.md"
 NOT_CAPS = (("budgets", "enforce"), ("budgets", "pinned"))
-REMEDY = ("policy-guard: an agent may raise one measured-file cap in this shape, or commit on the run "
-          "branch of a live unattended run; any other change to these files is the owner's, committed "
-          "from a terminal.")
+#: The values of `policy-file.guard` under which a live run's branch may write the policy file.
+RUN_WRITABLE = ("agents-with-reason", "agents-within-mandate")
+REMEDY = ("policy-guard: an agent may raise one measured-file cap in this shape; on the run branch of a live "
+          f"unattended run it may commit any other of these files, apart from {POLICY}, and that file where "
+          f"policy-file.guard, as landed, is {' or '.join(RUN_WRITABLE)}; any other change to these files is "
+          "the owner's, committed from a terminal.")
 MIRROR_REMEDY = (f" The landing renders {MIRROR} and commits it with no hook firing; drop it from this "
                  f"commit: git restore --staged --worktree {MIRROR}")
 RENDER_REMEDY = (f" {RENDER_INDEX} and the agent files under {RENDER_AGENTS} are admitted as render_agents.py "
@@ -312,10 +327,40 @@ def read_run_fact(text, key):
     return None
 
 
-def check_run_mandate():
-    """Whether the commit's branch is the run-branch of a live unattended run, read from HEAD alone
-    (PLAY-dOrderedCharter-84) -> (`"<run-state path>, phase <PHASE>"`, []) where it is, else (None,
-    each reason it is not). The branch is HEAD's symbolic ref; a candidate is a run-state file at HEAD,
+@functools.cache
+def read_guard_value(key):
+    """The policy key `key` as an admission reads it (TOOL-dBoundRoles-95) -> (value, why): the value the
+    LANDED policy file sets, read once per process by this kit's `policy.py get <key> --json` as a
+    subprocess, so the guard imports no reader. An unset key is `owner-only`, whatever the catalogue's
+    default says, since the reader takes the catalogue from the working tree and a run could move it: so
+    is any source but `file` and `last-valid`, and a reason resting on the catalogue default, as a
+    last valid revision that sets no key does. A reader that refuses, does not start or prints another
+    shape is (None, its first standard error line, or its exit), which admits nothing."""
+    argv = [sys.executable, "-B", str(Path(__file__).absolute().parent / "policy.py"), "get", key, "--json"]
+    try:
+        p = subprocess.run(argv, stdin=subprocess.DEVNULL, capture_output=True, text=True, encoding="utf-8",
+                           errors="replace")
+    except OSError as exc:
+        return None, f"policy.py did not start: {exc}"
+    if p.returncode == 0:
+        try:
+            hit = json.loads(p.stdout)
+            value, source, reason = hit["value"], hit["source"], hit["reason"]
+        except (ValueError, TypeError, KeyError):
+            value = source = reason = None
+        if isinstance(value, str) and isinstance(source, str) and isinstance(reason, str):
+            landed = source in ("file", "last-valid") and "the catalogue default" not in reason
+            return (value if landed else "owner-only"), reason
+    err = p.stderr.replace("\r", "").strip().split("\n")[0]
+    return None, err or f"policy.py get {key} exited {p.returncode} and printed no value"
+
+
+def check_run_mandate(paths):
+    """Whether a live unattended run's branch admits the commit writing the guarded `paths`, read from
+    HEAD alone (PLAY-dOrderedCharter-84) -> (`"<run-state path>, phase <PHASE>"`, []) where it does, else
+    (None, each reason it does not). `paths` holding the policy file is admitted only where
+    `read_guard_value` answers a RUN_WRITABLE value; else the one reason says the owner commits it
+    (TOOL-dBoundRoles-95). The branch is HEAD's symbolic ref; a candidate is a run-state file at HEAD,
     `builds/<slug>/RUN.md` under any root, whose `run-branch` fact, `refs/heads/` off, is that branch;
     the terminal set is the `PHASES_TERMINAL` line of every unattended driver at HEAD, parsed and never
     imported, and must read as one set of phase tokens; the first candidate in path order whose
@@ -346,7 +391,15 @@ def check_run_mandate():
     for path, text in kept:
         phase = read_run_fact(text, "phase") or ""
         if re.fullmatch(r"[A-Z]+", phase) and phase not in terminal:
-            return f"{path}, phase {phase}", []
+            admission = f"{path}, phase {phase}"
+            if POLICY not in paths:
+                return admission, []
+            value, why = read_guard_value("policy-file.guard")
+            if value in RUN_WRITABLE:
+                return admission, []
+            reads = "does not read, so it" if value is None else f"= {value}"
+            return None, [f"{admission}, names this branch, and policy-file.guard {reads} leaves {POLICY} to the "
+                          f"owner, who commits it from a terminal ({why})"]
         whys.append(f"{path} names {branch} and its phase at HEAD, {phase}, is terminal" if phase in terminal
                     else f"{path} names {branch} and its phase at HEAD, '{phase}', is no phase token")
     return None, whys
@@ -383,14 +436,14 @@ def main(argv):
     if not refused:
         print(f"policy-guard: admitted · {cap[0]} {cap[1]} -> {cap[2]} · its change record attached")
         return 0
-    admission, whys = check_run_mandate()
+    admission, whys = check_run_mandate(touched)
     if admission is not None:
         print(f"policy-guard: admitted · {' '.join(sorted(touched))} · the run-branch of {admission}")
         return 0
     for path, why in refused:
         print(f"policy-guard: refused · {path} · {why}")
     for why in whys:
-        print(f"policy-guard: not a live run's branch · {why}")
+        print(f"policy-guard: no run admits it · {why}")
     print(REMEDY + (MIRROR_REMEDY if MIRROR in touched else "") + (RENDER_REMEDY if render else ""))
     return 1
 

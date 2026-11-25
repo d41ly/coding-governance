@@ -472,7 +472,12 @@ its directory put first on `sys.path` so its `guard` is never this kit's file of
   a value and the layer point that value needs. The verdict reads its rule from the landed revision:
   guard-self before the value's rule, the live run's admission before guard-self, a change record for
   every change, then `policy-file.guard`, the minimal guard run as a subprocess for every shape it
-  admits. The help page's section "Who may change the policy file" is the user's statement.
+  admits. The run's admission is the minimal guard's `check_run_mandate` over the path each step judges:
+  the list of guarded paths under every value, the policy file only where the landed `policy-file.guard`
+  is `agents-with-reason` or `agents-within-mandate`. Under `owner-only` a live run's own change to the
+  policy file is refused but for the raised cap, and the owner commits it from a terminal
+  (TOOL-dBoundRoles-95); the value is the minimal guard's `read_guard_value`, one reading for each step.
+  The help page's section "Who may change the policy file" is the user's statement.
 - `policy_edit.py`: the policy file's one write path, `set`, `raise` and `propose`, each write through
   the guarded write, the block `guarded_write_py` it carries inline, writing the file and its change
   record, both staged, and printing the `Gov-Policy:` trailer line.
@@ -1008,5 +1013,6 @@ record's `Item` names a declared item, which reads `None`, or that a writer reso
 it wrote. An unknown key on a row is neither read nor refused. That a witness's `by` is true. That
 the build an actor-list row names will compute its witness. The guard does not see a change to the
 list of guarded paths alone, which the pre-commit block never hands it; a live run's own switch of the
-floor, which only its change record and the push arm witness; a pty wrapper giving an agent a
+floor where the landed `policy-file.guard` opens the policy file to it, which only its change record and
+the push arm witness; what the minimal guard's header lists as passing the run admission; a pty wrapper giving an agent a
 terminal, `--no-verify`, or that a change record's argument is true.

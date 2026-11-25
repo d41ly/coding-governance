@@ -1908,7 +1908,7 @@ function checkPolicyFile(tool, target, top) {
   if (!helper || !fs.existsSync(helper)) return null
   const rel = require(helper).POLICY_REL
   if (typeof rel !== 'string' || buildComparablePath(target) !== buildComparablePath(path.join(top, buildNativePath(rel)))) return null
-  return { deny: `BLOCKED by scratch-guard: this ${tool} targets the policy file ${rel}, which no tool write changes. Its door is the loop kit's policy_edit.py: \`set <key> <value>\` on a live run's branch or at the owner's terminal, \`raise <cap> <new>\` for one measured-file cap, \`propose <key> <value>\` to print the change; each writes the change record and stages it beside the file (TOOL-dDeclaredLoop-2).\n` }
+  return { deny: `BLOCKED by scratch-guard: this ${tool} targets the policy file ${rel}, which no tool write changes. Its door is the loop kit's policy_edit.py: \`set <key> <value>\` at the owner's terminal, or on a live run's branch where the landed policy-file.guard is agents-with-reason or agents-within-mandate, \`raise <cap> <new>\` for one measured-file cap, \`propose <key> <value>\` to print the change; each writes the change record and stages it beside the file (TOOL-dDeclaredLoop-2).\n` }
 }
 
 /**

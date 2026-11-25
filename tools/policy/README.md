@@ -396,8 +396,9 @@ branch, and a key set to `off` on a branch has no effect until it lands.
 ## The guard
 
 The minimal guard: the shapes an agent's commit is admitted in, owner-only outside a live unattended
-run's branch, enforced without reading `policy-file.guard` or `policy-file.proof`: `guard.py` imports
-no reader. The verdict it now serves is the loop kit's `guard.py --staged` (TOOL-dDeclaredLoop-2),
+run's branch, and for the policy file inside it too unless the landed `policy-file.guard` opens that file
+to a run (TOOL-dBoundRoles-95). It reads that one key, for that one admission, and `policy-file.proof`
+not at all: `guard.py` imports no reader. The verdict it now serves is the loop kit's `guard.py --staged` (TOOL-dDeclaredLoop-2),
 which reads both keys and the `floor` at the landed revision, refuses a change to the guard's own
 switch off a live run's branch, asks a change record of every change, and runs this file as a
 subprocess for every shape it admits, so the raise, the mirror's render and the run admission each
@@ -456,8 +457,8 @@ not guarded: the list gains its line in the role's own commit. The loop kit's ve
 shape under every value of `policy-file.guard`, through its step that runs this file.
 
 A change those conditions refuse is still admitted on a live run's branch (PLAY-dOrderedCharter-84),
-reading no policy key and asking for no decision row. `check_run_mandate` reads `HEAD` alone, each
-step stopping at its first miss: the branch, `git symbolic-ref -q HEAD` (none: `HEAD is detached`);
+asking for no decision row. `check_run_mandate(paths)` takes the guarded paths the caller would write and
+reads `HEAD` alone, each step stopping at its first miss: the branch, `git symbolic-ref -q HEAD` (none: `HEAD is detached`);
 the candidates, the run-state files `git grep -l` finds naming it over `:(glob)**/builds/*/RUN.md` at
 `HEAD`, kept where `read_run_fact`'s `run-branch`, `refs/heads/` off, is the branch (none:
 `no run-state file at HEAD names <branch> as its run-branch`), so a run-state file staged in the same
@@ -467,19 +468,33 @@ commit grants nothing; the terminal set, the `PHASES_TERMINAL="..."` line of eac
 a token not `[A-Z]+`: `the PHASES_TERMINAL declarations at HEAD read <values>, not one set of phase
 tokens`); and the phase, the first candidate in path order whose `phase` is a phase token outside
 that set admitting (else, per candidate, `<path> names <branch> and its phase at HEAD, <PHASE>, is
-terminal`, or `'<value>', is no phase token`). `read_run_fact` follows the driver's `fact` grammar:
+terminal`, or `'<value>', is no phase token`). Where that run is live and `paths` holds the policy file,
+however it changed and whatever stands beside it, one more read decides (TOOL-dBoundRoles-95):
+`read_guard_value("policy-file.guard")` must answer a value in `RUN_WRITABLE`, `agents-with-reason` or
+`agents-within-mandate`. It runs this kit's `policy.py get <key> --json` as a subprocess, once per
+process, and answers the value the LANDED policy file sets: an unset key is `owner-only` whatever the
+working tree's catalogue gives as its default, as is a `last-valid` answer resting on that default, so
+neither a switch on the run's branch nor a moved default opens anything. A reader that refuses answers
+no value, which admits nothing. The refusal is one reason, `<run-state path>, phase <PHASE>, names this
+branch, and policy-file.guard = <value> leaves .governance/policy.toml to the owner, who commits it from a
+terminal (<why>)`, `does not read, so it` in place of `= <value>` where nothing was read; the other
+guarded paths, committed apart, are admitted. The loop kit's guard and its `policy_edit.py set` call the
+same two functions. `read_run_fact` follows the driver's `fact` grammar:
 one trailing CR off each line, the `## Run facts` section to the next `## ` line, the first
 `<key>:` line winning, leading spaces off the value. An admission prints
 `policy-guard: admitted · <paths> · the run-branch of <run-state path>, phase <PHASE>`.
 
 Exit 0 prints `policy-guard: admitted · budgets.<cap> <old> -> <new> · its change record attached`.
 Exit 1 prints every failed condition as `policy-guard: refused · <path> · <why>`, then each reason no
-live run admits it as `policy-guard: not a live run's branch · <why>`, then one remedy line, which
+run admits it as `policy-guard: no run admits it · <why>`, then one remedy line, which
 names `git restore --staged --worktree` for the mirror, since the landing renders it with no hook
 firing. Exit 2 is a git read that failed. It stops forgetting, not evasion: `--no-verify`, a pty
 wrapper, a list line removed one commit before the change, another clone, a cherry-pick or rebase, a
 guard file deleted from the working tree, and a run-state file committed naming the agent's own
-branch with a live phase all pass it, and the push-time bar does not re-judge authorship. The block is gov's own; the runbook's copy instructions do not carry it.
+branch with a live phase all pass it, as does each further limit `guard.py`'s header lists: this kit's
+code or catalogue edited in the working tree, the landed revision moved by hand, a merge taking an old
+parent's blob, a value written while the key was open, and a run closing an opened key behind its own
+change. The push-time bar does not re-judge authorship. The block is gov's own; the runbook's copy instructions do not carry it.
 
 ## The arms
 
@@ -677,7 +692,11 @@ render recording one input more than today's and stages that input beside its mi
 1 naming the input (TOOL-dGroundRules-25 S19, S21). The live run's three (PLAY-dOrderedCharter-84),
 `guard-run-live`, `guard-run-terminal` and `guard-run-other-branch`, stage the deploy and instructions
 edits on a branch whose committed run-state record and driver decide, as `check_policy.py`'s header
-states. The rendered-paths shape's six (TOOL-dBoundRoles-6
+states, and none stages the policy file. That file's own three (TOOL-dBoundRoles-95): `guard-run-policy`
+stages it in each shape under a landed file that sets no `policy-file.guard`, and after a commit of the run
+moving the key or the catalogue's default, exit 1 each; `guard-run-policy-open` exits 0 under each
+`RUN_WRITABLE` value as landed and, under `owner-only`, on the argued raise; `guard-run-policy-merge` exits
+0 on a merge taking the branch's side and 1 on a third text. The rendered-paths shape's six (TOOL-dBoundRoles-6
 S2) commit a `.claude/roles.json`, which the copied list names, and stage one change of it, the
 renderer a stub beside the kit copy where the guard's `resolve_kit_dir` probes, exiting as its `rc`
 file says: `guard-render-admitted` exits 0 on a stub exiting 0, printing `each equals its render`;

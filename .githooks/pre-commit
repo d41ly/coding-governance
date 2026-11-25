@@ -240,7 +240,8 @@ resolve_hook_python() { # -> py; rc 1 when no tracked resolver or no usable laun
 # lists at HEAD. The verdict it runs is the loop kit's guard.py --staged wherever that resolves
 # (TOOL-dDeclaredLoop-2 S11): it reads policy-file.guard and the floor at the landed revision, asks a
 # change record of every change, and wraps the minimal guard below, whose admitted shapes, a cap raised,
-# the mirror's render and a live run's branch, it keeps. Where the loop kit does not resolve, the
+# the mirror's render and a live run's branch, it keeps; that branch admits the policy file itself only
+# where the landed policy-file.guard opens it to a run (TOOL-dBoundRoles-95). Where the loop kit does not resolve, the
 # minimal guard runs alone, as it did before the loop kit's guard landed.
 # Git sends a hook's stdout to stderr and leaves stderr as the committer's, so `[ -t 2 ]` reads
 # whether a person sits at a terminal, which an agent's shell does not. It stops forgetting, not
