@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-123 — the map replay run again: more runs per arm, a noise term more runs tighten, and the verdict rule fixed before the first run
 
-**Status:** INPROGRESS · rev-2 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 51 · advances TOOL-dTotalRecall-111
+**Status:** INPROGRESS · rev-3 · 2026-11-26 · node d · Tier-2 · base fbe06249 · streams tooling · order 51 · advances TOOL-dTotalRecall-111
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,8 +9,10 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-25-build-TOOL-dTotalRecall-123-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-1-builder-return.md) | journal | — |
+| [2026-11-25-build-TOOL-dTotalRecall-123-2-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-2-builder-return.md) | journal | — |
 | [2026-11-25-build-TOOL-dTotalRecall-123-widen-35.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-widen-35.md) | widen | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-123-build-2-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-2-brief.md) | journal | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-123-build-3-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-3-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-123-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-123-divergence-fold-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-divergence-fold-brief.md) | journal | — |
 
@@ -196,7 +198,7 @@ re-run with its cause, each term's figures, the second experiment's own variance
 
 | Field | Value |
 |---|---|
-| Departs from | `cl-dClosedLoop-0228@fcc9ca71` |
+| Departs from | `TOOL-dTotalRecall-17@rev-3` [§4 "The terms"] |
 | Hand-off | design-to-spec |
 | Before | the recall term's noise is the twin runs' difference, each arm run twice |
 | After | it is two standard errors of the rise, each arm run the count the manifest declares |
@@ -212,6 +214,11 @@ re-run with its cause, each term's figures, the second experiment's own variance
 
 What it relaxes: at the first experiment's spread the line is 20.46 where the clause's was 23 at two runs, and lower again
 as runs join. What it does not: the 5 items, the strict comparison, and the other two terms.
+
+The as-built view keeps the baseline text of cl-dClosedLoop-0228. Its words "the twin runs' difference" are therefore departed
+from under this record and not amended: `tools/memory-tree/asbuilt_view.py#resolve_clause_rows` refuses a record departing from
+a clause with no amends or supersedes row, and an amends row would leave the `Carries:` hash of frozen spec 17 stale. Amending
+the clause is the owner's, and the main loop names it to them at the close.
 
 ### Inventory
 
@@ -246,6 +253,7 @@ header to `CLOSED`, as TOOL-dTotalRecall-17 stayed `INPROGRESS` at `30c21c834` a
 - `memory/map/generated/`
 - `memory/LIVE.md` and `memory/builds/dTotalRecall/README.md`, rendered by the build index
 - `memory/builds/dTotalRecall/build/` (the deviation record, the ledger, the manifest and the verdict record)
+- `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md`, the as-built view, whose head counts the records
 
 ### Alternatives rejected
 
@@ -290,8 +298,8 @@ header to `CLOSED`, as TOOL-dTotalRecall-17 stayed `INPROGRESS` at `30c21c834` a
   it prints nothing, and the README's `map-replay` paragraph names the noise, its factor and the count rule.
   Red when: a docstring or the README states the old line. The `review-twin runs=` line of `tier2-review.js`'s twin runs is
   no hit.
-- **AC5** — When a probe calls `deviation_join.py#read_record` over the new deviation record, its `malformed` is empty and its
-  `bound` is §8 F1's `relaxes:` value; and `grep -rlE "^- \*\*Bound:\*\* the twin runs' difference as the recall term's noise$"
+- **AC5** — When a probe calls `deviation_join.py#read_record` over the new deviation record, its `malformed` is empty, its
+  `address` is `TOOL-dTotalRecall-17@rev-3`, its `follow` is `ask TOOL-dTotalRecall-111`, and its `bound` is §8 F1's `relaxes:` value; and `grep -rlE "^- \*\*Bound:\*\* the twin runs' difference as the recall term's noise$"
   memory/builds/dTotalRecall/build/` names that one file.
   Red when: a field is refused, or no record or two carry the bound.
 - **AC6** — When the manifest is read at the one orchestrating sha every `run.log` line names, its `candidates` is empty and
@@ -323,7 +331,7 @@ header to `CLOSED`, as TOOL-dTotalRecall-17 stayed `INPROGRESS` at `30c21c834` a
 
 ## 7. Gates
 
-`review-replay selftest` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `python reads (a name never bound, an import outside its guard)` · `python resolver (behaviour + inline parity + idiom ban)` · `ratchet (never gains)` · `ratchet (both ways)`
+`review-replay selftest` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `python reads (a name never bound, an import outside its guard)` · `python resolver (behaviour + inline parity + idiom ban)` · `ratchet (never gains)` · `ratchet (both ways)` · `chain-packet self-test` · `policy fixtures`
 
 New arm: tools/workflows/replay_scorer.py · covers AC1 AC2 · `map-noise`, staged by the range put back in `measure_rise_noise`, by its division by the count cut, and by the exact-count refusal cut · `ARMS_DECLARED` raised from 33 (PINNED 2026-11-25, `tools/workflows/replay_scorer.py#ARMS_DECLARED`) by the one arm
 New arm: tools/workflows/replay_scorer.py · covers AC3 · `map-verdict` moved to the figure `noise`, with a set whose noise alone loses, staged by the comparison reading the margin alone · none
@@ -356,6 +364,7 @@ and that a run was not re-run for its figure, which the record's re-run list sta
   re-read at `b4d582a2d`: AC4's grep leaves the twin-run line alone, AC5 reads the build records by `read_record`, the departures
   join is AC9 at the close, the manifest with `map` null joins the pass commit under AC10, and the header stays `INPROGRESS`
   until the verdict commit. No estimator, line or count moved.
+- rev-3 · 2026-11-26 · §4 · AC5 · §7 · per `2026-11-25-build-TOOL-dTotalRecall-123-2-builder-return`: the deviation record departs from spec 17.
 
 ## 10. Reuse audit
 
