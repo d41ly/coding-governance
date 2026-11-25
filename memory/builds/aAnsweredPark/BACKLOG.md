@@ -11,3 +11,6 @@
 - SEV · TOOL-aAnsweredPark-2 · MED · the card's item is unread on a large build and the guard is disarmed there
 - SEV · TOOL-aAnsweredPark-3 · MED · a parked run needs another session to record the owner's answer
 - SEV · TOOL-aAnsweredPark-4 · LOW · a hand-over line no reader uses
+- KEEP · TOOL-aAnsweredPark-2 · awaiting the owner
+- KEEP · TOOL-aAnsweredPark-3 · awaiting the owner
+- KEEP · TOOL-aAnsweredPark-4 · awaiting the owner
