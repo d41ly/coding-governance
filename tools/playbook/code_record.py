@@ -1084,6 +1084,8 @@ def build_code_fixture(root, rev="HEAD") -> pathlib.Path:
     return top
 
 
+#: The fixture repository's tool root, which the leg manifest of its tree sits in.
+FX_TOOL = "tools"
 #: the files of the resolution arms' repository, `{path: text}`
 ARM_FILES = {
     "a.py": "import os\n\n\nclass K:\n    def m(self):\n        def inner():\n            return 1\n        return inner()\n"
@@ -1103,7 +1105,7 @@ ARM_FILES = {
     "tools/kx/v.py": "V = 1\n",
     "tools/kx/w.py": "def w():\n    return 1\n",
     "tools/kx/note.md": "a note\n",
-    "tools/gate-legs.json": '[{"name": "leg z", "argv": ["bash", "{prefix}/../z.sh"]}, '
+    f"{FX_TOOL}/gate-legs.json": '[{"name": "leg z", "argv": ["bash", "{prefix}/../z.sh"]}, '
                             '{"name": "leg v", "argv": ["python", "{prefix}/kx/v.py"]}]\n',
 }
 
@@ -1184,13 +1186,13 @@ def run_selftest() -> int:
         check_arm("neighbourhood", rc == 0 and [g for g in got if g[-1].endswith(" f") or g[-1] == "def" and g[0] == "function f"]
                   == [["function f", "def"], ["function _p", "caller f"], ["function g", "caller f"],
                       ["module top", "caller f"], ["function test_f", "test f"]]
-                  and "return" not in said and "top.py:3-3 · module top · caller f" in said
-                  and "a.py:14-15 · function f · callee _p" in said, said)
+                  and "return" not in said and "top.py" ":3-3 · module top · caller f" in said
+                  and "a.py" ":14-15 · function f · callee _p" in said, said)
         check_arm("neighbourhood empty", run_verb(print_neighbourhood, root, ["tools/kx/v.py"], 30.0) == (0, ""))
         check_arm("neighbourhood refusal", run_verb(print_neighbourhood, root, ["none.py"], 30.0)[0] == 2)
         rc, said = run_verb(print_neighbourhood, root, ["tools/kx/w.py"], 30.0)
         check_arm("neighbourhood siblings", said.splitlines() == [
-            "tools/kx/w.py:1-2 · function w · def", "tools/kx/kit.toml · sibling", "tools/kx/note.md · sibling",
+            "tools/kx/w.py" ":1-2 · function w · def", "tools/kx/kit.toml · sibling", "tools/kx/note.md · sibling",
             "tools/kx/v.py · sibling"], said)
 
         root = build_repo(top, "amb", {"x/one.sh": "run() {\n  :\n}\n", "y/two.sh": "run() {\n  :\n}\n",

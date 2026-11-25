@@ -589,5 +589,6 @@ fi
 _uk=; check_sibling_kit memory-tree tree_lib.py || _uk=memory-tree
 check_sibling_kit policy policy.py || _uk=${_uk:-policy}
 if [ -n "$_uk" ]; then echo "UNARMED — the code record's arms: no $_uk kit in this install"; else
-"$PY_BIN" "$HERE/code_record.py" --selftest || exit 1
+# The script's last command, whose status is the script's.
+"$PY_BIN" "$HERE/code_record.py" --selftest
 fi
