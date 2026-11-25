@@ -1,6 +1,6 @@
 # TOOL-aTemperedLane-1 — the Red-fix lane's L3 reads a spec change confined to the `gen:spec-records` region as no spec edit
 
-**Status:** SPECCED · rev-1 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
+**Status:** INPROGRESS · rev-1 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

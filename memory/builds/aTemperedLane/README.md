@@ -48,13 +48,13 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-11-25 · streams tooling
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-11-25 · streams tooling
 ids TOOL-aTemperedLane-1 TOOL-aTemperedLane-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aTemperedLane-1 — the Red-fix lane's L3 reads a spec change confined to the `gen:spec-records` region as no spec edit](spec/2026-11-25-spec-TOOL-aTemperedLane-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-25 |
+| [TOOL-aTemperedLane-1 — the Red-fix lane's L3 reads a spec change confined to the `gen:spec-records` region as no spec edit](spec/2026-11-25-spec-TOOL-aTemperedLane-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-25 |
 | [TOOL-aTemperedLane-2 — limit L2 reads the guarded list at the commit's first parent](spec/2026-11-25-spec-TOOL-aTemperedLane-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
