@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-1 — a read of the served rows starts from the reading worktree's own extractor versions
 
-**Status:** SPECCED · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
+**Status:** INPROGRESS · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
