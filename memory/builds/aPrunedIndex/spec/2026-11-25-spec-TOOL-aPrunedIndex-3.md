@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-3 — a build's sweep touches only the rows that the trees and gone worktrees' edits it lets go of held
 
-**Status:** SPECCED · rev-3 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 3 · ratified 2026-11-25
+**Status:** SPECCED · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 3 · ratified 2026-11-25
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-11-25-prompt-TOOL-aPrunedIndex-3-1-spec-writer.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-3-1-spec-writer.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aPrunedIndex-3-revision.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-3-revision.md) | research | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-4 |
 | [2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md](../reviews/2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-4 |
+| [2026-11-26-review-TOOL-aPrunedIndex-1-2-3-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 |
 
 <!-- /gen:spec-records -->
 
@@ -21,7 +22,8 @@ for rows nothing holds. On the 12.6 GB copy two such sweeps took 537 s of one ch
 scan are mostly those of dead extractor versions (PINNED, the diagnosis, 2026-11-25). After this unit a
 build looks only at the rows that the trees and the gone worktrees' edits it lets go of held. An overlay
 clears none of those three tables, as today. The rows only a replaced edit held wait for `--gc`, which
-keeps the full sweep. No row that a tree or an edit holds is cleared.
+keeps the full sweep. No row that a tree or an edit holds is cleared. Because those rows are kept, an
+overlay now keys each edit by the very bytes it parses, so a kept row is right when its content comes back.
 
 ## 2. Scope (IN)
 
@@ -33,13 +35,16 @@ keeps the full sweep. No row that a tree or an edit holds is cleared.
   at every version and every conf key. Observed by AC1, AC2 and AC5.
 - **S3** — `tools/playbook/tag_index.py#build_index` ends its write block with S2 over S1's set.
   Observed by AC1 and AC2.
-- **S4** — `tools/playbook/tag_index.py#build_overlay` is not edited. It takes out its own worktree's
-  dirty rows and nothing else, as today. The rows only an old edit of that worktree held stay until
-  the full sweep of a collection. Observed by AC1, AC3 and AC8.
+- **S4** — `tools/playbook/tag_index.py#build_overlay` reads each changed file's bytes once, before the
+  write lock, keys the file by the blob of those bytes, and parses those bytes. A file whose bytes cannot be
+  read refuses the overlay, naming it, and no row moves. Bytes that are not UTF-8 are recorded with no text,
+  as today. What the overlay clears is unchanged: it takes out its own worktree's dirty rows and nothing
+  else, and the rows only an old edit of that worktree held stay until the full sweep of a collection.
+  Observed by AC1, AC3, AC8 and AC10.
 - **S5** — `remove_unheld_rows` keeps the full sweep alone, as `remove_unheld_rows(con)`, and
   `tools/playbook/tag_index.py#remove_dead_versions` calls S1 and then it. Observed by AC3.
 - **S6** — Two new plants, `released-rows` and `released-cost`, in `tools/playbook/gov_tag.py`, each with
-  its row in `SELFTEST_ROWS` of `tools/playbook/tag_bundle.py`. Observed by AC1, AC2, AC3 and AC8.
+  its row in `SELFTEST_ROWS` of `tools/playbook/tag_bundle.py`. Observed by AC1, AC2, AC3, AC8, AC10 and AC11.
 - **S7** — The docstrings of S1, S2, S3 and S5's functions, and the index paragraph of
   `tools/playbook/README.md`, say that a build clears only what the trees and the gone worktrees' dirty
   rows it lets go of held, and that the rows of an old edit wait for `--gc`, which alone sweeps the row
@@ -59,8 +64,15 @@ keeps the full sweep. No row that a tree or an edit holds is cleared.
 - The `SELECT DISTINCT tree FROM tree_path` that lists the trees. It reads one key index, and its cost
   follows the trees held.
 - A new SQL index, a schema change, or a stored table of released pairs.
-- Any open of either live index file. Every measurement runs on a private copy or a fixture.
-- Any run, from the building worktree before the owner's go, of what opens the live index: the legs
+- A retry of a file the overlay cannot read, and a held or locked file. It refuses, as a failed
+  `git hash-object` does today.
+- A content filter that changes more than line ends between the working file and its blob. The overlay
+  parses the working bytes with CRLF folded, as today, and this repository declares no such filter.
+- Any open of either live index file before the owner's go. The owner gave it on 2026-11-25, in
+  `2026-11-25-prompt-TOOL-aPrunedIndex-3-revision`, on three conditions: all four units are built and
+  measured on private copies, the closing review is clean, and the open comes before the bar. Every
+  measurement here runs on a private copy or a fixture.
+- Any run, from the building worktree before that go, of what opens the live index: the legs
   `tags (the resolver's checks)`, `instruction edits (manifest checks)`,
   `edges (every declared edge parses, is registered and resolves)` and `instruction units selftest`, and a
   `gov_tag.py` verb outside `--fixture`. This unit is verified by `--fixture` plants and private copies.
@@ -69,12 +81,12 @@ keeps the full sweep. No row that a tree or an edit holds is cleared.
 
 - **consumes-from** `TOOL-aPrunedIndex-1` — `path_row_version` and the new joins. AC5's copy, the plans of
   section 4 and AC9's whole check rest on them, and `released-cost` proves its pad with that unit's
-  `read_step_count`.
+  `read_step_count`. Section 4's Rollout adds one step to that unit's.
 - **consumes-from** `TOOL-aPrunedIndex-2` — `path_row_named`, for AC5, the plans and AC9.
 - **hands-off** `TOOL-aPrunedIndex-4` — `remove_dead_holders` and `remove_unheld_rows(con)`, which its
   `--gc` runs through, and the `released-rows` and `released-cost` rows its AC8 times.
-- **hands-off** external — the owner's word in the building session before this code first opens the
-  live index.
+- **consumes-from** external — the owner's go for this code's first open of the live index, on the
+  conditions the list above states.
 
 ## 4. Design
 
@@ -84,6 +96,12 @@ keeps the full sweep. No row that a tree or an edit holds is cleared.
 `build_index` and `remove_dead_versions` (`tools/playbook/tag_index.py@4b10fce5d:805,925`), and a grep
 over `tools/` found no other. `build_overlay` replaces its worktree's dirty rows
 (`tools/playbook/tag_index.py@4b10fce5d:875-876`) and sweeps nothing.
+
+Today's `tools/playbook/tag_index.py#build_overlay` reads each file twice. It hashes the path in its entries loop, takes the write lock, which
+can wait 600 s, and only then reads the bytes it parses. A save in between stores one text under another
+text's blob, and a failed read stores the blob as parsed with no rows. Today the next build of an unbuilt
+tree clears such rows once the edit is replaced. Under S3 they would stay, and no later run would parse the
+blob again, so S4 closes the gap that made them.
 
 A row of the three tables can stop being held in four ways only.
 
@@ -109,6 +127,14 @@ A row of the three tables can stop being held in four ways only.
 3. `build_index` calls `remove_released_rows(con, remove_dead_holders(con, root, keep={tree}))`.
 4. `remove_dead_versions` calls `remove_dead_holders(con, root)` and then `remove_unheld_rows(con)`,
    whose statements are today's three, byte for byte.
+5. `build_overlay` takes each changed file's bytes with one `read_bytes` in its entries loop. The blob is what
+   memory-tree's `tools/memory-tree/tree_lib.py#read_git_output` answers for
+   `git hash-object --stdin --path <path>` over those bytes, so the path's filters apply. It decodes the held
+   bytes there too, folding CRLF, and `_write_parsed` is handed that map. Its own `read_text` goes, and no
+   file is opened again. An `OSError` from either call becomes a `TagError` naming the path. Both forms of
+   `hash-object` answered one id on 2026-11-26 over CRLF text, `eol=lf`, `-text` and `ident` files and one in a
+   subfolder, under `core.autocrlf` true, false and input, and under true over an index blob holding CRLF. The
+   overlay still makes one git call per changed file.
 
 ```sql
 CREATE TEMP TABLE IF NOT EXISTS released(path TEXT, blob TEXT, PRIMARY KEY(path, blob));
@@ -152,7 +178,7 @@ that ceiling and an index on its blob as the way past it.
   clears nothing, so a reader keeps every row it keeps today. A reader of a tree or a worktree that a
   build elsewhere lets go of can still read no row, as today.
 - A worktree on older code. Its builds run the full sweep over the same file, which clears only rows
-  nothing holds, under the same write lock.
+  nothing holds, under the same write lock. That wait is a cost, and Rollout prices it.
 
 ### What it leaves
 
@@ -165,13 +191,25 @@ Three kinds of row that nothing holds stay until a `--gc`, or until a build by a
   That build clears the blob's `blob_row` and `blob_parsed` rows.
 - A legacy orphan: a row nothing held before this code ran, such as one an older worktree's overlay left.
 
-No view holds such a pair, so none serves its rows. When the pair is held again its rows are right: they
-are keyed by content, version and conf, and a blob with no `blob_parsed` row is parsed again. A build that
-lets go of a tree or a gone worktree holding the same pair clears it sooner.
+No view holds such a pair, so none serves its rows. When the pair is held again its rows are right. They
+are keyed by content, version and conf, S4 makes the content the bytes that were parsed, and a blob with no
+`blob_parsed` row is parsed again. A row an overlay of older code stored wrongly is not served here: it
+stands at that code's versions, and every extractor's import closure holds `tag_index.py`, so this unit's
+edit moves every version (read through `import_walk.derive_module_closure`, 2026-11-26). A build that lets go
+of a tree or a gone worktree holding the same pair clears it sooner.
 
-The cost is one file's rows per replaced edit. At the HEAD tree of the clean copy, 15,028 paths hold
-426,387 path rows: a mean of 28, 96 for `AGENTS.md`, and 2,010 for the largest (PINNED, 2026-11-26). Unit
-4 lets the `--gc` that clears them run on this node.
+The cost is one file's rows per replaced edit that some command recorded. An edit no command saw costs
+nothing. Read from the clean copy on 2026-11-26, PINNED, at one version of each extractor:
+
+| File | `path_row` | `blob_row` | `blob_parsed` |
+|---|---|---|---|
+| `AGENTS.md`, the charter | 96 | 94 | 2 |
+| `memory/guides/BUILD-METHOD.md` | 49 | 47 | 2 |
+| `memory/guides/UNATTENDED-PROTOCOL.md` | 144 | 142 | 2 |
+
+Over the paths of that copy's HEAD tree, not over edits, `path_row` alone has a mean of 28 a path and 2,010
+for the largest. How many edits a day are recorded and then replaced is unmeasured, since the index keeps no
+count of them. Unit 4 lets the `--gc` that clears the rows run on this node.
 
 ### The plants
 
@@ -182,10 +220,11 @@ step it opens the index, takes the write lock, reads two counts, and rolls back.
 - `lost`: `path_row` rows of a held pair whose blob, extractor and version have no `blob_parsed` row, and
   held paths under `memory/guides/` whose blob has a `blob_parsed` row no `path_row` row answers.
 
-`lost` is zero after every step. `left` is zero after steps 1 to 7 and 14, and after each other step it
-equals the rows named there, which the plant counts by blob while the edit is held and which must be above
-zero in each table. ALPHA and BETA are two guides, and a short word is the text a guide then holds. Each
-step ends with a `rebuild` by the worktree that moved.
+`lost` is zero after every step. `left` is zero after steps 1 to 7, 14 and 17, and after each other step but
+15 it equals the rows named there, which the plant counts by blob while the edit is held. Those must be above
+zero in each table, but for the bytes of step 16, which leave no `blob_row` row. ALPHA and BETA are two
+guides, and a short word is the text a guide then holds. Each step but 15 ends with a `rebuild` by the
+worktree that moved.
 
 | Step | What moves | `left` |
 |---|---|---|
@@ -203,15 +242,23 @@ step ends with a `rebuild` by the worktree that moved.
 | 12 | the main one edits ALPHA to `g1` again | `g2`, `e1` |
 | 13 | it reverts, one row is put in each table at the live version for a blob nothing holds, and it commits ALPHA | `g1`, `g2`, `e1`, and those three rows |
 | 14 | the second is moved onto the main one's commit, and `run_gc` runs | zero |
+| 15 | the main one edits ALPHA three times, and each time a second text is saved while the overlay runs: just before it reads the file, just after, and as it takes the write lock. Each of the six texts is then put back and read | not read |
+| 16 | the main one edits ALPHA to `k1` and its read fails, then ALPHA holds bytes that are not UTF-8, then `h3` | the six texts of step 15, and the rows of those bytes |
+| 17 | it reverts, commits ALPHA at the first text of step 15's last race and BETA at `k1`, the second is moved onto that commit, and `run_gc` runs | zero |
 
 After step 9 the connection of step 7 reads `doc.alpha#intro` again, and must be served the text of `g1`
-as before. After step 14 `read_dump` must equal `read_cold_dump`, through the plant runner's
-`print_equal`. The dump follows the collection because it counts a row nothing holds. It prints one line
-per step. It exits 0, with a last line ending `only replaced edits left, and nothing lost`, only when every
-condition holds.
+as before. After steps 14 and 17 `read_dump` must equal `read_cold_dump`, through the plant runner's
+`print_equal`. The dump follows the collection because it counts a row nothing holds.
 
-A prototype was green on 2026-11-26, with both SQL indexes in its `SCHEMA`, in 30 s on a busy machine. It
-was red on each of ten breaks:
+Step 15 wraps `pathlib.Path.read_bytes` for ALPHA and sets a trace callback that acts on `BEGIN IMMEDIATE`,
+so it stages a race against any order of hash, read and lock. Each put-back text must be the text
+`doc.alpha#intro` is served. In step 16 the failed read is a `PermissionError` from the same wrapper. The
+view must raise a `TagError` naming ALPHA, the three tables' counts and the dirty rows must not move, and
+the bytes must be recorded with a `blob_parsed` row and no refusal. It prints one line per step. It exits 0,
+with a last line ending `only replaced edits left, and nothing lost`, only when every condition holds.
+
+A prototype was green on 2026-11-26, with both SQL indexes in its `SCHEMA`. Steps 1 to 14 took 30 s and all
+17 took 85 s, on a busy machine. It was red on each of fifteen breaks:
 
 | Break | First step that reds |
 |---|---|
@@ -225,9 +272,15 @@ was red on each of ten breaks:
 | no set from a tree | 1, `left` |
 | `blob_row` left uncleared | 6, `left` |
 | `--gc` without the full sweep | 14, `left` |
+| today's overlay, whole | 15, the first texts of the save before the read and of the save at the lock served wrong; 16 and 17 red too |
+| the path hashed, then the bytes read, both before the lock | 15, the save before the read |
+| the bytes read, then the path hashed | 15, the save after the read |
+| a failed read recorded with no text | 16, no refusal, and 17, the dump |
+| bytes that are not UTF-8 refused | 16, the refusal |
 
 Twenty existing plants over rebuilds, worktrees, dirty edits, versions, schemas and conf keys, AC7's seven
-among them, ran green on the prototype.
+among them, ran green on the prototype of S1 to S3. `dirty`, `dirty-revert`, `dirty-rename`,
+`charter-dirty`, `worktree-recreate` and `queued-writers` ran green on the one that holds S4 too.
 
 **`released-cost`** grades cost. It counts virtual-machine steps with `set_progress_handler` at one
 instruction, over the statements of one `load_view` of a new commit that `set_trace_callback` shows from
@@ -263,6 +316,16 @@ What the two do not check: wall time, disk reads, and a planner that holds `sqli
 
 None. No stored table or key moves. The first build by this code clears what it releases.
 
+### Rollout
+
+One step follows unit 1's: the worktrees of the node that run bars are brought onto this code. A worktree on
+older code still runs the full sweep inside the write lock when it builds an unbuilt tree, and every check
+takes that lock at its overlay, with no edit to record too, and waits up to `BUSY_TIMEOUT`, 600 s. The
+diagnosis measured two such sweeps at 537 s, and the leg's ceiling is 420 s. On 2026-11-26 100 of the node's
+104 worktrees held the old sweep (PINNED, the count of `2026-11-26-review-TOOL-aPrunedIndex-1-2-3-spec-audit-round1`). So
+the leg fits its ceiling on a machine whose other writers run this code, and until the active worktrees do,
+a check beside an older build can still be killed waiting. No row and no verdict is wrong in either state.
+
 ### Files touched (estimate)
 
 - `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`, `tools/playbook/tag_bundle.py`
@@ -280,6 +343,10 @@ None. No stored table or key moves. The first build by this code clears what it 
 - The overlay's release put off by a generation, so a running command keeps its rows. It needs a stored
   table of released pairs, which section 3 rules out.
 - The plants' rows in `tools/playbook/adopt-playbook.sh`, for the leg time unit 1 states.
+- Re-hashing the path after the bytes are read. A save between the read and the second hash still parts
+  them, and an overlay that wrote no rows on a mismatch would serve the file as defining nothing.
+- A read that fails retried, or recorded with no text. The first hides a held file behind a wait, and the
+  second marks the blob parsed with no rows, which nothing parses again.
 - A Python loop asking per pair whether a holder remains. It makes the same seeks as the statements
   above, one call each.
 
@@ -287,13 +354,17 @@ None. No stored table or key moves. The first build by this code clears what it 
 
 - security: N/A — no new input, grant or write path. The index file stays derived and uncommitted.
 - perf / scale: a sweep costs one seek per released pair and one per row it clears. The file grows by one
-  file's rows per replaced edit until a `--gc`, and section 4 sizes it. A
-  whole-view read walks those of its own version alone, and drops them in its join.
+  file's rows per replaced edit, in all three tables, until a `--gc`. Section 4 sizes one edit, and the rate of
+  them is unmeasured. A whole-view read walks those of its own version alone, and drops them in its join.
 - error / empty / loading states: an empty set returns at once. The write lock, its 600 s wait and its
-  refusal are unchanged, and a failed block rolls back whole.
+  refusal are unchanged, and a failed block rolls back whole. A changed file that cannot be read refuses
+  before the write block, naming the file.
 - observability: N/A — no line of `check` or of `--gc` moves.
 - risks: clearing a row some worktree is served, which `released-rows` reds through its `lost` count. The
-  second is a node whose `--gc` nobody runs, where replaced edits accumulate as dead versions do today.
+  second is a node whose `--gc` nobody runs, where replaced edits accumulate as dead versions do today. The
+  third is the wait behind a worktree on older code, whose sweep can hold the write lock past the leg's
+  ceiling. Section 4's Rollout prices it and names the step that ends it. The fourth is a leg that is the
+  first to parse at a new version, which AC9 records apart.
 - testing: the two plants, each with its staged breaks, and the runs of AC4 and AC9.
 - migration: none, as section 4 says.
 - user docs: the `--gc` sentence of `help/tags.md` and the kit page, as S7 says.
@@ -305,7 +376,7 @@ None. No stored table or key moves. The first build by this code clears what it 
   Red when: `build_overlay` releases the pairs it replaces, so `left` is zero at step 8, or the pair filter
   is absent, so `lost` is non-zero at step 1, or no set comes from a gone worktree, so `left` is non-zero
   at step 6.
-  cost: 30 s for the prototype, on a machine running other bars.
+  cost: 85 s for the prototype, on a machine running other bars.
 - **AC2** — When `python tools/playbook/gov_tag.py --fixture --plant released-cost` runs, the sweep's
   second count is at most twice its first, each saw a delete on all three tables, the full sweep's own
   count more than doubled over the pad, and it exits 0.
@@ -335,8 +406,13 @@ None. No stored table or key moves. The first build by this code clears what it 
   `grep -c "let go of" tools/playbook/README.md` runs, it prints 1 or more. When
   `grep -c "old edit" tools/playbook/README.md` and
   `grep -c "old uncommitted" help/tags.md` run, each prints 1 or more.
-  Red when: a build still calls the full sweep, or a page does not say what a build clears and what waits
-  for `--gc`.
+  When a Python probe reads `ast.get_docstring` of each function of `tools/playbook/tag_index.py`, runs of
+  whitespace collapsed to one space, the docstring of `build_index` holds `let go of` and not
+  `rows no tree or worktree holds are removed`. Those of `remove_dead_holders` and `remove_released_rows`
+  each hold `let go of`. Those of `remove_unheld_rows` and `remove_dead_versions` each hold `old edit`, and the
+  last does not hold `as a build's sweep does`.
+  Red when: a build still calls the full sweep, or a page or a docstring does not say what a build clears and
+  what waits for `--gc`.
 - **AC7** — When `python tools/playbook/gov_tag.py --fixture --plant <case>` runs for `two-paths`,
   `dirty-revert`, `worktree-recreate`, `worktree-spelling`, `charter-dirty`, `two-versions` and
   `queued-writers`, each exits 0.
@@ -347,24 +423,43 @@ None. No stored table or key moves. The first build by this code clears what it 
   served in step 7, which holds `g1`.
   Red when: the overlay releases the pair it replaces, or the build runs the full sweep, so the connection
   is served nothing.
-- **AC9** — When `gov_tag.py check` runs with the unit's source over a private copy of the 12.6 GB index on
-  which both SQL indexes stand and the HEAD and compare-base trees are unbuilt, it finishes below 420 s of
-  wall, and the unit's record names its wall and CPU seconds and the load of the machine.
-  Red when: a read, a name probe or a sweep still walks the dead versions, so it passes the ceiling.
-  cost: 12.6 GB of scratch disk, about 205 s for the two indexes, and from the diagnosis about 122 s.
+- **AC9** — When `gov_tag.py check` runs twice with the unit's source over a private copy of the 12.6 GB index
+  on which both SQL indexes stand, the second run finishes below 420 s of wall. Before the first run the
+  HEAD and compare-base trees are unbuilt and no `blob_parsed` row stands at the unit's version, so it parses
+  every blob. Before the second the two trees' `tree_path` and `tree_built` rows at that digest are taken out
+  again, so it builds both trees and its summary prints 0 blobs parsed. The unit's record names, for each
+  run, its wall and CPU seconds, the `blobs parsed` and `skipped as fresh` figures of its summary, and the
+  load of the machine.
+  Red when: a read, a name probe or a sweep still walks the dead versions, so the second run passes the
+  ceiling, or the second run's summary counts a parsed blob, so the two runs timed one workload.
+  cost: 12.6 GB of scratch disk, about 205 s for the two indexes, and from the diagnosis about 122 s for the
+  second run, which skipped 15,106 blobs as fresh. The first run's cost has no measured basis.
   fixture: the 12.6 GB copy the building session's scratch holds, copied once more or restored after, with
   `derive_index_path` answering it as in AC4.
   figure: the ceiling is DERIVED from the `ceiling` of the leg in `tools/gate-legs.json`; the seconds are
-  DERIVED at observation time.
+  DERIVED at observation time. The ceiling binds the second run. The first run is recorded and bound by
+  nothing, because unit 1's Rollout command does that parse outside any leg. A later edit of an extractor's
+  import closure brings it back, to the first command at the new version. Neither run observes the wait
+  behind a worktree on older code, since a private copy has no other writer.
+- **AC10** — When `released-rows` runs steps 15 to 17, each of the six texts is served as itself once it is
+  put back, the failed read raises a `TagError` naming ALPHA with no row moved, the bytes that are not UTF-8
+  are recorded, and after step 17 the dumps are equal.
+  Red when: the blob comes from another read than the text, so a text is served under another's blob at step
+  15, or a failed read is recorded as parsed, so the cold dump holds rows the index lacks at step 17.
+- **AC11** — When a Python probe imports `tag_bundle` from `tools/playbook` and prints the lines of
+  `SELFTEST_ROWS` whose first field is `released-rows` or `released-cost`, it prints one of each, whose second
+  field is 0 and whose last is `only replaced edits left, and nothing lost` for the first and
+  `a sweep costs what was released` for the second.
+  Red when: a row is missing or misspelled, so no leg runs that plant.
 
 ## 7. Gates
 
 `tags (the resolver's checks)` · `instruction edits (manifest checks)` · `edges (every declared edge parses, is registered and resolves)` · `instruction units selftest` · `tags bundle selftest` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
-Those of the line that open the live index, the four section 3 lists, are owed at the close, after the
-owner's go, and by no pass before it.
+Those of the line that open the live index, the four section 3 lists, are owed at the close, once the go
+section 3 states holds, and by no pass before it.
 
-New arm: tools/playbook/tag_bundle.py · covers AC1 AC3 AC8 · the `released-rows` row; staged red with the overlay releasing the pairs it replaces, with the pair filter absent, with no set from a gone worktree, and with `remove_dead_versions` calling no full sweep · none
+New arm: tools/playbook/tag_bundle.py · covers AC1 AC3 AC8 AC10 · the `released-rows` row; staged red with the overlay releasing the pairs it replaces, with the pair filter absent, with no set from a gone worktree, with `remove_dead_versions` calling no full sweep, with today's overlay, with the path hashed before the bytes are read, with the path hashed after, with a failed read recorded with no text, and with bytes that are not UTF-8 refused · none
 New arm: tools/playbook/tag_bundle.py · covers AC2 · the `released-cost` row; staged red with `remove_unheld_rows` called from `build_index`, and with the pad written for a blob no table holds · none
 
 ## 8. Open questions
@@ -389,6 +484,13 @@ New arm: tools/playbook/tag_bundle.py · covers AC2 · the `released-cost` row; 
   by its window not opening, which AC8 now observes, and rev-2's reader refusal leaves with S8, S9, S10 and
   AC10. `released-rows` grades what stays, `released-cost` counts the build's sweep alone and proves its
   pad, and section 4 names the acceptance ledger.
+- rev-4 · 2026-11-26 · §1 §2 §3 §4 §5 §6 §7 §10 S4 S6 AC1 AC6 AC9 AC10 AC11 · folded
+  `2026-11-26-review-TOOL-aPrunedIndex-1-2-3-spec-audit-round1`: findings 8 and 12 (the overlay keys an
+  edit by the bytes it parses and refuses a file it cannot read, with steps 15 to 17 and AC10), 1 (AC9 states
+  both workloads, and which one 420 s binds), 3 (AC11 reads both plants' rows), 4 (the owner's go with its
+  conditions, stated once in section 3), 6 (AC6 reads the docstrings), 7 (the owner's go is taken, not handed
+  off), 13 (the wait behind older worktrees, in Rollout, in the risks and in AC9), 15 (the growth figure, its
+  denominator and all three tables).
 
 ## 10. Reuse audit
 
@@ -401,6 +503,9 @@ the pad of `released-cost`. It does not fit that plant's own count: it counts on
 counts one window inside a `load_view`, where the parse ledger a build reads would otherwise hide the
 sweep. Recall answered PLAY-dOrderedCharter-51 with its deviation 513, TOOL-aQueuedIndex-1 and
 KICK-dKeptSession-87. The performance review of TOOL-aMeasuredDrag-1 proposed the sweep in `--gc` alone,
-which section 4 rejects.
+which section 4 rejects. For S4,
+`tools/codebase-map/reuse_lookup.py "git blob id of bytes held in memory, hash-object from stdin"` named
+`read_git_output` of `tools/memory-tree/tree_lib.py`, which takes bytes on stdin and answers bytes, and
+that is the seam. `read_git` takes no stdin.
 
 Recall terms used: tag index sweep unheld rows tree_path dirty_path overlay path_row blob_row blob_parsed gc worktree eviction shared

@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-2 — a build finds an already-named path through a partial index, and reads no parse ledger without a blob
 
-**Status:** SPECCED · rev-3 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md) | research | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 |
 | [2026-11-25-prompt-TOOL-aPrunedIndex-3-revision.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-3-revision.md) | research | TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-4 |
 | [2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md](../reviews/2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 |
+| [2026-11-26-review-TOOL-aPrunedIndex-1-2-3-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-3 |
 
 <!-- /gen:spec-records -->
 
@@ -25,11 +26,11 @@ overlay with no blob reads no ledger. No row and no verdict changes.
 - **S1** — `tools/playbook/tag_index.py#SCHEMA` gains one statement, the partial index
   `path_row_named` over `path_row(path, blob, extractor, version, conf)` where `kind='parsed'`.
   `INDEX_SCHEMA` stays 3. An existing index file gains it at its next open, with no row changed.
-  Observed by AC1, AC2 and AC5.
+  Observed by AC1, AC2, AC5 and AC9.
 - **S2** — `tools/playbook/tag_index.py#_write_parsed` returns before it reads `blob_parsed` when
   `blobs` is empty. Observed by AC3 and AC4.
 - **S3** — A new plant, `named-probe`, in `tools/playbook/gov_tag.py`, and its row in `SELFTEST_ROWS` of
-  `tools/playbook/tag_bundle.py`. Observed by AC1, AC2 and AC3.
+  `tools/playbook/tag_bundle.py`. Observed by AC1, AC2, AC3 and AC8.
 - **S4** — The module docstring of `tools/playbook/tag_index.py` and the index paragraph of
   `tools/playbook/README.md` each say that the `parsed` rows are found through `path_row_named`. The help
   page's sentence on a missing SQL index is unit 1's and covers this one. Observed by AC6.
@@ -41,8 +42,11 @@ overlay with no blob reads no ledger. No row and no verdict changes.
 - A narrower ledger read for a build that has blobs. No measurement isolated its cost.
 - Dropping `path_row_key`. The sweep searches by path and blob.
 - The served reads, the sweep and `--gc`, which are units 1, 3 and 4.
-- Any open of the live index files. Every measurement runs on a private copy or a fixture.
-- Any run, from the building worktree before the owner's go, of what opens the live index: the legs
+- Any open of either live index file before the owner's go. The owner gave it on 2026-11-25, in
+  `2026-11-25-prompt-TOOL-aPrunedIndex-3-revision`, on three conditions: all four units are built and
+  measured on private copies, the closing review is clean, and the open comes before the bar. Every
+  measurement here runs on a private copy or a fixture.
+- Any run, from the building worktree before that go, of what opens the live index: the legs
   `tags (the resolver's checks)`, `instruction edits (manifest checks)`,
   `edges (every declared edge parses, is registered and resolves)` and `instruction units selftest`, and a
   `gov_tag.py` verb outside `--fixture`. This unit is verified by `--fixture` plants and private copies.
@@ -56,8 +60,8 @@ overlay with no blob reads no ledger. No row and no verdict changes.
 - **hands-off** `TOOL-aPrunedIndex-3` — `path_row_named`, which unit 3's AC5, AC9 and section 4 plans rest
   on.
 - **hands-off** `TOOL-aPrunedIndex-4` — the `named-probe` row, one of the five unit 4's AC8 times.
-- **consumes-from** external — the owner's word in the building session before this code first opens
-  the live index.
+- **consumes-from** external — the owner's go for this code's first open of the live index, on the
+  conditions the list above states.
 
 ## 4. Design
 
@@ -136,7 +140,9 @@ The first open after landing builds this index and unit 1's. The diagnosis measu
 writer outlasts it. An edit to `tag_index.py` is a new extractor version, so each worktree also
 re-parses once. Unit 1's Rollout step builds both indexes outside any leg. Each CREATE INDEX commits
 alone, so an opener killed in this one keeps unit 1's, rolls this one back with no row changed, and leaves
-the next opener to start it again. A rebuild of the file under a stale stamp runs the new statement too,
+the next opener to start it again. A disk that fills inside this one raises the `cannot be opened` refusal,
+with every row intact and unit 1's index kept, as unit 1's Migration records. Its Rollout checks the free
+space for both. A rebuild of the file under a stale stamp runs the new statement too,
 since it splits `SCHEMA` on `;` and the statement holds none.
 
 ### Inventory
@@ -148,6 +154,8 @@ grades either.
 
 - `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`, `tools/playbook/tag_bundle.py`
 - `tools/playbook/README.md`
+- `memory/builds/aPrunedIndex/build/2026-11-26-build-TOOL-aPrunedIndex-2-1-acceptance-ledger.md`, the unit's
+  record, which holds the figures AC5 and AC7 ask for
 
 ### Alternatives rejected
 
@@ -202,13 +210,23 @@ Recall terms used: tag index path_row parsed sentinel blob_parsed ledger probe p
   The unit's record names which index stood after the kill.
   Red when: a kill leaves a half-built index or moves a row.
   fixture: the copy AC5 makes.
+- **AC8** — When a Python probe imports `tag_bundle` from `tools/playbook` and prints the lines of
+  `SELFTEST_ROWS` whose first field is `named-probe`, it prints one, whose second field is 0 and whose last
+  is `within a tenth under every pad`.
+  Red when: the row is missing or misspelled, so no leg runs the plant.
+- **AC9** — When unit 1's AC9 probe runs with both index statements in `SCHEMA`, both SQL indexes dropped
+  and the cap at 35 pages above the file's `page_count`, `load_index` raises a `TagError` holding `cannot be
+  opened`, `path_row_version` stands, `path_row_named` does not, and the row count is 5,000.
+  Red when: the two indexes share one transaction, so the finished one goes too.
+  figure: the 35 pages are PINNED, 2026-11-26, SQLite 3.53.4; the probe moves the cap until one index stands
+  if the page count of either has moved.
 
 ## 6. Gates
 
-`tags (the resolver's checks)` · `tags bundle selftest` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
+`tags (the resolver's checks)` · `instruction edits (manifest checks)` · `edges (every declared edge parses, is registered and resolves)` · `instruction units selftest` · `tags bundle selftest` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
-The `tags` leg of the line opens the live index, so it is owed at the close, after the owner's go, and by no
-pass before it.
+Those of the line that open the live index, the four section 3 lists, are owed at the close, once the go
+section 3 states holds, and by no pass before it.
 
 New arm: tools/playbook/tag_bundle.py · covers AC1 AC2 AC3 · the `named-probe` row; staged red five times, with the `path_row_named` statement removed from `SCHEMA` while `path_row_version` stands, with the dead pad on unprobed paths, with the own pad under another extractor, with the early return removed, and with the early return unconditional · none
 
@@ -228,3 +246,8 @@ none
 - rev-3 · 2026-11-26 · §3 · TOOL-aPrunedIndex-3's revision on finding 16 of
   `2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1` leaves five rows for unit 4's AC8
   to time.
+- rev-4 · 2026-11-26 · §2 §3 §4 §5 §6 S1 S3 AC8 AC9 · folded
+  `2026-11-26-review-TOOL-aPrunedIndex-1-2-3-spec-audit-round1`: finding 3 (AC8 reads the plant's row), 4
+  (the owner's go with its conditions, stated once in section 3), 5 (the three legs that open the live index
+  and the lexicon leg), 10 (the acceptance ledger is the unit's record, with the two legs its path owes), 14
+  (the disk-full behaviour and AC9).

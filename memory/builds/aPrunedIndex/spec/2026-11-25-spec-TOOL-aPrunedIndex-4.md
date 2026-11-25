@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-4 — `--gc` skips a worktree that predates the tag registry, and still refuses one it cannot read
 
-**Status:** SPECCED · rev-3 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 4 · closes KICK-dKeptSession-87
+**Status:** SPECCED · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 4 · closes KICK-dKeptSession-87
 
 <!-- gen:spec-records -->
 
@@ -44,7 +44,7 @@ the line there.
 - **S5** — `tools/playbook/gov_tag.py#run_gc` prints one line per skipped worktree before its
   collected line, which keeps its bytes. Observed by AC1.
 - **S6** — A new plant, `gc-predates`, in `tools/playbook/gov_tag.py`, and its row in `SELFTEST_ROWS` of
-  `tools/playbook/tag_bundle.py`. Observed by AC1, AC2, AC3, AC4 and AC7.
+  `tools/playbook/tag_bundle.py`. Observed by AC1, AC2, AC3, AC4, AC7 and AC9.
 - **S7** — The sentence stating what `--gc` refuses, in `tools/playbook/README.md`, `help/tags.md` and
   the `gov_tag.py` module docstring, says what it skips too. Observed by AC6.
 - **S8** — The `tags bundle selftest` row of `tools/run-gates/selftest-budgets.txt`, and that leg's row of
@@ -55,7 +55,11 @@ the line there.
 
 - Any run of `--gc`, VACUUM or a deletion on either live index file. Every criterion here runs in a
   fixture, or reads git and the registries without opening an index.
-- Any run, from the building worktree before the owner's go, of what opens the live index: the legs
+- Any open of either live index file before the owner's go. The owner gave it on 2026-11-25, in
+  `2026-11-25-prompt-TOOL-aPrunedIndex-3-revision`, on three conditions: all four units are built and
+  measured on private copies, the closing review is clean, and the open comes before the bar. Every
+  measurement here runs on a private copy or a fixture.
+- Any run, from the building worktree before that go, of what opens the live index: the legs
   `tags (the resolver's checks)`, `instruction edits (manifest checks)`,
   `edges (every declared edge parses, is registered and resolves)` and `instruction units selftest`, and a
   `gov_tag.py` verb outside `--fixture`. This unit is verified by `--fixture` plants and private copies.
@@ -75,7 +79,7 @@ the line there.
   the split of the sweep into `remove_dead_holders` and `remove_unheld_rows(con)`, which
   `remove_dead_versions` calls.
 - **hands-off** external — the first collection of the live index, which the owner runs or orders in
-  the building session.
+  the building session. The go section 3 states covers an open and no `--gc`.
 
 ## 4. Design
 
@@ -269,13 +273,17 @@ plant, `gc-predates`, and one output line, `tag-index — skipped:`, which no ce
   5 s for `named-probe` and 17 to 35 s for `gc-predates`, on a machine running other bars; unit 3 names the
   seconds of its two.
   figure: DERIVED at observation time.
+- **AC9** — When a Python probe imports `tag_bundle` from `tools/playbook` and prints the lines of
+  `SELFTEST_ROWS` whose first field is `gc-predates`, it prints one, whose second field is 0 and whose last
+  is `refused on wt4, wt3 read and then skipped by name, refused on none, refused on a conf`.
+  Red when: the row is missing or misspelled, so no leg runs the plant.
 
 ## 7. Gates
 
 `tags (the resolver's checks)` · `instruction edits (manifest checks)` · `edges (every declared edge parses, is registered and resolves)` · `instruction units selftest` · `lexicon naming predicates` · `tags bundle selftest` · `playbook render selftest` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `govkit acceptance matrix` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
-Those of the line that open the live index, the four section 3 lists, are owed at the close, after the
-owner's go, and by no pass before it.
+Those of the line that open the live index, the four section 3 lists, are owed at the close, once the go
+section 3 states holds, and by no pass before it.
 
 New arm: tools/playbook/tag_bundle.py · covers AC1 AC2 AC3 AC4 AC7 · the `gc-predates` row; staged red five times, once per break in section 4's table · none
 
@@ -294,6 +302,9 @@ none
 - rev-3 · 2026-11-26 · §2 §3 §4 S8 AC8 · TOOL-aPrunedIndex-3's revision on finding 16 of
   `2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1` takes out its `moved-view` plant, so
   five rows are timed. Section 4 names the acceptance ledger.
+- rev-4 · 2026-11-26 · §2 §3 §6 §7 S6 AC9 · folded
+  `2026-11-26-review-TOOL-aPrunedIndex-1-2-3-spec-audit-round1`: finding 3 (AC9 reads the plant's
+  row), 4 (the owner's go with its conditions, stated once in section 3).
 
 ## 10. Reuse audit
 

@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-25
 streams: tooling
 roster: TOOL
-ids: TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4
+ids: TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9
 spec-audit: 2026-11-25
 ---
 
@@ -54,24 +54,24 @@ None.
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 4 unit(s) · node a · opened 2026-11-25 · streams tooling
-ids TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4
+ids TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aPrunedIndex-1 — a read of the served rows starts from the reading worktree's own extractor versions](spec/2026-11-25-spec-TOOL-aPrunedIndex-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-11-26 |
-| [TOOL-aPrunedIndex-2 — a build finds an already-named path through a partial index, and reads no parse ledger without a blob](spec/2026-11-25-spec-TOOL-aPrunedIndex-2.md) | 2 | 1 | SPECCED | rev-3 | 2026-11-26 |
-| [TOOL-aPrunedIndex-3 — a build's sweep touches only the rows that the trees and gone worktrees' edits it lets go of held](spec/2026-11-25-spec-TOOL-aPrunedIndex-3.md) | 3 | 2 | SPECCED | rev-3 | 2026-11-26 |
-| [TOOL-aPrunedIndex-4 — `--gc` skips a worktree that predates the tag registry, and still refuses one it cannot read](spec/2026-11-25-spec-TOOL-aPrunedIndex-4.md) | 4 | 2 | SPECCED | rev-3 | 2026-11-26 |
+| [TOOL-aPrunedIndex-1 — a read of the served rows starts from the reading worktree's own extractor versions](spec/2026-11-25-spec-TOOL-aPrunedIndex-1.md) | 1 | 2 | SPECCED | rev-4 | 2026-11-26 |
+| [TOOL-aPrunedIndex-2 — a build finds an already-named path through a partial index, and reads no parse ledger without a blob](spec/2026-11-25-spec-TOOL-aPrunedIndex-2.md) | 2 | 1 | SPECCED | rev-4 | 2026-11-26 |
+| [TOOL-aPrunedIndex-3 — a build's sweep touches only the rows that the trees and gone worktrees' edits it lets go of held](spec/2026-11-25-spec-TOOL-aPrunedIndex-3.md) | 3 | 2 | SPECCED | rev-4 | 2026-11-26 |
+| [TOOL-aPrunedIndex-4 — `--gc` skips a worktree that predates the tag registry, and still refuses one it cannot read](spec/2026-11-25-spec-TOOL-aPrunedIndex-4.md) | 4 | 2 | SPECCED | rev-4 | 2026-11-26 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 4 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 
-Ids whose spec moved past its audited revision: none — 4 of 4 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: TOOL-aPrunedIndex-4@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
