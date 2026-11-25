@@ -6045,8 +6045,9 @@ def test_relations(arm) -> None:
 def test_slug_claims(arm, files: dict) -> None:
     """TOOL-dTotalRecall-3's arms (section 7) over a bare remote whose default branch is `files`, the
     scaffold's home tree, and its clones: the concurrent slug claim, the parallel counter mints, the replays,
-    the floor, the scaffold's refusal and resume, the three offline values and the remote-less clone. Staged
-    red by a copy of the claim CLI whose push carries no lease, which lets both clones claim one slug."""
+    the floor, the scaffold's refusal and resume, the three offline values and the remote-less clone, and a
+    hyphenated slug under a landed `in-slug` date (TOOL-dTotalRecall-121 S4). Staged red by a copy of the
+    claim CLI whose push carries no lease, which lets both clones claim one slug."""
     cli = os.path.join(os.path.dirname(os.path.abspath(__file__)), CLAIM_CLI).replace(os.sep, "/")
     import corpus_ids  # noqa: PLC0415 — deferred exactly as the scaffold's own claim
     try:
@@ -6167,6 +6168,26 @@ def test_slug_claims(arm, files: dict) -> None:
         arm("TOOL-dTotalRecall-3 S1 — the slug asks, a family FAMILIES lacks and a malformed key each refuse before the remote",
             "[2, 2, 2] ['refused the slug asks', 'refused the family XYZ', 'refused the claimant key']",
             lambda: f"{[r for r, _ in bad]} {[' '.join(x.split()[:4]) for _, x in bad]}")
+        # TOOL-dTotalRecall-121 AC4: the pre-check leaves the grammar to the policy's, landed on the remote here
+        try:
+            from backlog import resolve_kit_dir  # noqa: PLC0415 — the kit's inline copy of the sibling resolver
+            resolve_kit_dir("policy", "policy.py", os.path.dirname(os.path.abspath(__file__)))
+        except LookupError as exc:
+            print(f"build-index: SKIP the hyphenated slug claim — no policy kit to read builds.slug-date from: {exc}")
+            return
+        write_text(os.path.join(seed, ".governance/policy.toml"), '[builds]\nslug-date = "in-slug"\n')
+        run("git", "add", "-A", cwd=seed)
+        run("git", "commit", "-q", "-m", "in-slug", "--no-verify", cwd=seed)
+        run("git", "push", "-q", remote, "HEAD:refs/heads/main", cwd=seed)
+        e, dated = build_clone("e"), "d2026-10-26ClosedLoop"
+        got7 = run_claims((e, "slug", dated, "--claimant", ka), (e, "ask", "TOOL", dated, "--claimant", ka))
+        arm("TOOL-dTotalRecall-121 AC4 — a hyphenated slug the landed in-slug grammar admits is claimed and minted under",
+            f"[0, 0] claimed refs/gov/claims/{dated} minted TOOL-{dated}-1",
+            lambda: f"{[r for r, _ in got7]} {' '.join(got7[0][1].split()[:2])} {got7[1][1]}")
+        bad7 = run_claims((e, "slug", "-x", "--claimant", ka), (e, "slug", "9x", "--claimant", ka))
+        arm("TOOL-dTotalRecall-121 AC4 — a slug opening with a dash or a digit refuses before the remote",
+            "[2, 2] ['refused -x is', 'refused the slug']",
+            lambda: f"{[r for r, _ in bad7]} {[' '.join(x.split()[:3]) for _, x in bad7]}")
 
 
 def test_staged_render(arm) -> None:

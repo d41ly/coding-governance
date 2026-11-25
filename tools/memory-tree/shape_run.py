@@ -5,6 +5,7 @@
     python <prefix>/memory-tree/shape_run.py --parse-line <line>   # its fields, one `key=value` each
     python <prefix>/memory-tree/shape_run.py --parse-file <path>   # every non-empty line of a file
     python <prefix>/memory-tree/shape_run.py --check               # each shape-run record against its line
+    python <prefix>/memory-tree/shape_run.py --fixture --plant <case>   # the check over one planted record
 
 THE GRAMMAR. Every review exit prints one byte-stable `review-shape` line, rendered by the review
 harness's `renderShapeLine`, and `SHAPE_RE` is that line's one grammar: the kind, round, intensity and
@@ -30,6 +31,10 @@ the `shape-run` row's `unarmed` key in the record-kind registry, read through
 `record_kinds.read_record_kinds`, the reason's one home (TOOL-dTotalRecall-53 S37). Exit 2 where the
 tracked population cannot be read.
 
+`--fixture --plant <case>` runs the check over one `PLANTS` case in a scratch repository, prints its lines and
+`shape-run: fixture <case> · exit <n>`, and exits with that code; `SKIP` on a host with no git
+(TOOL-dTotalRecall-121 S7).
+
 WHAT IT DOES NOT CHECK: that a review exit has a shape-run record (no writer calls the door yet), that the
 review record is the one its harness wrote, or a prose-wrapped line, which the strict grammar refuses.
 """
@@ -37,8 +42,10 @@ from __future__ import annotations
 
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 
 sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).resolve().parent
@@ -213,7 +220,66 @@ def check_shape_runs(root):
     return lines, 1 if reds else 0
 
 
+# ---------------------------------------------------------------------------------- the fixture
+#: one case per red branch of `check_shape_runs`, and `equal`, the green one (TOOL-dTotalRecall-121 S7)
+PLANTS = ("equal", "malformed", "cause-none", "cause-two", "review-no-line", "review-refused-line", "field-differs",
+          "field-absent")
+FIXTURE_UNIT = "TOOL-bFix-1"
+FIXTURE_STEM = f"2026-01-01-review-{FIXTURE_UNIT}"
+FIXTURE_LINE = (f"{LINE_HEAD} kind=diff-review round=1 intensity=full at=synth raw=3 confirmed=2 refuted=1 merged=0 "
+                "unverified=0 blocker=0 high=1 medium=1 low=0 agents=5 out-tokens=100")
+
+
+def build_fixture(root, plant):
+    """`plant` in a scratch repository at `root`: two build folders, a review record holding FIXTURE_LINE and the
+    shape-run record `write_record` writes from that line's parsed fields, then the plant's one edit, all
+    staged. The record's path."""
+    root = pathlib.Path(root)
+    subprocess.run(["git", "init", "-q", "--template=", str(root)], capture_output=True, check=True)
+    (root / ".memory-tree.conf").write_bytes(b'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n')
+    review = root / "memory/builds/bFix/reviews" / f"{FIXTURE_STEM}.md"
+    other = root / "memory/builds/bOther/reviews" / (f"{FIXTURE_STEM}.md" if plant == "cause-two"
+                                                     else "2026-01-01-review-TOOL-bOther-1.md")
+    line = {"review-no-line": "", "review-refused-line": FIXTURE_LINE.replace(" round=", " rounds=")}.get(plant, FIXTURE_LINE)
+    for path, held in ((review, line), (other, FIXTURE_LINE)):
+        path.parent.mkdir(parents=True)
+        path.write_bytes(f"# a review\n\n{held}\n".encode("utf-8"))
+    parsed = parse_shape_line(FIXTURE_LINE)
+    fields = [(derive_record_field(n), parsed[n.replace("-", "_")]) for n, _p, _o in SHAPE_FIELDS
+              if n.replace("-", "_") in parsed] + [("Caused-by", FIXTURE_STEM)]
+    rel = build_records.write_record(root, "bFix", FIXTURE_UNIT, KIND, FIXTURE_STEM, fields)
+    old, new = {"malformed": ("- **Round:** 1\n", "- **Round:** 1\n" * 2),
+                "cause-none": (f"- **Caused-by:** {FIXTURE_STEM}\n", f"- **Caused-by:** {FIXTURE_STEM}9\n"),
+                "field-differs": ("- **Raw:** 3\n", "- **Raw:** 4\n"),
+                "field-absent": ("- **Merged:** 0\n", "")}.get(plant, ("", ""))
+    record = root / rel
+    record.write_bytes(record.read_bytes().replace(old.encode("utf-8"), new.encode("utf-8"), 1 if old else 0))
+    subprocess.run(["git", "-C", str(root), "add", "-A"], capture_output=True, check=True)
+    return rel
+
+
+def run_fixture(plant):
+    """`--fixture --plant <case>`: `check_shape_runs` over the plant, its lines and the fixture line."""
+    if plant not in PLANTS:
+        return [f"{SAY}: refused · no plant {plant!r}: the plants are {', '.join(PLANTS)}"], 2
+    if shutil.which("git") is None:
+        return [f"{SAY}: SKIP — no git on this host, so the {plant} plant is UNEXERCISED here"], 0
+    from deviation_join import remove_tree, set_fixture_env   # noqa: E402  the kit's fixture helpers
+    top = tempfile.mkdtemp(prefix="sr-")
+    try:
+        with set_fixture_env():
+            build_fixture(top, plant)
+            lines, rc = check_shape_runs(top)
+    finally:
+        remove_tree(top)
+    return lines + [f"{SAY}: fixture {plant} · exit {rc}"], rc
+
+
 def main(argv):
+    if len(argv) == 3 and argv[:2] == ["--fixture", "--plant"]:
+        lines, rc = run_fixture(argv[2])
+        print("\n".join(lines))
+        return rc
     if len(argv) == 2 and argv[0] == "--parse-line":
         try:
             fields = parse_shape_line(argv[1])

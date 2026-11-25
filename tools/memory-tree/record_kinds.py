@@ -2420,7 +2420,8 @@ def remove_tree(path) -> None:
 
 def run_selftest() -> int:
     """Every plant red naming its subject, the green fixture and the green plants green with what each shows,
-    `new`'s round trip and its refusals, and `--write` restoring an edited region."""
+    `new`'s round trip and its refusals, and `--write` restoring an edited region. A `PLANTS` member in none
+    of the tables it runs is a failure naming it (TOOL-dTotalRecall-121 S6)."""
     from tree_lib import BIND_HEAD_LINES   # unkept-build-alias's compare sits two lines past the binding head
     want = {"writer-missing": ("row deviation", "`writer`"), "check-unknown": ("row research", "no such leg"),
             "source-drift": ("row deviation", "Extra"), "factory-kind-unrowed": ("typed kind exception",),
@@ -2494,8 +2495,9 @@ def run_selftest() -> int:
              "value-derive": test_value_pending(NONE_FOUND, False),
              "value-ledger": lambda ls: (test_value_pending(PURPOSE_PENDING, True)(ls)
                                          and any(f"seed · armed {PURPOSE_PENDING} 3" in ln for ln in ls))}
-    fails = []
-    for plant in (None, "field-missing-legacy", *shows, *want, *refusals):
+    table = ("field-missing-legacy", *shows, *want, *refusals)
+    fails = [f"{p}: a PLANTS member in no table the selftest runs" for p in PLANTS if p not in table]
+    for plant in (None, *table):
         lines, rc = run_fixture(plant)
         out = "\n".join(lines)
         reds = [ln for ln in lines if " RED " in ln]

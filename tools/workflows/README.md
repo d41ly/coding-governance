@@ -980,9 +980,12 @@ show it and a recorded line where they cannot. The manifest, read through `read_
 heading names or a heading naming a finding id no confirmed appendix row holds; each candidate a
 `{case, arm, report, matched, transcripts}`, `transcripts` naming every scored lens's transcript; two
 arms varying `map`; and `map` the map file, whose bytes are the allowance. It prints each audit's
-`known` line, each run's recall, the three terms' figures and `verdict win` or `verdict lose <terms>`,
+`known` line, each run's recall, the three terms' figures and `verdict win`, `verdict lose <terms>` or
+`verdict unarmed bytes`, where every lens run read zero bytes before its first act and no term lost,
 read by `derive_map_verdict`: the recall rise below the twin runs' difference plus 5, the median
-existence-search fall below 1, or the median bytes before the first act rising past the map's bytes. An unknown key is refused,
+existence-search fall below 1, or the median bytes before the first act rising past the map's bytes,
+the first act being the first call `check_read_call` does not read as a read: a read or search tool,
+`ToolSearch`, or a shell call running only its closed set of reading programs and writing no file. An unknown key is refused,
 so a misspelt rule is never skipped. Every rule runs before the first figure line, and a broken one
 exits 2 naming the rule, the arm or case, and the value:
 

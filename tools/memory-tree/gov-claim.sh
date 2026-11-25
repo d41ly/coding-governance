@@ -956,7 +956,7 @@ check_claim_args() { # argv -> 0 with GC_VERB GC_FAMILY GC_SLUG GC_KEY GC_OFFLIN
   [ -n "$key_set" ] || { GC_WHY="--claimant <key> is required"; return 1; }
   [[ $GC_KEY =~ ^[0-9a-f]{12}$ ]] || { GC_WHY="the claimant key is not twelve lowercase hex digits"; return 1; }
   case "$GC_OFFLINE" in warn|refuse|follow-leases) ;; *) GC_WHY="--offline is one of warn, refuse, follow-leases"; return 1 ;; esac
-  [[ $GC_SLUG =~ ^[A-Za-z0-9]+$ ]] || { GC_WHY="the slug is not letters and digits"; return 1; }
+  [[ $GC_SLUG =~ ^[A-Za-z][A-Za-z0-9-]*$ ]] || { GC_WHY="the slug is not a letter, then letters, digits or dashes"; return 1; }
   [ "$GC_VERB:$GC_SLUG" != slug:asks ] || { GC_WHY="the slug asks names the counters' subtree refs/gov/claims/asks/"; return 1; }
   [ -z "$GC_FAMILY" ] || [[ $GC_FAMILY =~ ^[A-Z][A-Z0-9]*$ ]] || { GC_WHY="the family is not an upper-case prefix"; return 1; }
   GC_SESSION=${CLAUDE_CODE_SESSION_ID:-absent}

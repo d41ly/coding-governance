@@ -1223,6 +1223,11 @@
       "file": "tools/check-playbook-parity.test.sh"
     },
     {
+      "id": "add_to_index",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "add_topology_worktree",
       "kind": "function",
       "file": ".githooks/straggler-guard.test.sh"
@@ -3356,6 +3361,11 @@
       "id": "build_fixture",
       "kind": "function",
       "file": "tools/memory-tree/seen_red.py"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/shape_run.py"
     },
     {
       "id": "build_fixture",
@@ -7213,6 +7223,11 @@
       "file": "tools/loop/position.py"
     },
     {
+      "id": "check_field_keys",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "check_file_line_row",
       "kind": "function",
       "file": "tools/playbook/positional.py"
@@ -9171,6 +9186,11 @@
       "id": "check_reaches",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "check_read_call",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "check_read_path",
@@ -15571,6 +15591,11 @@
       "id": "derive_seeded_home",
       "kind": "function",
       "file": "tools/govkit/steps/conf_pins_to_ledger.py"
+    },
+    {
+      "id": "derive_segment_program",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
     },
     {
       "id": "derive_selection",
@@ -37961,6 +37986,11 @@
       "id": "run_fixture",
       "kind": "function",
       "file": "tools/memory-tree/seen_red.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/shape_run.py"
     },
     {
       "id": "run_fixture",

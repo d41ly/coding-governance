@@ -462,7 +462,10 @@ fi
 # rule-member `enforces` target marked and never resolved.
 # The `cardinality-` rows are TOOL-dTotalRecall-22's: a declared row with its bound cut refused, the kind
 # registry's mirror differing from the bounds in memory, and two branches each superseding one node, clean
-# alone and red once merged clean. What they do not check: a bound above 1, which no row declares.
+# alone and red once merged clean; `cardinality-refused` is TOOL-dTotalRecall-53's refused record, and
+# `prose-pass` a prose `Pass:` value that refuses no read. The join under the rows (TOOL-dTotalRecall-121 S11) fails where
+# a plant `edge_grammar.py` admits opens no row of this block. What they do not check: a bound above 1, which
+# no row declares; and what a joined row asserts.
 _uk=; check_sibling_kit roles roles_lib.py || _uk=roles
 if [ -n "$_uk" ]; then echo "UNARMED — the edge grammar's plants: no $_uk kit in this install"; else
 _tf=0
@@ -521,7 +524,20 @@ cardinality-mirror|1|cardinality: registry · deviation · caused-by per-source 
 cardinality-branch|0|cardinality: read 1 edges of 1 types, 0 line(s) refused and not counted; 0 violations|exceeded at
 cardinality-merge|1|edges: plant cardinality-merge · git merge was clean
 cardinality-merge|1|cardinality: supersedes per-target 1 exceeded at PLAY-xDec-1 by memory/builds/xAlpha/build/2026-11-22-build-PLAY-xAlpha-1-note.md:5, memory/builds/xBeta/build/2026-11-22-build-PLAY-xBeta-1-note.md:5
+cardinality-refused|0|edges: plant cardinality-refused · PASS
+prose-pass|0|edges: plant prose-pass · edges ['PLAY-dOrderedCharter-28'] · 2 unread · as expected
 PLANTS
+"$PY_BIN" - "$HERE" "$HERE/adopt-playbook.sh" <<'JOIN' || _tf=$((_tf+1))
+import pathlib, re, sys
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv[1])
+import edge_grammar
+text = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").replace("\r\n", "\n")
+block = text.partition("\nrun_plant_rows edges ")[2].partition("\nPLANTS\n")[0]
+unrun = [p for p in edge_grammar.FIXTURE_PLANTS if not re.search("^" + re.escape(p) + "[ |]", block, re.M)]
+print("arm ok    edges join" if not unrun else "arm FAIL  edges join — no row opens with: " + ", ".join(unrun))
+sys.exit(1 if unrun else 0)
+JOIN
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf edge-grammar arm(s) failed"; exit 1; fi
 echo "PASS — the edge grammar's plants"
 fi

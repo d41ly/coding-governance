@@ -3609,7 +3609,7 @@ hit 'build-records: PASS pending-kind'
 # --- skipped (AC7), a template its own check refuses (AC8) and a name the door invented or a typed kind's
 # --- (AC10). The lease and the counter arms need the unattended kit beside this one and skip ALOUD without it.
 GRD="$TMP/grd"; GRS="$GRD/seed"
-run_record_door() { (cd "$GRD/$1" && CLAUDE_CODE_SESSION_ID="${GR_SESSION:-s-mine}" "$_PY" "$HERE/gov_record.py" new "${@:2}" 2>&1); }
+run_record_door() { (cd "$GRD/$1" && CLAUDE_CODE_SESSION_ID="${GR_SESSION-s-mine}" "$_PY" "$HERE/gov_record.py" new "${@:2}" 2>&1); }
 run_record_deviation() { run_record_door "$1" deviation --build "$2" --unit "TOOL-$2-2" --title t --field "Departs from=TOOL-$2-2@rev-1" \
   --field 'Hand-off=spec-to-code' --field 'Before=b' --field 'After=a' --field 'Cause=builder discovery' \
   --field "Reason=$3" --field 'Evidence=e' --field "Risk=${4:-additive}" --field 'Approver=p' --field 'Follow-through=gap x' \
@@ -3708,6 +3708,12 @@ if [ -n "$_gru" ]; then
   git -C "$GRD/a" push -q origin :refs/gov/leases/xLeased/build
   out=$(run_record_deviation a xLeased r3); hit 'refused deviation: the claim of xLeased (refs/gov/remote/claims/xLeased) is held by session s-other'
   out=$(GR_SESSION=s-other run_record_deviation a xLeased r4); hit 'wrote memory/builds/xLeased/build/'
+  # TOOL-dTotalRecall-121 AC2: an unnamed holder is never this session, and a named one refuses an absent caller
+  out=$(GR_SESSION='' run_record_deviation a xLeased r5)
+  hit 'refused deviation: the claim of xLeased (refs/gov/remote/claims/xLeased) is held by session s-other, not this session absent'
+  (cd "$GRD/a" && CLAUDE_CODE_SESSION_ID='' bash "$HERE/gov-claim.sh" slug dTotalRecall --claimant bbbbbbbbbbbb >/dev/null 2>&1)
+  out=$(GR_SESSION='' run_record_deviation a dTotalRecall r5); hit 'minted under the session rule: the claim of dTotalRecall names no session'
+  out=$(run_record_deviation a dTotalRecall r6); hit 'minted under the session rule: the claim of dTotalRecall names no session'
   out=$(run_record_door a planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello --caused-by TOOL-dTotalRecall-2)   # AC6, over the remote
   _grc=$(git -C "$GRD/r.git" rev-parse -q --verify refs/gov/claims/asks/TOOL-dTotalRecall)
   _gri=$(printf '%s\n' "$out" | sed -n 's|^wrote memory/builds/dTotalRecall/asks/\(TOOL-dTotalRecall-[0-9]*\)\.md key .*|\1|p')
@@ -3720,7 +3726,7 @@ if [ -n "$_gru" ]; then
   hit "wrote memory/builds/dTotalRecall/asks/TOOL-dTotalRecall-$((${_grn:-0} + 1)).md"
   hit "exists memory/builds/dTotalRecall/asks/TOOL-dTotalRecall-$((${_grn:-0} + 1)).md"
 else
-  echo "skip the record door's lease and counter arms: no unattended kit beside this one, so its 9 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+9))
+  echo "skip the record door's lease and counter arms: no unattended kit beside this one, so its 12 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+12))
 fi
 
 # --- TOOL-dTotalRecall-9 (AC3, AC4, AC5, AC7, AC8, AC9) — the record finder and the read budget, each plant of
@@ -3751,6 +3757,31 @@ run_find_plant superseded-refuse; hit 'refused budget: DEC-tFix-1 is superseded 
 run_find_plant superseded-mark; hit 'read DEC-tFix-1 '; hit ' B superseded-by DEC-tFix-2'; hit 'fixture superseded-mark · exit 0'
 run_find_plant missing-section; hit 'lacks the required section(s) section.acceptance-criteria; nothing was written'
 hit 'record-find: fixture missing-section · spec files 0'; hit 'record-find: fixture missing-section · exit 2'
+# --- TOOL-dTotalRecall-121 AC5: a section outside the addressed record is refused, and the file's stem reaches it. Red
+# --- on the pick that falls back to any section of the tag.
+run_find_plant section-outside; hit 'refused show: tag section.outcome names no section of TOOL-bFix-11'
+hit "the second's outcome"; hit 'record-find: fixture section-outside · file stem · exit 0'; hit 'record-find: fixture section-outside · exit 2'
+
+# --- TOOL-dTotalRecall-121 AC7 — the shape-run check's plants, one per red branch of `check_shape_runs` and a green
+# --- one, each `<case>|<exit>|<a line it must print>`. Red on each branch's red cut, whose plant then exits 0.
+if command -v git >/dev/null 2>&1; then
+  while IFS='|' read -r _srp _srx _srw; do
+    out=$("$_PY" "$HERE/shape_run.py" --fixture --plant "$_srp" 2>&1); _brc=$?
+    n=$((n+1)); [ "$_brc" = "$_srx" ] || { echo "FAIL shape_run.py --fixture --plant $_srp exited $_brc, expected $_srx"; st=1; }
+    hit "$_srw"; hit "shape-run: fixture $_srp · exit $_srx"
+  done <<'SRP'
+equal|0|shape-run: green
+malformed|1|-shape-run-1.md · Round is
+cause-none|1|-shape-run-1.md · Caused-by 2026-01-01-review-TOOL-bFix-19 names no tracked
+cause-two|1|names 2 tracked review records, memory/builds/bFix/reviews/2026-01-01-review-TOOL-bFix-1.md, memory/builds/bOther/reviews/
+review-no-line|1|gives no parsed line: no column-0 review-shape line
+review-refused-line|1|gives no parsed line: round
+field-differs|1|-shape-run-1.md · Raw · record 4 · line 3
+field-absent|1|-shape-run-1.md · Merged · record absent · line 0
+SRP
+else
+  echo "skip the shape-run plants: no git on this host, so their 24 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+24))
+fi
 
 # --- TOOL-dTotalRecall-19 (AC1 to AC8) — every record names its cause. The door's header plant: a `log` with
 # --- no `--caused-by` refused naming `Caused-by`, nothing written; an undefined cause refused; `Made-by`
@@ -3765,7 +3796,7 @@ out=$("$_PY" "$HERE/build_records.py" --fixture --plant door-header 2>&1)
 if grep -q 'build-records: SKIP door-header' <<<"$out"; then
   echo "skip the door-header plant: $out"; n_skip=$((${n_skip:-0}+1))
 else
-  hit 'build-records: PASS door-header — 20 cases'
+  hit 'build-records: PASS door-header — 24 cases'
 fi
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant legacy 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'   # AC4
 hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings causes'; hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings-2 causes'   # AC8
@@ -4040,6 +4071,34 @@ out=$("$_PY" "$HERE/record_causes.py" --fixture --plant adopter-no-registry 2>&1
 n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant adopter-no-registry exited $_brc, expected 0"; st=1; }
 hit 'record causes: fixture adopter-no-registry · PASS'
 
+# --- TOOL-dTotalRecall-121 AC8 — the census's three literal plants: a Serves literal past another's cause line, a
+# --- second literal of one file, and a literal beside a kept one, each red by its own line. Red on a census by file.
+for _crp in literal-without-cause duplicate-cause unmarked-writer; do
+  out=$("$_PY" "$HERE/record_causes.py" --fixture --plant "$_crp" 2>&1); hit "record causes: fixture $_crp · PASS"
+done
+# --- TOOL-dTotalRecall-121 AC6 — the kind registry's plants, every `PLANTS` member of the module in a table of its
+# --- selftest. Red on a plant added to the tuple and to no table.
+out=$("$_PY" "$HERE/record_kinds.py" --selftest 2>&1); _brc=$?
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL the record-kinds selftest exited $_brc, expected 0"; st=1; }
+hit 'record-kinds: selftest PASS · '
+# --- TOOL-dTotalRecall-121 AC8 — the join: every `PLANTS` member of the four modules is a whole word of a live line of
+# --- this suite, and the selftest call above stands on one. Red on an arm cut. What it does not check: that the arm
+# --- asserts anything, and a member that is also a common word of another line.
+out=$("$_PY" - "$HERE" "$HERE/check-memory-hygiene.test.sh" 2>&1 <<'JOIN'
+import importlib, pathlib, re, sys
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv[1])
+live = [ln for ln in pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").splitlines() if not ln.lstrip().startswith("#")]
+unrun = [f"{name} {p}" for name in ("build_records", "record_causes", "record_find", "shape_run")
+         for p in importlib.import_module(name).PLANTS
+         if not any(re.search(r"(?<![\w-])" + re.escape(p) + r"(?![\w-])", ln) for ln in live)]
+if not any("record_kinds.py" + '" --self' + "test" in ln for ln in live):
+    unrun.append("record_kinds its selftest")
+print("plant join: " + (", ".join(unrun) + " on no live line" if unrun else "every plant on a live line"))
+JOIN
+)
+hit 'plant join: every plant on a live line'
+
 # --- TOOL-dTotalRecall-7 (AC4 AC5 AC6 AC7 AC10 AC11 AC12) — the ask door, `gov_record.py new ask`: the plant
 # --- runs the refuse, undeclared-family, file, replay, grade, refused-read and refused-filing-on-a-remote
 # --- cases, each in a seed under the host temp directory. Red on a grade after the write, a family check
@@ -4051,7 +4110,7 @@ out=$("$_PY" "$HERE/build_records.py" --fixture --plant ask-door 2>&1)
 if grep -qF 'build-records: SKIP ask-door' <<<"$out"; then
   echo "skip the ask door's plant: $(grep -F 'build-records: SKIP ask-door' <<<"$out"), so its 2 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+2))
 else
-  hit 'build-records: PASS ask-door'
+  hit 'build-records: PASS ask-door — 17 cases'
   miss 'build-records: FAIL'
 fi
 
@@ -5819,7 +5878,11 @@ done
 # RAISED 837 -> 842 by TOOL-dTotalRecall-120 on 2026-11-25: the drained-home plant's exit, causes line, census count
 # line, backfill count line and PASS line, five top-level assertions, never skipped. Counted by reading; OWED:
 # observed at the close.
-FLOOR_ASSERTIONS=842
+# RAISED 842 -> 879 by TOOL-dTotalRecall-121 on 2026-11-25: three claim arms, four of section-outside, three of each of
+# the eight shape-run plants, the three census plants, the kind selftest's exit and PASS line and the plant join; the
+# claim arms and the shape-run ones are skipped aloud with n_skip carrying them. Counted by reading; OWED: observed at
+# the close.
+FLOOR_ASSERTIONS=879
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

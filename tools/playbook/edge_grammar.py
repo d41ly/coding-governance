@@ -1229,6 +1229,11 @@ def run_cardinality_plant(top, plant) -> int:
     return rc
 
 
+#: every plant `--plant` admits, the argument parser's one list, which adopt-playbook.sh joins to its rows
+#: (TOOL-dTotalRecall-121 S11)
+FIXTURE_PLANTS = tuple(sorted({*PLANTS, *RESOLVE_PLANTS, *CARDINALITY_PLANTS, "prose-pass"}))
+
+
 def run_fixture(plant) -> int:
     """One plant: a parse-and-grade plant over a scratch site, a resolve plant over a scratch repository, the
     trailer plant over one, or a cardinality plant; `edges.toml` must come out unchanged."""
@@ -1272,7 +1277,7 @@ def main(argv=None) -> int:
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--base", metavar="REV")
     ap.add_argument("--fixture", action="store_true")
-    ap.add_argument("--plant", choices=sorted({*PLANTS, *RESOLVE_PLANTS, *CARDINALITY_PLANTS, "prose-pass"}))
+    ap.add_argument("--plant", choices=FIXTURE_PLANTS)
     ap.add_argument("--cardinality", action="store_true")
     ap.add_argument("--registry", action="store_true")
     a = ap.parse_args(argv)

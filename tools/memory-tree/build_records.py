@@ -186,7 +186,8 @@ from design_lib import read_design_conf, read_tracked_builds  # noqa: E402  the 
 from tree_lib import RED_FIX_TRAILER, TYPED_RECORD_KINDS  # noqa: E402  the reader's kind list, this table's keys
 from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
 
-FIELD = re.compile(r"^- \*\*([A-Z][a-z-]+(?: [a-z]+)?):\*\* (.+)$")     # the instrument deviations.py's
+FIELD_KEY = r"[A-Z][a-z-]+(?: [a-z]+)?"                        # a field's name, whole (TOOL-dTotalRecall-121 S1)
+FIELD = re.compile(r"^- \*\*(" + FIELD_KEY + r"):\*\* (.+)$")     # the instrument deviations.py's
 ID = SlugPattern(lambda g: r"[A-Za-z]+-(?:" + g.slug_class + r")-\d+")   # a unit id, its slug the grammar's
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SLUG = SlugPattern(lambda g: g.BUILD_SLUG_RE.pattern)       # a build slug, every grammar one was minted under
@@ -929,11 +930,32 @@ def write_recommendation(root, build, unit, stage, score, source, binds, reason,
     return write_record(root, build, unit, "recommendation", f"{stage} review", fields, today)
 
 
+def check_field_keys(fields):
+    """Why one of `fields`' names is refused, or an empty string: outside `FIELD_KEY` whole, or given twice
+    (TOOL-dTotalRecall-121 S1). Both writers call it before any other read of the fields, so a name holding a
+    line break cannot forge a record line."""
+    seen = set()
+    for key, _value in fields:
+        if not re.fullmatch(FIELD_KEY, key):
+            return f"the field name {key!r} is outside the key grammar {FIELD_KEY}"
+        if key in seen:
+            return f"the field {key} is given twice, and a record names each field once"
+        seen.add(key)
+    return ""
+
+
+def add_to_index(root, rel):
+    """git's refusal to stage `rel`, or an empty string where it is staged (TOOL-dTotalRecall-121 S3)."""
+    p = subprocess.run(["git", "add", "--", rel], cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+                       errors="replace")
+    return "" if p.returncode == 0 else (p.stderr.strip() or f"git add exited {p.returncode}")
+
+
 def write_record(root, build, unit, kind, title, fields, today=None, lines=(), check=None, place=None):
     """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
     headed `# <unit> <kind> <n> — <title>`, then `Serves: <kind> <unit>` bolded, each `(key, value)` of
     `fields` as a bold-key bullet and, after one blank line, each of `lines` as written (TOOL-dDeclaredLoop-17
-    S1), each refused as a value is. `place(text)`, where given, returns the text with the record door's
+    S1), each refused as a value is; a field's name is refused by `check_field_keys`. `place(text)`, where given, returns the text with the record door's
     edge lines placed under their headings (TOOL-dTotalRecall-19 S6). `check(rel, text)`, where given, reads
     the bytes about to be written and raises ValueError to refuse them, before the file is opened
     (TOOL-dTotalRecall-2 S4). -> its repo-relative path. A refusal is ValueError."""
@@ -942,6 +964,9 @@ def write_record(root, build, unit, kind, title, fields, today=None, lines=(), c
     if "pending" in KINDS[kind]:   # PLAY-dOrderedCharter-55 S8: refused before any write, as `read` refuses it
         raise ValueError(f"the {kind} kind is pending on {KINDS[kind]['pending']}, which gives it fields, so no "
                          f"record of it is written")
+    why = check_field_keys(fields)
+    if why:
+        raise ValueError(why)
     if not SLUG.match(build):
         raise ValueError(f"--build {build!r} is not a build slug")
     if not ID.fullmatch(unit):
@@ -1053,8 +1078,10 @@ def read_mint_authority(root, build):
     holds and `owner` otherwise (TOOL-dTotalRecall-19 S4). The authority: the build lease, classed by the loop
     kit's `read_lease_class` where the unattended driver resolves, `mine` admitting and any fact refusing;
     then, the lease free or unread for want of a kit, the claim's `session` in this node's cache ref
-    (`gen_build_index.read_claim_lines`), this session's admitting and another's refusing; with neither, the
-    charter's per-session rule, named. ValueError naming the holder or the fact (S6, §4 "Minting")."""
+    (`gen_build_index.read_claim_lines`), this session's admitting and another's refusing; with neither, or a
+    claim naming no session, the charter's per-session rule, named: an unnamed holder is never read as this
+    session, and a named one refuses a session that has no id of its own (TOOL-dTotalRecall-121 S2).
+    ValueError naming the holder or the fact (S6, §4 "Minting")."""
     from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
     lines, loop = [], None
     for home, anchor in (("unattended", "unattended.sh"), ("loop", "placement.py")):
@@ -1078,6 +1105,8 @@ def read_mint_authority(root, build):
         sessions = [ln[len("session: "):].strip() for ln in claim if ln.startswith("session: ")]
         me = os.environ.get("CLAUDE_CODE_SESSION_ID") or "absent"
         holder = sessions[-1] if sessions else "absent"   # the oldest commit, the claim itself
+        if holder == "absent":
+            return lines + [f"minted under the session rule: the claim of {build} names no session"], "owner"
         if holder != me:
             raise ValueError(f"the claim of {build} ({gen_build_index.CLAIM_CACHE_NS}/{build}) is held by session "
                              f"{holder}, not this session {me}")
@@ -1181,8 +1210,9 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
     headed `title`, `fields` its `(key, value)` pairs in the caller's order, `name` the stem a row with an
     empty `id-rule` takes. In order: the row (S2), the render and its refusal by the kind's own check (S3,
     S4), the listing of the kind's home for a record of the same content key (S5), the authority (S6), then
-    the mint and the write, staged (S8). -> `(word, path or line, key, lines)`, `word` one of `wrote`,
-    `exists` and `waiting`, `lines` the authority's. ValueError for every refusal, nothing written.
+    the mint and the write, staged (S8), and removed where git will not stage it. -> `(word, path or line, key,
+    lines)`, `word` one of `wrote`, `exists` and `waiting`, `lines` the authority's. ValueError for every
+    refusal, nothing written.
 
     The header (TOOL-dTotalRecall-19 S2 to S6): `caused_by`, or a `Caused-by` field, is the record's cause,
     refused where absent on a kind whose row is no `root` or where it does not resolve
@@ -1198,7 +1228,7 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
     header refuses to read has no key: it is never `exists`, and at the call's own path it is the refusal."""
     import fnmatch
     import record_kinds  # noqa: E402  the registry's template and field check
-    from tree_lib import TYPED_RECORD_KINDS, read_header_edges
+    from tree_lib import BIND_RE, TYPED_RECORD_KINDS, read_header_edges
     root = pathlib.Path(root)
     row = read_kind_row(root, kind)
     kind = row["name"]
@@ -1207,6 +1237,9 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
         raise ValueError(f"its schema form is {schema.get('form')}, written only by a kind handler")
     rule, home, typed = row.get("id-rule") or "", row.get("home"), kind in TYPED_RECORD_KINDS
     fields = list(fields)
+    why = check_field_keys(fields)
+    if why:
+        raise ValueError(why)
     if any(k == "Made-by" for k, _v in fields):
         raise ValueError("--field Made-by: the door writes Made-by from the authority it mints under")
     named = [v for k, v in fields if k == "Caused-by"]
@@ -1286,7 +1319,7 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
         except ValueError:
             return None
         at = re.search(r"/builds/([^/]+)/", path)
-        serves = next((ln for ln in lines if ln.startswith("**Serves:** ")), "")
+        serves = next((ln for ln in lines if (b := BIND_RE.match(ln)) and b.group("key") == "Serves"), "")
         edges = [ln for ln in lines if ln.startswith("**Edges:** ")]
         return [("build", at.group(1) if at else ""), ("head", "" if m is None else repr(m.groupdict())), ("serves", serves),
                 ("cause", " ".join(cause)), *(("edge", ln) for ln in edges), *read_ordered_fields(text)]
@@ -1399,7 +1432,10 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
         pathlib.Path(root, rel).parent.mkdir(parents=True, exist_ok=True)
         with open(pathlib.Path(root, rel), "x", encoding="utf-8", newline="\n") as fh:
             fh.write(text)
-    subprocess.run(["git", "add", "--", rel], cwd=str(root), capture_output=True, check=False)
+    refused = add_to_index(root, rel)
+    if refused:
+        pathlib.Path(root, rel).unlink()
+        raise ValueError(f"{rel} was not staged, so it was removed: {refused}")
     return "wrote", rel, key, lines
 
 
@@ -1571,7 +1607,9 @@ def check_door_header_plant():
     the record lacks and two lines of one type under one heading each refused with nothing written; then
     `root = true` on the `log` row, which admits no cause. TOOL-dTotalRecall-43 adds `field-newline` and
     `edge-newline` (AC37), each refused with nothing written, and the mint beside an untracked draft and
-    under `mint-collision` (AC43). TOOL-dTotalRecall-117 adds the content key's cases: the replay `exists`, and the
+    under `mint-collision` (AC43). TOOL-dTotalRecall-121 adds `field-name-newline` and `field-name-twice`,
+    each refused with nothing written, and `index-lock`: the clone's index lock held, the door refuses
+    naming git's refusal with the record gone, and the same call with the lock gone writes. TOOL-dTotalRecall-117 adds the content key's cases: the replay `exists`, and the
     same call with another unit, title, cause, edge, no edge or build, and a typed pair differing in its unit,
     each refused or a fresh `wrote` and none `exists`. -> `(failures, cases)`, or `(None, why)` where a kit the
     door runs beside does not resolve."""
@@ -1656,6 +1694,21 @@ def check_door_header_plant():
         check_case("edge-newline", run_door(a, *base, "--name", "n0", "--caused-by", unit, "--edge",
                                             "a-note implements=feature.x\n**Caused-by:** X"), 2,
                    ["--edge holds a line feed"], a)
+        # TOOL-dTotalRecall-121 AC1: a field name outside the grammar or given twice; AC3: a stage git refuses
+        check_case("field-name-newline", run_door(a, *base, "--name", "n0", "--caused-by", unit, "--field",
+                                                  "Note\n**Commissions:** TOOL-dTotalRecall-3\n- **Z=v"), 2,
+                   ["the field name 'Note\\n**Commissions", "outside the key grammar"], a)
+        check_case("field-name-twice", run_door(a, *base, "--name", "n0", "--caused-by", unit, "--field", "Note=x",
+                                                "--field", "Note=y"), 2, ["the field Note is given twice"], a)
+        lock, locked = a / ".git" / "index.lock", f"{folder}/n-lock.md"
+        lock.write_bytes(b"")
+        check_case("index-lock", run_door(a, *base, "--name", "n-lock", "--caused-by", unit), 2,
+                   [f"{locked} was not staged, so it was removed: ", "index.lock"], a)
+        if (a / locked).exists():
+            bad.append("index-lock: the record git would not stage is still there")
+        lock.unlink()
+        check_case("index-lock gone", run_door(a, *base, "--name", "n-lock", "--caused-by", unit), 0,
+                   [f"wrote {locked}"], a)
         name = "2026-11-23-prompt-TOOL-dTotalRecall-2-owner"
         check_case("made-by owner", run_door(a, *base, "--name", name, "--caused-by", unit, "--edge",
                                              "a-note implements=feature.x"), 0, [f"wrote {folder}/{name}.md"], a)   # AC2
@@ -1766,8 +1819,8 @@ def run_planted_door(root, plant, *flags):
 
 def check_ask_plant():
     """`--fixture --plant ask-door` (TOOL-dTotalRecall-7 AC4 to AC7, AC10 to AC12; TOOL-dTotalRecall-41 AC1 to
-    AC4): the ask door's refuse, undeclared-family, value-refusal, planted-renderer, file, replay and grade
-    cases in one seed, the refused read in a seed whose one commit
+    AC4): the ask door's refuse, undeclared-family, value-refusal, planted-renderer, index-lock
+    (TOOL-dTotalRecall-121 AC3, over no file and over a held one), file, replay and grade cases in one seed, the refused read in a seed whose one commit
     holds an invalid `asks.acceptance`, and the refused and filed cases over a bare remote, each seed under
     the host temp directory and the door run from this kit. -> `(failures, cases)`, or `(None, why)` where
     a kit the door runs beside does not resolve."""
@@ -1822,6 +1875,15 @@ def check_ask_plant():
                    ["--sev", "a line feed"], a)
         check_case("graded-args-not-row", run_planted_door(a, "drop-clauses", *base, *accept), 2,
                    ["asks.acceptance", "states no acceptance"], a)
+        # TOOL-dTotalRecall-121 AC3: the index lock held, git's refusal named and no BACKLOG.md left; the `file` case
+        # is the same call with the lock gone
+        lock = a / ".git" / "index.lock"
+        lock.write_bytes(b"")
+        check_case("index-lock", run_ask_door(a, *base, *accept), 2,
+                   [f"{rel} was not staged, so it was removed", "index.lock"], a)
+        if (a / rel).exists():
+            bad.append("index-lock: the BACKLOG.md git would not stage is still there")
+        lock.unlink()
         got = run_ask_door(a, *base, *accept)   # AC5
         check_case("file", got, 0, [f"wrote {rel} {first} key "])
         key = (re.search(rf"^wrote {re.escape(rel)} {first} key ([0-9a-f]{{12}})$", got[1], re.M) or [None, None])[1]
@@ -1846,6 +1908,12 @@ def check_ask_plant():
                    ["add 2 ask(s)", "nothing was minted or written"])   # TOOL-dTotalRecall-41 AC4
         if (a / rel).read_bytes() != held or run_git(a, "status", "--porcelain") != status:
             bad.append("two-rows-added: the backlog's bytes or the status moved on a refused filing")
+        lock.write_bytes(b"")
+        check_case("index-lock held file", run_ask_door(a, *derive_flags(base, "--text", "y"), *accept), 2,
+                   [f"{rel} was not staged, so it was put back as it was", "index.lock"])
+        lock.unlink()
+        if (a / rel).read_bytes() != held or run_git(a, "status", "--porcelain") != status:
+            bad.append("index-lock held file: the backlog's bytes or the status moved on a filing git would not stage")
         (a / ".governance").mkdir(exist_ok=True)
         with open(a / ".governance/policy.toml", "w", encoding="utf-8", newline="\n") as fh:
             fh.write('asks.acceptance = "grade"\n')
@@ -1900,8 +1968,9 @@ def run_fixture(plant):
         if bad:
             return 1
         print(f"build-records: PASS {plant} — {cases} cases: " + (
-            "refuse, family, file, replay, grade, refused read, remote" if plant == "ask-door"
-            else "causeless, unresolved cause, three edge refusals, field-newline, edge-newline, made-by owner, "
+            "refuse, family, index-lock, file, replay, grade, refused read, remote" if plant == "ask-door"
+            else "causeless, unresolved cause, three edge refusals, field-newline, edge-newline, field-name-newline, "
+                 "field-name-twice, index-lock, index-lock gone, made-by owner, "
                  "replay, unit, title, cause, edge, no edge, build, typed, made-by lease, root log, mint beside a draft, mint-collision"))
         return 0
     root = pathlib.Path(tempfile.mkdtemp(prefix="br-"))

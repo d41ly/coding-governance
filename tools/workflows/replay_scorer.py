@@ -1178,6 +1178,13 @@ ITEM_HEADING = re.compile(r"^###[ \t]+([A-Za-z]{0,3}\d+)\.[ \t].*\((?:findings?|
 SEARCH_TOOLS = frozenset({"Grep", "Glob"})
 SEARCH_PROGRAMS = frozenset({"grep", "rg", "find", "ls"})
 GIT_SEARCHES = frozenset({"grep", "ls-files"})
+#: TOOL-dTotalRecall-121 S10: what a lens may run before its first act and still be reading. A shell call is a
+#: read when every segment's program is one of these and nothing in it redirects to a file.
+READ_PROGRAMS = SEARCH_PROGRAMS | {"cat", "head", "tail", "sed", "wc", "cd", "echo"}
+GIT_READS = GIT_SEARCHES | {"diff", "show", "log", "blame", "status", "cat-file", "rev-parse"}
+NON_ACTING_TOOLS = frozenset({"ToolSearch"})
+SAFE_REDIRECT = re.compile(r"[0-9]*>&[0-9-]|[0-9&*]*>>?[ \t]*(?:/dev/null|\$null)(?![\w./-])")   # `2>&1` and the null device
+QUOTED_SPAN = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"|\\.", re.S)   # what a shell takes whole, so its `>` is text
 #: The map's losing terms (the project map's `[test]`): the recall rise must reach the twin difference plus
 #: RECALL_MARGIN, the median search fall SEARCH_FLOOR, and the median bytes rise stay within the map's own bytes.
 RECALL_MARGIN = 5
@@ -1273,6 +1280,24 @@ def read_transcript_calls(path):
     return events
 
 
+def derive_segment_program(ex, words):
+    """`(program, subcommand)` of one shell segment, past env assignments and wrappers: the program's lower-cased
+    base name, and for `git` its first word that is no option; an empty string for each the segment lacks."""
+    k = 0
+    while k < len(words) and (ex.ENV_ASSIGN_RE.fullmatch(words[k]) or words[k] in ex.WRAPPERS or words[k] == "timeout"
+                              or (k and words[k - 1] == "timeout" and words[k][:1].isdigit())):
+        k += 1
+    if k >= len(words):
+        return "", ""
+    program = words[k].replace("\\", "/").rsplit("/", 1)[-1].lower().removesuffix(".exe")
+    if program not in ex.GIT_NAMES:
+        return program, ""
+    j = k + 1
+    while j < len(words) and words[j].startswith("-"):
+        j += 2 if words[j] in ex.GIT_OPTS_WITH_ARG else 1
+    return program, words[j] if j < len(words) else ""
+
+
 def measure_call_searches(ex, name, tool_input):
     """The existence searches one tool call makes: 1 for a `Grep` or `Glob`; for a shell call, each segment
     `extract_segments` reads whose program, past env assignments and wrappers, is a search program or `git`
@@ -1284,21 +1309,36 @@ def measure_call_searches(ex, name, tool_input):
         return 0
     count = 0
     for words, _sep in ex.extract_segments(command):
-        k = 0
-        while k < len(words) and (ex.ENV_ASSIGN_RE.fullmatch(words[k]) or words[k] in ex.WRAPPERS or words[k] == "timeout"
-                                  or (k and words[k - 1] == "timeout" and words[k][:1].isdigit())):
-            k += 1
-        if k >= len(words):
-            continue
-        program = words[k].replace("\\", "/").rsplit("/", 1)[-1].lower().removesuffix(".exe")
-        if program in SEARCH_PROGRAMS:
-            count += 1
-        elif program in ex.GIT_NAMES:
-            j = k + 1
-            while j < len(words) and words[j].startswith("-"):
-                j += 2 if words[j] in ex.GIT_OPTS_WITH_ARG else 1
-            count += j < len(words) and words[j] in GIT_SEARCHES
+        program, sub = derive_segment_program(ex, words)
+        count += program in SEARCH_PROGRAMS or sub in GIT_SEARCHES
     return count
+
+
+def check_read_call(ex, name, tool_input):
+    """True for a call a lens makes before its first act (TOOL-dTotalRecall-121 S10): a runlog `read` tool, a
+    search tool, a NON_ACTING_TOOLS member, or a shell call that redirects to no file but the null device, runs
+    a READ_PROGRAMS program or a GIT_READS subcommand in every segment, and hands `sed` no in-place option. Any
+    other call is the act. The redirect is read off the command, its heredoc bodies, SAFE_REDIRECT and quoted
+    spans out, so one glued behind its word is seen and a quoted `>` is not. Not read: a `>` in an unquoted
+    comment or an unquoted comparison, read as a redirect; a quoted null device, read as a file; a quote a
+    comment leaves open, and PowerShell's own quoting, whose spans may pair wrongly; `sed`'s `w` command; a
+    `find -exec`; and a call nested in `bash -c`."""
+    if name in NON_ACTING_TOOLS or name in SEARCH_TOOLS or ex.TOOL_CLASSES.get(name) == "read":
+        return True
+    command = tool_input.get("command") if name in ex.SHELL_TOOLS else None
+    if not isinstance(command, str):
+        return False
+    bare = SAFE_REDIRECT.sub(" ", ex._remove_heredocs(command))
+    if ">" in QUOTED_SPAN.sub("q", bare):                      # a redirect to a file, wherever it stands in its word
+        return False
+    segments = [words for words, _sep in ex.extract_segments(bare) if words]
+    for words in segments:
+        program, sub = derive_segment_program(ex, words)
+        if program not in READ_PROGRAMS and sub not in GIT_READS:
+            return False
+        if program == "sed" and any(re.match(r"-[A-Za-z]*i|--in-place", w) for w in words):
+            return False
+    return bool(segments)
 
 
 def measure_existence_searches(path):
@@ -1308,36 +1348,40 @@ def measure_existence_searches(path):
 
 
 def measure_bytes_before_act(path):
-    """The tool-result bytes one lens transcript received before its first ACT: a tool call neither in runlog's
-    `read` class (`TOOL_CLASSES`, read through `derive_tool_class`) nor an existence search, so a shell search
-    is never the act. With no act, every result counts. Bytes handed in the prompt are never counted."""
+    """The tool-result bytes one lens transcript received before its first ACT, the first tool call
+    `check_read_call` answers False for (TOOL-dTotalRecall-121 S10). With no act, every result counts. Bytes
+    handed in the prompt are never counted, and what `check_read_call` does not read is said there."""
     ex = resolve_runlog_extract()
     total = 0
     for kind, _id, name, value in read_transcript_calls(path):
         if kind == "result":
             total += value
-        elif ex.derive_tool_class(name, value)[0] != "read" and not measure_call_searches(ex, name, value):
+        elif not check_read_call(ex, name, value):
             break
     return total
 
 
 def derive_map_verdict(figures):
-    """`("win", [])`, or `("lose", [term, ...])` naming each losing term in `recall`, `searches`, `bytes` order.
+    """`("win", [])`, or `("lose", [term, ...])` naming each losing term in `recall`, `searches`, `bytes` order,
+    or `("unarmed", ["bytes"])` in place of a win no run measured (TOOL-dTotalRecall-121 S10).
 
     `figures` holds `recall` (the with-map arm's known items found less the without arm's), `twin` (the twin
     difference), `searches` (the without arm's median existence searches less the with arm's), `bytes` (the with
-    arm's median bytes before the first act less the without arm's) and `map` (the map's own bytes). A term
-    loses strictly past its boundary: recall below twin plus RECALL_MARGIN, searches below SEARCH_FLOOR, bytes
+    arm's median bytes before the first act less the without arm's), `map` (the map's own bytes) and `armed`
+    (False where every run of both arms read zero bytes before its first act). A term loses strictly past its boundary: recall below twin plus RECALL_MARGIN, searches below SEARCH_FLOOR, bytes
     above the map's."""
     lost = [term for term, held in (("recall", figures["recall"] < figures["twin"] + RECALL_MARGIN),
                                     ("searches", figures["searches"] < SEARCH_FLOOR),
                                     ("bytes", figures["bytes"] > figures["map"])) if held]
-    return ("lose", lost) if lost else ("win", [])
+    if lost:
+        return "lose", lost
+    return ("win", []) if figures["armed"] else ("unarmed", ["bytes"])
 
 
 def measure_map_experiment(manifest, arms, repo="."):
     """The map-replay experiment's lines (TOOL-dTotalRecall-17): the factory's head, each audit's `known` line,
-    each run's recall, each term's figures, then `verdict win` or `verdict lose <terms>`.
+    each run's recall, each term's figures, then `verdict win`, `verdict lose <terms>` or `verdict unarmed bytes`,
+    the bytes line `term bytes: unarmed` where every lens run of both arms read zero before its first act.
 
     Two arms, one declaring `settings.map` true and one false. Each `candidates` entry is one harness run of
     one audit's `case`, its `transcripts` `{<lens>: <path>}` naming every scored lens; the scored candidates
@@ -1411,14 +1455,16 @@ def measure_map_experiment(manifest, arms, repo="."):
     figures = {"recall": mean[with_map] - mean[without],
                "twin": sum(max(max(found[(name, case)]) - min(found[(name, case)]) for name in (without, with_map)) for case in sets),
                "searches": statistics.median(searches[without]) - statistics.median(searches[with_map]),
-               "bytes": statistics.median(before[with_map]) - statistics.median(before[without]), "map": map_bytes}
+               "bytes": statistics.median(before[with_map]) - statistics.median(before[without]), "map": map_bytes,
+               "armed": any(n for reads in before.values() for n in reads)}
     verdict, lost = derive_map_verdict(figures)
     terms = [f"term recall: known items found {with_map} {mean[with_map]:g} · {without} {mean[without]:g} · rise {figures['recall']:g} · "
              f"twin difference {figures['twin']:g} · loses below {figures['twin'] + RECALL_MARGIN:g}",
              f"term searches: median existence searches {with_map} {statistics.median(searches[with_map]):g} over {len(searches[with_map])} lens run(s) · "
              f"{without} {statistics.median(searches[without]):g} over {len(searches[without])} · fall {figures['searches']:g} · loses below {SEARCH_FLOOR}",
              f"term bytes: median bytes before the first act {with_map} {statistics.median(before[with_map]):g} · "
-             f"{without} {statistics.median(before[without]):g} · rise {figures['bytes']:g} · map {map_bytes} byte(s) · loses above {map_bytes}"]
+             f"{without} {statistics.median(before[without]):g} · rise {figures['bytes']:g} · map {map_bytes} byte(s) · loses above {map_bytes}"
+             if figures["armed"] else "term bytes: unarmed · every lens run read 0 before its first act"]
     return head + known_lines + recalls + terms + [f"verdict {verdict}" + (f" {', '.join(lost)}" if lost else "")]
 
 
@@ -2160,16 +2206,25 @@ def run_selftest():
 
     def check_map_verdict_arm():
         """TOOL-dTotalRecall-17 AC2: each planted set fails one term and loses on it alone; the set on every
-        boundary wins. Each planted value is PINNED here."""
-        edge = {"recall": 5, "twin": 0, "searches": 1, "bytes": 100, "map": 100}
+        boundary wins, and reads unarmed where no run measured the bytes (TOOL-dTotalRecall-121 AC10). Each
+        planted value is PINNED here."""
+        edge = {"recall": 5, "twin": 0, "searches": 1, "bytes": 100, "map": 100, "armed": True}
         planted = [("recall", {**edge, "recall": 4}), ("searches", {**edge, "searches": 0.5}), ("bytes", {**edge, "bytes": 101})]
         bad = next((f"a set failing {term} alone read {derive_map_verdict(f)!r}" for term, f in planted
                     if derive_map_verdict(f) != ("lose", [term])), None)
+        unarmed = derive_map_verdict({**edge, "armed": False})
+        if not bad and unarmed != ("unarmed", ["bytes"]):
+            bad = f"the boundary set with no run measured read {unarmed!r}"
+        lost = derive_map_verdict({**edge, "recall": 4, "armed": False})
+        if not bad and lost != ("lose", ["recall"]):
+            bad = f"a set failing recall alone with no run measured read {lost!r}"
         return bad or (None if derive_map_verdict(edge) == ("win", []) else f"the boundary set read {derive_map_verdict(edge)!r}")
 
     def check_map_transcript_arm():
-        """TOOL-dTotalRecall-17 AC3: a `Grep`, a piped shell `git grep`, a 900-byte `Read` (PINNED) and then an
-        `Edit` count 2 searches, and 900 plus the two searches' result bytes before the act; a torn line refuses."""
+        """TOOL-dTotalRecall-17 AC3, TOOL-dTotalRecall-121 AC10: a 500-byte `git diff` (PINNED), a `sed -n` pipe, a
+        `ToolSearch`, a `Grep`, a piped shell `git grep`, a 900-byte `Read` (PINNED) and then a `sed -i` count 2
+        searches, and every result before the `sed -i`; a file redirect, glued or not, is the act and one to
+        `/dev/null` is not; a torn line refuses."""
         try:
             resolve_runlog_extract()
         except Refusal as exc:
@@ -2180,17 +2235,25 @@ def run_selftest():
             if kind == "use":
                 return json.dumps({"type": "assistant", "message": {"content": [{"type": "tool_use", "id": tid, "name": value[0], "input": value[1]}]}})
             return json.dumps({"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": tid, "content": value}]}})
-        calls = [("t1", ("Grep", {"pattern": "x"}), "a.py:1:x\n"),
+        calls = [("t6", ("Bash", {"command": "git diff a..b 2>&1"}), "d" * 500),
+                 ("t7", ("Bash", {"command": "sed -n 1,5p a.py 2>/dev/null | head"}), "h" * 20),
+                 ("t8", ("ToolSearch", {"query": "select:Read"}), "q" * 30),
+                 ("t1", ("Grep", {"pattern": "x"}), "a.py:1:x\n"),
                  ("t2", ("Bash", {"command": "git grep -n x -- '*.py' | wc -l"}), [{"type": "text", "text": "3\n"}]),
-                 ("t3", ("Read", {"file_path": "a.py"}), "r" * 900), ("t4", ("Edit", {"file_path": "a.py"}), "e" * 50),
+                 ("t3", ("Read", {"file_path": "a.py"}), "r" * 900), ("t4", ("Bash", {"command": "sed -i s/a/b/ a.py"}), "e" * 50),
                  ("t5", ("Read", {"file_path": "b.py"}), "s" * 70)]
         text = "".join(derive_transcript_line("use", t, c) + "\n" + derive_transcript_line("result", t, r) + "\n" for t, c, r in calls)
         with tempfile.TemporaryDirectory() as tmp:
             path = pathlib.Path(tmp, "lens.jsonl")
             path.write_text(text, encoding="utf-8")
             got = (measure_existence_searches(path), measure_bytes_before_act(path))
-            if got != (2, 900 + 9 + 2):
-                return f"the transcript read {got!r} searches and bytes, not (2, 911)"
+            if got != (2, 500 + 20 + 30 + 9 + 2 + 900):
+                return f"the transcript read {got!r} searches and bytes, not (2, 1461)"
+            for redirect in (" > b.py", ">b.py"):
+                path.write_text(text.replace("sed -n 1,5p a.py 2>/dev/null", "sed -n 1,5p a.py" + redirect), encoding="utf-8")
+                got = measure_bytes_before_act(path)
+                if got != 500:
+                    return f"a shell read redirected by {redirect!r} read {got!r} bytes before the act, not 500"
             path.write_text(text + "{torn\n", encoding="utf-8")
             return check_refused(lambda: measure_bytes_before_act(path), "torn line")
 

@@ -469,7 +469,8 @@ def check_blob_path(root, sha: str, path: str) -> bool:
 
 def read_section(root, address: str) -> dict:
     """S5: `{key, tag, path, line, end_line, blob, text}` of `<key>[#<tag>][@<blob>]`: the record, or its
-    section of that tag, sliced from its blob. FindError naming an unknown key, tag or blob."""
+    section of that tag, sliced from its blob, a section counting only inside the record's own extent
+    (TOOL-dTotalRecall-121 S5). FindError naming an unknown key, tag or blob."""
     m = ADDRESS_RE.fullmatch(address.strip())
     if not m:
         raise FindError(f"{address} is no <key>[#<tag>][@<blob>] address")
@@ -487,7 +488,7 @@ def read_section(root, address: str) -> dict:
             for cand in rows:
                 held = [(t, line, end) for t, _p, line, _b, end, _x in con.execute(
                     RECORD_ROWS + " AND p.path=? AND p.blob=?", ("section", cand["path"], cand["blob"]))]
-                if not tag or any(s[0] == tag for s in held):
+                if not tag or any(s[0] == tag and cand["line"] <= s[1] <= cand["end_line"] for s in held):
                     rec, secs = cand, held
                     break
             text = read_view_texts(root, con, tree, [rec])[(rec["path"], rec["blob"])]
@@ -527,7 +528,7 @@ def read_section(root, address: str) -> dict:
         con.close()
     line, end = rec["line"], rec["end_line"]
     if tag:
-        inside = [s for s in secs if s[0] == tag and line <= s[1] <= end] or [s for s in secs if s[0] == tag]
+        inside = [s for s in secs if s[0] == tag and line <= s[1] <= end]
         if not inside:
             raise FindError(f"tag {tag} names no section of {key}")
         _t, line, end = inside[0]
@@ -588,7 +589,7 @@ def check_read_set(root, role: str, keys: list[str]) -> tuple[int, list[str]]:
 # ---------------------------------------------------------------------------------- the fixture
 PLANTS = ("cap", "archive", "superseded", "over-report", "over-refuse", "over-off", "superseded-refuse",
           "superseded-mark", "unheld-blob", "blob-unknown-key", "blob-foreign-text", "blob-foreign-record",
-          "missing-section")
+          "missing-section", "section-outside")
 FIXTURE_BUILD = "bFix"
 #: the kits a fixture copy-installs under its own `tools/`, each found as this kit finds a sibling
 FIXTURE_KITS = (("memory-tree", "tree_lib.py"), ("playbook", "tag_index.py"), ("memory-recall", "query.py"),
@@ -652,6 +653,11 @@ def build_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         policy.append(f'over-budget = "{plant[5:]}"')
     if plant == "superseded-mark":
         policy.append('superseded-slices = "mark"')
+    if plant == "section-outside":   # TOOL-dTotalRecall-121 S5: two ids, the one `section.findings` under the second
+        write_fixture_file(root, f"{folder}/build/2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-notes.md",
+                           f"# notes\n\n**Serves:** research TOOL-{FIXTURE_BUILD}-1\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
+                           f"## TOOL-{FIXTURE_BUILD}-11 — the first\n\nno section of its own\n\n"
+                           f"## TOOL-{FIXTURE_BUILD}-12 — the second\n\n### Outcome\n\nthe second's outcome\n")
     if plant == "missing-section":
         template = pathlib.Path(KIT.parent.parent, "memory", "TEMPLATE-SPEC.md")
         text = template.read_bytes().decode("utf-8").replace("\r\n", "\n") if template.is_file() else ""
@@ -686,6 +692,7 @@ def run_fixture(plant: str) -> tuple[int, list[str]]:
                 "archive": question, "superseded": question,
                 "superseded-refuse": ["budget", "--role", "gov-builder", "DEC-tFix-1"],
                 "superseded-mark": ["budget", "--role", "gov-builder", "DEC-tFix-1"],
+                "section-outside": ["show", f"TOOL-{FIXTURE_BUILD}-11#section.outcome"],
                 "missing-section": ["new", "spec", f"TOOL-{FIXTURE_BUILD}-2", "--tier", "2"]}.get(
             plant, ["budget", "--role", "gov-builder", f"2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-deviation-big"])
         if plant == "unheld-blob":   # the record edited and the commit amended, so no tree holds its old blob
@@ -701,6 +708,9 @@ def run_fixture(plant: str) -> tuple[int, list[str]]:
                         "blob-foreign-record": (stem, f"memory/builds/{FIXTURE_BUILD}/build/{stem[:-1]}2.md")}[plant]
             argv = ["show", f"{key}@{run_fixture_git(root, 'rev-parse', f'HEAD:{rel}').strip()}"]
         rc, lines = run_fixture_cli(root, argv)
+        if plant == "section-outside":   # the file's stem reaches the section, the first id does not
+            stem_rc, shown = run_fixture_cli(root, ["show", f"2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-notes#section.outcome"])
+            lines += shown + [f"{SAY}: fixture section-outside · file stem · exit {stem_rc}"]
         if plant == "missing-section":
             lines.append(f"{SAY}: fixture missing-section · spec files "
                          f"{len(list((root / 'memory/builds' / FIXTURE_BUILD).glob('spec/*.md')))}")
