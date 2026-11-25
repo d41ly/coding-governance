@@ -15,6 +15,7 @@
 | [2026-11-25-build-TOOL-dBoundRoles-95-widen-22.md](../build/2026-11-25-build-TOOL-dBoundRoles-95-widen-22.md) | widen | — |
 | [2026-11-25-prompt-TOOL-dBoundRoles-95-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dBoundRoles-95-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dBoundRoles-95-spec-brief.md](../prompts/2026-11-25-prompt-TOOL-dBoundRoles-95-spec-brief.md) | journal | — |
+| [2026-11-25-review-TOOL-dBoundRoles-95-security-diff-review-round1.md](../reviews/2026-11-25-review-TOOL-dBoundRoles-95-security-diff-review-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 
