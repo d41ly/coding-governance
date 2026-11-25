@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-25-build-TOOL-aTemperedLane-2-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-aTemperedLane-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aTemperedLane-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aTemperedLane-1-brief.md) | research | TOOL-aTemperedLane-1 |
+| [2026-11-25-review-TOOL-aTemperedLane-1-closing-diff-review-round1.md](../reviews/2026-11-25-review-TOOL-aTemperedLane-1-closing-diff-review-round1.md) | diff-review | TOOL-aTemperedLane-1 |
 
 <!-- /gen:spec-records -->
 

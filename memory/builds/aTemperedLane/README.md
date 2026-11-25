@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-25
 streams: tooling
 roster: TOOL
-ids: TOOL-aTemperedLane-1 TOOL-aTemperedLane-2
+ids: TOOL-aTemperedLane-1 TOOL-aTemperedLane-2 TOOL-aTemperedLane-3
 ---
 
 # aTemperedLane — the Red-fix lane's limits read past a generated region and read the guarded list at the commit's parent
@@ -31,7 +31,7 @@ half reads no waiver, and built work is never rewritten in place.
 - Owner answers, 2026-11-25: "Fix gate on main" to the starting session, and "A: list at parent" to
   this one on which L2 rule lands. The landing ask covers these two changes and nothing else.
 - **Classification (M2)**: two units at open, both MISSING, both Tier-2: each changes a shipped
-  kit's contract. Order 1 then 2; both edit one function, so they build in sequence.
+  kit's contract. Order 1 then 2; both edit one function, so they build in sequence. Unit 3 is the closing review's batch (M4).
 - Kit versions move through the lander's `mint`, once, after the last unit.
 - No spec audit: none is declared, and the task's closed done-list names one adversarial review.
 
@@ -45,11 +45,12 @@ None.
 |---|---|---|
 | 1 | `TOOL-aTemperedLane-1` | L3 reads a spec change confined to the `gen:spec-records` region as no spec edit |
 | 2 | `TOOL-aTemperedLane-2` | L2 reads the guarded list at the commit's first parent, the working tree's list where the parent has none |
+| 3 | `TOOL-aTemperedLane-3` | the closing review's mediums and lows: the deleted-list gap stated and pinned, and four arms |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node a · opened 2026-11-25 · streams tooling
-ids TOOL-aTemperedLane-1 TOOL-aTemperedLane-2
+ids TOOL-aTemperedLane-1 TOOL-aTemperedLane-2 TOOL-aTemperedLane-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -58,7 +59,7 @@ ids TOOL-aTemperedLane-1 TOOL-aTemperedLane-2
 | [TOOL-aTemperedLane-2 — limit L2 reads the guarded list at the commit's first parent](spec/2026-11-25-spec-TOOL-aTemperedLane-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
