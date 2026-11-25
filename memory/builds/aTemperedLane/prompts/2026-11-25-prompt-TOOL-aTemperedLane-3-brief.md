@@ -4,7 +4,7 @@
 
 ## The prompt
 
-> No words of the owner's ask for this unit: it is the closing review's exit (BUILD-METHOD M4). The
+> No words of the owner's ask for this unit: it is the closing review's exit (`doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it`). The
 > review is `memory/builds/aTemperedLane/reviews/2026-11-25-review-TOOL-aTemperedLane-1-closing-diff-review-round1.md`.
 
 ## The brief

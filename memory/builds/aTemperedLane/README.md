@@ -60,7 +60,7 @@ ids TOOL-aTemperedLane-1 TOOL-aTemperedLane-2 TOOL-aTemperedLane-3
 | [TOOL-aTemperedLane-3 — the closing review's three mediums and two lows: one false claim corrected and pinned, four coverage gaps given arms](spec/2026-11-25-spec-TOOL-aTemperedLane-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -27,7 +27,7 @@ kit in the session scratch directory, never an edit of this tree.
 - seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC5: an added or deleted spec, the parentless one included, exempt
 - seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC6: one exempt path clears the commit, then one edited path puts an exempt one back
 - seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC7: one blob read per call
-- seen-red — `marker contracts` — red `e7cae18c0` — green `e7cae18c0` — AC9: the predicate in `tree_lib` made to strip every trailing CR
+- seen-red — `marker contracts` — red `0a4783857` — green `0a4783857` — AC9: the predicate in `tree_lib` made to strip every trailing CR
 
 ## Owed to the close
 

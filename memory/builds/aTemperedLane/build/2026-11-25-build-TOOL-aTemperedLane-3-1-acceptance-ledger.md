@@ -22,7 +22,7 @@ probe's process, never an edit of this tree.
 - seen-red — `routed-commits selftest` — red `e7cae18c0` — green `e7cae18c0` — AC5: a None answer read as empty
 - seen-red — `routed-commits selftest` — red `e7cae18c0` — green `e7cae18c0` — AC6: the last parent read in place of the first
 - seen-red — `routed-commits selftest` — red `e7cae18c0` — green `e7cae18c0` — AC7: the header refusal dropped, then the body refusal, then only a blob's body skipped
-- seen-red — `marker contracts` — red `e7cae18c0` — green `e7cae18c0` — AC8: a local predicate using rstrip in `gen_build_index`, then in `routed_commits`
+- seen-red — `marker contracts` — red `0a4783857` — green `0a4783857` — AC8: a local predicate using rstrip in `gen_build_index`, then in `routed_commits`
 
 ## Owed to the close
 
