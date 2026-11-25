@@ -733,18 +733,13 @@ def read_step_count(con, read) -> tuple:
     """(the virtual-machine steps of `read()`, its result), counted on a second run: the progress handler
     fires while a statement compiles too, and the first run takes that cost (TOOL-aPrunedIndex-1)."""
     read()
-    steps = 0
-
-    def count():
-        nonlocal steps
-        steps += 1
-        return 0
-    con.set_progress_handler(count, 1)
+    ticks = []
+    con.set_progress_handler(lambda: ticks.append(1), 1)  # a falsy answer lets the statement run on
     try:
         result = read()
     finally:
         con.set_progress_handler(None, 1)
-    return steps, result
+    return len(ticks), result
 
 
 def run_plant(root, top, plant, sets) -> int:
