@@ -167,16 +167,11 @@ policy:memory.code-enrich	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.code-languages	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.code-roles	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.default-load	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:memory.item-budget	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:memory.legacy-anchors	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:memory.load-budget	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.map-budget	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.map-overflow	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.map-unfold	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.mirror	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:memory.over-budget	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.project-map	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:memory.superseded-slices	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:notices.record	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:notify.channel	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:notify.owner-items	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

@@ -154,4 +154,4 @@ tools/workflows/unattended-build.test.sh	2878	85a1c45076fd9093f1b9a08a2d720c8146
 tools/lib/template-cache.sh	81	f40895118614da5291bbeefa1701f88caaca8aa3	widened:2026-11-22-build-TOOL-dQuietDisk-37-widen-22
 tools/lib/owned-scratch.sh	39	3470633ba7207796277d51f89fca8329073ba9d3	widened:2026-11-22-build-TOOL-dQuietDisk-9-widen-15
 tools/hooks/actions-free.fixture.sh	133	d4f64934ca1b987434214ea8412f2f1950416afa	widened:2026-11-24-build-KICK-dKeptSession-80-widen-8
-tools/memory-tree/gov-claim.sh	810	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
+tools/memory-tree/gov-claim.sh	811	289db6c05abcd0c77990322eb6199391b9e1ba17	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-26

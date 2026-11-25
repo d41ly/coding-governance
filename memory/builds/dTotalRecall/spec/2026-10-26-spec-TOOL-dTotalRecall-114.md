@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-25-build-TOOL-dTotalRecall-114-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-1-acceptance-ledger.md) | log | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-1-builder-return.md) | journal | — |
 | [2026-11-25-build-TOOL-dTotalRecall-114-deviation-1015.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-deviation-1015.md) | deviation | — |
 | [2026-11-25-build-TOOL-dTotalRecall-114-widen-16.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-16.md) | widen | — |
 | [2026-11-25-build-TOOL-dTotalRecall-114-widen-17.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-17.md) | widen | — |
@@ -17,6 +18,9 @@
 | [2026-11-25-build-TOOL-dTotalRecall-114-widen-21.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-21.md) | widen | — |
 | [2026-11-25-build-TOOL-dTotalRecall-114-widen-22.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-22.md) | widen | — |
 | [2026-11-25-build-TOOL-dTotalRecall-114-widen-23.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-23.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-widen-24.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-24.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-widen-25.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-25.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-widen-26.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-26.md) | widen | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-114-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-114-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-114-spec-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-114-spec-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-114-spec-writer.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-114-spec-writer.md) | log | — |

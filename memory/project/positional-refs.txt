@@ -32859,6 +32859,11 @@ memory/builds/dTieredTribunal/spec/2026-08-26-spec-dTieredTribunal-3.md	tier2-re
 memory/builds/dTieredTribunal/spec/2026-08-26-spec-dTieredTribunal-3.md	tools/check-kit-versions.sh:169-194	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTieredTribunal/spec/2026-08-26-spec-dTieredTribunal-3.md	tools/drift-audit/drift_report.py:51	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTieredTribunal/spec/2026-08-26-spec-dTieredTribunal-3.md	tools/run-gates/run-gates.sh:741	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dTotalRecall/RUN.LANDED.bc313f97.md	branch_reconcile.py:520	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-16
+memory/builds/dTotalRecall/RUN.LANDED.bc313f97.md	check-recall.py:511	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-16
+memory/builds/dTotalRecall/RUN.LANDED.bc313f97.md	gen_build_index.py:4073	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-16
+memory/builds/dTotalRecall/RUN.LANDED.bc313f97.md	gen_build_index.py:8576	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-16
+memory/builds/dTotalRecall/RUN.LANDED.bc313f97.md	row_grammar.py:1116	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-16
 memory/builds/dTotalRecall/build/2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-a.md	HYGIENE check 4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/build/2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-a.md	backlog.py:129	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/build/2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-a.md	check-memory-hygiene.sh:3141	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -33117,6 +33122,11 @@ memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-43-widen-15.
 memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-43-widen-15.md	record_find.py:267-268	1	b9b6e584a4812d37e37c2e18296f42a960c4a476	widened:2026-11-23-build-TOOL-dTotalRecall-43-widen-15
 memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-49-widen-8.md	/asbuilt_view.py:2	1	60424d69e5b45453e89edd5ce4aa4711a3c08916	widened:2026-11-23-build-TOOL-dTotalRecall-49-widen-9
 memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-49-widen-9.md	/asbuilt_view.py:2	1	60424d69e5b45453e89edd5ce4aa4711a3c08916	widened:2026-11-23-build-TOOL-dTotalRecall-49-widen-9
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-114-widen-16.md	branch_reconcile.py:520	1	289db6c05abcd0c77990322eb6199391b9e1ba17	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-24
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-114-widen-16.md	check-recall.py:511	1	289db6c05abcd0c77990322eb6199391b9e1ba17	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-24
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-114-widen-16.md	gen_build_index.py:4073	1	289db6c05abcd0c77990322eb6199391b9e1ba17	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-24
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-114-widen-16.md	gen_build_index.py:8576	1	289db6c05abcd0c77990322eb6199391b9e1ba17	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-24
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-114-widen-16.md	row_grammar.py:1116	1	289db6c05abcd0c77990322eb6199391b9e1ba17	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-24
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-6-spec-writer.md	tools/govkit/registry.toml:380	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-6-spec-writer.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-owner-review-stop.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -37190,8 +37200,3 @@ tools/workflows/tier2-review.test.sh	p.js:9	1	9e21ac760dc0a43d6ed007396922722cce
 tools/workflows/tier2-review.test.sh	security.js:1	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh32-pathless.js:3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh36-mid.js:2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/RUN.LANDED.bc313f97.md	branch_reconcile.py:520	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-16
-memory/builds/dTotalRecall/RUN.LANDED.bc313f97.md	check-recall.py:511	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-16
-memory/builds/dTotalRecall/RUN.LANDED.bc313f97.md	gen_build_index.py:4073	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-16
-memory/builds/dTotalRecall/RUN.LANDED.bc313f97.md	gen_build_index.py:8576	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-16
-memory/builds/dTotalRecall/RUN.LANDED.bc313f97.md	row_grammar.py:1116	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-16

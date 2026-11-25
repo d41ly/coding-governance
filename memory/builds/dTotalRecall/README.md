@@ -196,7 +196,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113 TOOL-dTotalRecall-114
 | [TOOL-dTotalRecall-114 — the close's first bar: each red of the merged tree is repaired at its cause, converted where a conversion is short and widened through its ledger where the need is real](spec/2026-10-26-spec-TOOL-dTotalRecall-114.md) | 42 | 2 | CLOSED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 914 bound to this build, across 4 record folder(s).
+Records: 918 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -309,9 +309,9 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-25-build-TOOL-dTotalRecall-114-deviation-1015.md`, `2026-11-24-build-TOOL-dTotalRecall-87-deviation-1014.md` and 150 more under build/ |
 | red-fix | `2026-11-24-build-TOOL-dTotalRecall-60-red-fix-26.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md` and 24 more under build/ |
-| widen | `2026-11-25-build-TOOL-dTotalRecall-114-widen-23.md`, `2026-11-25-build-TOOL-dTotalRecall-114-widen-22.md` and 20 more under build/ |
+| widen | `2026-11-25-build-TOOL-dTotalRecall-114-widen-26.md`, `2026-11-25-build-TOOL-dTotalRecall-114-widen-25.md` and 23 more under build/ |
 | research | `2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md`, `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md` and 112 more under build/ |
-| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-114-1-acceptance-ledger.md` and 175 more under build/ |
+| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-114-1-builder-return.md` and 176 more under build/ |
 | open asks | `BACKLOG.md`, 16 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->

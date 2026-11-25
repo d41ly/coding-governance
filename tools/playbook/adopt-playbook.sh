@@ -508,7 +508,7 @@ bad-note-refs|1|site.py:1: `# gov:note layer.memory — x → y refs=a b` refs s
 leg-unregistered|0|edges: leg rows · 1 tests target(s) unarmed until their namespace is registered|is not registered
 leg-unregistered|0|edges: green · 1 edge(s)
 leg-unarmed|0|edges: green · 1 edge(s)|resolves to no row
-leg-unarmed|0|edges: gate-legs.json:4 · tests · feature.x|leg rows
+leg-unarmed|0| · tests · feature.x|leg rows
 leg-resolved|0|edges: resolved · gate-legs.json:
 leg-resolved|0|· tests=layer.memory · layer.memory
 leg-resolved|0|· enforces=practice.land · practice.land
