@@ -915,8 +915,8 @@ def run_guard_plant(case, top):
         write_fixture_files(top, dict(files, **{rel: moved}))
         run_fixture_git(top, "add", "-A")
         run_fixture_git(top, "commit", "-q", "-m", "the kits, the default moved")
-        run_scenario("the default read back", [sys.executable, "-B", "fx/policy/policy.py", "get", "policy-file.guard"], 0,
-                     "agents-with-reason")
+        run_scenario("the default read back", [sys.executable, "-B", "fx/%s/policy.py" % "policy", "get", "policy-file.guard"],
+                     0, "agents-with-reason")
         for name in ("off a run", "on %s" % FX_BRANCH):
             if name != "off a run":
                 run_reset()
@@ -924,7 +924,7 @@ def run_guard_plant(case, top):
             write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
             write_fixture_record(top, "policy.review.max-rounds")
             write_staged(top, {mguard.DECISIONS: add_text("- %s · review.max-rounds 3 -> 4: the fixture\n" % FX_UNIT)})
-            run_scenario(name, [sys.executable, "fx/loop/guard.py", "--staged"], 1,
+            run_scenario(name, [sys.executable, "fx/%s/guard.py" % "loop", "--staged"], 1,
                          "policy-file.guard = owner-only admits an agent's write only as")
     elif case == "landed-unread":
         run_fixture_git(top, "remote", "add", "origin", pathlib.Path(top).as_posix())
