@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-3 — a build's and an overlay's sweep touch only the rows that the trees and edits they let go of held
 
-**Status:** SPECCED · rev-1 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md](../build/2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md) | research | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-4 |
 | [2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md) | research | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-4 |
+| [2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md](../reviews/2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-4 |
 
 <!-- /gen:spec-records -->
 
@@ -17,7 +18,9 @@ Every build of an unbuilt tree ends by scanning the whole of `path_row`, `blob_r
 for rows nothing holds. On the 12.6 GB copy two such sweeps took 537 s of one check, and the rows they
 scan are mostly those of dead extractor versions (PINNED, the diagnosis, 2026-11-25). After this unit a
 build and an overlay look only at the rows that the trees and uncommitted edits they let go of held.
-`--gc` keeps the full sweep. No row any worktree is served changes.
+`--gc` keeps the full sweep. No row a worktree's view holds is cleared while a tree or an edit of that
+worktree holds it. A command whose view is let go of while it reads refuses and asks to be re-run, where
+today it can read nothing and say so as a verdict.
 
 ## 2. Scope (IN)
 
@@ -34,12 +37,19 @@ build and an overlay look only at the rows that the trees and uncommitted edits 
   rows wait for the next build by any worktree. Observed by AC1 and AC2.
 - **S5** — `remove_unheld_rows` keeps the full sweep alone, as `remove_unheld_rows(con)`, and
   `tools/playbook/tag_index.py#remove_dead_versions` calls S1 and then it. Observed by AC3.
-- **S6** — Two new plants, `released-rows` and `released-cost`, in `tools/playbook/gov_tag.py`, each
-  with its row in the tag resolver's plant table of `tools/playbook/adopt-playbook.sh`. Observed by
-  AC1, AC2 and AC3.
+- **S6** — Three new plants, `released-rows`, `released-cost` and `moved-view`, in
+  `tools/playbook/gov_tag.py`, each with its row in `SELFTEST_ROWS` of `tools/playbook/tag_bundle.py`.
+  Observed by AC1, AC2, AC3 and AC8.
 - **S7** — The docstrings of the functions above, and the index paragraph of
   `tools/playbook/README.md`, say that a build and an overlay clear only what the trees and dirty rows
   they let go of held, and that `--gc` alone sweeps the row tables whole. Observed by AC6.
+- **S8** — A new function, `check_view_held(con)`, in `tools/playbook/tag_index.py` raises a `TagError`,
+  `the view moved while it was read, so nothing is said: re-run`, when `view_path` holds no path, or holds
+  a pair that no tree row and no dirty row holds. Observed by AC8.
+- **S9** — Every command that reads a view calls S8 after its last read of that view and before it prints
+  what it read. Section 4 names the five places. Observed by AC8 and AC10.
+- **S10** — `help/tags.md` says that a command whose worktree moved under it while it read refuses with
+  that line and is run again. Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -53,9 +63,19 @@ build and an overlay look only at the rows that the trees and uncommitted edits 
   follows the trees held.
 - A new SQL index, a schema change, or a stored table of released pairs.
 - Any open of either live index file. Every measurement runs on a private copy or a fixture.
+- Any run, from the building worktree before the owner's go, of what opens the live index: the legs
+  `tags (the resolver's checks)`, `instruction edits (manifest checks)`,
+  `edges (every declared edge parses, is registered and resolves)` and `instruction units selftest`, and a
+  `gov_tag.py` verb outside `--fixture`. This unit is verified by `--fixture` plants and private copies.
+- A lock or a transaction held across a command's reads, and a retry inside the command.
 
 ### Edges
 
+- **consumes-from** `TOOL-aPrunedIndex-1` — `path_row_version` and the new joins. AC5's copy, the plans of
+  section 4 and AC9's whole check rest on them.
+- **consumes-from** `TOOL-aPrunedIndex-2` — `path_row_named`, for the same three.
+- **hands-off** `TOOL-aPrunedIndex-4` — `remove_dead_holders` and `remove_unheld_rows(con)`, which its
+  `--gc` runs through, and the `released-rows`, `released-cost` and `moved-view` rows its AC8 times.
 - **hands-off** external — the owner's word in the building session before this code first opens the
   live index.
 
@@ -129,7 +149,7 @@ and an index on its blob as the way past it.
 ### What does not change
 
 - What a worktree is served. `load_view` fills its view from `tree_path` and `dirty_path`, and a row is
-  cleared only when neither table holds its pair.
+  cleared only when neither table holds its pair. A command that holds an older view meets S8.
 - A worktree on older code. Its builds run the full sweep over the same file, which clears only rows
   nothing holds, under the same write lock.
 
@@ -138,10 +158,46 @@ and an index on its blob as the way past it.
 - A row nothing held before this code ran, such as one an older worktree's overlay left. No set names
   it, so it stays until a `--gc` or an older worktree's build. No view holds its pair, so none serves
   it. If its pair is held again, its rows are right: they are keyed by content, version and conf.
-- Two commands of one worktree with an edit to a file between them. The second command's overlay clears
-  the first edit's rows while the first command still reads its own view. Today those rows last until
-  the next build by any worktree. A commit between two such commands already opens the same window
-  through the build's sweep.
+- A view let go of and held again before the command's check, such as an edit made and reverted with a
+  build after each. The pairs are held again and their rows written again, so S8 sees nothing. A read in
+  between found no row.
+
+### The reader's refusal
+
+A command reads in many autocommit statements over the pairs `load_view` put in `view_path`. Another leg of
+the same worktree that meets an edit now releases the earlier blob's rows at once, where today they last
+until the next build. A commit, a removed worktree and a base tree no HEAD names open the same window
+through a build's sweep, today too. The window was run on 2026-11-25 over this design's prototype: a
+definition served before the edit, the commit and the removal was served by no row after each.
+
+`check_view_held(con)` runs one statement, after the empty-view test:
+
+```sql
+SELECT 1 FROM view_path v
+ WHERE NOT EXISTS (SELECT 1 FROM tree_path t WHERE t.path=v.path AND t.blob=v.blob)
+   AND NOT EXISTS (SELECT 1 FROM dirty_path d WHERE d.path=v.path AND d.blob=v.blob) LIMIT 1
+```
+
+Rows are cleared only for a pair nothing holds, so a view whose every pair is held at the end lost no row,
+but for the last bullet above. On the clean copy's view of 15,732 paths it took 0.22 s cold and 0.02 s
+warm, searching `tree_path_blob` per pair (PINNED, 2026-11-25). An empty view is refused because a tree let
+go of between its build and the fill of the view leaves one.
+
+It is called in five places:
+
+1. `tools/playbook/gov_tag.py#run_check`, before each of its two later `load_view` calls replaces a view it
+   read, and after its last served read, ahead of the summary.
+2. `tools/playbook/gov_tag.py#run_kit_verb`, after the rows of `show`, `where` and `refs` are read, and
+   `run_bundle_verb` before it says an address resolves to no row.
+3. `tools/playbook/tag_bundle.py#read_bundle_rows`, before it returns.
+4. `tools/playbook/edge_grammar.py#run_resolve`, after its last target, when its context opened an index.
+5. The resolver `tools/playbook/instruction_units.py#load_resolver` returns, when an address answers no row
+   but a `doc` one. A release only takes rows away, and its callers ask only whether such a row answers.
+
+Each command already answers the `TagError` a locked index raises where it opens its view: `gov_tag.py` and
+`edge_grammar.py` refuse with exit 2, and `instruction_units.py` prints a red with exit 1. `rebuild` and
+`--gc` read no view. An unrelated build refuses no reader of a worktree's own HEAD and edits, whose
+pairs stay held. It can refuse a reader of a base tree no HEAD names, as section 5 says.
 
 ### The plants
 
@@ -190,7 +246,26 @@ filter's dirty half absent; and `blob_row` left uncleared. The step that inserts
 rows was not prototyped. The existing plant rows for rebuilds, worktrees, dirty edits, versions and
 conf keys, 25 of them, ran green on the prototype.
 
-What the two do not check: wall time, disk reads, and a planner that holds `sqlite_stat` tables. In the
+**`moved-view`** grades S8 and S9, in the fixture's repository with one linked worktree. Each step loads
+a view, changes what holds it, and compares the rows served to the open connection and what
+`check_view_held` says:
+
+1. A build by the other worktree that lets go of nothing the view holds. The rows stay and it says nothing.
+2. An edit to a dirty guide, then a build by the same worktree. The rows are gone and it refuses.
+3. A commit of an edit, with the other worktree moved off the old tree, then a build. The same.
+4. The view of the linked worktree, which is removed and pruned, then a commit and a build. The same.
+5. A base tree's view, `overlay=False`, that a build lets go of. The same.
+6. `check` with `ti.check_unclosed` wrapped to edit a guide and build first. It must raise that `TagError`
+   and print no verdict line.
+7. `edge_grammar.run_resolve` and the `load_resolver` of the fixture's root, each with its view loaded
+   before an edit and a build. Each must raise.
+
+It records the connections it opens by wrapping `ti.load_index`, and closes them. Its last line ends
+`every moved view refused, every held one read`. A prototype was green on 2026-11-25 for every step but the
+raises of step 7, whose empty answers and refusing check it read apart. It took 12 s on a busy machine, and
+with `check_view_held` emptied its step 6 printed a green verdict.
+
+What the first two do not check: wall time, disk reads, and a planner that holds `sqlite_stat` tables. In the
 overlay half, a scan made by a SELECT ahead of the delete is not counted.
 
 ### Inventory
@@ -200,7 +275,8 @@ overlay half, a scan made by a SELECT ahead of the delete is not counted.
 | `remove_dead_holders` | function | `py.function`, answered OK by `lexicon.py --suggest` |
 | `remove_released_rows` | function | `py.function`, answered OK by `lexicon.py --suggest` |
 | `released` | temp table | none grades it |
-| `released-rows`, `released-cost` | plants | none grades them |
+| `check_view_held` | function | `py.function`, answered OK by `lexicon.py --suggest` |
+| `released-rows`, `released-cost`, `moved-view` | plants | none grades them |
 
 ### Migration
 
@@ -208,8 +284,10 @@ None. No stored table or key moves. The first build by this code clears what it 
 
 ### Files touched (estimate)
 
-- `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`, `tools/playbook/adopt-playbook.sh`
-- `tools/playbook/README.md`
+- `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`, `tools/playbook/tag_bundle.py`
+- `tools/playbook/edge_grammar.py`, `tools/playbook/instruction_units.py`
+- `tools/playbook/README.md`, `help/tags.md`
+- `memory/map/generated/symbols.json`, regenerated by `gen_map.py --write` for the new functions
 
 ### Alternatives rejected
 
@@ -217,6 +295,12 @@ None. No stored table or key moves. The first build by this code clears what it 
   leave rows behind, and the file would grow between collections.
 - The overlay left as it is. Its replaced rows would stay until `--gc`, since no later set names them.
   The prototype's first break shows it: 5 path rows after one replaced edit and 20 after four.
+- The overlay's release put off by a generation, so a running command keeps its rows. It needs a stored
+  table of released pairs, which section 3 rules out, and leaves the commit's window open.
+- A read transaction across a command. The journal mode is DELETE, so it would hold every writer of the
+  node out for as long as a check reads.
+- A check of the worktree's `dirty_path` rows alone. It misses a commit, a removed worktree and a base tree.
+- The plants' rows in `tools/playbook/adopt-playbook.sh`, for the leg time unit 1 states.
 - A Python loop asking per pair whether a holder remains. It makes the same seeks as the statements
   above, one call each.
 
@@ -226,13 +310,16 @@ None. No stored table or key moves. The first build by this code clears what it 
 - perf / scale: a sweep costs one seek per released pair and one per row it clears. An overlay whose
   worktree held no dirty row adds one read.
 - error / empty / loading states: an empty set returns at once. The write lock, its 600 s wait and its
-  refusal are unchanged, and a failed block rolls back whole.
-- observability: unchanged. No line of `check` or of `--gc` moves.
+  refusal are unchanged, and a failed block rolls back whole. A view that moved is
+  refused as a locked index is.
+- observability: S8's refusal. No other line of `check` or of `--gc` moves.
 - risks: clearing a row some worktree is served, which `released-rows` reds through its `lost` count.
-  The second is the window between two commands of one worktree that section 4 names.
-- testing: the two plants, each with its staged breaks, and the paired run of AC4.
+  The second is a read of a view another command let go of, which S8 refuses and `moved-view` reds, but for
+  the case section 4 says it cannot see. The third is a refusal on a busy node: a build elsewhere that lets
+  go of the base tree inside the seconds its rows are read asks for a re-run.
+- testing: the three plants, each with its staged breaks, and the runs of AC4 and AC9.
 - migration: none, as section 4 says.
-- user docs: N/A — no command, line or refusal a user sees moves. The kit page gains S7's sentence.
+- user docs: `help/tags.md` gains S10's sentence, and the kit page S7's.
 
 ## 6. Acceptance criteria
 
@@ -262,7 +349,7 @@ None. No stored table or key moves. The first build by this code clears what it 
 - **AC5** — When `EXPLAIN QUERY PLAN` runs on that copy over the five statements of
   `remove_released_rows`, none names a scan of `tree_path`, `path_row`, `blob_row` or `blob_parsed`.
   Red when: the planner serves a clear from a scan of its table.
-  fixture: the copy AC4 makes, opened through this code so units 1 and 2 are on it.
+  fixture: the copy AC4 makes, opened through this code so the indexes of units 1 and 2 are on it.
 - **AC6** — When `grep -n "remove_unheld_rows" tools/playbook/tag_index.py` runs, its only lines that
   define or call it are the definition taking `con` alone and the call in `remove_dead_versions`. When
   `grep -c "let go of" tools/playbook/README.md` runs, it prints 1 or more.
@@ -272,13 +359,35 @@ None. No stored table or key moves. The first build by this code clears what it 
   `queued-writers`, each exits 0.
   Red when: a pair two holders share loses its rows, a pruned worktree's dirty rows stay, or a write
   block no longer opens with the write lock.
+- **AC8** — When `python tools/playbook/gov_tag.py --fixture --plant moved-view` runs, its step 1 reads its
+  rows and is not refused, each of steps 2 to 7 is refused with `the view moved`, and it exits 0.
+  Red when: `check_view_held` is emptied, or its dirty half or its tree half is dropped from the statement,
+  or `run_check`, `run_resolve` or the resolver does not call it.
+- **AC9** — When `gov_tag.py check` runs with the unit's source over a private copy of the 12.6 GB index on
+  which both SQL indexes stand and the HEAD and compare-base trees are unbuilt, it finishes below 420 s of
+  wall, and the unit's record names its wall and CPU seconds and the load of the machine.
+  Red when: a read, a name probe or a sweep still walks the dead versions, so it passes the ceiling.
+  cost: 12.6 GB of scratch disk, about 205 s for the two indexes, and from the diagnosis about 122 s.
+  fixture: the 12.6 GB copy the building session's scratch holds, copied once more or restored after, with
+  `derive_index_path` answering it as in AC4.
+  figure: the ceiling is DERIVED from the `ceiling` of the leg in `tools/gate-legs.json`; the seconds are
+  DERIVED at observation time.
+- **AC10** — When `grep -c check_view_held` runs over `tools/playbook/tag_index.py`,
+  `tools/playbook/gov_tag.py`, `tools/playbook/tag_bundle.py`, `tools/playbook/edge_grammar.py` and
+  `tools/playbook/instruction_units.py`, each prints 1 or more, and `tools/playbook/gov_tag.py` 6 or more.
+  When `grep -n "view moved" help/tags.md` runs, it prints S10's sentence.
+  Red when: a command that reads a view says its result with no check, or the page omits the refusal.
 
 ## 7. Gates
 
-`tags (the resolver's checks)` · `instruction edits (manifest checks)` · `edges (every declared edge parses, is registered and resolves)` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`tags (the resolver's checks)` · `instruction edits (manifest checks)` · `edges (every declared edge parses, is registered and resolves)` · `instruction units selftest` · `tags bundle selftest` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC3 · the `released-rows` row; staged red with `build_overlay` passing no set, with the pair filter absent, and with `remove_dead_versions` calling no full sweep · none
-New arm: tools/playbook/adopt-playbook.sh · covers AC2 · the `released-cost` row; staged red with `remove_unheld_rows` called from `build_index`, and again from `build_overlay` · none
+Those of the line that open the live index, the four section 3 lists, are owed at the close, after the
+owner's go, and by no pass before it.
+
+New arm: tools/playbook/tag_bundle.py · covers AC1 AC3 · the `released-rows` row; staged red with `build_overlay` passing no set, with the pair filter absent, and with `remove_dead_versions` calling no full sweep · none
+New arm: tools/playbook/tag_bundle.py · covers AC2 · the `released-cost` row; staged red with `remove_unheld_rows` called from `build_index`, and again from `build_overlay` · none
+New arm: tools/playbook/tag_bundle.py · covers AC8 · the `moved-view` row; staged red with `check_view_held` emptied, with each half of its statement absent, and with the call absent from `run_check`, from `run_resolve` and from the resolver · none
 
 ## 8. Open questions
 
@@ -287,17 +396,25 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-25 · initial draft.
+- rev-2 · 2026-11-25 · §1 §2 §3 §4 §5 §6 §7 §10 S6 S8 S9 S10 AC8 AC9 AC10 · folded
+  `2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1`: finding 16 (a reader whose view
+  moved refuses, the class-level fix, with its plant), 3 (AC9 measures the whole check against its ceiling),
+  5 (the edges to units 1 and 2), 12 (the plants' rows move to `tags bundle selftest`), 14 (the legs that
+  open the live index), 15 (the symbol map).
 
 ## 10. Reuse audit
 
 `tools/codebase-map/reuse_lookup.py "delete index rows no tree or worktree holds any more"` named
 `build_index`, `load_index` and `read_rows` of `tools/playbook/tag_index.py` and no other eviction seam.
 The seams extended are `remove_unheld_rows`, split in two, `build_overlay`, `remove_dead_versions`, and
-for the plants `write_commit`, `read_dump`, `run_gc`, `print_equal` and the plant table of
-`tools/playbook/adopt-playbook.sh`. Unit 1's `read_step_count` does not fit `released-cost`: it counts
-one read, and this plant counts the statements of two windows inside one `load_view`, where the parse
-ledger a build reads would otherwise hide the sweep. Recall answered PLAY-dOrderedCharter-51 with its
-deviation 513, TOOL-aQueuedIndex-1 and KICK-dKeptSession-87. The performance review of TOOL-aMeasuredDrag-1
-proposed the sweep in `--gc` alone, which section 4 rejects.
+for the plants `write_commit`, `read_dump`, `run_gc`, `print_equal` and the row table of
+`tools/playbook/tag_bundle.py#run_selftest`. For S8 a second probe, "refuse when the index rows a command
+read were released while it read them", named no seam but `read_rows`. `TagError` is the refusal every
+caller already answers, so `check_view_held` raises it and no caller gains a handler. Unit 1's
+`read_step_count` does not fit `released-cost`: it counts one read, and this plant counts the statements
+of two windows inside one `load_view`, where the parse ledger a build reads would otherwise hide the
+sweep. Recall answered PLAY-dOrderedCharter-51 with its deviation 513, TOOL-aQueuedIndex-1 and
+KICK-dKeptSession-87. The performance review of TOOL-aMeasuredDrag-1 proposed the sweep in `--gc` alone,
+which section 4 rejects.
 
 Recall terms used: tag index sweep unheld rows tree_path dirty_path overlay path_row blob_row blob_parsed gc worktree eviction shared

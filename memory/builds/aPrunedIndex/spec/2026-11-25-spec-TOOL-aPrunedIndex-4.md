@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-4 — `--gc` skips a worktree that predates the tag registry, and still refuses one it cannot read
 
-**Status:** SPECCED · rev-1 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 4 · closes KICK-dKeptSession-87
+**Status:** SPECCED · rev-2 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 4 · closes KICK-dKeptSession-87
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md](../build/2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md) | research | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 |
 | [2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md) | research | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 |
+| [2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md](../reviews/2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 |
 
 <!-- /gen:spec-records -->
 
@@ -30,24 +31,33 @@ the line there.
   derives nothing from a skipped worktree: no version pair, no digest and no conf key. Observed by AC1
   and AC5.
 - **S2** — Every other worktree is read as today, and one that cannot be read refuses the whole
-  collection, naming it, with nothing deleted. That covers a registry HEAD holds and the working tree
-  lacks, a registry on disk that does not parse, an unreadable extractor module, and a HEAD git cannot
-  read. Observed by AC2.
+  collection, naming it, and no row moves. That covers a registry HEAD holds and the working tree
+  lacks, a registry on disk that does not parse, an unreadable extractor module, a HEAD git cannot
+  read, and a `.memory-tree.conf` that cannot be read. The last is one that does not decode or open, one
+  at whose path something other than a file stands, and one HEAD holds and the working tree lacks. A
+  worktree that holds none in either place derives the default key, as today. Observed by AC2 and AC7.
 - **S3** — A registry on disk is read even when HEAD holds none, so the versions of a worktree merging
   the registry in, or adding it uncommitted, stay live. Observed by AC3.
 - **S4** — When no worktree yields a version, `--gc` refuses and no row changes. An empty live set
   would otherwise collect the whole index. Observed by AC4.
 - **S5** — `tools/playbook/gov_tag.py#run_gc` prints one line per skipped worktree before its
   collected line, which keeps its bytes. Observed by AC1.
-- **S6** — A new plant, `gc-predates`, in `tools/playbook/gov_tag.py`, and its row in the tag
-  resolver's plant table of `tools/playbook/adopt-playbook.sh`. Observed by AC1, AC2, AC3 and AC4.
+- **S6** — A new plant, `gc-predates`, in `tools/playbook/gov_tag.py`, and its row in `SELFTEST_ROWS` of
+  `tools/playbook/tag_bundle.py`. Observed by AC1, AC2, AC3, AC4 and AC7.
 - **S7** — The sentence stating what `--gc` refuses, in `tools/playbook/README.md`, `help/tags.md` and
   the `gov_tag.py` module docstring, says what it skips too. Observed by AC6.
+- **S8** — The `tags bundle selftest` row of `tools/run-gates/selftest-budgets.txt`, and that leg's row of
+  `tools/run-gates/ceiling-evidence.txt`, carry a reading of the leg with this build's six plants in it.
+  Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
 - Any run of `--gc`, VACUUM or a deletion on either live index file. Every criterion here runs in a
   fixture, or reads git and the registries without opening an index.
+- Any run, from the building worktree before the owner's go, of what opens the live index: the legs
+  `tags (the resolver's checks)`, `instruction edits (manifest checks)`,
+  `edges (every declared edge parses, is registered and resolves)` and `instruction units selftest`, and a
+  `gov_tag.py` verb outside `--fixture`. This unit is verified by `--fixture` plants and private copies.
 - Collecting on a plain build, and evicting by age.
 - Skipping a worktree that is merely unreadable, whatever the reason.
 - Looking for a registry at another kit path than the collecting worktree's own.
@@ -58,6 +68,11 @@ the line there.
 
 ### Edges
 
+- **consumes-from** `TOOL-aPrunedIndex-1` — its `dead-versions` row, one of the six AC8 times.
+- **consumes-from** `TOOL-aPrunedIndex-2` — its `named-probe` row, for the same.
+- **consumes-from** `TOOL-aPrunedIndex-3` — its `released-rows`, `released-cost` and `moved-view` rows, for
+  the same, and the split of the sweep into `remove_dead_holders` and `remove_unheld_rows(con)`, which
+  `remove_dead_versions` calls.
 - **hands-off** external — the first collection of the live index, which the owner runs or orders in
   the building session.
 
@@ -68,8 +83,8 @@ the line there.
 `tools/playbook/tag_index.py#read_live_versions` iterates the top-level paths
 `read_worktree_trees` returns, reads each registry, and raises on the first `TagError`. It is called
 by `remove_dead_versions` alone, before the write lock, and `remove_dead_versions` is called by
-`run_gc` alone. `read_worktree_trees` also serves `remove_unheld_rows` and `read_index_rows`, and
-the latter calls `.discard` on both returned sets, so its return shape stays.
+`run_gc` alone. `read_worktree_trees` also serves `remove_dead_holders`, after unit 3 splits the sweep, and
+`read_index_rows`, and the latter calls `.discard` on both returned sets, so its return shape stays.
 
 The rule was run over the real tree first, with no index opened. On 2026-11-25, PINNED, it read 106
 worktrees and skipped four: `blissful-khayyam-69a7df`, `deterministic-attended-workflows-943570`,
@@ -88,6 +103,11 @@ took 123 s.
    `read_git(root, "ls-tree", "--full-tree", "--name-only", head, "--", rel)` is empty. `rel` is
    `kit_rel` joined to `namespaces.toml` in POSIX form. The skipped `top` joins a list, which becomes
    the fourth element of the return.
+   Inside the same `try`, before `load_conf`, it refuses when `.memory-tree.conf` is no regular file there
+   and either `os.path.lexists` finds something at that path or the same `ls-tree` finds that name in
+   `head`. `load_conf` moves inside the `try`, which takes `OSError` and `UnicodeDecodeError` too, so every
+   one of these names the worktree. `load_conf` itself answers an empty map for a path that is no file, for
+   every other caller, and is not edited.
 3. After the loop, an empty `pairs` raises
    `--gc: no worktree holds <rel>, so nothing is collected`.
 4. `remove_dead_versions` returns `(rows, versions, skipped)`.
@@ -132,11 +152,18 @@ The disk test comes first, so a worktree holding a registry costs no extra git c
 5. It calls `run_gc` with the kit path `tools/nokit`, which no worktree holds. It must raise a
    `TagError` naming the `tools/nokit` registry path, and the rows of `root`, above 0, must not move.
 
+6. It commits in `wt4` a `.memory-tree.conf` whose `CHARTER` is not the default and that charter, builds
+   `wt4`, and counts the `path_row` rows of its conf key, which must be above 0. It deletes the conf from
+   disk, then puts a directory at its path, then bytes that do not decode. After each, `run_gc` must raise
+   a `TagError` naming `wt4`, and the count must not move. It restores the conf, and `run_gc` must exit 0
+   with the count unmoved.
+
 It prints one line per step. Its last line is printed only when every condition holds, and ends
-`refused on wt4, wt3 read and then skipped by name, refused on none`. It exits 0 then, and 1 otherwise.
+`refused on wt4, wt3 read and then skipped by name, refused on none, refused on a conf`. It exits 0 then,
+and 1 otherwise.
 
 A prototype of this plant, over a patched `read_live_versions` held in scratch, ran green on
-2026-11-25. These breaks of it each turned a step red:
+2026-11-25, step 6 included, whose conf key held 16 rows. These breaks of it each turned a step red:
 
 | break | first step that reds |
 |---|---|
@@ -144,6 +171,7 @@ A prototype of this plant, over a patched `read_live_versions` held in scratch, 
 | skip on absence from disk alone | 2, collected with `wt4` unreadable |
 | skip on absence from HEAD alone | 3, the live rows of `wt3` collected |
 | no refusal on an empty live set | 5, the rows of `root` collected |
+| no refusal on an absent or non-file conf | 6, the 16 rows of `wt4`'s conf key collected |
 
 ### Migration
 
@@ -161,11 +189,17 @@ plant, `gc-predates`, and one output line, `tag-index — skipped:`, which no ce
 
 ### Files touched (estimate)
 
-- `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`, `tools/playbook/adopt-playbook.sh`
+- `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`, `tools/playbook/tag_bundle.py`
 - `tools/playbook/README.md`, `help/tags.md`
+- `memory/map/generated/symbols.json`, regenerated by `gen_map.py --write` for the new function
+- `tools/run-gates/selftest-budgets.txt`, `tools/run-gates/ceiling-evidence.txt`
 
 ### Alternatives rejected
 
+- The plant's row in the tag resolver's plant table of `tools/playbook/adopt-playbook.sh`, for the leg time
+  unit 1 states.
+- A refusal only where the conf is absent from disk and held by HEAD. A directory at its path is neither
+  absent nor an error to `load_conf`, so it would still derive the default key.
 - Skip every unreadable worktree, the widest reading of the ask. A registry deleted by mistake, or a
   half-written one, would then lose that worktree's live rows with only a printed line.
 - Ask HEAD alone. The prototype collected the live rows of a worktree holding an uncommitted registry.
@@ -178,13 +212,14 @@ plant, `gc-predates`, and one output line, `tag-index — skipped:`, which no ce
 
 - security: no new write path or grant. The sha and path passed to git are git's own output and the
   kit's own location.
-- perf / scale: one `git ls-tree` per worktree with no registry on disk, four on this node today.
+- perf / scale: one `git ls-tree` per worktree with no registry on disk, four on this node today, and one
+  per worktree with no conf on disk, none on this node on 2026-11-25.
 - error / empty / loading states: every git failure refuses. An empty live set refuses.
 - observability: one line per skipped worktree, and the refusal still names its worktree.
 - risks: a wrong skip costs a re-parse and never a wrong row, because reads join on the reading
   worktree's own versions. A reader open in that worktree during the collection can miss rows. A
   skipped worktree holds no registry at the kit path, so `gov_tag.py` there has nothing to read with.
-- testing: the `gc-predates` plant, its four breaks, and the read-only run over the real worktrees.
+- testing: the `gc-predates` plant, its five breaks, and the read-only run over the real worktrees.
 - migration: N/A — no stored shape moves.
 - user docs: `help/tags.md` and `tools/playbook/README.md`.
 
@@ -215,12 +250,31 @@ plant, `gc-predates`, and one output line, `tag-index — skipped:`, which no ce
 - **AC6** — When `grep -n "predates" tools/playbook/README.md help/tags.md tools/playbook/gov_tag.py`
   runs, each file prints the sentence on what `--gc` skips.
   Red when: a page still says only that `--gc` refuses.
+- **AC7** — When `gc-predates` runs step 6, `--gc` refuses naming `wt4` for a conf deleted from disk, for a
+  directory at its path and for bytes that do not decode, with the rows of its conf key above 0 and
+  unmoved, and collects nothing of them once the conf is back.
+  Red when: `load_conf` runs with no test ahead of it, so an absent or non-file conf reads as the default
+  key and the rows are collected, or stands outside the `try`, so the last is a traceback naming no
+  worktree.
+- **AC8** — When the main loop times `tags bundle selftest` alone once, after the last unit of the build is
+  built, its wall is below the leg's 300 s `ceiling` of `tools/gate-legs.json`. The budget row carries 1.5
+  times that reading, floored at 60, and names it, and the evidence row is written from it by
+  `derive-ceilings.py --write`.
+  Red when: the six plants take the leg to its ceiling, so it is killed before it reports an arm.
+  permission: a pass runs no self-test leg, so this reading is the main loop's, at the close.
+  cost: the leg read 22 s before this build. The plants' prototypes took 8 to 22 s for `dead-versions`, 3 to
+  5 s for `named-probe`, 12 s for `moved-view` and 17 to 35 s for `gc-predates`, on a machine running other
+  bars; the record of unit 3 names the seconds of its other two.
+  figure: DERIVED at observation time.
 
 ## 7. Gates
 
-`tags (the resolver's checks)` · `instruction edits (manifest checks)` · `edges (every declared edge parses, is registered and resolves)` · `lexicon naming predicates` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
+`tags (the resolver's checks)` · `instruction edits (manifest checks)` · `edges (every declared edge parses, is registered and resolves)` · `instruction units selftest` · `lexicon naming predicates` · `tags bundle selftest` · `playbook render selftest` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `govkit acceptance matrix` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 · the `gc-predates` row; staged red four times, once per break in section 4's table · none
+Those of the line that open the live index, the four section 3 lists, are owed at the close, after the
+owner's go, and by no pass before it.
+
+New arm: tools/playbook/tag_bundle.py · covers AC1 AC2 AC3 AC4 AC7 · the `gc-predates` row; staged red five times, once per break in section 4's table · none
 
 ## 8. Open questions
 
@@ -229,6 +283,11 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-25 · initial draft.
+- rev-2 · 2026-11-25 · §2 §3 §4 §5 §6 §7 S2 S6 S8 AC7 AC8 · folded
+  `2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1`: finding 6 (`remove_dead_holders` is
+  the caller after unit 3), 12 (the plant's row moves to `tags bundle selftest`, and AC8 times that leg), 14
+  (the legs that open the live index), 15 (the symbol map), 18 (a conf that cannot be read refuses, the
+  class-level fix, with step 6).
 
 ## 10. Reuse audit
 

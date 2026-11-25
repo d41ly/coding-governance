@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-2 — a build finds an already-named path through a partial index, and reads no parse ledger without a blob
 
-**Status:** SPECCED · rev-1 · 2026-11-25 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-25 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md](../build/2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md) | research | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 |
 | [2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md) | research | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 |
+| [2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md](../reviews/2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 |
 
 <!-- /gen:spec-records -->
 
@@ -26,13 +27,11 @@ overlay with no blob reads no ledger. No row and no verdict changes.
   Observed by AC1, AC2 and AC5.
 - **S2** — `tools/playbook/tag_index.py#_write_parsed` returns before it reads `blob_parsed` when
   `blobs` is empty. Observed by AC3 and AC4.
-- **S3** — A new plant, `named-probe`, in `tools/playbook/gov_tag.py`, and its row in the tag
-  resolver's plant table of `tools/playbook/adopt-playbook.sh`. Observed by AC1, AC2 and AC3.
+- **S3** — A new plant, `named-probe`, in `tools/playbook/gov_tag.py`, and its row in `SELFTEST_ROWS` of
+  `tools/playbook/tag_bundle.py`. Observed by AC1, AC2 and AC3.
 - **S4** — The module docstring of `tools/playbook/tag_index.py` and the index paragraph of
-  `tools/playbook/README.md` each say that the `parsed` rows are found through `path_row_named`.
-  The index paragraph of `help/tags.md` says that an open which finds an SQL index missing builds it
-  once, under the write lock. Where unit 1 already wrote that sentence, this unit adds none.
-  Observed by AC6.
+  `tools/playbook/README.md` each say that the `parsed` rows are found through `path_row_named`. The help
+  page's sentence on a missing SQL index is unit 1's and covers this one. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -42,12 +41,20 @@ overlay with no blob reads no ledger. No row and no verdict changes.
 - Dropping `path_row_key`. The sweep searches by path and blob.
 - The served reads, the sweep and `--gc`, which are units 1, 3 and 4.
 - Any open of the live index files. Every measurement runs on a private copy or a fixture.
+- Any run, from the building worktree before the owner's go, of what opens the live index: the legs
+  `tags (the resolver's checks)`, `instruction edits (manifest checks)`,
+  `edges (every declared edge parses, is registered and resolves)` and `instruction units selftest`, and a
+  `gov_tag.py` verb outside `--fixture`. This unit is verified by `--fixture` plants and private copies.
 
 ### Edges
 
 - **consumes-from** `TOOL-aPrunedIndex-1` — its index on the extractor version. On that index alone
   the probe gets slower, as the table in section 4 shows, so a tree carrying unit 1 without this unit
-  must open no shared index.
+  must open no shared index. The plant counts with its `read_step_count`, and this index is built by its
+  Rollout step and named by its stderr line.
+- **hands-off** `TOOL-aPrunedIndex-3` — `path_row_named`, which unit 3's AC5, AC9 and section 4 plans rest
+  on.
+- **hands-off** `TOOL-aPrunedIndex-4` — the `named-probe` row, one of the six unit 4's AC8 times.
 - **consumes-from** external — the owner's word in the building session before this code first opens
   the live index.
 
@@ -88,31 +95,48 @@ and the file held no `sqlite_stat` table. That read is PINNED, 2026-11-25.
 ### The plant
 
 `named-probe` builds its fixture's index with `rebuild`. It derives the pairs of the HEAD tree through
-`_derive_applicable`, and counts the steps of one `_write_path_rows` call over them with
-`set_progress_handler` at one instruction.
+`_derive_applicable`. It counts one probe as
+`read_step_count(con, lambda: ti._write_path_rows(con, pairs, versions, conf))`, the helper unit 1 adds,
+whose uncounted first run takes the compile out. A step of drift remains between two counts, so the bounds
+below are ratios. A count "without" an index drops it, counts, and runs `SCHEMA` to put it back.
 
-1. It counts with no pad, with the dead pad, and with the own pad added to that. The dead pad copies
-   the fixture's own `path_row` rows under 50 version names. The own pad copies the rows of the
-   versions the fixture derives to 20 new paths each. All three counts must be equal and above 0, and
-   each pad must have written rows.
-2. It drops `path_row_named` and counts again. That count must be higher, which proves the pads reach
-   the probe.
-3. It closes the connection and opens the file through `load_index`. The index must be back, the
-   `path_row` count unchanged, and the stamp still `INDEX_SCHEMA`.
-4. It traces the statements of `build_overlay` with `set_trace_callback`, and counts those that open
+1. It counts with no pad, as the first count, which must be above 0. It also counts without
+   `path_row_named`, and without `path_row_named` and `path_row_version` together.
+2. It writes the dead pad, the fixture's own `path_row` rows under 50 version names, and counts. That
+   count must be at most 1.1 times the first. Without both indexes the count must exceed twice the same
+   count of step 1, which proves the dead rows stand on the probed paths. While `path_row_version` stands
+   the dead pad is invisible, so dropping `path_row_named` alone would prove nothing about it.
+3. It adds the own pad, the rows of the versions the fixture derives at 20 new paths each, and counts. That
+   count must be at most 1.1 times the first. Without `path_row_named` the count must exceed twice the same
+   count of step 1 and twice the first, which proves the own rows are what that index hides. Each pad must
+   have written rows.
+4. It drops `path_row_named`, closes the connection and opens the file through `load_index`. The index must
+   be back, the `path_row` count unchanged, and the stamp still `INDEX_SCHEMA`.
+5. It traces the statements of `build_overlay` with `set_trace_callback`, and counts those that open
    with `SELECT` and read `blob_parsed`. The clean worktree must give 0, and the same worktree with
    one edited guide must give 1.
 
 It prints each count on its own line. Its last line is printed only when every condition holds, carries
-the two ledger counts, and ends `equal under every pad`. It exits 0 then, and 1 otherwise.
+the two ledger counts, and ends `within a tenth under every pad`. It exits 0 then, and 1 otherwise. A
+prototype of steps 1 to 3 over the `none` fixture's 6 pairs read these counts on 2026-11-25 with SQLite
+3.53.4. They are PINNED. The plant took 3 to 5 s.
+
+| Code | first, dead pad, both pads | dead pad's proof | own pad's proof |
+|---|---|---|---|
+| this unit | 125, 126, 126 | 317, 7817 | 346, 3348 |
+| `path_row_named` out of `SCHEMA`, the version index present | 346, 348, 3348 | 317, 7817 | 346, 3348 |
+| the dead pad on unprobed paths | 125, 126, 126 | 317, 318 | 346, 3348 |
+| the own pad under another extractor | 125, 126, 126 | 317, 7817 | 346, 348 |
 
 ### Migration
 
 The first open after landing builds this index and unit 1's. The diagnosis measured the pair at about
 205 s under the write lock and 1 GB on the 12.6 GB copy, and `BUSY_TIMEOUT` is 600 s, so a waiting
 writer outlasts it. An edit to `tag_index.py` is a new extractor version, so each worktree also
-re-parses once. A rebuild of the file under a stale stamp runs the new statement too, since it splits
-`SCHEMA` on `;` and the statement holds none.
+re-parses once. Unit 1's Rollout step builds both indexes outside any leg. Each CREATE INDEX commits
+alone, so an opener killed in this one keeps unit 1's, rolls this one back with no row changed, and leaves
+the next opener to start it again. A rebuild of the file under a stale stamp runs the new statement too,
+since it splits `SCHEMA` on `;` and the statement holds none.
 
 ### Inventory
 
@@ -121,8 +145,8 @@ grades either.
 
 ### Files touched (estimate)
 
-- `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`, `tools/playbook/adopt-playbook.sh`
-- `tools/playbook/README.md`, `help/tags.md`
+- `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`, `tools/playbook/tag_bundle.py`
+- `tools/playbook/README.md`
 
 ### Alternatives rejected
 
@@ -133,7 +157,8 @@ grades either.
 
 ### Reuse
 
-The seams extended are `SCHEMA`, `_write_parsed` and the `--fixture --plant` runner. The probe
+The seams extended are `SCHEMA`, `_write_parsed`, unit 1's `read_step_count`, the `--fixture --plant`
+runner and the row table of `tools/playbook/tag_bundle.py#run_selftest`. The probe
 `tools/codebase-map/reuse_lookup.py "find whether a path's rows are already named in the shared tag
 index"` returned `read_rows` and `build_index` of `tag_index.py` and no other row-index seam. The recall
 answered KICK-dKeptSession-87 and PLAY-dOrderedCharter-44.
@@ -141,13 +166,15 @@ Recall terms used: tag index path_row parsed sentinel blob_parsed ledger probe p
 
 ## 5. Acceptance criteria
 
-- **AC1** — When `python tools/playbook/gov_tag.py --fixture --plant named-probe` runs, its three step
-  counts are equal and above 0, and it exits 0.
-  Red when: the `path_row_named` statement is removed from `SCHEMA`, whether or not unit 1's index is
-  beside it.
-- **AC2** — When `named-probe` drops `path_row_named`, its count rises. When it reopens the file
-  through `load_index`, the index is back, the `path_row` count is unchanged and the stamp is 3.
-  Red when: the pads touch no probed path, so the count stays, or `INDEX_SCHEMA` moves.
+- **AC1** — When `python tools/playbook/gov_tag.py --fixture --plant named-probe` runs, its padded counts
+  are each at most 1.1 times the first, which is above 0, and it exits 0.
+  Red when: the `path_row_named` statement is removed from `SCHEMA` with unit 1's index beside it, so the
+  count under both pads is about ten times the first.
+- **AC2** — When `named-probe` takes each pad's proof, the dead pad's count without both indexes and the
+  own pad's without `path_row_named` each exceed twice the unpadded count taken without the same indexes.
+  When it reopens the file through `load_index`, the index is back, the `path_row` count is unchanged and
+  the stamp is 3.
+  Red when: a pad touches no probed path or version, so its proof count stays, or `INDEX_SCHEMA` moves.
 - **AC3** — When `named-probe` traces `build_overlay`, a clean worktree reads `blob_parsed` 0 times and
   a worktree with one edited guide reads it once.
   Red when: the early return is removed, so the clean count is 1, or it is unconditional, so the edited
@@ -166,15 +193,23 @@ Recall terms used: tag index path_row parsed sentinel blob_parsed ledger probe p
   criterion.
   figure: DERIVED at observation time.
 - **AC6** — When `grep -c path_row_named` runs over `tools/playbook/tag_index.py` and
-  `tools/playbook/README.md`, the first prints 2 or more and the second 1 or more. When
-  `grep -n "SQL index" help/tags.md` runs, it prints the sentence S4 names.
-  Red when: the docstring or a page still describes only the sentinel row.
+  `tools/playbook/README.md`, the first prints 2 or more and the second 1 or more.
+  Red when: the docstring or the page still describes only the sentinel row.
+- **AC7** — When a child process opening AC5's copy through `load_index`, with both SQL indexes dropped, is
+  killed after its `tag-index — building:` line and before it returns, and the file is then opened again
+  through `load_index`, both indexes are present and the `path_row` count is the one read before the kill.
+  The unit's record names which index stood after the kill.
+  Red when: a kill leaves a half-built index or moves a row.
+  fixture: the copy AC5 makes.
 
 ## 6. Gates
 
-`tags (the resolver's checks)` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
+`tags (the resolver's checks)` · `tags bundle selftest` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the `named-probe` row; staged red three times, with the `path_row_named` statement removed from `SCHEMA`, with the early return removed, and with the early return unconditional · none
+The `tags` leg of the line opens the live index, so it is owed at the close, after the owner's go, and by no
+pass before it.
+
+New arm: tools/playbook/tag_bundle.py · covers AC1 AC2 AC3 · the `named-probe` row; staged red five times, with the `path_row_named` statement removed from `SCHEMA` while `path_row_version` stands, with the dead pad on unprobed paths, with the own pad under another extractor, with the early return removed, and with the early return unconditional · none
 
 ## 7. Open questions
 
@@ -183,3 +218,9 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-25 · initial draft.
+- rev-2 · 2026-11-25 · §2 §3 §4 §5 §6 S3 S4 AC1 AC2 AC6 AC7 · folded
+  `2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1`: finding 2 (each pad proved against an
+  unpadded count that lacks the same indexes), 4 (the help sentence leaves this unit), 5 (the edge to unit
+  3), 8 and 11 (`read_step_count` is the counter), 9 (the uncounted first run and the 1.1 bound), 12 (the
+  plant's row moves to `tags bundle selftest`), 13 and 17 (the killed build and AC7), 14 (the legs that open
+  the live index).
