@@ -9,7 +9,7 @@ unchanged across the copy). Nothing in the repository, and neither live index fi
 
 ## Causes, as measured
 
-1. `read_defined` (`tools/playbook/tag_index.py:1052`) asks `SELECT DISTINCT p.tag`. SQLite answers DISTINCT
+1. `read_defined` (`tools/playbook/tag_index.py@4b10fce5:1052`) asks `SELECT DISTINCT p.tag`. SQLite answers DISTINCT
    in order, so its plan is `SCAN p USING INDEX path_row_tag`: all 17.8M rows, one random lookup each.
    622 s cold, 218 s on the second run. The same join with no DISTINCT: 39 s. `0200dd0cc` fixed this shape in
    `read_rows` and `read_population` with `+p.tag`, and missed this third reader. Called twice per check.
