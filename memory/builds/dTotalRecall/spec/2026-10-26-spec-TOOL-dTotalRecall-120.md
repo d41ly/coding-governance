@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-25-build-TOOL-dTotalRecall-120-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-120-1-builder-return.md) | journal | — |
 | [2026-11-25-build-TOOL-dTotalRecall-120-2-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-120-2-acceptance-ledger.md) | log | — |
+| [2026-11-25-build-TOOL-dTotalRecall-120-2-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-120-2-builder-return.md) | journal | — |
 | [2026-11-25-build-TOOL-dTotalRecall-120-widen-31.md](../build/2026-11-25-build-TOOL-dTotalRecall-120-widen-31.md) | widen | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-120-build-2-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-build-2-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-120-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-build-brief.md) | journal | — |

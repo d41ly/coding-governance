@@ -33,6 +33,6 @@ Probes over that draft, before the restore (they stand in for the record causes 
 
 The bug-class checklist was not run, because there is no commit. The rest of §7's legs, and the RED-first observation of the new suite arm, stay owed to the close.
 
-A RED FOR THE MAIN LOOP, outside this unit. `python tools/memory-tree/record_causes.py --cause-writers` over this tree lists `tools/memory-tree/build_records.py:1289` as red (DERIVED 2026-11-25). It is a bare `**Serves:** ` literal with no cause line in reach and no census marker. That file's last commit is unit 117's `07486a8f8`. So the `record causes` leg reads red at HEAD independently of this unit. I changed nothing there.
+A RED FOR THE MAIN LOOP, outside this unit. `python tools/memory-tree/record_causes.py --cause-writers` over this tree lists `tools/memory-tree/build_records.py@14341c75:1289` as red (DERIVED 2026-11-25). It is a bare `**Serves:** ` literal with no cause line in reach and no census marker. That file's last commit is unit 117's `07486a8f8`. So the `record causes` leg reads red at HEAD independently of this unit. I changed nothing there.
 
 One AC2 baseline attempt was refused by the worktree guard for an inline git command and was rerun from a script file. Nothing timed out.

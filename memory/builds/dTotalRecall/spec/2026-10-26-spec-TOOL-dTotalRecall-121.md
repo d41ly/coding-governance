@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-121 — the closing review's minors: the record door's names and stage, sessionless claims, hyphenated slugs, section containment, unrun plants, the floor and the map replay's byte term
 
-**Status:** SPECCED · rev-2 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 49
+**Status:** INPROGRESS · rev-2 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 49
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md) | journal | TOOL-dTotalRecall-120 |
+| [2026-11-25-prompt-TOOL-dTotalRecall-121-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-121-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
