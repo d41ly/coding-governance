@@ -34,7 +34,7 @@ measurements are in `build/2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md`.
 - **Classification (M2)**: four units, all MISSING at open. Unit 1 is Tier-2 (every reader's join), unit 2 Tier-1, unit 3
   Tier-2 (what a build deletes), unit 4 Tier-2 (what `--gc` collects).
 - The two live index files are not collected, vacuumed, deleted or opened by this build's code until the owner says so in
-  the building session: every measurement runs on a private copy.
+  the building session (said 2026-11-25, for after the closing review): every measurement runs on a private copy.
 - `tools/loop/position.py` and `tools/memory-tree/routed_commits.py` are not edited; other sessions are landing them.
 - No merge and no push without the owner's explicit ask in the building session.
 
@@ -48,7 +48,7 @@ None.
 |---|---|---|
 | 1 | `TOOL-aPrunedIndex-1` | the served rows are read through an index on the extractor version, so a read never walks another version's rows |
 | 2 | `TOOL-aPrunedIndex-2` | a build finds an already-named path through a partial index of the `parsed` rows, and reads no parse ledger when it has no blob |
-| 3 | `TOOL-aPrunedIndex-3` | a build's and an overlay's sweep deletes only what the trees and dirty rows it drops held |
+| 3 | `TOOL-aPrunedIndex-3` | a build's sweep deletes only what the trees and the gone worktrees' dirty rows it drops held; a replaced edit's rows wait for `--gc` |
 | 4 | `TOOL-aPrunedIndex-4` | `--gc` skips a worktree whose HEAD holds no tag registry, naming it, and still refuses an unreadable one |
 <!-- /roster:units -->
 
@@ -65,7 +65,7 @@ ids TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedInde
 | [TOOL-aPrunedIndex-4 — `--gc` skips a worktree that predates the tag registry, and still refuses one it cannot read](spec/2026-11-25-spec-TOOL-aPrunedIndex-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 4 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
