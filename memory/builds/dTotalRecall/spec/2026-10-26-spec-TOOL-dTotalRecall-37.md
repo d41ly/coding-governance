@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-37 — only the four rendered workflow scripts are `linguist-generated`, held equal to the kits' render rows both ways
 
-**Status:** DEFERRED · rev-7 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 4 · advances TOOL-dTotalRecall-27 TOOL-dTotalRecall-109
+**Status:** INPROGRESS · rev-7 · 2026-11-25 · node d · Tier-2 · base fbe06249 · streams tooling · order 4 · advances TOOL-dTotalRecall-27 TOOL-dTotalRecall-109
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-11-22-prompt-TOOL-dTotalRecall-37-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-37-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-37-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-37-reground-spec-writer.md) | journal | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-37-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-37-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md) | journal | TOOL-dTotalRecall-8 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 |
 | [2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-38 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-36 TOOL-dTotalRecall-39 TOOL-dTotalRecall-43 |
 

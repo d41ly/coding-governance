@@ -33132,6 +33132,15 @@ memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-114-widen-24
 memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-114-widen-24.md	gen_build_index.py:4073	1	289db6c05abcd0c77990322eb6199391b9e1ba17	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-24
 memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-114-widen-24.md	gen_build_index.py:8576	1	289db6c05abcd0c77990322eb6199391b9e1ba17	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-24
 memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-114-widen-24.md	row_grammar.py:1116	1	289db6c05abcd0c77990322eb6199391b9e1ba17	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-24
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-8-1-acceptance-ledger.md	a.py:1-2	1	9090bbb766e0c80a23d7546133333a415fd7cd9a	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-39
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-8-1-acceptance-ledger.md	b.py:4-5	1	9090bbb766e0c80a23d7546133333a415fd7cd9a	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-39
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-8-1-acceptance-ledger.md	test_a.py:4-5	1	9090bbb766e0c80a23d7546133333a415fd7cd9a	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-39
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-8-widen-39.md	a.py:1-2	1	9090bbb766e0c80a23d7546133333a415fd7cd9a	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-40
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-8-widen-39.md	b.py:4-5	1	9090bbb766e0c80a23d7546133333a415fd7cd9a	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-40
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-8-widen-39.md	test_a.py:4-5	1	9090bbb766e0c80a23d7546133333a415fd7cd9a	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-40
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-8-widen-40.md	a.py:1-2	1	9090bbb766e0c80a23d7546133333a415fd7cd9a	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-40
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-8-widen-40.md	b.py:4-5	1	9090bbb766e0c80a23d7546133333a415fd7cd9a	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-40
+memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-8-widen-40.md	test_a.py:4-5	1	9090bbb766e0c80a23d7546133333a415fd7cd9a	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-40
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-6-spec-writer.md	tools/govkit/registry.toml:380	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-6-spec-writer.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-owner-review-stop.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
