@@ -58,7 +58,7 @@ ids TOOL-aAnsweredPark-1 TOOL-aAnsweredPark-2 TOOL-aAnsweredPark-3 TOOL-aAnswere
 | [TOOL-aAnsweredPark-5 — the closing review's five minors: six fixture variants, the re-ask limit in three documents, the ledger's contradiction](spec/2026-11-25-spec-TOOL-aAnsweredPark-5.md) | 2 | 1 | CLOSED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

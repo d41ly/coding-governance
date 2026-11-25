@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-25-build-TOOL-aAnsweredPark-1-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-aAnsweredPark-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-25-build-TOOL-aAnsweredPark-1-agent-ledger.md](../build/2026-11-25-build-TOOL-aAnsweredPark-1-agent-ledger.md) | journal | TOOL-aAnsweredPark-5 |
 | [2026-11-25-prompt-TOOL-aAnsweredPark-1-1-spec-writer.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-1-spec-writer.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aAnsweredPark-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-brief.md) | research | — |
 | [2026-11-25-prompt-TOOL-aAnsweredPark-1-divergence.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-divergence.md) | research | — |
