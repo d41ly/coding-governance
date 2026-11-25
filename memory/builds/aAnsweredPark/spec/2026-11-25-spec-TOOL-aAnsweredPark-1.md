@@ -10,6 +10,7 @@
 | [2026-11-25-prompt-TOOL-aAnsweredPark-1-1-spec-writer.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-1-spec-writer.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aAnsweredPark-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-brief.md) | research | — |
 | [2026-11-25-prompt-TOOL-aAnsweredPark-1-divergence.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-divergence.md) | research | — |
+| [2026-11-25-review-TOOL-aAnsweredPark-1-closing-diff-round1.md](../reviews/2026-11-25-review-TOOL-aAnsweredPark-1-closing-diff-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 

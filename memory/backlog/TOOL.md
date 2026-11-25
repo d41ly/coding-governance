@@ -19,6 +19,7 @@ Cite ids, never line numbers.
 | [TOOL-aAnsweredPark-2](../builds/aAnsweredPark/BACKLOG.md) | OPEN | MED | — | 2026-11-25 | THE POSITION READ EXCEEDS THE CARD'S READ BOUND ON A LARGE BUILD. One… |
 | [TOOL-aAnsweredPark-3](../builds/aAnsweredPark/BACKLOG.md) | OPEN | MED | — | 2026-11-25 | A RUN THAT PARKS IS REFUSED THE COMMIT OF ITS OWN PARK ROW. An… |
 | [TOOL-aAnsweredPark-4](../builds/aAnsweredPark/BACKLOG.md) | OPEN | LOW | — | 2026-11-25 | THE POSITION HAND-OVER'S OWED LINE IS READ BY NOTHING. After… |
+| [TOOL-aAnsweredPark-6](../builds/aAnsweredPark/BACKLOG.md) | OPEN | MED | — | 2026-11-25 | THE DRIVER'S PARK NO-OP MATCHES AN ANSWERED ROW. --park writes nothing… |
 | [TOOL-aBatchedPacket-3](../builds/aBatchedPacket/BACKLOG.md) | OPEN | LOW | — | 2026-11-14 | THE MEMORY-TREE ENGINE VERSION THIS BUILD OWED. TOOL-aBatchedPacket-1… |
 | [TOOL-aBoundedCeiling-8](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | tools/run-gates/run-gates.turnstile.test.sh arm 4c (AC4c) CANNOT FAIL.… |
 | [TOOL-aBoundedCeiling-9](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the unattended kit gate leg is RED ON MAIN and has been since… |
