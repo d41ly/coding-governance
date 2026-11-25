@@ -2,6 +2,10 @@
 
 **Serves:** research TOOL-aAnsweredPark-1
 
+## The prompt
+
+> The unit harness's builder (run `wf_5a7a9476-d1a`) returned `diverged: true` before committing any code, with the `why` quoted whole below as the Goal.
+
 ## The brief
 
 ### Goal
@@ -16,6 +20,13 @@ I found this late, at my one commit attempt: the pre-commit hook refused it. I m
 The hook itself renders `memory/LIVE.md`, `memory/builds/aAnsweredPark/README.md` and the spec's gen:spec-records block; section 4 may name those as generated. No kickoff re-stamp is needed.
 
 That list is complete. In a throwaway clone, the built change plus the ledger and the three KEEP rows committed with rc=0 and every pre-commit leg ok (GOV_DEFAULT_BRANCH set there only because a clone is a primary tree). Nothing else in the spec failed. AC1 to AC10 were each observed as stated, and the base-tree claims I checked held.
+
+### Items
+1. Add to section 4's files touched `memory/builds/aAnsweredPark/build/2026-11-25-build-TOOL-aAnsweredPark-1-1-acceptance-ledger.md`,
+   the journal record evidencing AC1 to AC10, one line each. The three KEEP rows are committed by the main loop,
+   so `memory/builds/aAnsweredPark/BACKLOG.md` is not listed.
+2. Name `memory/LIVE.md`, `memory/builds/aAnsweredPark/README.md` and the spec's records block as rendered by the hook.
+3. Bump the rev and add the section 9 line naming this record. Nothing else changes.
 
 ### Acceptance
 Fixture cases of `position.py --fixture --plant`, seen red before and green after: an answered decision acts;
@@ -34,3 +45,6 @@ settle the parked row.
 
 ### Limitations
 Only a record of the owner's answer settles a row. Closed specs stay frozen: the superseded wording is named here.
+
+### Reuse
+Copied from the build's brief: `adapt.py`'s `read_disposition_release` and the `build_records.py new disposition` door.
