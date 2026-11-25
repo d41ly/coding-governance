@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-117 — the record door answers `exists` only for the same call
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 45
+**Status:** CLOSED · rev-1 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 45
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-dTotalRecall-117-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-117-1-acceptance-ledger.md) | log | — |
+| [2026-11-25-build-TOOL-dTotalRecall-117-deviation-1016.md](../build/2026-11-25-build-TOOL-dTotalRecall-117-deviation-1016.md) | deviation | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-117-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-117-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

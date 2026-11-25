@@ -62,6 +62,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [concurrent-runs-are-announced-not-refused](concurrent-runs-are-announced-not-refused.md) | invariant | 2 |  | two live unattended runs of different builds are announced at preflight and never refused, and that is the ruling, not a gap |
 | [conf-value-interpolated-into-a-regex](conf-value-interpolated-into-a-regex.md) | class | 10 |  | a config value spliced into a regex must be VALIDATED as a plain path, not escaped — a quoted value matches nothing and a value with a pipe swallows a subtree, both silently |
 | [containment-tested-one-way](containment-tested-one-way.md) | class | 8 |  | a guard asking only "is this path under the protected one" refuses the narrow declarations and admits the one that claims everything |
+| [content-key-omits-a-supplied-input](content-key-omits-a-supplied-input.md) | class | 3 |  | a write door's content key hashes only part of what the caller supplies, so a call differing in an input the key leaves out answers `exists` and its record is dropped with exit 0 |
 | [core-depends-on-an-optional-part](core-depends-on-an-optional-part.md) | class | 4 |  | a core item, leg, field or preset cannot run, or cannot be enforced, without an expansion or an optional component, and the dependency hides behind the guard or Absent clause that seems to degrade it |
 | [criterion-asserts-what-its-own-command-cannot-show](criterion-asserts-what-its-own-command-cannot-show.md) | class | 3 |  | an acceptance criterion names a command and then asserts a figure that command never prints, a field nothing the change moves, a state that holds when the scope item is skipped, an absence its own records break by quoting the pattern, an input respelled shorter to pass a join so it no longer probes what its scope item names, or an error text its tool never emits |
 | [decision-re-derived-by-a-second-process](decision-re-derived-by-a-second-process.md) | class | 8 |  | a second process that re-derives a decision the first one already acted on, from its OWN inputs, answers a different question whenever those inputs differ, and the gap is exactly where an attacker stands |
@@ -196,6 +197,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-180 record(s): 177 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+181 record(s): 178 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

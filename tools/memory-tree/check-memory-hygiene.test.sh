@@ -3765,7 +3765,7 @@ out=$("$_PY" "$HERE/build_records.py" --fixture --plant door-header 2>&1)
 if grep -q 'build-records: SKIP door-header' <<<"$out"; then
   echo "skip the door-header plant: $out"; n_skip=$((${n_skip:-0}+1))
 else
-  hit 'build-records: PASS door-header — 12 cases'
+  hit 'build-records: PASS door-header — 20 cases'
 fi
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant legacy 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'   # AC4
 hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings causes'; hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings-2 causes'   # AC8

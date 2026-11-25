@@ -699,3 +699,13 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-25T05:48:20Z draw · re-dispatch · TOOL-dTotalRecall-116 · 76/186 · 20261125T054820Z-e5a411
 
 2026-11-25T05:48:20Z dispatch · item 270795c1 TOOL-dTotalRecall-116 · reason tools/memory-tree/record_find.py tools/memory-tree/check-memory-hygiene.test.sh memory/project/shell-role.txt memory/map/generated memory/builds/dTotalRecall/build memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-116.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-116-2-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md
+
+2026-11-25T06:22:26Z brief · item TOOL-dTotalRecall-117 · reason 184e8282814d memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-117-build-brief.md
+
+2026-11-25T06:29:14Z dispatch · item ce1c2095 TOOL-dTotalRecall-117 · reason tools/memory-tree/build_records.py tools/memory-tree/gov_record.py tools/memory-tree/check-memory-hygiene.test.sh memory/gotchas/content-key-omits-a-supplied-input.md memory/project/shell-role.txt memory/map/generated memory/builds/dTotalRecall/build memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-117.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-117-1-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md
+2026-11-25T06:40:00Z draw · re-dispatch · TOOL-dTotalRecall-117 · 77/186 · 20261125T064000Z-1b3ac8
+
+2026-11-25T06:40:00Z dispatch · item ce1c2095 TOOL-dTotalRecall-117 · reason memory/gotchas/INDEX.md tools/memory-tree/README.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-117-deviation-1016.md
+2026-11-25T06:49:45Z draw · re-dispatch · TOOL-dTotalRecall-117 · 78/186 · 20261125T064945Z-588ea0
+
+2026-11-25T06:49:45Z dispatch · item ce1c2095 TOOL-dTotalRecall-117 · reason memory/map/features/row-grammar.md

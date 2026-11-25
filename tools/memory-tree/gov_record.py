@@ -20,7 +20,9 @@ registry or that door, so a factory door's kind (`build_records.py new <kind>`) 
 
 A `fields` kind is `build_records.write_new_record`: the row's template filled with each `--field`, a key
 the row does not name following in the caller's order; the bytes parsed back by the kind's own check
-before anything is written; a record of the kind whose content key matches is the same write, `exists`;
+before anything is written; a record of the kind whose content key matches is the same write, `exists`, the
+key holding everything the caller supplies, the build, the unit, the title, the cause, the edges and the
+fields, and neither `Made-by`, the date nor the minted `<n>` (TOOL-dTotalRecall-117);
 then the build's lease or claim is read, the id minted by the row's `id-rule` (a typed kind's `<n>`
 through `write_record`, an empty rule's `--name`, a `<FAMILY>-<slug>-<seq>` counter through
 `gov-claim.sh ask`, the family the unit's) and the file written and staged, never committed. Its header
@@ -46,8 +48,8 @@ The read verbs write nothing in the tree (TOOL-dTotalRecall-9): `find` lists at 
 their content, `show` prints one record or one section of it, and `budget` sums a role's read set against
 `memory.item-budget`; `record_find.py` beside this door holds all three and says what each prints.
 WHAT IT DOES NOT CHECK: whether a cause is reached
-from a root, which `record_causes.py --check` grades; whether two builds hold a `--name` record of one stem and one content key, which
-the listing reads as one write.
+from a root, which `record_causes.py --check` grades; whether a record written by hand in a spelling the door
+does not render says what a call says, since it keys as another record.
 """
 from __future__ import annotations
 

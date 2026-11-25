@@ -146,7 +146,8 @@ the newest one's `Measured` as `verdict.flakes.entry`'s `measured` threshold.
 THE RECORD DOOR (TOOL-dTotalRecall-2): `write_new_record` is the one write of `gov_record.py new <kind>`, the
 door of each kind whose registry row names it its writer (`read_kind_row`, `DOOR_WRITER`). It renders the row's
 template, refuses the bytes by the kind's own check (`check_typed_record`, the reader the `read` verb
-dispatches to), lists the kind's home for a record of the same content key (`derive_content_key`), reads the
+dispatches to), lists the kind's home for a record of the same content key (`derive_content_key` over the build,
+the unit, the title, the cause, the edge lines and the fields, TOOL-dTotalRecall-117), reads the
 build's authority (`check_mint_authority`) and mints: a typed kind through `write_record`, whose `check` hook
 reads the exact bytes before the file opens, an empty id rule by the caller's `--name`, a `SEQ_RULE` by the
 claim CLI's counter. The factory's own `new` doors stay their kinds' doors.
@@ -1189,7 +1190,12 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
     kind's `- **Made-by:**` and `- **Caused-by:**` fields following its row's, `Made-by` `lease-<build>` under
     the build lease and `owner` otherwise; `edges`, the `--edge` values, are each a `**Edges:**` line under
     its heading. The render is read back through `tree_lib.read_header_edges` and the edge parser before
-    any write. `Made-by` is never part of the content key."""
+    any write.
+
+    The content key (TOOL-dTotalRecall-117) holds everything the caller supplies, the build, the unit, the title,
+    the cause, the edge lines and the fields, read back from the record's bytes by `read_key_fields`, the one
+    reader of both sides of the compare; `Made-by`, the date and the minted `<n>` stay out. A listed record whose
+    header refuses to read has no key: it is never `exists`, and at the call's own path it is the refusal."""
     import fnmatch
     import record_kinds  # noqa: E402  the registry's template and field check
     from tree_lib import TYPED_RECORD_KINDS, read_header_edges
@@ -1247,6 +1253,8 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
     given = dict(fields)
     ordered = [(f, given[f]) for f in order if f in given] + [(k, v) for k, v in fields if k not in order]
     template = record_kinds.render_template([row], kind).split("\n")
+    head_re = re.compile(re.escape(template[0]).replace(re.escape("<unit id>"), r"(?P<unit>\S+)")
+                         .replace(re.escape("<n>"), r"\d+").replace(re.escape("<title>"), r"(?P<title>.*)"))
 
     def render_text(n, made_by="owner"):
         """The template filled, `n` the record's minted `<n>`, its header naming `made_by`."""
@@ -1267,6 +1275,21 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
                  if (m := FIELD.match(ln)) and m.group(1) != "Made-by"]
         seen = dict(pairs)
         return [(f, seen[f]) for f in order if f in seen] + [(k, v) for k, v in pairs if k not in order]
+
+    def read_key_fields(path, text):
+        """The `(key, value)` pairs of what the caller of one record supplied, read back from its bytes; None
+        where its header refuses to read (TOOL-dTotalRecall-117 S1, S2)."""
+        lines = text.replace("\r\n", "\n").split("\n")
+        m = head_re.fullmatch(lines[0])
+        try:
+            cause = [t for e in read_header_edges(text, path) if e["type"] == "caused-by" for t in e["targets"]]
+        except ValueError:
+            return None
+        at = re.search(r"/builds/([^/]+)/", path)
+        serves = next((ln for ln in lines if ln.startswith("**Serves:** ")), "")
+        edges = [ln for ln in lines if ln.startswith("**Edges:** ")]
+        return [("build", at.group(1) if at else ""), ("head", "" if m is None else repr(m.groupdict())), ("serves", serves),
+                ("cause", " ".join(cause)), *(("edge", ln) for ln in edges), *read_ordered_fields(text)]
 
     def check_header(rel, text, made_by):
         """The render's header read back through the one header reader and its edge lines through the one
@@ -1331,7 +1354,7 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
         raise ValueError(f"its id-rule {rule} holds a placeholder this door mints only in a typed kind")
     text = render_text(1)
     check_text(rel, text)
-    key = derive_content_key(kind, read_ordered_fields(text), given_id)
+    key = derive_content_key(kind, read_key_fields(rel, text), given_id)
 
     # the listing: a record of the kind whose re-derived key matches is the same write
     grammars = {k: derive_record_name(k) for k in TYPED_RECORD_KINDS}
@@ -1343,11 +1366,13 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
         if not p.is_file():
             continue
         stem = p.stem if not rule else None
-        other = derive_content_key(kind, read_ordered_fields(p.read_bytes().decode("utf-8", "replace")), stem)
+        supplied = read_key_fields(path, p.read_bytes().decode("utf-8", "replace"))
+        other = None if supplied is None else derive_content_key(kind, supplied, stem)   # an unread header has no key
         if other == key:
             return "exists", path, key, []
         if given_id is not None and path == rel:
-            raise ValueError(f"{path} already holds the record {given_id}, its content key {other}, not {key}")
+            raise ValueError(f"{path} already holds the record {given_id}, its content key "
+                             f"{other or 'unread, its header refusing to read'}, not {key}")
     if given_id is not None and pathlib.Path(root, rel).exists():
         raise ValueError(f"{rel} already exists, untracked: a different value under an existing id")
 
@@ -1546,8 +1571,10 @@ def check_door_header_plant():
     the record lacks and two lines of one type under one heading each refused with nothing written; then
     `root = true` on the `log` row, which admits no cause. TOOL-dTotalRecall-43 adds `field-newline` and
     `edge-newline` (AC37), each refused with nothing written, and the mint beside an untracked draft and
-    under `mint-collision` (AC43). -> `(failures, cases)`, or `(None, why)` where a
-    kit the door runs beside does not resolve."""
+    under `mint-collision` (AC43). TOOL-dTotalRecall-117 adds the content key's cases: the replay `exists`, and the
+    same call with another unit, title, cause, edge, no edge or build, and a typed pair differing in its unit,
+    each refused or a fresh `wrote` and none `exists`. -> `(failures, cases)`, or `(None, why)` where a kit the
+    door runs beside does not resolve."""
     import subprocess
     import tempfile
     import backlog  # noqa: E402  the sibling resolver
@@ -1573,12 +1600,12 @@ def check_door_header_plant():
                            timeout=600, env={**os.environ, "CLAUDE_CODE_SESSION_ID": "s-mine"})
         return p.returncode, (p.stdout + p.stderr).strip()
 
-    def check_case(case, got, rc, needles, root):
+    def check_case(case, got, rc, needles, root, bans=()):
         status = run_git(root, "status", "--porcelain").strip() if rc else ""
-        lack = [n for n in needles if n not in got[1]]
+        lack, held = [n for n in needles if n not in got[1]], [b for b in bans if b in got[1]]
         cases[0] += 1
-        if got[0] != rc or lack or status:
-            bad.append(f"{case}: exited {got[0]}, not {rc}; missing {lack}; status {status!r}: {got[1][:300]}")
+        if got[0] != rc or lack or held or status:
+            bad.append(f"{case}: exited {got[0]}, not {rc}; missing {lack}; carrying {held}; status {status!r}: {got[1][:300]}")
         print(f"build-records: door-header · {case} · exit {got[0]}")
 
     def read_header(root, name):
@@ -1594,6 +1621,7 @@ def check_door_header_plant():
         seed = top / "seed"
         files = {".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n', ".unattended.conf": 'RUN_CLAIMS="on"\n',
                  "memory/builds/dTotalRecall/README.md": "---\nslug: dTotalRecall\n---\n\n# dTotalRecall\n",
+                 "memory/builds/dOther/README.md": "---\nslug: dOther\n---\n\n# dOther\n",
                  f"memory/builds/dTotalRecall/spec/2026-09-01-spec-{unit}.md":
                      f"# {unit} — the door\n\n**Status:** INPROGRESS · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd\n",
                  f"{record_kinds.derive_kit_rel()}/{record_kinds.REGISTRY}": (KIT / record_kinds.REGISTRY).read_bytes().decode("utf-8")}
@@ -1637,6 +1665,34 @@ def check_door_header_plant():
         lines = (a / folder / f"{name}.md").read_bytes().decode("utf-8").split("\n")
         if lines[:2] != ["# A note", "**Edges:** implements=feature.x"]:
             bad.append(f"made-by owner: the edge line is not under its heading: {lines[:3]}")
+        # TOOL-dTotalRecall-117 AC1: the content key holds each supplied input, so the replay alone is `exists`; each
+        # record is committed before the next case, so a refusal's clean status reads that case's door alone
+        run_git(a, "commit", "-q", "--allow-empty", "-m", "the made-by owner record")
+        edge, other, where = "a-note implements=feature.x", "TOOL-dTotalRecall-3", f"{folder}/{name}.md"
+        call = {"--build": "dTotalRecall", "--unit": unit, "--title": "A note", "--name": name, "--caused-by": unit,
+                "--edge": edge}
+        for case, flags, rc, needle in (
+                ("replay", {}, 0, f"exists {where} key "),
+                ("unit", {"--unit": other}, 2, "already holds the record"),
+                ("title", {"--title": "B note", "--edge": "b-note implements=feature.x"}, 2, "already holds the record"),
+                ("cause", {"--caused-by": name}, 2, "already holds the record"),
+                ("edge", {"--edge": "a-note implements=feature.y"}, 2, "already holds the record"),
+                ("no edge", {"--edge": None}, 2, "already holds the record"),
+                ("build", {"--build": "dOther"}, 0, f"wrote {where.replace('/dTotalRecall/', '/dOther/', 1)}")):
+            got = run_door(a, "log", *(t for k, v in {**call, **flags}.items() if v is not None for t in (k, v)))
+            check_case(case, got, rc, [needle], a, () if case == "replay" else ("exists ",))
+        typed = [t for k, v in (("Departs from", f"{unit}@rev-1"), ("Hand-off", "spec-to-code"), ("Before", "b"),
+                                ("After", "a"), ("Cause", "builder discovery"), ("Reason", "r"), ("Evidence", "e"),
+                                ("Risk", "additive"), ("Approver", "p"), ("Follow-through", "gap x"),
+                                ("Caused-by", unit)) for t in ("--field", f"{k}={v}")]
+        pair = []
+        for who in (unit, other):
+            run_git(a, "commit", "-q", "--allow-empty", "-m", "the record before")
+            pair.append(run_door(a, "deviation", "--build", "dOther", "--unit", who, "--title", "t", *typed))
+        check_case("typed", pair[1], 0, [f"-build-{other}-deviation-2.md key "], a, ("exists ",))
+        if f"-build-{unit}-deviation-1.md key " not in pair[0][1]:
+            bad.append(f"typed: the first deviation was not written: {pair[0][1][:300]}")
+        run_git(a, "commit", "-q", "--allow-empty", "-m", "the typed pair")
         loop = str(backlog.resolve_kit_dir("loop", "breakpoints.py", KIT))
         if loop not in sys.path:
             sys.path.insert(0, loop)
@@ -1846,7 +1902,7 @@ def run_fixture(plant):
         print(f"build-records: PASS {plant} — {cases} cases: " + (
             "refuse, family, file, replay, grade, refused read, remote" if plant == "ask-door"
             else "causeless, unresolved cause, three edge refusals, field-newline, edge-newline, made-by owner, "
-                 "made-by lease, root log, mint beside a draft, mint-collision"))
+                 "replay, unit, title, cause, edge, no edge, build, typed, made-by lease, root log, mint beside a draft, mint-collision"))
         return 0
     root = pathlib.Path(tempfile.mkdtemp(prefix="br-"))
     if plant == "pending-kind":   # PLAY-dOrderedCharter-55 S8: a copy of this module with one kind pending

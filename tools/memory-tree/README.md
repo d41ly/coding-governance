@@ -370,7 +370,8 @@ kind with no row, or whose row names another door, exits 2 naming it, so a facto
 the row's `--template` skeleton filled with each `--field`, a key the row does not name following; the
 bytes parsed back by the kind's own check before anything is written (`check_typed_record` for a typed
 kind, the row's field lines for any other); then the kind's home is listed, and a record whose content
-key (`derive_content_key`, over the kind, a given `--name` and the field values in schema order) matches
+key (`derive_content_key`, over the kind, a given `--name`, the build, the unit, the title, the cause, the edge
+lines and the field values in schema order, so everything the caller supplies) matches
 is the same write, `exists`, while a different value under a given name is refused. The build's
 authority is read next, `check_mint_authority`: the build lease, classed by the loop kit's
 `read_lease_class` where the unattended driver resolves, `mine` admitting and a holder or an unread lease

@@ -280,7 +280,7 @@ Check 20: id collisions inside a single row document
 - status `shipped` · streams `tooling` · dossier `memory/map/features/row-grammar.md`
 - decisions 0
 - gate-legs 2: `row-grammar selftest`, `marker contracts`
-- gotcha-classes 1: `append-without-an-idempotence-key.md`
+- gotcha-classes 2: `append-without-an-idempotence-key.md`, `content-key-omits-a-supplied-input.md`
 - globs 2: `tools/memory-tree/row_grammar.py`, `tools/memory-tree/tree_lib.py`
 
 ## run-gates
