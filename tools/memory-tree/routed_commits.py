@@ -63,8 +63,10 @@ list gained after the commit or in it, whenever the commit lands; nor a path an 
 off the list, so a path unlisted in one commit, fixed in the next and relisted later passes; nor an
 edit of the list alone, since the list does not name itself; nor a list that has moved, a parent
 holding none at its present path being graded by the working tree's, which the graded run controls;
-nor the list's file mode, a symbolic link there read as its target text. L3 no longer checks what a fix commit writes between two unchanged marker
-lines: whether it is the generator's row is `gen_build_index.py --check`'s answer, at the graded tip
+nor the list's file mode, a symbolic link there read as its target text. A guarded list
+absent from the working tree, deleted by the fix commit or by any later one, leaves only the
+`.governance/` prefix, whatever the first parent's list holds (TOOL-aTemperedLane-3).
+L3 no longer checks what a fix commit writes between two unchanged marker lines: whether it is the generator's row is `gen_build_index.py --check`'s answer, at the graded tip
 and never per commit, so a hand-written line there that a later commit removes is seen by nothing.
 Nor where the pair sits: the region's extent is the parent's, so a pair an earlier commit widened
 widens what a fix commit may write.
@@ -909,9 +911,9 @@ SPEC2 = "memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-2.md"
 def build_fixture(root: pathlib.Path, name: str, commits: list) -> tuple:
     """A scratch repository from ONE `git fast-import`: `(repo, [sha per commit])`.
 
-    Each commit is `{msg, files: {path: text | None}, date?, parent?, merge?, exec?}`, parents named by
-    their 1-based position; a commit's first parent defaults to the one before it. A path `exec` lists
-    is written at mode 100755, every other at 100644."""
+    Each commit is `{msg, files: {path: text | bytes | None}, date?, parent?, merge?, exec?}`, parents
+    named by their 1-based position; a commit's first parent defaults to the one before it. A path
+    `exec` lists is written at mode 100755, every other at 100644."""
     repo = root / name
     repo.mkdir()
     run_git(repo, "init", "-q", "--template=")      # no template seeds node state (TOOL-dTrueNorth-32 S7)
@@ -932,7 +934,7 @@ def build_fixture(root: pathlib.Path, name: str, commits: list) -> tuple:
             if text is None:
                 out += b"D %s\n" % path.encode("utf-8")
             else:
-                body = text.encode("utf-8")
+                body = text if isinstance(text, bytes) else text.encode("utf-8")
                 mode = b"100755" if path in c.get("exec", []) else b"100644"
                 out += b"M %s inline %s\ndata %d\n%s\n" % (mode, path.encode("utf-8"), len(body), body)
     marks = repo / ".git" / "fixture-marks"
@@ -1537,7 +1539,26 @@ def run_selftest() -> int:
         rooted, r = build_fixture(root, "parentroot", [
             {"msg": fix_msg.format("root"), "files": {"src/a.txt": "a\n", SPEC1: "# TOOL-tFix-1 — one\n"}},
             *({"msg": fix_msg.format(n), "files": {"src/a.txt": f"a\n{n}\n"}} for n in range(30))])
-        for at in (repo, rooted):
+        # TOOL-aTemperedLane-3: a list that is not UTF-8, a directory at its path, and the list deleted by
+        # the fix commit itself; then a trailered merge whose two parents hold different lists.
+        started = {"msg": "init", "date": OLD_EPOCH, "files": {"src/a.txt": "a\n", "src/b.txt": "b\n",
+                                                               SPEC1: "# TOOL-tFix-1 — one\n"}}
+        odd, h = build_fixture(root, "parentodd", [
+            started,
+            {"msg": "chore: the list, not UTF-8", "files": {list_path: b"src/b.txt\n\xff\n"}},
+            {"msg": fix_msg.format("h3"), "files": {"src/a.txt": "a\nh3\n"}},
+            {"msg": "chore: a directory there", "files": {list_path: None, f"{list_path}/x": "x\n"}},
+            {"msg": fix_msg.format("h5"), "files": {"src/a.txt": "a\nh5\n"}},
+            {"msg": "chore: the list again", "files": {f"{list_path}/x": None, list_path: "src/b.txt\n"}},
+            {"msg": fix_msg.format("h7"), "files": {list_path: None, "src/b.txt": "b\nh7\n"}},
+        ])
+        joined, m = build_fixture(root, "parentmerge", [
+            started,
+            {"msg": "side: the list", "files": {list_path: "src/a.txt\n"}},
+            {"msg": "chore: the list", "files": {list_path: "src/b.txt\n"}, "parent": 1},
+            {"msg": fix_msg.format("m4"), "files": {"src/b.txt": "b\nm4\n"}, "parent": 3, "merge": [2]},
+        ])
+        for at in (repo, rooted, odd, joined):
             set_fixture_conf(at)
             (at / list_path).parent.mkdir(parents=True)
             (at / list_path).write_bytes(b"src/a.txt\n")
@@ -1565,9 +1586,15 @@ def run_selftest() -> int:
                 before = GIT_SPAWNS[0]
                 check_red_fix_limits(rooted, fixes, ["src/"], "memory", [])
                 cost.append(GIT_SPAWNS[0] - before)
+            globals()[const] = odd / "kits" / orig_kit.name
+            torn, dirred, deleted = (run_limits_verb(odd, h[n - 1]) for n in (3, 5, 7))
+            (odd / list_path).unlink()
+            unlisted = run_limits_verb(odd, h[6])
+            globals()[const] = joined / "kits" / orig_kit.name
+            merged = run_limits_verb(joined, m[3])
         finally:
             globals()[const] = orig_kit
-        l2 = "L2 guarded policy file: {}\n".format
+        l2 ="L2 guarded policy file: {}\n".format
         detail = "".join(f"g{n}: {rc} {out}" for n, (rc, out) in got.items())
         print_arm(all(got[n][0] == 1 and l2(p) in got[n][1] for n, p in ((5, "src/b.txt"), (6, agent))),
             "TOOL-aTemperedLane-2 AC2 the verb exits 1 naming L2 and the path the first parent's list names and the "
@@ -1594,6 +1621,34 @@ def run_selftest() -> int:
             f"one, one, 30, and 30 with the list outside the repository ({cost})")
         print_arm(listed != blank and swapped[0] == 1 and l2("src/b.txt") in swapped[1],
             "TOOL-aTemperedLane-2 AC8 a replace ref over the parent's list blob is not read", swapped[1])
+
+        # ---- TOOL-aTemperedLane-3 AC3-AC6, over the two fixtures graded above.
+        print_arm(deleted[0] == 1 and l2("src/b.txt") in deleted[1] and unlisted[0] == 0 and "L2" not in unlisted[1],
+            "TOOL-aTemperedLane-3 AC3 a fix commit that deletes the list is graded by its parent's while the working "
+            "tree holds one, and by the .governance/ prefix alone once it holds none", deleted[1] + unlisted[1])
+        for ac, (rc, out), what in (("AC4", torn, "a first parent's list that is not UTF-8"),
+                                    ("AC5", dirred, "a directory at the first parent's list path")):
+            print_arm(rc == 1 and l2("src/a.txt") in out,
+                f"TOOL-aTemperedLane-3 {ac} {what} leaves the working tree's list to grade", out)
+        print_arm(merged[0] == 1 and l2("src/b.txt") in merged[1],
+            "TOOL-aTemperedLane-3 AC6 a merge is graded by its first parent's list and not the side lineage's", merged[1])
+
+        # ---- TOOL-aTemperedLane-3 AC7: `read_blob_batch` over a stubbed stream cut before a header, one cut
+        # inside a body, and one whose tree body holds an LF before the blob asked for next.
+        run_name, answers = "run_git", []
+        real_git = globals()[run_name]
+        for stream in (b"n1 blob 2\nok\n", b"n1 blob 2\nok\nn2 blob 3\nxy", b"n1 tree 3\nx\ny\nn2 blob 2\nok\n"):
+            globals()[run_name] = lambda *_a, stream=stream, **_k: stream
+            try:
+                answers.append(read_blob_batch(root, ["n1", "n2"]))
+            except Refusal as exc:
+                answers.append(str(exc))
+            finally:
+                globals()[run_name] = real_git
+        print_arm(answers == ["`git cat-file --batch` ended before it answered n2",
+                              "`git cat-file --batch` ended inside n2", {"n1": None, "n2": b"ok"}],
+            "TOOL-aTemperedLane-3 AC7 a stream cut before a header and one cut inside a body are refused, and a body "
+            "that is not a blob is skipped whole", repr(answers))
 
         # ---- TOOL-dTrueNorth-4 AC1-AC7 AC10 AC13: the deviation join's fixture over every plant, each
         # plant's failing case staged by the plant itself, and the record-late plant through this host.

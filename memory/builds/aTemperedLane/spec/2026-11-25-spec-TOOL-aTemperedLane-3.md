@@ -1,11 +1,12 @@
 # TOOL-aTemperedLane-3 — the closing review's three mediums and two lows: one false claim corrected and pinned, four coverage gaps given arms
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-11-25 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-aTemperedLane-3-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-aTemperedLane-3-1-acceptance-ledger.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aTemperedLane-3-brief.md](../prompts/2026-11-25-prompt-TOOL-aTemperedLane-3-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

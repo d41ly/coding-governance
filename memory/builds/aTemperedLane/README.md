@@ -20,7 +20,7 @@ half reads no waiver, and built work is never rewritten in place.
 
 - A record row the generator writes into a spec's `gen:spec-records` region is no L3 finding.
 - A commit is graded against the guarded list that was in force when it was made.
-- A fix commit that shortens the guarded list in itself is caught, which it is not today.
+- A line a fix commit itself removes from the guarded list, the list still being present, still guards, which it does not today.
 
 ## Detriments if this is not built
 
@@ -49,7 +49,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-11-25 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-11-25 · streams tooling
 ids TOOL-aTemperedLane-1 TOOL-aTemperedLane-2 TOOL-aTemperedLane-3
 
 <!-- gen:build-units -->
@@ -57,10 +57,10 @@ ids TOOL-aTemperedLane-1 TOOL-aTemperedLane-2 TOOL-aTemperedLane-3
 |---|---|---|---|---|---|
 | [TOOL-aTemperedLane-1 — the Red-fix lane's L3 reads a spec change confined to the `gen:spec-records` region as no spec edit](spec/2026-11-25-spec-TOOL-aTemperedLane-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-25 |
 | [TOOL-aTemperedLane-2 — limit L2 reads the guarded list at the commit's first parent](spec/2026-11-25-spec-TOOL-aTemperedLane-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-25 |
-| [TOOL-aTemperedLane-3 — the closing review's three mediums and two lows: one false claim corrected and pinned, four coverage gaps given arms](spec/2026-11-25-spec-TOOL-aTemperedLane-3.md) | 3 | 1 | INPROGRESS | rev-1 | 2026-11-25 |
+| [TOOL-aTemperedLane-3 — the closing review's three mediums and two lows: one false claim corrected and pinned, four coverage gaps given arms](spec/2026-11-25-spec-TOOL-aTemperedLane-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 4 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

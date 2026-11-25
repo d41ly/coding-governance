@@ -84,9 +84,9 @@ The two figures of `L1` are the constants `RED_FIX_MAX_PATHS` and `RED_FIX_MAX_L
 takes a spec.
 
 `L2` reads the list that was in force when the commit was made: the one in the tree of its first
-parent, at the path the list has in the working tree. So a line the commit itself removes still
-guards. Where that parent holds no list, the commit has no parent, or the list lies outside the
-repository, `L2` reads the working tree's list.
+parent, at the path the list has in the working tree. So a line the commit itself removes,
+the list still being present, still guards. Where that parent holds no list, the commit has no
+parent, or the list lies outside the repository, `L2` reads the working tree's list.
 
 The index generator writes one record row into a spec whenever a record is added, so `L3` leaves
 that row alone. A spec's change is no spec edit when all of these hold:
@@ -215,7 +215,9 @@ With the key `off` both still print, and both can still red.
   in one commit, fixed in the next and relisted later passes. Nor does it see an edit of the list
   alone, since the list does not name itself, or the list's file mode, a symbolic link there being
   read as its target text. Where the list has moved, a parent holding none at its present path is
-  graded by the working tree's list, which the graded run controls.
+  graded by the working tree's list, which the graded run controls. A guarded list
+  absent from the working tree, deleted by the fix commit or by any later one, leaves only the
+  `.governance/` prefix, whatever the first parent's list holds.
 - `L3` does not see what a fix commit writes between two unchanged `gen:spec-records` marker lines.
   The index generator's `--check` grades the region at the graded tip and never per commit, so a
   hand-written line there that a later commit removes is seen by nothing. Nor does `L3` see where the
