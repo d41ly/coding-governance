@@ -141,7 +141,7 @@ tools/unattended/run-unattended-gates.sh	364	85a1c45076fd9093f1b9a08a2d720c8146a
 tools/unattended/runlog-writer.test.sh	738	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/stall-recorder.test.sh	350	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/stop-guard.test.sh	618	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/unattended/unattended.sh	12224	e0e9cb73b055ee5a50a5d6130d6ed2fb8c5e3d5d	widened:2026-11-25-build-TOOL-dTotalRecall-122-widen-34
+tools/unattended/unattended.sh	12223	e0e9cb73b055ee5a50a5d6130d6ed2fb8c5e3d5d	widened:2026-11-25-build-TOOL-dTotalRecall-122-widen-34
 tools/unattended/unattended.test.sh	17614	e0e9cb73b055ee5a50a5d6130d6ed2fb8c5e3d5d	widened:2026-11-25-build-TOOL-dTotalRecall-122-widen-34
 tools/workflows/check-protocol-parity.test.sh	712	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-22
 tools/workflows/check-review-join.sh	408	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded

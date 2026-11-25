@@ -9888,7 +9888,7 @@ out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit refuses another value of the charter's trailer, exit code" "$rc" "1"
 hit  "$out" "UNATTENDED check 49 FAILED"
 hit  "$out" "the trailer 'Co-Authored-By: Fx 2 <fx@example.invalid>' is not the charter's '$_fx_at'"
-hit  "$out" "end the message with '$_fx_at' and nothing after it"
+hit  "$out" "the message's trailers do not stand where git reads them: end the message with '$_fx_at' and nothing after it"
 printf 'records\n\nPass: none\n%s\nCommit-Checked: unattended@0\n' "$_fx_at" > "$CCM"
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit refuses a line after the charter's trailer, exit code" "$rc" "1"
@@ -9932,7 +9932,7 @@ done
 printf 'records\n\nDecided: a choice - why\n\nPass: none\n%s\n' "$_fx_at" > "$CCM"
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit refuses a Decided: line above the trailer block, exit code" "$rc" "1"
-hit  "$out" "put every 'Decided:' line in the message's final trailer block, with no blank line after it"
+hit  "$out" "the message's trailers do not stand where git reads them: put every 'Decided:' line in the message's final trailer block, with no blank line after it"
 hit  "$out" "git reads no trailer in 'Decided: a choice - why'"
 printf 'records\n\nPass: none\nDecided: a choice - why\n%s\n' "$_fx_at" > "$CCM"
 out=$(run --check-commit "$CCM"); rc=$?

@@ -18949,6 +18949,7 @@ check_commit_message() { # commit message file
   # binds, a `--no-verify` commit, a `core.commentChar` other than `#`, and the commits already made.
   # Exit 0 is shared by `ok`, `none` and `unarmed`, and only `unarmed` is a check that did not run, so
   # it alone is said (TOOL-dWitnessedBar-110 S4).
+  _trw=""
   _at=$("$py" "$KIT_DIR/commit_trailers.py" attribution "$msg" "$ROOT/AGENTS.md" 2>&1) && _arc=0 || _arc=$?
   _at=${_at//$'\r'/}
   case "$_arc" in
@@ -18958,10 +18959,7 @@ check_commit_message() { # commit message file
          "$KIT_DIR" "$ROOT/AGENTS.md" 2>/dev/null) || _ae=""
        _ae=${_ae//$'\r'/}
        _at=${_at#ATTRIBUTION refused · }
-       # The repair leads, so the site's signature is the literal its arm asserts (check-arms takes the
-       # longest literal run, and a leading interpolation would join its stripped prefix to it).
-       fail 49 "end the message with '$_ae' and nothing after it: $_at"
-       return 1 ;;
+       _trw="end the message with '$_ae' and nothing after it: $_at" ;;
     *) echo "unattended: --check-commit could not check this message's attribution: $_at" ;;
   esac
   # EVERY `Decided:` LINE WHERE GIT READS IT (TOOL-dTotalRecall-122 S9): git parses trailers from the
@@ -18972,11 +18970,11 @@ check_commit_message() { # commit message file
   _at=${_at//$'\r'/}
   case "$_arc" in
     0) ;;
-    1) _at=${_at#DECIDED refused · }
-       fail 49 "put every 'Decided:' line in the message's final trailer block, with no blank line after it: $_at"
-       return 1 ;;
+    1) _trw="${_trw:+$_trw; }put every 'Decided:' line in the message's final trailer block, with no blank line after it: ${_at#DECIDED refused · }" ;;
     *) echo "unattended: --check-commit could not check this message's decisions: $_at" ;;
   esac
+  # ONE SITE FOR BOTH (the refusal ceiling): the literal leads, so check-arms reads the one its arms assert.
+  [ -z "$_trw" ] || { fail 49 "the message's trailers do not stand where git reads them: $_trw"; return 1; }
   # ONE LINE PER UNIT, `<o|O> <unit> <anchor> <declared paths>`, from the key holding the unit's LAST
   # row (the library's `current`), which is the window check 23 grades a commit made now in: a row at
   # a later anchor is a new pass, graded alone, and an earlier pass's paths do not carry into it
