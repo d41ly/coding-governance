@@ -985,8 +985,8 @@ arms varying `map`; and `map` the map file, whose bytes are the allowance. It pr
 read by `derive_map_verdict`: the recall rise below the twin runs' difference plus 5, the median
 existence-search fall below 1, or the median bytes before the first act rising past the map's bytes,
 the first act being the first call `check_read_call` does not read as a read: a read or search tool,
-`ToolSearch`, or a shell call running only its closed set of reading programs and writing no file. An unknown key is refused,
-so a misspelt rule is never skipped. Every rule runs before the first figure line, and a broken one
+`ToolSearch`, or a shell call running only its closed set of reading programs and writing no file, less what
+`check_read_call`'s docstring lists as not read. An unknown key is refused, so a misspelt rule is never skipped. Every rule runs before the first figure line, and a broken one
 exits 2 naming the rule, the arm or case, and the value:
 
 - **evidence** — each instance's `case_evidence` hook: a `scouted-seam` case's `sha` and every

@@ -258,9 +258,9 @@ Workflow review harnesses — one pipeline, three implementations, one hardened
 - gate-legs 7: `workflow script syntax`, `review-join ban (no ref-keyed join)`, `review-join self-test`, `spec-audit opt-in pack self-test`, `review-replay selftest`, `tier2-review self-test`, `unattended-build self-test`
 - harness-hooks 1: `PreToolUse tools/workflows/spec-audit-optin.js`
 - workflow-scripts 11: `check-review-join.js`, `check-workflow-syntax.js`, `drift-audit-code.js`, `drift-audit-code.template.js`, `drift-audit-state.js`, `drift-audit-state.template.js`, `orient-counterfactual.js`, `spec-audit-optin.js`, `tier2-review.js`, `tier2-review.template.js`, `unattended-build.template.js`
-- gotcha-classes 7: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`
+- gotcha-classes 8: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`
 - globs 1: `tools/workflows/*`
-- cut 5 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 6 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## roles
 

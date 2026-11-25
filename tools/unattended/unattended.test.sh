@@ -9922,6 +9922,21 @@ hit  "$out" "fixture · attribution · the charter's trailer, a blank line and p
 hit  "$out" "fixture · attribution · another value spaced before its colon, then prose · refused"
 hit  "$out" "fixture · attribution · no agent trailer · none"
 hit  "$out" "fixture · attribution · the charter's trailer last, then a space and a tab · ok"
+# TOOL-dTotalRecall-122 S9: a `Decided:` line above the final trailer block, which git never reads as a trailer, is
+# refused, and one inside it admitted; the reader's own cases ride the `--fixture` run above. Against the parent
+# the first exits 0 and the fixture prints no decision line.
+for _fx_case in "above the trailer block · refused" "in the trailer block · ok" "no decision · ok" \
+                "one of two above the block · refused" "indented in prose · ok"; do
+  hit "$out" "fixture · decided · $_fx_case"
+done
+printf 'records\n\nDecided: a choice - why\n\nPass: none\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses a Decided: line above the trailer block, exit code" "$rc" "1"
+hit  "$out" "put every 'Decided:' line in the message's final trailer block, with no blank line after it"
+hit  "$out" "git reads no trailer in 'Decided: a choice - why'"
+printf 'records\n\nPass: none\nDecided: a choice - why\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit admits a Decided: line in the trailer block, exit code" "$rc" "0"
 # AC11: an admitted pass message gains its Commit-Checked: and still ends with the charter's trailer
 printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
 printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n%s\n' "$_fx_at" > "$CCM"
@@ -25694,7 +25709,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4223 -> 4228 by TOOL-dTotalRecall-115 on 2026-11-25: the record-feed block's merge landing, 4
 # region-eight `same` (AC1 3, AC2 1) and its keyless copy's `mutate`, each unconditional and outside any
 # loop, off the diff's own lines. No skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4228
+# RAISED 4228 -> 4237 by TOOL-dTotalRecall-122 on 2026-11-25: the decision check's region-four arms, five `hit` over
+# the reader's fixture lines, one a loop pass, and the refused and admitted messages' two `same` and two `hit`, each
+# unconditional. No skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4237
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25932,7 +25950,8 @@ FLOOR_SHARD_3=471
 # RAISED 415 -> 418 by TOOL-aTrimmedWait-5's fix pass: the same 3 region-four empty-batch assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 410, plus main's 13, plus this branch's 8 = 431.
 # MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: shard 4 the base 423, plus main's 8, plus this branch's 5 = 436; shard 5 this branch's 293, main having moved none.
-FLOOR_SHARD_4=436
+# RAISED 436 -> 445 by TOOL-dTotalRecall-122: the same 9 region-four decision assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=445
 FLOOR_SHARD_5=293
 # RAISED 127 -> 130 by TOOL-dPlacedRequest-16: the same 3 region-six settle-over-a-tombstone assertions, see FLOOR_ASSERTIONS.
 FLOOR_SHARD_6=130

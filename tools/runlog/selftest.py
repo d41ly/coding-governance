@@ -551,9 +551,13 @@ from collections import Counter  # noqa: E402
 # 8 + 7 + 3 + 4 + 4 + 4 + 2 + 21 = 53
 # RAISED 1711 -> 1724 by TOOL-dTotalRecall-118, the whole-root search: ONE new arm with 10 checks —
 # `test_memory_dtr118_root`'s column and its liveness over each of the five `root-` plants. Its decoy checks
-# move it by 3; the nine memory arms a merge dropped come back with it and move nothing here.
+# move it by 3. The nine memory arms a merge dropped come back with it: the seven of TOOL-dTotalRecall-12 were
+# counted in the 1711 above, and the two path arms were not.
 # 10 + 3 = 13
-ASSERTION_FLOOR = 1724
+# RAISED 1724 -> 1746 by TOOL-dTotalRecall-122: the two path arms the raise above left out, counted by reading:
+# `test_memory_dtr43_paths` with 10 checks and 3 decoy checks, 13, and `test_memory_dtr53_paths` with 6 and 3, 9.
+# 13 + 9 = 22
+ASSERTION_FLOOR = 1746
 
 PASS = []
 FAIL = []

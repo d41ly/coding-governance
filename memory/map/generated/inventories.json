@@ -441,6 +441,7 @@
       "process-creation-is-the-suite-cost.md",
       "ratchet-migration-ignores-how-each-source-grows.md",
       "rate-quoted-without-its-denominator.md",
+      "read-allowlist-admits-a-writing-option.md",
       "record-citing-a-foreign-id-defines-or-orphans-it.md",
       "record-file-read-by-line-position.md",
       "record-without-serves-or-with-a-round-counter.md",

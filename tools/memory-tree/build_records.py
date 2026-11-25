@@ -951,6 +951,21 @@ def add_to_index(root, rel):
     return "" if p.returncode == 0 else (p.stderr.strip() or f"git add exited {p.returncode}")
 
 
+def write_prior_bytes(root, rel, wrote, prior):
+    """Undo this call's write of `rel` where the file still holds `wrote`: removed where `prior` is None, else put back.
+    -> what happened, for the refusal. A file another writer moved is left as it stands (TOOL-dTotalRecall-122 S1).
+    WHAT IT DOES NOT CHECK: a writer inside the spawn-free window between its read and its replace."""
+    path = pathlib.Path(root, rel)
+    if (path.read_bytes() if path.is_file() else None) != wrote:
+        return "and it moved since it was written, so it is left as it stands, unstaged"
+    if prior is None:
+        path.unlink()
+        return "so it was removed"
+    from legacy_ledger import _write_atomic  # noqa: E402  the kit's one temp-file-and-replace write
+    _write_atomic(path, prior)
+    return "so it was put back as it was"
+
+
 def write_record(root, build, unit, kind, title, fields, today=None, lines=(), check=None, place=None):
     """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
     headed `# <unit> <kind> <n> — <title>`, then `Serves: <kind> <unit>` bolded, each `(key, value)` of
@@ -1210,7 +1225,8 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
     headed `title`, `fields` its `(key, value)` pairs in the caller's order, `name` the stem a row with an
     empty `id-rule` takes. In order: the row (S2), the render and its refusal by the kind's own check (S3,
     S4), the listing of the kind's home for a record of the same content key (S5), the authority (S6), then
-    the mint and the write, staged (S8), and removed where git will not stage it. -> `(word, path or line, key,
+    the mint and the write, staged (S8), and removed by `write_prior_bytes` where git will not stage it, unless
+    another writer moved it (TOOL-dTotalRecall-122 S1). -> `(word, path or line, key,
     lines)`, `word` one of `wrote`, `exists` and `waiting`, `lines` the authority's. ValueError for every
     refusal, nothing written.
 
@@ -1414,10 +1430,12 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
     if typed:
         def check_written(at, written):
             """The bytes `write_record` is about to write: the template's render, refused by the kind's check."""
+            nonlocal text
             n = re.search(r"-(\d+)\.md$", at).group(1)
             if written != render_text(n, made_by):
                 raise ValueError(f"the factory's layout and the {kind} template disagree at {at}")
             check_text(at, written, made_by)
+            text = written   # the bytes a refused stage undoes
         rel = write_record(root, build, unit, kind, title, ordered + [("Made-by", made_by)], today,
                            check=check_written, place=lambda text: render_edge_lines(text, edge_rows))
     else:
@@ -1434,8 +1452,8 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
             fh.write(text)
     refused = add_to_index(root, rel)
     if refused:
-        pathlib.Path(root, rel).unlink()
-        raise ValueError(f"{rel} was not staged, so it was removed: {refused}")
+        undone = write_prior_bytes(root, rel, text.encode("utf-8"), None)
+        raise ValueError(f"{rel} was not staged, {undone}: {refused}")
     return "wrote", rel, key, lines
 
 
@@ -1598,6 +1616,15 @@ RENDER_PLANTS = {
 }
 
 
+#: The stage plants of TOOL-dTotalRecall-122 S1, each the body of `plant(root, rel)` over `real`, the stage it
+#: rebinds: another writer's `foreign` line lands in the file, and git refuses the stage or takes both.
+STAGE_PLANTS = {
+    "foreign-refused": "return 'planted: git refused'",
+    "foreign-staged": "return real(root, rel)",
+}
+FOREIGN_LINE = "- EXMP-tDoor-99 · filed 2026-01-01 · another writer's ask"
+
+
 def check_door_header_plant():
     """`--fixture --plant door-header` (TOOL-dTotalRecall-19 AC1 to AC3, AC5): the record door's header in a
     clone of a seed holding this kit's registry, over a bare remote: a `log` with no `--caused-by` refused
@@ -1611,8 +1638,9 @@ def check_door_header_plant():
     each refused with nothing written, and `index-lock`: the clone's index lock held, the door refuses
     naming git's refusal with the record gone, and the same call with the lock gone writes. TOOL-dTotalRecall-117 adds the content key's cases: the replay `exists`, and the
     same call with another unit, title, cause, edge, no edge or build, and a typed pair differing in its unit,
-    each refused or a fresh `wrote` and none `exists`. -> `(failures, cases)`, or `(None, why)` where a kit the
-    door runs beside does not resolve."""
+    each refused or a fresh `wrote` and none `exists`. TOOL-dTotalRecall-122 adds `foreign line`, another
+    writer's line kept where the stage is refused, and `unread header`, a record of two cause lines refused and
+    never `exists`. -> `(failures, cases)`, or `(None, why)` where a kit the door runs beside does not resolve."""
     import subprocess
     import tempfile
     import backlog  # noqa: E402  the sibling resolver
@@ -1639,7 +1667,7 @@ def check_door_header_plant():
         return p.returncode, (p.stdout + p.stderr).strip()
 
     def check_case(case, got, rc, needles, root, bans=()):
-        status = run_git(root, "status", "--porcelain").strip() if rc else ""
+        status = run_git(root, "status", "--porcelain").strip() if rc and root is not None else ""
         lack, held = [n for n in needles if n not in got[1]], [b for b in bans if b in got[1]]
         cases[0] += 1
         if got[0] != rc or lack or held or status:
@@ -1709,6 +1737,15 @@ def check_door_header_plant():
         lock.unlink()
         check_case("index-lock gone", run_door(a, *base, "--name", "n-lock", "--caused-by", unit), 0,
                    [f"wrote {locked}"], a)
+        # TOOL-dTotalRecall-122 AC1: the stage refused over a record another writer appended to
+        foreign = a / folder / "n-foreign.md"
+        check_case("foreign line", run_planted_door(a, "foreign-refused", *base[1:], "--name", "n-foreign",
+                                                    "--caused-by", unit, kind=("log",)), 2,
+                   [f"{folder}/n-foreign.md was not staged, and it moved since it was written", "planted: git refused"],
+                   None)
+        if not foreign.is_file() or FOREIGN_LINE.encode("utf-8") not in foreign.read_bytes():
+            bad.append("foreign line: the bytes another writer appended are gone")
+        foreign.unlink(missing_ok=True)
         name = "2026-11-23-prompt-TOOL-dTotalRecall-2-owner"
         check_case("made-by owner", run_door(a, *base, "--name", name, "--caused-by", unit, "--edge",
                                              "a-note implements=feature.x"), 0, [f"wrote {folder}/{name}.md"], a)   # AC2
@@ -1734,7 +1771,18 @@ def check_door_header_plant():
                 ("build", {"--build": "dOther"}, 0, f"wrote {where.replace('/dTotalRecall/', '/dOther/', 1)}")):
             got = run_door(a, "log", *(t for k, v in {**call, **flags}.items() if v is not None for t in (k, v)))
             check_case(case, got, rc, [needle], a, () if case == "replay" else ("exists ",))
-        typed = [t for k, v in (("Departs from", f"{unit}@rev-1"), ("Hand-off", "spec-to-code"), ("Before", "b"),
+        # TOOL-dTotalRecall-122 AC7: a listed record of two cause lines has no key, so it is refused and never `exists`
+        again = [*base, "--name", "n-unread", "--caused-by", unit]
+        got = run_door(a, *again)
+        if got[0] != 0:
+            bad.append(f"unread header: the record was not written: {got[1][:300]}")
+        run_git(a, "commit", "-q", "-m", "the record before its second cause")
+        unread = a / folder / "n-unread.md"
+        line = f"**Caused-by:** {unit}\n".encode("utf-8")
+        unread.write_bytes(unread.read_bytes().replace(line, line * 2, 1))
+        run_git(a, "commit", "-q", "-a", "-m", "its second cause")
+        check_case("unread header", run_door(a, *again), 2, ["unread, its header refusing to read"], a, ("exists ",))
+        typed =[t for k, v in (("Departs from", f"{unit}@rev-1"), ("Hand-off", "spec-to-code"), ("Before", "b"),
                                 ("After", "a"), ("Cause", "builder discovery"), ("Reason", "r"), ("Evidence", "e"),
                                 ("Risk", "additive"), ("Approver", "p"), ("Follow-through", "gap x"),
                                 ("Caused-by", unit)) for t in ("--field", f"{k}={v}")]
@@ -1797,22 +1845,35 @@ def check_door_header_plant():
     return bad, cases[0]
 
 
-def run_planted_door(root, plant, *flags):
-    """`run_ask_door` in a child Python that first rebinds `backlog.render_ask_row` to the `RENDER_PLANTS`
-    body `plant` (TOOL-dTotalRecall-41 AC3, AC4), then runs `gov_record.main`: `(exit, output)`."""
+def run_planted_door(root, plant, *flags, kind=("ask", "--build", "tDoor")):
+    """`gov_record.py new <kind> <flags>` in a child Python that first rebinds `backlog.render_ask_row` to the
+    `RENDER_PLANTS` body `plant` (TOOL-dTotalRecall-41 AC3, AC4), or `build_records.add_to_index` to one that
+    adds FOREIGN_LINE, under `## Asks` where the file holds it, and then runs the `STAGE_PLANTS` body (TOOL-dTotalRecall-122 AC1), then
+    runs `gov_record.main`: `(exit, output)`."""
     import subprocess
-    code = ("import sys\n"
+    if plant in STAGE_PLANTS:
+        rebind = ("import build_records\n"
+                  "real = build_records.add_to_index\n"
+                  "def plant(root, rel):\n"
+                  f"    path, line = pathlib.Path(root, rel), {FOREIGN_LINE + chr(10)!r}.encode('utf-8')\n"
+                  "    head, asks, rest = path.read_bytes().partition(b'## Asks\\n')\n"
+                  "    path.write_bytes(head + asks + line + rest if asks else head + line)\n"
+                  f"    {STAGE_PLANTS[plant]}\n"
+                  "build_records.add_to_index = plant\n")
+    else:
+        rebind = ("import backlog\n"
+                  "real = backlog.render_ask_row\n"
+                  "def plant(ask_id, filed, text, unit=False, pointer='', clauses=()):\n"
+                  f"    {RENDER_PLANTS[plant]}\n"
+                  "backlog.render_ask_row = plant\n")
+    code = ("import pathlib, sys\n"
             "for s in (sys.stdout, sys.stderr):\n"
             "    s.reconfigure(encoding='utf-8', errors='replace')\n"
             "sys.path.insert(0, sys.argv[1])\n"
-            "import backlog\n"
-            "real = backlog.render_ask_row\n"
-            "def plant(ask_id, filed, text, unit=False, pointer='', clauses=()):\n"
-            f"    {RENDER_PLANTS[plant]}\n"
-            "backlog.render_ask_row = plant\n"
+            f"{rebind}"
             "import gov_record\n"
-            "sys.exit(gov_record.main(['new', 'ask', '--build', 'tDoor', *sys.argv[2:]]))\n")
-    p = subprocess.run([sys.executable, "-c", code, str(KIT), *flags], cwd=str(root), capture_output=True, text=True,
+            "sys.exit(gov_record.main(['new', *sys.argv[2:]]))\n")
+    p = subprocess.run([sys.executable, "-c", code, str(KIT), *kind, *flags], cwd=str(root), capture_output=True, text=True,
                        encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL, timeout=600)
     return p.returncode, (p.stdout + p.stderr).strip()
 
@@ -1820,7 +1881,8 @@ def run_planted_door(root, plant, *flags):
 def check_ask_plant():
     """`--fixture --plant ask-door` (TOOL-dTotalRecall-7 AC4 to AC7, AC10 to AC12; TOOL-dTotalRecall-41 AC1 to
     AC4): the ask door's refuse, undeclared-family, value-refusal, planted-renderer, index-lock
-    (TOOL-dTotalRecall-121 AC3, over no file and over a held one), file, replay and grade cases in one seed, the refused read in a seed whose one commit
+    (TOOL-dTotalRecall-121 AC3, over no file and over a held one), foreign-row (the same two) and foreign-read-back
+    (TOOL-dTotalRecall-122 AC1), file, replay and grade cases in one seed, the refused read in a seed whose one commit
     holds an invalid `asks.acceptance`, and the refused and filed cases over a bare remote, each seed under
     the host temp directory and the door run from this kit. -> `(failures, cases)`, or `(None, why)` where
     a kit the door runs beside does not resolve."""
@@ -1884,6 +1946,13 @@ def check_ask_plant():
         if (a / rel).exists():
             bad.append("index-lock: the BACKLOG.md git would not stage is still there")
         lock.unlink()
+        # TOOL-dTotalRecall-122 AC1: each foreign case keeps the line another writer appended and says the file moved
+        moved, foreign = f"{rel} was not staged, and it moved since it was written", FOREIGN_LINE.encode("utf-8")
+        check_case("foreign row", run_planted_door(a, "foreign-refused", *base, *accept), 2,
+                   [moved, "planted: git refused"])
+        if not (a / rel).is_file() or foreign not in (a / rel).read_bytes():
+            bad.append("foreign row: the bytes another writer appended are gone")
+        (a / rel).unlink(missing_ok=True)
         got = run_ask_door(a, *base, *accept)   # AC5
         check_case("file", got, 0, [f"wrote {rel} {first} key "])
         key = (re.search(rf"^wrote {re.escape(rel)} {first} key ([0-9a-f]{{12}})$", got[1], re.M) or [None, None])[1]
@@ -1914,6 +1983,14 @@ def check_ask_plant():
         lock.unlink()
         if (a / rel).read_bytes() != held or run_git(a, "status", "--porcelain") != status:
             bad.append("index-lock held file: the backlog's bytes or the status moved on a filing git would not stage")
+        for case, plant, rc, needle in (
+                ("foreign row held file", "foreign-refused", 2, moved),
+                ("foreign read-back", "foreign-staged", 3, "and it moved since it was written")):
+            check_case(case, run_planted_door(a, plant, *derive_flags(base, "--text", "y"), *accept), rc, [needle])
+            if foreign not in (a / rel).read_bytes():
+                bad.append(f"{case}: the bytes another writer appended are gone")
+            (a / rel).write_bytes(held)
+            run_git(a, "add", "--", rel)
         (a / ".governance").mkdir(exist_ok=True)
         with open(a / ".governance/policy.toml", "w", encoding="utf-8", newline="\n") as fh:
             fh.write('asks.acceptance = "grade"\n')
@@ -1968,10 +2045,10 @@ def run_fixture(plant):
         if bad:
             return 1
         print(f"build-records: PASS {plant} — {cases} cases: " + (
-            "refuse, family, index-lock, file, replay, grade, refused read, remote" if plant == "ask-door"
+            "refuse, family, index-lock, foreign row, foreign read-back, file, replay, grade, refused read, remote" if plant == "ask-door"
             else "causeless, unresolved cause, three edge refusals, field-newline, edge-newline, field-name-newline, "
-                 "field-name-twice, index-lock, index-lock gone, made-by owner, "
-                 "replay, unit, title, cause, edge, no edge, build, typed, made-by lease, root log, mint beside a draft, mint-collision"))
+                 "field-name-twice, index-lock, index-lock gone, foreign line, made-by owner, "
+                 "replay, unit, title, cause, edge, no edge, build, unread header, typed, made-by lease, root log, mint beside a draft, mint-collision"))
         return 0
     root = pathlib.Path(tempfile.mkdtemp(prefix="br-"))
     if plant == "pending-kind":   # PLAY-dOrderedCharter-55 S8: a copy of this module with one kind pending

@@ -6168,6 +6168,20 @@ def test_slug_claims(arm, files: dict) -> None:
         arm("TOOL-dTotalRecall-3 S1 — the slug asks, a family FAMILIES lacks and a malformed key each refuse before the remote",
             "[2, 2, 2] ['refused the slug asks', 'refused the family XYZ', 'refused the claimant key']",
             lambda: f"{[r for r, _ in bad]} {[' '.join(x.split()[:4]) for _, x in bad]}")
+        # TOOL-dTotalRecall-122 S3: the pre-check's own words, which the derived grammar's refusal never prints, and
+        # no claim of theirs on the remote; red on the pre-check line cut from the claim CLI
+        odd = ("9x", "x_y", "x/y")
+        got_odd = run_claims(*((a, "slug", s, "--claimant", ka) for s in odd))
+        arm("TOOL-dTotalRecall-122 S3 — a slug the pre-check refuses prints its whole reason, before any grammar",
+            f"{[2] * 3} {['refused the slug is not a letter, then letters, digits or dashes'] * 3}",
+            lambda: f"{[r for r, _ in got_odd]} {[x for _, x in got_odd]}")
+        refs = read_git(remote, "for-each-ref", "--format=%(refname)", "refs/gov/claims").split()
+        arm("TOOL-dTotalRecall-122 S3 — the pre-check's refusals leave no claim ref of theirs on the remote",
+            "[] beside dSame True", lambda: f"{[r for r in refs if r.removeprefix('refs/gov/claims/') in odd]} "
+                                            f"beside dSame {'refs/gov/claims/dSame' in refs}")
+        dash = run_claims((a, "slug", "-x", "--claimant", ka))
+        arm("TOOL-dTotalRecall-122 S3 — a slug opening with a dash is the option parser's to refuse",
+            "[(2, 'refused -x is no option')]", lambda: str(dash))
         # TOOL-dTotalRecall-121 AC4: the pre-check leaves the grammar to the policy's, landed on the remote here
         try:
             from backlog import resolve_kit_dir  # noqa: PLC0415 — the kit's inline copy of the sibling resolver
@@ -6184,10 +6198,6 @@ def test_slug_claims(arm, files: dict) -> None:
         arm("TOOL-dTotalRecall-121 AC4 — a hyphenated slug the landed in-slug grammar admits is claimed and minted under",
             f"[0, 0] claimed refs/gov/claims/{dated} minted TOOL-{dated}-1",
             lambda: f"{[r for r, _ in got7]} {' '.join(got7[0][1].split()[:2])} {got7[1][1]}")
-        bad7 = run_claims((e, "slug", "-x", "--claimant", ka), (e, "slug", "9x", "--claimant", ka))
-        arm("TOOL-dTotalRecall-121 AC4 — a slug opening with a dash or a digit refuses before the remote",
-            "[2, 2] ['refused -x is', 'refused the slug']",
-            lambda: f"{[r for r, _ in bad7]} {[' '.join(x.split()[:3]) for _, x in bad7]}")
 
 
 def test_staged_render(arm) -> None:

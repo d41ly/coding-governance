@@ -495,22 +495,23 @@ def read_section(root, address: str) -> dict:
         else:
             sha, text = read_git_blob(root, blob)
             path = next((r["path"] for r in rows if r["blob"] == sha), "")   # where the served view holds it
-            held = con.execute("SELECT b.line, b.end_line FROM blob_row b JOIN view_version w ON "
+            # every row of the key in line order: a file may define it twice (TOOL-dTotalRecall-122 S2)
+            held = con.execute("SELECT DISTINCT b.line, b.end_line FROM blob_row b JOIN view_version w ON "
                                "b.extractor=w.extractor AND b.version=w.version WHERE b.blob=? AND b.kind='record' "
-                               "AND b.text=?", (sha, key)).fetchone()
+                               "AND b.text=? ORDER BY b.line", (sha, key)).fetchall()
             secs = [tuple(x) for x in con.execute(
                 "SELECT b.tag, b.line, b.end_line FROM blob_row b JOIN view_version w ON b.extractor=w.extractor "
                 "AND b.version=w.version WHERE b.blob=? AND b.kind='section'", (sha,))]
-            if held is not None and not path:   # a blob another tree of this node holds
+            if held and not path:   # a blob another tree of this node holds
                 got = [p for (p,) in con.execute(
                     "SELECT DISTINCT path FROM path_row WHERE blob=? AND kind='record'", (sha,))]
                 if not got:
                     raise FindError(f"blob {sha} stands at no path the index holds")
                 path = min(got, key=lambda p: (pathlib.PurePosixPath(p).stem != key, p))
-            if held is None and not rows:
+            if not held and not rows:
                 raise FindError(f"key {key} names no record of the served view, and blob {sha} holds no indexed "
                                 "row of it")
-            if held is None:   # a blob no live tree holds under this key has lost its rows: verify its bytes here
+            if not held:   # a blob no live tree holds under this key has lost its rows: verify its bytes here
                 _ti, rx = load_tag_index()
                 for cand in dict.fromkeys(r["path"] for r in rows):
                     found = [(r[2], r[3]) for r in rx.extract_record(ctx, cand, text)
@@ -518,12 +519,13 @@ def read_section(root, address: str) -> dict:
                     # a stem's row comes from the path alone, so only git's history tells whose text it is
                     stem = pathlib.PurePosixPath(cand).stem == key
                     if found and (not stem or check_blob_path(root, sha, cand)):
-                        held, path = found[0], cand
+                        held, path = found, cand   # every row the text defines, in line order
                         secs = [(r[0], r[2], r[3]) for r in rx.extract_section(ctx, cand, text)]
                         break
-                if held is None:
+                if not held:
                     raise FindError(f"blob {sha} is no version of {key}")
-            rec = {"key": key, "path": path, "line": held[0], "end_line": held[1], "blob": sha}
+            held = next((h for h in held if any(s[0] == tag and h[0] <= s[1] <= h[1] for s in secs)), held[0])
+            rec ={"key": key, "path": path, "line": held[0], "end_line": held[1], "blob": sha}
     finally:
         con.close()
     line, end = rec["line"], rec["end_line"]
@@ -589,7 +591,8 @@ def check_read_set(root, role: str, keys: list[str]) -> tuple[int, list[str]]:
 # ---------------------------------------------------------------------------------- the fixture
 PLANTS = ("cap", "archive", "superseded", "over-report", "over-refuse", "over-off", "superseded-refuse",
           "superseded-mark", "unheld-blob", "blob-unknown-key", "blob-foreign-text", "blob-foreign-record",
-          "missing-section", "section-outside")
+          "missing-section", "section-outside", "section-later-row", "section-second-file", "other-tree",
+          "other-tree-unpathed")
 FIXTURE_BUILD = "bFix"
 #: the kits a fixture copy-installs under its own `tools/`, each found as this kit finds a sibling
 FIXTURE_KITS = (("memory-tree", "tree_lib.py"), ("playbook", "tag_index.py"), ("memory-recall", "query.py"),
@@ -630,6 +633,11 @@ def build_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
                        f"# deviation\n\n**Serves:** deviation TOOL-{FIXTURE_BUILD}-1\n\n## Findings\n\nthe first\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                        "## Findings\n\nthe second\n")
     policy = []
+
+    def write_notes(suffix, body):
+        write_fixture_file(root, f"{folder}/build/2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-notes{suffix}.md",
+                           f"# notes\n\n**Serves:** research TOOL-{FIXTURE_BUILD}-1\n\n" + body)  # census: kept cause-writer fixture: a record head its fixture plants
+
     if plant == "blob-foreign-record":
         write_fixture_file(root, f"{folder}/build/2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-deviation-2.md",
                            f"# deviation 2\n\n**Serves:** deviation TOOL-{FIXTURE_BUILD}-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
@@ -654,10 +662,15 @@ def build_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
     if plant == "superseded-mark":
         policy.append('superseded-slices = "mark"')
     if plant == "section-outside":   # TOOL-dTotalRecall-121 S5: two ids, the one `section.findings` under the second
-        write_fixture_file(root, f"{folder}/build/2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-notes.md",
-                           f"# notes\n\n**Serves:** research TOOL-{FIXTURE_BUILD}-1\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
-                           f"## TOOL-{FIXTURE_BUILD}-11 — the first\n\nno section of its own\n\n"
-                           f"## TOOL-{FIXTURE_BUILD}-12 — the second\n\n### Outcome\n\nthe second's outcome\n")
+        write_notes("", f"## TOOL-{FIXTURE_BUILD}-11 — the first\n\nno section of its own\n\n"
+                        f"## TOOL-{FIXTURE_BUILD}-12 — the second\n\n### Outcome\n\nthe second's outcome\n")
+    if plant == "section-later-row":   # TOOL-dTotalRecall-122 S2: one file defining the id twice, the section in the later
+        write_notes("", f"## TOOL-{FIXTURE_BUILD}-21 — the first row\n\nno section of its own\n\n"
+                        f"## TOOL-{FIXTURE_BUILD}-21 — the later row\n\n### Outcome\n\nthe later row's outcome\n")
+    if plant == "section-second-file":   # TOOL-dTotalRecall-122 S5: the first file's section is another id's
+        write_notes("-a", f"## TOOL-{FIXTURE_BUILD}-31 — the first file\n\nno section of its own\n\n"
+                          f"## TOOL-{FIXTURE_BUILD}-32 — another id\n\n### Outcome\n\nanother id's outcome\n")
+        write_notes("-b", f"## TOOL-{FIXTURE_BUILD}-31 — the second file\n\n### Outcome\n\nthe second file's outcome\n")
     if plant == "missing-section":
         template = pathlib.Path(KIT.parent.parent, "memory", "TEMPLATE-SPEC.md")
         text = template.read_bytes().decode("utf-8").replace("\r\n", "\n") if template.is_file() else ""
@@ -707,8 +720,46 @@ def run_fixture(plant: str) -> tuple[int, list[str]]:
                         "blob-foreign-text": (stem, "memory/README.md"),
                         "blob-foreign-record": (stem, f"memory/builds/{FIXTURE_BUILD}/build/{stem[:-1]}2.md")}[plant]
             argv = ["show", f"{key}@{run_fixture_git(root, 'rev-parse', f'HEAD:{rel}').strip()}"]
+        key = {"section-later-row": f"TOOL-{FIXTURE_BUILD}-21", "section-second-file": f"TOOL-{FIXTURE_BUILD}-31"}.get(plant)
+        if key:
+            argv = ["show", f"{key}#section.outcome"]
+        if plant.startswith("other-tree"):   # TOOL-dTotalRecall-122 S6: a blob another worktree holds at two paths
+            other, folder = top / "other", f"memory/builds/{FIXTURE_BUILD}/build"
+            run_fixture_git(root, "worktree", "add", "-q", "-b", "other", str(other))
+            text = (other / folder / f"{stem}.md").read_text(encoding="utf-8").replace("the second", "the other tree's")
+            for name in (stem, f"{stem[:-1]}0"):   # indexed after each, so the blob's one row is the record's own stem
+                write_fixture_file(other, f"{folder}/{name}.md", text)
+                run_fixture_git(other, "add", "-A")
+                run_fixture_git(other, "commit", "-q", "-m", name)
+                run_fixture_cli(other, ["show", stem])
+            blob = run_fixture_git(other, "rev-parse", f"HEAD:{folder}/{stem}.md").strip()
+            argv = ["show", f"{stem}#section.findings-2@{blob}"]
+            if plant == "other-tree-unpathed":
+                import contextlib
+                import sqlite3
+                with contextlib.closing(sqlite3.connect(next((root / ".git" / "gov").glob("index-s*.db")))) as con, con:
+                    con.execute("DELETE FROM path_row WHERE blob=?", (blob,))
         rc, lines = run_fixture_cli(root, argv)
-        if plant == "section-outside":   # the file's stem reaches the section, the first id does not
+        if plant == "other-tree":   # `show` prints text alone, so the path the read answers is read beside it
+            p = subprocess.run([sys.executable, "-c", "import sys; sys.path.insert(0, sys.argv[1]); import record_find; "
+                                "print(record_find.read_section(sys.argv[2], sys.argv[3])['path'])",
+                                str(root / TOOL_ROOT_NAME / KIT.name), str(root), argv[1]], cwd=str(root),
+                               env={k: v for k, v in os.environ.items() if not k.startswith("GIT_")},
+                               capture_output=True, text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+            lines.append(f"{SAY}: fixture other-tree · path " + (p.stdout + p.stderr).strip())
+        if plant == "section-later-row":   # the same section pinned, the record pinned, and the section at an unheld blob
+            rel = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-notes.md"
+            old = run_fixture_git(root, "rev-parse", f"HEAD:{rel}").strip()
+            lines = [f"read unpinned · {ln}" for ln in lines]
+            for case, address in (("pinned", f"{key}#section.outcome@{old}"), ("no tag", f"{key}@{old}"),
+                                  ("unheld", f"{key}#section.outcome@{old}")):
+                if case == "unheld":   # the record edited and the commit amended, so no tree holds its old blob
+                    write_fixture_file(root, rel, (root / rel).read_text(encoding="utf-8").replace("row's", "edited"))
+                    run_fixture_git(root, "commit", "-q", "-a", "--amend", "-m", "fixture")
+                    run_fixture_cli(root, ["show", key])   # the edit indexed, so the old blob has no row left
+                case_rc, shown = run_fixture_cli(root, ["show", address])
+                lines += [f"read {case} · {ln}" for ln in shown] + [f"{SAY}: fixture {plant} · {case} · exit {case_rc}"]
+        if plant == "section-outside":  # the file's stem reaches the section, the first id does not
             stem_rc, shown = run_fixture_cli(root, ["show", f"2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-notes#section.outcome"])
             lines += shown + [f"{SAY}: fixture section-outside · file stem · exit {stem_rc}"]
         if plant == "missing-section":

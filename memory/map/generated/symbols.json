@@ -6768,6 +6768,21 @@
       "file": ".githooks/pre-push.runlog.test.sh"
     },
     {
+      "id": "check_decisions_fixture",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "check_decisions_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "check_decisions_fixture",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
+    },
+    {
       "id": "check_decisions_row",
       "kind": "function",
       "file": "tools/policy/guard.py"
@@ -8309,6 +8324,21 @@
     },
     {
       "id": "check_message_attribution",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
+    },
+    {
+      "id": "check_message_decisions",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "check_message_decisions",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "check_message_decisions",
       "kind": "function",
       "file": "tools/unattended/commit_trailers.py"
     },
@@ -48161,6 +48191,11 @@
       "id": "write_preset",
       "kind": "function",
       "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "write_prior_bytes",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "write_probe_fields",

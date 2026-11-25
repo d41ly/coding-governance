@@ -515,7 +515,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   run-state file, the unit's brief rows, the generated outputs and gen-region-only changes, must sit
   inside that pass's declarations; otherwise it refuses, naming each path and printing the
   `--dispatch` that widens the declaration while widening is still legal. No trailer on a subject
-  naming an open pass is refused too, asking for `Pass: <unit-id>` or `Pass: none`. It writes
+  naming an open pass is refused too, asking for `Pass: <unit-id>` or `Pass: none`. It also refuses a
+  `Decided:` line outside the message's final trailer block, where git reads no trailer. It writes
   nothing; a `--no-verify` commit skips it, and check 23 still grades that pass at the close. An
   AMEND of a pass commit is graded too, but an undeclared path in it is refused with no widening:
   a `--dispatch` would anchor at the commit the amend replaces, which check 23 never grades.
@@ -859,7 +860,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   such event's commit that any branch or remote-tracking branch reaches and holds the events to those
   walks' keys, as sets, naming `missing`, `extra`, `duplicate` for a key a second line holds, or
   `unread` for a `MEMORY_ROOT` that is no plain relative path or a walk git refuses; `--feed rebuild`
-  then appends the record events of the remote default branch's tracking ref, and exits 2 with `feed: no record events were rebuilt: <why>` where none resolves.
+  then appends the record events of the remote default branch's tracking ref, and exits 2 with
+  `feed: no record events were rebuilt: <why>` where none resolves.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it

@@ -147,6 +147,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [process-creation-is-the-suite-cost](process-creation-is-the-suite-cost.md) | class | 2 |  | a shell suite that is 93% not-CPU is paying an on-access antivirus scanner per exec, so its cost is spawn count and nothing in the code reads that way |
 | [ratchet-migration-ignores-how-each-source-grows](ratchet-migration-ignores-how-each-source-grows.md) | class | 3 |  | a migration puts many registries under one shrink-only ratchet without asking how each one grows, so an append-only history or a declared set reds on correct work, or widen records turn routine and the ratchet stops meaning anything |
 | [rate-quoted-without-its-denominator](rate-quoted-without-its-denominator.md) | class | 5 |  | a rate put to the owner in a fork divides by the wrong population, so the option's own cost reads several times off |
+| [read-allowlist-admits-a-writing-option](read-allowlist-admits-a-writing-option.md) | class | 3 |  | an allow-list of reading programs decides a shell call only reads, and one of those programs takes an option that writes, so a call that changes a file is counted as a read |
 | [record-citing-a-foreign-id-defines-or-orphans-it](record-citing-a-foreign-id-defines-or-orphans-it.md) | class | 2 |  | writing another build's id into a record either DEFINES it or ORPHANS it, and the orphan count sees only one of those, so the obvious check passes on the worse half |
 | [record-file-read-by-line-position](record-file-read-by-line-position.md) | class | 3 |  | a key-TAB-value record file read by its first line takes whatever key the writer put first, and a TAB inside that value shifts every column after it in the row that copies it |
 | [record-without-serves-or-with-a-round-counter](record-without-serves-or-with-a-round-counter.md) | class | 7 |  | a new build record owes a Serves line and a filename that projects it, and a round counter in that filename mints an id nothing defines |
@@ -198,6 +199,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-182 record(s): 179 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+183 record(s): 180 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

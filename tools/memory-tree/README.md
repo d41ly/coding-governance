@@ -383,7 +383,8 @@ kind's `<n>` is `write_record`'s, a row with an empty `id-rule` takes `--name`, 
 the row's home and refused where a typed kind's name grammar matches it, and a `<FAMILY>-<slug>-<seq>`
 rule is minted by `gov-claim.sh ask` with the content key as its claimant, the family the unit's; a clone
 with no remote takes the unattended driver's `derive_ask_seq`. The file is staged, never committed, and one
-git will not stage is refused naming git's refusal, with nothing left written.
+git will not stage is refused naming git's refusal, with nothing left written, unless another writer moved
+the file since the write: that file is left as it stands, unstaged, and the refusal says so.
 Exit: 0 `wrote <path> key <key>` or `exists <path> key <key>`; 2 `refused <kind>: <why>`, nothing
 written; 4 `waiting offline <ref>`, a counter mint offline under `warn` or `follow-leases`.
 `new shape-run --review <path>` (TOOL-dTotalRecall-11) takes no other flag: a tracked review record of a

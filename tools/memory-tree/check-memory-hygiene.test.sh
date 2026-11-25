@@ -3761,6 +3761,20 @@ hit 'record-find: fixture missing-section · spec files 0'; hit 'record-find: fi
 # --- on the pick that falls back to any section of the tag.
 run_find_plant section-outside; hit 'refused show: tag section.outcome names no section of TOOL-bFix-11'
 hit "the second's outcome"; hit 'record-find: fixture section-outside · file stem · exit 0'; hit 'record-find: fixture section-outside · exit 2'
+# --- TOOL-dTotalRecall-122 AC2: a file defining its id twice answers the row whose extent holds the section, unpinned,
+# --- pinned and at a blob no tree holds, and a pinned read with no tag the first row. Red on the one-row pinned read.
+run_find_plant section-later-row; hit "read unpinned · the later row's outcome"; hit "read pinned · the later row's outcome"
+hit "read unheld · the later row's outcome"; hit 'read no tag · ## TOOL-bFix-21 — the first row'
+hit 'record-find: fixture section-later-row · exit 0'; hit 'record-find: fixture section-later-row · pinned · exit 0'
+hit 'record-find: fixture section-later-row · unheld · exit 0'; hit 'record-find: fixture section-later-row · no tag · exit 0'
+# --- TOOL-dTotalRecall-122 AC5: an id two files define answers the file whose own extent holds the section. Red on the
+# --- candidate loop's containment cut.
+run_find_plant section-second-file; hit "the second file's outcome"; hit 'record-find: fixture section-second-file · exit 0'
+# --- TOOL-dTotalRecall-122 AC6: a blob only another worktree's tree holds, at two paths, answers the record's own path,
+# --- and with no path row left is refused. Red on the path lookup cut, on a plain `min` and on the refusal cut.
+run_find_plant other-tree; hit "the other tree's"; hit 'record-find: fixture other-tree · exit 0'
+hit 'fixture other-tree · path memory/builds/bFix/build/2026-01-01-build-TOOL-bFix-1-deviation-1.md'
+run_find_plant other-tree-unpathed; hit 'stands at no path the index holds'; hit 'record-find: fixture other-tree-unpathed · exit 2'
 
 # --- TOOL-dTotalRecall-121 AC7 — the shape-run check's plants, one per red branch of `check_shape_runs` and a green
 # --- one, each `<case>|<exit>|<a line it must print>`. Red on each branch's red cut, whose plant then exits 0.
@@ -3796,7 +3810,7 @@ out=$("$_PY" "$HERE/build_records.py" --fixture --plant door-header 2>&1)
 if grep -q 'build-records: SKIP door-header' <<<"$out"; then
   echo "skip the door-header plant: $out"; n_skip=$((${n_skip:-0}+1))
 else
-  hit 'build-records: PASS door-header — 24 cases'
+  hit 'build-records: PASS door-header — 26 cases'
 fi
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant legacy 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'   # AC4
 hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings causes'; hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings-2 causes'   # AC8
@@ -4110,7 +4124,7 @@ out=$("$_PY" "$HERE/build_records.py" --fixture --plant ask-door 2>&1)
 if grep -qF 'build-records: SKIP ask-door' <<<"$out"; then
   echo "skip the ask door's plant: $(grep -F 'build-records: SKIP ask-door' <<<"$out"), so its 2 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+2))
 else
-  hit 'build-records: PASS ask-door — 17 cases'
+  hit 'build-records: PASS ask-door — 20 cases'
   miss 'build-records: FAIL'
 fi
 
@@ -5882,7 +5896,10 @@ done
 # the eight shape-run plants, the three census plants, the kind selftest's exit and PASS line and the plant join; the
 # claim arms and the shape-run ones are skipped aloud with n_skip carrying them. Counted by reading; OWED: observed at
 # the close.
-FLOOR_ASSERTIONS=879
+# RAISED 879 -> 894 by TOOL-dTotalRecall-122 on 2026-11-25: eight of section-later-row, two of section-second-file,
+# three of other-tree and two of other-tree-unpathed, fifteen top-level assertions, never skipped. Counted by reading;
+# OWED: observed at the close.
+FLOOR_ASSERTIONS=894
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

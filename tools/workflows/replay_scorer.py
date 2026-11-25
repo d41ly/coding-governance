@@ -127,8 +127,9 @@ INSTANCE_KEYS = ("review-replay", "scouted-seam", "map-replay")
 #: by TOOL-dFairHearing-32 S9: replay-subject, experiment-references and held-out-pathspec. Raised 24 -> 25 by
 #: TOOL-dFairHearing-37 S5: held-out-tracked. Raised 25 -> 26 by TOOL-dFairHearing-46 S5: stated-shape. Raised 26 -> 29
 #: by TOOL-dFairHearing-48 S3, S5: appendix-pipe, appendix-break and proof-pinned. Raised 29 -> 32 by
-#: TOOL-dTotalRecall-17 section 7: map-known, map-verdict and map-transcript.
-ARMS_DECLARED = 32
+#: TOOL-dTotalRecall-17 section 7: map-known, map-verdict and map-transcript. Raised 32 -> 33 by TOOL-dTotalRecall-122
+#: S4: map-experiment.
+ARMS_DECLARED = 33
 
 
 class Refusal(Exception):
@@ -1183,6 +1184,9 @@ GIT_SEARCHES = frozenset({"grep", "ls-files"})
 READ_PROGRAMS = SEARCH_PROGRAMS | {"cat", "head", "tail", "sed", "wc", "cd", "echo"}
 GIT_READS = GIT_SEARCHES | {"diff", "show", "log", "blame", "status", "cat-file", "rev-parse"}
 NON_ACTING_TOOLS = frozenset({"ToolSearch"})
+#: TOOL-dTotalRecall-122 S10: what makes an admitted program write, beside `sed`'s in-place option.
+GIT_WRITE_OPTION = re.compile(r"--output(?:=.*)?", re.S)     # never `-o`: `git grep -o` and `git ls-files -o` read
+FIND_WRITE_OPTIONS = frozenset({"-delete", "-fprint", "-fprint0", "-fprintf", "-fls", "-exec", "-execdir", "-ok", "-okdir"})
 SAFE_REDIRECT = re.compile(r"[0-9]*>&[0-9-]|[0-9&*]*>>?[ \t]*(?:/dev/null|\$null)(?![\w./-])")   # `2>&1` and the null device
 QUOTED_SPAN = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"|\\.", re.S)   # what a shell takes whole, so its `>` is text
 #: The map's losing terms (the project map's `[test]`): the recall rise must reach the twin difference plus
@@ -1317,12 +1321,13 @@ def measure_call_searches(ex, name, tool_input):
 def check_read_call(ex, name, tool_input):
     """True for a call a lens makes before its first act (TOOL-dTotalRecall-121 S10): a runlog `read` tool, a
     search tool, a NON_ACTING_TOOLS member, or a shell call that redirects to no file but the null device, runs
-    a READ_PROGRAMS program or a GIT_READS subcommand in every segment, and hands `sed` no in-place option. Any
+    a READ_PROGRAMS program or a GIT_READS subcommand in every segment, and hands `sed` no in-place option, a git
+    read no GIT_WRITE_OPTION and `find` no FIND_WRITE_OPTIONS member (TOOL-dTotalRecall-122 S10). Any
     other call is the act. The redirect is read off the command, its heredoc bodies, SAFE_REDIRECT and quoted
     spans out, so one glued behind its word is seen and a quoted `>` is not. Not read: a `>` in an unquoted
     comment or an unquoted comparison, read as a redirect; a quoted null device, read as a file; a quote a
-    comment leaves open, and PowerShell's own quoting, whose spans may pair wrongly; `sed`'s `w` command; a
-    `find -exec`; and a call nested in `bash -c`."""
+    comment leaves open, and PowerShell's own quoting, whose spans may pair wrongly; `sed`'s `w` command; and a
+    call nested in `bash -c`."""
     if name in NON_ACTING_TOOLS or name in SEARCH_TOOLS or ex.TOOL_CLASSES.get(name) == "read":
         return True
     command = tool_input.get("command") if name in ex.SHELL_TOOLS else None
@@ -1337,6 +1342,10 @@ def check_read_call(ex, name, tool_input):
         if program not in READ_PROGRAMS and sub not in GIT_READS:
             return False
         if program == "sed" and any(re.match(r"-[A-Za-z]*i|--in-place", w) for w in words):
+            return False
+        if sub in GIT_READS and any(GIT_WRITE_OPTION.fullmatch(w) for w in words):
+            return False
+        if program == "find" and FIND_WRITE_OPTIONS.intersection(words):
             return False
     return bool(segments)
 
@@ -2220,35 +2229,92 @@ def run_selftest():
             bad = f"a set failing recall alone with no run measured read {lost!r}"
         return bad or (None if derive_map_verdict(edge) == ("win", []) else f"the boundary set read {derive_map_verdict(edge)!r}")
 
-    def check_map_transcript_arm():
-        """TOOL-dTotalRecall-17 AC3, TOOL-dTotalRecall-121 AC10: a 500-byte `git diff` (PINNED), a `sed -n` pipe, a
-        `ToolSearch`, a `Grep`, a piped shell `git grep`, a 900-byte `Read` (PINNED) and then a `sed -i` count 2
-        searches, and every result before the `sed -i`; a file redirect, glued or not, is the act and one to
-        `/dev/null` is not; a torn line refuses."""
+    def render_transcript(calls):
+        """One transcript's text: each `(id, (tool, input), result)` as the assistant line carrying the call, then
+        the user line carrying its result."""
+        return "".join(json.dumps({"type": kind, "message": {"content": [body]}}) + "\n" for tid, (name, given), result in calls
+                       for kind, body in (("assistant", {"type": "tool_use", "id": tid, "name": name, "input": given}),
+                                          ("user", {"type": "tool_result", "tool_use_id": tid, "content": result})))
+
+    def check_map_experiment_arm():
+        """TOOL-dTotalRecall-122 S4: `check_experiment` over a known set of six items (PINNED), the with-map runs
+        confirming all six and the without runs one, each without run's one search past its act, so recall and
+        searches pass. With every run's act first the byte term and the verdict read `unarmed`; with a ten-byte
+        `Read` (PINNED) ahead of each act the figures line and `verdict win`."""
         try:
             resolve_runlog_extract()
         except Refusal as exc:
             return ("skip", f"no runlog kit resolves beside this kit, so no transcript can be read: {exc}")
+        items = [1, 2, 3, 4, 5, 6]
 
-        def derive_transcript_line(kind, tid, value):
-            """One transcript line: an assistant tool call, or the user record carrying its result."""
-            if kind == "use":
-                return json.dumps({"type": "assistant", "message": {"content": [{"type": "tool_use", "id": tid, "name": value[0], "input": value[1]}]}})
-            return json.dumps({"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": tid, "content": value}]}})
+        def render_report(ids):
+            head = f"**Serves:** diff-review X-1\n\nRange: {'a' * 40}..{'b' * 40}\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
+            return (head + "".join(f"### H{i}. item {i} (finding {i})\n\n" for i in ids)
+                    + f"Review shape: raw {len(ids)}, confirmed {len(ids)}, refuted 0.\n\n" + APPENDIX_HEADING
+                    + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n"
+                    + "".join(f"| {i} | l | a.py:{i * 100} | confirmed |\n" for i in ids))
+
+        with tempfile.TemporaryDirectory() as tmp:
+            def write_source(name, text):
+                path = pathlib.Path(tmp, name)
+                path.write_text(text, encoding="utf-8", newline="\n")
+                return str(path)
+            record = write_source("known.md", render_report(items))
+            size = len(render_report(items).encode("utf-8"))
+            want = (([], ["term bytes: unarmed · every lens run read 0 before its first act", "verdict unarmed bytes"]),
+                    ([("t1", ("Read", {"file_path": "a.py"}), "r" * 10)], [
+                        "term bytes: median bytes before the first act with 10 · without 10 · rise 0 · "
+                        f"map {size} byte(s) · loses above {size}", "verdict win"]))
+            for first, lines in want:
+                candidates = []
+                for arm, ids, late in (("without", items[:1], [("t3", ("Grep", {"pattern": "x"}), "a.py:1:x\n")]),
+                                       ("with", items, [])):
+                    calls = [*first, ("t2", ("Edit", {"file_path": "a.py"}), "ok"), *late]
+                    for run in (1, 2):
+                        candidates.append({"case": "r1", "arm": arm, "matched": None,
+                                           "report": write_source(f"{arm}-{run}.md", render_report(ids)),
+                                           "transcripts": {"l": write_source(f"{arm}-{run}.jsonl", render_transcript(calls))}})
+                got = check_experiment({"instance": "map-replay", "map": record, "candidates": candidates,
+                                        "known": [{"case": "r1", "record": record, "items": [f"H{i}" for i in items]}],
+                                        "arms": [{"name": "without", "settings": {"map": False}, "dispatched": 2},
+                                                 {"name": "with", "base": "without", "settings": {"map": True}, "dispatched": 2}]})
+                if got[-2:] != lines:
+                    return f"with {len(first)} read(s) ahead of each act the last lines read {got[-2:]!r}, not {lines!r}"
+        return None
+
+    def check_map_transcript_arm():
+        """TOOL-dTotalRecall-17 AC3, TOOL-dTotalRecall-121 AC10: a 500-byte `git diff` (PINNED), a `sed -n` pipe, a
+        `ToolSearch`, a `Grep`, a piped shell `git grep`, a 900-byte `Read` (PINNED), a `grep` for a quoted `>` and a
+        heredoc holding one (TOOL-dTotalRecall-122 S10), then a `sed -i` count 3 searches, and every result before the
+        `sed -i`; a file redirect, glued or not, is the act and one to `/dev/null` is not; a read program's or a git
+        read's writing option is the act; a torn line refuses."""
+        try:
+            resolve_runlog_extract()
+        except Refusal as exc:
+            return ("skip", f"no runlog kit resolves beside this kit, so no transcript can be read: {exc}")
         calls = [("t6", ("Bash", {"command": "git diff a..b 2>&1"}), "d" * 500),
                  ("t7", ("Bash", {"command": "sed -n 1,5p a.py 2>/dev/null | head"}), "h" * 20),
                  ("t8", ("ToolSearch", {"query": "select:Read"}), "q" * 30),
                  ("t1", ("Grep", {"pattern": "x"}), "a.py:1:x\n"),
                  ("t2", ("Bash", {"command": "git grep -n x -- '*.py' | wc -l"}), [{"type": "text", "text": "3\n"}]),
+                 ("t9", ("Bash", {"command": 'grep -n "a > b" f'}), "g" * 40),
+                 ("t10", ("Bash", {"command": "cat <<'EOF'\na > b\nEOF"}), "c" * 60),
                  ("t3", ("Read", {"file_path": "a.py"}), "r" * 900), ("t4", ("Bash", {"command": "sed -i s/a/b/ a.py"}), "e" * 50),
                  ("t5", ("Read", {"file_path": "b.py"}), "s" * 70)]
-        text = "".join(derive_transcript_line("use", t, c) + "\n" + derive_transcript_line("result", t, r) + "\n" for t, c, r in calls)
+        text = render_transcript(calls)
         with tempfile.TemporaryDirectory() as tmp:
             path = pathlib.Path(tmp, "lens.jsonl")
+            for command in ("git diff a..b --output=x.txt", "git diff --output x a b", "find . -delete", "find . -fprint x",
+                            "find . -fprint0 x", "find . -fprintf x %p", "find . -fls x", "find . -exec rm {} ;",
+                            "find . -execdir rm {} ;", "find . -ok rm {} ;", "find . -okdir rm {} ;"):
+                path.write_text(render_transcript([("t1", ("Bash", {"command": command}), "w" * 30), *calls]), encoding="utf-8")
+                got = measure_bytes_before_act(path)
+                if got != 0:
+                    return f"the writing {command!r} read {got!r} bytes before the act, not 0"
             path.write_text(text, encoding="utf-8")
             got = (measure_existence_searches(path), measure_bytes_before_act(path))
-            if got != (2, 500 + 20 + 30 + 9 + 2 + 900):
-                return f"the transcript read {got!r} searches and bytes, not (2, 1461)"
+            if got != (3, 500 + 20 + 30 + 9 + 2 + 40 + 60 + 900):
+                return f"the transcript read {got!r} searches and bytes, not (3, 1561)"
             for redirect in (" > b.py", ">b.py"):
                 path.write_text(text.replace("sed -n 1,5p a.py 2>/dev/null", "sed -n 1,5p a.py" + redirect), encoding="utf-8")
                 got = measure_bytes_before_act(path)
@@ -2270,7 +2336,7 @@ def run_selftest():
             ("held-out-tracked", check_held_out_tracked_arm), ("stated-shape", check_stated_shape_arm),
             ("appendix-pipe", check_appendix_pipe_arm), ("appendix-break", check_appendix_break_arm),
             ("proof-pinned", check_proof_pinned_arm), ("map-known", check_map_known_arm), ("map-verdict", check_map_verdict_arm),
-            ("map-transcript", check_map_transcript_arm)]
+            ("map-experiment", check_map_experiment_arm), ("map-transcript", check_map_transcript_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1

@@ -160,8 +160,10 @@ def write_new_ask(root, argv):
     write, a refusal where its bytes moved since the parse, then `legacy_ledger._write_atomic`'s temp file
     and `os.replace`; staged and parsed back to the same count, the file put back as it was where git will
     not stage it, the ValueError naming git's refusal (TOOL-dTotalRecall-121 S3), or where the read-back
-    fails, which prints `refused ask:` naming the file and exits 3. ValueError for every other refusal,
-    exit 2; a refusal after the mint leaves the minted id unused.
+    fails, which prints `refused ask:` naming the file and exits 3; each undo is
+    `build_records.write_prior_bytes`, which leaves a file another writer moved as it stands and says so
+    (TOOL-dTotalRecall-122 S1). ValueError for every other refusal, exit 2; a refusal after the mint leaves
+    the minted id unused.
     WHAT IT DOES NOT CHECK: an ask of the same key filed on another branch, which the counter hands the
     same id; an ask of the same text whose clauses differ, which is another key; the rows rendered under the
     minted id, which are counted and keyed, never graded; an ask the file already holds under the
@@ -260,30 +262,28 @@ def write_new_ask(root, argv):
     if now != held:
         raise ValueError(f"{rel} moved since it was parsed, another writer's bytes in it, so nothing was written and "
                          f"{said} stays unused: file the ask again")
-    _write_atomic(path, render_rows(said).encode("utf-8"))
+    wrote = render_rows(said).encode("utf-8")
+    _write_atomic(path, wrote)
     refused = build_records.add_to_index(root, rel)
     if refused:   # TOOL-dTotalRecall-121 S3: the file as it was, the minted id unused
-        if held is None:
-            path.unlink()
-        else:
-            _write_atomic(path, held)
-        raise ValueError(f"{rel} was not staged, so it was {'removed' if held is None else 'put back as it was'} "
-                         f"and {said} stays unused: {refused}")
+        undone = build_records.write_prior_bytes(root, rel, wrote, held)
+        raise ValueError(f"{rel} was not staged, {undone} and {said} stays unused: {refused}")
     back = backlog.parse_file(rel, path.read_bytes().decode("utf-8"), grammar)
     wrong = check_rows_added(before, back, said, level)
     asks = [x for x in back.asks if x.id == said]
     if wrong or derive_ask_key(asks[0].text, asks[0].unit, asks[0].pointer, asks[0].clauses) != key:
-        if prior is None:
-            subprocess.run(["git", "rm", "-q", "--cached", "-f", "--", rel], cwd=str(root), capture_output=True,
-                           check=False)
-            path.unlink()
-            refused = ""
+        undone, refused = build_records.write_prior_bytes(root, rel, wrote, held), ""
+        if not undone.startswith("so it was "):   # TOOL-dTotalRecall-122 S1: another writer's bytes, staged with these
+            undone = undone.removesuffix(", unstaged") + ", still staged"
         else:
-            _write_atomic(path, held)
-            refused = build_records.add_to_index(root, rel)
+            undone = "so the rows were removed and the file put back as it was"
+            if held is None:
+                subprocess.run(["git", "rm", "-q", "--cached", "-f", "--", rel], cwd=str(root), capture_output=True,
+                               check=False)
+            else:
+                refused = build_records.add_to_index(root, rel)
         print(f"refused ask: {rel} did not read {said} back as one ask of key {key} and one SEV row at {level}: "
-              f"the written rows {wrong or 'read another key'}, so the rows were removed and the file put back as it "
-              f"was" + (f", not staged: {refused}" if refused else ""))
+              f"the written rows {wrong or 'read another key'}, {undone}" + (f", not staged: {refused}" if refused else ""))
         return 3
     print(f"wrote {rel} {said} key {key}")
     if not ready:
