@@ -89,7 +89,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 72 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 73 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
@@ -173,6 +173,7 @@ ids TOOL-dBoundRoles-86 TOOL-dBoundRoles-87 TOOL-dBoundRoles-88 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-91 — the declaration verb cuts a work order from the composed item kind](spec/2026-11-24-spec-TOOL-dBoundRoles-91.md) | 45 | 2 | CLOSED | rev-1 | 2026-11-24 |
 | [TOOL-dBoundRoles-92 — the closing review's round-1 minors folded, and the reviewers step row declares the atomic resume unit 43 owed](spec/2026-11-24-spec-TOOL-dBoundRoles-92.md) | 46 | 2 | CLOSED | rev-1 | 2026-11-24 |
 | [TOOL-dBoundRoles-93 — the closing review's round-2 mediums: a PowerShell block is read as its own command, and the arms and leg guards the fold left out](spec/2026-11-24-spec-TOOL-dBoundRoles-93.md) | 47 | 2 | CLOSED | rev-1 | 2026-11-24 |
+| [TOOL-dBoundRoles-95 — under `policy-file.guard = owner-only` the policy guard admits no live run's own write of the policy file](spec/2026-11-25-spec-TOOL-dBoundRoles-95.md) | 48 | 2 | OPEN | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
 Records: 600 bound to this build, across 4 record folder(s).
@@ -180,7 +181,7 @@ Records: 600 bound to this build, across 4 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 TOOL-dBoundRoles-81 TOOL-dBoundRoles-82 TOOL-dBoundRoles-83 TOOL-dBoundRoles-84 TOOL-dBoundRoles-85 TOOL-dBoundRoles-86 TOOL-dBoundRoles-87 TOOL-dBoundRoles-88 TOOL-dBoundRoles-89
-TOOL-dBoundRoles-90 TOOL-dBoundRoles-91 TOOL-dBoundRoles-92 TOOL-dBoundRoles-93.
+TOOL-dBoundRoles-90 TOOL-dBoundRoles-91 TOOL-dBoundRoles-92 TOOL-dBoundRoles-93 TOOL-dBoundRoles-95.
 
 Ids whose spec moved past its audited revision: TOOL-dBoundRoles-1@rev-1 TOOL-dBoundRoles-10@rev-1 TOOL-dBoundRoles-11@rev-1 TOOL-dBoundRoles-12@rev-1 TOOL-dBoundRoles-13@rev-1 TOOL-dBoundRoles-14@rev-1 TOOL-dBoundRoles-15@rev-1 TOOL-dBoundRoles-16@rev-1 TOOL-dBoundRoles-17@rev-1
 TOOL-dBoundRoles-18@rev-1 TOOL-dBoundRoles-19@rev-1 TOOL-dBoundRoles-2@rev-1 TOOL-dBoundRoles-20@rev-1 TOOL-dBoundRoles-21@rev-1 TOOL-dBoundRoles-22@rev-1 TOOL-dBoundRoles-23@rev-1 TOOL-dBoundRoles-24@rev-1 TOOL-dBoundRoles-25@rev-1 TOOL-dBoundRoles-26@rev-1 TOOL-dBoundRoles-3@rev-1
@@ -192,7 +193,7 @@ TOOL-dBoundRoles-64@rev-1 TOOL-dBoundRoles-65@rev-1 TOOL-dBoundRoles-66@rev-1.
 
 <!-- gen:build-coverage -->
 
-Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 72 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 73 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 26
 - carried in parts: 0 (none)
@@ -212,7 +213,7 @@ Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 72 spec(s) at 
   `spec/2026-10-26-spec-TOOL-dBoundRoles-68.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-69.md` (PLAY-dClosedLoop-2), `spec/2026-11-23-spec-TOOL-dBoundRoles-81.md` (PLAY-dClosedLoop-2), `spec/2026-11-23-spec-TOOL-dBoundRoles-82.md` (PLAY-dClosedLoop-2),
   `spec/2026-11-23-spec-TOOL-dBoundRoles-83.md` (PLAY-dClosedLoop-2), `spec/2026-11-23-spec-TOOL-dBoundRoles-84.md` (PLAY-dClosedLoop-2), `spec/2026-11-23-spec-TOOL-dBoundRoles-85.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-86.md` (PLAY-dClosedLoop-2),
   `spec/2026-11-24-spec-TOOL-dBoundRoles-87.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-88.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-89.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-90.md` (PLAY-dClosedLoop-2),
-  `spec/2026-11-24-spec-TOOL-dBoundRoles-91.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-92.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-93.md` (PLAY-dClosedLoop-2)
+  `spec/2026-11-24-spec-TOOL-dBoundRoles-91.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-92.md` (PLAY-dClosedLoop-2), `spec/2026-11-24-spec-TOOL-dBoundRoles-93.md` (PLAY-dClosedLoop-2), `spec/2026-11-25-spec-TOOL-dBoundRoles-95.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0166, cl-dClosedLoop-0167, cl-dClosedLoop-0168, cl-dClosedLoop-0173, cl-dClosedLoop-0178, cl-dClosedLoop-0187, cl-dClosedLoop-0189
 <!-- /gen:build-coverage -->
 
@@ -267,6 +268,7 @@ Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 72 spec(s) at 
 | 45 | `TOOL-dBoundRoles-91` | no |
 | 46 | `TOOL-dBoundRoles-92` | no |
 | 47 | `TOOL-dBoundRoles-93` | no |
+| 48 | `TOOL-dBoundRoles-95` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
