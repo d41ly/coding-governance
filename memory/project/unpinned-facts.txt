@@ -14306,6 +14306,14 @@ memory/builds/dTotalRecall/prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents
 memory/builds/dTotalRecall/prompts/2026-11-05-prompt-TOOL-dTotalRecall-18-1-spec-writer.md	49152 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks.md	49152 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-22-build-brief.md	120 s	1	491dfe31c4fb9890ce3086eb73793d40f10dce1d	widened:2026-11-22-build-TOOL-dTotalRecall-22-widen-2
+memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md	1 MB	1	95e77b9c067eb33468a0a925c84240c439fdea30	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-36
+memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md	10 MB	1	95e77b9c067eb33468a0a925c84240c439fdea30	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-36
+memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md	10884519 bytes	1	95e77b9c067eb33468a0a925c84240c439fdea30	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-36
+memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md	30 s	1	95e77b9c067eb33468a0a925c84240c439fdea30	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-36
+memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-spec-writer.md	1 MB	1	95e77b9c067eb33468a0a925c84240c439fdea30	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-36
+memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-spec-writer.md	10 MB	1	95e77b9c067eb33468a0a925c84240c439fdea30	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-36
+memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-spec-writer.md	10884519 bytes	1	95e77b9c067eb33468a0a925c84240c439fdea30	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-36
+memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-spec-writer.md	30 s	1	95e77b9c067eb33468a0a925c84240c439fdea30	widened:2026-11-25-build-TOOL-dTotalRecall-8-widen-36
 memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md	11 files	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md	194 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md	22 specs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

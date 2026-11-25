@@ -250,8 +250,8 @@ The builder lands S1 to S4. The main loop then does S5 to S7, and the unit close
 ## 5. Production-readiness checklist
 
 - security — no new write path in product code; the runs write under `%TEMP%` clones and this build's records.
-- perf / scale — the table's calls; the new arm is in-memory fixtures inside the `review-replay selftest` ceiling of 300 s
-  (PINNED 2026-11-23, spec 17 §5).
+- perf / scale — the table's calls; the new arm is in-memory fixtures inside the `review-replay selftest` ceiling of
+  300 s (PINNED 2026-11-23, spec 17 §5).
 - error / empty / loading states — a missing, extra or unequal run count refuses, naming the arm and the case.
 - observability — the recall line prints the noise and the count; the record carries the variances.
 - risks — at five runs a true rise of ten loses more often than it wins, the line being 14.78 at the first spread. That spread
@@ -318,7 +318,7 @@ and that a run was not re-run for its figure, which the record's re-run list sta
   than halves its noise at two runs. (b) is rung 1: the clause's own shape, a noise plus 5 items, read for any count, under the
   owner's words in `2026-11-25-prompt-TOOL-dTotalRecall-17-replay-rerun-brief`.
   RESOLVED (agent, 2026-11-25, delegated): (b). widens: none · relaxes: the twin runs' difference as the recall term's noise
-- **F2 — How many runs per arm?** The owner's words name no number. Options: (a) five, resolving a rise near ten in 30 calls;
+- **F2 — How many runs per arm?** The owner's words name no number. Options: (a) five, resolving a rise near ten in 30 calls (DERIVED 2026-11-25, §4's table);
   (b) eighteen, near five in 108; (c) a count picked after a figure is read, which the fixed rule refuses. The brief has the
   main loop take the owner's answer, or five where none came by the manifest's commit. `dispatched` holds either, so no line
   of this spec or of the code moves with it.
