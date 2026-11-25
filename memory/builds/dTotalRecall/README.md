@@ -88,7 +88,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 99 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 99 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14
 ids TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27 TOOL-dTotalRecall-28
 ids TOOL-dTotalRecall-29 TOOL-dTotalRecall-30 TOOL-dTotalRecall-31 TOOL-dTotalRecall-32 TOOL-dTotalRecall-33 TOOL-dTotalRecall-34 TOOL-dTotalRecall-35 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42
@@ -194,7 +194,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113 TOOL-dTotalRecall-114 TOOL-dTota
 | [TOOL-dTotalRecall-99 — the tip scan is graded only on a full read: it exits 0, counts the records it read against the folder, and its `by` lines sum to the live records](spec/2026-10-26-spec-TOOL-dTotalRecall-99.md) | 40 | 2 | CLOSED | rev-2 | 2026-11-25 |
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | CLOSED | rev-2 | 2026-11-25 |
 | [TOOL-dTotalRecall-114 — the close's first bar: each red of the merged tree is repaired at its cause, converted where a conversion is short and widened through its ledger where the need is real](spec/2026-10-26-spec-TOOL-dTotalRecall-114.md) | 42 | 2 | CLOSED | rev-1 | 2026-11-25 |
-| [TOOL-dTotalRecall-115 — the change feed appends a record event once across a merge landing, and its check reads every logged commit as a tip](spec/2026-10-26-spec-TOOL-dTotalRecall-115.md) | 43 | 2 | SPECCED | rev-1 | 2026-11-25 |
+| [TOOL-dTotalRecall-115 — the change feed appends a record event once across a merge landing, and its check reads every logged commit as a tip](spec/2026-10-26-spec-TOOL-dTotalRecall-115.md) | 43 | 2 | INPROGRESS | rev-1 | 2026-11-25 |
 | [TOOL-dTotalRecall-116 — a blob-pinned record read returns a key only where the blob is that record's](spec/2026-10-26-spec-TOOL-dTotalRecall-116.md) | 44 | 2 | SPECCED | rev-1 | 2026-11-25 |
 | [TOOL-dTotalRecall-117 — the record door answers `exists` only for the same call](spec/2026-10-26-spec-TOOL-dTotalRecall-117.md) | 45 | 2 | SPECCED | rev-1 | 2026-11-25 |
 | [TOOL-dTotalRecall-118 — the memory re-measure counts a search of the whole root, and its suite runs its plants again](spec/2026-10-26-spec-TOOL-dTotalRecall-118.md) | 46 | 2 | SPECCED | rev-1 | 2026-11-25 |
@@ -203,7 +203,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113 TOOL-dTotalRecall-114 TOOL-dTota
 | [TOOL-dTotalRecall-121 — the closing review's minors: the record door's names and stage, sessionless claims, hyphenated slugs, section containment, unrun plants, the floor and the map replay's byte term](spec/2026-10-26-spec-TOOL-dTotalRecall-121.md) | 49 | 2 | SPECCED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 922 bound to this build, across 4 record folder(s).
+Records: 923 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-dTotalRecall-116 TOOL-dTotalRecall-117 TOOL-dTotalRecall-118 TOOL-dTotalRecall-119 TOOL-dTotalRecall-120 TOOL-dTotalRecall-121.
 
@@ -322,7 +322,7 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-25-prompt-TOOL-dTotalRecall-115-spec-writer.md`, `2026-11-25-prompt-TOOL-dTotalRecall-115-spec-brief.md` and 414 more under prompts/ |
+| briefs | `2026-11-25-prompt-TOOL-dTotalRecall-115-spec-writer.md`, `2026-11-25-prompt-TOOL-dTotalRecall-115-spec-brief.md` and 415 more under prompts/ |
 | reviews | `2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES) and 8 more under reviews/ |
 | deviation | `2026-11-25-build-TOOL-dTotalRecall-114-deviation-1015.md`, `2026-11-24-build-TOOL-dTotalRecall-87-deviation-1014.md` and 150 more under build/ |
 | red-fix | `2026-11-24-build-TOOL-dTotalRecall-60-red-fix-26.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md` and 24 more under build/ |
