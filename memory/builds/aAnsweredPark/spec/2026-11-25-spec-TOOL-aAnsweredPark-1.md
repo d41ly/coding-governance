@@ -1,11 +1,12 @@
 # TOOL-aAnsweredPark-1 — an owner decision settles by its own answer record, and only an open decision or a live hold interrupts
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-11-25 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-prompt-TOOL-aAnsweredPark-1-1-spec-writer.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-1-spec-writer.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aAnsweredPark-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-brief.md) | research | — |
 | [2026-11-25-prompt-TOOL-aAnsweredPark-1-divergence.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-1-divergence.md) | research | — |
 
@@ -202,6 +203,14 @@ record. Its `rescope` and `handoff` rows and its released hold stop interrupting
 `help/loop.md`
 `tools/run-gates/selftest-budgets.txt`
 `memory/map/generated/symbols.json`
+`memory/builds/aAnsweredPark/build/2026-11-25-build-TOOL-aAnsweredPark-1-1-acceptance-ledger.md`
+`memory/LIVE.md`
+`memory/builds/aAnsweredPark/README.md`
+
+The ledger is the journal record evidencing AC1 to AC10, one line each, every line sharing a backticked
+token with its criterion. The pre-commit hook
+renders `memory/LIVE.md`, `memory/builds/aAnsweredPark/README.md` and this spec's records block; none is
+hand-edited. The build's ask file is not touched: its three KEEP rows are the main loop's.
 
 The budgets row of `loop position fixtures` moves its `plants=` token from 45, PINNED 2026-11-25, to
 the derived `len(PLANTS)`, with the two new plants' direct readings added. The map file is regenerated
@@ -295,6 +304,9 @@ its own record, only decision rows and a live hold interrupt, and one open decis
 ## 9. Revision log
 
 - rev-1 · 2026-11-25 · initial draft.
+- rev-2 · 2026-11-25 · §4 · after the rev-1 builder's divergence, recorded in
+  `2026-11-25-prompt-TOOL-aAnsweredPark-1-divergence`: the files touched gain the acceptance ledger, and
+  name what the hook renders. No scope, design or criterion moved.
 
 ## 10. Reuse audit
 

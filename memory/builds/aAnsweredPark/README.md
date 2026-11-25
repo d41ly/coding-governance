@@ -52,10 +52,10 @@ ids TOOL-aAnsweredPark-1 TOOL-aAnsweredPark-2 TOOL-aAnsweredPark-3 TOOL-aAnswere
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aAnsweredPark-1 — an owner decision settles by its own answer record, and only an open decision or a live hold interrupts](spec/2026-11-25-spec-TOOL-aAnsweredPark-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-25 |
+| [TOOL-aAnsweredPark-1 — an owner decision settles by its own answer record, and only an open decision or a live hold interrupts](spec/2026-11-25-spec-TOOL-aAnsweredPark-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
