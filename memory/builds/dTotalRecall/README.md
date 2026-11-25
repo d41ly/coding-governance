@@ -199,13 +199,13 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113 TOOL-dTotalRecall-114 TOOL-dTota
 | [TOOL-dTotalRecall-117 — the record door answers `exists` only for the same call](spec/2026-10-26-spec-TOOL-dTotalRecall-117.md) | 45 | 2 | CLOSED | rev-1 | 2026-11-25 |
 | [TOOL-dTotalRecall-118 — the memory re-measure counts a search of the whole root, and its suite runs its plants again](spec/2026-10-26-spec-TOOL-dTotalRecall-118.md) | 46 | 2 | CLOSED | rev-1 | 2026-11-25 |
 | [TOOL-dTotalRecall-119 — the orphan walk reads the claim refs a clone really holds](spec/2026-10-26-spec-TOOL-dTotalRecall-119.md) | 47 | 2 | CLOSED | rev-1 | 2026-11-25 |
-| [TOOL-dTotalRecall-120 — the causes leg grades everything once its legacy population is drained](spec/2026-10-26-spec-TOOL-dTotalRecall-120.md) | 48 | 2 | INPROGRESS | rev-1 | 2026-11-25 |
-| [TOOL-dTotalRecall-121 — the closing review's minors: the record door's names and stage, sessionless claims, hyphenated slugs, section containment, unrun plants, the floor and the map replay's byte term](spec/2026-10-26-spec-TOOL-dTotalRecall-121.md) | 49 | 2 | SPECCED | rev-1 | 2026-11-25 |
+| [TOOL-dTotalRecall-120 — the causes leg grades everything once its legacy population is drained](spec/2026-10-26-spec-TOOL-dTotalRecall-120.md) | 48 | 2 | INPROGRESS | rev-2 | 2026-11-25 |
+| [TOOL-dTotalRecall-121 — the closing review's minors: the record door's names and stage, sessionless claims, hyphenated slugs, section containment, unrun plants, the floor and the map replay's byte term](spec/2026-10-26-spec-TOOL-dTotalRecall-121.md) | 49 | 2 | SPECCED | rev-2 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 946 bound to this build, across 4 record folder(s).
+Records: 949 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dTotalRecall-121.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dTotalRecall-100 TOOL-dTotalRecall-114 TOOL-dTotalRecall-115 TOOL-dTotalRecall-116 TOOL-dTotalRecall-117 TOOL-dTotalRecall-118 TOOL-dTotalRecall-119 TOOL-dTotalRecall-120 TOOL-dTotalRecall-121 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94
 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99.
@@ -322,13 +322,13 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-25-prompt-TOOL-dTotalRecall-120-build-brief.md`, `2026-11-25-prompt-TOOL-dTotalRecall-119-build-brief.md` and 422 more under prompts/ |
+| briefs | `2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md`, `2026-11-25-prompt-TOOL-dTotalRecall-120-build-brief.md` and 424 more under prompts/ |
 | reviews | `2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES) and 8 more under reviews/ |
 | deviation | `2026-11-25-build-TOOL-dTotalRecall-119-deviation-1017.md`, `2026-11-25-build-TOOL-dTotalRecall-117-deviation-1016.md` and 152 more under build/ |
 | red-fix | `2026-11-24-build-TOOL-dTotalRecall-60-red-fix-26.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md` and 24 more under build/ |
 | widen | `2026-11-25-build-TOOL-dTotalRecall-119-widen-30.md`, `2026-11-25-build-TOOL-dTotalRecall-116-widen-29.md` and 27 more under build/ |
 | research | `2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md`, `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md` and 112 more under build/ |
-| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-119-1-builder-return.md` and 187 more under build/ |
+| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-120-1-builder-return.md` and 188 more under build/ |
 | open asks | `BACKLOG.md`, 16 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->

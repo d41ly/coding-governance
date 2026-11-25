@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-120 — the causes leg grades everything once its legacy population is drained
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 48
+**Status:** INPROGRESS · rev-2 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 48
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-dTotalRecall-120-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-120-1-builder-return.md) | journal | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-120-build-2-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-build-2-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-120-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-build-brief.md) | journal | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md) | journal | TOOL-dTotalRecall-121 |
 
 <!-- /gen:spec-records -->
 
@@ -71,7 +74,9 @@ empty is graded whole, which is what an empty legacy population states.
 ### The plant
 
 `legacy-drained` joins `PLANTS` and takes the causeless plant's record. After the seed, the fixture calls
-`legacy_ledger.write_rows(root, reg, [])`, the writer a drain ends in, so the state is one production reaches. The
+`legacy_ledger.write_rows(root, reg, {})`, the writer a drain ends in, so the state is one production reaches. The
+argument is the empty mapping: `write_rows` iterates its items, and a list raises `AttributeError`, as the first pass
+found. Over the causeless plant the call left the header alone, `read_home_state` `armed` (DERIVED 2026-11-25, a probe). The
 plant's lines are `run_check`'s, then `write_missing_causes`'; it passes, exit 0 with a PASS line, when the check exits 1
 naming the new record under `causes`, prints the writer census's count line and no `unarmed`, and the backfill's count
 line reads at least one written.
@@ -137,6 +142,8 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 · the `le
 ## 9. Revision log
 
 - rev-1 · 2026-11-25 · initial draft, from the closing review's H6.
+- rev-2 · 2026-11-25 · §4 · the first pass's divergence folded: the plant hands `write_rows` the empty mapping; from
+  `2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief`.
 
 ## 10. Reuse audit
 

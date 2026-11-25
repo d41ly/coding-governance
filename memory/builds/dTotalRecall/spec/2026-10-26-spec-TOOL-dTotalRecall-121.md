@@ -1,19 +1,23 @@
 # TOOL-dTotalRecall-121 — the closing review's minors: the record door's names and stage, sessionless claims, hyphenated slugs, section containment, unrun plants, the floor and the map replay's byte term
 
-**Status:** SPECCED · rev-1 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 49
+**Status:** SPECCED · rev-2 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 49
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md) | journal | TOOL-dTotalRecall-120 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 The closing review's ten MEDIUMs and its LOW (findings 1, 3, 7, 10, 11, 13, 14, 15, 16, 20 and 18), one scope item
-each, as the review's minors batch. Each ends in an arm seen red on today's code.
+each, as the review's minors batch. Each ends in an arm seen red on today's code. Beside them stand two leftovers of units
+already built: two guides that misstate the feed check `TOOL-dTotalRecall-115` changed, and the writer census's red on
+`TOOL-dTotalRecall-117`'s reader.
 
 ## 2. Scope (IN)
 
@@ -43,7 +47,17 @@ each, as the review's minors batch. Each ends in an arm seen red on today's code
 - **S11** — L1, finding 18. `tools/playbook/adopt-playbook.sh` runs `cardinality-refused`, and `prose-pass`, which the join
   finds unrun too, and gains S8's join over `edge_grammar.py`'s plants (§4 "The join"). Observed by AC11.
 - **S12** — The `shell-role` rows of `gov-claim.sh`, `adopt-playbook.sh` and the suite take the measured count through
-  `ratchet.py widen`, unit `TOOL-dTotalRecall-121`. Observed by AC12.
+  `ratchet.py widen`, unit `TOOL-dTotalRecall-121`, each read at the pass, since `TOOL-dTotalRecall-120` moves the
+  suite's after this revision. A row whose measure did not move is left. Observed by AC12.
+- **S13** — The `--feed` entry of `tools/unattended/VERBS.template.md` and section 7 of `tools/unattended/STOPS.template.md` say what
+  `check_feed` walks and names for record events since `TOOL-dTotalRecall-115` (§4 "The feed sentences"), and
+  `memory/guides/UNATTENDED-VERBS.md` and `memory/guides/UNATTENDED-STOPS.md` are installed from them by `bash
+  tools/unattended/adopt-unattended.sh`. Observed by AC13.
+- **S14** — `build_records.py#write_new_record`'s `read_key_fields` finds a record's Serves line through `tree_lib.py#BIND_RE`, the
+  one binding grammar, and spells no Serves literal, so the writer census reads no red there (§4 "The Serves reader").
+  Observed by AC14.
+- **S15** — The sentences of `tools/memory-tree/README.md` and `tools/workflows/README.md` this unit makes false, and the one
+  `TOOL-dTotalRecall-117` left false, are rewritten (§4 "The kit READMEs"). Observed by AC15.
 
 ## 3. Non-goals (OUT)
 
@@ -54,11 +68,13 @@ each, as the review's minors batch. Each ends in an arm seen red on today's code
 - A join over other modules' plants: `deviation_join.py`, `ratchet.py` and `asbuilt_view.py` run theirs through a
   selftest of their own.
 - A leg ceiling, a selftest budget row or a policy key moved.
+- Any behaviour of the feed or its check: S13 states what stands. `help/loop.md`'s sentence on the feed is true and stays.
+- A raise of a guide's byte or line cap, or a trim of a guide past S13's two paragraphs.
 
 ### Edges
 
 - **consumes-from** external — the closing review's report and the landed units whose code it read
-- **consumes-from** `TOOL-dTotalRecall-115` — its bytes of the symbol map, the shell-role rows, the claim CLI, edited after it
+- **consumes-from** `TOOL-dTotalRecall-115` — its bytes of the symbol map, the shell-role rows, the claim CLI, edited after it, and the feed check its guides misstate
 - **consumes-from** `TOOL-dTotalRecall-116` — its bytes of the symbol map, the shell-role rows, the hygiene suite and its floor, the record finder, edited after it
 - **consumes-from** `TOOL-dTotalRecall-117` — its bytes of the symbol map, the shell-role rows, the hygiene suite and its floor, the record factory and its door-header plant, the ask and record door, edited after it
 - **consumes-from** `TOOL-dTotalRecall-118` — its bytes of the symbol map, edited after it
@@ -68,7 +84,9 @@ each, as the review's minors batch. Each ends in an arm seen red on today's code
 
 ## 4. Design
 
-Read at `acbb74bb` on 2026-11-25; each of the eleven holds. Where the code differs from the report it says so.
+Read at `acbb74bb` on 2026-11-25; each of the eleven holds. Where the code differs from the report it says so. Re-read at
+`20e9bd298` for rev-2, over units 115 to 119 as built: the eleven still hold, and the blob branch S5 edits is the one
+`TOOL-dTotalRecall-116` rev-2 wrote.
 
 ### S1 — the field names
 
@@ -148,7 +166,7 @@ One inline Python per suite. Over the memory suite: for each of the four modules
 whole word of a line that is no comment, and `record_kinds.py" --selftest` must be on one, whose coverage S6's own test
 holds. Over `adopt-playbook.sh`: every plant `edge_grammar.py` admits, which its new `FIXTURE_PLANTS` tuple names and its
 argument parser reads, must open a row. Run today it names the three census plants and no other in the memory suite, and
-`cardinality-refused` and `prose-pass` in the playbook's (DERIVED 2026-11-25, that predicate). What it does not check is
+`cardinality-refused` and `prose-pass` in the playbook's (DERIVED 2026-11-25, that predicate, the same at `acbb74bb` and `20e9bd298`). What it does not check is
 whether the arm asserts anything.
 
 `prose-pass` prints `edges: plant prose-pass` and exits 0 (DERIVED 2026-11-25, its run), and `cardinality-refused` prints
@@ -156,7 +174,8 @@ its PASS line and exits 0 (DERIVED, the same).
 
 ### S9 — the floor
 
-`TOOL-dTotalRecall-116`, `-117`, `-119` and `-120` raise it by reading. After the last suite edit the main loop runs the
+`TOOL-dTotalRecall-116` and `-119` raised it by reading, `-117` added no assertion, and `-120` raises it after this revision; it
+stands at 837 (DERIVED 2026-11-25, the suite at `20e9bd298`) and is read again at the pass. After the last suite edit the main loop runs the
 suite whole once and hands the printed count; the pass sets the floor to it and its comment names the commit, the node
 and `n_skip`, in the form of the suite's `TOOL-aHastenedSweep-7` line.
 
@@ -185,6 +204,57 @@ at the first call it answers False for.
 loses. Not read, each said in the docstring: a quoted word that opens with `>`, read as a redirect; `sed`'s `w` command; a
 `find -exec`; and a call nested in `bash -c`.
 
+### The feed sentences
+
+`check_feed`'s record arm walks from every logged `record` commit of the ref that a branch or remote-tracking branch
+reaches, compares the key sets, and prints `duplicate` for a key a second line holds; `unread <ref>` carries
+`MEMORY_ROOT <value>` for a refused root and `walk` for a walk git refuses (read at `19a209739`). The append leaves out a
+key the log holds. Today both guides say the walk goes up to the newest event, VERBS lists no `duplicate` for a record event and no refused walk. The
+sentences, wrapped as their neighbours are:
+
+```text
+VERBS  … the commit, each key once: one the feed already holds is left out. `--feed check` also walks from every such event's commit
+       that any branch or remote-tracking branch reaches and holds the events to those walks' keys, as sets, naming `missing`,
+       `extra`, `duplicate` for a key a second line holds, or `unread` for a `MEMORY_ROOT` that is no plain relative path or a walk
+       git refuses; `--feed rebuild` then …
+STOPS  … walking from the feed's newest `record` commit, so a landing this node only fetched joins too, and leaving out each key
+       the feed already holds; an uncommitted write never does. `--feed check` walks from every logged `record` commit a branch
+       reaches, compares the two key sets and names a key logged twice `duplicate`.
+```
+
+Each guide is its template's bytes with any CR cut, which the adopter writes and its `--check` compares. The ceilings: no
+`template-size-limits.txt` row names either template or guide. Hygiene check 6 prices each guide by `GUIDE_CAP_BYTES` 98304 and
+`GUIDE_CAP_LINES` 1200 (DERIVED, `check-memory-hygiene.sh`, no conf override), which warns under this repository's `budgets.enforce`.
+STOPS is under both, at 70937 bytes and 893 lines (DERIVED 2026-11-25, `wc`); VERBS is already over both, at 151348
+bytes and 1657 lines (DERIVED 2026-11-25, `wc`), so its entry grows by a few lines of an announced breach, none refused.
+
+### The Serves reader
+
+`python tools/memory-tree/record_causes.py --cause-writers` reads one red under the tool root, the line of `read_key_fields` testing
+`ln.startswith("**Serves:** ")` (DERIVED 2026-11-25, its run at `20e9bd298`). It reads a line and writes none, and the census grades
+spelling. Two answers: the census marker on the line, or a read that spells no literal. The read: `tree_lib.py` already owns
+the Serves grammar, so a literal prefix test is a second spelling of it, and a marker would keep that and grow the
+exemptions by one. `tree_lib` is imported in that function today.
+
+```python
+serves = next((ln for ln in lines if (b := BIND_RE.match(ln)) and b.group("key") == "Serves"), "")
+```
+
+The name is `b`: a walrus inside the generator binds in `read_key_fields`, where `m` is the head match read below it. The raw
+line is still what the key holds, so the door's own render reads as it did; a hand-written line behind a comment
+prefix now enters the key as itself where it entered as nothing, and equals no render either way. With the edit made to the text,
+`read_open_literals` over `build_records.py` lists no unkept literal, where today it lists one (DERIVED 2026-11-25, a probe).
+
+### The kit READMEs
+
+- `tools/memory-tree/README.md`, the record door: a claim naming no session mints under the session rule, announced (S2); a field
+  name outside the key grammar or given twice, and a file git will not stage, are refused with nothing left written
+  (S1, S3); and its `WHAT IT DOES NOT CHECK` says what `gov_record.py`'s docstring says since `TOOL-dTotalRecall-117`, in place
+  of two builds holding one stem, which that unit's key ended. Its `show` sentence says the section lies inside the record
+  (S5), and the `shape_run.py` row gains `--fixture --plant` (S7).
+- `tools/workflows/README.md`, the `map-replay` paragraph: the byte term's first act is the closed reading (S10), and the
+  verdict may be `verdict unarmed bytes`.
+
 ### Inventory
 
 Minted: `FIELD_KEY`, `check_field_keys` and `add_to_index` in `build_records.py`; `PLANTS`, `build_fixture` and `run_fixture`
@@ -205,6 +275,12 @@ function is a python-function cell with the verb its name opens.
 - `tools/playbook/edge_grammar.py`
 - `tools/playbook/adopt-playbook.sh`
 - `tools/workflows/replay_scorer.py`
+- `tools/memory-tree/README.md`
+- `tools/workflows/README.md`
+- `tools/unattended/VERBS.template.md`
+- `tools/unattended/STOPS.template.md`
+- `memory/guides/UNATTENDED-VERBS.md`
+- `memory/guides/UNATTENDED-STOPS.md`
 - `memory/project/shell-role.txt`
 - `memory/map/generated/`
 - `memory/builds/dTotalRecall/build/` (the widen record and this unit's ledger)
@@ -216,6 +292,9 @@ function is a python-function cell with the verb its name opens.
 - **A leg of its own for `record_kinds.py --selftest`.** It moves the gate manifest and the kickoff manifest's stamp; the
   suite already holds the sibling arms (§8 F2).
 - **One join module shared by both suites.** The two kits install apart, and each join is one inline read.
+- **The census marker on S14's line.** It keeps a second spelling of a grammar `tree_lib.py` owns and adds an exemption.
+- **The feed sentences in one guide alone.** The entry is the verb's contract and section 7 the feed's; each is read without
+  the other, and each is wrong today.
 
 ## 5. Production-readiness checklist
 
@@ -224,9 +303,9 @@ function is a python-function cell with the verb its name opens.
 - error / empty / loading states — S3 leaves nothing unstaged; S10's term says unarmed instead of zero.
 - observability — every refusal names its subject; S2's line names the claim.
 - risks — S5 refuses addresses that today print another record's section; S10 reads a call outside the closed set as an act.
-- testing — AC1 to AC12 by the pass; §7's arms by the main loop.
+- testing — AC1 to AC15 by the pass; §7's arms by the main loop.
 - migration — none.
-- user docs — N/A, no page states any of these behaviours.
+- user docs — S13 and S15; no page under `help/` states any of these behaviours.
 
 ## 6. Acceptance criteria
 
@@ -281,10 +360,27 @@ function is a python-function cell with the verb its name opens.
 - **AC12** — When `python tools/gate-lint/sh_hygiene.py --shell-role --measure . ':!memory/'` runs, the three paths of S12 read
   the counts their rows hold.
   Red when: a row stands under or over its measure.
+- **AC13** — When `grep -c 'newest one' tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md` runs, it prints 0 for each
+  (DERIVED, S13); the `--feed` entry, cut from its bullet to the next, names `duplicate` twice and `walk git refuses` once its
+  line breaks are folded; section 7 of the stops template names `duplicate`; and `cmp` of each template with its guide,
+  any CR cut, finds no difference.
+  Red when: either template keeps the old walk, or a guide is edited by hand. Today each template prints 1 (DERIVED, that grep).
+- **AC14** — When `python tools/memory-tree/record_causes.py --cause-writers` runs, it prints no `RED` line naming
+  `tools/memory-tree/build_records.py`, `grep -c 'startswith("\*\*Serves' tools/memory-tree/build_records.py` prints 0 (DERIVED, S14), and
+  `python build_records.py --fixture --plant door-header` from `tools/memory-tree/` still prints its replay as `exists` and every other
+  case as it does at `20e9bd298`.
+  Red when: the literal stands, or the walrus takes the head match's name and the key loses its title. Today the census prints one red.
+- **AC15** — When `grep -c 'two builds holding a' tools/memory-tree/README.md` runs, it prints 0 (DERIVED, S15), and the greps of `names no session`,
+  `--fixture --plant` on the `shape_run.py` row, and `verdict unarmed bytes` in `tools/workflows/README.md` each print at
+  least one line.
+  Red when: a README still states what the code no longer does.
 
 ## 7. Gates
 
-`memory hygiene` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `encoding posture (text IO names its encoding)` · `python reads (a name never bound, an import outside its guard)` · `portability (shell lines only shrink)` · `recall floor` · `recall floor arms` · `ratchet (never gains)` · `ratchet (both ways)` · `memory-hygiene self-test` · `build-index selftest` · `record causes (causes and orphans over the legacy population)` · `record-kinds` · `review-replay selftest` · `playbook render selftest` · `shape-run records (each record equals its review line)` · `remote literals (kit code names no remote)` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `policy fixtures`
+`memory hygiene` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `encoding posture (text IO names its encoding)` · `python reads (a name never bound, an import outside its guard)` · `portability (shell lines only shrink)` · `recall floor` · `recall floor arms` · `ratchet (never gains)` · `ratchet (both ways)` · `memory-hygiene self-test` · `build-index selftest` · `record causes (causes and orphans over the legacy population)` · `record-kinds` · `review-replay selftest` · `playbook render selftest` · `shape-run records (each record equals its review line)` · `remote literals (kit code names no remote)` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `policy fixtures` · `unattended kit gate` · `unattended skill wiring` · `docs`
+
+S13 and S15 are prose, which no arm reads past the pair compares of the legs above. S14's arm stands: the `record causes` leg is
+red on today's line, and the `door-header` cases red a key that loses a field.
 
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC3 · the `door-header` literal over the name, duplicate and index-lock cases, and `ask-door`'s index-lock case, red on today's door · none
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 · three claim arms beside the lease block (both absent, holder named and caller absent, holder absent and caller named), red on today's compare · `FLOOR_ASSERTIONS`, the three carried by `n_skip` with that block
@@ -307,10 +403,16 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC11 · the two rows and the
   suite past its ceiling it moves the call to a leg rather than the bound. widens: none · relaxes: none
 - **F3 — Does S11 arm `prose-pass` too?** Options: (a) yes; (b) the join excepts it. An exception is the class the join
   ends. RESOLVED (agent, 2026-11-25, delegated): (a). widens: none · relaxes: none
+- **F4 — Does S14 mark the line or stop spelling the literal?** Options: (a) read through `tree_lib.py#BIND_RE`; (b) the census
+  marker. (b) keeps a second spelling of the Serves grammar. RESOLVED (agent, 2026-11-25, delegated): (a). widens: none ·
+  relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-25 · initial draft, from the closing review's M1 to M10 and L1.
+- rev-2 · 2026-11-25 · S12 S13 S14 S15 §1 §3 §4 §5 §7 AC13 AC14 AC15 · two leftovers of built units taken, the feed guides and the
+  Serves reader; the README claim corrected and the floor and shell-role counts read at the pass; from
+  `2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief`.
 
 ## 10. Reuse audit
 

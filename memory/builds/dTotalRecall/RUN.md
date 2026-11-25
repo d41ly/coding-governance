@@ -720,3 +720,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-25T08:13:48Z draw · re-dispatch · TOOL-dTotalRecall-119 · 79/186 · 20261125T081348Z-672947
 
 2026-11-25T08:13:48Z dispatch · item 8c4aa9c7 TOOL-dTotalRecall-119 · reason memory/gotchas/INDEX.md tools/memory-tree/README.md memory/map/features/memory-tree-hygiene.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-119-deviation-1017.md
+
+2026-11-25T08:55:54Z brief · item TOOL-dTotalRecall-120 · reason 974a63034887 memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-build-brief.md
+
+2026-11-25T09:07:30Z dispatch · item 20e9bd29 TOOL-dTotalRecall-120 · reason tools/memory-tree/record_causes.py tools/memory-tree/check-memory-hygiene.test.sh memory/project/shell-role.txt memory/map/generated memory/builds/dTotalRecall/build memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-120.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-120-1-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md
