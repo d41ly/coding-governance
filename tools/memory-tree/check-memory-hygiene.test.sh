@@ -3771,6 +3771,11 @@ out=$("$_PY" "$HERE/record_causes.py" --fixture --plant legacy 2>&1); hit 'recor
 hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings causes'; hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings-2 causes'   # AC8
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant causeless 2>&1)   # AC6
 hit 'record causes: causes · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-new.md · names no Caused-by'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant legacy-drained 2>&1); _brc=$?   # TOOL-dTotalRecall-120 AC1
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant legacy-drained exited $_brc, expected 0"; st=1; }
+hit 'record causes: causes · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-new.md · names no Caused-by'
+hit 'record causes: cause-writer · 0 code files under tools'; hit 'record causes: 3 backfilled · 0 not backfilled'
+hit 'record causes: fixture legacy-drained · PASS'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant typed-causeless 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant orphan 2>&1)   # AC7
 hit 'record causes: orphans · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-cycle-a.md'
@@ -5811,7 +5816,10 @@ done
 # assertions each, top-level and never skipped. Counted by reading; OWED: observed at the close.
 # RAISED 836 -> 837 by TOOL-dTotalRecall-119 on 2026-11-25: the claim-root plant's cache ref line, one top-level
 # hit, never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=837
+# RAISED 837 -> 842 by TOOL-dTotalRecall-120 on 2026-11-25: the drained-home plant's exit, causes line, census count
+# line, backfill count line and PASS line, five top-level assertions, never skipped. Counted by reading; OWED:
+# observed at the close.
+FLOOR_ASSERTIONS=842
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

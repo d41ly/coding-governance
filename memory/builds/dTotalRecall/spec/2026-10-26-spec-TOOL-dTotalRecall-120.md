@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-120 — the causes leg grades everything once its legacy population is drained
 
-**Status:** INPROGRESS · rev-2 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 48
+**Status:** CLOSED · rev-2 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 48
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-25-build-TOOL-dTotalRecall-120-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-120-1-builder-return.md) | journal | — |
+| [2026-11-25-build-TOOL-dTotalRecall-120-2-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-120-2-acceptance-ledger.md) | log | — |
+| [2026-11-25-build-TOOL-dTotalRecall-120-widen-31.md](../build/2026-11-25-build-TOOL-dTotalRecall-120-widen-31.md) | widen | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-120-build-2-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-build-2-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-120-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-120-divergence-fold-brief.md) | journal | TOOL-dTotalRecall-121 |

@@ -87,8 +87,8 @@ reader of the key: `derived` (the default) derives anchors for untagged headings
 derives none and reads a legacy record as reached; `retag` reads the authored tags alone,
 `## [section.<anchor>] <heading>`, the form TOOL-dTotalRecall-20's retag step writes.
 
-Exit: 0 green or unarmed (no registration, an absent or unarmed home, an empty population), 1 a red, 2 a
-refused read, `memory.legacy-anchors` named. `--print-*` exit 3 where the class has no member here.
+Exit: 0 green or unarmed (no registration, an absent or unarmed home), 1 a red, 2 a refused read,
+`memory.legacy-anchors` named. `--print-*` exit 3 where the class has no member here.
 WHAT IT DOES NOT CHECK: a non-Markdown record whose head is not a comment; whether a `Made-by`
 names who really wrote it; the edge grammar of a header's targets, which `edge_grammar.py --check` grades;
 whether a census file that spells `Caused-by` writes the line at run time, since the census grades spelling;
@@ -145,7 +145,7 @@ PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "non
           "kept-row-traversal", "kept-row-nested", "kept-row-docs-root", "pinned-ask-is-spec",
           "build-slug-traversal", "build-slug-absent", "kept-row-multiword", "kept-row-arity",
           "kept-row-unknown-census", "kept-row-duplicate", "kept-home-rooted", "kept-home-trailing-root",
-          "kept-root-blank")
+          "kept-root-blank", "legacy-drained")
 #: TOOL-dTotalRecall-47 S1: the causes check's absent-cause rule, the one finding `--backfill` selects;
 #: TOOL-dTotalRecall-53 S4: it names its remedy, and stays the one spelling the backfill selects by
 ABSENT_CAUSE = "names no Caused-by, and its kind is no root; run record_causes.py --backfill"
@@ -393,8 +393,10 @@ def derive_population_rows(root, value=None) -> list:
 
 def read_legacy_paths(root) -> tuple:
     """`(paths, note)`: the paths of the `-` rows of the population's `causes` slice, the rows whose
-    `check` field is `causes`, or None and why the check is unarmed. ValueError for a registration keyed
-    by no `check` field, whose slices do not read apart."""
+    `check` field is `causes`; the empty set for an armed home with no such row, a drained one, under which
+    every record is graded (TOOL-dTotalRecall-120); or None and why the check is unarmed, for no registration
+    and for an absent or unarmed home. ValueError for a registration keyed by no `check` field, whose slices
+    do not read apart."""
     import legacy_ledger as ll   # noqa: E402  the ledger factory
     try:
         reg = next((r for r in ll.read_registrations(root) if r.population == POPULATION), None)
@@ -415,7 +417,7 @@ def read_legacy_paths(root) -> tuple:
     rows = [k for k in rows if k[at] == "causes"]
     paths = {k[0] for k in rows if k[1] == LEGACY_SECTION}
     if not paths:
-        return None, f"{POPULATION}'s home {reg.home} holds no record row"
+        return paths, f"0 record row(s) (-), {len(rows)} section row(s): {reg.home} is drained, and every record is graded"
     return paths, f"{len(paths)} record row(s) (-), {len(rows) - len(paths)} section row(s)"
 
 
@@ -1020,7 +1022,8 @@ def write_fixture(top, plant, memory="memory") -> pathlib.Path:
     """The plant's repository under `top`: a conf, a three-row registry (`log`, `research`, `card`), a govkit
     registry holding the `record-kinds-legacy` table keyed as gov keys it, its seed the `causes` slice, the
     build `fRoot` (README, a spec, a log record and a research record repeating `## Findings`), committed;
-    the population seeded; then the plant's new records and refs, committed. `none` commits `memory.legacy-anchors = "none"` first.
+    the population seeded; then the plant's new records and refs, committed. `none` commits `memory.legacy-anchors = "none"`
+    first; `legacy-drained` drains the seeded home through `legacy_ledger.write_rows`.
     `memory` is the tree's memory root, every path, home glob and conf line spelled from it."""
     import json
     import legacy_ledger as ll   # noqa: E402  the seed, run as `seed` runs it
@@ -1098,7 +1101,9 @@ def write_fixture(top, plant, memory="memory") -> pathlib.Path:
     reg = next(r for r in ll.read_registrations(root) if r.population == POPULATION)
     line, _ok = ll.seed_population(root, reg, run_git(root, "rev-parse", "HEAD").stdout.strip())
     print(f"{SAY}: fixture {plant} · seed · {line}")
-    if plant == "causeless":
+    if plant == "legacy-drained":   # TOOL-dTotalRecall-120 S3: the causeless tree, its home as a drain's writer leaves it
+        ll.write_rows(root, reg, {})
+    if plant in ("causeless", "legacy-drained"):
         write_file(f"{build}/2026-01-02-build-{FIXTURE_UNIT}-new.md", f"# New\n\n**Serves:** research {FIXTURE_UNIT}\n")  # census: kept cause-writer fixture: a record head its fixture plants
     elif plant == "typed-causeless":
         write_file(f"{build}/2026-01-02-build-{FIXTURE_UNIT}-card-1.md",
@@ -1380,6 +1385,22 @@ def check_census_plant(root, plant) -> tuple:
     return out, ok
 
 
+def check_drained_plant(root, plant) -> tuple:
+    """TOOL-dTotalRecall-120 S3: `--check`, then `--backfill`, over a `root` whose legacy home is drained. ->
+    `(lines, ok)`: both runs' lines, then one PASS or FAIL line. It passes when the check exits 1 naming the
+    plant's new record under `causes`, prints the writer census's count line and no `unarmed`, and the backfill
+    writes at least one."""
+    lines, rc = run_check(root)
+    second, _rc = write_missing_causes(root)
+    new = f"{SAY}: causes · memory/builds/fRoot/build/2026-01-02-build-{FIXTURE_UNIT}-new.md · "
+    wrote = re.match(rf"{SAY}: (\d+) backfilled · ", second[-1])
+    ok = rc == 1 and any(ln.startswith(new) for ln in lines) \
+        and any(ln.startswith(f"{SAY}: cause-writer · ") and " census file(s) · " in ln for ln in lines) \
+        and not any("unarmed" in ln for ln in lines) and wrote is not None and int(wrote.group(1)) >= 1
+    return lines + second + [f"{SAY}: fixture {plant} · {'PASS' if ok else 'FAIL'} · check exit {rc} · a drained home "
+                             "leaves every record graded"], ok
+
+
 def run_fixture(plant) -> tuple:
     """`--fixture --plant <case>`: the plant's repository under the system temp directory, its population's
     rows printed, then `--check` run there, `--cause-writers` under a `REWRITTEN_ROOTS` plant
@@ -1405,6 +1426,9 @@ def run_fixture(plant) -> tuple:
                 return head + lines, 0 if ok else 1
             if plant in CENSUS_PLANTS:
                 lines, ok = check_census_plant(root, plant)
+                return head + lines, 0 if ok else 1
+            if plant == "legacy-drained":
+                lines, ok = check_drained_plant(root, plant)
                 return head + lines, 0 if ok else 1
             lines, rc = run_cause_writers(root) if plant in REWRITTEN_ROOTS else run_check(root)
             if plant == "adopter-no-registry":   # TOOL-dTotalRecall-65 AC3: a row the kit itself held fails it

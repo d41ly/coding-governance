@@ -6923,6 +6923,11 @@
       "file": "tools/lib/python_floor.py"
     },
     {
+      "id": "check_drained_plant",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "check_draw_cause",
       "kind": "function",
       "file": "tools/loop/budget.py"
