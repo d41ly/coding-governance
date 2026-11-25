@@ -1144,8 +1144,9 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   but none for `no-remote`, plants one case, prints the engine's lines and one line ending `held` or
   `MISSED`, and removes it: `steps`, `typed-status`, `idempotent`, `owner-decision`,
   `parked-decisions` (a parked decision answered, unanswered, answered by an unstaged record, by another row's, by another
-  word and with no reason, then three rows of one second), `parked-kinds` (the five other row kinds,
-  then a hold resumed, live and passed), `parent-unlanded`,
+  word and with no reason, then three rows of one second, then answered by another build's record, by a
+  malformed one, and by one that a tenth record or a later date outranks), `parked-kinds` (the five other
+  row kinds, then a hold resumed, in `SPECCING`, with no phase fact, live and passed), `parent-unlanded`,
   `terminal`, `stale-remote` (its tracking tip's reflog entry aged past the bound), `no-remote`,
   `fresh-clone` (a clone read from clone), `quiet-remote` (a fetch from a linked worktree after the
   aged reflog, read from `FETCH_HEAD`), `offline-stale` (a clone's `FETCH_HEAD` dated past the bound), `failed-fetch` (the
@@ -1190,7 +1191,10 @@ file that no record of its own answers, and a hold while the run's `phase` fact 
 `hold-until` has not passed. This replaces the interrupt wording of TOOL-dDeclaredLoop-7, which counted
 every owed kind: a `rescope`, `handoff`, `abort`, `override` or `waiver` row no longer interrupts, nor
 does the hold of a run that resumed. A newly parked decision stops the run, the whole build answering
-`awaiting`, until it is answered.
+`awaiting`, until it is answered. The driver's `--park` writes no row for an item and reason already
+parked, so a question asked again in the same words after its answer raises no interrupt and must be
+parked with a different reason; a second `flow.on-exhausted` ending keeps the first row (ask
+TOOL-aAnsweredPark-6).
 
 An answer is [the owner's disposition record](#the-owners-disposition-record) of that row alone, its
 item the tag the `interrupt —` line prints after `answer`, its word exactly `answered`, and its reason

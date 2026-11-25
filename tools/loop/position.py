@@ -90,14 +90,17 @@ of the run-state file that no record of its own settles, and a hold, `hold-code`
 `hold-until`, while the `phase` fact reads `HELD`. This replaces the interrupt wording of
 TOOL-dDeclaredLoop-7, which counted every owed kind: a `rescope`, `handoff`, `abort`, `override` or `waiver`
 row raises nothing. A newly parked decision stops the run, the whole build answering `awaiting`, until it is
-answered. The answer is written as `build_records.py new disposition --build <slug> --unit <id> --item <tag>
---disposition answered --channel <channel> --reason "<the owner's words>"` and tracked, staged being
-enough; the tag is `item.parked.` and the row's timestamp, lowercased, each `:` written `-`, the second row
-of one timestamp, in file order, ending `.2`, the third `.3`, and the open row's `interrupt —` line prints
-it. An agent types the record, so the quoted words in its `Reason` are the evidence, which nothing here
-verifies. The newest well-formed record of the tag decides: the word exactly `answered` and a `Reason` that
-is not blank settle the row, and anything else leaves it open, so a later record of another word re-opens
-it. Each record that decided a row is a `read —` line.
+answered. The driver's `--park` writes no row for an item and reason already parked, so a question asked
+again in the same words after its answer raises no interrupt and must be parked with a different reason; a
+second `flow.on-exhausted` ending keeps the first row (ask TOOL-aAnsweredPark-6). The answer is written as
+`build_records.py new disposition --build <slug> --unit <id> --item <tag> --disposition answered
+--channel <channel> --reason "<the owner's words>"` and tracked, staged being enough; the tag is
+`item.parked.` and the row's timestamp, lowercased, each `:` written `-`, the second row of one
+timestamp, in file order, ending `.2`, the third `.3`, and the open row's `interrupt —` line prints it.
+An agent types the record, so the quoted words in its `Reason` are the evidence, which nothing here
+verifies. The newest well-formed record of the tag decides: the word exactly `answered` and a `Reason`
+that is not blank settle the row, and anything else leaves it open, so a later record of another word
+re-opens it. Each record that decided a row is a `read —` line.
 
 THE ITEM BOUNDARY, I12 (KICK-dKeptSession-13 S1). `derive_item_boundary(repo, slug, pointer, pos=None)`
 reads one position, or the `pos` its caller already derived, and returns the build's current item where
@@ -225,10 +228,12 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
           "typed-status": "unit 2's header typed CLOSED, no pass commit: designed, never built",
           "idempotent": "item 1 witnessed by a recorded move naming it: next is item 2, and the key moves with an input",
           "owner-decision": "a decision park no record answers: awaiting, its answer tag printed",
-          "parked-decisions": "a parked decision and its answer record in seven variants: answered acts; unanswered, "
-                              "untracked, another row's, another word's and no Reason await; three rows of one "
-                              "second settle apart",
-          "parked-kinds": "the five other row kinds: act; a hold: awaiting in phase HELD alone, act once passed",
+          "parked-decisions": "a parked decision and its answer record: answered acts; unanswered, untracked, another "
+                              "row's, another word's and no Reason await; three rows of one second settle apart; "
+                              "another build's and a malformed one are refused; the newest wins by date, then by "
+                              "n, a tenth over a second",
+          "parked-kinds": "the five other row kinds: act; a hold: awaiting in phase HELD alone, act in BUILDING, in "
+                          "SPECCING, with no phase fact and once passed",
           "parent-unlanded": "parents: names a build with no landed move and no derived LANDED: blocked",
           "terminal": "the newest recorded move enters landed: terminal",
           "stale-remote": "a remote whose tracking tip's newest reflog entry predates the bound: stale-remote, read from reflog",
@@ -300,33 +305,50 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
 FX_SLUG = "tPos"
 FX_IDS = ["TOOL-tPos-1", "TOOL-tPos-2", "TOOL-tPos-3"]
 FX_ASK = "TOOL-tAsk-1"
-#: `parked-decisions` and `parked-kinds` (TOOL-aAnsweredPark-1): per variant its name, the phase, the hold's two
-#: facts, the parked rows, each record `(tag, word, reason)` in writing order, whether they are staged, and the
-#: answer and the open tags owed, a hold's whole subject standing for its tag. The tags are literals, an oracle
-#: apart from the engine's own derivation.
+#: `parked-decisions` and `parked-kinds` (TOOL-aAnsweredPark-1, TOOL-aAnsweredPark-5): per variant its name, the
+#: phase, empty for no `phase` fact, the hold's two facts, the parked rows, each record `(tag, word, reason)` in
+#: writing order, a fourth member `(old, new)` replaced once in the path and once in the text the door wrote, the
+#: records' word, `read`, `untracked` or, staged and held back by one filter, `refused`, and the answer and the
+#: open tags owed, a hold's whole subject standing for its tag. The tags are literals, an oracle apart from the
+#: engine's own derivation.
 FX_DECISION = "2026-01-01T00:00:00Z decision · item which-way · reason the fixture's decision"
 FX_TAG = "item.parked.2026-01-01t00-00-00z"
 FX_ANSWER = (FX_TAG, "answered", "the owner: go left")
 FX_HOLD = "hold-code: host-owner-action\nhold-until: %s\n"
 FX_PARKED = {
     "parked-decisions": (
-        ("unanswered", "BUILDING", "", (FX_DECISION,), (), True, "awaiting", [FX_TAG]),
-        ("answered", "BUILDING", "", (FX_DECISION,), (FX_ANSWER,), True, "act", []),
-        ("untracked", "BUILDING", "", (FX_DECISION,), (FX_ANSWER,), False, "awaiting", [FX_TAG]),
+        ("unanswered", "BUILDING", "", (FX_DECISION,), (), "read", "awaiting", [FX_TAG]),
+        ("answered", "BUILDING", "", (FX_DECISION,), (FX_ANSWER,), "read", "act", []),
+        ("untracked", "BUILDING", "", (FX_DECISION,), (FX_ANSWER,), "untracked", "awaiting", [FX_TAG]),
         ("other-row", "BUILDING", "", (FX_DECISION,),
-         (("item.parked.2026-01-01t00-00-01z", "answered", "the owner: go left"),), True, "awaiting", [FX_TAG]),
-        ("other-word", "BUILDING", "", (FX_DECISION,), (FX_ANSWER, (FX_TAG, "withdrawn", "the owner: not yet")), True,
+         (("item.parked.2026-01-01t00-00-01z", "answered", "the owner: go left"),), "read", "awaiting", [FX_TAG]),
+        ("other-word", "BUILDING", "", (FX_DECISION,), (FX_ANSWER, (FX_TAG, "withdrawn", "the owner: not yet")), "read",
          "awaiting", [FX_TAG]),
-        ("no-reason", "BUILDING", "", (FX_DECISION,), ((FX_TAG, "answered", None),), True, "awaiting", [FX_TAG]),
+        ("no-reason", "BUILDING", "", (FX_DECISION,), ((FX_TAG, "answered", None),), "read", "awaiting", [FX_TAG]),
         ("one-second", "BUILDING", "", (FX_DECISION,) * 3,
-         (FX_ANSWER, (FX_TAG + ".3", "answered", "the owner: go right")), True, "awaiting", [FX_TAG + ".2"])),
+         (FX_ANSWER, (FX_TAG + ".3", "answered", "the owner: go right")), "read", "awaiting", [FX_TAG + ".2"]),
+        ("other-build", "BUILDING", "", (FX_DECISION,), (FX_ANSWER + (("builds/tPos/", "builds/tOth/"),),), "refused",
+         "awaiting", [FX_TAG]),
+        ("malformed", "BUILDING", "", (FX_DECISION,),
+         (FX_ANSWER + (("- **Channel:** terminal", "- **Channel:** elsewhere"),),), "refused", "awaiting", [FX_TAG]),
+        ("tenth", "BUILDING", "", (FX_DECISION,),
+         (FX_ANSWER + (("-disposition-1.md", "-disposition-2.md"),),
+          (FX_TAG, "withdrawn", "the owner: not yet", ("-disposition-3.md", "-disposition-10.md"))),
+         "read", "awaiting", [FX_TAG]),
+        ("later-date", "BUILDING", "", (FX_DECISION,),
+         (FX_ANSWER + (("-disposition-1.md", "-disposition-3.md"),),
+          (FX_TAG, "withdrawn", "the owner: not yet", ("2026-01-01-build-TOOL-tPos-1-disposition-4.md",
+                                                       "2026-01-02-build-TOOL-tPos-1-disposition-2.md"))),
+         "read", "awaiting", [FX_TAG])),
     "parked-kinds": (
         ("no-question", "BUILDING", "", tuple("2026-01-01T00:00:00Z %s · reason the fixture's row" % r for r in (
             "rescope · item defer %s" % FX_IDS[2], "handoff · item which-way", "abort · item which-way",
-            "override · item which-way", "waiver · item which-way")), (), True, "act", []),
-        ("hold-resumed", "BUILDING", FX_HOLD % "owner", (), (), True, "act", []),
-        ("hold-live", "HELD", FX_HOLD % "owner", (), (), True, "awaiting", ["hold host-owner-action · until owner"]),
-        ("hold-passed", "HELD", FX_HOLD % "after 2026-01-01T00:00:00Z", (), (), True, "act", []))}
+            "override · item which-way", "waiver · item which-way")), (), "read", "act", []),
+        ("hold-resumed", "BUILDING", FX_HOLD % "owner", (), (), "read", "act", []),
+        ("hold-specced", "SPECCING", FX_HOLD % "owner", (), (), "read", "act", []),
+        ("hold-no-phase", "", FX_HOLD % "owner", (), (), "read", "act", []),
+        ("hold-live", "HELD", FX_HOLD % "owner", (), (), "read", "awaiting", ["hold host-owner-action · until owner"]),
+        ("hold-passed", "HELD", FX_HOLD % "after 2026-01-01T00:00:00Z", (), (), "read", "act", []))}
 #: The hand-over's bound, in seconds.
 FX_BOUND = 5400
 #: The frontier plants' A, B and C, of the build's step, and D, the next step's root, as shipped.
@@ -1557,21 +1579,34 @@ def check_mail_plant(case, repo, definition, handover):
 
 def run_parked_plant(case, repo, definition, handover):
     """The misses of a `FX_PARKED` plant (TOOL-aAnsweredPark-1): per variant, the working copy of the run-state
-    file rewritten, its records written by the memory-tree kit's door and staged where the variant stages
-    them, one position derived, and the records removed. Each record is asserted read under its tag, or unread
-    where unstaged, so no variant holds by finding nothing."""
+    file rewritten, its records written one at a time by the memory-tree kit's door, each changed where it
+    carries a change, and staged unless `untracked`, one position derived, and the records removed. Each record
+    is asserted read under its tag where the word is `read`, else unread, and each staged one present, refused
+    by exactly one of the build and malformed filters under `refused` and by neither under `read`, so no
+    variant holds by finding nothing (TOOL-aAnsweredPark-5)."""
     read_memory_tree("build_records.py")
     from adapt import read_newest_dispositions
-    from build_records import write_disposition
+    from build_records import read_disposition, read_records, write_disposition
     run_path = repo / ("memory/builds/%s/RUN.md" % FX_SLUG)
     base, misses = run_path.read_text(encoding="utf-8"), []
-    for variant, phase, hold, rows, records, staged, answer, tags in FX_PARKED[case]:
-        text = base.replace("phase: BUILDING\n", "phase: %s\n" % phase, 1) + hold
+    for variant, phase, hold, rows, records, kept, answer, tags in FX_PARKED[case]:
+        text = base.replace("phase: BUILDING\n", "phase: %s\n" % phase if phase else "", 1) + hold
+        if ("\nphase:" in text) != bool(phase):
+            misses.append("%s planted the phase %r and its run-state file disagrees" % (variant, phase))
         write_fixture_files(repo, {run_path.relative_to(repo).as_posix(): text + "".join(
             ["\n## Parked\n\n"] + [r + "\n" for r in rows])})
-        paths = [write_disposition(repo, FX_SLUG, FX_IDS[0], tag, word, "terminal", reason, today="2026-01-01")
-                 for tag, word, reason in records]
-        if staged and paths:
+        paths = []
+        for tag, word, reason, *change in records:
+            path = write_disposition(repo, FX_SLUG, FX_IDS[0], tag, word, "terminal", reason, today="2026-01-01")
+            for old, new in change:
+                body = (repo / path).read_text(encoding="utf-8")
+                if old not in path and old not in body:
+                    misses.append("%s: %r is in neither the path nor the text of %s" % (variant, old, path))
+                (repo / path).unlink()
+                path = path.replace(old, new, 1)
+                write_fixture_files(repo, {path: body.replace(old, new, 1)})
+            paths.append(path)
+        if kept != "untracked" and paths:
             run_fixture_git(repo, "add", "--", *paths)
         newest = read_newest_dispositions(repo, FX_SLUG)
         pos = derive_plant_position(repo, definition, handover)
@@ -1580,15 +1615,22 @@ def run_parked_plant(case, repo, definition, handover):
         print("%s: fixture · %s · %s · %s · %s" % (SAY, case, variant, pos["answer"], " ".join(got) or "none"))
         if (pos["answer"], got) != (answer, tags):
             misses.append("%s answered %s with %r, owed %s with %r" % (variant, pos["answer"], got, answer, tags))
-        for tag, (path, word) in {t: (p, w) for (t, w, _r), p in zip(records, paths)}.items():
+        for tag, (path, word) in {r[0]: (p, r[1]) for r, p in zip(records, paths)}.items():
             held = newest.get(tag, {})
             if not (repo / path).is_file() or (held.get("path"), held.get("Disposition")) != (
-                    (path, word) if staged else (None, None)):
+                    (path, word) if kept == "read" else (None, None)):
                 misses.append("%s read the record of %s as %r" % (variant, tag, held))
             listed = any(ln.startswith("read — %s@" % path) for ln in lines)
-            if listed != (staged and tag.startswith(FX_TAG)):
+            if listed != (kept == "read" and tag.startswith(FX_TAG)):
                 misses.append("%s: the record of %s %s a read line" % (variant, tag, "is" if listed else "is not"))
-        if staged and paths:
+        tracked = {r["path"]: r for r in read_records(repo, {"MEMORY_ROOT": resolve_memory_root(repo)}, "disposition",
+                                                      read_disposition)}
+        for (tag, *_rest), path in zip(records, paths) if kept != "untracked" else ():
+            r = tracked.get(path, {})
+            refusals = (r.get("build") != FX_SLUG) + bool(r.get("malformed"))
+            if r.get("Item", "").strip("`") != tag or refusals != (kept == "refused"):
+                misses.append("%s: the record of %s at %s, owed %s, is read as %r" % (variant, tag, path, kept, r))
+        if kept != "untracked" and paths:
             run_fixture_git(repo, "rm", "-q", "--cached", "--", *paths)
         for path in paths:
             (repo / path).unlink()

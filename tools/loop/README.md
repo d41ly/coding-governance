@@ -787,8 +787,11 @@ and a hold while the `phase` fact reads `HELD` (TOOL-aAnsweredPark-1), which rep
 TOOL-dDeclaredLoop-7, where every owed kind counted. A row is answered by its own disposition record, read
 through `adapt.py`'s `read_newest_dispositions`: `Item` the tag `item.parked.<timestamp>` the interrupt
 prints, ending `.2` on the second row of one timestamp, `Disposition` `answered` and a `Reason`, the newest tracked one of the tag deciding. A newly parked
-decision stops the run until it is answered. The record is written by `build_records.py new disposition`, and
-an agent types it, so the quoted words in its `Reason` are the evidence.
+decision stops the run until it is answered. The driver's `--park` writes no row for an item and reason already
+parked, so a question asked again in the same words after its answer raises no interrupt and must be parked
+with a different reason; a second `flow.on-exhausted` ending keeps the first row (ask TOOL-aAnsweredPark-6).
+The record is written by `build_records.py new disposition`, and an agent types it, so the quoted words in its
+`Reason` are the evidence.
 
 `--fixture --plant <case>` runs one of `PLANTS` over a scratch repository and bare remote, the `FX_DRIVER`
 plants over the unattended driver, and `--selftest` runs every case through `run_selftest_cases`; it is gov's

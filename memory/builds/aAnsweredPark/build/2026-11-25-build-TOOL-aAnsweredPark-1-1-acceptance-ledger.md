@@ -16,10 +16,11 @@ line below is a direct CLI call or a `python -c` probe of the changed code.
 - AC8 — `grep -nE "FX_OWED|handover\[.owed.\]|PARKED_ROW" tools/loop/position.py` printed nothing, and the `steps` plant ended `held`.
 - AC9 — `grep -c "replaces the interrupt wording of" tools/loop/position.py help/loop.md` counted 1 in each, the other three sentences beside it, and the grep for `every owed entry stands` printed nothing.
 - AC10 — `read_open_decisions` over a shared clone at `18ba9d38` returned six open rows, the six tags the criterion lists, and no record path; the clone was removed.
+- seen-red — `loop position fixtures` — red `ace7f1eec` — green `ace7f1eec` — `parked-decisions`: the base engine's interrupt loop put back reds `answered` and `one-second` and, its tag unprinted, the other five; settled fixed true reds all but `answered`; the tag compare dropped reds `other-row`; the word test dropped reds `other-word`; the Reason test dropped reds `no-reason`
+- seen-red — `loop position fixtures` — red `ace7f1eec` — green `ace7f1eec` — `parked-kinds`: the base engine's interrupt loop and unconditional hold put back red `no-question` and `hold-resumed`; the hold branch removed reds `hold-live`; the passed test fixed false reds `hold-passed`
 
 ## Owed to the close
 
-Every leg section 7 of the spec names, and the RED-first observation of the two arms `parked-decisions` and
-`parked-kinds` on the staged breaks its two arm lines name. Neither was observed in this pass.
-- seen-red — `loop position fixtures` — red `ace7f1eec` — green `ace7f1eec` — `parked-decisions`: the base engine's interrupt loop put back reds `answered` and `one-second` and, its tag unprinted, the other five; settled fixed true reds all but `answered`; the tag compare dropped reds `other-row`; the word test dropped reds `other-word`; the Reason test dropped reds `no-reason`
-- seen-red — `loop position fixtures` — red `ace7f1eec` — green `ace7f1eec` — `parked-kinds`: the base engine's interrupt loop and unconditional hold put back red `no-question` and `hold-resumed`; the hold branch removed reds `hold-live`; the passed test fixed false reds `hold-passed`
+Every leg section 7 of the spec names. The two arms `parked-decisions` and `parked-kinds` were not
+observed in this pass; the main loop saw each red and then green afterwards, at `ace7f1eec`, and the
+two seen-red lines above record it.

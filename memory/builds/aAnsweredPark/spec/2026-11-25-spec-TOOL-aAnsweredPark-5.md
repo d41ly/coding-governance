@@ -1,11 +1,12 @@
 # TOOL-aAnsweredPark-5 — the closing review's five minors: six fixture variants, the re-ask limit in three documents, the ledger's contradiction
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-11-25 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-aAnsweredPark-5-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-aAnsweredPark-5-1-acceptance-ledger.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aAnsweredPark-5-brief.md](../prompts/2026-11-25-prompt-TOOL-aAnsweredPark-5-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
