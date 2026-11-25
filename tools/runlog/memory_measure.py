@@ -21,8 +21,9 @@ to `<letter>:/`, a drive letter lower-cased, and on Windows the whole path. A re
 against the working directory the call's transcript record carries, so `./memory/x` and
 `../../memory/x` read as the paths they name; with none recorded, `.` segments fold away and a word
 climbing out with `..` counts nowhere. An absolute word counts only when it starts with the main
-worktree, or a `.claude/worktrees/<name>` worktree of it, then `/<root>/`, so the harness's auto-memory
-directory and another repository's `memory/` never count; an unresolved relative word counts when it
+worktree, or a `.claude/worktrees/<name>` worktree of it, then `/<root>/`, or is that root itself, the
+widest read (TOOL-dTotalRecall-118), so the harness's auto-memory directory and another repository's
+`memory/` never count; an unresolved relative word counts when it
 starts `<root>/` or is `<root>` alone, so a kit directory whose name merely begins with the root's name
 never matches. A PowerShell command is folded before it is split, because `\\` is no escape character there.
 
@@ -109,8 +110,9 @@ def check_memory_word(word, memory_root, main_worktree=None, cwd=None) -> bool:
     directory, where it is an absolute path; else its `.` segments fold away and it counts when it starts
     with `<root>/` or is `<root>` alone, a word climbing out with `..` counting nowhere. An absolute word
     counts only when it starts with the main worktree, or a `.claude/worktrees/<name>` worktree of it, then
-    `/<root>/`; so the harness's own auto-memory directory and another repository's `memory/` never count,
-    and with no main worktree known no absolute word does."""
+    `/<root>/`, or is that root itself, whose search is the widest read (TOOL-dTotalRecall-118); so the
+    harness's own auto-memory directory and another repository's `memory/` never count, and with no main
+    worktree known no absolute word does."""
     if not isinstance(word, str) or not word:
         return False
     root = mdl.derive_path_key(memory_root)
@@ -125,13 +127,14 @@ def check_memory_word(word, memory_root, main_worktree=None, cwd=None) -> bool:
     if main_worktree is None:
         return False
     main = mdl.derive_path_key(str(main_worktree))
-    if folded.startswith(f"{main}/{root}/"):
+    home = f"{main}/{root}"
+    if folded == home or folded.startswith(home + "/"):
         return True
     lead = f"{main}/{WORKTREES_DIR}/"
     if not folded.startswith(lead):
         return False
     name, _sep, rest = folded[len(lead):].partition("/")
-    return bool(name) and rest.startswith(root + "/")
+    return bool(name) and (rest == root or rest.startswith(root + "/"))
 
 
 def check_read_verb(words) -> bool:
@@ -407,7 +410,7 @@ FIXTURE_CASES = ("read-memory", "read-other", "grep-memory", "shell-path", "reco
                  "recall-query", "shell-other", "foreign-dir", "outside-window", "median-under",
                  "median-over", "not-due", "unarmed", "empty", "privacy",
                  "harness-memory", "msys-path", "foreign-memory-path", "bare-root", "msys-d-drive", "dot-relative",
-                 "parent-relative")
+                 "parent-relative", "root-grep", "root-shell", "root-absolute", "root-worktree", "root-sibling")
 FIXTURE_CLOCK = "2026-12-15T00:00:00Z"
 # The scratch main worktree the planted project directories encode, and every planted absolute memory path
 # sits under (TOOL-dTotalRecall-43 S16): the memory measure counts this clone's tree alone.
@@ -464,6 +467,18 @@ FIXTURE_PLANTS = {
         ("Bash", {"command": "cat ./memory/LIVE.md"}, 300)], 0)]},
     "parent-relative": {"cwd": FIXTURE_MAIN + "/sub/dir", "agents": [("main", "gov-builder", 1, [
         ("Bash", {"command": "cat ../../memory/LIVE.md"}, 250)], 0)]},
+    # TOOL-dTotalRecall-118: a search of the whole root, the widest read, counts in each spelling that resolves
+    # to the root, in the main worktree and in a linked one; a sibling whose name begins with the root's does not.
+    "root-grep": {"cwd": FIXTURE_MAIN, "agents": [("main", "gov-builder", 1, [
+        ("Grep", {"pattern": "x", "path": "memory"}, 400)], 0)]},
+    "root-shell": {"cwd": FIXTURE_MAIN, "agents": [("main", "gov-builder", 1, [
+        ("Bash", {"command": "rg x memory/"}, 350)], 0)]},
+    "root-absolute": {"agents": [("main", "gov-builder", 1, [
+        ("Grep", {"pattern": "x", "path": "C:\\fx\\repo\\memory"}, 300)], 0)]},
+    "root-worktree": {"cwd": f"{FIXTURE_MAIN}/{WORKTREES_DIR}/side", "agents": [("main", "gov-builder", 1, [
+        ("Bash", {"command": "rg x memory"}, 250)], 0)]},
+    "root-sibling": {"cwd": FIXTURE_MAIN, "agents": [("main", "gov-builder", 1, [
+        ("Grep", {"pattern": "x", "path": "memories"}, 200)], 0)]},
     "foreign-dir": {"agents": [("main", "gov-builder", 1, [("Read", {"file_path": FX_MEMORY_FILE}, 600)], 0),
                                ("foreign", "gov-builder", 1, [("Read", {"file_path": FX_MEMORY_FILE}, 5000)], 0)]},
     "outside-window": {"agents": [("main", "gov-builder", 1, [("Read", {"file_path": FX_MEMORY_FILE}, 600)], 0),

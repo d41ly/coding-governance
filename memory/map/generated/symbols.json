@@ -26743,6 +26743,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_memory_cell",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_memory_root",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -26766,6 +26771,11 @@
       "id": "read_memory_root",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "read_memory_rows",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "read_memory_tree",
@@ -39088,6 +39098,11 @@
       "file": "tools/memory-tree/ratchet.py"
     },
     {
+      "id": "run_memory_plant",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "run_merge_pair",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -44381,6 +44396,56 @@
       "id": "test_member_outside_the_scope_set_is_dropped",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_memory_ac1_read_channel",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac2_shell_channel",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac3_unarmed",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac4_population",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac6_verdict",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac7_states",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac9_privacy",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_dtr118_root",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_dtr43_paths",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_dtr53_paths",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_miss_predictor_verdict_needs_enough_misses",

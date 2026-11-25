@@ -709,3 +709,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-25T06:49:45Z draw · re-dispatch · TOOL-dTotalRecall-117 · 78/186 · 20261125T064945Z-588ea0
 
 2026-11-25T06:49:45Z dispatch · item ce1c2095 TOOL-dTotalRecall-117 · reason memory/map/features/row-grammar.md
+
+2026-11-25T07:18:23Z brief · item TOOL-dTotalRecall-118 · reason 48cfd552856a memory/builds/dTotalRecall/prompts/2026-11-25-prompt-TOOL-dTotalRecall-118-build-brief.md
+
+2026-11-25T07:25:27Z dispatch · item ee598793 TOOL-dTotalRecall-118 · reason tools/runlog/memory_measure.py tools/runlog/selftest.py memory/map/generated memory/builds/dTotalRecall/build memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-118.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-118-1-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md
