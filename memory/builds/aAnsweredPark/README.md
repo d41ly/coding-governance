@@ -48,22 +48,23 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-25 · streams tooling
+**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-11-25 · streams tooling
 ids TOOL-aAnsweredPark-1 TOOL-aAnsweredPark-2 TOOL-aAnsweredPark-3 TOOL-aAnsweredPark-4 TOOL-aAnsweredPark-5 TOOL-aAnsweredPark-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aAnsweredPark-1 — an owner decision settles by its own answer record, and only an open decision or a live hold interrupts](spec/2026-11-25-spec-TOOL-aAnsweredPark-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-25 |
+| [TOOL-aAnsweredPark-5 — the closing review's five minors: six fixture variants, the re-ask limit in three documents, the ledger's contradiction](spec/2026-11-25-spec-TOOL-aAnsweredPark-5.md) | 2 | 1 | SPECCED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
 Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aAnsweredPark-1.
+Ids no `spec-audit` record has ever named: TOOL-aAnsweredPark-1 TOOL-aAnsweredPark-5.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -71,6 +72,7 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aAnsweredPark-1` | no |
+| 2 | `TOOL-aAnsweredPark-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
