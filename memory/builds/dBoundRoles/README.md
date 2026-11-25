@@ -177,7 +177,7 @@ ids TOOL-dBoundRoles-86 TOOL-dBoundRoles-87 TOOL-dBoundRoles-88 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-96 — the policy guard takes the key from the landed file alone, and the security review's other items](spec/2026-11-25-spec-TOOL-dBoundRoles-96.md) | 49 | 2 | CLOSED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 612 bound to this build, across 4 record folder(s).
+Records: 613 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
