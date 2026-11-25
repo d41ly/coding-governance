@@ -203,7 +203,7 @@ ids TOOL-dTotalRecall-112 TOOL-dTotalRecall-113 TOOL-dTotalRecall-114 TOOL-dTota
 | [TOOL-dTotalRecall-121 — the closing review's minors: the record door's names and stage, sessionless claims, hyphenated slugs, section containment, unrun plants, the floor and the map replay's byte term](spec/2026-10-26-spec-TOOL-dTotalRecall-121.md) | 49 | 2 | CLOSED | rev-3 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 958 bound to this build, across 4 record folder(s).
+Records: 959 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -328,7 +328,7 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 | red-fix | `2026-11-24-build-TOOL-dTotalRecall-60-red-fix-26.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md` and 24 more under build/ |
 | widen | `2026-11-25-build-TOOL-dTotalRecall-121-widen-32.md`, `2026-11-25-build-TOOL-dTotalRecall-120-widen-31.md` and 29 more under build/ |
 | research | `2026-11-24-build-TOOL-dTotalRecall-58-divergence-fold-return.md`, `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md` and 112 more under build/ |
-| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-121-2-acceptance-ledger.md` and 192 more under build/ |
+| logs | `2026-11-25-build-TOOL-dTotalRecall-99-1-builder-return.md`, `2026-11-25-build-TOOL-dTotalRecall-121-2-builder-return.md` and 193 more under build/ |
 | open asks | `BACKLOG.md`, 16 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->
