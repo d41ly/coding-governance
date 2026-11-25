@@ -3732,12 +3732,18 @@ fi
 # --- builder refused, then marked (AC9); and the door's `new spec` over a skeleton lacking `## 6. Acceptance
 # --- criteria` refused by tag, no file written (AC3). Red on the cap line cut, on `memory.superseded-slices`
 # --- read and ignored, and on `check_sections` skipped.
+# --- TOOL-dTotalRecall-116 (AC1, AC2): an address pinned to a blob that is not the key's is refused: an unknown key,
+# --- and a file-name key over a file that is no record and over another record the index holds. Red on the
+# --- whole-blob fallback; the second and third red on `check_blob_path` cut.
 run_find_plant() { out=$("$_PY" "$HERE/record_find.py" --fixture --plant "$1" 2>&1); }
 run_find_plant cap; hit '41 rows match; narrow with --kind, --build or --paths'; hit 'record-find: fixture cap · exit 0'
 out_rows=$(grep -c ' · deviation · bFix · ' <<<"$out"); n=$((n+1)); [ "$out_rows" = 40 ] || { echo "FAIL record find printed $out_rows rows, not 40"; st=1; }
 run_find_plant archive; hit 'DEC-tFix-1 · - · - · '; hit 'memory/archive/2025-01-01-decisions.md:3'
 run_find_plant superseded; hit 'DEC-tFix-2 · - · - · '; miss 'DEC-tFix-1 · '
 run_find_plant unheld-blob; hit 'the second'; miss 'the third'; hit 'record-find: fixture unheld-blob · exit 0'
+run_find_plant blob-unknown-key; hit 'refused show: key NO-SUCH-KEY names no record of the served view'; hit 'record-find: fixture blob-unknown-key · exit 2'
+run_find_plant blob-foreign-text; hit ' is no version of 2026-01-01-build-TOOL-bFix-1-deviation-1'; hit 'record-find: fixture blob-foreign-text · exit 2'
+run_find_plant blob-foreign-record; hit ' is no version of 2026-01-01-build-TOOL-bFix-1-deviation-1'; hit 'record-find: fixture blob-foreign-record · exit 2'
 run_find_plant over-report; hit 'memory over budget: gov-builder 130000 B > 96000 B'; hit 'record-find: fixture over-report · exit 0'
 run_find_plant over-refuse; hit 'refused budget: memory over budget: gov-builder 130000 B > 96000 B'; hit 'record-find: fixture over-refuse · exit 2'
 run_find_plant over-off; hit 'read 2026-01-01-build-TOOL-bFix-1-deviation-big 130000 B'; miss 'memory over budget'; hit 'fixture over-off · exit 0'
@@ -5800,7 +5806,9 @@ done
 # RAISED 828 -> 830 by TOOL-dTotalRecall-7 on 2026-11-22: the ask-door plant's two assertions, its PASS line
 # and no FAIL line, top-level and skipped aloud with n_skip carrying them where a kit the door runs beside is
 # absent. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=830
+# RAISED 830 -> 836 by TOOL-dTotalRecall-116 on 2026-11-25: the three blob plants' refusal and exit lines, two
+# assertions each, top-level and never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=836
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

@@ -6203,6 +6203,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_blob_path",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "check_blob_reader",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"

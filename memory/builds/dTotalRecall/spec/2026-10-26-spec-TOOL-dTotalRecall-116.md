@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-116 — a blob-pinned record read returns a key only where the blob is that record's
 
-**Status:** INPROGRESS · rev-2 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 44
+**Status:** CLOSED · rev-2 · 2026-11-25 · node d · Tier-2 · base acbb74bb · streams tooling · order 44
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-25-build-TOOL-dTotalRecall-116-1-builder-return.md](../build/2026-11-25-build-TOOL-dTotalRecall-116-1-builder-return.md) | journal | — |
+| [2026-11-25-build-TOOL-dTotalRecall-116-2-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-116-2-acceptance-ledger.md) | log | — |
+| [2026-11-25-build-TOOL-dTotalRecall-116-widen-29.md](../build/2026-11-25-build-TOOL-dTotalRecall-116-widen-29.md) | widen | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-116-build-2-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-116-build-2-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-116-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-116-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-116-divergence-fold-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-116-divergence-fold-brief.md) | journal | — |

@@ -18,14 +18,17 @@ its supersession map is the served one where that kit resolves, else `row_gramma
 
 `show` prints one record, or with `#<tag>` one section of it, sliced from its blob at the row's lines;
 `@<blob>` reads that blob, its rows where the index holds them, else its bytes from git sectioned by the
-`section` extractor. `budget` sums each key's `show` slice against the role's `memory.item-budget`
-(`measured` reads MEASURED_CAP until a role has 30 sliced work orders measured, `96` or `128` that many
-KB, a KB 1,000 bytes) and answers as `memory.over-budget` says; a key the served supersession map names
-superseded is refused or marked as `memory.superseded-slices` says. It prints one `read <key> <bytes> B`
-line per key, ` superseded-by <id>` after a marked one.
+`section` extractor. A blob not verified as the key's is refused: the key names no record of the served
+view and the index holds no row of it at that blob, or no row the blob's text defines is the key's and
+git's history never held the blob at the path whose file name the key is. `budget` sums each key's `show`
+slice against the role's `memory.item-budget` (`measured` reads MEASURED_CAP until a role has 30 sliced
+work orders measured, `96` or `128` that many KB, a KB 1,000 bytes) and answers as `memory.over-budget`
+says; a key the served supersession map names superseded is refused or marked as
+`memory.superseded-slices` says. It prints one `read <key> <bytes> B` line per key, ` superseded-by <id>`
+after a marked one.
 
-Exit: 0 an answer · 2 a refusal naming what refused: an unknown key, tag or blob, a policy read refused, an
-over-cap or superseded read refused, an unresolved kit named.
+Exit: 0 an answer · 2 a refusal naming what refused: an unknown key, tag or blob, a blob that is no version
+of the key, a policy read refused, an over-cap or superseded read refused, an unresolved kit named.
 WHAT IT DOES NOT CHECK: a per-role `memory.item-budget` value, which the catalogue's values cannot spell;
 and that a record's kind is current where its registry row changed after its blob was indexed.
 """
@@ -453,6 +456,17 @@ def read_git_blob(root, blob: str) -> tuple[str, str]:
         raise FindError(f"blob {blob} is not UTF-8 text") from None
 
 
+def check_blob_path(root, sha: str, path: str) -> bool:
+    """Whether some commit this clone holds, an amended one included, held the blob `sha` at `path`;
+    FindError naming git where it refuses."""
+    p = subprocess.run(["git", "--literal-pathspecs", "log", "--all", "--reflog", "-m", "-1", "--format=%H",
+                        f"--find-object={sha}", "--", path], cwd=str(root), capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    if p.returncode != 0:
+        raise FindError(f"git log --find-object={sha} refused: {p.stderr.strip()}")
+    return bool(p.stdout.strip())
+
+
 def read_section(root, address: str) -> dict:
     """S5: `{key, tag, path, line, end_line, blob, text}` of `<key>[#<tag>][@<blob>]`: the record, or its
     section of that tag, sliced from its blob. FindError naming an unknown key, tag or blob."""
@@ -479,19 +493,35 @@ def read_section(root, address: str) -> dict:
             text = read_view_texts(root, con, tree, [rec])[(rec["path"], rec["blob"])]
         else:
             sha, text = read_git_blob(root, blob)
-            path = rows[0]["path"] if rows else ""
+            path = next((r["path"] for r in rows if r["blob"] == sha), "")   # where the served view holds it
             held = con.execute("SELECT b.line, b.end_line FROM blob_row b JOIN view_version w ON "
                                "b.extractor=w.extractor AND b.version=w.version WHERE b.blob=? AND b.kind='record' "
                                "AND b.text=?", (sha, key)).fetchone()
             secs = [tuple(x) for x in con.execute(
                 "SELECT b.tag, b.line, b.end_line FROM blob_row b JOIN view_version w ON b.extractor=w.extractor "
                 "AND b.version=w.version WHERE b.blob=? AND b.kind='section'", (sha,))]
-            if held is None:   # a blob no live tree holds has lost its rows: section its bytes here
+            if held is not None and not path:   # a blob another tree of this node holds
+                got = [p for (p,) in con.execute(
+                    "SELECT DISTINCT path FROM path_row WHERE blob=? AND kind='record'", (sha,))]
+                if not got:
+                    raise FindError(f"blob {sha} stands at no path the index holds")
+                path = min(got, key=lambda p: (pathlib.PurePosixPath(p).stem != key, p))
+            if held is None and not rows:
+                raise FindError(f"key {key} names no record of the served view, and blob {sha} holds no indexed "
+                                "row of it")
+            if held is None:   # a blob no live tree holds under this key has lost its rows: verify its bytes here
                 _ti, rx = load_tag_index()
-                found = [(r[2], r[3]) for r in rx.extract_record(ctx, path, text) if r[1] == "record" and r[4] == key] \
-                    if path else []
-                held = found[0] if found else (1, len(text.split("\n")))
-                secs = [(r[0], r[2], r[3]) for r in rx.extract_section(ctx, path, text)]
+                for cand in dict.fromkeys(r["path"] for r in rows):
+                    found = [(r[2], r[3]) for r in rx.extract_record(ctx, cand, text)
+                             if r[1] == "record" and r[4] == key]
+                    # a stem's row comes from the path alone, so only git's history tells whose text it is
+                    stem = pathlib.PurePosixPath(cand).stem == key
+                    if found and (not stem or check_blob_path(root, sha, cand)):
+                        held, path = found[0], cand
+                        secs = [(r[0], r[2], r[3]) for r in rx.extract_section(ctx, cand, text)]
+                        break
+                if held is None:
+                    raise FindError(f"blob {sha} is no version of {key}")
             rec = {"key": key, "path": path, "line": held[0], "end_line": held[1], "blob": sha}
     finally:
         con.close()
@@ -557,7 +587,8 @@ def check_read_set(root, role: str, keys: list[str]) -> tuple[int, list[str]]:
 
 # ---------------------------------------------------------------------------------- the fixture
 PLANTS = ("cap", "archive", "superseded", "over-report", "over-refuse", "over-off", "superseded-refuse",
-          "superseded-mark", "unheld-blob", "missing-section")
+          "superseded-mark", "unheld-blob", "blob-unknown-key", "blob-foreign-text", "blob-foreign-record",
+          "missing-section")
 FIXTURE_BUILD = "bFix"
 #: the kits a fixture copy-installs under its own `tools/`, each found as this kit finds a sibling
 FIXTURE_KITS = (("memory-tree", "tree_lib.py"), ("playbook", "tag_index.py"), ("memory-recall", "query.py"),
@@ -598,6 +629,9 @@ def build_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
                        f"# deviation\n\n**Serves:** deviation TOOL-{FIXTURE_BUILD}-1\n\n## Findings\n\nthe first\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                        "## Findings\n\nthe second\n")
     policy = []
+    if plant == "blob-foreign-record":
+        write_fixture_file(root, f"{folder}/build/2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-deviation-2.md",
+                           f"# deviation 2\n\n**Serves:** deviation TOOL-{FIXTURE_BUILD}-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
     if plant == "cap":
         for i in range(2, FIND_CAP + 2):
             write_fixture_file(root, f"{folder}/build/2026-01-01-build-TOOL-{FIXTURE_BUILD}-1-deviation-{i}.md",
@@ -661,6 +695,11 @@ def run_fixture(plant: str) -> tuple[int, list[str]]:
             write_fixture_file(root, rel, (root / rel).read_text(encoding="utf-8").replace("the second", "the third"))
             run_fixture_git(root, "commit", "-q", "-a", "--amend", "-m", "fixture")
             argv = ["show", f"{stem}#section.findings-2@{old}"]
+        if plant.startswith("blob-"):   # an address whose blob is not the key's
+            key, rel = {"blob-unknown-key": ("NO-SUCH-KEY", f"memory/builds/{FIXTURE_BUILD}/build/{stem}.md"),
+                        "blob-foreign-text": (stem, "memory/README.md"),
+                        "blob-foreign-record": (stem, f"memory/builds/{FIXTURE_BUILD}/build/{stem[:-1]}2.md")}[plant]
+            argv = ["show", f"{key}@{run_fixture_git(root, 'rev-parse', f'HEAD:{rel}').strip()}"]
         rc, lines = run_fixture_cli(root, argv)
         if plant == "missing-section":
             lines.append(f"{SAY}: fixture missing-section · spec files "
