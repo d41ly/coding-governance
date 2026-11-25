@@ -225,13 +225,10 @@ for r in "r_check $K region" "r_unatt $U region" "r_splice $U splice"; do
 done
 # exactly ONE CR, both sides: awk's `sub(/\r$/,"")` removes one, and the Python predicate must too —
 # `rstrip("\r")` would remove all of them, which is a divergence no fixture on this host can show.
-grep -q 'line\[:-1\] if line.endswith(CR) else line' "$KIT_MT/tree_lib.py" || {
-  echo "FAIL [CR tolerance @source] the Python marker predicate no longer strips exactly one CR"; st=1; }
-# ...and that one predicate is the one every Python caller holds: a local copy passes the grep above
-# (TOOL-aTemperedLane-3 S7).
-ncase=$((ncase+1))
-"$PY" -c 'import sys; sys.path.insert(0, sys.argv[1]); import gen_build_index as G, routed_commits as R, tree_lib as L; sys.exit(not (G.check_marker_line is R.check_marker_line is L.check_marker_line))' "$KIT_MT" || {
-  echo "FAIL [one marker predicate] gen_build_index, routed_commits and tree_lib do not share one check_marker_line"; st=1; }
+# The second half is that the one predicate is the one every Python caller holds: a local copy passes the
+# grep (TOOL-aTemperedLane-3 S7).
+{ grep -q 'line\[:-1\] if line.endswith(CR) else line' "$KIT_MT/tree_lib.py" && "$PY" -c 'import sys; sys.path.insert(0, sys.argv[1]); import gen_build_index as G, routed_commits as R, tree_lib as L; sys.exit(not (G.check_marker_line is R.check_marker_line is L.check_marker_line))' "$KIT_MT"; } || {
+  echo "FAIL [CR tolerance @source] the Python marker predicate no longer strips exactly one CR, or gen_build_index, routed_commits and tree_lib do not share one check_marker_line"; st=1; }
 # and the behavioural half, for the one reader whose CR handling this host CAN observe
 printf 'head\r\n%s\r\nbody\r\n%s\r\ntail\r\n' "$O" "$C" > "$T/case.md"
 [ "$(py_verdict "$T/case.md")" = accept ] || { echo "FAIL [one trailing CR] python rejected a CRLF document"; st=1; }
