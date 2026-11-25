@@ -18,6 +18,16 @@ kit in the session scratch directory, never an edit of this tree.
 - AC8 — observed: the maps of `load_spec_paths` from this tree and from `3d6c1702` were equal over 3139 ids. A lane history was admitted, exit 0 counting two red-fix commits, with its `LEG_MANIFEST` file in the tree, and read `cannot be checked`, exit 1, with a name its tree does not hold. A batch stream cut before a header and one cut inside a body were each a refusal.
 - AC9 — observed: the four names are the same objects in `tree_lib` and `gen_build_index`; the `grep -c` of the definition printed 0; the arm's grep exited 0 over `tree_lib.py`.
 - AC10 — observed: `grep -c "gen:spec-records"` printed 3, 1 and 3 over the three files, each says what L3 no longer checks, and `any other exactly one` printed 0 in `routed_commits.py`.
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC2: the exemption removed, every spec path kept as a finding
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC3: the compare dropped, any pair on both sides exempting
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC3: CRLF folded before the compare
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC4: the marker lines cut with the region
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC4: the pair count dropped
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC5: the mode unread
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC5: an added or deleted spec, the parentless one included, exempt
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC6: one exempt path clears the commit, then one edited path puts an exempt one back
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC7: one blob read per call
+- seen-red — `marker contracts` — red `e7cae18c0` — green `e7cae18c0` — AC9: the predicate in `tree_lib` made to strip every trailing CR
 
 ## Owed to the close
 

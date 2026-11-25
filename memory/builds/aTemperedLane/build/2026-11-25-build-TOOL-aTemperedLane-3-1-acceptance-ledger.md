@@ -17,6 +17,12 @@ probe's process, never an edit of this tree.
 - AC7 — observed: `read_blob_batch` raised `Refusal` for the first two streams in the words of section 4, and answered None and the blob's bytes for the third. Each refusal dropped, and a body skipped for a blob alone, turned this arm and no other.
 - AC8 — observed: the check's python line exited 0 over `tools/memory-tree`, and 1 with `gen_build_index.check_marker_line`, then `routed_commits.check_marker_line`, replaced.
 - AC9 — observed: `--red-fix-limits` exited 0 for each of the nine shas, and the diff from `7654f9db2` shows the module docstring, `build_fixture` and `run_selftest` alone.
+- seen-red — `routed-commits selftest` — red `e7cae18c0` — green `e7cae18c0` — AC3: the list's path answered with no file on disk
+- seen-red — `routed-commits selftest` — red `e7cae18c0` — green `e7cae18c0` — AC4: a list that is not UTF-8 read as empty
+- seen-red — `routed-commits selftest` — red `e7cae18c0` — green `e7cae18c0` — AC5: a None answer read as empty
+- seen-red — `routed-commits selftest` — red `e7cae18c0` — green `e7cae18c0` — AC6: the last parent read in place of the first
+- seen-red — `routed-commits selftest` — red `e7cae18c0` — green `e7cae18c0` — AC7: the header refusal dropped, then the body refusal, then only a blob's body skipped
+- seen-red — `marker contracts` — red `e7cae18c0` — green `e7cae18c0` — AC8: a local predicate using rstrip in `gen_build_index`, then in `routed_commits`
 
 ## Owed to the close
 

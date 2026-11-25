@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-25-build-TOOL-aTemperedLane-1-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-aTemperedLane-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-25-build-TOOL-aTemperedLane-1-agent-ledger.md](../build/2026-11-25-build-TOOL-aTemperedLane-1-agent-ledger.md) | journal | TOOL-aTemperedLane-2 TOOL-aTemperedLane-3 |
 | [2026-11-25-prompt-TOOL-aTemperedLane-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aTemperedLane-1-brief.md) | research | TOOL-aTemperedLane-2 |
 | [2026-11-25-review-TOOL-aTemperedLane-1-closing-diff-review-round1.md](../reviews/2026-11-25-review-TOOL-aTemperedLane-1-closing-diff-review-round1.md) | diff-review | TOOL-aTemperedLane-2 |
 

@@ -18,6 +18,15 @@ process, never an edit of this tree.
 - AC8 — observed: an unpinned read answered the replacing blob, and `--red-fix-limits` for g5 still exited 1 naming `L2`. With the batch read unpinned, it passed.
 - AC9 — observed: 259 fix commits reachable from HEAD, 259 first parents holding a list, 0 `L2` findings by `check_red_fix_limits`.
 - AC10 — observed: `grep -n "first parent"` answered the L2 row and a bullet of "What it does not check" in `help/red-fix-lane.md`, and `grep -c "itself shortened"` printed 0 over both files.
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC2 AC3 AC4 AC8: the working list read alone
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC2: a path under the agent folder exempt
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC3 AC4: the list read in the commit's own tree
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC3: the parent's and the working list joined
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC5 AC6: an absent parent list read as empty
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC6: an unresolved list turns L2 off
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC7: a read per commit
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC7: the answers paired with the commits by position
+- seen-red — `routed-commits selftest` — red `7654f9db2` — green `7654f9db2` — AC8: the replace-refs pin dropped
 
 A directory at the list's path and a list that is not UTF-8 each read as no list. The eight commits
 of TOOL-aTemperedLane-1's AC1 still exit 0 under the verb.
