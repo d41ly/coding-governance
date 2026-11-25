@@ -39,7 +39,9 @@ or a judged cell without `primary` and `covered`, is a refusal naming the arm an
 `--experiment` alone: its known sets are each audit's `### <item>.` headings' findings, read by
 `extract_item_findings` against the confirmed appendix rows, and its transcripts are read through the runlog
 kit, found by the inline `resolve_kit_dir` under a `requires_if` row and imported at use; where none resolves
-it refuses `unarmed`. `derive_map_verdict` reads the three terms, recall, searches and bytes.
+it refuses `unarmed`. `derive_map_verdict` reads the three terms, recall, searches and bytes, the recall rise
+against `measure_rise_noise`'s two standard errors plus RECALL_MARGIN; one run count per audit and arm is declared
+and held (TOOL-dTotalRecall-123).
 
 THE EXPERIMENT SHAPE. `check_experiment` reads one committed JSON manifest (`--experiment <src>`) and
 runs every rule of aScoutedSeam's method before the first figure line, a broken one exiting 2 by name:
@@ -75,6 +77,7 @@ import contextlib
 import hashlib
 import io
 import json
+import math
 import os
 import pathlib
 import re
@@ -128,8 +131,8 @@ INSTANCE_KEYS = ("review-replay", "scouted-seam", "map-replay")
 #: TOOL-dFairHearing-37 S5: held-out-tracked. Raised 25 -> 26 by TOOL-dFairHearing-46 S5: stated-shape. Raised 26 -> 29
 #: by TOOL-dFairHearing-48 S3, S5: appendix-pipe, appendix-break and proof-pinned. Raised 29 -> 32 by
 #: TOOL-dTotalRecall-17 section 7: map-known, map-verdict and map-transcript. Raised 32 -> 33 by TOOL-dTotalRecall-122
-#: S4: map-experiment.
-ARMS_DECLARED = 33
+#: S4: map-experiment. Raised 33 -> 34 by TOOL-dTotalRecall-123 S3: map-noise.
+ARMS_DECLARED = 34
 
 
 class Refusal(Exception):
@@ -1189,9 +1192,11 @@ GIT_WRITE_OPTION = re.compile(r"--output(?:=.*)?", re.S)     # never `-o`: `git 
 FIND_WRITE_OPTIONS = frozenset({"-delete", "-fprint", "-fprint0", "-fprintf", "-fls", "-exec", "-execdir", "-ok", "-okdir"})
 SAFE_REDIRECT = re.compile(r"[0-9]*>&[0-9-]|[0-9&*]*>>?[ \t]*(?:/dev/null|\$null)(?![\w./-])")   # `2>&1` and the null device
 QUOTED_SPAN = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"|\\.", re.S)   # what a shell takes whole, so its `>` is text
-#: The map's losing terms (the project map's `[test]`): the recall rise must reach the twin difference plus
+#: The map's losing terms (the project map's `[test]`): the recall rise must reach `measure_rise_noise` plus
 #: RECALL_MARGIN, the median search fall SEARCH_FLOOR, and the median bytes rise stay within the map's own bytes.
 RECALL_MARGIN = 5
+#: TOOL-dTotalRecall-123 S1: how many standard errors of the recall rise `measure_rise_noise` answers.
+NOISE_FACTOR = 2
 SEARCH_FLOOR = 1
 
 
@@ -1370,16 +1375,21 @@ def measure_bytes_before_act(path):
     return total
 
 
+def measure_rise_noise(runs):
+    """NOISE_FACTOR standard errors of the recall rise, `runs` one list of known items found per arm and audit."""
+    return NOISE_FACTOR * math.sqrt(sum(statistics.variance(counts) / len(counts) for counts in runs))
+
+
 def derive_map_verdict(figures):
     """`("win", [])`, or `("lose", [term, ...])` naming each losing term in `recall`, `searches`, `bytes` order,
     or `("unarmed", ["bytes"])` in place of a win no run measured (TOOL-dTotalRecall-121 S10).
 
-    `figures` holds `recall` (the with-map arm's known items found less the without arm's), `twin` (the twin
-    difference), `searches` (the without arm's median existence searches less the with arm's), `bytes` (the with
+    `figures` holds `recall` (the with-map arm's known items found less the without arm's), `noise`
+    (`measure_rise_noise` over every arm and audit), `searches` (the without arm's median existence searches less the with arm's), `bytes` (the with
     arm's median bytes before the first act less the without arm's), `map` (the map's own bytes) and `armed`
-    (False where every run of both arms read zero bytes before its first act). A term loses strictly past its boundary: recall below twin plus RECALL_MARGIN, searches below SEARCH_FLOOR, bytes
+    (False where every run of both arms read zero bytes before its first act). A term loses strictly past its boundary: recall below noise plus RECALL_MARGIN, searches below SEARCH_FLOOR, bytes
     above the map's."""
-    lost = [term for term, held in (("recall", figures["recall"] < figures["twin"] + RECALL_MARGIN),
+    lost = [term for term, held in (("recall", figures["recall"] < figures["noise"] + RECALL_MARGIN),
                                     ("searches", figures["searches"] < SEARCH_FLOOR),
                                     ("bytes", figures["bytes"] > figures["map"])) if held]
     if lost:
@@ -1397,8 +1407,9 @@ def measure_map_experiment(manifest, arms, repo="."):
     are its report's confirmed rows from those lenses, matched by `measure_recall` at window 0 on a spec
     audit and 10 on a diff review, and a diff review's every reporting lens is scored, so one with no
     transcript is refused. A known item is found when any finding its heading names is matched. Refused, never
-    a zero: a report `parse_candidates` cannot read, a transcript unread, an arm with fewer than two runs of
-    an audit, an empty map, and no runlog kit (`unarmed`).
+    a zero: a report `parse_candidates` cannot read, a transcript unread, two arms with different `dispatched`
+    counts, a count the audits do not divide into two runs or more, an audit and arm whose parsed runs are not
+    exactly that count, an empty map, and no runlog kit (`unarmed`).
     """
     known_lines, sets = read_map_known(manifest["known"], repo)
     check_case_evidence("map-replay", [{**row, "record": s["record"]} for s in sets.values() for row in s["findings"] if row["path"]])
@@ -1454,21 +1465,27 @@ def measure_map_experiment(manifest, arms, repo="."):
                 transcript = pathlib.Path(repo, c["transcripts"][lens])
                 searches[name].append(measure_existence_searches(transcript))
                 before[name].append(measure_bytes_before_act(transcript))
+    head += measure_parsed(arms, parsed)
+    sent = {a["dispatched"] for a in arms}
+    want, rest = divmod(min(sent), len(sets))
+    if len(sent) > 1 or rest or want < 2:
+        raise Refusal(f"arms: dispatched {', '.join(map(str, sorted(sent)))} over {len(sets)} audit(s): both arms take one "
+                      "count, the audits times one run count of at least two")
     for case in sets:
         for name in (without, with_map):
-            if len(found.get((name, case), [])) < 2:
-                raise Refusal(f"arm {name} case {case}: {len(found.get((name, case), []))} parsed run(s); the twin difference needs two")
-    head += measure_parsed(arms, parsed)
+            n = len(found.get((name, case), []))
+            if n != want:
+                raise Refusal(f"arm {name} case {case}: {n} parsed run(s), not the {want} the manifest declares")
     head.append(check_judge_rotation(None))
     mean = {name: sum(statistics.mean(found[(name, case)]) for case in sets) for name in (without, with_map)}
     figures = {"recall": mean[with_map] - mean[without],
-               "twin": sum(max(max(found[(name, case)]) - min(found[(name, case)]) for name in (without, with_map)) for case in sets),
+               "noise": measure_rise_noise(found.values()),
                "searches": statistics.median(searches[without]) - statistics.median(searches[with_map]),
                "bytes": statistics.median(before[with_map]) - statistics.median(before[without]), "map": map_bytes,
                "armed": any(n for reads in before.values() for n in reads)}
     verdict, lost = derive_map_verdict(figures)
     terms = [f"term recall: known items found {with_map} {mean[with_map]:g} · {without} {mean[without]:g} · rise {figures['recall']:g} · "
-             f"twin difference {figures['twin']:g} · loses below {figures['twin'] + RECALL_MARGIN:g}",
+             f"noise {figures['noise']:g} at {want} run(s) per arm · loses below {figures['noise'] + RECALL_MARGIN:g}",
              f"term searches: median existence searches {with_map} {statistics.median(searches[with_map]):g} over {len(searches[with_map])} lens run(s) · "
              f"{without} {statistics.median(searches[without]):g} over {len(searches[without])} · fall {figures['searches']:g} · loses below {SEARCH_FLOOR}",
              f"term bytes: median bytes before the first act {with_map} {statistics.median(before[with_map]):g} · "
@@ -2217,8 +2234,9 @@ def run_selftest():
         """TOOL-dTotalRecall-17 AC2: each planted set fails one term and loses on it alone; the set on every
         boundary wins, and reads unarmed where no run measured the bytes (TOOL-dTotalRecall-121 AC10). Each
         planted value is PINNED here."""
-        edge = {"recall": 5, "twin": 0, "searches": 1, "bytes": 100, "map": 100, "armed": True}
-        planted = [("recall", {**edge, "recall": 4}), ("searches", {**edge, "searches": 0.5}), ("bytes", {**edge, "bytes": 101})]
+        edge = {"recall": 5, "noise": 0, "searches": 1, "bytes": 100, "map": 100, "armed": True}
+        planted = [("recall", {**edge, "recall": 4}), ("recall", {**edge, "noise": 1}),
+                   ("searches", {**edge, "searches": 0.5}), ("bytes", {**edge, "bytes": 101})]
         bad = next((f"a set failing {term} alone read {derive_map_verdict(f)!r}" for term, f in planted
                     if derive_map_verdict(f) != ("lose", [term])), None)
         unarmed = derive_map_verdict({**edge, "armed": False})
@@ -2236,6 +2254,30 @@ def run_selftest():
                        for kind, body in (("assistant", {"type": "tool_use", "id": tid, "name": name, "input": given}),
                                           ("user", {"type": "tool_result", "tool_use_id": tid, "content": result})))
 
+    def render_map_report(ids):
+        head = f"**Serves:** diff-review X-1\n\nRange: {'a' * 40}..{'b' * 40}\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
+        return (head + "".join(f"### H{i}. item {i} (finding {i})\n\n" for i in ids)
+                + f"Review shape: raw {len(ids)}, confirmed {len(ids)}, refuted 0.\n\n" + APPENDIX_HEADING
+                + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n"
+                + "".join(f"| {i} | l | a.py:{i * 100} | confirmed |\n" for i in ids))
+
+    def build_map_manifest(tmp, items, counts, calls):
+        """One map-replay manifest over one audit of `items`, its sources under `tmp`: per arm, one run confirming the
+        first n items for each n of `counts[arm]`, its one lens transcript `calls[arm]`, `dispatched` the run count."""
+        def write_source(name, text):
+            path = pathlib.Path(tmp, name)
+            path.write_text(text, encoding="utf-8", newline="\n")
+            return str(path)
+        record = write_source("known.md", render_map_report(items))
+        return {"instance": "map-replay", "map": record,
+                "known": [{"case": "r1", "record": record, "items": [f"H{i}" for i in items]}],
+                "candidates": [{"case": "r1", "arm": arm, "matched": None,
+                                "report": write_source(f"{arm}-{run}.md", render_map_report(items[:n])),
+                                "transcripts": {"l": write_source(f"{arm}-{run}.jsonl", render_transcript(calls[arm]))}}
+                               for arm, ns in counts.items() for run, n in enumerate(ns, 1)],
+                "arms": [{"name": "without", "settings": {"map": False}, "dispatched": len(counts["without"])},
+                         {"name": "with", "base": "without", "settings": {"map": True}, "dispatched": len(counts["with"])}]}
+
     def check_map_experiment_arm():
         """TOOL-dTotalRecall-122 S4: `check_experiment` over a known set of six items (PINNED), the with-map runs
         confirming all six and the without runs one, each without run's one search past its act, so recall and
@@ -2246,41 +2288,46 @@ def run_selftest():
         except Refusal as exc:
             return ("skip", f"no runlog kit resolves beside this kit, so no transcript can be read: {exc}")
         items = [1, 2, 3, 4, 5, 6]
-
-        def render_report(ids):
-            head = f"**Serves:** diff-review X-1\n\nRange: {'a' * 40}..{'b' * 40}\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
-            return (head + "".join(f"### H{i}. item {i} (finding {i})\n\n" for i in ids)
-                    + f"Review shape: raw {len(ids)}, confirmed {len(ids)}, refuted 0.\n\n" + APPENDIX_HEADING
-                    + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n"
-                    + "".join(f"| {i} | l | a.py:{i * 100} | confirmed |\n" for i in ids))
-
+        size = len(render_map_report(items).encode("utf-8"))
         with tempfile.TemporaryDirectory() as tmp:
-            def write_source(name, text):
-                path = pathlib.Path(tmp, name)
-                path.write_text(text, encoding="utf-8", newline="\n")
-                return str(path)
-            record = write_source("known.md", render_report(items))
-            size = len(render_report(items).encode("utf-8"))
             want = (([], ["term bytes: unarmed · every lens run read 0 before its first act", "verdict unarmed bytes"]),
                     ([("t1", ("Read", {"file_path": "a.py"}), "r" * 10)], [
                         "term bytes: median bytes before the first act with 10 · without 10 · rise 0 · "
                         f"map {size} byte(s) · loses above {size}", "verdict win"]))
             for first, lines in want:
-                candidates = []
-                for arm, ids, late in (("without", items[:1], [("t3", ("Grep", {"pattern": "x"}), "a.py:1:x\n")]),
-                                       ("with", items, [])):
-                    calls = [*first, ("t2", ("Edit", {"file_path": "a.py"}), "ok"), *late]
-                    for run in (1, 2):
-                        candidates.append({"case": "r1", "arm": arm, "matched": None,
-                                           "report": write_source(f"{arm}-{run}.md", render_report(ids)),
-                                           "transcripts": {"l": write_source(f"{arm}-{run}.jsonl", render_transcript(calls))}})
-                got = check_experiment({"instance": "map-replay", "map": record, "candidates": candidates,
-                                        "known": [{"case": "r1", "record": record, "items": [f"H{i}" for i in items]}],
-                                        "arms": [{"name": "without", "settings": {"map": False}, "dispatched": 2},
-                                                 {"name": "with", "base": "without", "settings": {"map": True}, "dispatched": 2}]})
+                act = [*first, ("t2", ("Edit", {"file_path": "a.py"}), "ok")]
+                got = check_experiment(build_map_manifest(tmp, items, {"without": [1, 1], "with": [6, 6]}, {
+                    "without": [*act, ("t3", ("Grep", {"pattern": "x"}), "a.py:1:x\n")], "with": act}))
                 if got[-2:] != lines:
                     return f"with {len(first)} read(s) ahead of each act the last lines read {got[-2:]!r}, not {lines!r}"
         return None
+
+    def check_map_noise_arm():
+        """TOOL-dTotalRecall-123 AC1, AC2: over one audit of seven items (PINNED), both arms alike, counts 2 and 6,
+        then 2, 6, 1 and 7, read the two whole `term recall` lines below, so more runs lower the line; with one run
+        of the four dropped the refusal names 3 and 4, and with two declared counts it names both."""
+        try:
+            resolve_runlog_extract()
+        except Refusal as exc:
+            return ("skip", f"no runlog kit resolves beside this kit, so no transcript can be read: {exc}")
+        items = [1, 2, 3, 4, 5, 6, 7]
+        act = [("t1", ("Edit", {"file_path": "a.py"}), "ok")]
+        with tempfile.TemporaryDirectory() as tmp:
+            for counts, tail in (([2, 6], "noise 5.65685 at 2 run(s) per arm · loses below 10.6569"),
+                                 ([2, 6, 1, 7], "noise 4.16333 at 4 run(s) per arm · loses below 9.16333")):
+                manifest = build_map_manifest(tmp, items, {"without": counts, "with": counts}, {"without": act, "with": act})
+                want = f"term recall: known items found with 4 · without 4 · rise 0 · {tail}"
+                got = [line for line in check_experiment(manifest) if line.startswith("term recall")]
+                if got != [want]:
+                    return f"counts {counts} read {got!r}, not {[want]!r}"
+            whole = manifest["candidates"]
+            manifest["candidates"] = whole[:-1]
+            why = check_refused(lambda: check_experiment(manifest), "3 parsed run(s)", "not the 4")
+            if why:
+                return why
+            manifest["candidates"] = whole
+            manifest["arms"][0]["dispatched"] = 5
+            return check_refused(lambda: check_experiment(manifest), "dispatched 4, 5")
 
     def check_map_transcript_arm():
         """TOOL-dTotalRecall-17 AC3, TOOL-dTotalRecall-121 AC10: a 500-byte `git diff` (PINNED), a `sed -n` pipe, a
@@ -2336,7 +2383,8 @@ def run_selftest():
             ("held-out-tracked", check_held_out_tracked_arm), ("stated-shape", check_stated_shape_arm),
             ("appendix-pipe", check_appendix_pipe_arm), ("appendix-break", check_appendix_break_arm),
             ("proof-pinned", check_proof_pinned_arm), ("map-known", check_map_known_arm), ("map-verdict", check_map_verdict_arm),
-            ("map-experiment", check_map_experiment_arm), ("map-transcript", check_map_transcript_arm)]
+            ("map-experiment", check_map_experiment_arm), ("map-noise", check_map_noise_arm),
+            ("map-transcript", check_map_transcript_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1

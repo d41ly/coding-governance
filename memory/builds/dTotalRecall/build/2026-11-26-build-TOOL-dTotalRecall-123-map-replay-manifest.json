@@ -1,0 +1,111 @@
+// **Serves:** research TOOL-dTotalRecall-123
+// **Caused-by:** TOOL-dTotalRecall-123
+{
+ "instance": "map-replay",
+ "known": [
+  {
+   "case": "r1",
+   "record": "memory/builds/dClosedLoop/reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md",
+   "items": [
+    "H1",
+    "H3",
+    "H4",
+    "M14",
+    "M15",
+    "M16",
+    "M18",
+    "M19",
+    "M20",
+    "M21",
+    "M24",
+    "M25",
+    "M26",
+    "M27",
+    "M28",
+    "M33",
+    "M35",
+    "L6",
+    "L8",
+    "L10",
+    "M1",
+    "M4",
+    "M5",
+    "M6",
+    "M7",
+    "M8",
+    "M22",
+    "M29",
+    "M31",
+    "L1",
+    "L2",
+    "L3",
+    "L7",
+    "L9",
+    "M2",
+    "M3",
+    "M10"
+   ]
+  },
+  {
+   "case": "r2",
+   "record": "memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md",
+   "items": [
+    "H1",
+    "M1",
+    "M5",
+    "M8",
+    "M12",
+    "M13",
+    "M2",
+    "M7",
+    "M9",
+    "M10",
+    "L1",
+    "L2",
+    "L3",
+    "L4"
+   ]
+  },
+  {
+   "case": "r3",
+   "record": "memory/builds/dClosedLoop/reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md",
+   "items": [
+    "M1",
+    "M4",
+    "M6",
+    "M7",
+    "M8",
+    "M9",
+    "L3",
+    "H1",
+    "M3",
+    "M5",
+    "M11",
+    "M12",
+    "L1",
+    "M2",
+    "M14",
+    "L5"
+   ]
+  }
+ ],
+ "candidates": [],
+ "map": null,
+ "arms": [
+  {
+   "name": "without",
+   "settings": {
+    "map": false
+   },
+   "dispatched": 15
+  },
+  {
+   "name": "with",
+   "base": "without",
+   "settings": {
+    "map": true
+   },
+   "dispatched": 15
+  }
+ ]
+}

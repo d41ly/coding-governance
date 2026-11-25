@@ -20918,6 +20918,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "measure_rise_noise",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "measure_round_count",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"

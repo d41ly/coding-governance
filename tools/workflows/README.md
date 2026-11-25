@@ -982,11 +982,15 @@ heading names or a heading naming a finding id no confirmed appendix row holds; 
 arms varying `map`; and `map` the map file, whose bytes are the allowance. It prints each audit's
 `known` line, each run's recall, the three terms' figures and `verdict win`, `verdict lose <terms>` or
 `verdict unarmed bytes`, where every lens run read zero bytes before its first act and no term lost,
-read by `derive_map_verdict`: the recall rise below the twin runs' difference plus 5, the median
+read by `derive_map_verdict`: the recall rise below the noise `measure_rise_noise` answers plus 5, the median
 existence-search fall below 1, or the median bytes before the first act rising past the map's bytes,
 the first act being the first call `check_read_call` does not read as a read: a read or search tool,
 `ToolSearch`, or a shell call running only its closed set of reading programs and writing no file, less what
-`check_read_call`'s docstring lists as not read. An unknown key is refused, so a misspelt rule is never skipped. Every rule runs before the first figure line, and a broken one
+`check_read_call`'s docstring lists as not read. The noise is two standard errors of the recall rise
+(`NOISE_FACTOR` times the root of the summed sample variance over n of each arm's counts on each audit), so
+more runs lower the line (`TOOL-dTotalRecall-123`). The run count per audit and arm is each arm's `dispatched`
+over the number of audits: refused are two arms with different counts, a count the audits do not divide, fewer
+than two runs, and any audit and arm whose parsed runs are not exactly that count. An unknown key is refused, so a misspelt rule is never skipped. Every rule runs before the first figure line, and a broken one
 exits 2 naming the rule, the arm or case, and the value:
 
 - **evidence** — each instance's `case_evidence` hook: a `scouted-seam` case's `sha` and every
