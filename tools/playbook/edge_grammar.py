@@ -52,7 +52,7 @@ Every other line opens `edges:`. Exit 0 green, 1 red or a malformed edge line, 2
 What it does not check: an edge's source against its row's `from`, since no source namespace (record,
 commit, act) is registered (an `id#tag` target resolves through memory-tree's `record_find.read_section`,
 the reader `record show` runs, TOOL-dTotalRecall-9 S5);
-an id whose class is not registered, `unarmed`; a `serves` target no spec defines, which check 21
+an id whose class is not registered, `unarmed`, as is a tag whose registered namespace defines none; a `serves` target no spec defines, which check 21
 reds, so `--check` counts it as unresolved and adds no second verdict; and two leg-row marks, each
 `unarmed` and counted on an `edges: leg rows` line: a `tests` target whose namespace no registry row
 holds, until its build registers it, and an `enforces` target of the rule-member form
@@ -634,12 +634,14 @@ def read_tag_rows(rc, address):
         ctx = ti.derive_context(rc["root"], rc["ns_path"])
         rc["con"] = ti.load_index(rc["root"])
         ti.load_view(rc["con"], rc["root"], ctx)
+        rc["armed"] = ti.derive_namespace_state(rc["con"], ctx)
     return ti.resolve_address(rc["con"], address, "leaf")
 
 
 def resolve_edge(target, rc) -> tuple[str, str]:
     """`(state, row or reason)` of one target: `resolved` with its target's row, `red` with why,
-    `unresolved` for an id its class does not hold, `unarmed` for a form or class not armed here."""
+    `unresolved` for an id its class does not hold, `unarmed` for a form, class or namespace not armed here,
+    a registered namespace no tag of the tree is defined in among them (TOOL-dTotalRecall-114 S27)."""
     import design_lib
     form, ns = parse_edge_target(target)
     base, _, pin = target.partition("@")
@@ -654,6 +656,8 @@ def resolve_edge(target, rc) -> tuple[str, str]:
         return "resolved", f"{target} · {sec['path']}:{sec['line']}-{sec['end_line']} · {first}"
     if ns is not None:
         rows = read_tag_rows(rc, base)
+        if not rows and rc["armed"].get(ns) == 0:
+            return "unarmed", f"the namespace {ns} defines no tag in this tree"
         if not rows:
             return "red", "resolves to no row of the tag index"
         r = rows[0]
@@ -1036,7 +1040,7 @@ PLANTS = {
     "bad-block": ("# Fixture\n\n## [x] A section\n\n**Edges:** tests=kit.y implements=kit.z\n", None),
     "bad-note-refs": ("# gov:note layer.memory — x → y refs=a b\n", None),
     # TOOL-dWitnessedBar-22 AC4: a leg row's `tests` target in a namespace the shipped registry does not hold
-    "leg-unregistered": ('[{"name": "x y", "tag": "leg.x.y", "argv": ["true"], "tests": ["feature.x"]}]\n', None),
+    "leg-unregistered": ('[{"name": "x y", "tag": "leg.x.y", "argv": ["true"], "tests": ["nowhere.x"]}]\n', None),
 }
 #: the parse plants whose site is not `site.md`, each its file name
 PLANT_SITES = {"bad-note-refs": "site.py", "leg-unregistered": LEG_MANIFEST}
@@ -1060,6 +1064,8 @@ RESOLVE_PLANTS = {
                      .replace("ENFORCES", '["practice.land"]')),
     "leg-rule-member": (LEG_MANIFEST, LEG_PLANT.replace("TESTS", "[]")
                         .replace("ENFORCES", '["practice.land", "practice.land.paths"]')),
+    # TOOL-dTotalRecall-114 S27: a `tests` target in a registered namespace that defines no tag
+    "leg-unarmed": (LEG_MANIFEST, LEG_PLANT.replace("TESTS", '["feature.x"]').replace("ENFORCES", "[]")),
 }
 #: PLAY-dOrderedCharter-49 S26: the commit plant's trailer values, each `(Pass: value, edges it yields)`; a prose
 #: value and `none` are counted unread, an id is one edge
@@ -1093,7 +1099,8 @@ def build_resolve_fixture(top, plant) -> tuple[pathlib.Path, pathlib.Path, pathl
     top = pathlib.Path(top)
     root = gov_tag.build_tags_fixture(top, "none")
     shipped = (KIT_DIR / "namespaces.toml").read_text(encoding="utf-8")
-    reg = gov_tag.FIXTURE_REGISTRY + gov_tag.FIXTURE_UNIT_ROW + "\n" + shipped[shipped.index("\n[[native]]") + 1:]
+    empty = gov_tag.derive_fixture_row("feature", "fixture_tags:extract_declared") if plant == "leg-unarmed" else ""
+    reg = gov_tag.FIXTURE_REGISTRY + gov_tag.FIXTURE_UNIT_ROW + empty + "\n" + shipped[shipped.index("\n[[native]]") + 1:]
     unit1, clause1 = FIXTURE_UNIT.format(help="the first text"), "the alpha clause `x`"
     gov_tag.write_commit(root, {
         ".memory-tree.conf": 'MEMORY_ROOT=memory\nCHARTER="AGENTS.md"\nFAMILIES="playbook:PLAY"\n'

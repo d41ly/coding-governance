@@ -1590,7 +1590,7 @@ def add_record_kind(root, a, kit_rel: str | None = None) -> int:
     return write_kind_region(root, kit_rel)   # the view is the registry's render, so it moves with the row
 
 
-def render_template(rows: list[dict], kind: str, typed_kinds=None) -> str | None:
+def render_template(rows: list[dict], kind: str) -> str | None:
     """S5: the skeleton one `fields` row defines, the layout `build_records.write_record` writes; None for
     a kind with no `fields` row."""
     row = next((r for r in rows if r.get("name") == kind), None)

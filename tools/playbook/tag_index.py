@@ -1184,7 +1184,8 @@ def check_retired(con, ctx, mode, base_spans, armed, base_sections=None, aliases
     under `refuse-new`, a WARN line under `warn`, silent under `allow`. -> (reds, warns, cited).
     PLAY-dOrderedCharter-29 S8, over sections: a `doc.<name>#<seg>` of `base_sections` (the compare base's
     section rows, None for no base) gone at the tip with no `[[alias]]` row is red, and a section an alias
-    row retires minted again at the tip is red, under every value."""
+    row retires minted again at the tip is red, under every value. A section row with no `#` is a record
+    heading, which a revision renames freely, and is never read as retired (TOOL-dTotalRecall-114 S26)."""
     retired = {}
     for tag, path, line, *_ in read_rows(con, ("retired",)):
         retired.setdefault(tag, (path, line))
@@ -1193,7 +1194,7 @@ def check_retired(con, ctx, mode, base_spans, armed, base_sections=None, aliases
     tip = {}
     for tag, path, line, *_ in read_rows(con, ("section",)):
         tip.setdefault(tag, (path, line))
-    for tag in sorted(set(base_sections or ()) - set(tip) - set(aliases)):
+    for tag in sorted(t for t in set(base_sections or ()) - set(tip) - set(aliases) if "#" in t):
         reds.append(f"tags: retired section · {tag} is at the compare base and gone at the tip with no [[alias]] "
                     "row: add one in aliases.toml naming where it went")
     for ref in sorted(r for r in aliases if r in tip):
@@ -1230,9 +1231,10 @@ def read_layer_kinds(path) -> dict:
 
 def check_owned(con, ctx, layers_path) -> list:
     """S14 `owned`: a tag minted in a namespace whose row's layer is a core layer, by a source sitting in
-    a kit whose descriptor's layer is an `optional` or `expansion` row, is red."""
+    a kit whose descriptor's layer is an `optional` or `expansion` row, is red. A namespace whose row reads
+    `minted = "anywhere"` is passed over: any tracked file mints its tags (TOOL-dTotalRecall-114 S26)."""
     kinds = read_layer_kinds(layers_path)
-    core_ns = {r["ns"] for r in ctx["namespaces"] if kinds.get(r["layer"]) == "core"}
+    core_ns = {r["ns"] for r in ctx["namespaces"] if kinds.get(r["layer"]) == "core" and r.get("minted") != "anywhere"}
     kit_of: dict = {}
 
     def read_kit_layer(path):
@@ -1262,9 +1264,10 @@ def check_owned(con, ctx, layers_path) -> list:
     return reds
 
 
-def derive_tag_fault(head: str, words) -> str | None:
+def derive_tag_fault(head: str, words, cap=TAG_MAX_BYTES) -> str | None:
     """S3's rule for one tag `head`, no `#<seg>`, against the registry's namespace `words`: the rule it
-    breaks, or None. The shape check and the memory index's promotion both grade through it."""
+    breaks, or None. The shape check and the memory index's promotion both grade through it. A `cap` of
+    None grades no length (TOOL-dTotalRecall-114 S26)."""
     ns, _, rest = head.partition(".")
     segs = rest.split(".") if rest else []
     bad = next((s for s in segs if not SEG_RE.fullmatch(s)), None)
@@ -1272,8 +1275,8 @@ def derive_tag_fault(head: str, words) -> str | None:
         return f"namespace '{ns}' is not registered"
     if not segs or bad is not None:
         return f"segment '{bad or ''}' is outside {SEG}"
-    if len(head.encode("utf-8")) > TAG_MAX_BYTES:
-        return f"over {TAG_MAX_BYTES} bytes ({len(head.encode('utf-8'))})"
+    if cap is not None and len(head.encode("utf-8")) > cap:
+        return f"over {cap} bytes ({len(head.encode('utf-8'))})"
     if len(segs) > 1 and segs[0] in words:  # a one-segment name's bare form is no citation (TOOL-dDeclaredLoop-18 S10)
         return f"first segment '{segs[0]}' is a namespace word"
     return None
@@ -1282,14 +1285,19 @@ def derive_tag_fault(head: str, words) -> str | None:
 def check_tag_shape(con, ctx) -> tuple[list, list]:
     """S3, the shape check, over every defining row, every unit row's selector value and every `family`
     prefix: each graded before any `#<seg>`, against the registry's words, a word outside `seg` a red
-    naming its row and never a word. -> (reds, the tags graded)."""
+    naming its row and never a word. The byte cap passes over a derived heading anchor, a `section` row whose
+    tag opens with its heading's own fold: no author spelled it, and `record show` compares the whole fold. An
+    authored or mapped section tag is still graded (TOOL-dTotalRecall-114 S26). -> (reds, the tags graded)."""
     words = {r["ns"] for r in ctx["namespaces"]}
     reds = [f"tags: {ctx['registry']} · shape · namespace row '{ns}' is outside seg, so no tag is graded "
             f"against it" for ns in ctx["malformed"]]
     graded = []
-    for tag, path, line, *_ in read_rows(con, DEFINE_KINDS + ("selector", "family")):
+    for tag, path, line, kind, blob, ex in read_rows(con, DEFINE_KINDS + ("selector", "family")):
         head = tag.split("#")[0]
         reason = derive_tag_fault(head, words)
+        if reason and kind == "section" and "#" not in tag and derive_tag_fault(head, words, None) is None:
+            fold = derive_heading_seg(read_text_of(con, blob, ex, kind, line)[1])
+            reason = None if fold and head.startswith("section." + fold) else reason
         if reason:
             reds.append(f"tags: {path}:{line} · shape · {head} · {reason}")
         graded.append(head)

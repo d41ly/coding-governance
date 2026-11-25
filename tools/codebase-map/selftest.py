@@ -1992,7 +1992,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check("shell layer: public definitions only, untokenizable refuses (aMendedFleet-35)",
                           lambda: test_shell_layer_indexes_public_definitions_only(Path(td)))
-    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+    with tempfile.TemporaryDirectory() as td:
         failures += check("shell layer: builds with no lexicon kit reachable (dTotalRecall-13 S5)",
                           lambda: test_shell_layer_needs_no_lexicon_kit(Path(td)))
     with tempfile.TemporaryDirectory() as td:

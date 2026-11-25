@@ -612,7 +612,7 @@ def read_spec_edges(text, verb):
     return [tuple(x) for x in out]
 
 
-def extract_spec_head(text, arg=None):
+def extract_spec_head(text, _arg=None):
     """The `spec-head` leg reader (TOOL-dTotalRecall-23 S2), beside the two readers it calls: a spec's first
     five unfenced lines, its `read_spec_writes` words and its `read_spec_edges` consumes targets, the
     path-independent half of the index generator's `parse_spec_text`; `{"undecodable": true}` for a blob

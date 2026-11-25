@@ -35,3 +35,6 @@ nothing else.
 - Where a command is meant for cmd.exe or PowerShell, say which shell runs it; never leave a reader to
   infer it from the variable's spelling.
 - On review, read every `%` pair in a criterion's command as a question: which shell expands it?
+- It coexists-with `observed-by-claim-no-arm-discharges`: both leave a criterion observed against
+  something its author never meant, there an arm that never reads the surface, here a path bash
+  never expanded.

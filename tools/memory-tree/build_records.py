@@ -1248,8 +1248,8 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
     ordered = [(f, given[f]) for f in order if f in given] + [(k, v) for k, v in fields if k not in order]
     template = record_kinds.render_template([row], kind).split("\n")
 
-    def render_text(rel, n, made_by="owner"):
-        """The template filled for the record at `rel`, `n` its minted `<n>`, its header naming `made_by`."""
+    def render_text(n, made_by="owner"):
+        """The template filled, `n` the record's minted `<n>`, its header naming `made_by`."""
         head = template[0].replace("<unit id>", unit).replace("<n>", str(n)).replace("<title>", title)
         body = [head, "", f"**Serves:** {kind} {unit}"]
         if not typed:
@@ -1329,7 +1329,7 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
         rel, given_id = f"{folder}/{seq[0]}-{build}-0.md", None   # provisional, for the check
     else:
         raise ValueError(f"its id-rule {rule} holds a placeholder this door mints only in a typed kind")
-    text = render_text(rel, 1)
+    text = render_text(1)
     check_text(rel, text)
     key = derive_content_key(kind, read_ordered_fields(text), given_id)
 
@@ -1357,7 +1357,7 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
         def check_written(at, written):
             """The bytes `write_record` is about to write: the template's render, refused by the kind's check."""
             n = re.search(r"-(\d+)\.md$", at).group(1)
-            if written != render_text(at, n, made_by):
+            if written != render_text(n, made_by):
                 raise ValueError(f"the factory's layout and the {kind} template disagree at {at}")
             check_text(at, written, made_by)
         rel = write_record(root, build, unit, kind, title, ordered + [("Made-by", made_by)], today,
@@ -1369,7 +1369,7 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
                 return "waiting", minted, key, lines
             lines = lines + floor
             rel = f"{folder}/{minted}.md"
-        text = render_text(rel, 1, made_by)
+        text = render_text(1, made_by)
         check_text(rel, text, made_by)
         pathlib.Path(root, rel).parent.mkdir(parents=True, exist_ok=True)
         with open(pathlib.Path(root, rel), "x", encoding="utf-8", newline="\n") as fh:
@@ -1647,7 +1647,7 @@ def check_door_header_plant():
                f"status: live\nlease-utc: {now}\nbeat-utc: {now}\nepoch: 1\nkind: build\nfleet-tag: {tag}\nrenews: yes")
         tree = subprocess.run(["git", "mktree"], cwd=str(a), input="", capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip()
         lease = run_git(a, "commit-tree", tree, "-m", msg).strip()
-        run_git(a, "push", "-q", "-f", "origin", f"{lease}:refs/gov/leases/dTotalRecall/build")
+        run_git(a, "push", "-q", "-f", run_git(a, "remote").strip(), f"{lease}:refs/gov/leases/dTotalRecall/build")
         name = "2026-11-23-prompt-TOOL-dTotalRecall-2-lease"
         check_case("made-by lease", run_door(a, *base, "--name", name, "--caused-by", name.replace("lease", "owner")),
                    0, [f"wrote {folder}/{name}.md"], a)   # AC2 under the lease, its cause a record key
@@ -1806,13 +1806,14 @@ def check_ask_plant():
         run_git(top, "init", "-q", "--bare", "--template=", "c.git")
         run_git(top / "c.git", "symbolic-ref", "HEAD", "refs/heads/main")
         run_git(c, "remote", "add", "origin", (top / "c.git").as_posix())
-        run_git(c, "push", "-q", "origin", "main")
+        rem = run_git(c, "remote").strip()
+        run_git(c, "push", "-q", rem, "main")
         check_case("refused on a remote", run_ask_door(c, *base), 2, ["asks.acceptance"], c)
-        refs = run_git(c, "ls-remote", "origin", "refs/gov/claims/asks/*").strip()
+        refs = run_git(c, "ls-remote", rem, "refs/gov/claims/asks/*").strip()
         if refs:
             bad.append(f"refused on a remote: the refused filing left a counter ref on origin: {refs}")
         check_case("filed on a remote", run_ask_door(c, *base, *accept), 0, [f"wrote {rel} {first} key "])
-        refs = run_git(c, "ls-remote", "origin", "refs/gov/claims/asks/*").strip().splitlines()
+        refs = run_git(c, "ls-remote", rem, "refs/gov/claims/asks/*").strip().splitlines()
         if len(refs) != 1 or not refs[0].endswith("refs/gov/claims/asks/EXMP-tDoor"):
             bad.append(f"filed on a remote: origin holds {refs}, not the one counter ref of EXMP-tDoor")
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError, ValueError) as exc:

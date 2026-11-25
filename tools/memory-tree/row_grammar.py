@@ -226,8 +226,11 @@ def derive_row_re(conf):
 # Written with a real string builder, never a shell heredoc: the first cut of this line carried a
 # word-boundary escape that reached the file as a literal BACKSPACE byte, so the pattern compiled,
 # printed correctly, and matched nothing. Only repr() showed it.
-from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
-GENERIC_ID = SlugPattern(lambda g: r"[A-Z][A-Z0-9]{1,9}-(?:" + g.slug_class + r")-[0-9]+[a-z]*")
+def derive_generic_id_re():
+    """The generic id pattern over the slug grammar's class (TOOL-dTotalRecall-5 S7), read at the call through
+    `tree_lib.read_slug_class`: an import of `id_grammar` here would stop this module, and check 27's named
+    refusal with it, in an install whose `id_grammar.py` is absent or too old."""
+    return re.compile(r"[A-Z][A-Z0-9]{1,9}-(?:" + read_slug_class() + r")-[0-9]+[a-z]*")
 
 
 # A rotated archive, by the name of the document it ROTATED: `<STEM>.<iso-date><suffix?>.md`, flat.
@@ -358,7 +361,7 @@ def scan(root, conf):
     idre = id_pattern(conf)
     # A ROW leads with a dash and then an id, optionally emphasised. Anything else on the line is
     # prose and is not this check's business.
-    rowre = derive_row_re(conf)
+    rowre, generic = derive_row_re(conf), derive_generic_id_re()
     rows = loose = 0
     unkeyed, dupes, open_fences = [], [], []
     for p in row_docs(root, m, conf):
@@ -377,7 +380,7 @@ def scan(root, conf):
             if line is None:          # the document ended inside a fence; n is where it opened
                 open_fences.append((p, n))
                 continue
-            if GENERIC_ID.search(line):
+            if generic.search(line):
                 loose += 1
             mm = rowre.match(line)
             if not mm:
@@ -1653,7 +1656,8 @@ def scan_engine_imports(kit_dir):
     of either engine cannot kill its siblings on import; a later edit re-adding `from corpus_ids
     import ...` to a sibling would reopen that silently, because in THIS tree the import resolves.
     The two owners' use of each other is exempt, as the spec states. Parsed with `ast`, so a
-    comment or a docstring naming the module is not an import.
+    comment or a docstring naming the module is not an import. An import in a function body runs at
+    the call and kills no sibling on import, so it is no hit (TOOL-dTotalRecall-2, -19).
 
     NOT CHECKED: a load by path (`importlib.util.spec_from_file_location`), which `gotchas.py` uses
     to ASK `corpus_ids` a question at run time and which degrades to a named failure rather than an
@@ -1670,7 +1674,11 @@ def scan_engine_imports(kit_dir):
         graded += 1
         if stem in ENGINE_OWNERS:
             continue
+        late = {id(n) for f in ast.walk(tree) if isinstance(f, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda))
+                for n in ast.walk(f)}
         for node in ast.walk(tree):
+            if id(node) in late:
+                continue
             if isinstance(node, ast.ImportFrom) and node.level == 0:
                 mods = [node.module or ""]
             elif isinstance(node, ast.Import):
@@ -2425,11 +2433,15 @@ def cmd_selftest():
             fh.write("# a docstring naming corpus_ids is not an import\nimport os\n")
         with open(os.path.join(staged, "check-arms.py"), "w", encoding="utf-8") as fh:
             fh.write("from corpus_ids import parse_conf\n")
+        with open(os.path.join(staged, "late.py"), "w", encoding="utf-8") as fh:
+            fh.write("def read_late():\n    import corpus_ids\n    return corpus_ids\n")
         with open(os.path.join(staged, "gen_build_index.py"), "w", encoding="utf-8") as fh:
             fh.write("from corpus_ids import parse_conf\n")
         arm("a staged sibling re-import is named with its file, line and module",
             "('check-arms.py', 1, 'corpus_ids')",
             lambda: repr(scan_engine_imports(staged)[0]))
+        arm("...and an import in a function body, which no sibling's import runs, is no hit", "late-exempt",
+            lambda: "late-exempt" if not [h for h in scan_engine_imports(staged)[0] if h[0] == "late.py"] else "FLAGGED")
         arm("...and the two owners' own mutual use is exempt", "owner-exempt",
             lambda: "owner-exempt" if not [h for h in scan_engine_imports(staged)[0]
                                            if h[0] == "gen_build_index.py"] else "FLAGGED")

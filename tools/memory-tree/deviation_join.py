@@ -235,7 +235,7 @@ def set_env_aside(names=(), **put):
 def set_fixture_env():
     """A fixture's environment for the block, reading nothing of the caller's (TOOL-dTotalRecall-88 S9, the
     contract of branch-reconcile's `seed_env`)."""
-    with tempfile.TemporaryDirectory(prefix="fe-", ignore_cleanup_errors=True) as d:
+    with tempfile.TemporaryDirectory(prefix="fe-") as d:
         conf = pathlib.Path(d, "gitconfig")
         conf.write_bytes(b"[user]\n\tname = fx\n\temail = fx@example.invalid\n[init]\n\tdefaultBranch = main\n"
                          b"[core]\n\tautocrlf = false\n")
@@ -763,7 +763,7 @@ def check_approver(rec, rows, approval, at=""):
             return f"its approver {role} is below {need}, the least approver its {what} requires under by-risk"
     if role != "owner":
         return None
-    cited = list(dict.fromkeys(m.group(0) for m in row_grammar.GENERIC_ID.finditer(a)))
+    cited = list(dict.fromkeys(m.group(0) for m in row_grammar.derive_generic_id_re().finditer(a)))
     if not cited:
         return f"its approver '{a}' names the owner and cites no decision id"
     clause = re.match(r"`?(" + _CL + r")@", rec["departs"])

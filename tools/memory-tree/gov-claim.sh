@@ -44,7 +44,8 @@
 # cannot see; a replay on a history the cache ref's first parents do not reach; and whether the remote's
 # default branch is the one the caller lands on, which the remote ladder answers.
 set -u
-HERE=$(cd "$(dirname "$0")" && pwd)
+case "$0" in */*) HERE=${0%/*} ;; *) HERE=. ;; esac
+HERE=$(cd "$HERE" && pwd)
 # The blocks below are INLINE, byte-identical to their canonical copies in gov's lib dir, because this
 # kit is copy-installed and that dir ships nothing; its resolve-python.test.sh reds a copy that drifts.
 # >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)

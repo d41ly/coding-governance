@@ -1,5 +1,5 @@
 """memory_measure.py — the acceptance re-measure: memory bytes per memory-reading agent over every read
-channel (TOOL-dTotalRecall-12). gov:kit runlog@1.18
+channel (TOOL-dTotalRecall-12). gov:kit runlog@1.19
 
     python <this kit>/runlog.py memory [--from <utc>] [--to <utc>] [--transcripts <projects dir>]
     python <this kit>/runlog.py memory --landed <rev> [--transcripts <projects dir>]
@@ -57,7 +57,6 @@ import os
 import pathlib
 import posixpath
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -175,7 +174,7 @@ def derive_read_channel(name, tool_input, memory_root, main_worktree=None, cwd=N
 
 # ---------------------------------------------------------------------------------- one agent
 
-def read_slice_bytes(agent_path):
+def read_slice_bytes(_agent_path):
     """The bytes of the slices a work order inlined for this agent. A STAND-IN: None, the channel
     `unarmed`, until the executor that writes the slice manifest gives this a body (TOOL-dTotalRecall-12 S9)."""
     return None
@@ -562,7 +561,8 @@ def print_memory_fixture(case) -> int:
     """Plant `case` in a scratch transcripts root, measure it as the CLI does, print the report and its
     verdict, remove the scratch, and return the verdict's exit code. Only here does a slice reader
     return bytes, and only where the case arms the channel."""
-    base = pathlib.Path(tempfile.mkdtemp(prefix="runlog-memory-"))
+    td = tempfile.TemporaryDirectory(prefix="runlog-memory-")
+    base = pathlib.Path(td.name)
     try:
         projects, landed, slices = write_memory_fixture(base, case)
         read_slice = read_slice_bytes
@@ -579,4 +579,4 @@ def print_memory_fixture(case) -> int:
         sys.stdout.flush()
         return verdict[1]
     finally:
-        shutil.rmtree(base, ignore_errors=True)
+        td.cleanup()

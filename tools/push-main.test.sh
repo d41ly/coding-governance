@@ -836,7 +836,7 @@ build_main; build_feat
 mkdir -p "$tmp/wt/memory"; echo "r $RANDOM" > "$tmp/wt/memory/land.md"; git -C "$tmp/wt" add memory/land.md
 git -C "$tmp/wt" commit -q -m "TOOL-tFix-5: a record"; re_c=$(git -C "$tmp/wt" rev-parse HEAD)
 re_out=$(run_wt --prepare --slug tFix 2>&1 && run_wt --land --slug tFix 2>&1); re_rc=$?
-re_l=$(printf 'refs/heads/main\trecord\t%s\t%s' "$(git -C "$tmp/wt" rev-parse "$re_c:memory/land.md")" "$re_c")
+printf -v re_l 'refs/heads/main\trecord\t%s\t%s' "$(git -C "$tmp/wt" rev-parse "$re_c:memory/land.md")" "$re_c"
 [ "$re_rc" = 0 ] && cut -f2-5 "$re_feed" 2>/dev/null | grep -qxF "$re_l" \
   && ok "RE AC7 --land appends the landed record commit's event to the feed" \
   || bad "RE AC7 --land (rc $re_rc) left no record event for ${re_c:0:8} in the feed: $re_out"
@@ -844,7 +844,7 @@ build_main; git -C "$tmp/work2" checkout -q main
 mkdir -p "$tmp/work2/memory"; echo "a $RANDOM" > "$tmp/work2/memory/attended.md"; git -C "$tmp/work2" add memory/attended.md
 git -C "$tmp/work2" commit -q -m "a record, landed attended"; re_c=$(git -C "$tmp/work2" rev-parse HEAD)
 re_out=$( cd "$tmp/work2" && bash "$lander" 2>&1 ); re_rc=$?
-re_l=$(printf 'refs/heads/main\trecord\t%s\t%s' "$(git -C "$tmp/work2" rev-parse "$re_c:memory/attended.md")" "$re_c")
+printf -v re_l 'refs/heads/main\trecord\t%s\t%s' "$(git -C "$tmp/work2" rev-parse "$re_c:memory/attended.md")" "$re_c"
 [ "$re_rc" = 0 ] && cut -f2-5 "$re_feed" 2>/dev/null | grep -qxF "$re_l" \
   && ok "RE AC7 the attended path appends the landed record commit's event to the feed" \
   || bad "RE AC7 the attended landing (rc $re_rc) left no record event for ${re_c:0:8} in the feed: $re_out"

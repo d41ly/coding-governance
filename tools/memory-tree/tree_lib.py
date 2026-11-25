@@ -1077,7 +1077,7 @@ def derive_leg_version(name, root) -> str:
     return load_leg_reader(name, root)[2]
 
 
-def extract_head_lines(text, arg=None) -> dict:
+def extract_head_lines(text, _arg=None) -> dict:
     """The `unfenced-head` reader: the first `BIND_HEAD_LINES` lines `unfenced` yields, which
     `read_bindings` classifies, or `{"undecodable": true}` for a blob that is not UTF-8."""
     if text is None:

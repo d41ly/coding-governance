@@ -423,7 +423,7 @@ reference-no-h1 $_tk|1|member doc.reference.fixture (|resolves to no row
 reference-no-h1 $_tk|1|/references.toml) lacks h1
 repeat-heading $_tk|0|tags: plant repeat-heading · sections findings findings-2 findings-2-2
 repeat-heading $_tk|0|tags: green · 0 red|doc.repeat#findings
-memory-records $_tk|0|section 4 feature 0 class 1 marker 1
+memory-records $_tk|0|section 5 feature 0 class 1 marker 1
 memory-records $_tk|0|tags: plant memory-records · record rows record.research=2026-01-01-build-TOOL-bFix-1-research-1
 memory-records $_tk|0|tags: plant memory-records · section.goal memory/builds/bFix/spec/2026-01-01-spec-TOOL-bFix-1.md
 memory-records $_tk|0|tags:   the second findings|tags:   the first findings
@@ -458,7 +458,8 @@ fi
 # over a scratch repository whose unit and clause texts moved under a second commit, beside the malformed
 # section, block and note refs segment. The `leg-` rows are TOOL-dWitnessedBar-22's leg-row site, each its
 # site named `gate-legs.json`: a `tests` target in a namespace the shipped registry lacks marked `unarmed`
-# and counted, a row's two edges resolved, and a rule-member `enforces` target marked and never resolved.
+# and counted, one in a registered namespace no tag is defined in read `unarmed`, a row's two edges resolved, and a
+# rule-member `enforces` target marked and never resolved.
 # The `cardinality-` rows are TOOL-dTotalRecall-22's: a declared row with its bound cut refused, the kind
 # registry's mirror differing from the bounds in memory, and two branches each superseding one node, clean
 # alone and red once merged clean. What they do not check: a bound above 1, which no row declares.
@@ -506,6 +507,8 @@ bad-block|1|site.md:5: `**Edges:** tests=kit.y implements=kit.z` carries a secon
 bad-note-refs|1|site.py:1: `# gov:note layer.memory — x → y refs=a b` refs segment holds the target 'a b'
 leg-unregistered|0|edges: leg rows · 1 tests target(s) unarmed until their namespace is registered|is not registered
 leg-unregistered|0|edges: green · 1 edge(s)
+leg-unarmed|0|edges: green · 1 edge(s)|resolves to no row
+leg-unarmed|0|edges: gate-legs.json:4 · tests · feature.x|leg rows
 leg-resolved|0|edges: resolved · gate-legs.json:
 leg-resolved|0|· tests=layer.memory · layer.memory
 leg-resolved|0|· enforces=practice.land · practice.land

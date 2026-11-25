@@ -188,7 +188,7 @@ def extract_section(ctx, path, text=None):
     return out
 
 
-def extract_feature(ctx, path, text=None):
+def extract_feature(_ctx, path, text=None):
     """The `feature` namespace: each feature-tag anchor in tracked code outside Markdown (S1)."""
     if text is None:
         return None if path.endswith(".md") else ""
@@ -220,7 +220,7 @@ def extract_class(ctx, path, text=None):
     return [(tag, "tag", n, n, fm["description"])]
 
 
-def extract_marker(ctx, path, text=None):
+def extract_marker(_ctx, _path, text=None):
     """The `marker` namespace: each `gov` marker word of tracked text, once per file (S1)."""
     if text is None:
         return ""

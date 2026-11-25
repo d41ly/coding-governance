@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-114 — the close's first bar: each red of the merged tree is repaired at its cause, converted where a conversion is short and widened through its ledger where the need is real
 
-**Status:** INPROGRESS · rev-1 · 2026-11-25 · node d · Tier-2 · base e5b7ee15 · streams tooling · order 42
+**Status:** CLOSED · rev-1 · 2026-11-25 · node d · Tier-2 · base e5b7ee15 · streams tooling · order 42
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,15 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-25-build-TOOL-dTotalRecall-114-1-acceptance-ledger.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-1-acceptance-ledger.md) | log | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-deviation-1015.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-deviation-1015.md) | deviation | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-widen-16.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-16.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-widen-17.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-17.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-widen-18.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-18.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-widen-19.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-19.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-widen-21.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-21.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-widen-22.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-22.md) | widen | — |
+| [2026-11-25-build-TOOL-dTotalRecall-114-widen-23.md](../build/2026-11-25-build-TOOL-dTotalRecall-114-widen-23.md) | widen | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-114-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-114-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-114-spec-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-114-spec-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-114-spec-writer.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-114-spec-writer.md) | log | — |

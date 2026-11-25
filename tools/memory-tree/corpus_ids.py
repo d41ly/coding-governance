@@ -392,6 +392,7 @@ def ask_shell(flag: str, root: str) -> str:
 # A trailing `:12` or `:12-30` on a cited path. Cut ONLY for the advisory population below: cutting it
 # inside check 15 proper would move a gated verdict, which is the open ask TOOL-aProbedToolkit-17.
 LINE_LOCATOR = re.compile(r":\d+(?:-\d+)?$")
+SYMBOL_LOCATOR = re.compile(r"(?<=\w)#[A-Za-z_]\w*$")   # `path#symbol`: the path half is what check 15 resolves
 
 
 def read_live_readmes(root: str, m: str, tracked_set: set) -> tuple:
@@ -530,7 +531,7 @@ def walk(root: str, conf: dict) -> dict:
                 for i in ids:
                     cites.setdefault(i, set()).add(p)
             for tok in toks:
-                cited = (LINE_LOCATOR.sub("", tok) if admitted else tok).rstrip("/")
+                cited = SYMBOL_LOCATOR.sub("", LINE_LOCATOR.sub("", tok) if admitted else tok).rstrip("/")
                 if any(e in cited for e in ELISION) or "/" not in cited:
                     continue
                 # A token counts as a repo-path citation two ways. (1) Its first segment is a real

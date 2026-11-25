@@ -586,16 +586,12 @@ guard = [
   "{prefix}/memory-recall/",
   "memory/",
   ".memory-tree.conf",
-  "{prefix}/memory-tree/id_grammar.py",
-  "{prefix}/memory-tree/tree_lib.py",
-  "{prefix}/policy/budgets.py",
-  "{prefix}/policy/policy.py",
-  "{prefix}/memory-tree/backlog.py",
-  "{prefix}/memory-tree/record_find.py",
-  "{prefix}/memory-tree/coverage_join.py",
-  "{prefix}/memory-tree/legacy_ledger.py",
-  "{prefix}/policy/presets.py",
-  "{prefix}/memory-tree/design_lib.py",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "declarations"
 subject = "repo"
@@ -615,16 +611,12 @@ guard = [
   "{prefix}/memory-recall/",
   "memory/",
   "{prefix}/govkit/",
-  "{prefix}/memory-tree/id_grammar.py",
-  "{prefix}/memory-tree/tree_lib.py",
-  "{prefix}/policy/budgets.py",
-  "{prefix}/policy/policy.py",
-  "{prefix}/memory-tree/backlog.py",
-  "{prefix}/memory-tree/record_find.py",
-  "{prefix}/memory-tree/coverage_join.py",
-  "{prefix}/memory-tree/legacy_ledger.py",
-  "{prefix}/policy/presets.py",
-  "{prefix}/memory-tree/design_lib.py",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "selftests"
 subject = "repo"
@@ -1317,7 +1309,7 @@ tag = "leg.gov.runlog-selftest"
 tests = ["feature.runlog"]
 purpose = "arms the runlog kit over fixtures and scratch trees"
 argv = ["python", "{prefix}/runlog/selftest.py"]
-guard = ["{prefix}/runlog/"]
+guard = ["{prefix}/runlog/", "{prefix}/memory-tree/id_grammar.py"]
 chunk = "selftests"
 subject = "kit"
 ceiling = 720
@@ -1333,15 +1325,12 @@ argv = ["python3", "{prefix}/memory-recall/selftest.py"]
 guard = [
   "{prefix}/lib/",
   "{prefix}/memory-recall/",
-  "{prefix}/memory-tree/id_grammar.py",
-  "{prefix}/memory-tree/tree_lib.py",
-  "{prefix}/policy/budgets.py",
-  "{prefix}/policy/policy.py",
-  "{prefix}/memory-tree/backlog.py",
-  "{prefix}/memory-tree/coverage_join.py",
-  "{prefix}/memory-tree/legacy_ledger.py",
-  "{prefix}/policy/presets.py",
-  "{prefix}/memory-tree/design_lib.py",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "selftests"
 subject = "kit"
@@ -1839,6 +1828,9 @@ guard = [
   "{prefix}/playbook/row_checks.py",
   "{prefix}/playbook/tag_bundle.py",
   "{prefix}/playbook/tag_index.py",
+  "{prefix}/loop/",
+  "{prefix}/memory-tree/",
+  "{prefix}/playbook/record_extract.py",
 ]
 chunk = "selftests"
 subject = "kit"

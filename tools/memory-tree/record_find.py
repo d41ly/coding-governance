@@ -667,7 +667,8 @@ def run_fixture(plant: str) -> tuple[int, list[str]]:
                          f"{len(list((root / 'memory/builds' / FIXTURE_BUILD).glob('spec/*.md')))}")
         return rc, lines + [f"{SAY}: fixture {plant} · exit {rc}"]
     finally:
-        shutil.rmtree(top, ignore_errors=True)
+        from deviation_join import remove_tree   # noqa: E402  the kit's fixture helper
+        remove_tree(top)
 
 
 def main(argv) -> int:

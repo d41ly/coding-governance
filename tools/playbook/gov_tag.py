@@ -458,7 +458,8 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
           "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "repeat-heading", "memory-records")
 #: TOOL-dTotalRecall-9's `memory-records`: a build record whose untagged `## Findings` repeats, a legacy spec, a class
-#: record, a marker, and a guide citing a pocket kind no record file holds; `feature` declares nothing
+#: record, a marker, and a guide citing a pocket kind no record file holds; `feature` declares nothing. The legacy
+#: spec's third heading derives a tag over TAG_MAX_BYTES, which the shape arm passes over (TOOL-dTotalRecall-114 S26)
 MEMORY_BUILD = "memory/builds/bFix"
 MEMORY_RECORD = "2026-01-01-build-TOOL-bFix-1-research-1"
 MEMORY_FILES = {
@@ -466,7 +467,8 @@ MEMORY_FILES = {
     f"{MEMORY_BUILD}/build/{MEMORY_RECORD}.md": ("# research\n\n**Serves:** research TOOL-bFix-1\n\n## Findings\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                                                 "the first findings\n\n## Findings\n\nthe second findings\n"),
     f"{MEMORY_BUILD}/spec/2026-01-01-spec-TOOL-bFix-1.md": ("# TOOL-bFix-1 — a fixture spec\n\n## 1. Goal\n\nthe goal\n\n"
-                                                           "## 2. Scope (IN)\n\nthe scope\n"),
+                                                           "## 2. Scope (IN)\n\nthe scope\n\n## A heading whose derived anchor runs "
+                                                           "past the byte cap the shape arm holds tags to\n\nlong\n"),
     "memory/gotchas/fixture-class.md": "---\nname: fixture-class\ndescription: a planted class\nkind: class\n---\n# c\n",
     "tools/corekit/marked.py": "# gov:fixture-mark\nx = 1\n",
 }

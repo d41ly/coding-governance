@@ -208,16 +208,12 @@ load_slug_class() {
   [ -n "$SLUG_CLASS" ] && return 0
   local py="" here d top re=""
   declare -F resolve_python >/dev/null && py=$(resolve_python 2>/dev/null) || py=""
-  here=$(dirname -- "${BASH_SOURCE[0]}")
-  # Anchored on the module: an install, or a fixture, carrying the kit's Python without its hygiene
-  # script asks the module's own print mode, whose bytes the script's are (TOOL-dTotalRecall-5 AC5).
+  case "${BASH_SOURCE[0]}" in */*) here=${BASH_SOURCE[0]%/*} ;; *) here=. ;; esac
+  # Anchored on the module, and asked of it: the hygiene script's `--print-slug-re` is an exec of this very
+  # command, so its bytes are these, and its prologue's forks are not spent here (TOOL-dTotalRecall-5 AC5, -114 S19).
   if [ -n "$py" ] && d=$(resolve_kit_dir "$py" memory-tree id_grammar.py "$here" 2>/dev/null); then
     top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$here" rev-parse --show-toplevel 2>/dev/null) || top=$here
-    if [ -f "$top/$d/check-memory-hygiene.sh" ]; then
-      re=$("${BASH:-bash}" "$top/$d/check-memory-hygiene.sh" --print-slug-re 2>/dev/null) || re=""
-    else
-      re=$("$py" "$top/$d/id_grammar.py" --print slug-re "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null) || re=""
-    fi
+    re=$("$py" "$top/$d/id_grammar.py" --print slug-re "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null) || re=""
     re=${re%$'\r'}
   fi
   case "$re" in

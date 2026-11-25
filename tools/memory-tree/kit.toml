@@ -15,6 +15,9 @@ optional = [
   { part = "gen_build_index.py", point = "point.memory.live-column", fallback = "the Landed-unclosed column renders not-installed: drift-audit" },
   { part = "check-memory-hygiene.test.sh", point = "point.memory.consult", fallback = "the map arms skip with the slot line, their assertions counted" },
   { part = "legacy_ledger.py", point = "point.memory.record-home", fallback = "with no deployer registry tracked, the registrations are the kit descriptors' own [[ledger]] tables" },
+  { part = "kit.toml", point = "point.memory.consult", fallback = "the memory-recall row is a declaration and selects no kit" },
+  { part = "record_find.py", point = "point.memory.consult", fallback = "a question exits 2 with one refused line naming memory-recall, and a filter-only find reads no recall kit" },
+  { part = "record_kinds.py", point = "point.runtime.reading", fallback = "the Serves-alias join prints unarmed and reds nothing with no runlog kit; its fixture writes a runlog file of its own" },
 ]
 
 [[files]]
@@ -365,9 +368,12 @@ guard = [
   "{prefix}/lib/",
   "{prefix}/memory-tree/",
   "{prefix}/check-spec-tokens.py",
-  "{prefix}/policy/budgets.py",
-  "{prefix}/policy/policy.py",
-  "{prefix}/policy/presets.py",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "selftests"
 ceiling = 350
@@ -382,7 +388,16 @@ guard = ["{kit}/"]
 stage = ["step.test"]
 
 [gate_leg.gov]
-guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
+]
 chunk = "selftests"
 ceiling = 2690
 
@@ -399,9 +414,12 @@ stage = ["step.test"]
 guard = [
   "{prefix}/lib/",
   "{prefix}/memory-tree/",
-  "{prefix}/policy/budgets.py",
-  "{prefix}/policy/policy.py",
-  "{prefix}/policy/presets.py",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "selftests"
 ceiling = 300
@@ -418,7 +436,16 @@ stage = ["step.test"]
 enforces = ["practice.gate"]
 
 [gate_leg.gov]
-guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
+]
 chunk = "selftests"
 ceiling = 300
 
@@ -437,7 +464,16 @@ guard = ["{kit}/"]
 stage = ["step.test"]
 
 [gate_leg.gov]
-guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
+]
 chunk = "selftests"
 ceiling = 300
 
@@ -483,7 +519,16 @@ stage = ["step.test"]
 enforces = ["practice.gate"]
 
 [gate_leg.gov]
-guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
+]
 chunk = "selftests"
 ceiling = 300
 
@@ -525,6 +570,11 @@ guard = [
   "{prefix}/memory-tree/",
   "{prefix}/unattended/lib-unattended.sh",
   "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "selftests"
 ceiling = 660

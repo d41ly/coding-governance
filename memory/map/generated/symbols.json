@@ -278,6 +278,11 @@
       "file": "tools/loop/factories.py"
     },
     {
+      "id": "LateSlugPattern",
+      "kind": "class",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "LaunchFailed",
       "kind": "class",
       "file": "tools/run-gates/measure_legs.py"
@@ -13531,6 +13536,11 @@
       "id": "derive_gate_runner",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_generic_id_re",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "derive_git_env",

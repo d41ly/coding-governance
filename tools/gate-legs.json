@@ -1165,9 +1165,12 @@
       "{prefix}/lib/",
       "{prefix}/memory-tree/",
       "{prefix}/check-spec-tokens.py",
-      "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py",
-      "{prefix}/policy/presets.py"
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1190,7 +1193,13 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1211,9 +1220,12 @@
     "guard": [
       "{prefix}/lib/",
       "{prefix}/memory-tree/",
-      "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py",
-      "{prefix}/policy/presets.py"
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1236,7 +1248,13 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1262,7 +1280,13 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1321,7 +1345,13 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1375,7 +1405,12 @@
       "{prefix}/lib/",
       "{prefix}/memory-tree/",
       "{prefix}/unattended/lib-unattended.sh",
-      "{prefix}/policy/"
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -2236,16 +2271,12 @@
       "{prefix}/memory-recall/",
       "memory/",
       ".memory-tree.conf",
-      "{prefix}/memory-tree/id_grammar.py",
-      "{prefix}/memory-tree/tree_lib.py",
-      "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py",
-      "{prefix}/memory-tree/backlog.py",
-      "{prefix}/memory-tree/record_find.py",
-      "{prefix}/memory-tree/coverage_join.py",
-      "{prefix}/memory-tree/legacy_ledger.py",
-      "{prefix}/policy/presets.py",
-      "{prefix}/memory-tree/design_lib.py"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -2269,16 +2300,12 @@
       "{prefix}/memory-recall/",
       "memory/",
       "{prefix}/govkit/",
-      "{prefix}/memory-tree/id_grammar.py",
-      "{prefix}/memory-tree/tree_lib.py",
-      "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py",
-      "{prefix}/memory-tree/backlog.py",
-      "{prefix}/memory-tree/record_find.py",
-      "{prefix}/memory-tree/coverage_join.py",
-      "{prefix}/memory-tree/legacy_ledger.py",
-      "{prefix}/policy/presets.py",
-      "{prefix}/memory-tree/design_lib.py"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -3269,7 +3296,8 @@
       "{prefix}/runlog/selftest.py"
     ],
     "guard": [
-      "{prefix}/runlog/"
+      "{prefix}/runlog/",
+      "{prefix}/memory-tree/id_grammar.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3292,15 +3320,12 @@
     "guard": [
       "{prefix}/lib/",
       "{prefix}/memory-recall/",
-      "{prefix}/memory-tree/id_grammar.py",
-      "{prefix}/memory-tree/tree_lib.py",
-      "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py",
-      "{prefix}/memory-tree/backlog.py",
-      "{prefix}/memory-tree/coverage_join.py",
-      "{prefix}/memory-tree/legacy_ledger.py",
-      "{prefix}/policy/presets.py",
-      "{prefix}/memory-tree/design_lib.py"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -4043,7 +4068,10 @@
       "{prefix}/playbook/positional.py",
       "{prefix}/playbook/row_checks.py",
       "{prefix}/playbook/tag_bundle.py",
-      "{prefix}/playbook/tag_index.py"
+      "{prefix}/playbook/tag_index.py",
+      "{prefix}/loop/",
+      "{prefix}/memory-tree/",
+      "{prefix}/playbook/record_extract.py"
     ],
     "chunk": "selftests",
     "subject": "kit",

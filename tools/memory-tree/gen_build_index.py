@@ -5951,7 +5951,7 @@ def test_leg_rows(arm) -> None:
         except Exception as exc:  # noqa: BLE001 — every arm below names it
             seen["error"] = f"UNEXPECTED {type(exc).__name__}: {exc}"
         finally:
-            shutil.rmtree(t, ignore_errors=True)
+            remove_tree(t)
     say = seen.get("error", "")
     arm("TOOL-dTotalRecall-23 AC6 — --check over the leg fixture reads alike with and without the index",
         "rc=0 same=True with=['leg rows: spec-head 1 from the index, 0 parsed', 'leg rows: unfenced-head 3 from "
@@ -6148,7 +6148,7 @@ def test_slug_claims(arm, files: dict) -> None:
             "(0, 'minted TOOL-dFloor-15')", lambda: str(run_claims((b, "ask", "TOOL", "dFloor", "--claimant", kb))[0]))
 
         o = build_clone("o")
-        run("git", "remote", "set-url", "origin", os.path.join(base, "missing.git").replace(os.sep, "/"), cwd=o)
+        run("git", "remote", "set-url", run("git", "remote", cwd=o).strip(), os.path.join(base, "missing.git").replace(os.sep, "/"), cwd=o)
         queue = os.path.join(o, ".git", "gov-queue.log")
         offline = [run_claims((o, "ask", "TOOL", "dSame", "--claimant", "eeeeeeeeeeee", "--offline", v))[0]
                    for v in ("refuse", "warn", "follow-leases")]

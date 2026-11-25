@@ -136,10 +136,23 @@ def load_id_grammar():
     return id_grammar
 
 
+class LateSlugPattern:
+    """The sibling's `SlugPattern`, itself built at first use: an import of `id_grammar` here would stop this
+    module, and check 26's named refusal and dormant mode with it, in a tree whose `id_grammar.py` is absent."""
+
+    def __init__(self, build):
+        self._build, self._re = build, None
+
+    def __getattr__(self, name):
+        if self._re is None:
+            self._re = load_id_grammar().SlugPattern(self._build)
+        return getattr(self._re, name)
+
+
 # A build folder slug: the slug grammar's BUILD_SLUG_RE, every grammar a build was minted under
 # (TOOL-dTotalRecall-5 S7), bound at first use. It admits an all-lower-case legacy slug, so the
 # REOPEN slot below asks SHA_RE first: an all-letter hex sha is also a legacy-shaped slug.
-SLUG_RE = load_id_grammar().SlugPattern(lambda g: g.BUILD_SLUG_RE.pattern)
+SLUG_RE = LateSlugPattern(lambda g: g.BUILD_SLUG_RE.pattern)
 
 # THE THREE LOCATOR FORMS OF §4, and the one shape fix F6 forbids, each anchored at BOTH ends. A
 # locator is the whole value or it is not a locator: an unanchored form would read the first legal
@@ -215,7 +228,7 @@ def build_grammar(families) -> Grammar:
                       f"id grammar instead of failing")
     alt = "|".join(sorted(set(fams))) or "(?!)"
     return Grammar(tuple(sorted(set(fams))),
-                   load_id_grammar().SlugPattern(lambda g: r"^(?:" + alt + r")-(?:" + g.slug_class + r")-\d+$"))
+                   LateSlugPattern(lambda g: r"^(?:" + alt + r")-(?:" + g.slug_class + r")-\d+$"))
 
 
 def check_id(token: str, grammar: Grammar) -> bool:
@@ -477,7 +490,7 @@ def extract_grants(value: str) -> tuple:
 #: build's asks are filed under — grading it against the backlog allowlist would refuse a
 #: legitimate grant on any tree whose two sets differ. Whether the id RESOLVES is the question the
 #: unit that HONOURS a grant asks, at the moment it honours one.
-GRANT_ID_RE = load_id_grammar().SlugPattern(lambda g: r"^" + ANY_FAMILY + r"-(?:" + g.slug_class + r")-\d+$")
+GRANT_ID_RE = LateSlugPattern(lambda g: r"^" + ANY_FAMILY + r"-(?:" + g.slug_class + r")-\d+$")
 
 
 def check_grant(grant: str) -> bool:
@@ -1675,7 +1688,7 @@ VIEW_H1_RE = re.compile(
 # A rendered DATA row, recognised by its LINK-WRAPPED first cell. That wrapper is what keeps the
 # table-anchor shape off the row, so the row that the anchor grammar refuses to claim is exactly the
 # row this pattern accepts — one property, asserted from both sides.
-VIEW_ROW_RE = load_id_grammar().SlugPattern(
+VIEW_ROW_RE = LateSlugPattern(
     lambda g: r"^\| \[[A-Za-z][A-Za-z0-9]*-(?:" + g.slug_class + r")-\d+\]\(\.\./builds/(?:" + g.slug_class
     + r")/BACKLOG\.md\) \|.*\|$")
 _LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")

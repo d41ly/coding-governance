@@ -127,6 +127,10 @@ EVIDENCE_GLOBS: list[str] = PRODUCT_GLOBS + [
     # row by the tracked FILE PATH where a key's value is consumed, and a record's file name carries
     # its unit id, so a row names that id without claiming any of its work shipped.
     ":(exclude)*/unscanned-readers.txt",
+    # THE RECORD-KIND REGISTRY, for the size registries' reason (TOOL-dTotalRecall-16). Each row's purpose
+    # cites the design record it was read from by FILE PATH, and a record's file name carries its
+    # unit id, so a purpose names that id without claiming any of its work shipped.
+    ":(exclude)*/record-kinds.toml",
 ]
 
 # --------------------------------------------------------------------------------------------

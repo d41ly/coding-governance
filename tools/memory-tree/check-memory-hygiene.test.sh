@@ -1256,8 +1256,8 @@ rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exist
 
 out=$(bash "$SCRIPT" 2>/dev/null); mainrc=$?
 st=0; n=0
-hit()  { n=$((n+1)); grep -qF "$1" <<<"$out" || { echo "FAIL missing: $1"; st=1; }; }
-miss() { n=$((n+1)); if grep -qF "$1" <<<"$out"; then echo "FAIL unexpected: $1"; st=1; fi; }
+hit()  { n=$((n+1)); grep -qF -- "$1" <<<"$out" || { echo "FAIL missing: $1"; st=1; }; }
+miss() { n=$((n+1)); if grep -qF -- "$1" <<<"$out"; then echo "FAIL unexpected: $1"; st=1; fi; }
 hitl() { n=$((n+1)); grep -qxF "$1" <<<"$out" || { echo "FAIL missing exact line: $1"; st=1; }; }
 lineno()  { grep -nF "$1" <<<"$out" | head -1 | cut -d: -f1; }
 before()  { local a b; n=$((n+1)); a=$(lineno "$1"); b=$(lineno "$2")
@@ -3641,11 +3641,12 @@ hit 'refused deviation: Risk bogus is outside'; miss 'deviation-1.md'
 out=$(run_record_deviation a dTotalRecall r1); hit 'minted under the session rule: no claim or lease for dTotalRecall'   # AC3, AC5's neither
 hit 'wrote memory/builds/dTotalRecall/build/'; _grk=$(printf '%s\n' "$out" | sed -n 's/^wrote .* key //p')
 out=$(run_record_deviation a dTotalRecall r1; echo "files $(git -C "$GRD/a" status --porcelain | wc -l | tr -d ' ')")
-hit "exists memory/builds/dTotalRecall/build/$(date +%Y-%m-%d)-build-TOOL-dTotalRecall-2-deviation-1.md key ${_grk:-NONE}"
+printf -v _grd_day '%(%Y-%m-%d)T' -1
+hit "exists memory/builds/dTotalRecall/build/$_grd_day-build-TOOL-dTotalRecall-2-deviation-1.md key ${_grk:-NONE}"
 hit 'files 1'
 out=$(run_record_deviation a dTotalRecall r2); hit "TOOL-dTotalRecall-2-deviation-2.md key"   # AC4: a changed field writes the next <n>
 out=$(run_record_door a spec TOOL-dTotalRecall-2 --tier 2); hit 'refused spec: --new-spec: memory/builds/dTotalRecall/spec/2026-09-01-spec-TOOL-dTotalRecall-2.md already carries'
-out=$("$_PY" "$HERE/build_records.py" read "$GRD/a/memory/builds/dTotalRecall/build/$(date +%Y-%m-%d)-build-TOOL-dTotalRecall-2-deviation-1.md" >/dev/null 2>&1; echo "rc=$?"
+out=$("$_PY" "$HERE/build_records.py" read "$GRD/a/memory/builds/dTotalRecall/build/$_grd_day-build-TOOL-dTotalRecall-2-deviation-1.md" >/dev/null 2>&1; echo "rc=$?"
       grep -m1 '^\*\*Serves:\*\*' "$GRD/a/memory/builds/dTotalRecall/build/"*-deviation-1.md)   # AC8
 hit 'rc=0'; hit '**Serves:** deviation TOOL-dTotalRecall-2'
 out=$("$_PY" -c 'import sys, tomllib
@@ -3695,10 +3696,10 @@ hit 'rc 0 slug-grammar True claim True'   # AC7: the scaffold's README, its clai
 _gru=$(resolve_kit_dir "$_PY" unattended unattended.sh "$HERE" 2>/dev/null) || _gru=""
 if [ -n "$_gru" ]; then
   _grt=$(cd "$GRD/a" && bash -c '. "$1" >/dev/null 2>&1 || exit 2; load_driver_conf >/dev/null 2>&1; resolve_fleet_tag 2>/dev/null' _ \
-         "$(git -C "$HERE" rev-parse --show-toplevel)/$_gru/unattended.sh")
+         "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_gru/unattended.sh")
   write_record_lease() { # fleet tag · session -> the lease of xLeased on the remote, held live by them
-    local now m; now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-    m=$(printf 'gov-claim xLeased/build\n\nslug: xLeased\nnode: %s\nhost: h\nsession: %s\nkeepalive: k\nstatus: live\nlease-utc: %s\nbeat-utc: %s\nepoch: 1\nkind: build\nfleet-tag: %s\nrenews: yes' "$1" "$2" "$now" "$now" "$1")
+    local now m; TZ=UTC0 printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+    printf -v m 'gov-claim xLeased/build\n\nslug: xLeased\nnode: %s\nhost: h\nsession: %s\nkeepalive: k\nstatus: live\nlease-utc: %s\nbeat-utc: %s\nepoch: 1\nkind: build\nfleet-tag: %s\nrenews: yes' "$1" "$2" "$now" "$now" "$1"
     git -C "$GRD/a" push -q -f origin "$(git -C "$GRD/a" commit-tree "$(git -C "$GRD/a" mktree </dev/null)" -m "$m"):refs/gov/leases/xLeased/build"; }
   write_record_lease z s-other; out=$(run_record_deviation a xLeased r1); hit 'refused deviation: the build lease of xLeased reads live, held by z session s-other'   # AC5
   (cd "$GRD/a" && CLAUDE_CODE_SESSION_ID=s-other bash "$HERE/gov-claim.sh" slug xLeased --claimant aaaaaaaaaaaa >/dev/null 2>&1)
@@ -3758,10 +3759,10 @@ out=$("$_PY" "$HERE/build_records.py" --fixture --plant door-header 2>&1)
 if grep -q 'build-records: SKIP door-header' <<<"$out"; then
   echo "skip the door-header plant: $out"; n_skip=$((${n_skip:-0}+1))
 else
-  hit 'build-records: PASS door-header — 8 cases'
+  hit 'build-records: PASS door-header — 12 cases'
 fi
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant legacy 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'   # AC4
-hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings 1'; hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings-2 1'   # AC8
+hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings causes'; hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings-2 causes'   # AC8
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant causeless 2>&1)   # AC6
 hit 'record causes: causes · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-new.md · names no Caused-by'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant typed-causeless 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'
@@ -3770,7 +3771,7 @@ hit 'record causes: orphans · memory/builds/fRoot/build/2026-01-02-build-TOOL-f
 hit 'record causes: orphans · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-cycle-b.md'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant claim-root 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant none 2>&1)   # AC8's none
-hit 'record causes: record-kinds-legacy · 2 record row(s) (-), 0 section row(s) · memory.legacy-anchors none'; miss 'findings 1'
+hit 'record causes: record-kinds-legacy · 2 record row(s) (-), 0 section row(s) · memory.legacy-anchors none'; miss 'findings causes'
 # --- TOOL-dTotalRecall-36 AC6 — the writer census: a code file under the fixture's tool root spelling a Serves
 # --- literal and no cause is red at its line, and the legacy plant's census holds no file. Red on
 # --- `check_cause_writers` cut from `--check`.
@@ -4393,7 +4394,7 @@ case "$o" in
   *) echo "FAIL check 4 did not red memory/builds/d_bad (rc=$r) — the derived pattern is not reaching check 4"; st=1 ;;
 esac
 n=$((n+1))
-_sg_n=$(printf '%s\n' "$o" | grep -c '^slug grammar: the policy reader refused builds.slug-words, the defaults apply: ' || true)
+_sg_n=$(grep -c '^slug grammar: the policy reader refused builds.slug-words, the defaults apply: ' <<<"$o" || true)
 case "$_sg_n:$_sg_after" in
   1:*"slug grammar: the policy reader refused builds.slug-words"*) echo "ok   the slug grammar's fallback line prints once, after check 4's finding" ;;
   *) echo "FAIL the fallback line printed $_sg_n time(s), or before check 4's finding, not once after it"; st=1 ;;
