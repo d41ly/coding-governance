@@ -137,7 +137,7 @@ The code is correct today and the gap is confined to a replay tool.
 
 **Grades:** 5 MEDIUM.
 
-**Fix (judged SOUND):** an arm driving the experiment over a manifest with two arms and two runs each, whose transcripts all read 0 bytes before the act, asserting `term bytes: unarmed` and no `verdict win`; plus one with a nonzero transcript asserting the figures line.
+**Fix (judged SOUND):** an arm driving the experiment over a manifest with two arms and two runs each, whose transcripts all read 0 bytes before the act, asserting `term bytes: unarmed` and no `verdict win`; plus one with a nonzero transcript asserting the figures line. (DERIVED 2026-11-25, the review)
 
 **Left-shift gate:** that arm, seen red with `armed` pinned True. Class `refusal-branch-with-no-arm`.
 

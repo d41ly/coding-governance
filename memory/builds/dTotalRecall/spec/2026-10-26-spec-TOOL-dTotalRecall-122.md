@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-122 — the closing review's round 2: the rollback that checks its bytes, one section read for a pinned and an unpinned address, the arms no branch could red, the runlog floor, the lost decisions and the feed line's wrap
 
-**Status:** OPEN · rev-1 · 2026-11-25 · node d · Tier-2 · base 146df780 · streams tooling · order 50
+**Status:** INPROGRESS · rev-1 · 2026-11-25 · node d · Tier-2 · base 146df780 · streams tooling · order 50
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-25-build-TOOL-dTotalRecall-122-widen-33.md](../build/2026-11-25-build-TOOL-dTotalRecall-122-widen-33.md) | widen | — |
+| [2026-11-25-prompt-TOOL-dTotalRecall-122-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-122-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-122-spec-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-122-spec-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
