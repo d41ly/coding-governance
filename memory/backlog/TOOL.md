@@ -260,6 +260,8 @@ Cite ids, never line numbers.
 | [TOOL-aPrunedIndex-21](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS amendment-leaves-its-other-half-standing EARNED A GATE AT ITS… |
 | [TOOL-aPrunedIndex-22](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS two-answers-to-one-question EARNED A GATE AT ITS SECOND… |
 | [TOOL-aPrunedIndex-23](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS criterion-asserts-what-its-own-command-cannot-show EARNED A… |
+| [TOOL-aPrunedIndex-25](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS fixture-passes-by-finding-nothing EARNED A GATE AT ITS SECOND… |
+| [TOOL-aPrunedIndex-26](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS observed-by-claim-no-arm-discharges EARNED A GATE AT ITS… |
 | [TOOL-aQuenchedHarness-9](../builds/aQuenchedHarness/BACKLOG.md) | OPEN | — | — | 2026-09-07 | govkit selftest HAS TWO ARMS RED AT 274aa39b AND NOBODY KNEW, which is… |
 | [TOOL-aQuenchedHarness-12](../builds/aQuenchedHarness/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE REUSE PROBE CANNOT SEE SIBLING WORKTREES, so it cannot answer the… |
 | [TOOL-aReapedSpinner-11](../builds/aReapedSpinner/BACKLOG.md) | OPEN | — | — | 2026-09-08 | run-selftests.sh:37 CARRIES THE BANNED PYTHON-LAUNCHER IDIOM, AND THE… |

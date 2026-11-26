@@ -26,3 +26,8 @@ tags bundle selftest; lexicon naming predicates; memory hygiene; spec tokens (a 
 
 ### Non-goals
 No edit to `tools/playbook/tag_index.py` or its import closure. No change to the five plants' verdicts or output lines. No ceiling or budget row moves. `tools/loop/position.py` and `tools/memory-tree/routed_commits.py` stay untouched. Tier 1.
+
+## Owner confirmation
+
+Asked: How should the three small code findings be handled? (file as asks and land, or build them first)
+Answer: Build them first

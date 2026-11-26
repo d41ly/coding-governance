@@ -123,3 +123,12 @@ round 5 · finding 20 · MEDIUM · local · specs TOOL-aPrunedIndex-17 TOOL-aPru
 round 5 · finding 21 · MEDIUM · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 4
 round 5 · finding 22 · LOW · local · specs TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
 round 5 · finding 23 · LOW · local · specs TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 6 · subject aPrunedIndex-spec-set-r6 · audited TOOL-aPrunedIndex-24
+round 6 · finding 1 · MEDIUM · local · specs TOOL-aPrunedIndex-24 · unit TOOL-aPrunedIndex-24 · rev 2
+round 6 · finding 6 · MEDIUM · local · specs TOOL-aPrunedIndex-24 · unit TOOL-aPrunedIndex-24 · rev 2
+round 6 · finding 7 · MEDIUM · local · specs TOOL-aPrunedIndex-24 · unit TOOL-aPrunedIndex-24 · rev 2
+round 6 · finding 8 · LOW · local · specs TOOL-aPrunedIndex-24 · unit TOOL-aPrunedIndex-24 · rev 2
+round 6 · finding 2 · LOW · local · specs TOOL-aPrunedIndex-24 · unit TOOL-aPrunedIndex-24 · rev 2
+round 6 · finding 4 · LOW · local · specs TOOL-aPrunedIndex-24 · unit TOOL-aPrunedIndex-24 · rev 2
+round 6 · finding 5 · LOW · local · specs TOOL-aPrunedIndex-24 · unit TOOL-aPrunedIndex-24 · rev 2
+round 6 · finding 3 · LOW · local · specs TOOL-aPrunedIndex-24 · unit TOOL-aPrunedIndex-24 · rev 2
