@@ -68,17 +68,17 @@ ids TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedI
 | [TOOL-aPrunedIndex-3 — a build's sweep touches only the rows that the trees and gone worktrees' edits it lets go of held](spec/2026-11-25-spec-TOOL-aPrunedIndex-3.md) | 3 | 2 | CLOSED | rev-4 | 2026-11-26 |
 | [TOOL-aPrunedIndex-4 — `--gc` skips a worktree that predates the tag registry, and still refuses one it cannot read](spec/2026-11-25-spec-TOOL-aPrunedIndex-4.md) | 4 | 2 | CLOSED | rev-4 | 2026-11-26 |
 | [TOOL-aPrunedIndex-10 — the closing review's four lows: the sweep's cost stated as its ceiling, a named plant helper, and two steps whose HEAD git cannot read](spec/2026-11-26-spec-TOOL-aPrunedIndex-10.md) | 5 | 1 | CLOSED | rev-2 | 2026-11-26 |
-| [TOOL-aPrunedIndex-17 — the five tag plants hold the git answers that cannot change while they run](spec/2026-11-26-spec-TOOL-aPrunedIndex-17.md) | 6 | 2 | INPROGRESS | rev-2 | 2026-11-26 |
+| [TOOL-aPrunedIndex-17 — the five tag plants hold the git answers that cannot change while they run](spec/2026-11-26-spec-TOOL-aPrunedIndex-17.md) | 6 | 2 | INPROGRESS | rev-3 | 2026-11-26 |
 | [TOOL-aPrunedIndex-20 — the tag plants of `tags bundle selftest` run on a bounded pool, graded in row order](spec/2026-11-26-spec-TOOL-aPrunedIndex-20.md) | 7 | 1 | SPECCED | rev-1 | 2026-11-26 |
 <!-- /gen:build-units -->
 
-Records: 20 bound to this build, across 4 record folder(s).
+Records: 22 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aPrunedIndex-20.
 
-Ids whose spec moved past its audited revision: none — 6 of 7 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: TOOL-aPrunedIndex-17@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

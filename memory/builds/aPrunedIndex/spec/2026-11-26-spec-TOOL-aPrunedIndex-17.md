@@ -1,12 +1,14 @@
 # TOOL-aPrunedIndex-17 — the five tag plants hold the git answers that cannot change while they run
 
-**Status:** INPROGRESS · rev-2 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 6
+**Status:** INPROGRESS · rev-3 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md) | research | TOOL-aPrunedIndex-10 |
+| [2026-11-26-prompt-TOOL-aPrunedIndex-17-2-revision.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-2-revision.md) | research | — |
+| [2026-11-26-prompt-TOOL-aPrunedIndex-17-4-spec-writer.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-4-spec-writer.md) | journal | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md) | research | TOOL-aPrunedIndex-20 |
 | [2026-11-26-review-TOOL-aPrunedIndex-17-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-spec-audit-round1.md) | spec-audit | — |
 
@@ -290,14 +292,22 @@ Live at landing. The held answers exist only inside a `--fixture` run of the fiv
   fixture: the lines in the ledgers of units 1 to 4 name 26 breaks, and unit 10's two lines name 2. The (PINNED, 2026-11-26)
   brief counts 27 for the first group. The main loop re-stages what the lines name, and records the count
   it staged.
-- **AC7** — When the builder times the five plants three times before the edit and three times after,
-  back to back on one box, the ledger records each run's wall. Beside each it records a load gauge: the
-  mean wall of 20 `git --version` spawns, taken just before the reading. The ledger also records the sum
-  of the five walls per round, and that sum after over before.
-  Red when: the slowest round after is not faster than the fastest round before, so the two spreads
-  overlap. A no-op build passes this only when all three rounds after happen to sit below all three
-  before, probability 1/20 for six readings from one distribution.
-  cost: six rounds of the five plants, about 19 minutes at a 0.21 s gauge, three times section 4's
+- **AC7** — When the builder times three interleaved A/B pairs of the five-plant set on the one built
+  tree, the ledger records each run's wall. Each run is
+  `python -c "import sys; sys.path.insert(0, 'tools/playbook'); import gov_tag; <A only: gov_tag.HELD_PLANTS = ()>; sys.exit(gov_tag.main(['--fixture', '--plant', '<plant>']))"`,
+  so A is the built code with `HELD_PLANTS` emptied and B is the code as built. Inside a pair each
+  plant runs its A and its B back to back, A first in pairs 1 and 3 and B first in pair 2, so a drift
+  in load lands on both halves of a plant's reading. Beside each run the ledger records a load gauge:
+  the mean wall of 20 `git --version` spawns, taken just before the run. It also records each pair's
+  five-wall sums for A and for B, and that pair's B over A.
+  Red when: a pair's B sum is not below its own A sum, or the median of the three B over A ratios is
+  above 0.85. The bound sits above section 4's 0.71 round for the five and the builder's interleaved
+  probe of `gc-predates` alone near 0.56, on node a on 2026-11-26, so a correct build clears it under (PINNED, 2026-11-26)
+  the noise that round showed. It sits below 1.0, where a no-op build's ratio centres, and a
+  no-op passes the first condition alone with probability 1/8 for three pairs.
+  The wall is noisy and AC4's spawn counts remain the stable measure; AC7 only shows the saving
+  reaches the wall.
+  cost: three pairs of the five plants, about 19 minutes at a 0.21 s gauge, three times section 4's
   381 s round; it scales with the gauge.
   figure: the walls and gauges are PINNED when measured, in the ledger.
 - **AC8** — When the main loop, at the close, times `python tools/playbook/tag_bundle.py --selftest`
@@ -363,6 +373,7 @@ none
   (AC5 names its normaliser and proves it on two pre-edit runs), 8 (AC5's and AC7's costs from section
   4's pinned sums), 11 (section 10 cites the two prior reader swaps and the grep that found them), 15
   (the hold key is an allow-list of every element, with a ninth AC2 read).
+- rev-3 · 2026-11-26 · AC7 reworded to interleaved A/B pairs on one tree, after the builder's divergence (two-block rounds red under a 0.041 to 0.324 s gauge swing)
 
 ## 10. Reuse audit
 
