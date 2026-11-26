@@ -19,8 +19,8 @@ hold-code: host-owner-action
 held-from: RUNNING
 refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 25df45c46e3d7dc7e7245635bac9ea5c54c04f55
-phase: RUNNING
+witness: 84a0522fc
+phase: VERIFYING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dtotalrecall-ae256e
