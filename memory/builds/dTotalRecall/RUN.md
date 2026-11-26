@@ -797,3 +797,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-26T03:13:45Z rescope · item add TOOL-dTotalRecall-124 · reason promoted from the closing diff review round 3, item H1 of 2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3, by M4's severity rule after the loop ended at round 2
 
 2026-11-26T03:13:58Z rescope · item add TOOL-dTotalRecall-125 · reason promoted from the closing diff review round 3, items M1-M8+L1-L3 of 2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3, one minors batch by M4's severity rule
+
+2026-11-26T04:17:05Z brief · item TOOL-dTotalRecall-124 · reason be2914bc42c9 memory/builds/dTotalRecall/prompts/2026-11-26-prompt-TOOL-dTotalRecall-124-build-brief.md
+
+2026-11-26T04:32:22Z dispatch · item 6fa6785f TOOL-dTotalRecall-124 · reason memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/build memory/gotchas/path-list-input-read-as-options.md memory/ledger memory/map/features/playbook.md memory/map/generated tools/memory-tree/tree_lib.py tools/playbook/code_record.py tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-124.md memory/builds/dTotalRecall/build/2026-11-26-build-TOOL-dTotalRecall-124-1-acceptance-ledger.md

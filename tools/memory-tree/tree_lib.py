@@ -541,21 +541,37 @@ def read_blobs_at(root, requests) -> dict:
     (`missing`, `ambiguous`), for one that is not a blob, its body skipped so the next header is read
     where it starts, and for one that is not UTF-8. A failed call, a stream ending before a request's
     header, or a header of no known shape is `OSError` naming it, never a partial answer.
+
+    A request whose `<rev>:<path>` holds a line feed or a carriage return is never written to the batch,
+    where a line feed splits it in two and shifts every later answer, and git drops a closing CR: it is
+    read through its own `git cat-file blob` spawn instead, one spawn per such request, as
+    `history_store`'s one-shot reads such a name (TOOL-dTotalRecall-124). That spawn failing is None,
+    so a git that could not start reads as a path the rev lacks.
     """
     requests = list(dict.fromkeys((str(rev), str(path)) for rev, path in requests))
     if not requests:
         return {}
-    data = read_git_output(root, ("cat-file", "--batch"),
-                            "".join(f"{rev}:{path}\n" for rev, path in requests).encode("utf-8"))
-    out: dict = {}
-    at = 0
+    bodies: dict = {}
+    sent = []
     for rev, path in requests:
+        spec = f"{rev}:{path}"
+        if "\n" not in spec and "\r" not in spec:
+            sent.append((rev, path))
+            continue
+        try:   # off the batch: a line feed splits the request in two, and git drops a closing CR
+            bodies[(rev, path)] = read_git_output(root, ("cat-file", "blob", spec))
+        except OSError:
+            bodies[(rev, path)] = None
+    data = read_git_output(root, ("cat-file", "--batch"),
+                           "".join(f"{rev}:{path}\n" for rev, path in sent).encode("utf-8")) if sent else b""
+    at = 0
+    for rev, path in sent:
         end = data.find(b"\n", at)
         if end < 0:
             raise OSError(f"`git cat-file --batch` ended before {rev}:{path}, so its blob cannot be read")
         head, at = data[at:end], end + 1
         if head.endswith((b" missing", b" ambiguous")):
-            out[(rev, path)] = None
+            bodies[(rev, path)] = None
             continue
         fields = head.rsplit(b" ", 2)
         if len(fields) != 3 or not fields[2].isdigit():
@@ -563,13 +579,13 @@ def read_blobs_at(root, requests) -> dict:
                           "so its blob cannot be read")
         size = int(fields[2])
         body, at = data[at:at + size], at + size + 1
-        if fields[1] != b"blob":
-            out[(rev, path)] = None
-            continue
+        bodies[(rev, path)] = body if fields[1] == b"blob" else None
+    out: dict = {}
+    for key, body in bodies.items():
         try:
-            out[(rev, path)] = body.decode("utf-8").replace("\r\n", "\n")
+            out[key] = None if body is None else body.decode("utf-8").replace("\r\n", "\n")
         except UnicodeDecodeError:
-            out[(rev, path)] = None
+            out[key] = None
     return out
 
 

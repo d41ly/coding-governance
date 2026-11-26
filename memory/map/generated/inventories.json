@@ -431,6 +431,7 @@
       "owner-item-without-its-reject-outcome.md",
       "parser-drops-rows-it-cannot-place.md",
       "path-keyed-row-strands-on-a-rename.md",
+      "path-list-input-read-as-options.md",
       "pin-copied-from-another-corpus.md",
       "pin-gated-checks-arm-nothing-without-a-pin.md",
       "pipe-in-a-code-span-splits-a-table-cell.md",

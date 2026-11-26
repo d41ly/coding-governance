@@ -389,7 +389,8 @@ def parse_facts(data) -> dict:
 
 def read_ctags_defs(cfg, want) -> dict:
     """`{path: [definition]}` in `extract_ranges`'s shape for `want` `{path: text}`, from one ctags run over
-    copies in a scratch directory, no shell."""
+    copies in a scratch directory, no shell. Each `-L` line is `./` and a path `read_code_inputs` admitted as
+    printable, so no tracked name opening `-` is read as an option."""
     out: dict = {}
     with tempfile.TemporaryDirectory(prefix="ct") as top:
         for path, text in want.items():
@@ -398,7 +399,7 @@ def read_ctags_defs(cfg, want) -> dict:
             f.write_bytes(text.encode("utf-8"))
         try:
             p = subprocess.run([cfg["ctags"], "--output-format=json", "--fields=+neKS", "-f", "-", "-L", "-"], cwd=top,
-                               input="".join(x + "\n" for x in sorted(want)).encode("utf-8"), capture_output=True)
+                               input="".join(f"./{x}\n" for x in sorted(want)).encode("utf-8"), capture_output=True)
         except OSError as exc:
             raise CodeRecordError(f"{KEY} is {cfg['value']} and {cfg['ctags']} did not run: {exc}") from None
     if p.returncode:
@@ -1257,7 +1258,8 @@ def run_selftest() -> int:
             stub = pathlib.Path(top) / "bin"
             stub.mkdir()
             (stub / "ctags_stub.py").write_text(
-                'import sys\nif "--version" in sys.argv:\n    print("Stub Ctags 9.9, a fixture")\nelse:\n'
+                'import os, sys\nif "--version" in sys.argv:\n    print("Stub Ctags 9.9, a fixture")\nelse:\n'
+                '    open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "lines"), "wb").write(sys.stdin.buffer.read())\n'
                 '    print(\'{"_type": "tag", "name": "Go", "path": "a.go", "line": 3, "end": 4, "kind": "func"}\')\n',
                 encoding="utf-8")
             if os.name == "nt":
@@ -1269,6 +1271,25 @@ def run_selftest() -> int:
             rec = derive_code_record(root)
             check_arm("ctags pack", "Stub Ctags 9.9" in rec.text.split("\n")[0] and "a.go::Go" in {r[1] for r in rec.code_row}
                       and "ok.py::f" in {r[1] for r in rec.code_row}, rec.text)
+            write_commit(root, {"-fZ.go": "package z\n\nfunc Z() {\n}\n", "z9/kit.toml": 'id = "z9"\n'}, "dash")
+            loose = pathlib.Path(top) / "loose"
+            for name, text in (("n\nl.go", "package n\n"), ("j\nk/kit.toml", 'id = "jk"\n')):
+                loose.write_text(text, encoding="utf-8")
+                blob = run_git(root, "hash-object", "-w", str(loose)).strip()
+                run_git(root, "-c", "core.protectNTFS=false", "update-index", "--add", "--cacheinfo", f"100644,{blob},{name}")
+            run_git(root, "commit", "-q", "-m", "line breaks")
+            try:
+                skipped = derive_code_record(root).inputs["skipped"]
+            except OSError as exc:   # a line-break path past the input boundary cannot be copied on Windows
+                skipped = {"the derivation raised": str(exc)}
+            lines = (stub / "lines").read_text(encoding="utf-8").splitlines()
+            tree_lib, _ = ti.load_memory_tree()
+            asked = [("HEAD", "j\nk/kit.toml"), ("HEAD", "z9/kit.toml"), ("HEAD", "ok.py\r")]
+            answers = tree_lib.read_blobs_at(root, asked)
+            check_arm("ctags list input", lines == ["./-fZ.go"]
+                      and skipped.get("n\nl.go") == "a path no cell holds"
+                      and [answers.get(k) for k in asked] == ['id = "jk"\n', 'id = "z9"\n', None],
+                      f"{lines} {skipped} {answers}")
         finally:
             os.environ["PATH"] = path
 

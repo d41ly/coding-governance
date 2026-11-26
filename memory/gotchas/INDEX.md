@@ -136,6 +136,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [owner-item-without-its-reject-outcome](owner-item-without-its-reject-outcome.md) | class | 8 |  | a design hands a decision to the owner and routes only the yes, so a no leaves landed work with no route and a check that turns red on the default branch |
 | [parser-drops-rows-it-cannot-place](parser-drops-rows-it-cannot-place.md) | class | 7 |  | a record-parsing instrument skips rows under a heading it does not know, or rows its pattern cannot read, and still prints a clean run, so its population shrinks without a word |
 | [path-keyed-row-strands-on-a-rename](path-keyed-row-strands-on-a-rename.md) | class | 2 |  | a registry row keyed by a file's path breaks on a rename, so the old row reads as one no scan finds and every instance as one with no row, and a unit that only moved a file reds on legacy it did not write |
+| [path-list-input-read-as-options](path-list-input-read-as-options.md) | class | 10 |  | a program reads file names one per line from a list input that also takes options or splits on a line break, so a tracked name opening a dash or holding a line break arrives as an option or as two names |
 | [pin-copied-from-another-corpus](pin-copied-from-another-corpus.md) | class | 2 |  | a threshold measured on one tree is vacuous or permanently red on another |
 | [pin-gated-checks-arm-nothing-without-a-pin](pin-gated-checks-arm-nothing-without-a-pin.md) | class | 5 |  | hygiene checks 13-15 alone are behind a declared pin, so a fixture conf without one arms nothing there and the checks report clean by never loading |
 | [pipe-in-a-code-span-splits-a-table-cell](pipe-in-a-code-span-splits-a-table-cell.md) | class | 4 |  | a markdown table cell holding a pipe, even inside backticks, splits into extra cells, so a reader that splits the row on its pipes reads the wrong cell as a column |
@@ -199,6 +200,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-183 record(s): 180 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+184 record(s): 181 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

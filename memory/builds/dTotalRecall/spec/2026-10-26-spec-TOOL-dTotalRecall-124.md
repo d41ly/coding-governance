@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-124 — the closing review's round 3 high: every tracked path the code record hands a list input reaches it as a file name
 
-**Status:** INPROGRESS · rev-1 · 2026-11-26 · node d · Tier-2 · base 33706662 · streams tooling · order 52
+**Status:** CLOSED · rev-1 · 2026-11-26 · node d · Tier-2 · base 33706662 · streams tooling · order 52
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-26-build-TOOL-dTotalRecall-124-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-dTotalRecall-124-1-acceptance-ledger.md) | log | — |
 | [2026-11-26-prompt-TOOL-dTotalRecall-124-1-spec-writer.md](../prompts/2026-11-26-prompt-TOOL-dTotalRecall-124-1-spec-writer.md) | log | — |
 | [2026-11-26-prompt-TOOL-dTotalRecall-124-build-brief.md](../prompts/2026-11-26-prompt-TOOL-dTotalRecall-124-build-brief.md) | journal | — |
 | [2026-11-26-prompt-TOOL-dTotalRecall-124-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-dTotalRecall-124-spec-brief.md) | journal | — |
