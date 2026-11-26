@@ -17,7 +17,7 @@ hold-reason: the owner moves the run to node a (2026-11-23); resume there from m
 hold-until: owner
 hold-code: host-owner-action
 held-from: RUNNING
-refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
+refreshed-at: 3d6c1702afb6c2e86638785950d80657a187192c · park · ? touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 84a0522fc
 phase: VERIFYING
@@ -811,3 +811,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-26T06:12:11Z draw · re-dispatch · TOOL-dTotalRecall-125 · 92/186 · 20261126T061211Z-8bb707
 
 2026-11-26T06:12:11Z dispatch · item bed60eae TOOL-dTotalRecall-125 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-11-26T13:52:07Z decision · item d0e02120b, node d's red-fix of this build, is 69 lines over 2 paths against the inline lane's 60-line bound, so routed commits reds every bar of this branch: replay that pushed history into a routed unit, or record the over-bound red-fix as accepted at the landing? · reason options seen: rewrite pushed history so the fix rides a specced unit; split it, which also rewrites pushed history; or the owner's waiver row for the commit. Refused because each rewrites a pushed commit or waives a gate, and the mandate delegates neither
