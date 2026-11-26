@@ -63,3 +63,19 @@ round 2 · finding 13 · MEDIUM · local · specs TOOL-aPrunedIndex-1 TOOL-aPrun
 round 2 · finding 14 · MEDIUM · local · specs TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 · unit TOOL-aPrunedIndex-1 · rev 4
 round 2 · finding 14 · MEDIUM · local · specs TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 · unit TOOL-aPrunedIndex-2 · rev 4
 round 2 · finding 15 · LOW · local · specs TOOL-aPrunedIndex-3 · unit TOOL-aPrunedIndex-3 · rev 4
+round 3 · subject aPrunedIndex-spec-set-r3 · audited TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-10
+round 3 · finding 1 · MEDIUM · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 2 · LOW · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 3 · LOW · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 4 · LOW · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 6 · MEDIUM · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 7 · MEDIUM · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 8 · LOW · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 9 · MEDIUM · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 10 · MEDIUM · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 11 · MEDIUM · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 12 · MEDIUM · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 13 · MEDIUM · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 14 · MEDIUM · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 15 · LOW · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
+round 3 · finding 16 · LOW · local · specs TOOL-aPrunedIndex-10 · unit TOOL-aPrunedIndex-10 · rev 2
