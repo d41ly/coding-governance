@@ -54,3 +54,4 @@ code, an arm cut out of its runner or a staged break restored byte-equal, outsid
 - AC16 — `memory/project/shell-role.txt` — `sh_hygiene.py --shell-role --measure . ':!memory/'` read the unattended
   suite at 17615 (DERIVED 2026-11-26), and `ratchet.py widen shell-role` moved its row to that count under widen
   record 42 of this unit. The observed count at the close is the main loop's.
+- seen-red — `encoding posture (an entry point writes stdout as UTF-8)` — red `f9818e59e` — green `0f04cb55c` — the three `commit_trailers.py` stdout rows of `memory/project/encoding-stdout-sites.txt` left declared after this unit drained them
