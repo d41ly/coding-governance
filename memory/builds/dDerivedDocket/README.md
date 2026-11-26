@@ -108,7 +108,7 @@ recorded stop causes.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 51 unit(s) · node d · opened 2026-09-14 · streams tooling+playbook+deployer
+**Build status:** CLOSED · 51 unit(s) · node d · opened 2026-09-14 · streams deployer+playbook+tooling
 ids DEPL-dDerivedDocket-1 PLAY-dDerivedDocket-1 TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11
 ids TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23
 ids TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35
@@ -226,9 +226,25 @@ Ids whose spec moved past its audited revision: none — 0 of 51 unit id(s) carr
 | 38 | `PLAY-dDerivedDocket-1` | no |
 | 39 | `TOOL-dDerivedDocket-36` | no |
 | 40 | `DEPL-dDerivedDocket-1` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md`, `2026-09-14-prompt-TOOL-dDerivedDocket-1-owner-mandate.md` and 1 more under prompts/ |
+| reviews | `2026-09-28-review-TOOL-dDerivedDocket-1-closing-diff-review-round2.md` (CLEAN WITH FIXES), `2026-09-28-review-TOOL-dDerivedDocket-1-closing-diff-review-round1.md` (CLEAN WITH FIXES) and 19 more under reviews/ |
+| research | `2026-09-14-build-TOOL-dDerivedDocket-1-design.md` |
+| logs | `2026-09-29-build-TOOL-dDerivedDocket-34-triage.tsv`, `2026-09-29-build-TOOL-dDerivedDocket-34-status.tsv` and 68 more under build/ |
+| open asks | `BACKLOG.md`, 20 open |
+| card ref | `refs/gov/builds/dDerivedDocket/card` |
+<!-- /gen:build-routes -->

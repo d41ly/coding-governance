@@ -179,7 +179,7 @@ region rather than on two readings of the same prose.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-18 · streams playbook+tooling+deployer
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-18 · streams deployer+playbook+tooling
 ids DEPL-aFusedCharter-1 PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 TOOL-aFusedCharter-4
 
 <!-- gen:build-units -->
@@ -212,3 +212,15 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-18-review-PLAY-aFusedCharter-1-2.md`, `2026-08-18-review-PLAY-aFusedCharter-1-1.md` (BLOCKED) and 1 more under reviews/ |
+| logs | `2026-08-18-build-PLAY-aFusedCharter-1-1-conditional-enumeration.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aFusedCharter/card` |
+<!-- /gen:build-routes -->

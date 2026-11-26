@@ -98,7 +98,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.138 # gov:kit unattended@1.138 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.139 # gov:kit unattended@1.139 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1260,7 +1260,8 @@ TRIGGER_CAUSES="owed opt-in recommendation placement"
 # THE CHAIN RECORD'S GRAMMAR, ONE SPELLING EACH (TOOL-dFoldedAudit-15 S22): `_ids_of`, `write_chain_round`
 # and `derive_chain_verdict` read these, the awk through `-v` and dynamic regexes. Which two severities
 # are major stays in that awk, because it asks a different question from which four exist.
-UNIT_ID_ERE='[A-Z]+-[A-Za-z0-9]+-[0-9]+'
+# UNIT_ID_ERE, the unit id, is lib-unattended.sh's: `load_slug_class` sets it from the slug grammar
+# (TOOL-dTotalRecall-5 S7), and every reader below loads it first.
 CHAIN_SEVERITIES='BLOCKER|HIGH|MEDIUM|LOW'
 CHAIN_NATURES='local|new-mechanism'
 # The class of a cited path, whole (TOOL-aCarriedStop-2): the bracket expression and no quantifier, so
@@ -3007,7 +3008,9 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # GOVREF_WHY. An EMPTY source returns 2 `no source` and pushes nothing, so a failed build captured as
 # `c=$(build_gov_commit …)` is never a deletion; `remove_gov_ref` is the one deletion form, its
 # expected sha non-empty, and it reaches the same push and porcelain read through `write_gov_ref`,
-# which admits an empty source only when `remove_gov_ref` is its caller.
+# which admits an empty source only when `remove_gov_ref` is its caller. NO CLAIM REF IS PRUNED
+# (TOOL-dTotalRecall-3 S5): `remove_gov_ref` returns 2 for any ref under `refs/gov/claims/`, a slug's
+# claim and an ask family's counter, naming the rule in GOVREF_WHY, before it reaches the push.
 # THE CALLER SETS THREE NAMES: GOVREF_RUNNER, a function taking `<outfile> <git args…>` that runs git
 # bounded and writes its stdout to the file; GOVREF_REMOTE, the remote NAME the push names, so the
 # pre-push hook observes `<name>/HEAD`; GOVREF_GITDIR, the git dir whose `pre-push-refusal` a hook
@@ -3076,6 +3079,7 @@ write_gov_ref() {    # ref · expected sha or empty · src · [lower commit ...]
 }
 remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref's deletion
   GOVREF_WHY=""
+  case "$1" in refs/gov/claims/*) GOVREF_WHY="a ref under refs/gov/claims/ is never deleted: a claim and a counter are append-only"; return 2 ;; esac
   [ -n "$2" ] || { GOVREF_WHY="no expected sha"; return 2; }
   write_gov_ref "$1" "$2" ""
 }
@@ -3086,12 +3090,14 @@ remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref'
 # the common dir, taken through `write_dir_lock_wait` with the stem `node`, so a stale break appends
 # `node-lock-broken` or `node-guard-cleared`. NODE_LOCK_BOUND is the seconds a node lock may hold,
 # a pinned literal over every section it covers (TOOL-dPlacedRequest-49 S33): the feed append,
-# `add_feed_event`; the queue's append, `add_gov_queue`, and its flush's two file passes,
+# `write_feed_lines`, for `add_feed_event` and for `add_record_events`, whose walk runs under the lock
+# (TOOL-dTotalRecall-24); the queue's append, `add_gov_queue`, and its flush's two file passes,
 # `write_gov_queue`, which pushes with no lock held; the offline write's hold through
 # `write_gov_queue_hold`, from its read of the queue through its append, which builds the commit but
-# never pushes; and `write_request_record`'s compare, copy and `.typed` append. The longest is the
-# offline write's hold, measured once on node d on 2026-11-20 over the lease fixture:
-# 1.412 s, PINNED, under this bound.
+# never pushes; and `write_request_record`'s compare, copy and `.typed` append. The offline write's
+# hold, measured once on node d on 2026-11-20 over the lease fixture: 1.412 s, PINNED. The longest is
+# a node's first record walk, over gov's whole history to 55f322f29 (69,097 events), measured once on
+# 2026-11-23 by TOOL-dTotalRecall-24's pass: 4.01 s, PINNED, under this bound.
 NODE_LOCK_BOUND=10
 # THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory (TOOL-aPiecewiseGrade-6), moved into this
 # block (TOOL-dPlacedRequest-24) so every carrier holds the one definition. `write_dir_lock` takes the
@@ -3229,7 +3235,8 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # torn line stays for `check_feed` to name. A failure prints ONE `feed: NOTE -` line on stderr and
 # returns 0, as the health log's appender does: the governance write already landed.
 # THE CONTAINED APPEND (TOOL-dPlacedRequest-39): the clock test, the common dir and the git reads run
-# in the caller's shell; the lock, the key check, the counter and the append run in a subshell whose
+# in the caller's shell; the lock, the key check, the counter and the append run in a subshell, which
+# `write_feed_lines` holds for both appenders since TOOL-dTotalRecall-24, whose
 # `EXIT` trap is armed BEFORE the take (TOOL-dPlacedRequest-49 S6) and acts only once `write_dir_lock`
 # has set `_fl_mine`, which the subshell empties first: it then releases the lock directory where its
 # `owner` reads this call's token, and clears one with no `owner` only while no `gov-feed.lock.break`
@@ -3260,11 +3267,76 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # gives two events one `seq` and loses none; `seq` and `seen-utc` are node-local and never compared; a
 # ref's events from before a deletion of it are outside every chain git holds and are not compared;
 # a retry made after another event of its ref landed appends again, an event that did happen.
+# RECORD EVENTS, I17 (TOOL-dTotalRecall-24): every landed commit that touches a record joins the feed
+# as one line per distinct key: `ref` the landed branch's remote name, `refs/heads/<default>`, `kind`
+# `record`, `blob` the record file's blob at that commit (`-` where the file is absent after it) and
+# `commit` the commit, so two files of one commit sharing a blob give one event. A record is any
+# tracked path under MEMORY_ROOT, read by `read_record_root` from the top level's `.memory-tree.conf`,
+# sourced in a subshell with MEMORY_ROOT unset first; none declared reads `memory`, and a value that is
+# no plain relative path (a byte outside `A-Za-z0-9_./-`, a leading `/`, a `..` segment) is refused:
+# the appender prints one `feed: NOTE -` line, the check `unread <ref> MEMORY_ROOT <value>`.
+# `derive_record_events` is ONE `git log --reverse --topo-order --no-merges --raw --no-abbrev` over
+# `<from>..<tip>`, a parent's events before its child's. `add_record_events`, which the lander calls
+# on each landing's success, walks from the feed's newest `record` commit of the ref, read under the
+# lock, so a landing another node made and this one only fetched joins too. THE SHARED CORE,
+# `write_feed_lines`, is the one append path: under the node lock it runs the caller's row builder
+# against the log, numbers its rows from one more than the larger of the counter and the log's last
+# `seq`, closes a torn last byte, appends every row in one write and writes the counter once.
+# `add_feed_event`'s builder is its append-once read, `derive_feed_row`; a record range's is
+# `derive_record_rows`, which leaves out every row whose ref, blob and commit a `record` line already
+# holds, so a merge landing, whose walk re-lists commits the start does not dominate, appends each key
+# once (TOOL-dTotalRecall-115). `check_feed`'s record arm walks from every `record` commit of the ref
+# any branch or remote-tracking branch reaches, and compares the keys that walk derives with the feed's
+# keys as SETS, `missing` and `extra`, and prints `duplicate` for a key a second line holds.
+# WHAT THIS DOES NOT CHECK: records outside MEMORY_ROOT; a landing pushed past the lander until a
+# later landing's walk appends it; a planted line naming a side branch's commit, which makes that
+# branch's record commits read `missing`.
 # A staging name beside <dest> that nobody can know before it is written: <dest>.<SRANDOM twice>.tmp, or
 # mktemp -u's where bash has no SRANDOM; 1 when neither names one. The run-gates runner carries the same line.
 derive_temp_path() { if [ -n "${SRANDOM:-}" ]; then printf -v "$1" '%s.%s%s.tmp' "$2" "$SRANDOM" "$SRANDOM"; else printf -v "$1" '%s' "$(mktemp -u "$2.XXXXXXXX" 2>/dev/null)"; [ -n "${!1}" ]; fi; }
+write_feed_lines() { # common dir · what the rows are, for a NOTE · row builder… -> the contained append's exit: 0, 3 the lock busy, 4 the builder refused, else aborted
+  local d="$1" what="$2" tok rows text s=0 l n m now rc=0
+  shift 2
+  tok="$BASHPID.$RANDOM"
+  ( _fl_mine=
+    trap '[ -z "$_fl_mine" ] || { [ -s "$d/gov-feed.lock/owner" ] || [ -e "$d/gov-feed.lock.break" ] || rm -rf "$d/gov-feed.lock"; remove_dir_lock "$d/gov-feed.lock" "$tok"; }' EXIT
+    write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3
+    rows=$("$@" "$d/gov-feed.log") || exit 4
+    [ -n "$rows" ] || exit 0
+    if [ -f "$d/gov-feed.seq" ]; then { read -r s <"$d/gov-feed.seq"; } 2>/dev/null || :; fi
+    s=${s%$'\r'}
+    case "$s" in ""|*[!0-9]*) s=0 ;; esac
+    l=0
+    if [ -s "$d/gov-feed.log" ]; then
+      l=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 0 }' "$d/gov-feed.log" 2>/dev/null) || l=0
+      case "$l" in ""|*[!0-9]*) l=0 ;; esac
+      [ -z "$(tail -c1 "$d/gov-feed.log" 2>/dev/null)" ] || printf '\n' >>"$d/gov-feed.log"
+    fi
+    n=$(( (10#$s > 10#$l ? 10#$s : 10#$l) + 1 ))
+    TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+    text=$(printf '%s\n' "$rows" | awk -v n="$n" -v now="$now" '{ sub(/\r$/, "") } NF { print n++ "\t" $0 "\t" now }') || exit 5
+    m=${text##*$'\n'}; m=${m%%$'\t'*}
+    if ! printf '%s\n' "$text" >>"$d/gov-feed.log" 2>/dev/null; then
+      printf 'feed: NOTE - %s/gov-feed.log could not be written, so %s is not in the feed\n' "$d" "$what" >&2
+    elif st=""; ! { derive_temp_path st "$d/gov-feed.seq" && printf '%s\n' "$m" >"$st" && mv -f "$st" "$d/gov-feed.seq"; } 2>/dev/null; then
+      [ -z "$st" ] || rm -f "$st" 2>/dev/null
+      printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
+    fi
+    exit 0 ) || rc=$?
+  return "$rc"
+}
+# The append-once read (TOOL-dPlacedRequest-27): nothing where the ref's newest line holds this key.
+derive_feed_row() {  # ref · kind · blob · commit · feed log -> `ref TAB kind TAB blob TAB commit`, or nothing
+  if [ -f "$5" ] && FEED_EV="$1"$'\t'"$3"$'\t'"$4" awk -F'\t' '
+      BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
+      $2 == ev[1] { p = $4 "\t" $5 }
+      END { exit !(p == ev[2] "\t" ev[3]) }' "$5" 2>/dev/null; then
+    return 0
+  fi
+  printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4"
+}
 add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the event appended once
-  local ref="$1" c="${2:-}" d k t=- r s=0 l n now tok rc=0
+  local ref="$1" c="${2:-}" d k t=- r rc=0
   [ -n "${EPOCHSECONDS:-}" ] || { printf 'feed: NOTE - no EPOCHSECONDS, bash 5 or later is required\n' >&2; return 0; }
   [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
   d=${GOVFEED_DIR%$'\r'}
@@ -3278,34 +3350,7 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     [ "${#c}:${#t}" = 40:40 ] || c=""
     case "$c$t" in *[!0-9a-f]*|"") printf 'feed: NOTE - %s names no commit this clone holds, so the write is not in the feed\n' "$ref" >&2; return 0 ;; esac
   fi
-  tok="$BASHPID.$RANDOM"
-  ( _fl_mine=
-    trap '[ -z "$_fl_mine" ] || { [ -s "$d/gov-feed.lock/owner" ] || [ -e "$d/gov-feed.lock.break" ] || rm -rf "$d/gov-feed.lock"; remove_dir_lock "$d/gov-feed.lock" "$tok"; }' EXIT
-    write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3
-    if [ -f "$d/gov-feed.log" ] && FEED_EV="$ref"$'\t'"$t"$'\t'"$c" awk -F'\t' '
-        BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
-        $2 == ev[1] { p = $4 "\t" $5 }
-        END { exit !(p == ev[2] "\t" ev[3]) }' "$d/gov-feed.log" 2>/dev/null; then
-      exit 0
-    fi
-    if [ -f "$d/gov-feed.seq" ]; then { read -r s <"$d/gov-feed.seq"; } 2>/dev/null || :; fi
-    s=${s%$'\r'}
-    case "$s" in ""|*[!0-9]*) s=0 ;; esac
-    l=0
-    if [ -s "$d/gov-feed.log" ]; then
-      l=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 0 }' "$d/gov-feed.log" 2>/dev/null) || l=0
-      case "$l" in ""|*[!0-9]*) l=0 ;; esac
-      [ -z "$(tail -c1 "$d/gov-feed.log" 2>/dev/null)" ] || printf '\n' >>"$d/gov-feed.log"
-    fi
-    n=$(( (10#$s > 10#$l ? 10#$s : 10#$l) + 1 ))
-    TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
-    if ! printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$ref" "$k" "$t" "$c" "$now" >>"$d/gov-feed.log" 2>/dev/null; then
-      printf 'feed: NOTE - %s/gov-feed.log could not be written, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2
-    elif st=""; ! { derive_temp_path st "$d/gov-feed.seq" && printf '%s\n' "$n" >"$st" && mv -f "$st" "$d/gov-feed.seq"; } 2>/dev/null; then
-      [ -z "$st" ] || rm -f "$st" 2>/dev/null
-      printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
-    fi
-    exit 0 ) || rc=$?
+  write_feed_lines "$d" "this write of $ref at $c" derive_feed_row "$ref" "$k" "$t" "$c" || rc=$?
   case "$rc" in
     0) ;;
     3) printf 'feed: NOTE - the feed lock in %s was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2 ;;
@@ -3323,6 +3368,69 @@ write_feed_success() { # ref · commit, or empty for a deletion -> 0 always; the
   else git update-ref -d "refs/gov/remote/${1#refs/gov/}" 2>/dev/null; fi \
     || printf 'feed: NOTE - the cache ref refs/gov/remote/%s was not set to this write\n' "${1#refs/gov/}" >&2
   add_feed_event "$1" "${2:-}"
+  return 0
+}
+read_record_root() { # -> the memory root, `memory` where no conf declares one; rc 1 printing the value when it is no plain relative path
+  local top v=""
+  top=$(git rev-parse --show-toplevel 2>/dev/null) || top=""
+  top=${top%$'\r'}
+  if [ -n "$top" ] && [ -f "$top/.memory-tree.conf" ]; then
+    v=$( set +u; unset MEMORY_ROOT; . "$top/.memory-tree.conf" >/dev/null 2>&1; printf '%s' "${MEMORY_ROOT-}" )
+  fi
+  v=${v%$'\r'}
+  [ -n "$v" ] || v=memory
+  case "/$v/" in *[!A-Za-z0-9_./-]*|//*|*/../*) printf '%s' "$v"; return 1 ;; esac
+  while [ "${v%/}" != "$v" ]; do v=${v%/}; done
+  printf '%s' "$v"
+}
+derive_record_events() { # ref · tip · [from] -> `ref TAB record TAB blob TAB commit` per distinct key, parents first; rc 1 git refused the walk, 2 MEMORY_ROOT refused
+  local root top out
+  root=$(read_record_root) || return 2
+  top=$(git rev-parse --show-toplevel 2>/dev/null) || return 1
+  top=${top%$'\r'}
+  out=$(git -C "$top" -c core.quotePath=false log --reverse --topo-order --no-merges --no-renames --raw --no-abbrev \
+    --root --no-color --format=%H "${3:+$3..}$2" -- "$root/" 2>/dev/null) || return 1
+  [ -n "$out" ] || return 0
+  printf '%s\n' "$out" | awk -v ref="$1" '
+    { sub(/\r$/, "") }
+    length($0) == 40 && $0 !~ /[^0-9a-f]/ { c = $0; next }
+    substr($0, 1, 1) == ":" && c != "" {
+      split($0, t, "\t"); split(t[1], m, " "); b = m[4]
+      if (b !~ /[^0]/) b = "-"
+      if ((c SUBSEP b) in seen) next
+      seen[c, b] = 1; printf "%s\trecord\t%s\t%s\n", ref, b, c }'
+}
+# The record range's builder: the walk from the newest `record` line of <ref>, in file order, less every key the log holds.
+derive_record_rows() { # ref · tip · feed log -> derive_record_events' rows the log does not hold, walked from that line's commit, the whole history where none
+  local from="" rows
+  if [ -f "$3" ]; then
+    from=$(awk -F'\t' -v ref="$1" '{ sub(/\r$/, "") } NF == 6 && $2 == ref && $3 == "record" { c = $5 } END { print c }' "$3" 2>/dev/null) || return 1
+  fi
+  rows=$(derive_record_events "$1" "$2" ${from:+"$from"}) || return 1
+  [ -n "$rows" ] || return 0
+  FEED_FILE="$3" awk -F'\t' '
+    BEGIN { f = ENVIRON["FEED_FILE"]; while ((getline ln < f) > 0) { sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") == 6 && x[3] == "record") k[x[2] SUBSEP x[4] SUBSEP x[5]] = 1 } }
+    !(($1 SUBSEP $3 SUBSEP $4) in k)' <<<"$rows"
+}
+add_record_events() { # ref · tip -> 0 always; the record events of every commit after the feed's newest one of <ref> to <tip> appended once
+  local ref="$1" c d r rc=0
+  [ -n "${EPOCHSECONDS:-}" ] || { printf 'feed: NOTE - no EPOCHSECONDS, bash 5 or later is required\n' >&2; return 0; }
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  d=${GOVFEED_DIR%$'\r'}
+  [ -n "$d" ] || { printf 'feed: NOTE - no git common dir resolves here, so the record events of %s are not in the feed\n' "$ref" >&2; return 0; }
+  r=$(read_record_root) || { printf 'feed: NOTE - MEMORY_ROOT %s is no plain relative path, so no record event of %s was appended\n' "$r" "$ref" >&2; return 0; }
+  c=$(git rev-parse --verify -q "${2:-}^{commit}" 2>/dev/null) || c=""
+  c=${c%$'\r'}
+  case "$c" in *[!0-9a-f]*) c="" ;; esac
+  [ "${#c}" = 40 ] || { printf 'feed: NOTE - %s names no commit this clone holds, so no record event of %s was appended\n' "${2:-}" "$ref" >&2; return 0; }
+  write_feed_lines "$d" "the record events of $ref to $c" derive_record_rows "$ref" "$c" || rc=$?
+  case "$rc" in
+    0) ;;
+    3) printf 'feed: NOTE - the feed lock in %s was held for 5s, so the record events of %s to %s are not in the feed\n' "$d" "$ref" "$c" >&2 ;;
+    4) printf 'feed: NOTE - git could not walk the records of %s to %s, so no record event was appended\n' "$ref" "$c" >&2 ;;
+    *) printf 'feed: NOTE - %s: the record append exited %s\n' "$ref" "$rc" >&2 ;;
+  esac
   return 0
 }
 derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob TAB commit` per event, per ref oldest first
@@ -3357,7 +3465,7 @@ add_feed_sightings() { # cache prefix -> 0 always; every unseen commit of a cach
   return 0
 }
 check_feed() {       # cache prefix · [feed file, the node's by default] -> one line per finding and rc 1, or rc 0
-  local pre="${1%/}/" f="${2:-}" dv au
+  local pre="${1%/}/" f="${2:-}" dv au rc=0 rf root rr g tips dr
   if [ -z "$f" ]; then
     [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
     f="${GOVFEED_DIR%$'\r'}/gov-feed.log"
@@ -3378,6 +3486,7 @@ check_feed() {       # cache prefix · [feed file, the node's by default] -> one
       while ((getline ln < f) > 0) {
         sub(/\r$/, "", ln)
         if (split(ln, x, "\t") != 6) { print "torn " ln; bad = 1; continue }
+        if (x[3] == "record") continue
         k = x[4] SUBSEP x[5]
         if ((x[2] in last) && last[x[2]] == k) { print "duplicate " x[2] " " x[5]; bad = 1; continue }
         last[x[2]] = k
@@ -3394,7 +3503,42 @@ check_feed() {       # cache prefix · [feed file, the node's by default] -> one
         }
         if (off != "") { print "order " g " " off; bad = 1 }
       }
-      exit bad }'
+      exit bad }' || rc=1
+  # THE RECORD ARM (TOOL-dTotalRecall-24 S6): per ref carrying `record` lines, the walk from
+  # every such line's commit a branch or remote-tracking branch reaches, compared as sets.
+  [ -f "$f" ] || return "$rc"
+  rf=$(awk -F'\t' '{ sub(/\r$/, "") } NF == 6 && $3 == "record" && !($2 in s) { s[$2] = 1; print $2 }' "$f" 2>/dev/null)
+  [ -n "$rf" ] || return "$rc"
+  if ! root=$(read_record_root); then
+    for g in $rf; do printf 'unread %s MEMORY_ROOT %s\n' "$g" "$root"; done
+    return 1
+  fi
+  rr=$(git rev-list --branches --remotes 2>/dev/null)
+  for g in $rf; do
+    tips=$(FEED_FILE="$f" awk -F'\t' -v ref="$g" '
+      { sub(/\r$/, ""); r[$0] = 1 }
+      END { f = ENVIRON["FEED_FILE"]
+            while ((getline ln < f) > 0) { sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") == 6 && x[2] == ref && x[3] == "record" && (x[5] in r) && !(x[5] in t)) {
+                t[x[5]] = 1; print x[5] } } }' <<<"$rr")
+    dr=""
+    if [ -n "$tips" ] && ! dr=$(derive_record_events "$g" --stdin <<<"$tips"); then
+      printf 'unread %s walk\n' "$g"; rc=1; continue
+    fi
+    printf '%s\n' "$dr" | FEED_FILE="$f" awk -F'\t' -v ref="$g" '
+      { sub(/\r$/, "") } NF == 4 { d[$3 SUBSEP $4] = 1; dc[$3 SUBSEP $4] = $4; o[++n] = $3 SUBSEP $4 }
+      END { f = ENVIRON["FEED_FILE"]; bad = 0
+            while ((getline ln < f) > 0) { sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") != 6 || x[2] != ref || x[3] != "record") continue
+              k = x[4] SUBSEP x[5]
+              if (k in got) { print "duplicate " ref " " x[5]; bad = 1; continue }
+              got[k] = 1
+              if (!(k in d) && !(("extra " x[5]) in said)) { said["extra " x[5]] = 1; print "extra " ref " " x[5]; bad = 1 } }
+            for (i = 1; i <= n; i++) if (!(o[i] in got) && !(("missing " dc[o[i]]) in said)) {
+              said["missing " dc[o[i]]] = 1; print "missing " ref " " dc[o[i]]; bad = 1 }
+            exit bad }' || rc=1
+  done
+  return "$rc"
 }
 write_feed() {       # cache prefix -> rc 0 the derived feed written, rc 2 naming a feed already present
   local pre="${1%/}/" d now n=0 l lt="" st=""
@@ -6267,9 +6411,9 @@ trusted_base() { # run-state file [· allow-degenerate [· preflight]]  ->  sets
 # The SHAPE is its own predicate because a second caller needs it with no refusal attached: the run
 # log's START records a slug only when it passes, and it runs before any verb could refuse. One
 # grammar, two callers, rather than a copy of the pattern that drifts. TOOL-dLoggedFlight-2.
-check_slug_shape() { # slug -> 0 when it is a build-folder name
-  case "$1" in *[!A-Za-z0-9-]* | "" | [!A-Za-z]*) return 1 ;; esac
-  return 0
+check_slug_shape() { # slug -> 0 when it is a build-folder name: the slug grammar's BUILD_SLUG_RE (TOOL-dTotalRecall-5 S7)
+  load_slug_class || return 1
+  [[ $1 =~ $SLUG_RE_ERE ]]
 }
 check_slug() {
   # Bound to a NAME, not used as `$1`: check-arms reads `${?[A-Za-z_]…` as an interpolation and a
@@ -7766,6 +7910,7 @@ check_authorization() { # slug · base
       fail 20 "the working copy's build README does not carry exactly one well-formed units pair while the pinned BASE does, so the scope this run is executing against cannot be compared: $rel"
       return 1
     fi
+    load_slug_class || return 1
     miss=$(comm -23 <(printf '%s\n' "$ub" | _ids_of) <(printf '%s\n' "$uh" | _ids_of) | tr '\n' ' ' | sed 's/[[:space:]]*$//')
     if [ -n "$miss" ]; then
       fail 20 "a unit in the scope at the pinned BASE is absent from it now, so this run narrowed or renamed the scope it was authorized for; additions are admitted and removals are not: $miss"
@@ -8369,16 +8514,17 @@ unit_rows() { # build README -> unit rows; rc 3 = no single well-formed pair
 nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
 # TOOL-aBoundedVerdict-11 S6 - ids out of whatever row text it is handed, sorted and deduplicated so
 # two callers cannot disagree about order. Reads stdin, so it composes with either side of the compare.
-_ids_of() { grep -oE "$UNIT_ID_ERE" | sort -u; }
+_ids_of() { load_slug_class || return 2; grep -oE "$UNIT_ID_ERE" | sort -u; }
 # The FIRST id on each row, which is the row's OWN id: a generated unit row leads with its link label
 # and may mention another id in the title text. `_ids_of` over a row SET cannot tell the two apart,
 # and a foreign id there would put a unit into a population it is not in. Measured over this corpus:
 # 80 generated regions, zero foreign ids — so this closes a shape rather than a live instance, which
 # is stated rather than implied.
 row_ids_of() { # stdin: unit rows -> each row's own id, one per line, sorted
+  load_slug_class || return 2
   while IFS= read -r _ri_row; do
     [ -n "$_ri_row" ] || continue
-    printf '%s\n' "$_ri_row" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | head -1
+    printf '%s\n' "$_ri_row" | grep -oE "$UNIT_ID_ERE" | head -1
   done | sort -u
 }
 # `expand_id_runs` USED TO BE DEFINED HERE. TOOL-dDerivedDocket-18 moved it, unchanged, into
@@ -9298,6 +9444,7 @@ build_ask_plan() { # slug · spec paths… -> sets ASK_PLAN_ROWS, ASK_PLAN_NEXT,
   local _m _mids _bl _fids _pop="" _mset="" _id _i=0 _rev _rel _sp _spid _live _cover _disp
   local _n=0 _sum _rdy _dup
   ASK_PLAN_ROWS=""; ASK_PLAN_NEXT=""; ASK_PLAN_WHY=""; ASK_POSITIONS=""; AW_ROWS=""
+  load_slug_class || return 2
   _m=$(mandate_of "$slug")
   # A MANDATE THAT DOES NOT READ WHOLE IS NAMED, not planned from (closing review F2). This verb
   # reports and refuses nothing, so it plans the folder's own asks and says, on a line of its own
@@ -9366,7 +9513,7 @@ build_ask_plan() { # slug · spec paths… -> sets ASK_PLAN_ROWS, ASK_PLAN_NEXT,
     # names, so two DIFFERENT builds closing it once each is a contest, which is a different thing
     # and is what the R2 grade already reports.
     _dup=$(ask_field "$_id" closers | tr ',' '\n' | sed 's/^stale://' \
-      | grep -E '^[A-Z]+-[A-Za-z0-9]+-[0-9]+$' \
+      | grep -E "^$UNIT_ID_ERE\$" \
       | awk '{ b = $0; sub(/^[A-Z]+-/, "", b); sub(/-[0-9]+$/, "", b)
                c[b]++; s[b] = s[b] (s[b] == "" ? "" : ",") $0 }
              END { for (b in c) if (c[b] > 1) { print s[b]; exit } }')
@@ -9842,12 +9989,14 @@ ASKROWS
   fi
   # EACH PARENT'S DERIVED PHASE, so the engine reads a parent landed by its recorded move OR by the
   # derivation this driver owns (TOOL-dDeclaredLoop-7 section 8 F6). The front matter is read in this
-  # shell, from line 1's `---` to the next, as the index generator's parser reads it.
+  # shell, from line 1's `---` to the next, as the index generator's parser reads it. Both spellings of
+  # the `after` relation are read, `parents:` and `depends-on:`, the two `[[front-matter]]` rows of the
+  # playbook kit's edges.toml that type it (TOOL-dTotalRecall-6 S11); no gate compares this list to them.
   while IFS= read -r _pl || [ -n "$_pl" ]; do
     _pl=${_pl%$'\r'}
     if [ "$_pl" = "---" ]; then _pin=$((_pin + 1)); [ "$_pin" -lt 2 ] && continue; break; fi
     [ "$_pin" = 1 ] || break
-    case "$_pl" in parents:*) _pl=${_pl#parents:} ;; *) continue ;; esac
+    case "$_pl" in parents:*) _pl=${_pl#parents:} ;; depends-on:*) _pl=${_pl#depends-on:} ;; *) continue ;; esac
     for _pp in $_pl; do
       if [ -f "$M/builds/$_pp/RUN.md" ]; then read_derived_phase "$M/builds/$_pp/RUN.md"; else DP_PHASE="-"; fi
       _ho+="parent	$_pp	${DP_PHASE:--}"$'\n'
@@ -10635,7 +10784,7 @@ print_interrupted_acts() {
     [ -d "$_q" ] || continue
     for _tk in "$_q"/*; do
       [ -e "$_tk" ] || continue
-      _pid=${_tk##*/}; _pid=${_pid#*-}; _pid=${_pid%%-*}
+      _pid=${_tk##*/}; _pid=${_pid#*-}; _pid=${_pid%%-*}  # census: kept slug-grammar not a unit id: the ticket pid
       case "$_pid" in ""|*[!0-9]*) continue ;; esac
       if ! kill -0 "$_pid" 2>/dev/null; then
         _said=1
@@ -11720,14 +11869,15 @@ derive_review_signals() { # slug · stage -> sets _rs_why _rs_tier2 _rs_anchor; 
   local _rs_row _rs_id _rs_t _rs_sp _rs_n=0 _rs_seen=" "
   local -a _rs_rows=()
   _rs_why=""; _rs_tier2=""; _rs_anchor=""
+  load_slug_class || return 2
   readme_of "$1" >/dev/null
   mapfile -t _rs_rows < <(unit_rows "$_readme" 2>/dev/null)
   for _rs_row in ${_rs_rows[@]+"${_rs_rows[@]}"}; do
-    [[ $_rs_row =~ [A-Z]+-[A-Za-z0-9]+-[0-9]+ ]] || continue
+    [[ $_rs_row =~ $UNIT_ID_ERE ]] || continue
     _rs_id=${BASH_REMATCH[0]}
     case "$_rs_seen" in *" $_rs_id "*) ;; *)
       _rs_seen="$_rs_seen$_rs_id "; _rs_n=$((_rs_n + 1))
-      if [ -z "$_rs_anchor" ] || [ "$((10#${_rs_id##*-}))" -lt "$((10#${_rs_anchor##*-}))" ]; then _rs_anchor=$_rs_id; fi ;;
+      if [ -z "$_rs_anchor" ] || [ "$((10#${_rs_id##*-}))" -lt "$((10#${_rs_anchor##*-}))" ]; then _rs_anchor=$_rs_id; fi ;;  # census: kept slug-grammar the sequence after the last hyphen
     esac
     _rs_t=${_rs_row%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t%|*}; _rs_t=${_rs_t##*|}
     [ "${_rs_t//[[:space:]]/}" != 2 ] || _rs_tier2=1
@@ -13786,7 +13936,7 @@ sys.exit(1)
 derive_ask_seq() { # family · slug -> one past the highest <family>-<slug>-<n> in the tracked and working trees
   local f=$1 s=$2 hi=0 v
   while IFS= read -r v; do
-    v=${v##*-}
+    v=${v##*-}  # census: kept slug-grammar the sequence after the last hyphen
     case "$v" in ''|*[!0-9]*) continue ;; esac
     [ "$((10#$v))" -gt "$hi" ] && hi=$((10#$v))
   done < <( { GIT grep -h -o -w -I -E --untracked "$f-$s-[0-9]+" 2>/dev/null
@@ -13972,10 +14122,14 @@ read_ask_back() { # ask id · slug · SEV -> 0 when ASKS_CMD reads it back as ON
   return 1
 }
 
-read_roster_family() { # slug -> the first family of the build README's front-matter roster; nothing when none
-  readme_of "$1" >/dev/null
-  awk 'NR == 1 { next } /^---/ { exit } /^roster:/ { v = $0; sub(/^roster:[[:space:]]*/, "", v); print v; exit }' \
-    "$_readme" 2>/dev/null | tr '+, ' '\n\n\n' | grep -m1 -E '^[A-Z]+$'
+read_roster_family() { # slug -> the first family of the build's DERIVED roster; nothing when none
+  # TOOL-dTotalRecall-4 S3: the roster is derived, never typed, so it is the generator's
+  # `--print-front-matter` answer, run on the generator the library resolver names.
+  local py gen
+  py=$(resolve_python 2>/dev/null) && [ -n "$py" ] && gen=$(resolve_index_generator) && [ -f "$gen" ] || return 0
+  "$py" "$gen" --print-front-matter "$1" 2>/dev/null \
+    | awk '/^roster:/ { v = $0; sub(/\r$/, "", v); sub(/^roster:[[:space:]]*/, "", v); print v; exit }' \
+    | tr '+, ' '\n\n\n' | grep -m1 -E '^[A-Z]+$'
 }
 
 # THE BACKUP, THE WRITE, THE READ-BACK AND THE ROLLBACK, one copy for every auto-filer of this
@@ -14029,6 +14183,7 @@ write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 or emp
 write_inherited_asks() { # slug · R · run dir
   local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid blk cand reused fam seq id argv file tok a s k cls
   local r8=${2:0:8} today sev filed=0
+  load_slug_class || return 1
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   [ -f "$d/attribution" ] || return 0
@@ -14048,13 +14203,13 @@ write_inherited_asks() { # slug · R · run dir
           echo "gates-green: ask $cand already OPEN for leg $leg at $r8 · reused"; reused=1; break
         fi
       done < <(grep -F -- "$cls red: leg $leg red at $r8," "$bl" 2>/dev/null \
-                 | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
+                 | awk -v idre="^- $UNIT_ID_ERE · filed " '$0 ~ idre { v = $2; print v }')
     fi
     [ -z "$reused" ] || continue
     # THE ID, minted under this run's slug: the owner id's family when the age probe named one, else
     # the first family of the build README's roster.
     fam=""
-    case "$ownid" in [A-Z]*-*) fam=${ownid%%-*} ;; esac
+    case "$ownid" in [A-Z]*-*) fam=${ownid%%-*} ;; esac  # census: kept slug-grammar the family at index 0
     [ -n "$fam" ] || fam=$(read_roster_family "$slug")
     if [ -z "$fam" ]; then
       echo "gates-green: no ask filed for leg $leg — the build README names no roster family and the age probe named no owner id, so there is no family to mint the id in"
@@ -14133,6 +14288,7 @@ write_inherited_asks() { # slug · R · run dir
 # WHAT IT DOES NOT CHECK: that the leg is a leg of the bar, or that the text is true: the caller's.
 write_leg_ask() { # slug · leg · form · ask text · SEV · SEV reason · KEEP reason -> 0 filed or reused, 1 not; one line each
   local slug=$1 leg=$2 form=$3 text=$4 sev=$5 bl f home cand fam id a s k at8=""
+  load_slug_class || return 1
   bl="$M/builds/$slug/BACKLOG.md"
   if [ -n "${ASKS_CMD:-}" ]; then
     for f in $(GIT ls-files -- ":(glob)$M/builds/*/BACKLOG.md" 2>/dev/null); do
@@ -14143,8 +14299,8 @@ write_leg_ask() { # slug · leg · form · ask text · SEV · SEV reason · KEEP
         if read_ask_back "$cand" "$home" "$sev"; then
           echo "gates-green: ask $cand already OPEN $sev for ${form#*: } $leg in $f · reused"; return 0
         fi
-      done < <(WLA_KEY="$form $leg ${text%% *} " awk '
-                 /^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed [^ ]+ · / {
+      done < <(WLA_KEY="$form $leg ${text%% *} " awk -v idre="^- $UNIT_ID_ERE · filed [^ ]+ · " '
+                 $0 ~ idre {
                    r = $0; sub(/^- [^ ]+ · filed [^ ]+ · /, "", r)
                    if (substr(r, 1, length(ENVIRON["WLA_KEY"])) == ENVIRON["WLA_KEY"]) print $2
                  }' "$f" 2>/dev/null)
@@ -14208,6 +14364,7 @@ write_ask_closing() { # ask id · home build slug · by (sha or id) · why -> 0 
 write_flake_releases() { # R -> one line per release: closed or refused
   local r=$1 py k out rc=0 tmp line rest leg id why home head
   [ -n "$r" ] || { echo "gates-green: releases — no advertised tip was observed, so there is no R to select at"; return 0; }
+  load_slug_class || return 1
   if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
      || ! k=$(resolve_kit_dir "$py" run-gates verdict_flow.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
     echo "gates-green: releases — no run-gates kit holding verdict_flow.py resolves beside this kit, so no quarantined leg is released"
@@ -14226,8 +14383,8 @@ write_flake_releases() { # R -> one line per release: closed or refused
     line=${line%$'\r'}
     case "$line" in "release  "*) ;; *) continue ;; esac
     rest=${line#release  }; leg=${rest%%  *}; rest=${rest#*  }; id=${rest%%  *}; why=${rest#*  }
-    home=${id#*-}; home=${home%-*}
-    if [[ ! $id =~ ^[A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+$ ]] || [ -z "$head" ] || [ "$why" = "$rest" ]; then
+    home=${id#*-}; home=${home%-*}  # census: kept slug-grammar the first and the last segment stripped
+    if [[ ! $id =~ ^${UNIT_ID_ERE}$ ]] || [ -z "$head" ] || [ "$why" = "$rest" ]; then
       echo "gates-green: releases — no ask closed: the line is not release  <leg>  <ask id>  <reason>, or HEAD does not resolve: $line"
       continue
     fi
@@ -18172,6 +18329,7 @@ check_chain_fold() { # unit · the row's rev, with `load_spec_facts` already rea
 # on every verdict and dispatch line, and no guard against a run that lies.
 write_chain_round() { # slug · subject · audited ids · blockers · highs, rows in RR_FINDINGS and RR_SIBLINGS, or the cited record in RR_OWNER_STOP
   local slug="$1" subj="$2" audited="$3" blockers="$4" highs="$5" path="$RR_OWNER_STOP"
+  load_slug_class || return 1
   local id="$UNIT_ID_ERE" rec now tok rows="" last=0 seen=0 round folds=() mixed="" named
   local f_id f_sev f_nat f_specs f_unit f_rev
   local re_ids="^$id( $id)*\$" re_sibling="^$id@rev-[0-9]+\$"
@@ -18260,7 +18418,8 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
     mkdir -p "${rec%/*}" 2>/dev/null || print_env_failure 118 "cannot create the build's record folder, so no round was written: ${rec%/*}"
   fi
   {
-    [ -n "$_chain_rec" ] || printf '# %s — the spec-audit chain'\''s rounds\n\n**Serves:** journal %s\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\n' "$slug" "$named"
+    # TOOL-dTotalRecall-36 S8: the cause line under the Serves line, the id the record names
+    [ -n "$_chain_rec" ] || printf '# %s — the spec-audit chain'\''s rounds\n\n**Serves:** log %s\n**Caused-by:** %s\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\n' "$slug" "$named" "$named"
     printf '%s' "$rows"
   } >> "$rec" || print_env_failure 118 "cannot append to the record, so this round is not recorded: $rec"
   stage_runmd "$rec" || print_env_failure 118 "the round is written and git could not stage it, so the next call cannot find the record: $rec"
@@ -18289,10 +18448,12 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
 # would read as R5, and step 2 answers a clean round first anyway. POSIX awk, for the reason `spec_facts`
 # gives, so the lists sort by hand, as strings. A row outside the grammar was hand-edited: the file is
 # append-only, so one no reader can parse is a fault to name, never a question for the owner. A blank
-# line is skipped anywhere and the three header lines only before the first row, so a body row wearing a
+# line is skipped anywhere and the four header lines, the cause line among them (TOOL-dTotalRecall-36
+# S8), only before the first row, so a body row wearing a
 # header's prefix reaches that fault instead of leaving the sets (TOOL-dFoldedAudit-15 S4).
 derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -> 0 with _cv_* set, else check 118 and 1
   local out
+  load_slug_class || return 1
   out=$(awk -v live="$2" -v stop="$3" -v ceiling="$4" -v idre="^$UNIT_ID_ERE\$" -v sevre="^($CHAIN_SEVERITIES)\$" -v natre="^($CHAIN_NATURES)\$" -v pathre="^record $CHAIN_PATH_CLASS+\$" '
     function isid(s) { return s ~ idre }
     function isids(s,   a, k, i) {
@@ -18320,7 +18481,7 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
     }
     { sub(/\r$/, "") }
     /^$/ { next }
-    !body && (/^# / || /^\*\*Serves:\*\* journal / || /^Appended by /) { next }
+    !body && (/^# / || /^\*\*Serves:\*\* (log|journal) / || /^\*\*Caused-by:\*\* / || /^Appended by /) { next }  # census: kept alias-compare both tokens: the pattern reads log and its alias as one kind
     {
       body = 1
       k = split($0, f, " · "); c = split(f[1], w, " ")
@@ -18788,6 +18949,7 @@ check_commit_message() { # commit message file
   # binds, a `--no-verify` commit, a `core.commentChar` other than `#`, and the commits already made.
   # Exit 0 is shared by `ok`, `none` and `unarmed`, and only `unarmed` is a check that did not run, so
   # it alone is said (TOOL-dWitnessedBar-110 S4).
+  _trw=""
   _at=$("$py" "$KIT_DIR/commit_trailers.py" attribution "$msg" "$ROOT/AGENTS.md" 2>&1) && _arc=0 || _arc=$?
   _at=${_at//$'\r'/}
   case "$_arc" in
@@ -18797,12 +18959,22 @@ check_commit_message() { # commit message file
          "$KIT_DIR" "$ROOT/AGENTS.md" 2>/dev/null) || _ae=""
        _ae=${_ae//$'\r'/}
        _at=${_at#ATTRIBUTION refused · }
-       # The repair leads, so the site's signature is the literal its arm asserts (check-arms takes the
-       # longest literal run, and a leading interpolation would join its stripped prefix to it).
-       fail 49 "end the message with '$_ae' and nothing after it: $_at"
-       return 1 ;;
+       _trw="end the message with '$_ae' and nothing after it: $_at" ;;
     *) echo "unattended: --check-commit could not check this message's attribution: $_at" ;;
   esac
+  # EVERY `Decided:` LINE WHERE GIT READS IT (TOOL-dTotalRecall-122 S9): git parses trailers from the
+  # message's final block alone, so a decision above it is lost to every reader of the key, and three
+  # commits lost theirs that way. WHAT IT DOES NOT CHECK: a commit no run binds, a `--no-verify` commit,
+  # and a `Decided:` line git parses with another key's value folded into it.
+  _at=$("$py" "$KIT_DIR/commit_trailers.py" decided "$msg" 2>&1) && _arc=0 || _arc=$?
+  _at=${_at//$'\r'/}
+  case "$_arc" in
+    0) ;;
+    1) _trw="${_trw:+$_trw; }put every 'Decided:' line in the message's final trailer block, with no blank line after it: ${_at#DECIDED refused · }" ;;
+    *) echo "unattended: --check-commit could not check this message's decisions: $_at" ;;
+  esac
+  # ONE SITE FOR BOTH (the refusal ceiling): the literal leads, so check-arms reads the one its arms assert.
+  [ -z "$_trw" ] || { fail 49 "the message's trailers do not stand where git reads them: $_trw"; return 1; }
   # ONE LINE PER UNIT, `<o|O> <unit> <anchor> <declared paths>`, from the key holding the unit's LAST
   # row (the library's `current`), which is the window check 23 grades a commit made now in: a row at
   # a later anchor is a new pass, graded alone, and an earlier pass's paths do not carry into it
@@ -19989,7 +20161,7 @@ write_runlog_start() { # the caller's first argument · its second -> the START 
 # no call writes two END lines. EVERY read is defaulted: `set -u` holds inside a trap, and
 # a trap that aborts on an unset name writes nothing for exactly the call it exists to record.
 write_runlog_end() { # the status the EXIT trap saw -> the END line, then the out-of-band stamp
-  local rc="${1:-}" ex=unclean t d dur="" chk="" c u="" ub="" pt="" p1 p2 p3
+  local rc="${1:-}" ex=unclean t d dur="" chk="" c u="" ub="" pt=""
   local -a f=()
   [ "${RUNLOG_CLEAN:-}" = 1 ] && ex=clean
   if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; d=${t//[!0-9]/}
@@ -20004,14 +20176,11 @@ write_runlog_end() { # the status the EXIT trap saw -> the END line, then the ou
     --dispatch|--rescope) u=${PK_ITEM:-} ;;
     --review)             u=${RV_SUBJECT:-} ;;
   esac
-  # `_ids_of`'s grammar, `[A-Z]+-[A-Za-z0-9]+-[0-9]+`, anchored, and asked of the three parts in
-  # turn rather than of a regex: `=~` ranges follow the locale, and these patterns are ASCII here.
+  # `_ids_of`'s grammar, UNIT_ID_ERE, anchored: its slug is the slug grammar's (TOOL-dTotalRecall-5
+  # S7), so a dated slug's hyphens are read as the slug's and never as the id's separators. A grammar
+  # that does not load marks the unit bad, never guessed.
   if [ -n "$u" ]; then
-    p1=${u%%-*}; p3=${u##*-}; p2=${u#"$p1"-}; p2=${p2%-"$p3"}
-    case "$u" in *-*-*) ;; *) ub=1 ;; esac
-    case "$p1" in ""|*[!A-Z]*) ub=1 ;; esac
-    case "$p2" in ""|*[!A-Za-z0-9]*) ub=1 ;; esac
-    case "$p3" in ""|*[!0-9]*) ub=1 ;; esac
+    if load_slug_class 2>/dev/null; then [[ $u =~ ^${UNIT_ID_ERE}$ ]] || ub=1; else ub=1; fi
     [ -n "$ub" ] && u=""
   fi
   [ -n "${RUNLOG_SLUG:-}" ] && read_phase_into pt "${ROOT:-.}/${M:-memory}/builds/$RUNLOG_SLUG/RUN.md"
@@ -20479,7 +20648,19 @@ while [ $# -gt 0 ]; do
     --feed)         refuse_waive_unless_preflight --feed
                     case "${2:-}" in
                       check)   check_feed refs/gov/remote/ "${3:-}"; _rl_rc=$? ;;
-                      rebuild) write_feed refs/gov/remote/; _rl_rc=$? ;;
+                      # TOOL-dTotalRecall-24 S8: then the default branch's record events, from its tracking ref.
+                      rebuild) write_feed refs/gov/remote/; _rl_rc=$?
+                               if [ "$_rl_rc" = 0 ]; then
+                                 _fr_b=""; _fr_why=""
+                                 if ! RR_GIT=GIT resolve_remote_sh; then _fr_why=$RR_WHY
+                                 elif [ -z "$RR_REMOTE" ]; then _fr_why="this repository has no remote"
+                                 elif ! _fr_b=$(default_branch 2>/dev/null) || [ -z "$_fr_b" ]; then _fr_why="no default branch resolves for $RR_REMOTE"
+                                 elif ! GIT rev-parse -q --verify "refs/remotes/$RR_REMOTE/$_fr_b^{commit}" >/dev/null 2>&1; then
+                                   _fr_why="refs/remotes/$RR_REMOTE/$_fr_b is absent"
+                                 fi
+                                 if [ -n "$_fr_why" ]; then echo "feed: no record events were rebuilt: $_fr_why"; _rl_rc=2
+                                 else add_record_events "refs/heads/$_fr_b" "refs/remotes/$RR_REMOTE/$_fr_b"; fi
+                               fi ;;
                       print)   case "${3:-}" in
                                  "")     print_feed; _rl_rc=$? ;;
                                  --from) print_feed "${4:-none}"; _rl_rc=$? ;;

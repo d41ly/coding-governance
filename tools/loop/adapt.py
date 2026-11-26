@@ -98,7 +98,9 @@ ACTS = ("add", "amend", "exclude", "supersede")
 EDGE_OF = {"add": None, "amend": "amends", "supersede": "supersedes"}
 SEP = " · "
 TAG = re.compile(r"[a-z0-9][a-z0-9-]*(?:\.[a-z0-9][a-z0-9-]*)+")
-UNIT_ID = re.compile(r"[A-Za-z]+-[A-Za-z0-9]+-\d+")
+read_memory_tree("id_grammar.py")
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
+UNIT_ID = SlugPattern(lambda g: r"[A-Za-z]+-(?:" + g.slug_class + r")-\d+")
 FLOW_ROW = re.compile(r"^\S+ rescope · flow (add|amend|exclude|supersede) (\S+)(?: · change (\S+))? · reason (.*)$")
 STATE_ROW = re.compile(r"^\S+ rescope · flow-state (\S+) · (applied|held|refused) · class (\S+) · flow\.adapt (\S+)"
                        r"(?: · recommend (\S+))?(?: · disposition (\S+))?$")

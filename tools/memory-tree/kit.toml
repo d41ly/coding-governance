@@ -6,7 +6,7 @@ layer = "layer.memory"
 scope = "repo"
 version_from = { file = "check-memory-hygiene.sh", pattern = "^KIT_MEMORY_TREE_VERSION=" }
 requires = []
-requires_if = [{ kit = "playbook-render", why = "TOOL-aRepatriatedFork-42: the four renders ask the playbook-render engine's `--answers` for every adopter-declared path, and rev-3 speaks keys only 1.11 answers. A FLOOR, which govkit cannot express: a plain `requires` would refuse every default apply, since the default selection carries this kit and not that one, and no key couples two kits' rollbacks. So the render enforces it: it reads KIT_PLAYBOOK_RENDER_VERSION before spawning the engine, and an engine below 1.11, or none, renders each path's stated phrase with one stderr line naming `govkit update --kits playbook-render`. No condition key: the edge holds wherever the target carries a deploy.toml, which no key of this kit's config names" }, { kit = "unattended", when_any_key_set = ["DESIGN_RECORD", "DESIGN_BASELINE", "DESIGN_VIEW", "DESIGN_NODES"], why = "TOOL-dTrueNorth-12, its four keys design_lib's DESIGN_KEYS (TOOL-dTrueNorth-20 S29): deviation_join.py, armed by these keys, strips each graded spec revision's generated regions with the unattended kit's GEN_REGION_AWK, read from its lib-unattended.sh through `backlog.resolve_kit_dir` and never copied. The live join resolves that strip as its first act and, where the kit does not resolve, refuses by name, exit 2, because a population read without the strip would count a status-only revision as a member. Its fixture and the routed-commits self-test print one named `deviation: SKIP` line instead, naming the plants that read the strip, and run every other plant under the strip stubbed to the identity, so an adopter without the kit runs that self-test with the skip said aloud. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it SELECTS no kit, so an adopter installs the unattended kit before setting the keys, which ship blank" }, { kit = "review-harness", when_any_key_set = ["SPEC_AUDIT_PIN_CUTOFF"], why = "TOOL-dTrueNorth-20 S14: under SPEC_AUDIT_PIN_CUTOFF, gen_build_index.py's derive_audit_writers reads the workflows kit's tier2-review.js, the harness this entry ships, at each graded spec-audit record's adding commit, and exempts a record whose harness there lacks the function AUDIT_WRITER_MARK names, that constant being the reader's one spelling of it. Where the kit does not resolve, --print-bindings prints one `build-index: SKIP audit-writer test` line and exempts nothing. The producer pins the literal: an arm of the harness's own suite reads AUDIT_WRITER_MARK and asserts the harness defines that function, so a rename reds the producer before it strands this reader. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it SELECTS no kit, and the key ships blank" }]
+requires_if = [{ kit = "playbook-render", why = "TOOL-aRepatriatedFork-42: the four renders ask the playbook-render engine's `--answers` for every adopter-declared path, and rev-3 speaks keys only 1.11 answers. A FLOOR, which govkit cannot express: a plain `requires` would refuse every default apply, since the default selection carries this kit and not that one, and no key couples two kits' rollbacks. So the render enforces it: it reads KIT_PLAYBOOK_RENDER_VERSION before spawning the engine, and an engine below 1.11, or none, renders each path's stated phrase with one stderr line naming `govkit update --kits playbook-render`. No condition key: the edge holds wherever the target carries a deploy.toml, which no key of this kit's config names. TOOL-dTotalRecall-16 S4: record_kinds.py --purpose-review reads the chain registry's path from this engine's tag_index.py CHAIN_REGISTRY, found by the inline resolve_kit_dir block and read by `ast` through read_schema_source, never by import; where the kit or the literal does not resolve it prints `unarmed chain · <why>` and reviews the registry alone. TOOL-dTotalRecall-43 S10: record_find.py, behind gov_record.py's find, show and budget, reads this engine's tag index, tag_index.py and record_extract.py found by the inline resolve_kit_dir block at call time (record_find.py's load_tag_index); where the kit does not resolve, the verb exits 2 with one `refused` line naming the kit and reads no index (gov_record.py's run_read_verb)" }, { kit = "memory-recall", why = "TOOL-dTotalRecall-43 S10: record_find.py's question form, behind gov_record.py's find, ranks over the FTS tables memory-recall's query.py load_served_set fills, that kit's directory found by the inline resolve_kit_dir block at call time (record_find.py's load_recall_kit) and its bench.py imported from it. A filter-only find needs no recall kit; a question where the kit does not resolve exits 2 with one `refused` line naming it. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it SELECTS no kit" }, { kit = "unattended", when_any_key_set = ["DESIGN_RECORD", "DESIGN_BASELINE", "DESIGN_VIEW", "DESIGN_NODES"], why = "TOOL-dTrueNorth-12, its four keys design_lib's DESIGN_KEYS (TOOL-dTrueNorth-20 S29): deviation_join.py, armed by these keys, strips each graded spec revision's generated regions with the unattended kit's GEN_REGION_AWK, read from its lib-unattended.sh through `backlog.resolve_kit_dir` and never copied. The live join resolves that strip as its first act and, where the kit does not resolve, refuses by name, exit 2, because a population read without the strip would count a status-only revision as a member. Its fixture and the routed-commits self-test print one named `deviation: SKIP` line instead, naming the plants that read the strip, and run every other plant under the strip stubbed to the identity, so an adopter without the kit runs that self-test with the skip said aloud. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it SELECTS no kit, so an adopter installs the unattended kit before setting the keys, which ship blank" }, { kit = "review-harness", when_any_key_set = ["SPEC_AUDIT_PIN_CUTOFF"], why = "TOOL-dTrueNorth-20 S14: under SPEC_AUDIT_PIN_CUTOFF, gen_build_index.py's derive_audit_writers reads the workflows kit's tier2-review.js, the harness this entry ships, at each graded spec-audit record's adding commit, and exempts a record whose harness there lacks the function AUDIT_WRITER_MARK names, that constant being the reader's one spelling of it. Where the kit does not resolve, --print-bindings prints one `build-index: SKIP audit-writer test` line and exempts nothing. The producer pins the literal: an arm of the harness's own suite reads AUDIT_WRITER_MARK and asserts the harness defines that function, so a rename reds the producer before it strands this reader. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it SELECTS no kit, and the key ships blank" }, { kit = "roles", why = "TOOL-dTotalRecall-18 S2, the owner's ruling on its F6 (a): record_kinds.py renders the record-kind view's `Read by` and `Written by` cells from the roles kit, its READ_KEYS and load_roles from roles_lib.py and its WRITE_FOLDERS from check_roles.py, the modules found through the inline resolve_kit_dir block and called in process, the role files read under the tree checked. A plain `requires` cannot hold it, since the roles kit requires this one. Where the kit does not resolve, or holds no role, --check prints one `unarmed` line naming it and reds, and --write and new render `unarmed` cells, so an unresolved kit never reads as an empty column. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it SELECTS no kit" }, { kit = "loop", why = "TOOL-dTotalRecall-18 S2, the owner's ruling on its F6 (a): record_kinds.py takes the loop items of the record-kind view's `Read by` and `Written by` cells from the loop kit's definition, read through loop_lib.py's read_definition and read_item_rows and parsed by loop_items.py's derive_record_ref, the modules found through the inline resolve_kit_dir block and called in process, the definition read under the tree checked. Where the kit does not resolve or its definition does not read, --check prints one `unarmed` line naming it and reds, and --write and new render `unarmed` cells. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it SELECTS no kit" }]
 # PLAY-dOrderedCharter-17: the edges this core kit keeps to a non-core one, each a declared slot with
 # its fallback. The Landed-unclosed column replaced the drift-audit `requires_if` row: under
 # LIVE_LANDED_UNCLOSED=1 with no drift-audit kit the render proceeds and the column reads
@@ -15,6 +15,9 @@ optional = [
   { part = "gen_build_index.py", point = "point.memory.live-column", fallback = "the Landed-unclosed column renders not-installed: drift-audit" },
   { part = "check-memory-hygiene.test.sh", point = "point.memory.consult", fallback = "the map arms skip with the slot line, their assertions counted" },
   { part = "legacy_ledger.py", point = "point.memory.record-home", fallback = "with no deployer registry tracked, the registrations are the kit descriptors' own [[ledger]] tables" },
+  { part = "kit.toml", point = "point.memory.consult", fallback = "the memory-recall row is a declaration and selects no kit" },
+  { part = "record_find.py", point = "point.memory.consult", fallback = "a question exits 2 with one refused line naming memory-recall, and a filter-only find reads no recall kit" },
+  { part = "record_kinds.py", point = "point.runtime.reading", fallback = "the Serves-alias join prints unarmed and reds nothing with no runlog kit; its fixture writes a runlog file of its own" },
 ]
 
 [[files]]
@@ -101,7 +104,7 @@ required_keys_render = ["MEMORY_ROOT", "READINESS_ROWS"]
 # declared one executes nothing.
 # BACKLOG_MODE's spelling is frozen — the transition audit classifies commits by it — so it is
 # declared here as well as in the conf example, and a sibling unit's `requires_if` names this entry.
-optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "SPEC_AUDIT_PIN_CUTOFF", "RECORD_UNDATED_ARTIFACTS", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF", "ARMS_FLOORS", "ARMS_REFUSALS", "BACKLOG_MODE", "ASK_CUTOFF", "BACKLOG_EXCERPT_CHARS", "PROBE_ALLOW", "ROUTED_COMMIT_CUTOFF", "ROUTED_COMMIT_WAIVED", "ROUTED_PATHS"]
+optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "SPEC_AUDIT_PIN_CUTOFF", "RECORD_UNDATED_ARTIFACTS", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF", "ARMS_FLOORS", "ARMS_REFUSALS", "BACKLOG_MODE", "ASK_CUTOFF", "BACKLOG_EXCERPT_CHARS", "PROBE_ALLOW", "ROUTED_COMMIT_CUTOFF", "ROUTED_COMMIT_WAIVED", "ROUTED_PATHS"]
 # TOOL-dTrueNorth-20 S1: the four DESIGN_* keys are gov's, the as-built view's and the deviation join's,
 # and blank or absent is off. Listed so govkit's check 7 resolves the unattended row's condition keys;
 # that check is the list's one reader and writes nothing. The example conf declares them blank, which
@@ -365,9 +368,12 @@ guard = [
   "{prefix}/lib/",
   "{prefix}/memory-tree/",
   "{prefix}/check-spec-tokens.py",
-  "{prefix}/policy/budgets.py",
-  "{prefix}/policy/policy.py",
-  "{prefix}/policy/presets.py",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "selftests"
 ceiling = 350
@@ -382,7 +388,16 @@ guard = ["{kit}/"]
 stage = ["step.test"]
 
 [gate_leg.gov]
-guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
+]
 chunk = "selftests"
 ceiling = 2690
 
@@ -399,9 +414,12 @@ stage = ["step.test"]
 guard = [
   "{prefix}/lib/",
   "{prefix}/memory-tree/",
-  "{prefix}/policy/budgets.py",
-  "{prefix}/policy/policy.py",
-  "{prefix}/policy/presets.py",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "selftests"
 ceiling = 300
@@ -418,7 +436,16 @@ stage = ["step.test"]
 enforces = ["practice.gate"]
 
 [gate_leg.gov]
-guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
+]
 chunk = "selftests"
 ceiling = 300
 
@@ -437,7 +464,16 @@ guard = ["{kit}/"]
 stage = ["step.test"]
 
 [gate_leg.gov]
-guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
+]
 chunk = "selftests"
 ceiling = 300
 
@@ -483,7 +519,16 @@ stage = ["step.test"]
 enforces = ["practice.gate"]
 
 [gate_leg.gov]
-guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
+]
 chunk = "selftests"
 ceiling = 300
 
@@ -525,6 +570,11 @@ guard = [
   "{prefix}/memory-tree/",
   "{prefix}/unattended/lib-unattended.sh",
   "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "selftests"
 ceiling = 660
@@ -651,6 +701,15 @@ consumer = "corpus_ids.py"
 probe = ["bash", "{own}", "--print-rotated-archive-ere"]
 expect = '\A[^\n]+\n?\Z'
 consumer = "row_grammar.py"
+# TOOL-dTotalRecall-5 S5: the slug grammar's export, the module's ERE run once through the script's python.
+[[contract.clause]]
+probe = ["bash", "{own}", "--print-slug-re"]
+expect = '\A\^\([^\n]+\)\$\r?\n?\Z'
+consumer = "unattended:unattended.sh"
+[[contract.clause]]
+probe = ["bash", "{own}", "--print-slug-class"]
+expect = '\A[^\n]+\n?\Z'
+consumer = "unattended:unattended.sh review-harness:check-protocol-parity.test.sh"
 
 # ---------------------------------------------------------------- the GENERATED OUTPUTS this kit writes
 # TOOL-aWindowedPass-4. Paths a generator in this kit rewrites on its own schedule, usually from the
@@ -1019,6 +1078,39 @@ witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{t
 surfaces = ["conf-key:.memory-tree.conf#LIVE_ROW_PIN", "file:memory/project/conf-scalar-pins.txt"]
 needs-target = false
 
+# TOOL-dTotalRecall-20: dTotalRecall's three moves an adopter can see. The journal step grades the
+# target's `journal` records through the alias and writes nothing; the front-matter step grades each
+# build README's keys before the schema's refusal meets them, and writes nothing; the retag writes
+# each untagged record heading's derived anchor as its authored tag, only under the target's own
+# `memory.legacy-anchors = "retag"`, through a before-image its down restores. Each runs gov's code
+# over the target's files and none of the target's, so none needs the target.
+[[upgrade]]
+id = "memory-tree/serves-journal-read-as-log"
+up = ["python", "{gov}/govkit/steps/memory_journal_alias.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/memory_journal_alias.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/memory_journal_alias.py", "witness", "{target}"]
+resume = "atomic"
+surfaces = ["serves-kind:journal"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/readme-front-matter-graded"
+up = ["python", "{gov}/govkit/steps/memory_front_matter.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/memory_front_matter.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/memory_front_matter.py", "witness", "{target}"]
+resume = "atomic"
+surfaces = ["front-matter:build-readme"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/legacy-anchors-retag"
+up = ["python", "{gov}/govkit/steps/memory_retag.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/memory_retag.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/memory_retag.py", "witness", "{target}"]
+resume = "atomic"
+surfaces = ["record-headings:memory-root"]
+needs-target = false
+
 # THE RATCHET PACK (TOOL-dWitnessedBar-14): one leg per row of retrofit's `[ratchet]` table, each a verb
 # of `ratchet.py`; `untouched quiet` and `merge` are plants of `ratchet selftest`, and the touch join is
 # `build.scope`'s, printed unarmed by `ratchet.py --list`. An adopter receives these two legs; the
@@ -1059,3 +1151,17 @@ ceiling = 300
 [[command]]
 verb = "seen-red"
 run = "seen_red.py"
+
+[[gate_leg]]
+name = "shape-run records (each record equals its review line)"
+tag = "leg.memory-tree.shape-run-records-each-record-equals-its-review"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "compares each shape-run record with its review line"
+argv = ["python3", "{kit}/shape_run.py", "--check"]
+subject = "repo"
+enforces = ["practice.one-fact"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "records"
+ceiling = 125

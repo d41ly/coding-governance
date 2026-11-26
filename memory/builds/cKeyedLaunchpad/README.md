@@ -264,3 +264,12 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md` (CHANGES REQUESTED), `2026-08-13-review-KICK-cKeyedLaunchpad-3-1.md` (BLOCKED) |
+| card ref | `refs/gov/builds/cKeyedLaunchpad/card` |
+<!-- /gen:build-routes -->

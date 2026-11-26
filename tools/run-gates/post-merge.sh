@@ -285,7 +285,9 @@ read_remote_red() { # -> rc 0 with PM_RED_STATE present|absent and PM_RED_SHA; r
 # GOVREF_WHY. An EMPTY source returns 2 `no source` and pushes nothing, so a failed build captured as
 # `c=$(build_gov_commit …)` is never a deletion; `remove_gov_ref` is the one deletion form, its
 # expected sha non-empty, and it reaches the same push and porcelain read through `write_gov_ref`,
-# which admits an empty source only when `remove_gov_ref` is its caller.
+# which admits an empty source only when `remove_gov_ref` is its caller. NO CLAIM REF IS PRUNED
+# (TOOL-dTotalRecall-3 S5): `remove_gov_ref` returns 2 for any ref under `refs/gov/claims/`, a slug's
+# claim and an ask family's counter, naming the rule in GOVREF_WHY, before it reaches the push.
 # THE CALLER SETS THREE NAMES: GOVREF_RUNNER, a function taking `<outfile> <git args…>` that runs git
 # bounded and writes its stdout to the file; GOVREF_REMOTE, the remote NAME the push names, so the
 # pre-push hook observes `<name>/HEAD`; GOVREF_GITDIR, the git dir whose `pre-push-refusal` a hook
@@ -354,6 +356,7 @@ write_gov_ref() {    # ref · expected sha or empty · src · [lower commit ...]
 }
 remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref's deletion
   GOVREF_WHY=""
+  case "$1" in refs/gov/claims/*) GOVREF_WHY="a ref under refs/gov/claims/ is never deleted: a claim and a counter are append-only"; return 2 ;; esac
   [ -n "$2" ] || { GOVREF_WHY="no expected sha"; return 2; }
   write_gov_ref "$1" "$2" ""
 }
@@ -364,12 +367,14 @@ remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref'
 # the common dir, taken through `write_dir_lock_wait` with the stem `node`, so a stale break appends
 # `node-lock-broken` or `node-guard-cleared`. NODE_LOCK_BOUND is the seconds a node lock may hold,
 # a pinned literal over every section it covers (TOOL-dPlacedRequest-49 S33): the feed append,
-# `add_feed_event`; the queue's append, `add_gov_queue`, and its flush's two file passes,
+# `write_feed_lines`, for `add_feed_event` and for `add_record_events`, whose walk runs under the lock
+# (TOOL-dTotalRecall-24); the queue's append, `add_gov_queue`, and its flush's two file passes,
 # `write_gov_queue`, which pushes with no lock held; the offline write's hold through
 # `write_gov_queue_hold`, from its read of the queue through its append, which builds the commit but
-# never pushes; and `write_request_record`'s compare, copy and `.typed` append. The longest is the
-# offline write's hold, measured once on node d on 2026-11-20 over the lease fixture:
-# 1.412 s, PINNED, under this bound.
+# never pushes; and `write_request_record`'s compare, copy and `.typed` append. The offline write's
+# hold, measured once on node d on 2026-11-20 over the lease fixture: 1.412 s, PINNED. The longest is
+# a node's first record walk, over gov's whole history to 55f322f29 (69,097 events), measured once on
+# 2026-11-23 by TOOL-dTotalRecall-24's pass: 4.01 s, PINNED, under this bound.
 NODE_LOCK_BOUND=10
 # THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory (TOOL-aPiecewiseGrade-6), moved into this
 # block (TOOL-dPlacedRequest-24) so every carrier holds the one definition. `write_dir_lock` takes the
@@ -507,7 +512,8 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # torn line stays for `check_feed` to name. A failure prints ONE `feed: NOTE -` line on stderr and
 # returns 0, as the health log's appender does: the governance write already landed.
 # THE CONTAINED APPEND (TOOL-dPlacedRequest-39): the clock test, the common dir and the git reads run
-# in the caller's shell; the lock, the key check, the counter and the append run in a subshell whose
+# in the caller's shell; the lock, the key check, the counter and the append run in a subshell, which
+# `write_feed_lines` holds for both appenders since TOOL-dTotalRecall-24, whose
 # `EXIT` trap is armed BEFORE the take (TOOL-dPlacedRequest-49 S6) and acts only once `write_dir_lock`
 # has set `_fl_mine`, which the subshell empties first: it then releases the lock directory where its
 # `owner` reads this call's token, and clears one with no `owner` only while no `gov-feed.lock.break`
@@ -538,11 +544,76 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # gives two events one `seq` and loses none; `seq` and `seen-utc` are node-local and never compared; a
 # ref's events from before a deletion of it are outside every chain git holds and are not compared;
 # a retry made after another event of its ref landed appends again, an event that did happen.
+# RECORD EVENTS, I17 (TOOL-dTotalRecall-24): every landed commit that touches a record joins the feed
+# as one line per distinct key: `ref` the landed branch's remote name, `refs/heads/<default>`, `kind`
+# `record`, `blob` the record file's blob at that commit (`-` where the file is absent after it) and
+# `commit` the commit, so two files of one commit sharing a blob give one event. A record is any
+# tracked path under MEMORY_ROOT, read by `read_record_root` from the top level's `.memory-tree.conf`,
+# sourced in a subshell with MEMORY_ROOT unset first; none declared reads `memory`, and a value that is
+# no plain relative path (a byte outside `A-Za-z0-9_./-`, a leading `/`, a `..` segment) is refused:
+# the appender prints one `feed: NOTE -` line, the check `unread <ref> MEMORY_ROOT <value>`.
+# `derive_record_events` is ONE `git log --reverse --topo-order --no-merges --raw --no-abbrev` over
+# `<from>..<tip>`, a parent's events before its child's. `add_record_events`, which the lander calls
+# on each landing's success, walks from the feed's newest `record` commit of the ref, read under the
+# lock, so a landing another node made and this one only fetched joins too. THE SHARED CORE,
+# `write_feed_lines`, is the one append path: under the node lock it runs the caller's row builder
+# against the log, numbers its rows from one more than the larger of the counter and the log's last
+# `seq`, closes a torn last byte, appends every row in one write and writes the counter once.
+# `add_feed_event`'s builder is its append-once read, `derive_feed_row`; a record range's is
+# `derive_record_rows`, which leaves out every row whose ref, blob and commit a `record` line already
+# holds, so a merge landing, whose walk re-lists commits the start does not dominate, appends each key
+# once (TOOL-dTotalRecall-115). `check_feed`'s record arm walks from every `record` commit of the ref
+# any branch or remote-tracking branch reaches, and compares the keys that walk derives with the feed's
+# keys as SETS, `missing` and `extra`, and prints `duplicate` for a key a second line holds.
+# WHAT THIS DOES NOT CHECK: records outside MEMORY_ROOT; a landing pushed past the lander until a
+# later landing's walk appends it; a planted line naming a side branch's commit, which makes that
+# branch's record commits read `missing`.
 # A staging name beside <dest> that nobody can know before it is written: <dest>.<SRANDOM twice>.tmp, or
 # mktemp -u's where bash has no SRANDOM; 1 when neither names one. The run-gates runner carries the same line.
 derive_temp_path() { if [ -n "${SRANDOM:-}" ]; then printf -v "$1" '%s.%s%s.tmp' "$2" "$SRANDOM" "$SRANDOM"; else printf -v "$1" '%s' "$(mktemp -u "$2.XXXXXXXX" 2>/dev/null)"; [ -n "${!1}" ]; fi; }
+write_feed_lines() { # common dir · what the rows are, for a NOTE · row builder… -> the contained append's exit: 0, 3 the lock busy, 4 the builder refused, else aborted
+  local d="$1" what="$2" tok rows text s=0 l n m now rc=0
+  shift 2
+  tok="$BASHPID.$RANDOM"
+  ( _fl_mine=
+    trap '[ -z "$_fl_mine" ] || { [ -s "$d/gov-feed.lock/owner" ] || [ -e "$d/gov-feed.lock.break" ] || rm -rf "$d/gov-feed.lock"; remove_dir_lock "$d/gov-feed.lock" "$tok"; }' EXIT
+    write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3
+    rows=$("$@" "$d/gov-feed.log") || exit 4
+    [ -n "$rows" ] || exit 0
+    if [ -f "$d/gov-feed.seq" ]; then { read -r s <"$d/gov-feed.seq"; } 2>/dev/null || :; fi
+    s=${s%$'\r'}
+    case "$s" in ""|*[!0-9]*) s=0 ;; esac
+    l=0
+    if [ -s "$d/gov-feed.log" ]; then
+      l=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 0 }' "$d/gov-feed.log" 2>/dev/null) || l=0
+      case "$l" in ""|*[!0-9]*) l=0 ;; esac
+      [ -z "$(tail -c1 "$d/gov-feed.log" 2>/dev/null)" ] || printf '\n' >>"$d/gov-feed.log"
+    fi
+    n=$(( (10#$s > 10#$l ? 10#$s : 10#$l) + 1 ))
+    TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+    text=$(printf '%s\n' "$rows" | awk -v n="$n" -v now="$now" '{ sub(/\r$/, "") } NF { print n++ "\t" $0 "\t" now }') || exit 5
+    m=${text##*$'\n'}; m=${m%%$'\t'*}
+    if ! printf '%s\n' "$text" >>"$d/gov-feed.log" 2>/dev/null; then
+      printf 'feed: NOTE - %s/gov-feed.log could not be written, so %s is not in the feed\n' "$d" "$what" >&2
+    elif st=""; ! { derive_temp_path st "$d/gov-feed.seq" && printf '%s\n' "$m" >"$st" && mv -f "$st" "$d/gov-feed.seq"; } 2>/dev/null; then
+      [ -z "$st" ] || rm -f "$st" 2>/dev/null
+      printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
+    fi
+    exit 0 ) || rc=$?
+  return "$rc"
+}
+# The append-once read (TOOL-dPlacedRequest-27): nothing where the ref's newest line holds this key.
+derive_feed_row() {  # ref · kind · blob · commit · feed log -> `ref TAB kind TAB blob TAB commit`, or nothing
+  if [ -f "$5" ] && FEED_EV="$1"$'\t'"$3"$'\t'"$4" awk -F'\t' '
+      BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
+      $2 == ev[1] { p = $4 "\t" $5 }
+      END { exit !(p == ev[2] "\t" ev[3]) }' "$5" 2>/dev/null; then
+    return 0
+  fi
+  printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4"
+}
 add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the event appended once
-  local ref="$1" c="${2:-}" d k t=- r s=0 l n now tok rc=0
+  local ref="$1" c="${2:-}" d k t=- r rc=0
   [ -n "${EPOCHSECONDS:-}" ] || { printf 'feed: NOTE - no EPOCHSECONDS, bash 5 or later is required\n' >&2; return 0; }
   [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
   d=${GOVFEED_DIR%$'\r'}
@@ -556,34 +627,7 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     [ "${#c}:${#t}" = 40:40 ] || c=""
     case "$c$t" in *[!0-9a-f]*|"") printf 'feed: NOTE - %s names no commit this clone holds, so the write is not in the feed\n' "$ref" >&2; return 0 ;; esac
   fi
-  tok="$BASHPID.$RANDOM"
-  ( _fl_mine=
-    trap '[ -z "$_fl_mine" ] || { [ -s "$d/gov-feed.lock/owner" ] || [ -e "$d/gov-feed.lock.break" ] || rm -rf "$d/gov-feed.lock"; remove_dir_lock "$d/gov-feed.lock" "$tok"; }' EXIT
-    write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3
-    if [ -f "$d/gov-feed.log" ] && FEED_EV="$ref"$'\t'"$t"$'\t'"$c" awk -F'\t' '
-        BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
-        $2 == ev[1] { p = $4 "\t" $5 }
-        END { exit !(p == ev[2] "\t" ev[3]) }' "$d/gov-feed.log" 2>/dev/null; then
-      exit 0
-    fi
-    if [ -f "$d/gov-feed.seq" ]; then { read -r s <"$d/gov-feed.seq"; } 2>/dev/null || :; fi
-    s=${s%$'\r'}
-    case "$s" in ""|*[!0-9]*) s=0 ;; esac
-    l=0
-    if [ -s "$d/gov-feed.log" ]; then
-      l=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 0 }' "$d/gov-feed.log" 2>/dev/null) || l=0
-      case "$l" in ""|*[!0-9]*) l=0 ;; esac
-      [ -z "$(tail -c1 "$d/gov-feed.log" 2>/dev/null)" ] || printf '\n' >>"$d/gov-feed.log"
-    fi
-    n=$(( (10#$s > 10#$l ? 10#$s : 10#$l) + 1 ))
-    TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
-    if ! printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$ref" "$k" "$t" "$c" "$now" >>"$d/gov-feed.log" 2>/dev/null; then
-      printf 'feed: NOTE - %s/gov-feed.log could not be written, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2
-    elif st=""; ! { derive_temp_path st "$d/gov-feed.seq" && printf '%s\n' "$n" >"$st" && mv -f "$st" "$d/gov-feed.seq"; } 2>/dev/null; then
-      [ -z "$st" ] || rm -f "$st" 2>/dev/null
-      printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
-    fi
-    exit 0 ) || rc=$?
+  write_feed_lines "$d" "this write of $ref at $c" derive_feed_row "$ref" "$k" "$t" "$c" || rc=$?
   case "$rc" in
     0) ;;
     3) printf 'feed: NOTE - the feed lock in %s was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2 ;;
@@ -601,6 +645,69 @@ write_feed_success() { # ref · commit, or empty for a deletion -> 0 always; the
   else git update-ref -d "refs/gov/remote/${1#refs/gov/}" 2>/dev/null; fi \
     || printf 'feed: NOTE - the cache ref refs/gov/remote/%s was not set to this write\n' "${1#refs/gov/}" >&2
   add_feed_event "$1" "${2:-}"
+  return 0
+}
+read_record_root() { # -> the memory root, `memory` where no conf declares one; rc 1 printing the value when it is no plain relative path
+  local top v=""
+  top=$(git rev-parse --show-toplevel 2>/dev/null) || top=""
+  top=${top%$'\r'}
+  if [ -n "$top" ] && [ -f "$top/.memory-tree.conf" ]; then
+    v=$( set +u; unset MEMORY_ROOT; . "$top/.memory-tree.conf" >/dev/null 2>&1; printf '%s' "${MEMORY_ROOT-}" )
+  fi
+  v=${v%$'\r'}
+  [ -n "$v" ] || v=memory
+  case "/$v/" in *[!A-Za-z0-9_./-]*|//*|*/../*) printf '%s' "$v"; return 1 ;; esac
+  while [ "${v%/}" != "$v" ]; do v=${v%/}; done
+  printf '%s' "$v"
+}
+derive_record_events() { # ref · tip · [from] -> `ref TAB record TAB blob TAB commit` per distinct key, parents first; rc 1 git refused the walk, 2 MEMORY_ROOT refused
+  local root top out
+  root=$(read_record_root) || return 2
+  top=$(git rev-parse --show-toplevel 2>/dev/null) || return 1
+  top=${top%$'\r'}
+  out=$(git -C "$top" -c core.quotePath=false log --reverse --topo-order --no-merges --no-renames --raw --no-abbrev \
+    --root --no-color --format=%H "${3:+$3..}$2" -- "$root/" 2>/dev/null) || return 1
+  [ -n "$out" ] || return 0
+  printf '%s\n' "$out" | awk -v ref="$1" '
+    { sub(/\r$/, "") }
+    length($0) == 40 && $0 !~ /[^0-9a-f]/ { c = $0; next }
+    substr($0, 1, 1) == ":" && c != "" {
+      split($0, t, "\t"); split(t[1], m, " "); b = m[4]
+      if (b !~ /[^0]/) b = "-"
+      if ((c SUBSEP b) in seen) next
+      seen[c, b] = 1; printf "%s\trecord\t%s\t%s\n", ref, b, c }'
+}
+# The record range's builder: the walk from the newest `record` line of <ref>, in file order, less every key the log holds.
+derive_record_rows() { # ref · tip · feed log -> derive_record_events' rows the log does not hold, walked from that line's commit, the whole history where none
+  local from="" rows
+  if [ -f "$3" ]; then
+    from=$(awk -F'\t' -v ref="$1" '{ sub(/\r$/, "") } NF == 6 && $2 == ref && $3 == "record" { c = $5 } END { print c }' "$3" 2>/dev/null) || return 1
+  fi
+  rows=$(derive_record_events "$1" "$2" ${from:+"$from"}) || return 1
+  [ -n "$rows" ] || return 0
+  FEED_FILE="$3" awk -F'\t' '
+    BEGIN { f = ENVIRON["FEED_FILE"]; while ((getline ln < f) > 0) { sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") == 6 && x[3] == "record") k[x[2] SUBSEP x[4] SUBSEP x[5]] = 1 } }
+    !(($1 SUBSEP $3 SUBSEP $4) in k)' <<<"$rows"
+}
+add_record_events() { # ref · tip -> 0 always; the record events of every commit after the feed's newest one of <ref> to <tip> appended once
+  local ref="$1" c d r rc=0
+  [ -n "${EPOCHSECONDS:-}" ] || { printf 'feed: NOTE - no EPOCHSECONDS, bash 5 or later is required\n' >&2; return 0; }
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  d=${GOVFEED_DIR%$'\r'}
+  [ -n "$d" ] || { printf 'feed: NOTE - no git common dir resolves here, so the record events of %s are not in the feed\n' "$ref" >&2; return 0; }
+  r=$(read_record_root) || { printf 'feed: NOTE - MEMORY_ROOT %s is no plain relative path, so no record event of %s was appended\n' "$r" "$ref" >&2; return 0; }
+  c=$(git rev-parse --verify -q "${2:-}^{commit}" 2>/dev/null) || c=""
+  c=${c%$'\r'}
+  case "$c" in *[!0-9a-f]*) c="" ;; esac
+  [ "${#c}" = 40 ] || { printf 'feed: NOTE - %s names no commit this clone holds, so no record event of %s was appended\n' "${2:-}" "$ref" >&2; return 0; }
+  write_feed_lines "$d" "the record events of $ref to $c" derive_record_rows "$ref" "$c" || rc=$?
+  case "$rc" in
+    0) ;;
+    3) printf 'feed: NOTE - the feed lock in %s was held for 5s, so the record events of %s to %s are not in the feed\n' "$d" "$ref" "$c" >&2 ;;
+    4) printf 'feed: NOTE - git could not walk the records of %s to %s, so no record event was appended\n' "$ref" "$c" >&2 ;;
+    *) printf 'feed: NOTE - %s: the record append exited %s\n' "$ref" "$rc" >&2 ;;
+  esac
   return 0
 }
 derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob TAB commit` per event, per ref oldest first
@@ -635,7 +742,7 @@ add_feed_sightings() { # cache prefix -> 0 always; every unseen commit of a cach
   return 0
 }
 check_feed() {       # cache prefix · [feed file, the node's by default] -> one line per finding and rc 1, or rc 0
-  local pre="${1%/}/" f="${2:-}" dv au
+  local pre="${1%/}/" f="${2:-}" dv au rc=0 rf root rr g tips dr
   if [ -z "$f" ]; then
     [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
     f="${GOVFEED_DIR%$'\r'}/gov-feed.log"
@@ -656,6 +763,7 @@ check_feed() {       # cache prefix · [feed file, the node's by default] -> one
       while ((getline ln < f) > 0) {
         sub(/\r$/, "", ln)
         if (split(ln, x, "\t") != 6) { print "torn " ln; bad = 1; continue }
+        if (x[3] == "record") continue
         k = x[4] SUBSEP x[5]
         if ((x[2] in last) && last[x[2]] == k) { print "duplicate " x[2] " " x[5]; bad = 1; continue }
         last[x[2]] = k
@@ -672,7 +780,42 @@ check_feed() {       # cache prefix · [feed file, the node's by default] -> one
         }
         if (off != "") { print "order " g " " off; bad = 1 }
       }
-      exit bad }'
+      exit bad }' || rc=1
+  # THE RECORD ARM (TOOL-dTotalRecall-24 S6): per ref carrying `record` lines, the walk from
+  # every such line's commit a branch or remote-tracking branch reaches, compared as sets.
+  [ -f "$f" ] || return "$rc"
+  rf=$(awk -F'\t' '{ sub(/\r$/, "") } NF == 6 && $3 == "record" && !($2 in s) { s[$2] = 1; print $2 }' "$f" 2>/dev/null)
+  [ -n "$rf" ] || return "$rc"
+  if ! root=$(read_record_root); then
+    for g in $rf; do printf 'unread %s MEMORY_ROOT %s\n' "$g" "$root"; done
+    return 1
+  fi
+  rr=$(git rev-list --branches --remotes 2>/dev/null)
+  for g in $rf; do
+    tips=$(FEED_FILE="$f" awk -F'\t' -v ref="$g" '
+      { sub(/\r$/, ""); r[$0] = 1 }
+      END { f = ENVIRON["FEED_FILE"]
+            while ((getline ln < f) > 0) { sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") == 6 && x[2] == ref && x[3] == "record" && (x[5] in r) && !(x[5] in t)) {
+                t[x[5]] = 1; print x[5] } } }' <<<"$rr")
+    dr=""
+    if [ -n "$tips" ] && ! dr=$(derive_record_events "$g" --stdin <<<"$tips"); then
+      printf 'unread %s walk\n' "$g"; rc=1; continue
+    fi
+    printf '%s\n' "$dr" | FEED_FILE="$f" awk -F'\t' -v ref="$g" '
+      { sub(/\r$/, "") } NF == 4 { d[$3 SUBSEP $4] = 1; dc[$3 SUBSEP $4] = $4; o[++n] = $3 SUBSEP $4 }
+      END { f = ENVIRON["FEED_FILE"]; bad = 0
+            while ((getline ln < f) > 0) { sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") != 6 || x[2] != ref || x[3] != "record") continue
+              k = x[4] SUBSEP x[5]
+              if (k in got) { print "duplicate " ref " " x[5]; bad = 1; continue }
+              got[k] = 1
+              if (!(k in d) && !(("extra " x[5]) in said)) { said["extra " x[5]] = 1; print "extra " ref " " x[5]; bad = 1 } }
+            for (i = 1; i <= n; i++) if (!(o[i] in got) && !(("missing " dc[o[i]]) in said)) {
+              said["missing " dc[o[i]]] = 1; print "missing " ref " " dc[o[i]]; bad = 1 }
+            exit bad }' || rc=1
+  done
+  return "$rc"
 }
 write_feed() {       # cache prefix -> rc 0 the derived feed written, rc 2 naming a feed already present
   local pre="${1%/}/" d now n=0 l lt="" st=""

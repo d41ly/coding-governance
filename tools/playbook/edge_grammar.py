@@ -4,6 +4,7 @@
     python edge_grammar.py --list
     python edge_grammar.py --parse <file>
     python edge_grammar.py --check [--base <rev>]
+    python edge_grammar.py --cardinality [--registry]
     python edge_grammar.py --fixture --plant <case>
 
 THE REGISTRY is `edges.toml` beside this file: one `[[edge]]` row per type of one closed set, with
@@ -22,10 +23,12 @@ line per type, outside code fences. A target holds no space, comma or bracket an
 `tag` (`TAG_RE`), `pinned-tag` (`<tag>@<hash8>`), `section` (`<tag>#<seg>`), `id` (a native id),
 `id#tag` (`<id>#<seg>(.<seg>)*`) or `pinned-id` (`<id>@<hash8>`). A pinned tag is legal only on a row
 whose `pin` is `tag` (`amends`, `supersedes`), a pinned id only on one whose `pin` is `clause`
-(`carries-clause`); a final eight-hex run behind `:`, `/` or `=` is red, since a pin is written `@<hash8>`.
+(`carries-clause`, `caused-by`); a final eight-hex run behind `:`, `/` or `=` is red, since a pin is written `@<hash8>`.
 
-THE SITES, one adapter each: a record's header (`**Serves:**` through `tree_lib.read_bindings`,
-`**Caused-by:**`, `**Made-by:**`), a record's section (`**Edges:**`), an instruction unit's row (`edges`,
+THE SITES, one adapter each: a record's header (`check_header_edges` over memory-tree's one header
+reader, `tree_lib.read_header_edges`: `**Serves:**` through `tree_lib.read_bindings`, and `Caused-by` and
+`Made-by`, an untyped record's column-0 `**Caused-by:**` line, a typed record's `- **Caused-by:**` field,
+a key given twice refused), a record's section (`**Edges:**`), an instruction unit's row (`edges`,
 `scope`, `required-by`, `enforced-by`, read through the registry's `parse_unit_rows`), a leg row of the leg manifest
 (`gate-legs.json`: its `tests` and `enforces` lists, sourced at its `tag`, TOOL-dWitnessedBar-22), code (a `gov:note` line's `refs=` segment), a commit's trailers
 (the `[[trailer]]` table; a `serves` value is edges only when every target passes the grammar, and a
@@ -37,10 +40,19 @@ committed revision of its unit's text hashes to its pin (`derive_pin_hash`); a n
 resolver prints it; a pinned clause id when the clause's text in some committed revision of the design
 view hashes to its pin (`derive_clause_hash`), the baseline's included.
 
-Every line opens `edges:`. Exit 0 green, 1 red or a malformed edge line, 2 an unreadable registry.
+CARDINALITY (TOOL-dTotalRecall-22). Every declared row carries `cardinality = { per-source, per-target }`,
+each a positive integer or `many`. `--cardinality` counts every edge `read_tree_edges` reads with no base,
+plus the build README relations `gen_build_index.py --print-relations` prints, each target's pin cut, per
+source and per target through `design_lib.check_edge_bounds`, the one counter the as-built view's head rule
+uses too; `--registry` also compares the kind registry's `cardinality` cells with the cells the bounds
+derive. Its lines open `cardinality:`; it exits 1 on a violation, 0 with the counts read, 2 on an
+unreadable registry or a failed `--print-relations`.
+
+Every other line opens `edges:`. Exit 0 green, 1 red or a malformed edge line, 2 an unreadable registry.
 What it does not check: an edge's source against its row's `from`, since no source namespace (record,
-commit, act) is registered; an `id#tag` target, `unarmed` until dTotalRecall arms the record namespace;
-an id whose class is not registered, `unarmed`; a `serves` target no spec defines, which check 21
+commit, act) is registered (an `id#tag` target resolves through memory-tree's `record_find.read_section`,
+the reader `record show` runs, TOOL-dTotalRecall-9 S5);
+an id whose class is not registered, `unarmed`, as is a tag whose registered namespace defines none; a `serves` target no spec defines, which check 21
 reds, so `--check` counts it as unresolved and adds no second verdict; and two leg-row marks, each
 `unarmed` and counted on an `edges: leg rows` line: a `tests` target whose namespace no registry row
 holds, until its build registers it, and an `enforces` target of the rule-member form
@@ -118,7 +130,6 @@ FORMS = (
 )
 #: the pin word each pinned form needs on its row
 PIN_OF = {"pinned-tag": "tag", "pinned-id": "clause"}
-HEADER_RE = re.compile(r"^\*\*(Caused-by|Made-by):\*\*[ \t]+(\S.*?)[ \t]*$")
 NOTE_RE = re.compile(r"^[ \t]*(?:#+|//|--|;|/?\*+|<!--)[ \t]*gov:note[ \t].*?[ \t]refs=(.*?)[ \t]*(?:-->|\*/)?[ \t]*$")
 UNIT_FIELDS = (("scope", "instructs", False), ("required-by", "instructs", True), ("enforced-by", "enforces", True))
 #: the leg manifest's file name, and the row keys its site reads as edges of the type each names
@@ -127,6 +138,9 @@ LEG_EDGE_KEYS = ("tests", "enforces")
 #: each leg-row mark's `edges: leg rows` wording, keyed by the edge type it marks
 LEG_UNARMED = {"tests": "tests target(s) unarmed until their namespace is registered",
                "enforces": "enforces target(s) unarmed, practice rules core meta-check grades"}
+#: TOOL-dTotalRecall-22 S1: the two ends a declared row's `cardinality` bounds, each a positive integer or `many`
+CARDINALITY_ENDS = ("per-source", "per-target")
+BOUND_RE = re.compile(r"[1-9][0-9]*")
 
 
 class EdgeError(RuntimeError):
@@ -145,9 +159,21 @@ def read_toml_rows(path, table, label) -> list:
         raise EdgeError(f"the {label} {path.as_posix()} is unreadable: {exc}") from None
 
 
+def parse_bound(value):
+    """One end of a `cardinality`: an int for a positive integer (a TOML integer or its decimal string),
+    `"many"` for `many`, None for anything else."""
+    if value == "many":
+        return "many"
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value if value > 0 else None
+    return int(value) if isinstance(value, str) and BOUND_RE.fullmatch(value) else None
+
+
 def read_edge_types(path=None) -> dict:
     """`{type: row}` of the registry's `[[edge]]` rows, each carrying every field of EDGE_FIELDS, or
-    EdgeError: a missing field, a `pin` or `status` outside its words, a type or inverse named twice."""
+    EdgeError: a missing field, a `pin` or `status` outside its words, a type or inverse named twice, a
+    declared row with no `cardinality` of exactly CARDINALITY_ENDS, each a positive integer or `many`, and
+    a derived row carrying one (TOOL-dTotalRecall-22 S1)."""
     path = pathlib.Path(path or KIT_DIR / "edges.toml")
     types, words = {}, set()
     for i, row in enumerate(read_toml_rows(path, "edge", "edge registry"), 1):
@@ -157,6 +183,17 @@ def read_edge_types(path=None) -> dict:
         if row["pin"] not in ("none", "tag", "clause") or row["status"] not in ("declared", "derived"):
             raise EdgeError(f"{path.as_posix()}: edge '{row['type']}' has pin '{row['pin']}' and status "
                             f"'{row['status']}': pin is none, tag or clause, status declared or derived")
+        card = row.get("cardinality")
+        if row["status"] == "derived" and card is not None:
+            raise EdgeError(f"{path.as_posix()}: edge '{row['type']}' (row {i}) is derived and carries cardinality: "
+                            "a derived type is never declared, so nothing counts it")
+        if row["status"] == "declared" and not (
+                isinstance(card, dict) and sorted(card) == sorted(CARDINALITY_ENDS)
+                and all(parse_bound(card[end]) is not None for end in CARDINALITY_ENDS)):
+            raise EdgeError(f"{path.as_posix()}: edge '{row['type']}' (row {i}) "
+                            + ("lacks cardinality" if card is None else f"has cardinality {card!r}")
+                            + ": a declared row carries cardinality = { per-source, per-target }, each a positive "
+                              "integer or \"many\"")
         for word in (row["type"], row["inverse"]):
             if word in words:
                 raise EdgeError(f"{path.as_posix()}: '{word}' is named twice as a type or an inverse")
@@ -311,24 +348,17 @@ def read_section_edges(text, path) -> list[dict]:
     return parse_edge_lines(text, path)
 
 
-def read_header_edges(text, path, binding=None) -> list[dict]:
-    """A record header's edges: `**Serves:**` as `serves`, its ids `tree_lib.read_bindings`' (`binding`, that
-    reader's row for `path`, None for a text it did not read), and the column-0 `**Caused-by:**` and
-    `**Made-by:**` lines of the same head as `caused-by` and `made-by`, one target each, backticks cut."""
+def check_header_edges(text, path, binding=None) -> list[dict]:
+    """A record header's edges, read by memory-tree's one reader and graded by the one target grammar
+    (TOOL-dTotalRecall-39 S1): `tree_lib.read_header_edges`, looked up on the module `load_memory_tree`
+    returns at each call, so a wrap of that reader is the one this site reaches. `binding` is
+    `tree_lib.read_bindings`' row for `path`, None for a text it did not read. The reader's ValueError on a
+    key given twice is one EdgeRefusal, its message on the second line, the line the walk collects."""
     tree_lib, _ = ti.load_memory_tree()
-    edges = []
-    for n, line in list(tree_lib.unfenced_lines(text))[:tree_lib.BIND_HEAD_LINES]:
-        if line is None:
-            break
-        mb = tree_lib.BIND_RE.match(line)
-        if binding and binding.get("ids") and mb and mb.group("key") == "Serves":
-            edges.append({"path": path, "line": n, "type": "serves", "targets": list(binding["ids"]), "site": "header"})
-            binding = None
-            continue
-        m = HEADER_RE.match(line)
-        if m:
-            edges.append({"path": path, "line": n, "type": m.group(1).lower(), "targets": [m.group(2).strip("`")],
-                          "site": "header"})
+    try:
+        edges = tree_lib.read_header_edges(text, path, binding)
+    except ValueError as exc:
+        raise EdgeRefusal(f"edges: {path}: 1 header line(s) refused:\n  {exc}") from None
     return check_site_targets(edges, path)
 
 
@@ -604,19 +634,30 @@ def read_tag_rows(rc, address):
         ctx = ti.derive_context(rc["root"], rc["ns_path"])
         rc["con"] = ti.load_index(rc["root"])
         ti.load_view(rc["con"], rc["root"], ctx)
+        rc["armed"] = ti.derive_namespace_state(rc["con"], ctx)
     return ti.resolve_address(rc["con"], address, "leaf")
 
 
 def resolve_edge(target, rc) -> tuple[str, str]:
     """`(state, row or reason)` of one target: `resolved` with its target's row, `red` with why,
-    `unresolved` for an id its class does not hold, `unarmed` for a form or class not armed here."""
+    `unresolved` for an id its class does not hold, `unarmed` for a form, class or namespace not armed here,
+    a registered namespace no tag of the tree is defined in among them (TOOL-dTotalRecall-114 S27)."""
     import design_lib
     form, ns = parse_edge_target(target)
     base, _, pin = target.partition("@")
-    if form == "id#tag":
-        return "unarmed", "an id#tag target resolves once dTotalRecall arms the record namespace"
+    if form == "id#tag":   # TOOL-dTotalRecall-9 S5: the one section reader `record show` runs
+        ti.load_memory_tree()  # puts memory-tree, the finder's kit, on the path
+        import record_find
+        try:
+            sec = record_find.read_section(rc["root"], target)
+        except record_find.FindError as exc:
+            return "red", str(exc)
+        first = sec["text"].splitlines()[0] if sec["text"] else ""
+        return "resolved", f"{target} · {sec['path']}:{sec['line']}-{sec['end_line']} · {first}"
     if ns is not None:
         rows = read_tag_rows(rc, base)
+        if not rows and rc["armed"].get(ns) == 0:
+            return "unarmed", f"the namespace {ns} defines no tag in this tree"
         if not rows:
             return "red", "resolves to no row of the tag index"
         r = rows[0]
@@ -704,7 +745,7 @@ def read_tree_edges(root, base) -> tuple[list, list]:
             continue
         try:
             if md:
-                edges += read_header_edges(text, rel, bindings.get(rel))
+                edges += check_header_edges(text, rel, bindings.get(rel))
                 if EDGE_HEAD in text:   # a text holding no edge head hides no edge line, fenced or not
                     edges += read_section_edges(text, rel)
                 if spec_re.fullmatch(rel):
@@ -779,6 +820,118 @@ def run_check(root, base) -> int:
     return 1 if reds else 0
 
 
+# ------------------------------------------------------------------------------------------ cardinality
+
+def derive_edge_bounds(types) -> dict:
+    """`{type: (per_source, per_target)}` of every declared row, each end an int or `"many"`, the bounds
+    `design_lib.check_edge_bounds` counts against (TOOL-dTotalRecall-22 S5)."""
+    return {t: tuple(parse_bound(r["cardinality"][end]) for end in CARDINALITY_ENDS)
+            for t, r in types.items() if r["status"] == "declared"}
+
+
+def derive_cardinality_cell(row, types) -> dict:
+    """The `cardinality` cell a kind registry row mirrors (TOOL-dTotalRecall-22 §4 "The mirror"): each
+    bounded type, one end not `many`, whose name equals a member of the row's `schema.fields` lower-cased,
+    with its `edges.toml` bounds as strings; `{}` when its fields name none."""
+    schema = row.get("schema") if isinstance(row.get("schema"), dict) else {}
+    fields = {f.lower() for f in schema.get("fields") or () if isinstance(f, str)}
+    return {t: {end: str(b) for end, b in zip(CARDINALITY_ENDS, bounds)}
+            for t, bounds in derive_edge_bounds(types).items() if bounds != ("many", "many") and t in fields}
+
+
+def check_cardinality_mirror(rows, types) -> list[str]:
+    """The kind registry's `cardinality` cells against the cells `derive_cardinality_cell` derives from
+    `edges.toml`, one red line each, naming the row, the type and both values: a cell that differs, a cell
+    missing, and a cell on a row whose fields name no bounded type (TOOL-dTotalRecall-22 S2)."""
+    reds = []
+    for n, row in enumerate(rows, 1):
+        name = row.get("name") or f"#{n}"
+        want, have = derive_cardinality_cell(row, types), row.get("cardinality")
+        at = f"cardinality: registry · {name} ·"
+        if not want and have is not None:
+            reds.append(f"{at} carries a cardinality cell, and its schema.fields name no bounded type of edges.toml")
+            continue
+        if want and not isinstance(have, dict):
+            reds.append(f"{at} carries no cardinality cell, and edges.toml derives "
+                        + ", ".join(f"{t} per-source \"{c['per-source']}\" per-target \"{c['per-target']}\""
+                                    for t, c in want.items()))
+            continue
+        for t in sorted({*want, *(have or {})}):
+            if t not in want:
+                reds.append(f"{at} {t} is in its cell, and its schema.fields name no bounded {t}")
+            elif not isinstance(have.get(t), dict):
+                reds.append(f"{at} {t} is missing from its cell, which edges.toml bounds")
+            else:
+                for end in CARDINALITY_ENDS:
+                    got = have[t].get(end)
+                    if str(got) != want[t][end]:
+                        reds.append(f"{at} {t} {end} is \"{got}\" here, \"{want[t][end]}\" in edges.toml")
+    return reds
+
+
+def read_relation_edges(root) -> list[dict]:
+    """The build README relations (TOOL-dTotalRecall-6 S8), one edge per `<source slug> TAB <type> TAB
+    <target> TAB <state>[ TAB <detail>]` line of memory-tree's `gen_build_index.py --print-relations` run
+    at `root`, its source the slug and its site the build's `README.md`; EdgeError on a non-zero exit."""
+    tree_lib, _ = ti.load_memory_tree()
+    import design_lib
+    m = design_lib.read_design_conf(root).get("MEMORY_ROOT", "memory").strip().strip("/") or "memory"
+    script = pathlib.Path(tree_lib.__file__).parent / "gen_build_index.py"
+    p = subprocess.run([sys.executable, str(script), "--print-relations"], cwd=str(root), capture_output=True,
+                       text=True, encoding="utf-8", errors="replace")
+    if p.returncode:
+        raise EdgeError(f"gen_build_index.py --print-relations exited {p.returncode}: {(p.stderr or p.stdout)[-300:]}")
+    edges = []
+    for ln in p.stdout.splitlines():
+        cells = ln.split("\t")
+        if len(cells) >= 4:
+            edges.append({"path": f"{m}/builds/{cells[0]}/README.md", "line": None, "type": cells[1],
+                          "targets": [cells[2]], "site": "readme", "source": cells[0]})
+    return edges
+
+
+def check_edge_cardinality(root, registry=False) -> tuple[int, list[str]]:
+    """`--cardinality [--registry]` (TOOL-dTotalRecall-22 S5): `(rc, lines)`. Every edge `read_tree_edges`
+    reads at `root` with no base, and the README relations, each target's pin cut, counted per source and
+    per target by `design_lib.check_edge_bounds` against `edges.toml`'s bounds; a source is the edge's
+    file, a README edge's its slug. With `registry`, `check_cardinality_mirror` over the kind registry
+    too. 1 with one line per violation, 0 with the counts read; EdgeError on an absent registry under
+    `registry` or a failed `--print-relations`.
+    What it does not check: two sources inside one file (unit rows, leg rows) count as one source, which
+    no bounded type reaches; a line `read_tree_edges` refuses counts no edge and is not graded, the edges
+    leg's red, but is printed with its record, `cardinality: refused · <refusal>` (TOOL-dTotalRecall-53 S12)."""
+    tree_lib, _ = ti.load_memory_tree()
+    import design_lib
+    root = pathlib.Path(root)
+    types = read_edge_types()
+    bounds = derive_edge_bounds(types)
+    edges, refused = read_tree_edges(root, None)
+    edges += read_relation_edges(root)
+    counted = [(e["type"], e["source"] if e["site"] == "readme" else e["path"], t.partition("@")[0],
+                e["path"] if e["line"] is None else f"{e['path']}:{e['line']}")
+               for e in edges if e["type"] in bounds for t in e["targets"]]
+    violations = [f"cardinality: {v.type} per-{v.end} {v.bound} exceeded at {v.node} by "
+                  + ", ".join(m[3] for m in v.members) for v in design_lib.check_edge_bounds(counted, bounds)]
+    mirror, lines = [], list(violations)
+    if registry:
+        import record_kinds   # memory-tree's, on sys.path since load_memory_tree
+        try:
+            rows = record_kinds.read_record_kinds(root)
+        except record_kinds.RecordKindsError as exc:
+            raise EdgeError(f"--registry: {exc}") from None
+        if rows is None:
+            raise EdgeError(f"--registry: the kind registry is absent at {root.as_posix()}")
+        mirror = check_cardinality_mirror(rows, types)
+        cells = [r for r in rows if derive_cardinality_cell(r, types)]
+        differ = {ln.split(" · ")[1] for ln in mirror}
+        lines += mirror + [f"cardinality: registry · {len(cells)} kind(s) mirror a bounded type; {len(differ)} differ"]
+    reds = len(violations) + len(mirror)
+    lines += [f"cardinality: refused · {r}" for r in refused]   # S12: each refusal named with its record
+    lines.append(f"cardinality: read {len(counted)} edges of {len({c[0] for c in counted})} types, {len(refused)} "
+                 f"line(s) refused and not counted; {reds} violations")
+    return (1 if reds else 0), lines
+
+
 def check_native_classes(root, ns_path, slugs) -> tuple[list, list]:
     """The native classes for `gov_tag.py check`'s summary: `(reds, lines)`, one line per class naming its
     owner and its population; a class that resolves nothing is red, one not armed here says so. A class
@@ -825,7 +978,7 @@ def read_site_edges(path, text) -> list[dict]:
         return read_leg_edges(text, path)
     if not str(path).endswith(".md"):
         return read_note_refs(text, path)
-    return read_header_edges(text, path) + read_section_edges(text, path) + read_carries_edges(text, path)
+    return check_header_edges(text, path) + read_section_edges(text, path) + read_carries_edges(text, path)
 
 
 def run_parse(path, text, ns_path=None, rc=None) -> int:
@@ -887,7 +1040,7 @@ PLANTS = {
     "bad-block": ("# Fixture\n\n## [x] A section\n\n**Edges:** tests=kit.y implements=kit.z\n", None),
     "bad-note-refs": ("# gov:note layer.memory — x → y refs=a b\n", None),
     # TOOL-dWitnessedBar-22 AC4: a leg row's `tests` target in a namespace the shipped registry does not hold
-    "leg-unregistered": ('[{"name": "x y", "tag": "leg.x.y", "argv": ["true"], "tests": ["feature.x"]}]\n', None),
+    "leg-unregistered": ('[{"name": "x y", "tag": "leg.x.y", "argv": ["true"], "tests": ["nowhere.x"]}]\n', None),
 }
 #: the parse plants whose site is not `site.md`, each its file name
 PLANT_SITES = {"bad-note-refs": "site.py", "leg-unregistered": LEG_MANIFEST}
@@ -911,6 +1064,8 @@ RESOLVE_PLANTS = {
                      .replace("ENFORCES", '["practice.land"]')),
     "leg-rule-member": (LEG_MANIFEST, LEG_PLANT.replace("TESTS", "[]")
                         .replace("ENFORCES", '["practice.land", "practice.land.paths"]')),
+    # TOOL-dTotalRecall-114 S27: a `tests` target in a registered namespace that defines no tag
+    "leg-unarmed": (LEG_MANIFEST, LEG_PLANT.replace("TESTS", '["feature.x"]').replace("ENFORCES", "[]")),
 }
 #: PLAY-dOrderedCharter-49 S26: the commit plant's trailer values, each `(Pass: value, edges it yields)`; a prose
 #: value and `none` are counted unread, an id is one edge
@@ -944,7 +1099,8 @@ def build_resolve_fixture(top, plant) -> tuple[pathlib.Path, pathlib.Path, pathl
     top = pathlib.Path(top)
     root = gov_tag.build_tags_fixture(top, "none")
     shipped = (KIT_DIR / "namespaces.toml").read_text(encoding="utf-8")
-    reg = gov_tag.FIXTURE_REGISTRY + gov_tag.FIXTURE_UNIT_ROW + "\n" + shipped[shipped.index("\n[[native]]") + 1:]
+    empty = gov_tag.derive_fixture_row("feature", "fixture_tags:extract_declared") if plant == "leg-unarmed" else ""
+    reg = gov_tag.FIXTURE_REGISTRY + gov_tag.FIXTURE_UNIT_ROW + empty + "\n" + shipped[shipped.index("\n[[native]]") + 1:]
     unit1, clause1 = FIXTURE_UNIT.format(help="the first text"), "the alpha clause `x`"
     gov_tag.write_commit(root, {
         ".memory-tree.conf": 'MEMORY_ROOT=memory\nCHARTER="AGENTS.md"\nFAMILIES="playbook:PLAY"\n'
@@ -987,13 +1143,106 @@ def run_trailer_plant(top) -> int:
     return 0 if ok else 1
 
 
+#: TOOL-dTotalRecall-22 §7: the cardinality plants, and the record each branch of the merge plant adds, its
+#: section's edge line on line 5
+CARDINALITY_PLANTS = ("cardinality-missing", "cardinality-mirror", "cardinality-branch", "cardinality-merge",
+                      "cardinality-refused")
+CARDINALITY_RECORD = "# A record\n\n## [x] A section\n\n**Edges:** supersedes=PLAY-xDec-1\n"
+#: TOOL-dTotalRecall-53 AC12: the refused plant's typed record, two bulleted `- **Caused-by:**` fields
+CARDINALITY_REFUSED = "memory/builds/xAlpha/build/2026-11-22-build-PLAY-xAlpha-1-deviation-1.md"
+CARDINALITY_REFUSED_TEXT = ("# PLAY-xAlpha-1 deviation 1 — a cause given twice\n\n**Serves:** deviation PLAY-xAlpha-1\n\n"
+                            + "- **Caused-by:** PLAY-xAlpha-1\n" * 2)
+#: the README each branch's build carries, since the README relations' reader refuses a build folder without one
+CARDINALITY_README = ("---\nslug: {slug}\nopened: 2026-11-22\nids: PLAY-{slug}-1\nstatus: OPEN\n---\n\n# {slug}\n\n"
+                      "<!-- gen:build-index -->\n<!-- /gen:build-index -->\n")
+
+
+def run_cardinality_plant(top, plant) -> int:
+    """One cardinality plant. `cardinality-missing`: a scratch copy of `edges.toml` with the key cut from
+    the `part-of` row, read by `read_edge_types`, which must refuse naming it (2). `cardinality-mirror`:
+    memory-tree's kind registry with the `deviation` row's `caused-by` per-source set to `many` in memory,
+    which `check_cardinality_mirror` must red (1). `cardinality-branch` and `cardinality-merge`: gov_tag's
+    fixture repository, one branch adding a record whose section supersedes PLAY-xDec-1, and for the merge a
+    second branch adding another, merged clean; `check_edge_cardinality` at the tip (0 alone, 1 merged).
+    `cardinality-refused` (TOOL-dTotalRecall-53 AC12): the branch plant beside a typed record carrying two
+    bulleted `- **Caused-by:**` fields, which must print one refused line naming it, read no edge of it and
+    finish: 0 with a PASS line, else 1."""
+    top = pathlib.Path(top)
+    if plant == "cardinality-missing":
+        src = (KIT_DIR / "edges.toml").read_text(encoding="utf-8")
+        cut = re.sub(r'(type = "part-of"\n(?:(?!\[\[).*\n)*?)cardinality = .*\n', r"\1", src, count=1)
+        if cut == src:
+            print("edges: plant cardinality-missing · NOT planted, the part-of row carries no cardinality line")
+            return 1
+        (top / "edges.toml").write_text(cut, encoding="utf-8", newline="")
+        try:
+            read_edge_types(top / "edges.toml")
+        except EdgeError as exc:
+            print(f"edges: plant cardinality-missing · refused · {exc}")
+            return 2
+        print("edges: plant cardinality-missing · NOT refused, a declared row read with no bound")
+        return 1
+    tree_lib, _ = ti.load_memory_tree()
+    if plant == "cardinality-mirror":
+        import record_kinds
+        rows = record_kinds.read_record_kinds(pathlib.Path(tree_lib.__file__).parent, ".") or []
+        row = next((r for r in rows if r.get("name") == "deviation"), {})
+        cell = (row.get("cardinality") or {}).get("caused-by")
+        if not isinstance(cell, dict):
+            print("edges: plant cardinality-mirror · NOT planted, the deviation row carries no caused-by cell")
+            return 2
+        cell["per-source"] = "many"
+        reds = check_cardinality_mirror(rows, read_edge_types())
+        for r in reds:
+            print(r)
+        print(f"edges: plant cardinality-mirror · {len(reds)} red")
+        return 1 if reds else 0
+    import gov_tag
+    from deviation_join import set_env_aside
+    with set_env_aside(tree_lib.GIT_ENV_LEAKS):
+        root = gov_tag.build_tags_fixture(top, "none")
+        # a family and the stale-header waiver, empty: the README relations' reader refuses a tree without either
+        gov_tag.write_commit(root, {".memory-tree.conf": 'MEMORY_ROOT=memory\nCHARTER="AGENTS.md"\nFAMILIES="playbook:PLAY"\n',
+                                    "memory/project/stale-header-waiver.txt": "# empty\n"}, "cardinality base")
+        for slug in ("xAlpha", "xBeta") if plant == "cardinality-merge" else ("xAlpha",):
+            gov_tag.run_git(root, "checkout", "-q", "-b", slug.lower(), "main")
+            files = {f"memory/builds/{slug}/README.md": CARDINALITY_README.format(slug=slug),
+                     f"memory/builds/{slug}/build/2026-11-22-build-PLAY-{slug}-1-note.md": CARDINALITY_RECORD}
+            if plant == "cardinality-refused":
+                files[CARDINALITY_REFUSED] = CARDINALITY_REFUSED_TEXT
+            gov_tag.write_commit(root, files, f"record {slug}")
+        if plant == "cardinality-merge":
+            gov_tag.run_git(root, "merge", "-q", "--no-edit", "xalpha")   # TagError on a conflict
+            parents = gov_tag.run_git(root, "rev-list", "--parents", "-n", "1", "HEAD").split()
+            print(f"edges: plant cardinality-merge · git merge was clean, HEAD a merge of {len(parents) - 1} parents")
+        rc, lines = check_edge_cardinality(root)
+        if plant == "cardinality-refused":   # S12: the refusal printed against its record, no edge of it counted
+            edges, _refused = read_tree_edges(pathlib.Path(root), None)
+            named = [ln for ln in lines if ln.startswith("cardinality: refused · ") and CARDINALITY_REFUSED in ln]
+            mine = [e for e in edges if e["path"] == CARDINALITY_REFUSED]
+            ok = rc == 0 and len(named) == 1 and not mine and lines[-1].startswith("cardinality: read ")
+            lines.append(f"edges: plant cardinality-refused · {'PASS' if ok else 'FAIL'} · {len(named)} refused "
+                         f"line(s) name {CARDINALITY_REFUSED}, {len(mine)} edge(s) of it read")
+            rc = 0 if ok else 1
+    for ln in lines:
+        print(ln)
+    return rc
+
+
+#: every plant `--plant` admits, the argument parser's one list, which adopt-playbook.sh joins to its rows
+#: (TOOL-dTotalRecall-121 S11)
+FIXTURE_PLANTS = tuple(sorted({*PLANTS, *RESOLVE_PLANTS, *CARDINALITY_PLANTS, "prose-pass"}))
+
+
 def run_fixture(plant) -> int:
-    """One plant: a parse-and-grade plant over a scratch site, a resolve plant over a scratch repository, or
-    the trailer plant over one; `edges.toml` must come out unchanged."""
+    """One plant: a parse-and-grade plant over a scratch site, a resolve plant over a scratch repository, the
+    trailer plant over one, or a cardinality plant; `edges.toml` must come out unchanged."""
     shipped = (KIT_DIR / "edges.toml").read_bytes()
     top = tempfile.mkdtemp(prefix="edges-")
     try:
-        if plant == "prose-pass":
+        if plant in CARDINALITY_PLANTS:
+            rc_ = run_cardinality_plant(top, plant)
+        elif plant == "prose-pass":
             ti.load_memory_tree()
             from deviation_join import set_env_aside
             from tree_lib import GIT_ENV_LEAKS
@@ -1028,9 +1277,16 @@ def main(argv=None) -> int:
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--base", metavar="REV")
     ap.add_argument("--fixture", action="store_true")
-    ap.add_argument("--plant", choices=sorted({*PLANTS, *RESOLVE_PLANTS, "prose-pass"}))
+    ap.add_argument("--plant", choices=FIXTURE_PLANTS)
+    ap.add_argument("--cardinality", action="store_true")
+    ap.add_argument("--registry", action="store_true")
     a = ap.parse_args(argv)
     try:
+        if a.cardinality:
+            rc, lines = check_edge_cardinality(resolve_repo_root(), registry=a.registry)
+            for ln in lines:
+                print(ln)
+            return rc
         if a.list:
             types = read_edge_types()
             for t, r in types.items():
@@ -1053,7 +1309,7 @@ def main(argv=None) -> int:
             return run_check(resolve_repo_root(), a.base)
         if a.fixture and a.plant:
             return run_fixture(a.plant)
-        ap.error("--list, --parse <file>, --check [--base <rev>], or --fixture --plant <case>")
+        ap.error("--list, --parse <file>, --check [--base <rev>], --cardinality [--registry], or --fixture --plant <case>")
     except (EdgeError, ti.TagError) as exc:
         print(f"edges: refused · {exc}", file=sys.stderr)
         return 2

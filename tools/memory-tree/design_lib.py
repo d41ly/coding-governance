@@ -104,12 +104,14 @@ import pathlib
 import re
 import subprocess
 import sys
+from typing import NamedTuple
 
-KIT = os.path.dirname(os.path.abspath(__file__))
+KIT =os.path.dirname(os.path.abspath(__file__))
 if KIT not in sys.path:
     sys.path.insert(0, KIT)
 from tree_lib import (  # noqa: E402
-    GIT_ENV_LEAKS, build_git_env, build_spec_path_re, parse_conf, read_blobs_at, read_git_output, unfenced_lines)
+    GIT_ENV_LEAKS, build_git_env, build_spec_path_re, parse_conf, read_blobs_at, read_git_output, unfenced,
+    unfenced_lines)
 
 _CL = r"cl-d[A-Z]\w+-\d{4}"
 _DECISION = r"[A-Z]+-d[A-Z]\w+-\d+"
@@ -181,6 +183,32 @@ def derive_clause_hash(text):
     """A clause's pin: `derive_pin_hash` of its text with its trailing `cl-` id cut off
     (`carries.py:85-87`)."""
     return derive_pin_hash(CLAUSE_ID.sub("", text))
+
+
+class Violation(NamedTuple):
+    """One group of edges past its bound (TOOL-dTotalRecall-22 S3): the type, the end (`source` or
+    `target`), the node at that end, the bound, and every member edge `(type, source, target, where)`."""
+    type: str
+    end: str
+    node: str
+    bound: int
+    members: tuple
+
+
+def check_edge_bounds(edges, bounds) -> list:
+    """THE ONE EDGE COUNTER (TOOL-dTotalRecall-22 S3), generalised from the as-built view's one head per
+    clause: `edges` an iterable of `(type, source, target, where)`, `bounds` `{type: (per_source,
+    per_target)}`, each `"many"` or a positive int. Groups the edges by `(type, source)` and by `(type,
+    target)` and returns one `Violation` per group holding more members than its end's bound, in first-seen
+    order. A type `bounds` does not name is not counted. Pure: no I/O."""
+    groups: dict = {}
+    for edge in edges:
+        kind, source, target, _where = edge
+        for end, node, bound in zip(("source", "target"), (source, target), bounds.get(kind, ("many", "many"))):
+            if bound != "many":
+                groups.setdefault((kind, end, node, int(bound)), []).append(tuple(edge))
+    return [Violation(kind, end, node, bound, tuple(members))
+            for (kind, end, node, bound), members in groups.items() if len(members) > bound]
 
 
 def extract_clause_tokens(text):
@@ -582,6 +610,22 @@ def read_spec_edges(text, verb):
             cur = [t[1] if t[1] is not None else t[2], line]
             out.append(cur)
     return [tuple(x) for x in out]
+
+
+def extract_spec_head(text, _arg=None):
+    """The `spec-head` leg reader (TOOL-dTotalRecall-23 S2), beside the two readers it calls: a spec's first
+    five unfenced lines, its `read_spec_writes` words and its `read_spec_edges` consumes targets, the
+    path-independent half of the index generator's `parse_spec_text`; `{"undecodable": true}` for a blob
+    that is not UTF-8."""
+    if text is None:
+        return {"undecodable": True}
+    head = []
+    for line in unfenced(text):
+        if len(head) == 5:
+            break
+        head.append(line)
+    return {"head": head, "writes": read_spec_writes(text),
+            "consumes": [t for t, _b in read_spec_edges(text, "consumes-from")]}
 
 
 def read_rev_log(text):

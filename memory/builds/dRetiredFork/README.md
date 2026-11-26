@@ -132,7 +132,7 @@ every invalidated generator, re-stamps `gov_commit`, and leaves nothing for a pe
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 30 unit(s) · node d · opened 2026-09-02 · streams tooling+deployer
+**Build status:** DEFERRED · 30 unit(s) · node d · opened 2026-09-02 · streams deployer+tooling
 ids DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 DEPL-dRetiredFork-10 DEPL-dRetiredFork-11 DEPL-dRetiredFork-12 DEPL-dRetiredFork-13 DEPL-dRetiredFork-14
 ids DEPL-dRetiredFork-15 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13
 ids TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22 TOOL-dRetiredFork-23 TOOL-dRetiredFork-24 TOOL-dRetiredFork-25 TOOL-dRetiredFork-26 TOOL-dRetiredFork-27
@@ -196,9 +196,24 @@ Ids whose spec moved past its audited revision: none — 0 of 30 unit id(s) carr
 | 7 | `DEPL-dRetiredFork-3` | no |
 | 8 | `DEPL-dRetiredFork-6` | no |
 | 9 | `TOOL-dRetiredFork-17` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-03-prompt-TOOL-dRetiredFork-9-1-build-brief.md`, `2026-09-03-prompt-TOOL-dRetiredFork-8-1-build-brief.md` and 25 more under prompts/ |
+| reviews | `2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md` (CLEAN WITH FIXES), `2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md` (BLOCKED) and 2 more under reviews/ |
+| logs | `2026-09-03-build-TOOL-dRetiredFork-8-1-acceptance-ledger.md`, `2026-09-03-build-TOOL-dRetiredFork-7-1-acceptance-ledger.md` and 25 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dRetiredFork/card` |
+<!-- /gen:build-routes -->

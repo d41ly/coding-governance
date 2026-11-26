@@ -278,10 +278,7 @@ build() { # slug
   cat > "memory/builds/$1/README.md" <<EOF
 ---
 slug: $1
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-$1-1
 ---
 
@@ -361,10 +358,7 @@ mkdir -p memory/builds/tPlanOk/spec
 cat > memory/builds/tPlanOk/README.md <<'PLANOK'
 ---
 slug: tPlanOk
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-tPlanOk-1
 ---
 
@@ -833,7 +827,7 @@ ma_init() { # name · [bare] -> $ma_root/<name>, built to the shape above; `bare
   cp "$TMP/$KIT_REL/ASKS.template.md" "$d/$KIT_REL/"
   cp "$TMP/$KIT_REL/ASKS.template.md" "$d/memory/guides/UNATTENDED-ASKS.md"
   cp "$TMP/.unattended.conf" "$d/.unattended.conf"
-  ma_readme "$d" tRun; ma_readme "$d" tOther; ma_readme "$d" tOther2; ma_readme "$d" tOther3
+  ma_readme "$d" tRun; ma_readme "$d" tOther; ma_readme "$d" tOtherTwo; ma_readme "$d" tOtherThree
   ma_run "$d" tRun
   ( cd "$d" || exit 2
     git init -q -b main . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
@@ -843,7 +837,7 @@ ma_init() { # name · [bare] -> $ma_root/<name>, built to the shape above; `bare
     git remote add origin "$d.git" && git push -q origin main
     git checkout -q -b unit ) >/dev/null 2>&1
   ma_facts "$d" tRun RUNNING main "$(ma_base "$d")"; ma_commit "$d" facts
-  [ "${2:-}" = bare ] || { ma_grant "$d" tOther2 bin/run-granted.sh; ma_commit "$d" "run grants"; }
+  [ "${2:-}" = bare ] || { ma_grant "$d" tOtherTwo bin/run-granted.sh; ma_commit "$d" "run grants"; }
   ( cd "$d" && git commit -q --allow-empty -m "unit work" --no-verify )
   ( cd "$d" && git checkout -q main ) >/dev/null 2>&1
   [ "${2:-}" = bare ] || { ma_grant "$d" tOther bin/owner-granted.sh; ma_commit "$d" "owner grants"; }
@@ -2770,10 +2764,7 @@ mkdir -p memory/builds/tWaive
 cat > memory/builds/tWaive/README.md <<'RM'
 ---
 slug: tWaive
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-tWaive-1
 ---
 
@@ -5643,7 +5634,7 @@ ric_fn=$(mktemp)
 sed -n '/^resolve_introducing_commit() {/,/^}$/p' "$SCRIPT" > "$ric_fn"
 [ -s "$ric_fn" ] || { echo "FAIL could not extract resolve_introducing_commit from $SCRIPT — every arm below would grade nothing"; st=1; }
 ric_root=$(mktemp -d)
-ric_d=memory/builds/b
+ric_d=memory/builds/bFix
 # ONE CALL, IN A SUBSHELL, so the `cd` and the sourced kit library cannot reach the arms that follow
 # — and the assertions stay in THIS shell, where `n` and `st` live. A subshell that ran the
 # assertions too would lose every failure it found.
@@ -6179,11 +6170,11 @@ cd "$TMP" || exit 2; anchor_restore; read_topo s6   # every section after a re-c
 reset_tree
 tc_root=$(mktemp -d)
 tc_fx=$tc_root/fx
-tc_P=memory/builds/b/RUN.md
+tc_P=memory/builds/bFix/RUN.md
 # ONE CALL, IN A SUBSHELL, so the `cd` and the sourced library reach no arm that follows, and the
 # assertions stay in THIS shell, where `n` and `st` live. The STATUS is the answer, so it is printed
 # as `rc=<n>` and is the only stdout a call may carry; the reason line lands in `err`.
-mkdir -p "$tc_fx/memory/builds/b"
+mkdir -p "$tc_fx/memory/builds/bFix"
 ( cd "$tc_fx" || exit 2
   git init -q -b main . && git config user.email t@t.test && git config user.name t \
     && git config core.autocrlf false
@@ -6291,16 +6282,16 @@ cd "$TMP" || exit 2; anchor_restore; read_topo s7   # every section after a re-c
 #
 # EVERY GRAPH CARRIES BOTH SIDES OF THE QUESTION. An OWNER commit on the default branch, made after
 # BASE, adds a grant to `tOther` - the channel ruling D12-j keeps open, which must never red - and
-# the RUN's own commit adds one to `tOther2`, which must always red. An arm asserting only the red
+# the RUN's own commit adds one to `tOtherTwo`, which must always red. An arm asserting only the red
 # half would pass a walk over `base..HEAD`, and one asserting only the quiet half would pass a walk
 # over nothing. `--skip 28` on every run, for the reason the ask block above gives.
 reset_tree
 ma_root=$(mktemp -d)
 # BASE is the commit named `second`, found by subject so a moved `main` can never re-point it.
 # THE BUILDER. BASE is `second` on main; the run branch `unit` opens with the record's first commit
-# (its facts), then the RUN'S grant to tOther2, then ordinary work; main then takes the OWNER'S grant
+# (its facts), then the RUN'S grant to tOtherTwo, then ordinary work; main then takes the OWNER'S grant
 # to tOther and is pushed. What each group does after that is the thing it tests.
-MA_RUN_RD="in memory/builds/tOther2/README.md, run memory/builds/tRun/RUN.md"
+MA_RUN_RD="in memory/builds/tOtherTwo/README.md, run memory/builds/tRun/RUN.md"
 MA_OWN_RD="in memory/builds/tOther/README.md, run"
 MA_WRITES="a commit among a run's own commits writes a may: line into a build README, so a run could land the grant the next run would be authorized by - commit and README follow:"
 
@@ -6372,7 +6363,7 @@ hit "$out" "a run-state file pins a may: grant while recording an authorization 
 ma_init gsa; masa="$ma_root/gsa"
 printf 'SPEC_AUDIT_DEFAULT=""\n' >> "$masa/.unattended.conf"; ma_commit "$masa" "run blanks the default"
 printf 'SPEC_AUDIT_DEFAULT="2026-10-05"\n' >> "$masa/.unattended.conf"; ma_commit "$masa" "run dates the default"
-sed -i '/^slug: tOther3$/a spec-audit: 2026-10-05' "$masa/memory/builds/tOther3/README.md"; ma_commit "$masa" "run opts in"
+sed -i '/^slug: tOtherThree$/a spec-audit: 2026-10-05' "$masa/memory/builds/tOtherThree/README.md"; ma_commit "$masa" "run opts in"
 ( cd "$masa" && git checkout -q main ) >/dev/null 2>&1
 sed -i '/^slug: tOther$/a spec-audit: 2026-10-05' "$masa/memory/builds/tOther/README.md"; ma_commit "$masa" "owner opts in"
 ( cd "$masa" && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
@@ -6383,7 +6374,7 @@ MASA_OWN=$(git -C "$masa" log main --format=%H --grep='^owner opts in$' -1)
 n=$((n+1)); { [ -n "$MASA_BLANK" ] && [ -n "$MASA_DATE" ] && [ -n "$MASA_KEY" ] && [ -n "$MASA_OWN" ]; } \
   || { echo "FAIL the TOOL-aWardedAudit-5 fixture did not build its four commits"; st=1; }
 out=$(ma_leg "$masa")
-hit  "$out" "a commit among a run's own commits writes a spec-audit: line into a build README, so a run could land the opt-in the next run's pre-code audit would rest on, and only the owner opts a build in - commit and README follow: $MASA_KEY in memory/builds/tOther3/README.md, run memory/builds/tRun/RUN.md"
+hit  "$out" "a commit among a run's own commits writes a spec-audit: line into a build README, so a run could land the opt-in the next run's pre-code audit would rest on, and only the owner opts a build in - commit and README follow: $MASA_KEY in memory/builds/tOtherThree/README.md, run memory/builds/tRun/RUN.md"
 hit  "$out" "a commit among a run's own commits writes a non-blank SPEC_AUDIT_DEFAULT into the project conf, so a run could land the project-wide opt-in every later run's pre-code audit would rest on, and only the owner opts a build in - commit and conf follow: $MASA_DATE in .unattended.conf, run memory/builds/tRun/RUN.md"
 miss "$out" "$MASA_BLANK in .unattended.conf"
 miss "$out" "$MASA_OWN in memory/builds/tOther/README.md"
@@ -6396,18 +6387,18 @@ hit  "$out" "$MA_WRITES $(git -C "$masa" log --format=%H --grep='^run grants$' -
 # ---- checked-out branch, or any record on a detached HEAD, is graded as before.
 sed -i '/^may: none$/a branch-ref: refs/heads/elsewhere' "$masa/memory/builds/tRun/RUN.md"; ma_commit "$masa" "record on another branch"
 out=$(ma_leg "$masa")
-miss "$out" "$MASA_KEY in memory/builds/tOther3/README.md"
+miss "$out" "$MASA_KEY in memory/builds/tOtherThree/README.md"
 miss "$out" "$MASA_DATE in .unattended.conf"
 miss "$out" "$MA_WRITES"
 hit  "$out" "check 19 SKIPPED the grant-write and round-bound arms for memory/builds/tRun/RUN.md - it is live on its run branch refs/heads/elsewhere and this tree has refs/heads/unit checked out"
 sed -i 's|^branch-ref: .*|branch-ref: refs/heads/unit|' "$masa/memory/builds/tRun/RUN.md"; ma_commit "$masa" "record on its own branch"
 out=$(ma_leg "$masa")
-hit  "$out" "commit and README follow: $MASA_KEY in memory/builds/tOther3/README.md, run memory/builds/tRun/RUN.md"
+hit  "$out" "commit and README follow: $MASA_KEY in memory/builds/tOtherThree/README.md, run memory/builds/tRun/RUN.md"
 miss "$out" "it is live on its run branch"
 sed -i 's|^branch-ref: .*|branch-ref: refs/heads/elsewhere|' "$masa/memory/builds/tRun/RUN.md"; ma_commit "$masa" "record on another branch again"
 ( cd "$masa" && git checkout -q --detach ) >/dev/null 2>&1
 out=$(ma_leg "$masa")
-hit  "$out" "commit and README follow: $MASA_KEY in memory/builds/tOther3/README.md, run memory/builds/tRun/RUN.md"
+hit  "$out" "commit and README follow: $MASA_KEY in memory/builds/tOtherThree/README.md, run memory/builds/tRun/RUN.md"
 miss "$out" "it is live on its run branch"
 ( cd "$masa" && git checkout -q unit ) >/dev/null 2>&1
 # ---- G1: A LIVE RECORD, AND AN IN-PLACE TERMINAL ONE, over unit 2's prepared merge T - first parent
@@ -6462,7 +6453,7 @@ ma_init g4; ma4="$ma_root/g4"
 ( cd "$ma4" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit ) >/dev/null 2>&1
 ( git clone -q "$ma4.git" "$ma_root/g4-other" && cd "$ma_root/g4-other" \
     && git config user.email o@t.test && git config user.name o \
-    && sed -i '/^slug: tOther3$/a may: bin/other-node.sh' memory/builds/tOther3/README.md \
+    && sed -i '/^slug: tOtherThree$/a may: bin/other-node.sh' memory/builds/tOtherThree/README.md \
     && git commit -qam "other node grants" --no-verify && git push -q origin main ) >/dev/null 2>&1
 ( cd "$ma4" && git fetch -q origin && git merge -q --no-ff --no-edit -m "reconcile origin/main" origin/main ) >/dev/null 2>&1
 MA_M=$(ma_sha "$ma4" HEAD)
@@ -6476,7 +6467,7 @@ printf 'landed-anchor: remote\n' >> "$ma4/memory/builds/tRun/RUN.md"; ma_commit 
 out=$(ma_leg "$ma4")
 hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
 miss "$out" "$MA_OWN_RD"
-miss "$out" "in memory/builds/tOther3/README.md, run"
+miss "$out" "in memory/builds/tOtherThree/README.md, run"
 
 # ---- G3: A RUN ABORTED BEFORE --prepare, after a PLAIN reconcile R brought the owner's grant in.
 # ---- Graded live, then terminal with R as the witness, then with a single-parent commit after R.

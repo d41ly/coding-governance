@@ -99,9 +99,21 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 | 3 | `TOOL-aSweptBar-5` | no |
 | 4 | `TOOL-aSweptBar-6` | no |
 | 5 | `TOOL-aSweptBar-7` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-10-13-prompt-TOOL-aSweptBar-7-brief.md`, `2026-10-13-prompt-TOOL-aSweptBar-3-2-fix-brief.md` and 1 more under prompts/ |
+| reviews | `2026-10-13-review-TOOL-aSweptBar-1-6-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| card ref | `refs/gov/builds/aSweptBar/card` |
+<!-- /gen:build-routes -->

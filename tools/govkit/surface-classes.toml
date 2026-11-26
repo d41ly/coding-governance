@@ -110,3 +110,9 @@ reader = "{prefix}/loop/splice.py:read_stage_members"
 plant = "{prefix}/loop/splice.py:write_stage_plant"
 summary = "each gov [[step]] tag of the loop definition, the tags a repository stage names in after and before (TOOL-dDeclaredLoop-25)"
 witness = "{prefix}/playbook/pins.py:read_change_successors"
+
+[[class]]
+id = "record-kind-schema"
+reader = "{prefix}/memory-tree/record_kinds.py:read_kind_schema_members"
+plant = "{prefix}/memory-tree/record_kinds.py:write_kind_schema_plant"
+summary = "each field of every record-kind row, as <kind>.<field>, the schemas the record door renders and refuses against (TOOL-dTotalRecall-1)"

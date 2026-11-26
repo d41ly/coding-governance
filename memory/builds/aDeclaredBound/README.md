@@ -152,3 +152,15 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-18-review-TOOL-aDeclaredBound-1.md` (BLOCKED), `2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative.md` (BLOCKED) and 2 more under reviews/ |
+| research | `2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aDeclaredBound/card` |
+<!-- /gen:build-routes -->

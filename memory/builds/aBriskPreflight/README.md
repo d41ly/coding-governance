@@ -113,9 +113,25 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 | 4 | `TOOL-aBriskPreflight-7` | no |
 | 6 | `TOOL-aBriskPreflight-11`, `TOOL-aBriskPreflight-12` | no |
 | 7 | `TOOL-aBriskPreflight-19` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-12-prompt-TOOL-aBriskPreflight-19-build-brief.md`, `2026-10-12-prompt-TOOL-aBriskPreflight-12-spec-brief.md` and 20 more under prompts/ |
+| reviews | `2026-10-12-review-TOOL-aBriskPreflight-1-2-3-4-5-6-7-10-diff-review-round1.md` |
+| research | `2026-10-11-build-TOOL-aBriskPreflight-7-ceilings.sh`, `2026-10-11-build-TOOL-aBriskPreflight-7-ceiling-rows.log` and 20 more under build/ |
+| logs | `2026-10-12-build-TOOL-aBriskPreflight-7-acceptance-ledger.md`, `2026-10-12-build-TOOL-aBriskPreflight-4-acceptance-ledger.md` and 5 more under build/ |
+| open asks | `BACKLOG.md`, 8 open |
+| card ref | `refs/gov/builds/aBriskPreflight/card` |
+<!-- /gen:build-routes -->

@@ -59,6 +59,10 @@ globs = [
   "tools/check-placeholders.test.sh",
   "tools/govkit/entries/check-placeholders.kit.toml",
 ]
+symbols = [
+  "tools/lexicon/extract_code.py::read_defs_at",
+  "tools/lexicon/extract_code.py::extract_text",
+]
 ```
 
 ## Constraints & why

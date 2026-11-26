@@ -1,0 +1,11 @@
+# ledger · census-kept-paths · key key census,path,reason,records · direction shrink-only · drain key
+check_cause_writers	memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py	pinned instrument	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py	pinned instrument	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-fold-inventory.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-walk-seed.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-73-harness.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-93-ab.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signer.py	outside the write set	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded
+check_cause_writers	memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py	pinned instrument	memory/builds/*/build/*-build-*-departures-*.md	1	db95ebf86eb573410cac49dfabd142b931cb0a92	keep:PLAY-dClosedLoop-1002
+check_alias_compares	memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py	pinned instrument	-	1	c0a7077829c8878b77443e43cd6bca04b8dbdcba	seeded

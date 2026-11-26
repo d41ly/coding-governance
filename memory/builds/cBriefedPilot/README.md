@@ -315,7 +315,7 @@ The build method is `memory/guides/BUILD-METHOD.md`. The generated region below 
 
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 23 unit(s) · node c · opened 2026-08-14 · streams tooling+playbook
+**Build status:** CLOSED · 23 unit(s) · node c · opened 2026-08-14 · streams tooling
 ids TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13
 ids TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23 TOOL-cBriefedPilot-24 TOOL-cBriefedPilot-25 TOOL-cBriefedPilot-26
 ids TOOL-cBriefedPilot-27 TOOL-cBriefedPilot-28 TOOL-cBriefedPilot-29 TOOL-cBriefedPilot-30 TOOL-cBriefedPilot-31 TOOL-cBriefedPilot-32 TOOL-cBriefedPilot-34 TOOL-cBriefedPilot-35 TOOL-cBriefedPilot-36 TOOL-cBriefedPilot-37 TOOL-cBriefedPilot-38
@@ -366,3 +366,15 @@ Ids whose spec moved past its audited revision: none — 0 of 23 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-16-review-TOOL-cBriefedPilot-5-3.md` (CHANGES REQUESTED), `2026-08-16-review-TOOL-cBriefedPilot-1-2.md` (BLOCKED) and 1 more under reviews/ |
+| logs | `2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/cBriefedPilot/card` |
+<!-- /gen:build-routes -->

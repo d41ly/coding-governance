@@ -94,9 +94,23 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-aGroundedOrientation-3` | no |
 | 2 | `TOOL-aGroundedOrientation-1` | no |
 | 3 | `TOOL-aGroundedOrientation-2` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-08-27-prompt-TOOL-aGroundedOrientation-1.md` |
+| reviews | `2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-08-27-review-TOOL-aGroundedOrientation-1-diff-review-round1.md` (BLOCKED) |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aGroundedOrientation/card` |
+<!-- /gen:build-routes -->

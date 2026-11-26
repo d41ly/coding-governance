@@ -619,8 +619,13 @@ Every return carries seven fields beside the counts:
   `count=- state=-` (TOOL-dFairHearing-20): a gapped walk's count is no clean reading, so no caller routing on
   the counts may take its `0` and `CONVERGED` as one.
 
-- `shape` — one record line, also logged, in this fixed grammar:
-  `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> merged=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown> trigger=<cause|-> shape=- efforts=- role-sha=-`.
+- `shape` — one record line, also logged, opening `review-shape` and carrying, in this order, `kind`,
+  `round`, `intensity`, `at`, `raw`, `confirmed`, `refuted`, `merged`, `unverified`, `blocker`, `high`,
+  `medium`, `low`, `agents`, `out-tokens`, `trigger`, `shape`, `efforts` and `role-sha`, each as
+  `<field>=<value>`. Its grammar is `SHAPE_RE` in the memory-tree kit's `shape_run.py`, the one spelling of
+  it (TOOL-dTotalRecall-11): the suite's shape arm parses each exit's line through `shape_run.py
+  --parse-line`, and `gov_record.py new shape-run --review <path>` files a review record's line as a
+  typed record.
   `trigger`, `shape`, `efforts` and `role-sha` are `review.cost`'s fields (TOOL-dDeclaredLoop-20): the cause the
   caller passed, and three a shape registry will supply, each `-` while absent. `at` is the stage the exit reached; a count that stage has not produced is `-`, never `0`, and the
   every-lens-dead exit prints `raw=-`. `merged` counts the findings a skeptic refuted as `duplicate of
@@ -934,8 +939,13 @@ does a lens set or a prompt change find MORE of what a previous review proved re
 lives there as its `review-replay` instance, and this file is that instance's adapter: its CLI, its
 printer, its corpus listing and its arms. The second instance, `scouted-seam`, is aScoutedSeam's
 reuse grader (`check_hit`, `check_case` and the `grade`, `compare` and `judged` readings), ported from
-its grader blob at `b0fe68f30`. Both sit in one `INSTANCES` table, and `check_instances` reds when it
-lacks either. Every population arrives as a `<src>`: a working-tree path, a 40-hex blob or
+its grader blob at `b0fe68f30`. The third, `map-replay` (`TOOL-dTotalRecall-17`), is a project map's
+losing test: past audits replayed with the map handed and without, run only as `--experiment`. Its
+known set is each audit's `### <item>.` headings, read by `extract_item_findings` into the confirmed
+appendix findings each names, and its lens transcripts are read through the runlog kit, reached in
+process by the inline `resolve_kit_dir` under a `requires_if` row; where no runlog kit resolves it
+exits 2 `unarmed`. All three sit in one `INSTANCES` table, and `check_instances` reds when it
+lacks one. Every population arrives as a `<src>`: a working-tree path, a 40-hex blob or
 `<rev>:<path>`, read by one `git cat-file blob`, and an object git cannot read is refused, never an
 empty arm. `derive_paired_cases` is the one place variants are paired with cases: it refuses an
 answer outside the population, a variant that answered nothing and an empty pairing, and each figure
@@ -965,8 +975,22 @@ of how they were measured, and `check_experiment` makes that method a rule where
 show it and a recorded line where they cannot. The manifest, read through `read_raw_output`, names
 `instance`, `cases`, `results` and `arms`, each arm `{name, base, settings, dispatched}`, and may name
 `heldOut`, `judge {verdicts, key}` and `union {tuning, heldOut}`; the `review-replay` instance takes
-`known` and `candidates` in place of `cases` and `results`. An unknown key is refused,
-so a misspelt rule is never skipped. Every rule runs before the first figure line, and a broken one
+`known` and `candidates` in place of `cases` and `results`. The `map-replay` instance takes `known`,
+`candidates`, `arms` and `map`: `known` one `{case, record, items}` per audit, refused on an item no
+heading names or a heading naming a finding id no confirmed appendix row holds; each candidate a
+`{case, arm, report, matched, transcripts}`, `transcripts` naming every scored lens's transcript; two
+arms varying `map`; and `map` the map file, whose bytes are the allowance. It prints each audit's
+`known` line, each run's recall, the three terms' figures and `verdict win`, `verdict lose <terms>` or
+`verdict unarmed bytes`, where every lens run read zero bytes before its first act and no term lost,
+read by `derive_map_verdict`: the recall rise below the noise `measure_rise_noise` answers plus 5, the median
+existence-search fall below 1, or the median bytes before the first act rising past the map's bytes,
+the first act being the first call `check_read_call` does not read as a read: a read or search tool,
+`ToolSearch`, or a shell call running only its closed set of reading programs and writing no file, less what
+`check_read_call`'s docstring lists as not read. The noise is two standard errors of the recall rise
+(`NOISE_FACTOR` times the root of the summed sample variance over n of each arm's counts on each audit), so
+more runs lower the line (`TOOL-dTotalRecall-123`). The run count per audit and arm is each arm's `dispatched`
+over the number of audits: refused are two arms with different counts, a count the audits do not divide, fewer
+than two runs, and any audit and arm whose parsed runs are not exactly that count. An unknown key is refused, so a misspelt rule is never skipped. Every rule runs before the first figure line, and a broken one
 exits 2 naming the rule, the arm or case, and the value:
 
 - **evidence** — each instance's `case_evidence` hook: a `scouted-seam` case's `sha` and every

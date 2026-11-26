@@ -77,3 +77,15 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-20-review-TOOL-aMeteredTurnstile-1.md` |
+| logs | `2026-08-20-build-TOOL-aMeteredTurnstile-1.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aMeteredTurnstile/card` |
+<!-- /gen:build-routes -->

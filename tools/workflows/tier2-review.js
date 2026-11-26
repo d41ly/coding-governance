@@ -1,6 +1,6 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.69', // gov:kit tier2-review@1.69 // gov:kit review-harness@1.69 — BOTH ids: the
+  version: '1.70', // gov:kit tier2-review@1.70 // gov:kit review-harness@1.70 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
@@ -624,11 +624,12 @@ function deriveRoundFields(count) {
 }
 const reviewDir = a.reviewDir || 'reviews/'
 // TOOL-aOrientedCast-27 S3/S9 - every agent's label and the run's identity, `<slug> · <scope> · <stage>`.
-// The slug is the segment after a `builds/` segment of `reviewDir` when it is letters only, else none,
+// The slug is the segment after a `builds/` segment of `reviewDir` when the slug grammar admits it
+// (`[a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3}`, rendered from the memory-tree kit, TOOL-dTotalRecall-5 S5), else none,
 // so a review outside a build folder carries no slug part. The stage is the label a spawn carried
 // before, so `pending`, the log lines and every reader of a stage keep their spelling. The build
 // harness holds its own copy of the function, because a workflow script imports nothing.
-const reviewSlug = (/(?:^|\/)builds\/([A-Za-z]+)(?:\/|$)/.exec(String(reviewDir).replace(/\\/g, '/')) || [])[1] || ''
+const reviewSlug = (/(?:^|\/)builds\/([a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3})(?:\/|$)/.exec(String(reviewDir).replace(/\\/g, '/')) || [])[1] || ''
 const reviewScope = kind + ' round ' + round
 function renderAgentLabel(scope, stage) {
   return [reviewSlug, scope, stage].filter(Boolean).join(' · ')
@@ -650,9 +651,15 @@ function renderAuditBinding(subjects) {
     if (SPEC_SUBJECT_PATH.test(String(x.path))) pins[x.id] = x.rev
     if (ids.indexOf(x.id) === -1) ids.push(x.id)
   })
-  return '**Serves:** spec-audit ' + ids.map(function (id) {
+  return '**Serves:** spec-audit ' + ids.map(function (id) {  // census: kept cause-writer its cause line is renderCauseLine, written under it
     return Object.prototype.hasOwnProperty.call(pins, id) ? id + '@rev-' + pins[id] : id
   }).join(' ')
+}
+// TOOL-dTotalRecall-36 S1 - the record's CAUSE line, the second line under the binding: the first id,
+// bare, its `@rev-<n>` pin cut, since a cause resolves as a family id or a record key and a pinned
+// token is neither. The memory tree's causes check reds a new record that names no resolving cause.
+function renderCauseLine(ids) {
+  return '**Caused-by:** ' + String(ids[0]).replace(/@rev-\d+$/, '')
 }
 // TOOL-dTrueNorth-13 S3 - the record's SUBJECTS line, rendered here too, so its reader has one spelling
 // to read: `Reviewed: <path>@<blob>, ...` in subject order. The memory tree's pin grading reads which
@@ -770,7 +777,8 @@ const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulat
 // `base` sha are "an immutable 7-40 hex object id", which is one question with one answer.
 const PINNED_SHA = /^[0-9a-f]{7,40}$/
 // `expand_id_runs`' id grammar, anchored: a subject's pin below and a finding's address in the tally.
-const PIN_ID = /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/
+// A pinned unit id; its slug is the slug grammar's class, rendered as `[a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3}` (TOOL-dTotalRecall-5 S5).
+const PIN_ID = /^[A-Z]+-([a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3})-[0-9]+$/
 const subjects = Array.isArray(a.subjects) ? a.subjects : []
 if (isSpec) {
   // D6 - `find(pred) || null` collapsed a FALSY offender back onto the pass sentinel, so the `!x`
@@ -2914,8 +2922,11 @@ const synth = await agent(
     // S4b - the token set is READ from the carrier that ENFORCES it on a diff-review record, which
     // is hygiene check 22 in check-memory-hygiene.sh (gated by REVIEW_VERDICT_CUTOFF). It is not a
     // new rule invented here, and the build method is not the enforcing carrier for this kind.
-    `THE RECORD'S OPENING IS ORDERED, and these four things precede the body, in this order. ` +
-    `First the \`**Serves:**\` binding line described below. Then the report's title and provenance. ` +
+    // TOOL-dTotalRecall-36 S1 - the cause line is counted here, the second of the five, directly under
+    // the binding line, so both sit inside the memory tree's header window.
+    `THE RECORD'S OPENING IS ORDERED, and these five things precede the body, in this order. ` +
+    `First the \`**Serves:**\` binding line described below. Directly under it the \`**Caused-by:**\` ` +
+    `cause line described below. Then the report's title and provenance. ` +
     `Then the range line named above. Then, as a heading of its own, the literal \`## Verdict: \` ` +
     `followed by exactly ONE token from the CLOSED set CLEAN, CLEAN WITH FIXES, BLOCKED. ` +
     `The set is closed: no fourth token, no tally appended to the line, no qualifier on it. ` +
@@ -2936,12 +2947,16 @@ const synth = await agent(
     // synthesis (the TOOL-dMergedTally-1 note below). The diff kind keeps its sentence.
     (isSpec
       ? `The report's FIRST line must be the record's binding line, which the harness rendered from each ` +
-        `subject's pinned revision: copy the line between the two marker lines below VERBATIM, alone on its ` +
-        `own line, neither marker line copied, and add, drop or reorder no id on it.\n` +
-        `<<<SERVES\n${renderAuditBinding(subjects)}\nSERVES>>>\n`
+        `subject's pinned revision, and its SECOND line the record's \`**Caused-by:**\` cause line, rendered ` +
+        `from the first subject's id: copy the two lines between the two marker lines below VERBATIM, each ` +
+        `alone on its own line and in this order, neither marker line copied, and add, drop or reorder no id ` +
+        `on either.\n` +
+        `<<<SERVES\n${renderAuditBinding(subjects)}\n${renderCauseLine(subjects.map(function (x) { return x.id }))}\nSERVES>>>\n`
       : `The report's FIRST line must be the record's binding line, exactly: **Serves:** ${kind} ` +
         `followed by every unit id in the diff, space-separated. A kind with no id is malformed under the ` +
-        `project's record-binding grammar, so never emit the kind alone. `) +
+        `project's record-binding grammar, so never emit the kind alone. Its SECOND line must be the ` +
+        `record's cause line, exactly: **Caused-by:** followed by the FIRST unit id of that binding line, ` +
+        `bare, with no @rev pin, so the record names a cause the project's causes check resolves. `) +
     // TOOL-dMergedTally-1 - THE AGENT RETURNS IDS AND THIS FILE COUNTS THEM. TOOL-dTieredTribunal-1
     // S5 defined `blockers` and `highs` as the CONFIRMED findings at each severity and had the agent
     // type both integers, and its own note said the agreement was a property of this prompt and not

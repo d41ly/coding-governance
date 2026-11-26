@@ -95,3 +95,10 @@ Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry
 
 - **Child builds:** [aJoinedCanon](../aJoinedCanon/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| card ref | `refs/gov/builds/aWeighedCanon/card` |
+<!-- /gen:build-routes -->

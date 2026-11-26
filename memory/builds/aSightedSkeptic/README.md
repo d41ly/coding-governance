@@ -114,9 +114,24 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 | 9 | `TOOL-aSightedSkeptic-9` | no |
 | 10 | `TOOL-aSightedSkeptic-10` | no |
 | 13 | `TOOL-aSightedSkeptic-13` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-02-prompt-TOOL-aSightedSkeptic-13-2-build-brief.md`, `2026-10-02-prompt-TOOL-aSightedSkeptic-13-1-spec-brief.md` and 14 more under prompts/ |
+| reviews | `2026-10-01-review-TOOL-aSightedSkeptic-1-closing-diff-round1.md` |
+| logs | `2026-10-02-build-TOOL-aSightedSkeptic-13-1-acceptance-ledger.md`, `2026-10-01-build-TOOL-aSightedSkeptic-9-2-live-replay.md` and 11 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aSightedSkeptic/card` |
+<!-- /gen:build-routes -->

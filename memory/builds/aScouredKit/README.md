@@ -85,7 +85,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 19 unit(s) · node a · opened 2026-08-30 · streams tooling+playbook
+**Build status:** CLOSED · 19 unit(s) · node a · opened 2026-08-30 · streams tooling
 ids TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-10 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15
 ids TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit-19 TOOL-aScouredKit-20 TOOL-aScouredKit-21 TOOL-aScouredKit-22 TOOL-aScouredKit-23 TOOL-aScouredKit-24 TOOL-aScouredKit-25 TOOL-aScouredKit-26 TOOL-aScouredKit-27 TOOL-aScouredKit-28 TOOL-aScouredKit-29
 ids TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit-33 TOOL-aScouredKit-34 TOOL-aScouredKit-35 TOOL-aScouredKit-36
@@ -132,3 +132,15 @@ Ids whose spec moved past its audited revision: none — 0 of 19 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-08-30-prompt-TOOL-aScouredKit-1.md` |
+| reviews | `2026-08-31-review-TOOL-aScouredKit-2-wave3-lens-security.md` (CLEAN WITH FIXES), `2026-08-31-review-TOOL-aScouredKit-2-wave3-lens-crossos.md` (CLEAN WITH FIXES) and 22 more under reviews/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aScouredKit/card` |
+<!-- /gen:build-routes -->

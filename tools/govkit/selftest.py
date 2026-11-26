@@ -552,7 +552,7 @@ def check_retired_flags(module_path: pathlib.Path = GOVKIT) -> None:
           "one every assertion below is vacuously true and this arm is a DEAD PROBE reporting a "
           "clean pass over nothing", bool(RETIRED_FLAGS), "RETIRED_FLAGS is empty")
     for name, date, unit in RETIRED_FLAGS:
-        parts = name.replace("_", "-").split("-")
+        parts = name.replace("_", "-").split("-")  # census: kept slug-grammar not a unit id: a retired flag name
         # A name this engine does not spell the way it spells the others reds NAMING THE ROW, rather
         # than being quietly narrowed to whatever survives the derivation.
         spellable = all(p.isalnum() for p in parts)
@@ -854,6 +854,7 @@ def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
 
 sys.path.insert(0, str(HERE))
 from fixture_target import build_scratch_gov, build_target  # noqa: E402 — TOOL-dSafePassage-5 S12, -26 S19: the factories
+from fixture_target import INSTALL_ANSWERS, render_deploy_tail  # noqa: E402 — TOOL-dTotalRecall-21 S11
 
 # TOOL-dQuietDisk-11 S1/S2: one suite template cache per run, loaded by path from gov's lib dir.
 # `main` binds it once its scratch root exists; a `build_target` call whose `(deploy, files)` text
@@ -1911,6 +1912,43 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
     r4 = run_selfcheck(gcopy)
     check("[aBP-4] ...and the restored copy is green", r4.returncode == 0,
           (r4.stdout + r4.stderr)[-1500:])
+
+
+def check_generated_attribute_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
+    """TOOL-dTotalRecall-37 AC3: selfcheck's generated-attribute parity, each side staged in a COPY of gov
+    and silent once restored. A one-direction compare passes one of the two plants. The unresolved
+    `to` token shares the first run; its line is its own."""
+    ga = gcopy / ".gitattributes"
+    kt = gcopy / PFX / KIT_NAMES["workflows"] / "kit.toml"
+    keep = {f: f.read_bytes() for f in (ga, kt)}
+    wf = f"{PFX}{KIT_NAMES['workflows']}/"
+    by_none, unmarked = "is linguist-generated but rendered by no kit", "is rendered but not linguist-generated"
+
+    def write_staged(f: pathlib.Path, new: bytes, label: str) -> None:
+        check(f"[dTR-37] {label} LIVENESS the staged edit matched", new != keep[f], f"no match in {f.name}")
+        f.write_bytes(new)
+
+    write_staged(ga, keep[ga] + f"\n{wf}*.js linguist-generated\n".encode(), "generated-glob")
+    write_staged(kt, keep[kt].replace(b'to = "{kit}/drift-audit-state.js"', b'to = "{nosuch}/state.js"', 1),
+                 "render-token")
+    out = run_selfcheck(gcopy)
+    check("[dTR-37 AC3] generated-glob: a hand-written script the glob marks is named",
+          out.returncode != 0 and f"'{wf}unattended-unit.js' {by_none}" in out.stdout,
+          (out.stdout + out.stderr)[-1500:])
+    check("[dTR-37] render-token: a rendered `to` whose token gov cannot resolve is named, never dropped",
+          "to '{nosuch}/state.js', whose token(s) {nosuch} gov cannot resolve" in out.stdout,
+          (out.stdout + out.stderr)[-1500:])
+    kt.write_bytes(keep[kt])
+    write_staged(ga, keep[ga].replace(f"{wf}tier2-review.js linguist-generated".encode(), b"", 1), "render-unmarked")
+    out = run_selfcheck(gcopy)
+    check("[dTR-37 AC3] render-unmarked: the render that lost its line is named",
+          out.returncode != 0 and f"'{wf}tier2-review.js' {unmarked}" in out.stdout,
+          (out.stdout + out.stderr)[-1500:])
+    ga.write_bytes(keep[ga])
+    out = run_selfcheck(gcopy)
+    check("[dTR-37 AC3] ...and restored, neither side prints",
+          out.returncode == 0 and by_none not in out.stdout and unmarked not in out.stdout,
+          (out.stdout + out.stderr)[-1500:])
 
 
 def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
@@ -4272,6 +4310,132 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
     check("[dSP-1 S6 F10] a FANOUT_CAP that lowers nothing retires the file and leaves the policy file byte-identical",
           up.returncode == 0 and not (t / ".agent-cap.conf").exists()
           and (t / ".governance" / "policy.toml").read_bytes() == pol0, up.stdout + up.stderr)
+
+
+#: TOOL-dTotalRecall-20's planted adopter: two `journal` records and one `log` record, the first holding two
+#: `## Notes` headings, a spec carrying a heading the retag must never touch, and a README carrying an
+#: unknown key and a typed derived one.
+MT_RECORD = "memory/builds/xOne/build/2026-01-01-build-TOOL-xOne-1-a.md"
+MT_README = "memory/builds/xOne/README.md"
+MT_SPEC = "memory/builds/xOne/spec/2026-01-01-spec-TOOL-xOne-1.md"
+MT_FILES = {
+    ".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n',
+    MT_README: "---\nslug: xOne\nopened: 2026-01-01\nids: TOOL-xOne-1\nparent: dX\nnode: d\n---\n\n# xOne\n",
+    MT_RECORD: "**Serves:** journal TOOL-xOne-1\n\n# A\n\n## Notes\n\nx\n\n## Findings\n\nz\n\n## Notes\n\ny\n",
+    "memory/builds/xOne/build/2026-01-01-build-TOOL-xOne-1-b.md": "**Serves:** journal TOOL-xOne-1\n\n# B\n\nb\n",
+    "memory/builds/xOne/build/2026-01-01-build-TOOL-xOne-1-c.md": "**Serves:** log TOOL-xOne-1\n\n# C\n\nc\n",
+    MT_SPEC: "# TOOL-xOne-1 — x\n\n**Status:** OPEN · rev-1 · 2026-01-01 · node x · Tier-1 · base 0123abcd\n\n## Notes\n\nq\n",
+}
+
+
+def check_memory_tree_steps(tmp: pathlib.Path) -> None:
+    """TOOL-dTotalRecall-20 AC1 AC4 AC5 AC6 AC7 AC8 — the three memory-tree step programs over a planted
+    adopter, each run under `-I` as the runner runs it, and the journal step over a scratch copy of gov
+    whose `gen_build_index.py` is renamed. Its RED is the retag writing under `derived`: AC6's arm reads the
+    tree changed."""
+    steps = {name: HERE / "steps" / f"memory_{name}.py" for name in ("journal_alias", "front_matter", "retag")}
+
+    def run_step(name: str, *args, prog: pathlib.Path | None = None) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(prog or steps[name]), *[str(a) for a in args]],
+                              capture_output=True, text=True, encoding="utf-8", errors="replace", env=STEPS_ENV)
+
+    def read_tree(t: pathlib.Path) -> dict:
+        return {p.relative_to(t).as_posix(): p.read_bytes() for p in t.rglob("*")
+                if p.is_file() and ".git" not in p.relative_to(t).parts}
+
+    t = build_target(tmp, None, "mt-journal", MT_FILES)
+    up = run_step("journal_alias", "up", t)
+    status = run_gov_git(t, "status", "--porcelain")
+    check("[dTR-20 AC1] the journal step counts the two `journal` records read through the alias, exits 0 and "
+          "writes nothing", up.returncode == 0 and "journal 2 record(s) read as log" in up.stdout and status == "",
+          up.stdout + up.stderr + status)
+
+    sources = {n: p.read_text(encoding="utf-8") for n, p in steps.items()}
+    banned = _re.compile(r"^\s*(import|from) +(tree_lib|gen_build_index|tag_index|policy_value)\b|spec_from_file_location", _re.M)
+    check("[dTR-20 AC8] no step imports a memory-tree or playbook module, and the retag reads its key through "
+          "govkit's own reader", not any(banned.search(s) for s in sources.values())
+          and 'read_policy_value("memory.legacy-anchors"' in sources["retag"], str({n: bool(banned.search(s))
+                                                                                   for n, s in sources.items()}))
+    gcopy = tmp / "mt-gov" / KIT_NAMES["govkit"]
+    (gcopy / "steps").mkdir(parents=True)
+    for rel in ("govkit.py", "upgrade_steps.py", "steps/memory_journal_alias.py"):
+        shutil.copyfile(HERE / rel, gcopy / rel)
+    (gcopy.parent / KIT_NAMES["memory-tree"]).mkdir()
+    shutil.copyfile(KIT_DIRS["memory-tree"] / "gen_build_index.py",
+                    gcopy.parent / KIT_NAMES["memory-tree"] / "gen_build_index.renamed.py")
+    up = run_step("journal_alias", "up", t, prog=gcopy / "steps" / "memory_journal_alias.py")
+    check("[dTR-20 AC8] with gov's gen_build_index.py renamed in a scratch copy, the journal step exits 1 naming "
+          "the memory-tree kit", up.returncode == 1 and "the memory-tree kit does not resolve" in up.stderr,
+          up.stdout + up.stderr)
+
+    readme = (t / MT_README).read_bytes()
+    up = run_step("front_matter", "up", t)
+    check("[dTR-20 AC4] unarmed, the front-matter step exits 1 naming `parent` unknown and no `node` derived, says "
+          "the population is unarmed, and leaves the README's bytes",
+          up.returncode == 1 and f"{MT_README}: parent unknown" in up.stdout and "node derived" not in up.stdout
+          and "legacy population unarmed" in up.stderr and (t / MT_README).read_bytes() == readme,
+          up.stdout + up.stderr)
+    (t / "kit").mkdir()
+    (t / "kit" / "kit.toml").write_text(
+        '[[ledger]]\npopulation = "build-readme-typed-derived"\nleg = "memory hygiene"\nseed = []\nkey = "record"\n'
+        'fields = ["path"]\ndrain = "key"\ndirection = "shrink-only"\n'
+        'home = "memory/project/build-readme-typed-derived.txt"\n', encoding="utf-8", newline="\n")
+    (t / "memory" / "project").mkdir(parents=True)
+    (t / "memory" / "project" / "build-readme-typed-derived.txt").write_text(
+        "# ledger · build-readme-typed-derived · key record path · direction shrink-only · drain key\n",
+        encoding="utf-8", newline="\n")
+    settle(t, "the legacy population armed, listing no README")
+    up = run_step("front_matter", "up", t)
+    check("[dTR-20 AC4] armed with no README listed, the front-matter step prints `node` derived too",
+          up.returncode == 1 and f"{MT_README}: parent unknown" in up.stdout and f"{MT_README}: node derived" in up.stdout,
+          up.stdout + up.stderr)
+    (t / MT_README).write_text(MT_FILES[MT_README].replace("parent: dX\nnode: d\n", ""), encoding="utf-8", newline="\n")
+    settle(t, "authored keys only")
+    up = run_step("front_matter", "up", t)
+    check("[dTR-20 AC4] over a README carrying only authored keys the front-matter step exits 0",
+          up.returncode == 0 and "0 front-matter finding(s)" in up.stdout, up.stdout + up.stderr)
+
+    t = build_target(tmp, None, "mt-retag", MT_FILES)
+    for label, policy in (("no policy row for the key", None), ("`derived`", 'legacy-anchors = "derived"')):
+        if policy:
+            (t / ".governance").mkdir(exist_ok=True)
+            (t / ".governance" / "policy.toml").write_text(f"[memory]\n{policy}\n", encoding="utf-8", newline="\n")
+            settle(t, "derived")
+        pre = read_tree(t)
+        got = {v: run_step("retag", v, t) for v in ("plan", "up", "witness")}
+        check(f"[dTR-20 AC6] under {label}, the retag's plan, up and witness exit 0 and write nothing",
+              all(p.returncode == 0 for p in got.values()) and read_tree(t) == pre,
+              " | ".join(p.stdout + p.stderr for p in got.values()))
+    (t / ".governance" / "policy.toml").write_text('[memory]\nlegacy-anchors = "retag"\n', encoding="utf-8", newline="\n")
+    settle(t, "retag")
+    pre = read_tree(t)
+    dry = run_step("retag", "up", t, "--dry-run")
+    check("[dTR-20 AC5] under `retag`, up --dry-run prints the plan, the second `## Notes` as [section.notes-2] "
+          "(dTR-43 S6), and the conservation table, and writes nothing",
+          dry.returncode == 0 and f"{MT_RECORD}:13 · ## [section.notes-2] Notes" in dry.stdout
+          and f"{MT_RECORD}:5 · ## [section.notes] Notes" in dry.stdout and f"conservation · {MT_RECORD} · 3 ·" in dry.stdout
+          and read_tree(t) == pre, dry.stdout + dry.stderr)
+    up = run_step("retag", "up", t)
+    want = MT_FILES[MT_RECORD].replace("## Notes\n\nx", "## [section.notes] Notes\n\nx").replace(
+        "## Findings", "## [section.findings] Findings").replace("## Notes\n\ny", "## [section.notes-2] Notes\n\ny")
+    wit = run_step("retag", "witness", t)
+    check("[dTR-20 AC5] up writes those bytes, the planted spec untouched, and the witness then exits 0",
+          up.returncode == 0 and (t / MT_RECORD).read_text(encoding="utf-8") == want
+          and (t / MT_SPEC).read_bytes() == pre[MT_SPEC] and wit.returncode == 0, up.stdout + up.stderr + wit.stdout)
+    down = run_step("retag", "down", t)
+    check("[dTR-20 AC5] down restores every file byte-identical", down.returncode == 0 and read_tree(t) == pre,
+          down.stdout + down.stderr)
+
+    lst = subprocess.run([sys.executable, str(HERE / "upgrade_steps.py"), "list"], capture_output=True, text=True,
+                         encoding="utf-8", errors="replace", cwd=str(GOV_ROOT))
+    ids = [ln.split(" · ")[1] for ln in lst.stdout.splitlines() if " · memory-tree/" in ln and "retired" not in ln]
+    mine = ["memory-tree/serves-journal-read-as-log", "memory-tree/readme-front-matter-graded",
+            "memory-tree/legacy-anchors-retag"]
+    check("[dTR-20 AC7] upgrade_steps.py list prints the three memory-tree rows, in order",
+          [i for i in ids if i in mine] == mine, lst.stdout[-1500:] + lst.stderr)
+    got = {n: run_step(n, "witness", GOV_ROOT) for n in steps}
+    check("[dTR-20 AC7] each program's witness exits 0 against gov's own root",
+          all(p.returncode == 0 for p in got.values()), " | ".join(p.stdout + p.stderr for p in got.values()))
 
 
 def check_kickoff_facts_step() -> None:
@@ -6939,6 +7103,7 @@ def main() -> int:
         check_upgrade_steps(tmp / "dsp")
         check_succession(tmp / "dsc")
         check_fanout_step(tmp / "dfs")
+        check_memory_tree_steps(tmp / "dmt")
         check_kickoff_facts_step()
         check_review_rounds_step(tmp / "drr")
         check_inherited_red_step(tmp / "dir")
@@ -8234,6 +8399,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         check_halved_install_arms(gcopy, _run_selfcheck)
         check_benched_probe_arms(gcopy, _run_selfcheck)
+        check_generated_attribute_arms(gcopy, _run_selfcheck)
         # --- PLAY-dOrderedCharter-70 S10: a shipped engine file planted with one row citing gov's records.
         rf = gcopy / PFX / KIT_NAMES["playbook"] / "README.md"
         rkeep = rf.read_bytes()
@@ -8813,14 +8979,20 @@ user_skills = "/tmp/gk-fake-skills"
 
         # ===== unit 6, the pin block =====
         NLp = chr(10)
+        # --- TOOL-dTotalRecall-21 S4: recall requires `playbook-render`, whose own `requires` names
+        # --- `playbook`, `memory-tree` and `policy`, so `apply` refuses any recall selection short of
+        # --- that closure, and `playbook-render`'s adopter refuses DEPLOY_FULL's answers alone (F9).
+        # --- Every apply below names the closure over ONE deploy text: DEPLOY_FULL's `gov_source`
+        # --- and `prefix` lines, then the stub tail the playbook entry's placeholder rows derive.
+        RECALL_CLOSURE = "memory-recall,memory-tree,playbook-render,playbook,policy"
+        deploy_recall = ("".join(ln for ln in DEPLOY_FULL.splitlines(keepends=True)
+                                 if ln.startswith(("gov_source = ", "prefix = ")))
+                         + render_deploy_tail(RECALL_CLOSURE.split(","), INSTALL_ANSWERS))
 
         def pin_target(name: str, ga: bytes | None) -> pathlib.Path:
             g = tmp / name
             (g / ".governance").mkdir(parents=True, exist_ok=True)
-            (g / ".governance" / "deploy.toml").write_text(
-                'gov_source = "l"' + NLp + f'prefix = "{PFX[:-1]}"' + NLp +
-                'kits = ["memory-recall"]' + NLp + "[answers]" + NLp +
-                'memory_root = "memory"' + NLp, encoding="utf-8", newline=NLp)
+            (g / ".governance" / "deploy.toml").write_text(deploy_recall, encoding="utf-8", newline=NLp)
             (g / "README.md").write_text("t" + NLp, encoding="utf-8", newline=NLp)
             if ga is not None:
                 (g / ".gitattributes").write_bytes(ga)
@@ -8838,10 +9010,14 @@ user_skills = "/tmp/gk-fake-skills"
         # --- CLI it never wrote (DEPL-dGaugedVintage-3). The kit declares no forked rule now, so a
         # --- fresh target receives all three. The INCOMPLETE report that existed for that state is
         # --- graded over the synthetic `demo` fork in the DEPL-dCarriedReceipt-10 block below.
-        inc = build_target(tmp / "incomplete", DEPLOY_FULL, template=TEMPLATES)
-        p = run("apply", "--target", str(inc), "--kits", "memory-recall,memory-tree")
+        # --- TOOL-dTotalRecall-21 S4: every apply here names the closure over `deploy_recall`, the
+        # --- block's one deploy text, and the exit-0 checks are what let `run` write a receipt pin.
+        inc = build_target(tmp / "incomplete", deploy_recall, template=TEMPLATES)
+        p = run("apply", "--target", str(inc), "--kits", RECALL_CLOSURE)
         out = p.stdout + p.stderr
         _mr = inc / PFX / KIT_NAMES["memory-recall"]
+        check("[aRF-36] the closure's apply over the playbook entry's stubs exits 0",
+              p.returncode == 0, out[-900:])
         check("[aRF-36] apply lands memory-recall's CLI and extractor on a fresh target",
               all((_mr / f).is_file() for f in ("query.py", "extract.py")), out[-900:])
         check("[aRF-36] ...and reports no entry INCOMPLETE", "INCOMPLETE" not in out, out[-900:])
@@ -8852,13 +9028,15 @@ user_skills = "/tmp/gk-fake-skills"
         check("[aRF-36] rev-3 ...and the skip names the key that takes it",
               f"SKIPPED [opt-in       ] {PFX}{KIT_NAMES['memory-recall']}/recall-opened.js" in out
               and "with_hook" in out, out[-900:])
-        _optin = build_target(tmp / "optin36", DEPLOY_FULL + "\n[kit.memory-recall]\nwith_hook = \"yes\"\n")
-        _po = run("apply", "--target", str(_optin), "--kits", "memory-recall,memory-tree")
+        _optin = build_target(tmp / "optin36", deploy_recall + "\n[kit.memory-recall]\nwith_hook = \"yes\"\n")
+        _po = run("apply", "--target", str(_optin), "--kits", RECALL_CLOSURE)
+        check("[aRF-36] rev-3 the opt-in target's closure apply exits 0", _po.returncode == 0,
+              (_po.stdout + _po.stderr)[-900:])
         check("[aRF-36] rev-3 a target declaring [kit.memory-recall] with_hook = \"yes\" gets the hook",
               (_optin / PFX / KIT_NAMES["memory-recall"] / "recall-opened.js").is_file(),
               (_po.stdout + _po.stderr)[-900:])
-        _all = build_target(tmp / "optall36", DEPLOY_FULL + "\n[kit.memory-recall]\nopt_in_all = \"yes\"\n")
-        _pa = run("apply", "--target", str(_all), "--kits", "memory-recall,memory-tree")
+        _all = build_target(tmp / "optall36", deploy_recall + "\n[kit.memory-recall]\nopt_in_all = \"yes\"\n")
+        _pa = run("apply", "--target", str(_all), "--kits", RECALL_CLOSURE)
         check("[aRF-36] rev-3 a target spelling the canonical ctx's reserved key is refused by name",
               _pa.returncode != 0 and "reserved" in (_pa.stdout + _pa.stderr)
               and not (_all / PFX / KIT_NAMES["memory-recall"] / "recall-opened.js").exists(),
@@ -8869,7 +9047,9 @@ user_skills = "/tmp/gk-fake-skills"
               (_pr.stdout + _pr.stderr)[-900:])
 
         pg = pin_target("u6p1", b"*.sh text eol=lf")          # deliberately no trailing newline
-        run("apply", "--target", str(pg), "--kits", "memory-recall,memory-tree")
+        _p1 = run("apply", "--target", str(pg), "--kits", RECALL_CLOSURE)
+        check("the pin target's closure apply exits 0", _p1.returncode == 0,
+              (_p1.stdout + _p1.stderr)[-900:])
         lines = (pg / ".gitattributes").read_text(encoding="utf-8").split(NLp)
         check("an append to an attributes file with no trailing newline does not join two lines",
               lines[0] == "*.sh text eol=lf", str(lines[:2]))
@@ -8885,7 +9065,9 @@ user_skills = "/tmp/gk-fake-skills"
         # The block is written EARLY and the renormalize runs LAST. On a first install the pinned
         # population does not exist yet, so a one-phase design either refuses every install or
         # reports success over nothing.
-        pa = run("apply", "--target", str(pin_target("u6p2", None)), "--kits", "memory-recall,memory-tree")
+        pa = run("apply", "--target", str(pin_target("u6p2", None)), "--kits", RECALL_CLOSURE)
+        check("the virgin pin target's closure apply exits 0", pa.returncode == 0,
+              (pa.stdout + pa.stderr)[-900:])
         idx_att = pa.stdout.index("/ATTRIBUTES]")
         check("the ATTRIBUTES step runs before LAND", idx_att < pa.stdout.index("/LAND]"), pa.stdout)
         check("and the RENORMALIZE step runs after CONFIGURE",
@@ -21073,7 +21255,7 @@ user_skills = "/tmp/gk-fake-skills"
     import concurrent.futures as _cf
     _shim_cases = [(f"[dSafePassage-6] AC3-AC5 plant {_l} --mode {_m} forwards intact and {_m} reports as it should",
                     ["--plant", _l, "--mode", _m], 0, "observation(s) matched")
-                   for _l in ("sh", "js", "py", "module") for _m in ("warn", "journal", "unset", "bogus")]
+                   for _l in ("sh", "js", "py", "module") for _m in ("warn", "journal", "unset", "bogus")]  # census: kept alias-compare homonym: the shim install.on-shim-call mode
     # TOOL-dSafePassage-26 S9: the window plant takes the expected verdict and exits by the one plant
     # contract, 0 on a match; each pair is asserted with its case and against the other verdict.
     _shim_cases += [(f"[dSafePassage-6] AC6 window {_w} with {_n} release(s) {_v} a closed row, "

@@ -65,7 +65,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 9 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff
+**Build status:** CLOSED · 9 unit(s) · node a · opened 2026-10-11 · streams kickoff+tooling
 ids KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7 TOOL-aTrimmedHook-8 TOOL-aTrimmedHook-16 TOOL-aTrimmedHook-17
 
 <!-- gen:build-units -->
@@ -101,9 +101,24 @@ Ids whose spec moved past its audited revision: none — 0 of 9 unit id(s) carry
 | 4 | `TOOL-aTrimmedHook-5` | no |
 | 5 | `TOOL-aTrimmedHook-7` | no |
 | 6 | `TOOL-aTrimmedHook-16` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-12-prompt-TOOL-aTrimmedHook-16-1-build-brief.md`, `2026-10-11-prompt-TOOL-aTrimmedHook-7-1-build-brief.md` and 8 more under prompts/ |
+| reviews | `2026-10-11-review-TOOL-aTrimmedHook-1-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-10-12-build-TOOL-aTrimmedHook-16-1-acceptance-ledger.md`, `2026-10-11-build-TOOL-aTrimmedHook-7-1-acceptance-ledger.md` and 8 more under build/ |
+| open asks | `BACKLOG.md`, 2 open |
+| card ref | `refs/gov/builds/aTrimmedHook/card` |
+<!-- /gen:build-routes -->

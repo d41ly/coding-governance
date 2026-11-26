@@ -74,3 +74,15 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-10-14-prompt-TOOL-dTracedLedger-1-spec-input.md`, `2026-10-14-prompt-TOOL-dTracedLedger-1-brief.md` and 1 more under prompts/ |
+| research | `2026-10-14-build-TOOL-dTracedLedger-1-research-check-23-reds.md`, `2026-10-14-build-TOOL-dTracedLedger-1-pairs.py` |
+| logs | `2026-10-14-build-TOOL-dTracedLedger-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 2 open |
+| card ref | `refs/gov/builds/dTracedLedger/card` |
+<!-- /gen:build-routes -->

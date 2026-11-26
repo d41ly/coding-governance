@@ -11,6 +11,7 @@
 - TOOL-dCalibratedLens-54 · filed 2026-11-03 · held red: suite unattended driver selftest shard 4/8 red at 2c50ab31 on the daily held job, run 41632620578 · seen `.github/workflows/remote-ci.yml`@2c50ab31 · accept the suite is green on the daily held job at the default branch's tip
 - TOOL-dCalibratedLens-55 · filed 2026-11-03 · held red: suite unattended runlog-writer selftest red at 2c50ab31 on the daily held job, run 41632620578 · seen `.github/workflows/remote-ci.yml`@2c50ab31 · accept the suite is green on the daily held job at the default branch's tip
 - TOOL-dCalibratedLens-56 · filed 2026-11-02 · run the losing test of each of the six opt-in review lenses TOOL-dFairHearing-3 catalogued `optin = false` in tools/workflows/lenses.toml (security, alternatives, cost, portability, adopter-migration, topology), each a blind replay that needs the replay bundle, the known-set file and the scorer factory ordered after that unit; the tests are the review-lens research's `[candidates]` section, PLAY-dClosedLoop-1 · accept each of the six losing tests is recorded, and each row whose test it does not lose is flipped to `optin = true` and nothing else
+- TOOL-dCalibratedLens-57 · filed 2026-11-23 · TOOL-dTotalRecall-17's map replay lost on recall, so no map is built: compute the not-in-view cause from the slice manifest alone · accept the cause reads no map → memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict.md
 
 ## Dispositions
 
@@ -31,3 +32,4 @@
 - SEV · TOOL-dCalibratedLens-55 · HIGH · a held self-test is red on the default branch's daily job
 - KEEP · TOOL-dCalibratedLens-55 · filed by an unattended run for the owning build; outside this build's goal
 - SEV · TOOL-dCalibratedLens-56 · LOW · until the tests run, no opt-in lens is selectable and a review cannot aim one at its class; nothing that ships today breaks
+- SEV · TOOL-dCalibratedLens-57 · MED · the map lost its replay

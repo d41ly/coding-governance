@@ -72,9 +72,21 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 |---|---|---|
 | 10 | `TOOL-dCountedConsumers-1` | no |
 | 20 | `TOOL-dCountedConsumers-2` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-02-prompt-TOOL-dCountedConsumers-2-brief.md`, `2026-11-02-prompt-TOOL-dCountedConsumers-1-brief.md` |
+| logs | `2026-11-02-build-TOOL-dCountedConsumers-2-1-builder-return.md`, `2026-11-02-build-TOOL-dCountedConsumers-1-1-builder-return.md` |
+| card ref | `refs/gov/builds/dCountedConsumers/card` |
+<!-- /gen:build-routes -->

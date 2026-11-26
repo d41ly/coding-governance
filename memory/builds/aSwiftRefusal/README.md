@@ -82,9 +82,22 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 | 2 | `TOOL-aSwiftRefusal-2` | no |
 | 3 | `TOOL-aSwiftRefusal-3` | no |
 | 4 | `TOOL-aSwiftRefusal-4` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-10-prompt-TOOL-aSwiftRefusal-4-token-fix-brief.md`, `2026-11-10-prompt-TOOL-aSwiftRefusal-4-round1-fix-brief.md` and 8 more under prompts/ |
+| reviews | `2026-11-10-review-TOOL-aSwiftRefusal-1-3-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-11-10-build-TOOL-aSwiftRefusal-4-1-acceptance-ledger.md`, `2026-11-10-build-TOOL-aSwiftRefusal-3-1-acceptance-ledger.md` and 3 more under build/ |
+| card ref | `refs/gov/builds/aSwiftRefusal/card` |
+<!-- /gen:build-routes -->

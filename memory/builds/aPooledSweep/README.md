@@ -93,9 +93,25 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-aPooledSweep-1` | no |
 | 2 | `TOOL-aPooledSweep-2` | no |
 | 3 | `TOOL-aPooledSweep-3` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 - **Parent builds:** [aQuenchedHarness](../aQuenchedHarness/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-07-prompt-TOOL-aPooledSweep-3-brief.md`, `2026-09-07-prompt-TOOL-aPooledSweep-2-brief.md` and 2 more under prompts/ |
+| reviews | `2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round2.md`, `2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md` and 2 more under reviews/ |
+| research | `2026-09-07-build-TOOL-aPooledSweep-1-why-the-port-could-not-finish.md` |
+| logs | `2026-09-08-build-TOOL-aPooledSweep-1-the-full-sweep-and-what-it-refutes.md`, `2026-09-08-build-TOOL-aPooledSweep-1-full-sweep-rows.tsv` and 1 more under build/ |
+| open asks | `BACKLOG.md`, 4 open |
+| card ref | `refs/gov/builds/aPooledSweep/card` |
+<!-- /gen:build-routes -->

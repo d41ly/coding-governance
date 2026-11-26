@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-10 — derived anchors suffixed for a repeated heading
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 15 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 15 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0221@5746ccbd whole
 
@@ -11,41 +11,65 @@
 | [2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-b.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
+| [2026-11-22-build-TOOL-dTotalRecall-10-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-10-1-acceptance-ledger.md) | log | — |
+| [2026-11-22-build-TOOL-dTotalRecall-10-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-10-1-builder-return.md) | journal | — |
+| [2026-11-22-build-TOOL-dTotalRecall-10-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-10-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-10-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-10-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-10-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-10-reground-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-10-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-10-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
+| [2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md](../reviews/2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md) | diff-review | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-36 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-114 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 A section address `<id>#<tag>` is derived from a heading's text when the record carries no authored
-tag, and 16 tracked records repeat an H2 or H3 heading, so the derived address of the second one is
-the first one's: `record show` would hand a builder the wrong section (systems-retrofit review, `:352`;
-systems `[design-memory-structure]`, `:510-515`). This unit makes the derivation one function,
-`derive_anchor(heading, seen)`, which folds a heading by PLAY-dOrderedCharter-19 S3's rule and suffixes
-a repeat `-2`, `-3` in document order, and holds derived anchors outside any uniqueness grade.
+tag, and tracked records repeat an H2 or H3 heading (§4 "The measurement" counts them), so the derived
+address of the second one is the first one's: `record show` would hand a builder the wrong section
+(systems-retrofit review, `:352`; systems `[design-memory-structure]`, `:510-515`). This unit makes the
+derivation one function, `derive_anchor(heading, seen)`, which folds a heading through the tag index's
+landed fold `tag_index.py#derive_heading_seg` (PLAY-dOrderedCharter-19 S3) and suffixes a repeat `-2`,
+`-3` in document order, and holds derived anchors outside any uniqueness grade.
 
 ## 2. Scope (IN)
 
-Preconditions this unit calls and does not build, each cited by its parent spec: `tools/playbook/tag_index.py`
-with `TAG_RE`, `extract_doc` and the heading fold of PLAY-dOrderedCharter-19 S1 and S3, and its fixture
-`gov_tag.py --fixture --plant <case>` (S13).
+Preconditions this unit calls and does not build, landed by PLAY-dOrderedCharter-19 (CLOSED, rev-8):
+`tools/playbook/tag_index.py` with `#derive_heading_seg` (S3's fold), `#scan_unfenced` (the walk outside
+fences, through `tools/memory-tree/tree_lib.py#unfenced_lines`) and `#extract_doc` (the `doc`
+namespace's extractor); and its fixture `gov_tag.py --fixture --plant <case>` (S13), built by
+`tools/playbook/gov_tag.py#build_tags_fixture` and run by `#run_plant`, each plant's printed lines
+asserted by a `<plant>|<exit>|<must print>|<must not print>` row of the tag-resolver block of
+`tools/playbook/adopt-playbook.sh` (`run_plant_rows`), which the leg `playbook render selftest` runs.
 
-- **S1** — `derive_anchor(heading, seen)` in `tools/playbook/tag_index.py`. `heading` is a heading's
-  text without its `#` marks; `seen` is the set of anchors already derived in the same document, which
-  the function extends. The base is S3's fold: lower-cased, each run of characters outside `[a-z0-9]`
-  folded to one hyphen, the ends trimmed. A base `seen` lacks is returned as it is; otherwise the
-  function returns `<base>-<n>` for the smallest `n` from 2 whose result `seen` lacks. Observed by AC1
-  and AC2.
+- **S1** — `derive_anchor(heading, seen)` in `tools/playbook/tag_index.py`, beside `derive_heading_seg`.
+  `heading` is a heading's text without its `#` marks; `seen` is the set of anchors already derived in
+  the same document, which the function extends. The base is `derive_heading_seg(heading)`, called and
+  never re-typed. A base `seen` lacks is returned as it is; otherwise the function returns `<base>-<n>`
+  for the smallest `n` from 2 whose result `seen` lacks. An empty base is returned empty and never added
+  to `seen`, so two headings of no fold never mint `-2`, a segment the tag shape refuses. Observed by
+  AC1 and AC2.
 - **S2** — One fold. `extract_doc` derives each `##` heading's segment through `derive_anchor`, one
-  `seen` per document, so the doc namespace's rule and every later caller's are one function and not
-  two spellings. Observed by AC3.
-- **S3** — Not graded for uniqueness. No check of `gov_tag.py check` reports a derived anchor as a
-  duplicate: uniqueness is a property of authored tags alone. Observed by AC4.
-- **S4** — The fixture: `gov_tag.py --fixture --plant repeat-heading` adds to S13's scratch repository a
-  guide repeating an H2 three ways, `## Findings`, `## Findings` and `## Findings 2`, builds the index and
-  asserts the three section rows `findings`, `findings-2` and `findings-2-2`, in that order, and that
-  `show` on `findings-2` returns the second section's text. Observed by AC3 and AC4.
+  `seen` per call (one document), keeping its skip of an empty segment, so the doc namespace's rule and
+  every later caller's are one function and not two spellings. `derive_heading_seg` stays the fold, and
+  its callers that want the plain fold keep it (§3). Observed by AC3.
+- **S3** — Not graded for uniqueness. No arm of `gov_tag.py check` (`gov_tag.py#run_check`) reports a
+  derived anchor as a duplicate: uniqueness is a property of authored tags alone. None does at HEAD (read
+  at `#run_check`; `tag_index.py` raises "registered twice" only for a namespace or a chain build); this
+  clause keeps it so. Observed by AC4.
+- **S4** — The fixture: the plant `repeat-heading`, appended to `gov_tag.py#PLANTS`. Its
+  `build_tags_fixture` branch adds to the base commit `memory/guides/REPEAT.md` (`doc.repeat`), an H1
+  `# Repeat` and an H2 three ways, `## Findings`, `## Findings` and `## Findings 2`, each section's one
+  body line `the first findings`, `the second findings`, `the third findings`. Its `run_plant` branch
+  runs `rebuild`, then prints `tags: plant repeat-heading · sections <segs>`, the segments of
+  `doc.repeat`'s section rows in line order, and `tags: plant repeat-heading · findings-2 serves <line>`,
+  the body line of the text `doc.repeat#findings-2` serves, then runs `check`; it exits 0 only when the
+  segments are `findings findings-2 findings-2-2`, the served text holds `the second findings` and not
+  `the first findings`, and `check` exits 0. Two rows join the tag-resolver block of
+  `adopt-playbook.sh`, each `repeat-heading $_tk`, exit 0: one must print `sections findings findings-2
+  findings-2-2`, the other `tags: green · 0 red` and must not print `doc.repeat#findings`. Observed by
+  AC3 and AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -54,9 +78,17 @@ with `TAG_RE`, `extract_doc` and the heading fold of PLAY-dOrderedCharter-19 S1 
 - Legacy anchors as edges and `memory.legacy-anchors`: TOOL-dTotalRecall-19, which calls S1.
 - Rewriting any record to carry an authored tag, and the `retag` step: TOOL-dTotalRecall-20.
 - A heading whose fold is empty. None exists in the tracked memory tree (§4 "The measurement"), and
-  S3's fold owns that case; this unit adds only the suffix.
+  `extract_doc` skips one at HEAD; this unit adds only the suffix and keeps that skip (S1, S2).
 - Freezing derived anchors as aliases across revisions: memory-plan `[migration]` (`:347-348`) gives
   that to the legacy-anchor reading, TOOL-dTotalRecall-19's.
+- The other callers of `derive_heading_seg`, which keep the plain fold:
+  `tools/playbook/writing_practice.py#derive_sections`, whose `one-subject` arm reds a heading repeated
+  in one live file and prints it frozen under `memory/builds/` (a writing grade over heading text, not
+  an address grade, and why no live file repeats a heading), and
+  `tools/govkit/steps/adopter_rules_to_overlay.py#derive_rule_tag`, whose tags an ordinal prefix already
+  keeps apart.
+- The help-page fragment slugs of `tools/govkit/docs_leg.py#derive_heading_slugs`: GitHub's rule, a
+  different fold and a `-1` first suffix, modelling a renderer this unit does not own.
 
 ### Edges
 
@@ -73,7 +105,9 @@ with `TAG_RE`, `extract_doc` and the heading fold of PLAY-dOrderedCharter-19 S1 
 ```python
 def derive_anchor(heading: str, seen: set) -> str:
     """One heading's derived anchor in one document. `seen` holds the anchors derived before it."""
-    base = re.sub(r"[^a-z0-9]+", "-", heading.lower()).strip("-")
+    base = derive_heading_seg(heading)
+    if not base:
+        return ""
     anchor, n = base, 2
     while anchor in seen:
         anchor, n = f"{base}-{n}", n + 1
@@ -88,31 +122,38 @@ record carries this case today (an ordinal-only suffix collides in none, measure
 "The measurement"), so S4's fixture plants it.
 
 Document order is the caller's: each extractor walks its headings top to bottom, outside fenced blocks
-(`tree_lib.unfenced_lines`, `tools/memory-tree/tree_lib.py:149`), with a fresh `seen` per document. A
-caller that derives H2 and H3 together passes one `seen` for both, so an H3 repeating an H2's text is
-suffixed too.
+(`tag_index.py#scan_unfenced`), with a fresh `seen` per document. `extract_doc` already walks so; its
+one change is the line `seg = derive_heading_seg(head)` becoming `seg = derive_anchor(head, seen)`, with
+`seen = set()` before its loop. A caller that derives H2 and H3 together passes one `seen` for both, so
+an H3 repeating an H2's text is suffixed too.
 
 ### The measurement
 
-Folding every `##` and `###` heading outside fences in the 6,638 tracked `.md` files under `memory/`,
-16 records repeat a fold and none carries a heading whose fold is empty; with S1 applied per record, no
-record holds two equal anchors. PINNED: measured on 2026-10-26 over the tree at `fb872a37` by a scratch
-probe; AC5 re-derives it. The design's own probe counted 13 on 2026-10-17.
+Folding every `##` and `###` heading outside fences in the 14,421 tracked `.md` files under `memory/`
+(PINNED 2026-11-22 at `e1ae60af8`), 24 records repeat a fold, every one under `memory/builds/` (PINNED
+2026-11-22 at `e1ae60af8`), and none carries a heading whose fold is empty; with S1 applied per file, no
+file holds two equal anchors, and an ordinal-only suffix would collide in none. Measured by a scratch
+probe over `git ls-files memory/` reading through `tree_lib.py#unfenced_lines`; AC5 re-derives it. The
+rev-1 probe counted 16 at `fb872a37` and the design's 13 on 2026-10-17 (PINNED at those dates).
 
 ### Inventory
 
-Minted: `derive_anchor`; the fixture case `repeat-heading`. Naming cells: `derive_anchor` is asked of
-the lexicon's `--suggest` under `--as py.function` at the pass.
+Minted: `derive_anchor`; the fixture case `repeat-heading`. Naming cells: `derive_anchor` passes the
+lexicon's `--suggest derive_anchor --as py.function` (`derive` leads, run 2026-11-22).
 
 ### Migration
 
-None. A document with no repeated heading derives the anchors it derives today under S3's fold, byte
-for byte, because the suffix applies only to a repeat.
+None. No file the `doc` namespace reads repeats an H2 (the measurement: no repeat outside
+`memory/builds/`), so every index row `extract_doc` derives is byte-identical, and a document with no
+repeated heading keeps the anchors S3's fold gives it, because the suffix applies only to a repeat. The
+edit changes `tag_index.py`'s bytes, so `tag_index.py#derive_extractor_versions` re-keys its extractors
+and the index re-parses their blobs once, as any edit to that module does.
 
 ### Files touched (estimate)
 
 - `tools/playbook/tag_index.py`
 - `tools/playbook/gov_tag.py`
+- `tools/playbook/adopt-playbook.sh`
 
 ### Alternatives rejected
 
@@ -120,14 +161,19 @@ for byte, because the suffix applies only to a repeat.
   review's second option. It changes every H3's address, not only a repeat's, so a record with no
   repeat would read differently, and S3's addresses would move.
 - **Suffix by ordinal without the search.** It collides on a natural `-2` heading, measured above.
+- **Reuse `docs_leg.py#derive_heading_slugs`.** It folds by GitHub's rule (word characters kept, a
+  space one hyphen), so `M5 — Recall and reuse` would not be `m5-recall-and-reuse` and every `doc`
+  section would move; its output must match GitHub's renderer, a fact this unit does not own.
 
 ## 5. Production-readiness checklist
 
 - security — N/A — a pure function over text; no write path, no input outside the document.
-- perf / scale — one regex and a set lookup per heading.
-- error / empty / loading states — an empty `seen` is the first heading's case; an empty base is S3's
-  (§3).
-- observability — the fixture prints each derived row.
+- perf / scale — one regex and a set lookup per heading. The two plant rows add two fixture
+  repositories to `playbook render selftest`, about 2 s each (DERIVED: the `two-paths` plant ran in
+  1.8 s on 2026-11-22), against that leg's `ceiling` in `tools/gate-legs.json`.
+- error / empty / loading states — an empty `seen` is the first heading's case; an empty base is
+  returned empty and recorded nowhere (S1).
+- observability — the plant prints the derived segments and the served line.
 - risks — a caller that shares one `seen` across documents suffixes headings that do not repeat; S1's
   contract and AC2 state the per-document rule.
 - testing — AC1 to AC5 by a pass; the arm of §7 at the close.
@@ -142,27 +188,37 @@ for byte, because the suffix applies only to a repeat.
   Red when: the suffix is the bare ordinal, so the third value prints `findings-2` and two sections
   share an address.
 - **AC2** — When the same probe derives `Findings` with one `seen` and then `Findings` with a second,
-  fresh `seen`, it prints `findings` both times.
-  Red when: `seen` is held at module level, so a heading is suffixed for a repeat in another document.
-- **AC3** — When `python gov_tag.py --fixture --plant repeat-heading` runs from `tools/playbook/`, it
-  prints the section rows `findings`, `findings-2` and `findings-2-2` of the planted guide in document
-  order, and `show` on `findings-2` returns the second section's first line.
-  Red when: `extract_doc` keeps its own fold, so the second row repeats `findings`.
-- **AC4** — When `gov_tag.py check` runs inside the same fixture, it reports no finding naming
-  `findings`.
-  Red when: a uniqueness grade is applied to derived anchors, so the repeated heading reds.
+  fresh `seen`, it prints `findings` both times; and when it derives `—` twice into one `seen`, it prints
+  `''` both times and `seen` stays empty.
+  Red when: `seen` is held at module level, so a heading is suffixed for a repeat in another document;
+  or an empty base is recorded, so the second `—` prints `-2`.
+- **AC3** — When `python gov_tag.py --fixture --plant repeat-heading --set tags.bare-refs=charter-only
+  --set tags.retired-cites=refuse-new` runs from `tools/playbook/`, it prints
+  `tags: plant repeat-heading · sections findings findings-2 findings-2-2` and
+  `tags: plant repeat-heading · findings-2 serves the second findings`, and exits 0. At HEAD it exits 2,
+  `tags: no plant 'repeat-heading'` (run 2026-11-22).
+  Red when: `extract_doc` keeps `derive_heading_seg` alone, so the second row repeats `findings` and the
+  plant exits 1.
+- **AC4** — In the same run, `check` prints `tags: green · 0 red` and no line naming
+  `doc.repeat#findings`.
+  Red when: a uniqueness grade is applied to derived anchors, so the repeated heading reds and the plant
+  exits 1.
 - **AC5** — When a scratch probe calls `derive_anchor` over the `##` and `###` headings of every tracked
-  `.md` file under `memory/`, read outside fences with `unfenced_lines` and a fresh `seen` per file, it
-  counts no file holding two equal anchors, and prints the number of files whose plain folds repeat.
+  `.md` file under `memory/`, read outside fences with `tree_lib.py#unfenced_lines` and a fresh `seen` per
+  file, it counts no file holding two equal anchors, and prints the number of files whose plain folds
+  repeat.
   Red when: a repeat takes the bare base, so each of the records whose folds repeat holds two equal
   anchors.
-  figure: DERIVED at observation; 16 at `fb872a37`.
+  figure: DERIVED at observation; 24 at `e1ae60af8`.
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix`
+`playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `tags (the resolver's checks)`
 
-New arm: tools/playbook/gov_tag.py · covers AC3 AC4 · the `repeat-heading` plant of `gov_tag.py --fixture`, run by the `tags` leg pack PLAY-dOrderedCharter-19 S12 adds, staged by `extract_doc` folding without `derive_anchor` · none
+New arm: tools/playbook/adopt-playbook.sh · covers AC3 AC4 · the two `repeat-heading` rows of its tag-resolver block over `gov_tag.py --fixture`, run by the `playbook render selftest` leg, staged by `extract_doc` folding with `derive_heading_seg` alone · none
+
+`tags (the resolver's checks)` runs `extract_doc` over this repository's own `doc` files, which S2 changes
+and the measurement shows unchanged. Not checked by any leg: AC1, AC2 and AC5, observed by a pass alone.
 
 ## 8. Open questions
 
@@ -181,8 +237,9 @@ New arm: tools/playbook/gov_tag.py · covers AC3 AC4 · the `repeat-heading` pla
   Options: (a) the parent spec's spelling as cited in §2, the build run re-grounding on the landed
   code and bumping this spec's rev before any code where they differ; (b) wait for the parent.
   RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, BUILD-METHOD M2 ("to diverge, change the spec
-  first") and the brief's rule that a spec calls each parent surface as its spec names it.
-  widens: none · relaxes: none
+  first") and the brief's rule that a spec calls each parent surface as its spec names it. Applied at
+  rev-3: the fold landed as `derive_heading_seg` and the plant rows in `adopt-playbook.sh`, and the
+  preconditions of §2 name them so. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -190,18 +247,27 @@ New arm: tools/playbook/gov_tag.py · covers AC3 AC4 · the `repeat-heading` pla
   cl-0221, and a fold probe over the tracked memory tree.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-11-22 · §1 · §2 preconditions, S1, S2, S3, S4 · §3 · §4 · §5 · AC2, AC3, AC4, AC5 · §7 ·
+  §8 F3 · §10 · re-grounded at `e1ae60af8` per `2026-11-22-prompt-TOOL-dTotalRecall-10-reground-brief`:
+  PLAY-dOrderedCharter-19 CLOSED, its fold landed as `derive_heading_seg`, which S1 calls; an empty base
+  stays unrecorded; the plant's rows live in `adopt-playbook.sh` under `playbook render selftest`, so
+  the arm moves there and Files touched gains it; `policy fixtures` and the `tags` leg join §7; the
+  measurement re-pinned (24 at `e1ae60af8`, DERIVED); §3 names the plain fold's other callers.
 
 ## 10. Reuse audit
 
-The seam extended is PLAY-dOrderedCharter-19 S3's heading fold inside `extract_doc` in
-`tools/playbook/tag_index.py`, specced and unbuilt; this unit names it `derive_anchor` and adds the
-suffix, rather than writing a second fold beside it. The lookup,
-`python tools/codebase-map/reuse_lookup.py "derive an anchor slug from a markdown heading"`, ranked
-`slug` (`tools/hooks/agent-cap.js`), `anchors` (`tools/memory-tree/merge-rows.py`) and `anchor_at`
-(`tools/memory-recall/extract.py:551`); read at source, `anchor_at` returns the record id a line
-defines and `anchors` keys merge rows, so no heading-anchor deriver exists in code, as scout B found by
-`git grep`. Disagreements with source: scout B and systems `:514` count 13 records repeating an H2 or
-H3; the probe of §4 counts 16 at `fb872a37`. The recall probe returned scout B's row, the
-systems-retrofit finding at `:352` offering the two options of §8 F1, and systems `:504-515`.
+The seam extended is `tools/playbook/tag_index.py#derive_heading_seg`, PLAY-dOrderedCharter-19 S3's
+fold as landed, and its caller `#extract_doc`; this unit wraps the fold in `derive_anchor` and adds the
+suffix, rather than writing a second fold beside it. The fixture seam is `gov_tag.py#PLANTS`,
+`#build_tags_fixture` and `#run_plant`, asserted by `adopt-playbook.sh`'s `run_plant_rows`. The lookup,
+`python tools/codebase-map/reuse_lookup.py "derive an anchor slug from a markdown heading"`, rerun
+2026-11-22, ranked `SlugPattern` and `anchor_at` (`tools/memory-tree/id_grammar.py`) and `anchors`
+(`tools/memory-tree/merge-rows.py`); read at source, `anchor_at` returns the record id a line defines,
+`SlugPattern` is the build-slug grammar and `anchors` keys merge rows, so none derives a heading anchor.
+`git grep "def derive_.*heading"` found `derive_heading_seg` and `docs_leg.py#derive_heading_slugs`, the
+second rejected in §4. Disagreements with source: scout B and systems `:514` count 13 records repeating
+an H2 or H3; rev-1 counted 16 at `fb872a37`; the probe of §4 counts 24 at `e1ae60af8` (PINNED
+2026-11-22). The recall probe returned scout B's row, the systems-retrofit finding at `:352` offering
+the two options of §8 F1, and systems `:504-515`.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a repeated heading given a unique derived anchor" --terms "derived anchor repeated heading ordinal suffix fold slug section tag M35 legacy-anchors derive_anchor"`

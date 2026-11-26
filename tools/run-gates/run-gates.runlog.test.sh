@@ -610,7 +610,7 @@ check_ac3_signals() {
     tp=$!
     i=0; while [ ! -s "$rp" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done
     lp=$(cat "$rp" 2>/dev/null); LEG_PIDS="$LEG_PIDS $lp"
-    id=$(cat "$REPO/.git/gate-run/current" 2>/dev/null); rpid=${id##*-}
+    id=$(cat "$REPO/.git/gate-run/current" 2>/dev/null); rpid=${id##*-}  # census: kept slug-grammar not a unit id: a process id
     check "AC3 $sig: the leg reported ready, so the bar is past its header" "$([ -n "$lp" ] && echo yes)" yes
     check "AC3 $sig: the run id names the runner's pid" "$(case "$rpid" in ''|*[!0-9]*) echo no ;; *) echo yes ;; esac)" yes
     check "AC3 $sig: no line before the signal" "$(measure_lines)" "$l0"
@@ -644,7 +644,7 @@ check_ac3_signals() {
     timeout --foreground 300 bash "$fp/run-gates.sh" >"$WORK/out.fp" 2>&1 &
   tp=$!
   i=0; while [ ! -s "$rp" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done
-  id=$(cat "$REPO/.git/gate-run/current" 2>/dev/null); rpid=${id##*-}
+  id=$(cat "$REPO/.git/gate-run/current" 2>/dev/null); rpid=${id##*-}  # census: kept slug-grammar not a unit id: a process id
   check "AC3 foreground: the stub holds the runner in a command substitution" "$([ -s "$rp" ] && echo yes)" yes
   kill -TERM "$rpid" 2>/dev/null
   : > "$rp.sent"

@@ -204,6 +204,8 @@ Coverage of dFairHearing's 18 clause(s) and 10 owned node(s), over 45 spec(s) at
 | 31 | `TOOL-dFairHearing-47` | no |
 | 32 | `TOOL-dFairHearing-48` | no |
 | 33 | `TOOL-dFairHearing-50` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
@@ -211,3 +213,18 @@ Coverage of dFairHearing's 18 clause(s) and 10 owned node(s), over 45 spec(s) at
 - **Parent builds:** [dSafePassage](../dSafePassage/README.md)
 - **Child builds:** [dCalibratedLens](../dCalibratedLens/README.md), [dDeclaredLoop](../dDeclaredLoop/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-08-prompt-TOOL-dFairHearing-1-arms-brief.md`, `2026-11-08-prompt-TOOL-dFairHearing-1-1-researcher.md` and 190 more under prompts/ |
+| reviews | `2026-11-05-review-TOOL-dFairHearing-43-47-diff-review.md` (CLEAN WITH FIXES), `2026-11-04-review-TOOL-dFairHearing-1-40-diff-review.md` (CLEAN WITH FIXES) and 5 more under reviews/ |
+| deviation | `2026-11-05-build-TOOL-dFairHearing-50-deviation-502.md`, `2026-11-05-build-TOOL-dFairHearing-50-deviation-501.md` and 43 more under build/ |
+| research | `2026-11-04-build-TOOL-dFairHearing-30-ungated.py`, `2026-11-04-build-TOOL-dFairHearing-30-replay-verdict.md` and 21 more under build/ |
+| logs | `2026-11-08-build-TOOL-dFairHearing-50-1-builder-return.md`, `2026-11-08-build-TOOL-dFairHearing-1-runlog-70b3ac3f.md` and 113 more under build/ |
+| open asks | `BACKLOG.md`, 8 open |
+| card ref | `refs/gov/builds/dFairHearing/card` |
+<!-- /gen:build-routes -->

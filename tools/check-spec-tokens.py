@@ -814,7 +814,7 @@ SPEC_UID = re.compile(r"^# ([A-Z][A-Za-z0-9-]*) ", re.M)
 # A unit id is this join's SUBJECT, not its payload. The target is dropped by identity; every other
 # id in the bullet is context — a sibling unit, a prior decision — and grading one would demand that
 # every spec a bullet mentions names the unit mentioning it.
-UNIT_ID = re.compile(r"^[A-Z][A-Za-z0-9]*-[A-Za-z]+-[0-9]+$")
+# Its slug is the slug grammar's class (TOOL-dTotalRecall-5 S7), bound below once the kit resolves.
 HANDOFF_WHY = ("this bullet hands the token to that sibling and the sibling's own spec never names "
                "it: name it there, or correct the bullet — the join proves the sibling NAMES the "
                "token, never that it does the work")
@@ -840,6 +840,20 @@ try:
 except LookupError as exc:
     KIT_DIR, KIT_MISS = None, str(exc)
 DESIGN_LIB = KIT_DIR / "design_lib.py" if KIT_DIR else None
+
+
+def load_unit_id():
+    """`UNIT_ID`, bound from the memory-tree kit's slug grammar at first use; None where the kit does not
+    resolve, a tree `main` refuses by name before any join reads it."""
+    if KIT_DIR is None:
+        return None
+    if str(KIT_DIR) not in sys.path:
+        sys.path.append(str(KIT_DIR))
+    import id_grammar  # noqa: PLC0415 — the kit beside this file, reached through its resolver
+    return id_grammar.SlugPattern(lambda g: r"^[A-Z][A-Za-z0-9]*-(?:" + g.slug_class + r")-[0-9]+$")
+
+
+UNIT_ID = load_unit_id()
 # The kit's own loads while a namesake from another file holds their `sys.modules` slot, keyed by the
 # resolved path, so one process loads each kit file once (TOOL-dTrueNorth-31 S11).
 KIT_LOADS = {}

@@ -98,9 +98,22 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 | 4 | `TOOL-dFoldedVerdict-3` | no |
 | 5 | `TOOL-dFoldedVerdict-4` | no |
 | 6 | `TOOL-dFoldedVerdict-6` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-09-02-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-closing-diff-round1.md` (BLOCKED), `2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md` (BLOCKED) |
+| logs | `2026-09-01-build-TOOL-dFoldedVerdict-6-1-compression.md`, `2026-09-01-build-TOOL-dFoldedVerdict-5-1-verb-carrier.md` and 4 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dFoldedVerdict/card` |
+<!-- /gen:build-routes -->

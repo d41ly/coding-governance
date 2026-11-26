@@ -313,6 +313,8 @@ Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 80 spec(s) at 
 | 32 | `TOOL-dGroundRules-85` | no |
 | 33 | `TOOL-dGroundRules-86` | no |
 | 34 | `TOOL-dGroundRules-87`, `TOOL-dGroundRules-88` | yes |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
@@ -320,3 +322,18 @@ Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 80 spec(s) at 
 - **Parent builds:** [dTrueNorth](../dTrueNorth/README.md)
 - **Child builds:** [dSafePassage](../dSafePassage/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-25-prompt-TOOL-dGroundRules-9-close-arms-researcher.md`, `2026-10-25-prompt-TOOL-dGroundRules-9-close-arms-brief.md` and 271 more under prompts/ |
+| reviews | `2026-10-25-review-TOOL-dGroundRules-72-79-closing-diff-round2.md`, `2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md` (BLOCKED) and 7 more under reviews/ |
+| deviation | `2026-10-25-build-TOOL-dGroundRules-67-deviation-79.md`, `2026-10-24-build-TOOL-dGroundRules-66-deviation-71.md` and 77 more under build/ |
+| research | `2026-10-25-build-TOOL-dGroundRules-84-research-bar-triage.md` |
+| logs | `2026-10-26-build-TOOL-dGroundRules-1-departures-build.md`, `2026-10-25-build-TOOL-dGroundRules-88-ledger.md` and 71 more under build/ |
+| open asks | `BACKLOG.md`, 14 open |
+| card ref | `refs/gov/builds/dGroundRules/card` |
+<!-- /gen:build-routes -->

@@ -179,6 +179,8 @@ Coverage of dTrueNorth's 6 clause(s) and 1 owned node(s), over 30 spec(s) at or 
 | 14 | `TOOL-dTrueNorth-31` | no |
 | 15 | `TOOL-dTrueNorth-32` | no |
 | 16 | `TOOL-dTrueNorth-33` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
@@ -186,3 +188,17 @@ Coverage of dTrueNorth's 6 clause(s) and 1 owned node(s), over 30 spec(s) at or 
 - **Parent builds:** [dClosedLoop](../dClosedLoop/README.md)
 - **Child builds:** [dGroundRules](../dGroundRules/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-22-prompt-TOOL-dTrueNorth-33-spec-brief.md`, `2026-10-22-prompt-TOOL-dTrueNorth-33-1-spec-writer.md` and 62 more under prompts/ |
+| reviews | `2026-10-22-review-TOOL-dTrueNorth-31-closing-diff-review-round3.md` (CLEAN WITH FIXES), `2026-10-22-review-TOOL-dTrueNorth-23-closing-diff-review-round2.md` (CLEAN WITH FIXES) and 3 more under reviews/ |
+| deviation | `2026-10-22-build-TOOL-dTrueNorth-8-deviation-37.md`, `2026-10-22-build-TOOL-dTrueNorth-33-deviation-41.md` and 39 more under build/ |
+| logs | `2026-10-22-build-TOOL-dTrueNorth-29-flagged-bar.md`, `2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md` and 33 more under build/ |
+| open asks | `BACKLOG.md`, 7 open |
+| card ref | `refs/gov/builds/dTrueNorth/card` |
+<!-- /gen:build-routes -->

@@ -121,9 +121,22 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 | 1 | `TOOL-aTunedCompass-1`, `TOOL-aTunedCompass-4`, `TOOL-aTunedCompass-5`, `TOOL-aTunedCompass-6`, `TOOL-aTunedCompass-7`, `TOOL-aTunedCompass-9` | no |
 | 2 | `TOOL-aTunedCompass-10`, `TOOL-aTunedCompass-11`, `TOOL-aTunedCompass-2` | unknown |
 | 3 | `TOOL-aTunedCompass-3`, `TOOL-aTunedCompass-8` | yes |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 - **Parent builds:** [aWeighedCompass](../aWeighedCompass/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-09-05-review-TOOL-aTunedCompass-4-spec-audit-round2.md`, `2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md` and 2 more under reviews/ |
+| logs | `2026-09-05-build-TOOL-aTunedCompass-8-acceptance-ledger.md`, `2026-09-05-build-TOOL-aTunedCompass-6-acceptance-ledger.md` and 4 more under build/ |
+| card ref | `refs/gov/builds/aTunedCompass/card` |
+<!-- /gen:build-routes -->

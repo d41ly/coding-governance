@@ -184,3 +184,14 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-18-review-TOOL-aRelaxedShard-4.md` (BLOCKED), `2026-08-17-review-TOOL-aRelaxedShard-1.md` (BLOCKED) and 1 more under reviews/ |
+| research | `2026-08-18-build-TOOL-aRelaxedShard-4-census.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aRelaxedShard/card` |
+<!-- /gen:build-routes -->

@@ -3,7 +3,9 @@
 One factory per kind: `build_target`, the scratch adopter target a fixture installs into, and
 `build_scratch_gov`, an empty synthetic gov repository a fixture fills (TOOL-dSafePassage-26 S19),
 lifted from `selftest.py`'s `build_gov17`. Callers: `selftest.py`'s arms, `upgrade_walk.py`'s
-release-0 tree, and the fixtures of `upgrade_steps.py` and `fixtures/retired_edits.py`. A local
+release-0 tree, and the fixtures of `upgrade_steps.py` and `fixtures/retired_edits.py`. Beside them,
+the deploy-tail factory `render_deploy_tail`, a scratch deploy file's stub answers, read by
+`matrix.py`'s shapes 6 and 7 and the suite's recall closure (TOOL-dTotalRecall-21 S11). A local
 helper that calls a factory takes a name of its own, since a local binding of the factory's name
 calling it calls itself.
 """
@@ -125,6 +127,53 @@ def build_target(tmp: pathlib.Path, deploy: str | None, name: str = "target",
     run_git(t, "add", "-A")
     run_git(t, "commit", "-qm", "base")
     return t
+
+
+#: The six answers shapes 6 and 7 fix over the stubs (PLAY-dOrderedCharter-80 S7), one constant so the
+#: default install and the aged one cannot drift apart. Moved here from `matrix.py` with the two
+#: functions below at their second consumer, the deployer suite's recall closure (TOOL-dTotalRecall-21 S11).
+INSTALL_ANSWERS = {"memory_root": "memory", "playbook_path": "docs/PARALLEL.md", "playbook_dir": "docs",
+                   "manifest_path": "docs/SESSION-KICKOFF.md", "user_skills": "~/.claude/skills",
+                   "preset": "standard"}
+
+
+def derive_bullet_placeholders() -> set[str]:
+    """PLAY-dOrderedCharter-81 S2, PLAY-dOrderedCharter-82 S2. The lowercased keys whose token is a
+    whole line inside a one-line region of gov's charter template, as the renderer's `--bullet-keys`
+    prints them. A child process, so no import edge joins the renderer's closure to this one.
+    `govkit` is imported here rather than at the module's head: `upgrade_steps.py`, a `build_target`
+    caller, runs inside the engine (TOOL-dTotalRecall-21 S11)."""
+    import sys  # noqa: PLC0415
+    import govkit  # noqa: PLC0415
+    here = pathlib.Path(__file__).resolve().parent
+    kd = govkit.resolve_kit_dir("playbook", "render_playbook.py", here)
+    p = subprocess.run([sys.executable, str(kd / "render_playbook.py"), "--bullet-keys"], capture_output=True,
+                       text=True, encoding="utf-8", stdin=subprocess.DEVNULL)
+    if p.returncode:
+        raise RuntimeError(f"render_playbook.py --bullet-keys exited {p.returncode}: {p.stderr.strip()}")
+    return set(p.stdout.split())
+
+
+def render_deploy_tail(kits, fixed: dict) -> str:
+    """A scratch deploy file's tail: the `kits` line, the `[answers]` header and one stub per
+    placeholder the playbook entry declares, with `fixed` over the stubs. PLAY-dOrderedCharter-80 S7.
+
+    The answers are DERIVED from the descriptor's own placeholder rows, never listed. Every key gets
+    a stub, whatever its class: for a `derived` row the probe still wins when it can see, and the stub
+    is only the override the engine already honours when it cannot. A hand list here would go stale
+    the first time the charter grew a placeholder. A placeholder whose token is a whole line inside a
+    one-line region the render grades (aDistilledCharter) takes a `- ` bullet stub: the template,
+    not the row's default, decides the bullet shape. The descriptor is read from this module's own
+    directory, the deployer kit's (TOOL-dTotalRecall-21 S11)."""
+    import govkit  # noqa: PLC0415
+    nl = chr(10)
+    pdesc = govkit.load_toml(pathlib.Path(__file__).resolve().parent / "entries" / "playbook.kit.toml")
+    bullets = derive_bullet_placeholders()
+    ans = {r["key"].lower(): ("- stated" if r["key"].lower() in bullets else "stated")
+           for r in pdesc.get("placeholder", [])}
+    ans.update(fixed)
+    return ("kits = [" + ", ".join('"%s"' % k for k in kits) + "]" + nl + "[answers]" + nl
+            + nl.join('%s = "%s"' % (k, v) for k, v in sorted(ans.items())) + nl)
 
 
 def check_inherited_config() -> int:
