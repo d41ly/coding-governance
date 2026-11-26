@@ -14222,10 +14222,11 @@ memory/builds/dTotalRecall/build/2026-11-05-build-TOOL-dTotalRecall-1-parents-cr
 memory/builds/dTotalRecall/build/2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md	20653 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/build/2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md	29821 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/build/2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md	49152 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dTotalRecall/build/2026-11-26-build-TOOL-dTotalRecall-123-map-replay-verdict.md	30748 bytes	1	2d94dd3b952200222d74d2cd7766bda5d88fb498	widened:2026-11-26-build-TOOL-dTotalRecall-125-widen-41
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	1 MB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	1,000 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	1,436 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	101 specs	1	fbe06249e7d0ab90b087f9c06d3fa45fa2d07741	widened:2026-11-25-build-TOOL-dTotalRecall-123-widen-35
+memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	103 specs	1	2d94dd3b952200222d74d2cd7766bda5d88fb498	widened:2026-11-26-build-TOOL-dTotalRecall-125-widen-41
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	30 s	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	32,768 B	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	33 KB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -14355,6 +14356,9 @@ memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-77-spec-a
 memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md	8 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md	80 calls	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md	8 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dTotalRecall/reviews/2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md	300 s	1	2d94dd3b952200222d74d2cd7766bda5d88fb498	widened:2026-11-26-build-TOOL-dTotalRecall-125-widen-41
+memory/builds/dTotalRecall/reviews/2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md	60 s	1	2d94dd3b952200222d74d2cd7766bda5d88fb498	widened:2026-11-26-build-TOOL-dTotalRecall-125-widen-41
+memory/builds/dTotalRecall/reviews/2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md	73 s	1	2d94dd3b952200222d74d2cd7766bda5d88fb498	widened:2026-11-26-build-TOOL-dTotalRecall-125-widen-41
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-10.md	13 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-100.md	40 units	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	1,000 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -14363,6 +14367,10 @@ memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	33 KB	1	
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	33,000 B	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	33000 B	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	34,000 B	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-125.md	0 bytes	1	2d94dd3b952200222d74d2cd7766bda5d88fb498	widened:2026-11-26-build-TOOL-dTotalRecall-125-widen-41
+memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-125.md	30 bytes	1	2d94dd3b952200222d74d2cd7766bda5d88fb498	widened:2026-11-26-build-TOOL-dTotalRecall-125-widen-41
+memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-125.md	73 s	1	2d94dd3b952200222d74d2cd7766bda5d88fb498	widened:2026-11-26-build-TOOL-dTotalRecall-125-widen-41
+memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-125.md	79 files	1	2d94dd3b952200222d74d2cd7766bda5d88fb498	widened:2026-11-26-build-TOOL-dTotalRecall-125-widen-41
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-13.md	8 calls	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-14.md	16,384 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-14.md	32,768 B	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

@@ -801,3 +801,6 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-26T04:17:05Z brief · item TOOL-dTotalRecall-124 · reason be2914bc42c9 memory/builds/dTotalRecall/prompts/2026-11-26-prompt-TOOL-dTotalRecall-124-build-brief.md
 
 2026-11-26T04:32:22Z dispatch · item 6fa6785f TOOL-dTotalRecall-124 · reason memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/build memory/gotchas/path-list-input-read-as-options.md memory/ledger memory/map/features/playbook.md memory/map/generated tools/memory-tree/tree_lib.py tools/playbook/code_record.py tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-124.md memory/builds/dTotalRecall/build/2026-11-26-build-TOOL-dTotalRecall-124-1-acceptance-ledger.md
+2026-11-26T05:00:49Z draw · fix-pass · TOOL-dTotalRecall-124 · 91/186 · 20261126T050049Z-bb8eff
+
+2026-11-26T05:00:50Z dispatch · item 6fa6785f TOOL-dTotalRecall-124 · reason memory/gotchas/INDEX.md memory/LIVE.md

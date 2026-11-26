@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-125 — the closing review's round 3 minors: a read that runs a program is the act, each decision matched to git's parse, anchors that refine path staleness and resolve at HEAD, a guard and a budget, two refusals armed, a README row, a pinned noise and a record's variances
 
-**Status:** OPEN · rev-1 · 2026-11-26 · node d · Tier-2 · base 33706662 · streams tooling · order 53
+**Status:** INPROGRESS · rev-1 · 2026-11-26 · node d · Tier-2 · base 33706662 · streams tooling · order 53
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-26-build-TOOL-dTotalRecall-125-widen-41.md](../build/2026-11-26-build-TOOL-dTotalRecall-125-widen-41.md) | widen | — |
 | [2026-11-26-prompt-TOOL-dTotalRecall-125-1-spec-writer.md](../prompts/2026-11-26-prompt-TOOL-dTotalRecall-125-1-spec-writer.md) | log | — |
+| [2026-11-26-prompt-TOOL-dTotalRecall-125-build-brief.md](../prompts/2026-11-26-prompt-TOOL-dTotalRecall-125-build-brief.md) | journal | — |
 | [2026-11-26-prompt-TOOL-dTotalRecall-125-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-dTotalRecall-125-spec-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
