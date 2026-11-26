@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-3 — a build's sweep touches only the rows that the trees and gone worktrees' edits it lets go of held
 
-**Status:** SPECCED · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 3 · ratified 2026-11-25
+**Status:** INPROGRESS · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 3 · ratified 2026-11-25
 
 <!-- gen:spec-records -->
 
