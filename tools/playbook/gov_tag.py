@@ -27,6 +27,7 @@ revision. `--set` is honoured under `--fixture` only, so the leg cannot be relax
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import os
 import pathlib
@@ -37,6 +38,7 @@ import subprocess
 import sys
 import tempfile
 import types
+import unittest.mock
 
 KIT_DIR = pathlib.Path(os.path.abspath(__file__)).parent
 sys.path.insert(0, str(KIT_DIR))
@@ -437,6 +439,11 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
           "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "dead-versions", "named-probe", "released-rows",
           "released-cost", "gc-predates")
+#: TOOL-aPrunedIndex-17 S3: the plants `run_fixture` runs inside `set_git_held`; every other asks git each time
+HELD_PLANTS = ("dead-versions", "named-probe", "released-rows", "released-cost", "gc-predates")
+#: S1: the one full object id a held read names, alone or naming its tree, and every flag it may carry
+HELD_ID_RE = re.compile(r"[0-9a-f]{40}(\^\{tree\})?")
+HELD_FLAGS = frozenset({"--full-tree", "--name-only", "-r", "-z", "--"})
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -702,6 +709,50 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
     return root
 
 
+def derive_held_key(repo, args):
+    """The key a git read's answer is held under for one plant run, or None where that answer can move
+    (TOOL-aPrunedIndex-17 S1): the common dir or top of a worktree whose `.git` entry stands at `repo`, or a
+    `rev-parse` or `ls-tree` whose one revision is a full object id, every other element an allow-listed flag
+    or a path after `--`."""
+    args = tuple(args)
+    if args in (("rev-parse", "--git-common-dir"), ("rev-parse", "--show-toplevel")):
+        return (str(repo), args) if os.path.lexists(os.path.join(repo, ".git")) else None
+    if not args or args[0] not in ("rev-parse", "ls-tree"):
+        return None
+    ids, paths = 0, False
+    for arg in args[1:]:
+        if paths:
+            continue
+        if arg == "--":
+            paths = True
+        elif HELD_ID_RE.fullmatch(arg):
+            ids += 1
+        elif arg not in HELD_FLAGS:
+            return None
+    return (str(repo), args) if ids == 1 else None
+
+
+def read_held_git(repo, *args, held, reader):
+    """`reader(repo, *args)`, answered from `held` where `derive_held_key` gives the read a key and stored there
+    on its first success; a read that raises stores nothing, so it asks git again (S2)."""
+    key = derive_held_key(repo, args)
+    if key is None:
+        return reader(repo, *args)
+    if key not in held:
+        held[key] = reader(repo, *args)
+    return held[key]
+
+
+@contextlib.contextmanager
+def set_git_held():
+    """`tag_index`'s two git readers, `read_git_stdout` and `git`, set to one `read_held_git` over a store the
+    block owns, both put back on every exit by `patch.object`, the swap `tools/loop/guard.py` makes (S2);
+    `tag_index.py` itself is never edited (section 3)."""
+    held = functools.partial(read_held_git, held={}, reader=ti.read_git_stdout)
+    with unittest.mock.patch.object(ti, "read_git_stdout", held), unittest.mock.patch.object(ti, "git", held):
+        yield
+
+
 def run_fixture(plant: str, sets: dict) -> int:
     if plant not in PLANTS:
         print(f"tags: no plant '{plant}': one of {', '.join(PLANTS)}", file=sys.stderr)
@@ -711,7 +762,8 @@ def run_fixture(plant: str, sets: dict) -> int:
     from tree_lib import GIT_ENV_LEAKS
     top = pathlib.Path(tempfile.mkdtemp(prefix="gt"))
     try:
-        with set_env_aside(GIT_ENV_LEAKS):
+        held = set_git_held() if plant in HELD_PLANTS else contextlib.nullcontext()
+        with set_env_aside(GIT_ENV_LEAKS), held:
             root = build_tags_fixture(top, plant)
             return run_plant(root, top, plant, sets)
     finally:

@@ -13038,6 +13038,11 @@
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
+      "id": "derive_held_key",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "derive_hold_lines",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
@@ -24256,6 +24261,11 @@
       "id": "read_held_gates",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_held_git",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "read_held_keys",
@@ -40591,6 +40601,11 @@
       "id": "set_gen_strip",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "set_git_held",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "set_group",
