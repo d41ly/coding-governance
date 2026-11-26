@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md](../../aPrunedIndex/reviews/2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23 TOOL-aPrunedIndex-24 TOOL-aPrunedIndex-25 TOOL-aPrunedIndex-26 PLAY-dClosedLoop-1 TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-105 TOOL-dSettledStage-1 |
 | [2026-11-15-build-TOOL-aTwinnedPass-1-1-acceptance-ledger.md](../build/2026-11-15-build-TOOL-aTwinnedPass-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-15-build-TOOL-aTwinnedPass-2-measurement.md](../build/2026-11-15-build-TOOL-aTwinnedPass-2-measurement.md) | research | TOOL-aTwinnedPass-2 |
 | [2026-11-15-prompt-TOOL-aTwinnedPass-1-1-spec-writer.md](../prompts/2026-11-15-prompt-TOOL-aTwinnedPass-1-1-spec-writer.md) | journal | — |
