@@ -839,3 +839,31 @@ readers-none = "its first role reader is the work order's code slot, which TOOL-
 lifecycle = "generated"
 check = "code record"
 purpose = { text = "what a tree's code defines, calls, invokes and registers, derived per blob and cached by tree hash", source = "owner" }
+
+[[record-kind]]
+name = "request-records"
+tag = "record.request-records"
+layer = "layer.runtime"
+home = ["<git-common-dir>/requests/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "request.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "session-registry"
+tag = "record.session-registry"
+layer = "layer.runtime"
+home = ["<git-common-dir>/procmon/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "tether.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }

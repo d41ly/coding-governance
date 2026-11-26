@@ -836,7 +836,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 
 <!-- gen:record-kinds -->
 
-55 kinds · 26 purposes pending
+57 kinds · 28 purposes pending
 
 | Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |
 |---|---|---|---|---|---|---|---|
@@ -895,6 +895,8 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 | `ask` | `record.ask` | `memory/builds/*/BACKLOG.md` | `gov_record.py new ask` | — | — | `memory hygiene` | the ask kind's acceptance at filing; its writers are the items that file asks, each filing stating its acceptance |
 | `shape-run` | `record.shape-run` | `memory/builds/*/build/*-build-*-shape-run-*.md` | `gov_record.py new shape-run` | — | — | `shape-run records (each record equals its review line)` | one review exit's review-shape line as typed fields, compared back to that line by shape_run.py |
 | `code` | `record.code` | `<git-common-dir>/gov/index-s*.db` | `generator:{prefix}/playbook/code_record.py` | — | — | `code record` | what a tree's code defines, calls, invokes and registers, derived per blob and cached by tree hash |
+| `request-records` | `record.request-records` | `<git-common-dir>/requests/*` | `request.py` | — | — | `record-kinds` | — |
+| `session-registry` | `record.session-registry` | `<git-common-dir>/procmon/*` | `tether.py` | — | — | `record-kinds` | — |
 
 <!-- /gen:record-kinds -->
 
