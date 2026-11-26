@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-26-build-TOOL-aPrunedIndex-10-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-aPrunedIndex-10-1-acceptance-ledger.md) | journal | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-10-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-10-1-spec-brief.md) | research | TOOL-aPrunedIndex-4 |
+| [2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md) | research | TOOL-aPrunedIndex-17 |
 | [2026-11-26-review-TOOL-aPrunedIndex-4-10-diff-review-round2.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-4-10-diff-review-round2.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 |
 | [2026-11-26-review-TOOL-aPrunedIndex-4-10-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-4-10-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-4 |
 
