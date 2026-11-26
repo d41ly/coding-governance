@@ -5,8 +5,8 @@
 No merge bar, no self-test suite and no gate leg ran in this pass, and nothing here opened either live index
 file. Every reading is node a's, 2026-11-26, from base `bf124054d` at spec rev-4, by `--fixture` plants in
 their own scratch repositories and by `python -c` probes of `tools/playbook/gov_tag.py`. The load gauge is the
-mean wall of 20 `git --version` spawns taken just before each run. The five arms' staged reds (AC6), AC8 and
-the legs of section 7 are owed at the close.
+mean wall of 20 `git --version` spawns taken just before each run. The legs of section 7 are owed at the close. The main
+loop recorded AC6 and AC8 at the close, on the AC6, AC8 and seen-red lines below.
 
 **Evidences:** TOOL-aPrunedIndex-17
 - AC1 — `python tools/playbook/gov_tag.py --fixture --plant <plant>` for each of the five after the edit — each exit 0, each last line ending in its `tag_bundle.SELFTEST_ROWS` text: `reads cost their own version's rows`, `within a tenth under every pad`, `only replaced edits left, and nothing lost`, `a sweep costs what was released` and `refused on wt4, wt3 read and then skipped by name, refused on none, refused on a conf`.
