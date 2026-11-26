@@ -74,13 +74,13 @@ Every commit carrying the trailer is graded against four limits, and a finding r
 
 | Limit | Bound |
 |---|---|
-| `L1 size` | at most 3 product paths and at most 60 lines over them, added plus deleted; a binary path is over |
+| `L1 size` | at most 3 product paths and at most 69 lines over them, added plus deleted; a binary path is over |
 | `L2 guarded policy file` | no path the policy kit's `guarded-paths.txt` lists; with no policy kit, no path under `.governance/` |
 | `L3 spec edit` | no path under any build's `spec/` folder |
 | `L4 new surface` | no product path added; a rename counts as a deletion and an addition |
 
 The two figures of `L1` are the constants `RED_FIX_MAX_PATHS` and `RED_FIX_MAX_LINES` of
-`routed_commits.py`, read on 2026-11-12. A fix that needs more than the limits allow is a unit, and
+`routed_commits.py`, read on 2026-11-26. A fix that needs more than the limits allow is a unit, and
 takes a spec.
 
 Grade one commit before you push it with
@@ -88,7 +88,7 @@ Grade one commit before you push it with
 1 over one, and 2 when `<rev>` names no commit or the commit carries no trailer:
 
 ```text
-routed-commits: red-fix limits · <sha> is inside all four · bound 3 path(s), 60 line(s)
+routed-commits: red-fix limits · <sha> is inside all four · bound 3 path(s), 69 line(s)
 routed-commits FAILED — a Red-fix commit is outside the inline lane's limits:
 ```
 
