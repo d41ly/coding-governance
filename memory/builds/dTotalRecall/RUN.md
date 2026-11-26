@@ -9,18 +9,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dTotalRecall-27=DEFERRED TOOL-dTotalRecall-28=OPEN TOOL-dTotalRecall-29=CLOSED TOOL-dTotalRecall-30=CLOSED TOOL-dTotalRecall-31=CLOSED TOOL-dTotalRecall-32=CLOSED TOOL-dTotalRecall-33=OPEN TOOL-dTotalRecall-34=OPEN TOOL-dTotalRecall-35=OPEN TOOL-dTotalRecall-101=OPEN TOOL-dTotalRecall-102=CLOSED TOOL-dTotalRecall-103=CLOSED TOOL-dTotalRecall-104=OPEN TOOL-dTotalRecall-105=OPEN TOOL-dTotalRecall-106=OPEN TOOL-dTotalRecall-107=OPEN TOOL-dTotalRecall-108=OPEN TOOL-dTotalRecall-109=CLOSED TOOL-dTotalRecall-110=OPEN TOOL-dTotalRecall-111=OPEN TOOL-dTotalRecall-112=OPEN TOOL-dTotalRecall-113=OPEN TOOL-dTotalRecall-126=OPEN
+units-at-landing: TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-37 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-38 TOOL-dTotalRecall-4 TOOL-dTotalRecall-54 TOOL-dTotalRecall-40 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-6 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-41 TOOL-dTotalRecall-10 TOOL-dTotalRecall-42 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-36 TOOL-dTotalRecall-39 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-61 TOOL-dTotalRecall-24 TOOL-dTotalRecall-67 TOOL-dTotalRecall-20 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-17 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 TOOL-dTotalRecall-43 TOOL-dTotalRecall-52 TOOL-dTotalRecall-62 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-60 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-73 TOOL-dTotalRecall-75 TOOL-dTotalRecall-74 TOOL-dTotalRecall-87 TOOL-dTotalRecall-76 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-90 TOOL-dTotalRecall-88 TOOL-dTotalRecall-91 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-89 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-92 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-114 TOOL-dTotalRecall-115 TOOL-dTotalRecall-116 TOOL-dTotalRecall-117 TOOL-dTotalRecall-118 TOOL-dTotalRecall-119 TOOL-dTotalRecall-120 TOOL-dTotalRecall-121 TOOL-dTotalRecall-122 TOOL-dTotalRecall-123 TOOL-dTotalRecall-124 TOOL-dTotalRecall-125
 hold-run: 
-hold-streak: 1 · at 9024276e
+hold-streak: 1 · at 3123949f
 resume-owed: none · owner
-held-at: 2026-11-23T20:53:03Z
-hold-reason: the owner moves the run to node a (2026-11-23); resume there from memory/builds/dTotalRecall/prompts/2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-session.md
+held-at: 2026-11-26T13:55:37Z
+hold-reason: the parked d0e02120b decision: every bar of this branch reds routed commits on that pushed red-fix, 69 lines against the 60-line lane; the close at 3ab8abdd blocked on gates-green, so the landing waits on the owner's choice
 hold-until: owner
-hold-code: host-owner-action
-held-from: RUNNING
-refreshed-at: 3d6c1702afb6c2e86638785950d80657a187192c · park · ? touching
+hold-code: owner-decision
+held-from: VERIFYING
+refreshed-at: 3d6c1702afb6c2e86638785950d80657a187192c · handoff · ? touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 84a0522fc
-phase: VERIFYING
+witness: 3123949fe07d403a1da346c865c13bd7acfa6ab2
+phase: HELD
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dtotalrecall-ae256e
@@ -813,3 +815,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-26T06:12:11Z dispatch · item bed60eae TOOL-dTotalRecall-125 · reason memory/guides/SESSION-KICKOFF.md
 
 2026-11-26T13:52:07Z decision · item d0e02120b, node d's red-fix of this build, is 69 lines over 2 paths against the inline lane's 60-line bound, so routed commits reds every bar of this branch: replay that pushed history into a routed unit, or record the over-bound red-fix as accepted at the landing? · reason options seen: rewrite pushed history so the fix rides a specced unit; split it, which also rewrites pushed history; or the owner's waiver row for the commit. Refused because each rewrites a pushed commit or waives a gate, and the mandate delegates neither
+
+2026-11-26T13:56:02Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dTotalRecall && bash tools/push-main.sh --land --slug dTotalRecall && bash tools/unattended/unattended.sh --settle dTotalRecall
+
+2026-11-26T13:56:03Z hold · item owner-decision · reason until owner · reaped 3c88023a · resume none(owner)
