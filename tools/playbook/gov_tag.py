@@ -1216,7 +1216,7 @@ def run_plant(root, top, plant, sets) -> int:
         alpha, beta = "memory/guides/ALPHA.md", "memory/guides/BETA.md"
         ctx = ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml")
 
-        def count_rows(con, where="", args=()):
+        def measure_rows(con, where="", args=()):
             return [con.execute(f"SELECT COUNT(*) FROM {t} {where}", args).fetchone()[0] for t in tables]
 
         def derive_texts(files):  # {path: the word its intro holds}
@@ -1239,15 +1239,15 @@ def run_plant(root, top, plant, sets) -> int:
             try:
                 con.execute("BEGIN IMMEDIATE")
                 lost = [con.execute(q).fetchone()[0] for q in lost_queries]
-                before = count_rows(con)
+                before = measure_rows(con)
                 ti.remove_unheld_rows(con)
-                left = [b - a for b, a in zip(before, count_rows(con))]
+                left = [b - a for b, a in zip(before, measure_rows(con))]
                 con.rollback()
                 return left, lost
             finally:
                 con.close()
 
-        def look(step, want=zero, rebuild=(root,)):  # a step's line; `want` None reads `lost` alone
+        def check_step(step, want=zero, rebuild=(root,)):  # a step's line; `want` None reads `lost` alone
             for where in rebuild:
                 run_verb(where, "rebuild", None, sets=sets)
             left, lost = read_left()
@@ -1260,7 +1260,7 @@ def run_plant(root, top, plant, sets) -> int:
             blob = ti.read_git(where, "hash-object", "--", alpha).strip()
             con = ti.load_index(root)
             try:
-                return count_rows(con, "WHERE blob=?", (blob,))
+                return measure_rows(con, "WHERE blob=?", (blob,))
             finally:
                 con.close()
 
@@ -1271,36 +1271,36 @@ def run_plant(root, top, plant, sets) -> int:
         write_commit(root, {beta: GUIDE}, "a twin")
         run_verb(root, "rebuild", None, sets=sets)
         commit_texts({alpha: "apart"})
-        look(1)
+        check_step(1)
         for where, branch in ((other, "two"), (gone, "three")):
             run_git(root, "worktree", "add", "-q", str(where), "-b", branch)
         commit_texts({alpha: "e1"})
-        look(2)
+        check_step(2)
         write_text(other, "e1")
         write_text(gone, "f1", beta)
-        look(3, rebuild=(other, gone))
+        check_step(3, rebuild=(other, gone))
         commit_texts({alpha: "f1"})
-        look(4)
+        check_step(4)
         commit_texts({alpha: "f2"})
-        look(5)
+        check_step(5)
         run_git(root, "worktree", "remove", "--force", str(gone))
         run_git(root, "worktree", "prune")
         commit_texts({alpha: "c6"})
-        look(6)
+        check_step(6)
         write_text(root, "g1")
         run_verb(root, "rebuild", None, sets=sets)
         reader = ti.load_index(root)
         try:
             ti.load_view(reader, root, ctx)
             served = read_intro(reader)
-            look(7, rebuild=())
+            check_step(7, rebuild=())
             g1, e1 = read_edit(root), read_edit(other)
             write_text(root, "g2")
-            look(8, g1)
+            check_step(8, g1)
             g2 = read_edit(root)
             run_git(other, "checkout", "-q", "--", alpha)
             write_commit(other, {"AGENTS.md": "# Charter\n\n## Practices\n\nchanged in two\n"}, "two commits")
-            look(9, add(g1, e1), rebuild=(other,))
+            check_step(9, add(g1, e1), rebuild=(other,))
             still = read_intro(reader)
         finally:
             reader.close()
@@ -1309,11 +1309,11 @@ def run_plant(root, top, plant, sets) -> int:
         say("the open view of step 7", "still served g1" if kept else f"served {still}, not {served}")
         run_git(root, "checkout", "-q", "--", alpha)
         commit_texts({beta: "g1"})
-        look(10, add(g2, e1, [g1[0], 0, 0]))
+        check_step(10, add(g2, e1, [g1[0], 0, 0]))
         commit_texts({beta: "b11"})
-        look(11, add(g2, e1, [g1[0], 0, 0]))
+        check_step(11, add(g2, e1, [g1[0], 0, 0]))
         write_text(root, "g1")
-        look(12, add(g2, e1))
+        check_step(12, add(g2, e1))
         run_git(root, "checkout", "-q", "--", alpha)
         con = ti.load_index(root)
         with con:  # one row in each table at the live version, for a blob nothing holds
@@ -1324,10 +1324,10 @@ def run_plant(root, top, plant, sets) -> int:
                 con.execute(f"INSERT INTO {t} SELECT {c} FROM {t} LIMIT 1")
         con.close()
         commit_texts({alpha: "c13"})
-        look(13, add(g1, g2, e1, [1, 1, 1]))
+        check_step(13, add(g1, g2, e1, [1, 1, 1]))
         run_git(other, "checkout", "-q", "--detach", "main")
         run_gc(root, FIXTURE_KIT)
-        look(14)
+        check_step(14)
         dumps = [print_equal(read_dump(root), read_cold_dump())]
         # steps 15 and 16: a save staged before the read, after it and at the write lock, then a read that fails
         hook, fired, real_read, target = [None], [], pathlib.Path.read_bytes, root / alpha
@@ -1349,7 +1349,7 @@ def run_plant(root, top, plant, sets) -> int:
                 return data
             return real_read(self)
 
-        def trace(sql):
+        def run_lock_save(sql):  # the trace callback: the staged save as the overlay takes the write lock
             if hook[0] and hook[0][0] == "at the lock" and sql.strip() == "BEGIN IMMEDIATE":
                 act, hook[0] = hook[0], None
                 act[1]()
@@ -1361,7 +1361,7 @@ def run_plant(root, top, plant, sets) -> int:
                 write_text(root, first)
                 hook[0] = (kind, functools.partial(lambda k, w: (write_text(root, w), fired.append(k)), kind, second))
                 con = ti.load_index(root)
-                con.set_trace_callback(trace)
+                con.set_trace_callback(run_lock_save)
                 try:
                     ti.load_view(con, root, ctx)
                 finally:
@@ -1374,18 +1374,18 @@ def run_plant(root, top, plant, sets) -> int:
                     races.append(word in text and rival not in text)
                     say(f"step 15: the save {kind}, {word} put back:", "served as itself" if races[-1] else
                         f"SERVED {text!r}")
-            look(15, None, rebuild=())
+            check_step(15, None, rebuild=())
             write_text(root, "k1")
             hook[0] = ("fail", None)
             con = ti.load_index(root)
             try:
-                before = count_rows(con) + con.execute("SELECT * FROM dirty_path ORDER BY 1, 2").fetchall()
+                before = measure_rows(con) + con.execute("SELECT * FROM dirty_path ORDER BY 1, 2").fetchall()
                 try:
                     ti.load_view(con, root, ctx)
                     refused = ""
                 except ti.TagError as exc:
                     refused = str(exc)
-                moved = before != count_rows(con) + con.execute("SELECT * FROM dirty_path ORDER BY 1, 2").fetchall()
+                moved = before != measure_rows(con) + con.execute("SELECT * FROM dirty_path ORDER BY 1, 2").fetchall()
             finally:
                 hook[0] = None
                 con.close()
@@ -1403,13 +1403,13 @@ def run_plant(root, top, plant, sets) -> int:
             raw = [0, 0, 0]
         say(f"step 16: the bytes that are not UTF-8 hold {raw} rows")
         write_text(root, "h3")
-        look(16, add(*texts.values(), raw))
+        check_step(16, add(*texts.values(), raw))
         run_git(root, "checkout", "-q", "--", alpha)
         commit_texts({alpha: "race2a", beta: "k1"})
         run_git(other, "checkout", "-q", "--detach", "main")
         run_verb(root, "rebuild", None, sets=sets)  # the revert recorded first, so its edit is one `--gc` collects
         run_gc(root, FIXTURE_KIT)
-        look(17)
+        check_step(17)
         dumps.append(print_equal(read_dump(root), read_cold_dump()))
         counted = all(all(n) for n in (g1, g2, e1, *texts.values())) and raw[0] and raw[2] and not raw[1]
         ok = (not bad and all(dumps) and len(races) == 6 and all(races) and len(fired) == 3 and failed
@@ -1422,10 +1422,10 @@ def run_plant(root, top, plant, sets) -> int:
         return 0 if ok else 1
     if plant == "released-cost":
 
-        def count_window(con, run):  # -> (steps from the tree_built insert to its COMMIT, tables deleted from)
+        def measure_window(con, run):  # -> (steps from the tree_built insert to its COMMIT, tables deleted from)
             on, n, seen = [False], [0], set()
 
-            def trace(sql):
+            def read_statement(sql):  # the trace callback: the window opens at the tree_built insert
                 sql = " ".join(sql.split())
                 if sql.startswith("INSERT OR REPLACE INTO tree_built"):
                     on[0] = True
@@ -1434,11 +1434,11 @@ def run_plant(root, top, plant, sets) -> int:
                 if on[0]:
                     seen.update(t for t in tables if sql.startswith(f"DELETE FROM {t} "))
 
-            def tick():
+            def add_step():
                 n[0] += on[0]
                 return 0
-            con.set_trace_callback(trace)
-            con.set_progress_handler(tick, 1)
+            con.set_trace_callback(read_statement)
+            con.set_progress_handler(add_step, 1)
             try:
                 run()
             finally:
@@ -1446,7 +1446,7 @@ def run_plant(root, top, plant, sets) -> int:
                 con.set_progress_handler(None, 1)
             return n[0], len(seen)
 
-        def count_full(con):  # the full sweep's steps, in a block rolled back
+        def measure_full_sweep(con):  # the full sweep's steps, in a block rolled back
             con.execute("BEGIN IMMEDIATE")
             try:
                 return read_step_count(con, lambda: ti.remove_unheld_rows(con))[0]
@@ -1468,8 +1468,8 @@ def run_plant(root, top, plant, sets) -> int:
                                 pad += con.execute(f"INSERT INTO {t} SELECT {c} FROM {t} WHERE blob IN (SELECT blob "
                                                    "FROM tree_path WHERE path='AGENTS.md') AND version NOT LIKE "
                                                    "'dead%'", (f"dead{i}",)).rowcount
-                full.append(count_full(con))
-                out.append(count_window(con, lambda: ti.load_view(con, root, ctx)))
+                full.append(measure_full_sweep(con))
+                out.append(measure_window(con, lambda: ti.load_view(con, root, ctx)))
             finally:
                 con.close()
         ok = (out[0][1] == out[1][1] == 3 and 0 < out[1][0] <= 2 * out[0][0] and full[1] > 2 * full[0] and pad > 0)
