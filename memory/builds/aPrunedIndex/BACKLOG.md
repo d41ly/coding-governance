@@ -15,3 +15,8 @@
 - SEV · TOOL-aPrunedIndex-7 · LOW · the class `hand-named-gate-list-green-while-the-bar-reds` recurs with no gate, so its next instance is found by review again
 - SEV · TOOL-aPrunedIndex-8 · LOW · the class `criterion-asserts-what-its-own-command-cannot-show` recurs with no gate, so its next instance is found by review again
 - SEV · TOOL-aPrunedIndex-9 · LOW · the class `amendment-leaves-its-other-half-standing` recurs with no gate, so its next instance is found by review again
+- KEEP · TOOL-aPrunedIndex-5 · awaiting the owner: a gate for a review class this build's specs met, out of its scope
+- KEEP · TOOL-aPrunedIndex-6 · awaiting the owner: a gate for a review class this build's specs met, out of its scope
+- KEEP · TOOL-aPrunedIndex-7 · awaiting the owner: a gate for a review class this build's specs met, out of its scope
+- KEEP · TOOL-aPrunedIndex-8 · awaiting the owner: a gate for a review class this build's specs met, out of its scope
+- KEEP · TOOL-aPrunedIndex-9 · awaiting the owner: a gate for a review class this build's specs met, out of its scope
