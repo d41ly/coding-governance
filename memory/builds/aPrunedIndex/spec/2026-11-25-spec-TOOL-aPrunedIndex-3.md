@@ -1,12 +1,13 @@
 # TOOL-aPrunedIndex-3 — a build's sweep touches only the rows that the trees and gone worktrees' edits it lets go of held
 
-**Status:** INPROGRESS · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 3 · ratified 2026-11-25
+**Status:** CLOSED · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 3 · ratified 2026-11-25
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md](../build/2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md) | research | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-4 |
+| [2026-11-26-build-TOOL-aPrunedIndex-3-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-aPrunedIndex-3-1-acceptance-ledger.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-1-brief.md) | research | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-4 |
 | [2026-11-25-prompt-TOOL-aPrunedIndex-3-1-spec-writer.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-3-1-spec-writer.md) | journal | — |
 | [2026-11-25-prompt-TOOL-aPrunedIndex-3-revision.md](../prompts/2026-11-25-prompt-TOOL-aPrunedIndex-3-revision.md) | research | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-4 |

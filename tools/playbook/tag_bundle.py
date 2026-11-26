@@ -382,6 +382,8 @@ bundle-dangling-target|1|target-resolves: rc=1, named memory/notes/site.md:1 and
 bundle-empty-sections|0|empty sections: instructions searched-empty, regions not-installed naming its fallback
 dead-versions|0|reads cost their own version's rows
 named-probe|0|within a tenth under every pad
+released-rows|0|only replaced edits left, and nothing lost
+released-cost|0|a sweep costs what was released
 """
 
 

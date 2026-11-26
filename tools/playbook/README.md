@@ -333,7 +333,10 @@ read joins the reading worktree's own key, and a conf edit, committed or not, is
 `git worktree list` names derives, each read from that worktree's own registry and modules, and refuses,
 exit 2, when one of them cannot be read; it prints `tag-index — collected: <n> rows of <m> versions`. A
 plain build collects nothing, and a worktree deleted without `git worktree prune` keeps its rows until it
-is pruned. A helper imported from another
+is pruned. A build clears only the rows that the trees and the gone worktrees' dirty rows it let go of held
+and nothing else holds, one seek per released pair, and an overlay clears none, keying each edit by the
+blob of the very bytes it parses: the rows of an old edit, one a worktree edited again, reverted or
+committed over, wait for `--gc`, which alone sweeps the row tables whole (TOOL-aPrunedIndex-3). A helper imported from another
 module is outside that version, so its edit needs `--rebuild`. The file is stamped `user_version` =
 `INDEX_SCHEMA`; a file of another stamp is rebuilt from nothing, printing `tag-index — rebuilt: schema
 <old> to <new>`.

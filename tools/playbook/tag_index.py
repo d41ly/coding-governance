@@ -783,8 +783,9 @@ def build_index(root, tree, ctx, con, stats) -> None:
     """Index `tree` (a tree id) of the repository at `root`, unless `tree_built` already holds it under this
     worktree's `versions` digest (PLAY-dOrderedCharter-51 S4): one
     `git ls-tree -r`, then each extractor over each blob it has not read at its current version
-    (`_write_parsed`), read through memory-tree's `read_blobs_at`, in one transaction. Then rows no tree
-    or worktree holds are removed. Counts into `stats`, nothing for a tree already built."""
+    (`_write_parsed`), read through memory-tree's `read_blobs_at`, in one transaction. Then it clears the rows
+    that the trees and the gone worktrees' dirty rows it let go of held and nothing else holds; the rows of an
+    old edit wait for `--gc` (TOOL-aPrunedIndex-3). Counts into `stats`, nothing for a tree already built."""
     built = ("SELECT 1 FROM tree_built WHERE tree=? AND versions=?", (tree, ctx["digest"]))
     if con.execute(*built).fetchone():
         return
@@ -817,7 +818,7 @@ def build_index(root, tree, ctx, con, stats) -> None:
             _write_parsed(con, ctx, blobs, read_text, stats)
             _write_path_rows(con, pairs, ctx["versions"], ctx["conf"])
             con.execute("INSERT OR REPLACE INTO tree_built VALUES (?,?,?)", (tree, ctx["digest"], time.time()))
-            remove_unheld_rows(con, root, keep={tree})
+            remove_released_rows(con, remove_dead_holders(con, root, keep={tree}))
     except sqlite3.OperationalError as exc:
         raise TagError(f"the tag index is locked or unwritable: {exc}") from None
 
@@ -837,19 +838,49 @@ def read_worktree_trees(root) -> tuple[set, set]:
     return trees, tops
 
 
-def remove_unheld_rows(con, root, keep=()) -> None:
-    """Drop the trees no worktree's HEAD names (bar `keep`), the dirty rows of worktrees that are gone,
-    and every path, blob and `blob_parsed` row no remaining tree or dirty row holds. A tree with `tree_path`
-    rows and no `tree_built` row is read here too."""
+def remove_dead_holders(con, root, keep=()) -> set:
+    """Drop the trees no worktree's HEAD names (bar `keep`) and the dirty rows of worktrees that are gone.
+    A tree with `tree_path` rows and no `tree_built` row is read here too. -> the set of (path, blob) pairs
+    what it let go of held, which `remove_released_rows` clears (TOOL-aPrunedIndex-3 S1)."""
     trees, tops = read_worktree_trees(root)
     trees |= set(keep)
+    released: set = set()
     for (tree,) in con.execute("SELECT tree FROM tree_built UNION SELECT DISTINCT tree FROM tree_path").fetchall():
         if tree not in trees:
+            released.update(con.execute("SELECT path, blob FROM tree_path WHERE tree=?", (tree,)))
             con.execute("DELETE FROM tree_path WHERE tree=?", (tree,))
             con.execute("DELETE FROM tree_built WHERE tree=?", (tree,))
     for (wt,) in con.execute("SELECT DISTINCT worktree FROM dirty_path").fetchall():
         if wt not in tops:
+            released.update(con.execute("SELECT path, blob FROM dirty_path WHERE worktree=?", (wt,)))
             con.execute("DELETE FROM dirty_path WHERE worktree=?", (wt,))
+    return released
+
+
+def remove_released_rows(con, released) -> None:
+    """Clear the rows of the (path, blob) pairs in `released`, what a build let go of, that no remaining tree
+    or dirty row holds, and the blob and `blob_parsed` rows of those blobs that none holds at any path, at
+    every version and conf key: a sweep that costs what was released (TOOL-aPrunedIndex-3 S2)."""
+    if not released:
+        return
+    con.execute("CREATE TEMP TABLE IF NOT EXISTS released(path TEXT, blob TEXT, PRIMARY KEY(path, blob))")
+    con.execute("DELETE FROM released")
+    con.executemany("INSERT INTO released VALUES (?,?)", released)
+    # ponytail: each EXISTS's dirty half scans `dirty_path` once per pair no tree holds; it holds only the node's
+    # uncommitted edits. An index on `dirty_path(blob)` is the way past that ceiling if it grows.
+    con.execute("DELETE FROM released WHERE EXISTS (SELECT 1 FROM tree_path t WHERE t.path=released.path AND "
+                "t.blob=released.blob) OR EXISTS (SELECT 1 FROM dirty_path d WHERE d.path=released.path AND "
+                "d.blob=released.blob)")
+    con.execute("DELETE FROM path_row WHERE (path, blob) IN (SELECT path, blob FROM released)")
+    con.execute("DELETE FROM released WHERE EXISTS (SELECT 1 FROM tree_path t WHERE t.blob=released.blob) OR "
+                "EXISTS (SELECT 1 FROM dirty_path d WHERE d.blob=released.blob)")
+    for table in ("blob_row", "blob_parsed"):  # one set of blobs, one transaction: never parsed twice
+        con.execute(f"DELETE FROM {table} WHERE blob IN (SELECT blob FROM released)")
+
+
+def remove_unheld_rows(con) -> None:
+    """The full sweep, `--gc`'s alone: every path, blob and `blob_parsed` row no tree or dirty row holds,
+    the rows of an old edit, one a worktree edited again, reverted or committed over, among them."""
     con.execute("DELETE FROM path_row WHERE NOT EXISTS (SELECT 1 FROM tree_path t WHERE t.path=path_row.path "
                 "AND t.blob=path_row.blob) AND NOT EXISTS (SELECT 1 FROM dirty_path d WHERE d.path=path_row.path "
                 "AND d.blob=path_row.blob)")
@@ -860,14 +891,30 @@ def remove_unheld_rows(con, root, keep=()) -> None:
 
 def build_overlay(root, ctx, con, stats) -> None:
     """Record this worktree's uncommitted edits to tracked files as its own `dirty_path` rows, a deleted
-    file as blob "", replacing the rows it held. Counts into `stats`."""
+    file as blob "", replacing the rows it held, and clearing none: the rows an old edit alone held wait for
+    `--gc`. Each changed file's bytes are read once, before the write lock, and keyed by their own blob, so
+    a save mid-run never files one text under another's blob; a file it cannot read refuses, naming it, and
+    bytes that are not UTF-8 are recorded with no text (TOOL-aPrunedIndex-3 S4). Counts into `stats`."""
     wt = ctx["worktree"]
+    tree_lib, _ = load_memory_tree()
     # --no-renames: a staged rename is its old path deleted and its new one added (PLAY-dOrderedCharter-70 S7)
     changed = [p for p in read_git(root, "diff", "--name-only", "--no-renames", "-z", "HEAD").split("\0") if p]
-    entries = []
+    entries, texts = [], {}
     for path in changed:
         f = pathlib.Path(root) / path
-        blob = read_git(root, "hash-object", "--", path).strip() if f.is_file() else ""
+        if not f.is_file():
+            entries.append((path, ""))
+            continue
+        try:
+            data = f.read_bytes()
+            blob = tree_lib.read_git_output(root, ["hash-object", "--stdin", "--path", path], stdin=data)
+        except OSError as exc:
+            raise TagError(f"the overlay cannot read {path}, so nothing is recorded: {exc}") from None
+        blob = blob.decode("ascii").strip()
+        try:
+            texts[blob] = data.decode("utf-8").replace("\r\n", "\n")
+        except UnicodeDecodeError:
+            texts[blob] = None
         entries.append((path, blob))
     live = [(p, b) for p, b in entries if b]
     pairs = _derive_applicable(ctx, live)
@@ -875,21 +922,12 @@ def build_overlay(root, ctx, con, stats) -> None:
     for path, blob, ex, _name in pairs:
         blobs.setdefault(blob, []).append((path, ex))
 
-    def read_text(want):
-        out = {}
-        for blob, path in want.items():
-            try:
-                out[blob] = (pathlib.Path(root) / path).read_bytes().decode("utf-8").replace("\r\n", "\n")
-            except (OSError, UnicodeDecodeError):
-                out[blob] = None
-        return out
-
     try:
         with con:
             con.execute("BEGIN IMMEDIATE")
             con.execute("DELETE FROM dirty_path WHERE worktree=?", (wt,))
             con.executemany("INSERT INTO dirty_path VALUES (?,?,?)", [(wt, p, b) for p, b in entries])
-            _write_parsed(con, ctx, blobs, read_text, stats)
+            _write_parsed(con, ctx, blobs, lambda _want: texts, stats)
             _write_path_rows(con, pairs, ctx["versions"], ctx["conf"])
     except sqlite3.OperationalError as exc:
         raise TagError(f"the tag index is locked or unwritable: {exc}") from None
@@ -919,8 +957,9 @@ def read_live_versions(root, kit_rel) -> tuple[set, set, set]:
 
 def remove_dead_versions(con, root, kit_rel) -> tuple[int, int]:
     """`--gc` (PLAY-dOrderedCharter-51 S5): delete the blob, path and `blob_parsed` rows of every (extractor,
-    version) pair no live worktree derives and the `tree_built` rows of every digest none does, then the
-    rows no live tree or worktree holds, as a build's sweep does. -> (rows, versions) collected."""
+    version) pair no live worktree derives and the `tree_built` rows of every digest none does, then lets go
+    of the dead trees and gone worktrees and sweeps the row tables whole, the rows of every old edit among
+    them, which a build leaves (TOOL-aPrunedIndex-3 S5). -> (rows, versions) collected."""
     live, digests, keys = read_live_versions(root, kit_rel)
     rows = 0
     try:
@@ -937,7 +976,8 @@ def remove_dead_versions(con, root, kit_rel) -> tuple[int, int]:
             for (d,) in con.execute("SELECT DISTINCT versions FROM tree_built").fetchall():
                 if d not in digests:
                     rows += con.execute("DELETE FROM tree_built WHERE versions=?", (d,)).rowcount
-            remove_unheld_rows(con, root)
+            remove_dead_holders(con, root)
+            remove_unheld_rows(con)
     except sqlite3.OperationalError as exc:
         raise TagError(f"the tag index is locked or unwritable: {exc}") from None
     return rows, len(dead)

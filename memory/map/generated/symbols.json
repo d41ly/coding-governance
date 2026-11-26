@@ -29063,6 +29063,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "remove_dead_holders",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "remove_dead_regions",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -29206,6 +29211,11 @@
       "id": "remove_red_ref",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "remove_released_rows",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "remove_repo",

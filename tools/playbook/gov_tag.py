@@ -430,7 +430,8 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
           "positional-spec-revbump", "positional-bulk-move", "positional-archived", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
-          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "dead-versions", "named-probe")
+          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "dead-versions", "named-probe", "released-rows",
+          "released-cost")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -1207,6 +1208,277 @@ def run_plant(root, top, plant, sets) -> int:
             return "\n".join(r["text"] for r in ti.resolve_address(con, address))
         finally:
             con.close()
+    # TOOL-aPrunedIndex-3: a build clears only the rows of what it let go of, an overlay keys an edit by the
+    # bytes it parses, and a replaced edit's rows wait for `--gc`. What the two do not check: wall time, disk
+    # reads, and a planner holding `sqlite_stat` tables
+    if plant in ("released-rows", "released-cost"):
+        tables = ("path_row", "blob_row", "blob_parsed")
+        alpha, beta = "memory/guides/ALPHA.md", "memory/guides/BETA.md"
+        ctx = ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml")
+
+        def count_rows(con, where="", args=()):
+            return [con.execute(f"SELECT COUNT(*) FROM {t} {where}", args).fetchone()[0] for t in tables]
+
+        def derive_texts(files):  # {path: the word its intro holds}
+            return {p: GUIDE.replace("the intro text", w) for p, w in files.items()}
+    if plant == "released-rows":
+        import functools
+        other, gone, zero, bad = top / "wt2", top / "wt3", [0, 0, 0], []
+        add = lambda *v: [sum(x) for x in zip(*v)]  # noqa: E731
+        lost_queries = (  # a held pair's path rows with no parse ledger row, and a held guide's ledger row unnamed
+            "SELECT COUNT(*) FROM path_row p JOIN (SELECT path, blob FROM tree_path UNION SELECT path, blob FROM "
+            "dirty_path) h ON h.path=p.path AND h.blob=p.blob WHERE NOT EXISTS (SELECT 1 FROM blob_parsed b "
+            "WHERE b.blob=p.blob AND b.extractor=p.extractor AND b.version=p.version)",
+            "SELECT COUNT(*) FROM (SELECT path, blob FROM tree_path UNION SELECT path, blob FROM dirty_path) h "
+            "JOIN blob_parsed b ON b.blob=h.blob WHERE h.path LIKE 'memory/guides/%' AND NOT EXISTS (SELECT 1 "
+            "FROM path_row p WHERE p.path=h.path AND p.blob=h.blob AND p.extractor=b.extractor AND "
+            "p.version=b.version)")
+
+        def read_left():  # -> (the rows of each table the full sweep would clear now, the two lost counts)
+            con = ti.load_index(root)
+            try:
+                con.execute("BEGIN IMMEDIATE")
+                lost = [con.execute(q).fetchone()[0] for q in lost_queries]
+                before = count_rows(con)
+                ti.remove_unheld_rows(con)
+                left = [b - a for b, a in zip(before, count_rows(con))]
+                con.rollback()
+                return left, lost
+            finally:
+                con.close()
+
+        def look(step, want=zero, rebuild=(root,)):  # a step's line; `want` None reads `lost` alone
+            for where in rebuild:
+                run_verb(where, "rebuild", None, sets=sets)
+            left, lost = read_left()
+            ok = (want is None or left == want) and not any(lost)
+            bad.extend([] if ok else [step])
+            say(f"step {step}:", "left not read" if want is None else f"left {left}, wanted {want};",
+                f"lost {lost}", "" if ok else "FAILED")
+
+        def read_edit(where):  # the rows of each table held by the blob ALPHA holds in `where` now
+            blob = ti.read_git(where, "hash-object", "--", alpha).strip()
+            con = ti.load_index(root)
+            try:
+                return count_rows(con, "WHERE blob=?", (blob,))
+            finally:
+                con.close()
+
+        def read_intro(con):
+            return [(r["path"], r["text"]) for r in ti.resolve_address(con, "doc.alpha#intro")]
+        write_text = lambda where, word, path=alpha: write_files(where, derive_texts({path: word}))  # noqa: E731
+        commit_texts = lambda files: write_commit(root, derive_texts(files), "texts")  # noqa: E731
+        write_commit(root, {beta: GUIDE}, "a twin")
+        run_verb(root, "rebuild", None, sets=sets)
+        commit_texts({alpha: "apart"})
+        look(1)
+        for where, branch in ((other, "two"), (gone, "three")):
+            run_git(root, "worktree", "add", "-q", str(where), "-b", branch)
+        commit_texts({alpha: "e1"})
+        look(2)
+        write_text(other, "e1")
+        write_text(gone, "f1", beta)
+        look(3, rebuild=(other, gone))
+        commit_texts({alpha: "f1"})
+        look(4)
+        commit_texts({alpha: "f2"})
+        look(5)
+        run_git(root, "worktree", "remove", "--force", str(gone))
+        run_git(root, "worktree", "prune")
+        commit_texts({alpha: "c6"})
+        look(6)
+        write_text(root, "g1")
+        run_verb(root, "rebuild", None, sets=sets)
+        reader = ti.load_index(root)
+        try:
+            ti.load_view(reader, root, ctx)
+            served = read_intro(reader)
+            look(7, rebuild=())
+            g1, e1 = read_edit(root), read_edit(other)
+            write_text(root, "g2")
+            look(8, g1)
+            g2 = read_edit(root)
+            run_git(other, "checkout", "-q", "--", alpha)
+            write_commit(other, {"AGENTS.md": "# Charter\n\n## Practices\n\nchanged in two\n"}, "two commits")
+            look(9, add(g1, e1), rebuild=(other,))
+            still = read_intro(reader)
+        finally:
+            reader.close()
+        kept = bool(served) and "g1" in served[0][1] and still == served
+        bad.extend([] if kept else ["the open view"])
+        say("the open view of step 7", "still served g1" if kept else f"served {still}, not {served}")
+        run_git(root, "checkout", "-q", "--", alpha)
+        commit_texts({beta: "g1"})
+        look(10, add(g2, e1, [g1[0], 0, 0]))
+        commit_texts({beta: "b11"})
+        look(11, add(g2, e1, [g1[0], 0, 0]))
+        write_text(root, "g1")
+        look(12, add(g2, e1))
+        run_git(root, "checkout", "-q", "--", alpha)
+        con = ti.load_index(root)
+        with con:  # one row in each table at the live version, for a blob nothing holds
+            con.execute("BEGIN IMMEDIATE")
+            for t, c in (("path_row", "'no/where.md','nohold',extractor,version,conf,tag,kind,line"),
+                         ("blob_row", "'nohold',extractor,version,tag,kind,line,end_line,text"),
+                         ("blob_parsed", "'nohold',extractor,version")):
+                con.execute(f"INSERT INTO {t} SELECT {c} FROM {t} LIMIT 1")
+        con.close()
+        commit_texts({alpha: "c13"})
+        look(13, add(g1, g2, e1, [1, 1, 1]))
+        run_git(other, "checkout", "-q", "--detach", "main")
+        run_gc(root, FIXTURE_KIT)
+        look(14)
+        dumps = [print_equal(read_dump(root), read_cold_dump())]
+        # steps 15 and 16: a save staged before the read, after it and at the write lock, then a read that fails
+        hook, fired, real_read, target = [None], [], pathlib.Path.read_bytes, root / alpha
+
+        def read_bytes(self):
+            act = hook[0]
+            if act is None or self != target:
+                return real_read(self)
+            if act[0] == "fail":
+                raise PermissionError(13, "held by another process (planted)", str(self))
+            if act[0] == "before the read":
+                hook[0] = None
+                act[1]()
+                return real_read(self)
+            if act[0] == "after the read":
+                hook[0] = None
+                data = real_read(self)
+                act[1]()
+                return data
+            return real_read(self)
+
+        def trace(sql):
+            if hook[0] and hook[0][0] == "at the lock" and sql.strip() == "BEGIN IMMEDIATE":
+                act, hook[0] = hook[0], None
+                act[1]()
+        pathlib.Path.read_bytes = read_bytes
+        texts, races = {}, []
+        try:
+            for i, kind in enumerate(("before the read", "after the read", "at the lock")):
+                first, second = f"race{i}a", f"race{i}b"
+                write_text(root, first)
+                hook[0] = (kind, functools.partial(lambda k, w: (write_text(root, w), fired.append(k)), kind, second))
+                con = ti.load_index(root)
+                con.set_trace_callback(trace)
+                try:
+                    ti.load_view(con, root, ctx)
+                finally:
+                    hook[0] = None
+                    con.close()
+                for word, rival in ((first, second), (second, first)):
+                    write_text(root, word)
+                    text = read_served(root, "doc.alpha#intro")
+                    texts[word] = read_edit(root)
+                    races.append(word in text and rival not in text)
+                    say(f"step 15: the save {kind}, {word} put back:", "served as itself" if races[-1] else
+                        f"SERVED {text!r}")
+            look(15, None, rebuild=())
+            write_text(root, "k1")
+            hook[0] = ("fail", None)
+            con = ti.load_index(root)
+            try:
+                before = count_rows(con) + con.execute("SELECT * FROM dirty_path ORDER BY 1, 2").fetchall()
+                try:
+                    ti.load_view(con, root, ctx)
+                    refused = ""
+                except ti.TagError as exc:
+                    refused = str(exc)
+                moved = before != count_rows(con) + con.execute("SELECT * FROM dirty_path ORDER BY 1, 2").fetchall()
+            finally:
+                hook[0] = None
+                con.close()
+        finally:
+            pathlib.Path.read_bytes = real_read
+        failed = alpha in refused and not moved
+        say("step 16: the failed read", f"refused, naming {alpha}," if alpha in refused else "NOT REFUSED,",
+            "no row moved" if not moved else "ROWS MOVED")
+        target.write_bytes(GUIDE.encode("utf-8").replace(b"the intro text", b"bytes \xff here"))
+        try:
+            run_verb(root, "rebuild", None, sets=sets)
+            raw = read_edit(root)
+        except ti.TagError as exc:
+            say(f"step 16: the bytes that are not UTF-8 REFUSED: {exc}")
+            raw = [0, 0, 0]
+        say(f"step 16: the bytes that are not UTF-8 hold {raw} rows")
+        write_text(root, "h3")
+        look(16, add(*texts.values(), raw))
+        run_git(root, "checkout", "-q", "--", alpha)
+        commit_texts({alpha: "race2a", beta: "k1"})
+        run_git(other, "checkout", "-q", "--detach", "main")
+        run_verb(root, "rebuild", None, sets=sets)  # the revert recorded first, so its edit is one `--gc` collects
+        run_gc(root, FIXTURE_KIT)
+        look(17)
+        dumps.append(print_equal(read_dump(root), read_cold_dump()))
+        counted = all(all(n) for n in (g1, g2, e1, *texts.values())) and raw[0] and raw[2] and not raw[1]
+        ok = (not bad and all(dumps) and len(races) == 6 and all(races) and len(fired) == 3 and failed
+              and counted)
+        if ok:
+            say("only replaced edits left, and nothing lost")
+        else:
+            say(f"FAILED: steps {bad}, dumps {dumps}, races {races} of saves {fired}, failed read {failed},",
+                f"counts g1 {g1} g2 {g2} e1 {e1} raw {raw}")
+        return 0 if ok else 1
+    if plant == "released-cost":
+
+        def count_window(con, run):  # -> (steps from the tree_built insert to its COMMIT, tables deleted from)
+            on, n, seen = [False], [0], set()
+
+            def trace(sql):
+                sql = " ".join(sql.split())
+                if sql.startswith("INSERT OR REPLACE INTO tree_built"):
+                    on[0] = True
+                elif sql == "COMMIT":
+                    on[0] = False
+                if on[0]:
+                    seen.update(t for t in tables if sql.startswith(f"DELETE FROM {t} "))
+
+            def tick():
+                n[0] += on[0]
+                return 0
+            con.set_trace_callback(trace)
+            con.set_progress_handler(tick, 1)
+            try:
+                run()
+            finally:
+                con.set_trace_callback(None)
+                con.set_progress_handler(None, 1)
+            return n[0], len(seen)
+
+        def count_full(con):  # the full sweep's steps, in a block rolled back
+            con.execute("BEGIN IMMEDIATE")
+            try:
+                return read_step_count(con, lambda: ti.remove_unheld_rows(con))[0]
+            finally:
+                con.rollback()
+        run_verb(root, "rebuild", None, sets=sets)
+        out, full, pad = [], [], 0
+        for word in ("one", "two"):
+            write_commit(root, derive_texts({alpha: word}), word)
+            con = ti.load_index(root)
+            try:
+                if word == "two":  # one held file's rows under 40 further version names, in all three tables
+                    with con:
+                        con.execute("BEGIN IMMEDIATE")
+                        for i in range(40):
+                            for t, c in (("path_row", "path,blob,extractor,?,conf,tag,kind,line"),
+                                         ("blob_row", "blob,extractor,?,tag,kind,line,end_line,text"),
+                                         ("blob_parsed", "blob,extractor,?")):
+                                pad += con.execute(f"INSERT INTO {t} SELECT {c} FROM {t} WHERE blob IN (SELECT blob "
+                                                   "FROM tree_path WHERE path='AGENTS.md') AND version NOT LIKE "
+                                                   "'dead%'", (f"dead{i}",)).rowcount
+                full.append(count_full(con))
+                out.append(count_window(con, lambda: ti.load_view(con, root, ctx)))
+            finally:
+                con.close()
+        ok = (out[0][1] == out[1][1] == 3 and 0 < out[1][0] <= 2 * out[0][0] and full[1] > 2 * full[0] and pad > 0)
+        say(f"the build's sweep: {out[0][0]} steps, then {out[1][0]} after {pad} padded rows; tables deleted from:",
+            f"{out[0][1]} and {out[1][1]}; the full sweep: {full[0]} steps, then {full[1]};",
+            "held" if ok else "FAILED")
+        if ok:
+            say("a sweep costs what was released")
+        return 0 if ok else 1
     # PLAY-dOrderedCharter-49 AC41: a dirty row leaves with its edit, and a worktree re-created at a gone
     # one's path inherits none of its rows
     if plant == "dirty-revert":
