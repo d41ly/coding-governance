@@ -7478,6 +7478,11 @@
       "file": "tools/run-gates/check-receipt.py"
     },
     {
+      "id": "check_git_option",
+      "kind": "function",
+      "file": "tools/workflows/replay_scorer.py"
+    },
+    {
       "id": "check_git_split_parses",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -43938,6 +43943,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_anchor_resolves_at_head",
+      "kind": "function",
+      "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
       "id": "test_anchored_dossier_staleness",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -46179,6 +46189,11 @@
     },
     {
       "id": "test_undeclared_layer_refuses_with_both_remedies",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_unheld_anchor_exits_one",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },

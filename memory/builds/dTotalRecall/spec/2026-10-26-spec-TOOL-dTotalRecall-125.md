@@ -8,7 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-26-build-TOOL-dTotalRecall-125-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-dTotalRecall-125-1-acceptance-ledger.md) | log | — |
 | [2026-11-26-build-TOOL-dTotalRecall-125-widen-41.md](../build/2026-11-26-build-TOOL-dTotalRecall-125-widen-41.md) | widen | — |
+| [2026-11-26-build-TOOL-dTotalRecall-125-widen-42.md](../build/2026-11-26-build-TOOL-dTotalRecall-125-widen-42.md) | widen | — |
 | [2026-11-26-prompt-TOOL-dTotalRecall-125-1-spec-writer.md](../prompts/2026-11-26-prompt-TOOL-dTotalRecall-125-1-spec-writer.md) | log | — |
 | [2026-11-26-prompt-TOOL-dTotalRecall-125-build-brief.md](../prompts/2026-11-26-prompt-TOOL-dTotalRecall-125-build-brief.md) | journal | — |
 | [2026-11-26-prompt-TOOL-dTotalRecall-125-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-dTotalRecall-125-spec-brief.md) | journal | — |

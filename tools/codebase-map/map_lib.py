@@ -1592,9 +1592,11 @@ def measure_dossier_staleness(
     log prints none for it), so a change made only in a conflict resolution is not seen.
 
     ``anchors`` is ``{feature: ({symbol key: body hash at HEAD}, {the same at the dossier's own last
-    commit})}`` for each dossier with `symbols`, `map_diff.read_anchor_hashes`'s. Such a dossier is stale
-    only when an anchored definition's hash differs between the two, whatever else its paths did, and
-    in range scope only when the range moved a path it claims too (TOOL-dTotalRecall-8 S12).
+    commit})}`` for each dossier with `symbols`, `map_diff.read_anchor_hashes`'s. Such a dossier's anchored
+    files are graded by their anchored definitions' hashes: a change to one of them stales it only when an
+    anchored definition's hash differs between the two, and in range scope only when the range moved a path
+    it claims too (TOOL-dTotalRecall-8 S12). Every other claimed path stays on commit ancestry, so a commit
+    behind the dossier touching one stales it whatever the hashes say (TOOL-dTotalRecall-125 S3).
 
     ``refreshed`` is None for a dossier no commit carries yet; the caller leaves it out rather
     than reading it as stale or fresh. FOUNDATION.md is not measured: its globs name shared
@@ -1607,6 +1609,7 @@ def measure_dossier_staleness(
             owners.setdefault(p, set()).add(feature)
     touched_by = {sha: set().union(*(owners.get(p, ()) for p in ps)) for sha, _, ps in commits
                   if scope is None or sha in scope}
+    touched = {sha: ps for sha, _, ps in commits}
     rows: list[dict] = []
     for d in tree.dossiers:
         dossier = f"{prefix}features/{d.feature}.md"
@@ -1622,7 +1625,11 @@ def measure_dossier_staleness(
         stale = bool(behind)
         if anchors and d.feature in anchors:
             now, then = anchors[d.feature]
-            stale = now != then and (scope is None or stale)
+            # TOOL-dTotalRecall-125 S3: the hashes grade the anchored files alone; every other claimed path
+            # stays on ancestry, so a commit behind the dossier touching one of them still stales it.
+            held = {key.split("::")[0] for key in now}
+            loose = [sha for sha in behind if any(p not in held and d.feature in owners.get(p, ()) for p in touched[sha])]
+            stale = bool(loose) or (now != then and (scope is None or bool(behind)))
         rows.append({"feature": d.feature, "dossier": dossier, "refreshed": refreshed,
                      "stale": stale, "behind": len(behind),
                      "newest": behind[0] if behind else None, "touched": len(touches)})

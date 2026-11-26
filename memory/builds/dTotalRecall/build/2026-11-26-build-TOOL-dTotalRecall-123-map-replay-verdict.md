@@ -118,3 +118,17 @@ are to be retired as `WONTDO`, and their clauses cl-dClosedLoop-0225, cl-dClosed
 re-homed, as the accept clause of ask TOOL-dTotalRecall-111 says. This run does neither: the three units stay
 `DEFERRED` and the ask stays open until the owner's turn. The three asks spec 17 S7 filed, TOOL-dBoundRoles-77,
 TOOL-dWellOiledMachine-961 and TOOL-dCalibratedLens-57, stand, and nothing is filed again.
+
+## Added 2026-11-26 by TOOL-dTotalRecall-125: the variances
+
+Each arm's sample variance of the known items found, per audit, and their sum, each by `statistics.variance` over the
+`recall <arm> <case>: <n> of` lines the instance printed over this record's manifest (DERIVED 2026-11-26):
+
+| Arm | r1 | r2 | r3 | Sum |
+|---|---|---|---|---|
+| without | 5.3 | 1.5 | 2.8 | 9.6 |
+| with | 42 | 6.7 | 4.7 | 53.4 |
+
+The printed noise 7.0993 is `2*sqrt(63/5)`: the six variances sum to 63, each taken over five runs (DERIVED 2026-11-26).
+Audit 1's with-arm variance, 42 of the 63, two thirds, dominates it (DERIVED). The instance re-run after spec 125 S1
+prints the same three `term` lines (DERIVED 2026-11-26), since that refusal finds no refused form in the population.

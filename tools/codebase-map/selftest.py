@@ -1572,7 +1572,8 @@ def test_anchored_dossier_staleness(tmp: Path):
     """TOOL-dTotalRecall-8 S12: a dossier anchoring `a.py::f` is stale when f's body changes and fresh when
     another definition of the same file does, over a REAL git fixture; a key HEAD does not define answers
     None, which `main` turns into exit 1. Staged red by reading anchors at path granularity: the change
-    beside f then stales it."""
+    beside f then stales it. A second claimed file, `b.py`, no anchor names, stales it by ancestry
+    (TOOL-dTotalRecall-125 S3), staged red by grading the whole dossier by the hashes."""
     import os
     import subprocess
 
@@ -1601,7 +1602,7 @@ def test_anchored_dossier_staleness(tmp: Path):
     body = "def f():\n    return {}\n\n\ndef g():\n    return {}\n"
     write_commit("a.py", body.format(1, 1))
     refreshed = write_commit("map/features/x.md", "x\n")
-    text = DOSSIER.replace('globs = ["src/x/**"]', 'globs = ["a.py"]\nsymbols = ["a.py::f"]')
+    text = DOSSIER.replace('globs = ["src/x/**"]', 'globs = ["a.py", "b.py"]\nsymbols = ["a.py::f"]')
     f = m.parse_dossier(DOSSIER.replace('feature = "x"', 'feature = "foundation"'), IDS, source="f")
 
     def measure(dossier_text=text):
@@ -1618,11 +1619,81 @@ def test_anchored_dossier_staleness(tmp: Path):
     assert row["refreshed"] == refreshed and row["behind"] == 1 and not row["stale"], f"g alone moved: {row}"
     plain, _ = measure(text.replace('\nsymbols = ["a.py::f"]', ""))
     assert plain["stale"], f"an unanchored dossier still reads at path granularity: {plain}"
+    # TOOL-dTotalRecall-125 S3: the anchors grade a.py alone, so a second claimed file's move stales it by ancestry
+    write_commit("b.py", "x = 1\n")
+    row, _ = measure()
+    assert row["behind"] == 2 and row["stale"], f"b.py moved and the anchored dossier read fresh: {row}"
     write_commit("a.py", body.format(2, 2))
     assert measure()[0]["stale"], "f's body moved and the anchored dossier read fresh"
     _row, gone = measure(text.replace("a.py::f", "a.py::gone"))
     assert gone["x"][0] == {"a.py::gone": None}, gone
     expect_maperror(text.replace("a.py::f", "a.py"), "paths.symbols")
+
+
+def test_unheld_anchor_exits_one(tmp: Path):
+    """TOOL-dTotalRecall-125 S8: `map_diff.py --stale-dossiers` over an adopted fixture root whose dossier anchors
+    `a.py::gone`, which HEAD does not define, exits 1 naming the key on stderr, and exits 0 once the key is
+    `a.py::f`. The dossiers carry the project layer's inventory ids, so `main` reaches the anchor read rather than
+    exiting 1 through a MapError. Staged red by deleting the unheld branch's `return 1`."""
+    import contextlib
+    import io
+    import subprocess
+    import sys as _sys
+
+    import map_diff as md
+    import map_extractors as ext
+
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+               GIT_CONFIG_NOSYSTEM="1")
+
+    def run_git(*a):
+        r = subprocess.run(["git", "-C", str(tmp), *a], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
+
+    def write_commit(files):
+        for rel, body in files.items():
+            (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
+            (tmp / rel).write_text(body, encoding="utf-8", newline="\n")
+        run_git("add", "-A")
+        run_git("commit", "-qm", "fixture")
+
+    claims_block = "[claims]\n" + "".join(f"{inv} = []\n" for inv in ext.inventory_ids()) + "\n"
+    base = re.sub(r"\[claims\]\n.*?\n\n", lambda _m: claims_block, DOSSIER, flags=re.S)
+
+    def render_dossier(key):
+        return base.replace('globs = ["src/x/**"]', f'globs = ["a.py"]\nsymbols = ["{key}"]')
+
+    run_git("init", "--template=", "-q")
+    run_git("config", "user.email", "t@t")
+    run_git("config", "user.name", "t")
+    run_git("config", "commit.gpgsign", "false")
+    write_commit({m.CONF_NAME: "MAP_ROOT=map\n", "a.py": "def f():\n    return 1\n",
+                  "map/FOUNDATION.md": base.replace('feature = "x"', 'feature = "foundation"'),
+                  "map/features/x.md": render_dossier("a.py::gone")})
+
+    def run_main():
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = md.main()
+        return rc, err.getvalue()
+
+    saved_argv, saved_root = _sys.argv, os.environ.get("CODEBASE_MAP_ROOT")
+    os.environ["CODEBASE_MAP_ROOT"] = str(tmp)
+    _sys.argv = ["map_diff.py", "--stale-dossiers"]
+    try:
+        rc, err = run_main()
+        assert rc == 1, f"an unheld anchor exited {rc}, not 1: {err}"
+        assert "anchors a.py::gone, which HEAD does not define" in err, err
+        write_commit({"map/features/x.md": render_dossier("a.py::f")})
+        rc, err = run_main()
+        assert rc == 0, f"a held anchor exited {rc}, not 0: {err}"
+    finally:
+        _sys.argv = saved_argv
+        if saved_root is None:
+            os.environ.pop("CODEBASE_MAP_ROOT", None)
+        else:
+            os.environ["CODEBASE_MAP_ROOT"] = saved_root
 
 
 def test_record_roots_split_code_from_records(tmp: Path):
@@ -2089,6 +2160,11 @@ def main() -> int:
         failures += check(
             "stale dossiers: an anchored dossier reads its definitions' hashes (dTotalRecall-8)",
             lambda: test_anchored_dossier_staleness(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "stale dossiers: an anchor HEAD does not define exits 1 naming it (dTotalRecall-125)",
+            lambda: test_unheld_anchor_exits_one(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(

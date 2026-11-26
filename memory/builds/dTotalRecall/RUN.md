@@ -804,3 +804,10 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-26T05:00:49Z draw · fix-pass · TOOL-dTotalRecall-124 · 91/186 · 20261126T050049Z-bb8eff
 
 2026-11-26T05:00:50Z dispatch · item 6fa6785f TOOL-dTotalRecall-124 · reason memory/gotchas/INDEX.md memory/LIVE.md
+
+2026-11-26T05:41:43Z brief · item TOOL-dTotalRecall-125 · reason 8fd85e30d653 memory/builds/dTotalRecall/prompts/2026-11-26-prompt-TOOL-dTotalRecall-125-build-brief.md
+
+2026-11-26T05:51:04Z dispatch · item bed60eae TOOL-dTotalRecall-125 · reason memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/build memory/builds/dTotalRecall/build/2026-11-26-build-TOOL-dTotalRecall-123-map-replay-verdict.md memory/gotchas/read-allowlist-admits-a-writing-option.md memory/gotchas/record-omits-a-figure-its-spec-names.md memory/gotchas/refinement-replaces-the-rule-it-refines.md memory/map/features/codebase-map.md memory/map/features/review-harnesses.md memory/map/generated memory/project/shell-role.txt tools/codebase-map/README.md tools/codebase-map/map_diff.py tools/codebase-map/map_lib.py tools/codebase-map/selftest.py tools/codebase-map/test_codebase_map.py tools/codebase-map/test_codebase_map.template.py tools/drift-audit/README.md tools/lib/commit_trailers.py tools/memory-tree/commit_trailers.py tools/playbook/kit.toml tools/unattended/commit_trailers.py tools/unattended/unattended.test.sh tools/workflows/replay_scorer.py tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-125.md memory/builds/dTotalRecall/build/2026-11-26-build-TOOL-dTotalRecall-125-1-acceptance-ledger.md
+2026-11-26T06:12:11Z draw · re-dispatch · TOOL-dTotalRecall-125 · 92/186 · 20261126T061211Z-8bb707
+
+2026-11-26T06:12:11Z dispatch · item bed60eae TOOL-dTotalRecall-125 · reason memory/guides/SESSION-KICKOFF.md

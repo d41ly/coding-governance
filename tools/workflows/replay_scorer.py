@@ -1192,6 +1192,15 @@ GIT_WRITE_OPTION = re.compile(r"--output(?:=.*)?", re.S)     # never `-o`: `git 
 FIND_WRITE_OPTIONS = frozenset({"-delete", "-fprint", "-fprint0", "-fprintf", "-fls", "-exec", "-execdir", "-ok", "-okdir"})
 SAFE_REDIRECT = re.compile(r"[0-9]*>&[0-9-]|[0-9&*]*>>?[ \t]*(?:/dev/null|\$null)(?![\w./-])")   # `2>&1` and the null device
 QUOTED_SPAN = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"|\\.", re.S)   # what a shell takes whole, so its `>` is text
+#: TOOL-dTotalRecall-125 S1: the git options a read may carry before its subcommand. Any other, and any env
+#: assignment ahead of a read program, makes the segment the act: deny by default.
+GIT_GLOBAL_READS = frozenset({"-C", "--no-pager"})
+#: The options that make an admitted program run another, each `(name, the shortest spelling its parser takes)`:
+#: `git grep` reads any unambiguous prefix of a long option, and `rg`, `diff`, `log` and `show` read none.
+RUN_OPTIONS = {("rg", ""): (("--pre", "--pre"), ("--hostname-bin", "--hostname-bin")),
+               ("git", "grep"): (("--open-files-in-pager", "--op"), ("--textconv", "--textc")),
+               **{("git", sub): (("--ext-diff", "--ext-diff"), ("--textconv", "--textconv")) for sub in ("diff", "log", "show")}}
+GIT_GREP_PAGER = re.compile(r"-[^-efmABC]*O.*", re.S)   # `-O`, alone or behind short options that take no argument
 #: The map's losing terms (the project map's `[test]`): the recall rise must reach `measure_rise_noise` plus
 #: RECALL_MARGIN, the median search fall SEARCH_FLOOR, and the median bytes rise stay within the map's own bytes.
 RECALL_MARGIN = 5
@@ -1290,21 +1299,26 @@ def read_transcript_calls(path):
 
 
 def derive_segment_program(ex, words):
-    """`(program, subcommand)` of one shell segment, past env assignments and wrappers: the program's lower-cased
-    base name, and for `git` its first word that is no option; an empty string for each the segment lacks."""
-    k = 0
+    """`(program, subcommand, lead)` of one shell segment, past env assignments and wrappers: the program's
+    lower-cased base name, and for `git` its first word that is no option; an empty string for each the segment
+    lacks. `lead` is the env assignments passed and, for `git`, each option word ahead of the subcommand, without
+    the argument GIT_OPTS_WITH_ARG gives an option (TOOL-dTotalRecall-125 S1)."""
+    k, lead = 0, []
     while k < len(words) and (ex.ENV_ASSIGN_RE.fullmatch(words[k]) or words[k] in ex.WRAPPERS or words[k] == "timeout"
                               or (k and words[k - 1] == "timeout" and words[k][:1].isdigit())):
+        if ex.ENV_ASSIGN_RE.fullmatch(words[k]):
+            lead.append(words[k])
         k += 1
     if k >= len(words):
-        return "", ""
+        return "", "", lead
     program = words[k].replace("\\", "/").rsplit("/", 1)[-1].lower().removesuffix(".exe")
     if program not in ex.GIT_NAMES:
-        return program, ""
+        return program, "", lead
     j = k + 1
     while j < len(words) and words[j].startswith("-"):
+        lead.append(words[j])
         j += 2 if words[j] in ex.GIT_OPTS_WITH_ARG else 1
-    return program, words[j] if j < len(words) else ""
+    return program, words[j] if j < len(words) else "", lead
 
 
 def measure_call_searches(ex, name, tool_input):
@@ -1318,21 +1332,32 @@ def measure_call_searches(ex, name, tool_input):
         return 0
     count = 0
     for words, _sep in ex.extract_segments(command):
-        program, sub = derive_segment_program(ex, words)
+        program, sub, _lead = derive_segment_program(ex, words)
         count += program in SEARCH_PROGRAMS or sub in GIT_SEARCHES
     return count
+
+
+def check_git_option(word, options):
+    """True where `word` spells one of `options` as its parser reads it, from the shortest spelling up to the whole
+    name, with an optional `=value`."""
+    head = word.split("=", 1)[0]
+    return any(len(head) >= len(least) and name.startswith(head) for name, least in options)
 
 
 def check_read_call(ex, name, tool_input):
     """True for a call a lens makes before its first act (TOOL-dTotalRecall-121 S10): a runlog `read` tool, a
     search tool, a NON_ACTING_TOOLS member, or a shell call that redirects to no file but the null device, runs
     a READ_PROGRAMS program or a GIT_READS subcommand in every segment, and hands `sed` no in-place option, a git
-    read no GIT_WRITE_OPTION and `find` no FIND_WRITE_OPTIONS member (TOOL-dTotalRecall-122 S10). Any
+    read no GIT_WRITE_OPTION and `find` no FIND_WRITE_OPTIONS member (TOOL-dTotalRecall-122 S10), with no env
+    assignment ahead of its program, no git option but GIT_GLOBAL_READS ahead of a git subcommand, and no
+    RUN_OPTIONS member or `git grep` GIT_GREP_PAGER cluster handed to the program (TOOL-dTotalRecall-125 S1). Any
     other call is the act. The redirect is read off the command, its heredoc bodies, SAFE_REDIRECT and quoted
     spans out, so one glued behind its word is seen and a quoted `>` is not. Not read: a `>` in an unquoted
     comment or an unquoted comparison, read as a redirect; a quoted null device, read as a file; a quote a
-    comment leaves open, and PowerShell's own quoting, whose spans may pair wrongly; `sed`'s `w` command; and a
-    call nested in `bash -c`."""
+    comment leaves open, and PowerShell's own quoting, whose spans may pair wrongly; `sed`'s `w` and `e`
+    commands; `rg --search-zip`, whose decompressors are fixed programs that read; a run option written after
+    `--`, which is read as a path and refused all the same; and a call nested in `bash -c`. GIT_GLOBAL_READS is
+    the whole of what may precede a git subcommand."""
     if name in NON_ACTING_TOOLS or name in SEARCH_TOOLS or ex.TOOL_CLASSES.get(name) == "read":
         return True
     command = tool_input.get("command") if name in ex.SHELL_TOOLS else None
@@ -1343,8 +1368,14 @@ def check_read_call(ex, name, tool_input):
         return False
     segments = [words for words, _sep in ex.extract_segments(bare) if words]
     for words in segments:
-        program, sub = derive_segment_program(ex, words)
+        program, sub, lead = derive_segment_program(ex, words)
         if program not in READ_PROGRAMS and sub not in GIT_READS:
+            return False
+        if any(not w.startswith("-") or w not in GIT_GLOBAL_READS for w in lead):
+            return False
+        if any(check_git_option(w, RUN_OPTIONS.get((program, sub), ())) for w in words):
+            return False
+        if (program, sub) == ("git", "grep") and any(GIT_GREP_PAGER.fullmatch(w) for w in words):
             return False
         if program == "sed" and any(re.match(r"-[A-Za-z]*i|--in-place", w) for w in words):
             return False
@@ -2233,7 +2264,12 @@ def run_selftest():
     def check_map_verdict_arm():
         """TOOL-dTotalRecall-17 AC2: each planted set fails one term and loses on it alone; the set on every
         boundary wins, and reads unarmed where no run measured the bytes (TOOL-dTotalRecall-121 AC10). Each
-        planted value is PINNED here."""
+        planted value is PINNED here. The first experiment's six count lists, without and then with, audits r1 to r3,
+        are PINNED from its verdict record, `2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict.md`, and read
+        the noise 15.46 that spec 123 AC3 pins (TOOL-dTotalRecall-125 S10)."""
+        noise = measure_rise_noise([[18, 29], [3, 8], [7, 7], [28, 20], [10, 5], [5, 3]])
+        if round(noise, 2) != 15.46:
+            return f"the first experiment's counts read noise {noise!r}, not 15.46"
         edge = {"recall": 5, "noise": 0, "searches": 1, "bytes": 100, "map": 100, "armed": True}
         planted = [("recall", {**edge, "recall": 4}), ("recall", {**edge, "noise": 1}),
                    ("searches", {**edge, "searches": 0.5}), ("bytes", {**edge, "bytes": 101})]
@@ -2261,22 +2297,24 @@ def run_selftest():
                 + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n"
                 + "".join(f"| {i} | l | a.py:{i * 100} | confirmed |\n" for i in ids))
 
-    def build_map_manifest(tmp, items, counts, calls):
-        """One map-replay manifest over one audit of `items`, its sources under `tmp`: per arm, one run confirming the
-        first n items for each n of `counts[arm]`, its one lens transcript `calls[arm]`, `dispatched` the run count."""
+    def build_map_manifest(tmp, items, counts, calls, cases=("r1",)):
+        """One map-replay manifest over one audit of `items` per name in `cases`, each over the one record, its sources
+        under `tmp`: per case and arm, one run confirming the first n items for each n of `counts[arm]`, its one lens
+        transcript `calls[arm]`, `dispatched` the run count times the cases (TOOL-dTotalRecall-125 S7)."""
         def write_source(name, text):
             path = pathlib.Path(tmp, name)
             path.write_text(text, encoding="utf-8", newline="\n")
             return str(path)
         record = write_source("known.md", render_map_report(items))
         return {"instance": "map-replay", "map": record,
-                "known": [{"case": "r1", "record": record, "items": [f"H{i}" for i in items]}],
-                "candidates": [{"case": "r1", "arm": arm, "matched": None,
-                                "report": write_source(f"{arm}-{run}.md", render_map_report(items[:n])),
-                                "transcripts": {"l": write_source(f"{arm}-{run}.jsonl", render_transcript(calls[arm]))}}
-                               for arm, ns in counts.items() for run, n in enumerate(ns, 1)],
-                "arms": [{"name": "without", "settings": {"map": False}, "dispatched": len(counts["without"])},
-                         {"name": "with", "base": "without", "settings": {"map": True}, "dispatched": len(counts["with"])}]}
+                "known": [{"case": case, "record": record, "items": [f"H{i}" for i in items]} for case in cases],
+                "candidates": [{"case": case, "arm": arm, "matched": None,
+                                "report": write_source(f"{arm}-{case}-{run}.md", render_map_report(items[:n])),
+                                "transcripts": {"l": write_source(f"{arm}-{case}-{run}.jsonl", render_transcript(calls[arm]))}}
+                               for case in cases for arm, ns in counts.items() for run, n in enumerate(ns, 1)],
+                "arms": [{"name": "without", "settings": {"map": False}, "dispatched": len(counts["without"]) * len(cases)},
+                         {"name": "with", "base": "without", "settings": {"map": True},
+                          "dispatched": len(counts["with"]) * len(cases)}]}
 
     def check_map_experiment_arm():
         """TOOL-dTotalRecall-122 S4: `check_experiment` over a known set of six items (PINNED), the with-map runs
@@ -2305,7 +2343,8 @@ def run_selftest():
     def check_map_noise_arm():
         """TOOL-dTotalRecall-123 AC1, AC2: over one audit of seven items (PINNED), both arms alike, counts 2 and 6,
         then 2, 6, 1 and 7, read the two whole `term recall` lines below, so more runs lower the line; with one run
-        of the four dropped the refusal names 3 and 4, and with two declared counts it names both."""
+        of the four dropped the refusal names 3 and 4, and with two declared counts it names both; a count of 5 over two
+        audits and a one-run set are each refused naming the count (PINNED, TOOL-dTotalRecall-125 S7)."""
         try:
             resolve_runlog_extract()
         except Refusal as exc:
@@ -2327,14 +2366,28 @@ def run_selftest():
                 return why
             manifest["candidates"] = whole
             manifest["arms"][0]["dispatched"] = 5
-            return check_refused(lambda: check_experiment(manifest), "dispatched 4, 5")
+            why = check_refused(lambda: check_experiment(manifest), "dispatched 4, 5")
+            if why:
+                return why
+            # TOOL-dTotalRecall-125 S7: a count the audits do not divide, and a one-run set, each refused by its count
+            manifest = build_map_manifest(tmp, items, {"without": [2, 6], "with": [2, 6]}, {"without": act, "with": act},
+                                          cases=("r1", "r2"))
+            for arm in manifest["arms"]:
+                arm["dispatched"] = 5
+            why = check_refused(lambda: check_experiment(manifest), "dispatched 5", "over 2 audit(s)")
+            if why:
+                return why
+            manifest = build_map_manifest(tmp, items, {"without": [2], "with": [2]}, {"without": act, "with": act})
+            return check_refused(lambda: check_experiment(manifest), "dispatched 1", "over 1 audit(s)")
 
     def check_map_transcript_arm():
         """TOOL-dTotalRecall-17 AC3, TOOL-dTotalRecall-121 AC10: a 500-byte `git diff` (PINNED), a `sed -n` pipe, a
         `ToolSearch`, a `Grep`, a piped shell `git grep`, a 900-byte `Read` (PINNED), a `grep` for a quoted `>` and a
         heredoc holding one (TOOL-dTotalRecall-122 S10), then a `sed -i` count 3 searches, and every result before the
         `sed -i`; a file redirect, glued or not, is the act and one to `/dev/null` is not; a read program's or a git
-        read's writing option is the act; a torn line refuses."""
+        read's writing option is the act, and so is an option that runs a program, an env assignment ahead of a read
+        and a git option outside GIT_GLOBAL_READS ahead of its subcommand, while seven reads beside them each read
+        their own 30 bytes (PINNED, TOOL-dTotalRecall-125 S1); a torn line refuses."""
         try:
             resolve_runlog_extract()
         except Refusal as exc:
@@ -2353,11 +2406,24 @@ def run_selftest():
             path = pathlib.Path(tmp, "lens.jsonl")
             for command in ("git diff a..b --output=x.txt", "git diff --output x a b", "find . -delete", "find . -fprint x",
                             "find . -fprint0 x", "find . -fprintf x %p", "find . -fls x", "find . -exec rm {} ;",
-                            "find . -execdir rm {} ;", "find . -ok rm {} ;", "find . -okdir rm {} ;"):
+                            "find . -execdir rm {} ;", "find . -ok rm {} ;", "find . -okdir rm {} ;",
+                            # TOOL-dTotalRecall-125 S1: an option that runs a program, and what precedes a subcommand
+                            "rg --pre rm x .", "rg --pre=rm x", "rg --hostname-bin=rm x", "git grep -Orm x",
+                            "git grep -nOrm x", "git grep --open-files-in-pager=rm x", "git grep --op=rm x",
+                            "git grep --textc x", "git -c core.pager=rm log", "git --config-env=core.fsmonitor=X status",
+                            "GIT_PAGER=rm git log", "env GIT_EXTERNAL_DIFF=rm git diff", "RIPGREP_CONFIG_PATH=x rg y",
+                            "git diff --ext-diff", "git log -p --textconv", "git show --ext-diff x"):
                 path.write_text(render_transcript([("t1", ("Bash", {"command": command}), "w" * 30), *calls]), encoding="utf-8")
                 got = measure_bytes_before_act(path)
                 if got != 0:
                     return f"the writing {command!r} read {got!r} bytes before the act, not 0"
+            for command in ("git -C sub log -1", "git --no-pager log -1", "git grep -eOops x", "git grep -o x",
+                            "git grep --or -e a -e b", "git grep --no-textconv x", "rg --pre-glob '*.gz' x"):
+                path.write_text(render_transcript([("t1", ("Bash", {"command": command}), "w" * 30),
+                                                   ("t2", ("Edit", {"file_path": "a.py"}), "ok")]), encoding="utf-8")
+                got = measure_bytes_before_act(path)
+                if got != 30:
+                    return f"the read {command!r} read {got!r} bytes before the act, not its own 30"
             path.write_text(text, encoding="utf-8")
             got = (measure_existence_searches(path), measure_bytes_before_act(path))
             if got != (3, 500 + 20 + 30 + 9 + 2 + 40 + 60 + 900):

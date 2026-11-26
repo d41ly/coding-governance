@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 231 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 184 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 231 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 186 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -474,7 +474,9 @@ Inventories: gate-legs: 231 · kits: 20 · git-hooks: 4 · harness-hooks: 15 · 
 | `read-allowlist-admits-a-writing-option.md` | review-harnesses |
 | `record-citing-a-foreign-id-defines-or-orphans-it.md` | memory-tree-hygiene |
 | `record-file-read-by-line-position.md` | run-gates-turnstile |
+| `record-omits-a-figure-its-spec-names.md` | review-harnesses |
 | `record-without-serves-or-with-a-round-counter.md` | memory-tree-hygiene |
+| `refinement-replaces-the-rule-it-refines.md` | codebase-map |
 | `reflowed-prompt-string-reads-as-a-deleted-stop.md` | unattended |
 | `refusal-branch-with-no-arm.md` | unattended |
 | `remote-write-without-an-unreachable-outcome.md` | build-method |

@@ -22,15 +22,30 @@ findings 3 and 9). `tools/workflows/replay_scorer.py#check_read_call` refused `s
 admitted every option of `git` and `find`, so the bytes a lens read before its first act ran on past a
 `git diff --output` and a `find -delete`. `find -exec` stood in its docstring as a gap; the other options did not.
 
+The same closing review, round 3, of 2026-11-26
+(`memory/builds/dTotalRecall/reviews/2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md`,
+finding 1). The round-2 fix refused the writing options and admitted every option that RUNS a program: `rg --pre`,
+`git grep -O`, `git diff --ext-diff`, `git log --textconv`, and an env assignment or a `git -c` ahead of the read,
+`GIT_PAGER=rm git log` among them. ripgrep's `--hostname-bin`, which the report did not name, runs one too.
+
 ## The fix
 
-- Read each admitted program's manual for what it writes, and refuse each such option beside the program's name.
+- Read each admitted program's manual for what it writes AND for what it runs, and refuse each such option beside
+  the program's name: `rg --pre` and `--hostname-bin`, `git grep -O` and `--open-files-in-pager`, `--ext-diff` and
+  `--textconv`.
+- Deny by default for what precedes the subcommand: any env assignment ahead of a read program, and any git option
+  outside a short allow-list (`-C`, `--no-pager`) ahead of a git subcommand, makes the call the act, so the next hook
+  variable or config option is refused without being named.
 - Match the option whole. `git grep -o` and `git ls-files -o` read, so a short option is never refused by its letter.
+  Where the parser takes prefixes, as `git grep` takes any unambiguous prefix of a long option, match from the
+  shortest unique spelling up (`--op`, `--textc`); and match a short option inside a cluster only behind letters
+  that take no argument, so `-nOrm` is the pager and `-eOops` a pattern.
 - Write one case per option, each seen red with that option's test cut.
 
 ## Gated by
 
-`tools/workflows/replay_scorer.py`, whose `map-transcript` arm reads zero bytes before a call of each option. A
+`tools/workflows/replay_scorer.py`, whose `map-transcript` arm reads zero bytes before a call of each option, each
+run option and each form that precedes a subcommand, and reads its own bytes before each read beside them. A
 program joining the list owes its own cases; nothing reds one that arrives without them.
 
 ## What this does NOT say

@@ -79,6 +79,7 @@ Codebase map — CI-verified inventory claims + the reuse recall index
 - decisions 0
 - gate-legs 4: `codebase-map coverage + freshness`, `codebase-map gate coverage`, `codebase-map kit selftest`, `codebase-map adopter e2e`
 - kits 1: `codebase-map`
+- gotcha-classes 1: `refinement-replaces-the-rule-it-refines.md`
 - globs 3: `tools/codebase-map/*`, `memory/map/*`, `.codebase-map.conf`
 
 ## gate-lint
@@ -259,9 +260,9 @@ Workflow review harnesses — one pipeline, three implementations, one hardened
 - gate-legs 7: `workflow script syntax`, `review-join ban (no ref-keyed join)`, `review-join self-test`, `spec-audit opt-in pack self-test`, `review-replay selftest`, `tier2-review self-test`, `unattended-build self-test`
 - harness-hooks 1: `PreToolUse tools/workflows/spec-audit-optin.js`
 - workflow-scripts 11: `check-review-join.js`, `check-workflow-syntax.js`, `drift-audit-code.js`, `drift-audit-code.template.js`, `drift-audit-state.js`, `drift-audit-state.template.js`, `orient-counterfactual.js`, `spec-audit-optin.js`, `tier2-review.js`, `tier2-review.template.js`, `unattended-build.template.js`
-- gotcha-classes 8: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`
+- gotcha-classes 9: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`
 - globs 1: `tools/workflows/*`
-- cut 6 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 7 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## roles
 

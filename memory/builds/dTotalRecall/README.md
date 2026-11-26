@@ -208,7 +208,7 @@ ids TOOL-dTotalRecall-125
 | [TOOL-dTotalRecall-125 — the closing review's round 3 minors: a read that runs a program is the act, each decision matched to git's parse, anchors that refine path staleness and resolve at HEAD, a guard and a budget, two refusals armed, a README row, a pinned noise and a record's variances](spec/2026-10-26-spec-TOOL-dTotalRecall-125.md) | 53 | 2 | INPROGRESS | rev-1 | 2026-11-26 |
 <!-- /gen:build-units -->
 
-Records: 1011 bound to this build, across 4 record folder(s).
+Records: 1013 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -336,9 +336,9 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 | reviews | `2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md` (CLEAN WITH FIXES), `2026-11-25-review-TOOL-dTotalRecall-115-closing-diff-review-round2.md` (CLEAN WITH FIXES) and 10 more under reviews/ |
 | deviation | `2026-11-26-build-TOOL-dTotalRecall-123-deviation-1021.md`, `2026-11-25-build-TOOL-dTotalRecall-8-deviation-84.md` and 157 more under build/ |
 | red-fix | `2026-11-25-build-TOOL-dTotalRecall-8-red-fix-30.md`, `2026-11-25-build-TOOL-dTotalRecall-8-red-fix-29.md` and 28 more under build/ |
-| widen | `2026-11-26-build-TOOL-dTotalRecall-125-widen-41.md`, `2026-11-25-build-TOOL-dTotalRecall-8-widen-40.md` and 38 more under build/ |
+| widen | `2026-11-26-build-TOOL-dTotalRecall-125-widen-42.md`, `2026-11-26-build-TOOL-dTotalRecall-125-widen-41.md` and 39 more under build/ |
 | research | `2026-11-26-build-TOOL-dTotalRecall-123-map-replay-verdict.md`, `2026-11-26-build-TOOL-dTotalRecall-123-map-replay-manifest.json` and 114 more under build/ |
-| logs | `2026-11-26-build-TOOL-dTotalRecall-124-1-builder-return.md`, `2026-11-26-build-TOOL-dTotalRecall-124-1-acceptance-ledger.md` and 205 more under build/ |
+| logs | `2026-11-26-build-TOOL-dTotalRecall-125-1-acceptance-ledger.md`, `2026-11-26-build-TOOL-dTotalRecall-124-1-builder-return.md` and 206 more under build/ |
 | open asks | `BACKLOG.md`, 14 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->

@@ -37,10 +37,11 @@ which lists the dossiers a range touched and did not refresh. Paths under the ma
 claim, and a merge commit carries no paths (a conflict-resolution-only change is not seen). A
 shallow clone prints `live` false instead of a count over an amputated history. `--json` prints
 one object: scope, of, stale, live, note, dossiers. Exit 1 when git cannot read the range.
-A dossier whose `[paths]` carries `symbols`, `<path>::<qualified name>` keys, is stale only when an
-anchored definition's body hash at HEAD differs from its hash at the dossier's last commit, read from
-both blobs through this kit's `extract_ranges`; a key HEAD's blob does not define exits 1 naming it
-(TOOL-dTotalRecall-8 S12).
+A dossier whose `[paths]` carries `symbols`, `<path>::<qualified name>` keys, grades each anchored file
+by its anchored definitions' hashes: a change to that file stales it only when an anchored definition's
+body hash at HEAD differs from its hash at the dossier's last commit, read from both blobs through this
+kit's `extract_ranges`. Every other claimed path stays on commit ancestry (TOOL-dTotalRecall-125 S3). A key
+HEAD's blob does not define exits 1 naming it (TOOL-dTotalRecall-8 S12).
 
 Exit 2 is the one exception, and it is a REFUSAL rather than a result: the resolved repo root
 carries no .codebase-map.conf. At a root that was never adopted the digest would report every

@@ -9926,7 +9926,8 @@ hit  "$out" "fixture · attribution · the charter's trailer last, then a space 
 # refused, and one inside it admitted; the reader's own cases ride the `--fixture` run above. Against the parent
 # the first exits 0 and the fixture prints no decision line.
 for _fx_case in "above the trailer block · refused" "in the trailer block · ok" "no decision · ok" \
-                "one of two above the block · refused" "indented in prose · ok"; do
+                "one of two above the block · refused" "indented in prose · ok" \
+                "a spaced key in the block beside one above it · refused" "a value folded onto the next line · ok"; do
   hit "$out" "fixture · decided · $_fx_case"
 done
 printf 'records\n\nDecided: a choice - why\n\nPass: none\n%s\n' "$_fx_at" > "$CCM"
@@ -25712,7 +25713,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4228 -> 4237 by TOOL-dTotalRecall-122 on 2026-11-25: the decision check's region-four arms, five `hit` over
 # the reader's fixture lines, one a loop pass, and the refused and admitted messages' two `same` and two `hit`, each
 # unconditional. No skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4237
+# RAISED 4237 -> 4239 by TOOL-dTotalRecall-125 on 2026-11-26: the decision loop's two new region-four `hit` passes,
+# the spaced key and the folded value, each unconditional. No skip branch. No suite ran, and its RED-first
+# observation is the close's.
+FLOOR_ASSERTIONS=4239
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25951,7 +25955,8 @@ FLOOR_SHARD_3=471
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 410, plus main's 13, plus this branch's 8 = 431.
 # MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: shard 4 the base 423, plus main's 8, plus this branch's 5 = 436; shard 5 this branch's 293, main having moved none.
 # RAISED 436 -> 445 by TOOL-dTotalRecall-122: the same 9 region-four decision assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_4=445
+# RAISED 445 -> 447 by TOOL-dTotalRecall-125: the same 2 region-four decision loop passes, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=447
 FLOOR_SHARD_5=293
 # RAISED 127 -> 130 by TOOL-dPlacedRequest-16: the same 3 region-six settle-over-a-tombstone assertions, see FLOOR_ASSERTIONS.
 FLOOR_SHARD_6=130
