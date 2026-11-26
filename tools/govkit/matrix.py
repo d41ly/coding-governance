@@ -88,6 +88,9 @@ SCRATCH_EXPECT = {
     "micro-format definitions": "microformats OK —",
     "micro-format gate selftest": "PASS (",
     "line length": "NOT ADOPTED — no declaration at",
+    # The install's HEAD is the governance commit, which tracks no code file, so the record has
+    # nothing to read and says so rather than grading an empty population green (TOOL-dTotalRecall-8).
+    "code record": "code-record: unarmed — the tree holds no code file the record reads",
     # `line-length gate selftest` USED to be here and its removal is the point. The suite it runs is
     # withheld from every target now: TOOL-aQuenchedHarness-6 ported it onto `<prefix>/lib/lib-selftest.sh`,
     # which is gov-internal and travels to nobody, so a shipped copy would red on arrival with
