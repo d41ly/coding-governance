@@ -72,7 +72,7 @@ ids TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedI
 | [TOOL-aPrunedIndex-20 — the tag plants of `tags bundle selftest` run on a bounded pool, graded in row order](spec/2026-11-26-spec-TOOL-aPrunedIndex-20.md) | 7 | 1 | CLOSED | rev-2 | 2026-11-26 |
 <!-- /gen:build-units -->
 
-Records: 25 bound to this build, across 4 record folder(s).
+Records: 28 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

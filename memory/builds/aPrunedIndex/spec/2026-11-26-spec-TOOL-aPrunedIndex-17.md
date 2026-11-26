@@ -7,9 +7,11 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-26-build-TOOL-aPrunedIndex-17-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-aPrunedIndex-17-1-acceptance-ledger.md) | journal | — |
+| [2026-11-26-build-TOOL-aPrunedIndex-17-deviation-1.md](../build/2026-11-26-build-TOOL-aPrunedIndex-17-deviation-1.md) | deviation | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md) | research | TOOL-aPrunedIndex-10 |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-17-2-revision.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-2-revision.md) | research | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-17-4-spec-writer.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-4-spec-writer.md) | journal | — |
+| [2026-11-26-prompt-TOOL-aPrunedIndex-17-5-owner-waiver.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-5-owner-waiver.md) | research | TOOL-aPrunedIndex-20 |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md) | research | TOOL-aPrunedIndex-20 |
 | [2026-11-26-review-TOOL-aPrunedIndex-17-20-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-20 |
 | [2026-11-26-review-TOOL-aPrunedIndex-17-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-spec-audit-round1.md) | spec-audit | — |
