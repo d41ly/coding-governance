@@ -438,12 +438,12 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "positional-spec-revbump", "positional-bulk-move", "positional-archived", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
           "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "dead-versions", "named-probe", "released-rows",
-          "released-cost", "gc-predates")
+          "released-cost", "gc-predates", "held-key")
 #: TOOL-aPrunedIndex-17 S3: the plants `run_fixture` runs inside `set_git_held`; every other asks git each time
 HELD_PLANTS = ("dead-versions", "named-probe", "released-rows", "released-cost", "gc-predates")
-#: S1: the one full object id a held read names, alone or naming its tree, and every flag it may carry
+#: S1: the one full object id a held read names, alone or naming its tree, and every flag it may carry before its paths
 HELD_ID_RE = re.compile(r"[0-9a-f]{40}(\^\{tree\})?")
-HELD_FLAGS = frozenset({"--full-tree", "--name-only", "-r", "-z", "--"})
+HELD_FLAGS = frozenset({"--full-tree", "--name-only", "-r", "-z"})
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -1348,6 +1348,47 @@ def run_plant(root, top, plant, sets) -> int:
             con.close()
         if ok:
             say(f"ledger reads {ledger[0]} and {ledger[1]}; the probe within a tenth under every pad")
+        return 0 if ok else 1
+    # TOOL-aPrunedIndex-24: unit 17's held-answer rules, each read through the module's globals at run time. What
+    # it does not check: a held read spec 17's eleven do not list, and a held answer going stale inside a plant
+    if plant == "held-key":
+        oid, sub = ti.read_git(root, "rev-parse", "HEAD").strip(), root / "memory"  # `memory` holds no `.git`
+        reads = [(root, ("rev-parse", "--git-common-dir")), (sub, ("rev-parse", "--git-common-dir")),
+                 (root, ("rev-parse", "--show-toplevel")), (sub, ("rev-parse", "--show-toplevel")),
+                 (root, ("rev-parse", "HEAD^{tree}")), (root, ("worktree", "list", "--porcelain")),
+                 (root, ("ls-tree", "--full-tree", "--name-only", oid, "--", "x")),
+                 (root, ("rev-parse", oid + "^{tree}")), (root, ("diff", "--name-only", "HEAD")),
+                 (root, ("hash-object", oid)), (root, ("rev-parse", oid, "HEAD"))]
+        keys = [derive_held_key(at, args) is not None for at, args in reads]
+        ok = keys == [True, False, True, False, False, False, True, True, False, False, False]
+        say(f"keys: {keys};", "held" if ok else "FAILED")
+        bad, good = ("rev-parse", "0" * 40 + "^{tree}"), ("rev-parse", oid + "^{tree}")
+        before = (ti.read_git_stdout, ti.git)
+        with set_git_held(), unittest.mock.patch.object(subprocess, "Popen", wraps=subprocess.Popen) as popen:
+            keyed = all(derive_held_key(root, args) is not None for args in (bad, good))  # before any spawn
+            raised = 0
+            for _ in range(2):
+                try:
+                    ti.read_git(root, *bad)
+                except ti.TagError:
+                    raised += 1
+            failing = popen.call_count
+            answers = {ti.read_git(root, *good) for _ in range(2)}
+            spawned = popen.call_count - failing
+        back = (ti.read_git_stdout, ti.git) == before
+        held = keyed and raised == 2 and failing == 2 and spawned == 1 and len(answers) == 1 and back
+        ok = ok and held
+        say(f"a failing read: {raised} reads, {failing} spawn{'s' * (failing != 1)};",
+            f"a held read: 2 reads, {spawned} spawn{'s' * (spawned != 1)},",
+            f"{'one answer' if len(answers) == 1 else 'answers DIFFER'};",
+            f"readers {'put back' if back else 'LEFT SWAPPED'};", "held" if held else "FAILED")
+        flags = sorted(HELD_FLAGS)
+        held = (flags == ["--full-tree", "--name-only", "-r", "-z"]
+                and all(derive_held_key(root, ("ls-tree", f, oid)) is not None for f in flags))
+        ok = ok and held
+        say(f"flags read: {' '.join(flags)};", "held" if held else "FAILED")
+        if ok:
+            say("held keys as listed, failures asked again, every flag read")
         return 0 if ok else 1
     # PLAY-dOrderedCharter-70's four: a TOML row placed on its own line, a staged rename, and a conf edit
     if plant == "toml-row":

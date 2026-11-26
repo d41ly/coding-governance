@@ -1,11 +1,12 @@
 # TOOL-aPrunedIndex-24 — the held-answer rules get a `held-key` plant that `tags bundle selftest` runs
 
-**Status:** INPROGRESS · rev-2 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 8
+**Status:** CLOSED · rev-2 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-26-build-TOOL-aPrunedIndex-24-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-aPrunedIndex-24-1-acceptance-ledger.md) | journal | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-24-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-24-1-spec-brief.md) | research | TOOL-aPrunedIndex-17 |
 | [2026-11-26-review-TOOL-aPrunedIndex-24-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-spec-audit-round1.md) | spec-audit | — |
 
