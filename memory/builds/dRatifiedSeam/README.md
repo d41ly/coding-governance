@@ -63,7 +63,7 @@ None yet. Five forks sit in the two specs' §8 with recommendations.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-09-03 · streams tooling+deployer
+**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-09-03 · streams deployer+tooling
 ids DEPL-dRatifiedSeam-1 DEPL-dRatifiedSeam-2 DEPL-dRatifiedSeam-3 DEPL-dRatifiedSeam-4 DEPL-dRatifiedSeam-5 DEPL-dRatifiedSeam-6 TOOL-dRatifiedSeam-1 TOOL-dRatifiedSeam-2
 
 <!-- gen:build-units -->
@@ -88,9 +88,24 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 |---|---|---|
 | 1 | `DEPL-dRatifiedSeam-1` | no |
 | 2 | `TOOL-dRatifiedSeam-1` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 - **Child builds:** [aHoistedPass](../aHoistedPass/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-03-prompt-TOOL-dRatifiedSeam-1-1-build-brief.md`, `2026-09-03-prompt-DEPL-dRatifiedSeam-1-1-build-brief.md` |
+| reviews | `2026-09-03-review-DEPL-dRatifiedSeam-1-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-09-03-review-DEPL-dRatifiedSeam-1-closing-diff.md` (CLEAN WITH FIXES) |
+| logs | `2026-09-03-build-TOOL-dRatifiedSeam-1-1-acceptance-ledger.md`, `2026-09-03-build-DEPL-dRatifiedSeam-1-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dRatifiedSeam/card` |
+<!-- /gen:build-routes -->

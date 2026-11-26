@@ -2,7 +2,7 @@
 """handoff.py — a role and one task's inputs, rendered into one hashed prompt file (TOOL-aOrientedCast-2).
 
     python handoff.py render --role <name> --build <slug> [--unit <id>] [--card <path>]
-                             [--input <key>=<value>]... [--upstream <rows file>]
+                             [--input <key>=<value>]... [--upstream <rows file>] [--read <key>]...
                              [--out <path> | --stdout | --stand-in]
                              [--part full|task]
     python handoff.py harness-args <harness>
@@ -33,6 +33,11 @@ Outside `--stand-in` it prints one stderr line after the notes, `handoff: descri
 spawn's name `<build> · <unit> · <workflow>`, the unit part left out with no `--unit`: the `Agent`
 call passes it as `description`, and the hooks kit's spawn guard derives the same name and refuses
 any other (TOOL-aOrientedCast-27). stdout is unchanged by it in every mode.
+`--read <key>`, repeated, hands a memory record or `<key>#<tag>` section by key (TOOL-dTotalRecall-9 S8):
+before anything is rendered the memory-tree kit's `gov_record.py budget` measures the set against
+`memory.item-budget`, outside the load-set budget, and the work order carries a `reads:` list, one key per
+line with its bytes and any `superseded-by` mark; its over-budget report prints as a note, and its refusal
+refuses the render, exit 2, nothing written.
 `--stand-in` declares that the main loop does the role's work itself, because its tool cannot spawn
 a sub-agent (TOOL-aOrientedCast-19): it refuses with exit 1, writing nothing, unless a valid row of
 the owner's `<MEMORY_ROOT>/project/role-stand-in-waiver.txt` names the role and the build, and
@@ -144,7 +149,7 @@ PLACEHOLDERS =("…", "...", "tbd", "todo", "n/a", "none", "-", "?")
 KICKOFF_HOME, KICKOFF_CHECKER = "session-kickoff", "manifest-check.sh"
 CHECKER_BOUND_S = 30
 SLUG_RE = lib.SLUG_RE
-UNIT_RE = re.compile(r"^[A-Z]+-([A-Za-z]+)-[0-9]+$")
+UNIT_RE = lib.load_slug_pattern(lambda g: r"^[A-Z]+-((?:" + g.slug_class + r"))-[0-9]+$")
 READY_RE = re.compile(r"^(- )?READY — ")
 BLANK_EDGES_RE = re.compile(r"\A\s*\n|\n\s*\Z")
 WORK_ORDER = KIT_DIR / "templates" / "work-order.template.md"
@@ -178,7 +183,7 @@ WRITE_TOOLS = ("Write", "Edit", "MultiEdit", "NotebookEdit")
 SESSION_ID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 #: A run id or an agent id reaches a path only in this shape.
 PATH_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
-LABEL_UNIT_RE = re.compile(r"[A-Z]+-[A-Za-z]+-[0-9]+")
+LABEL_UNIT_RE = lib.load_slug_pattern(lambda g: r"[A-Z]+-(?:" + g.slug_class + r")-[0-9]+")
 SHAPE_FIELD_RE = re.compile(r"<([^<>]+)>")
 NOTIFICATION_RE = re.compile(r"<task-notification>(.*?)</task-notification>", re.S)
 #: The session file's lines worth parsing: every other line is skipped unparsed, by its bytes.
@@ -187,6 +192,13 @@ SESSION_LINE_TOKENS = (b'"Agent"', b'"Workflow"', b"toolUseResult", b"task-notif
 #: session file, and the record's keys, every one checked by read_session_record before use.
 SESSION_CACHE_DIR = "handoff-calls"
 SESSION_RECORD_KEYS = frozenset(("parser", "session", "offset", "prefix", "calls", "notified", "bad"))
+#: TOOL-dTotalRecall-4 S6: `builds.agent-root`'s catalogue default, applied where no reader answers, and
+#: the `## Task` opening's root line per value; `%s` is the build README's path.
+AGENT_ROOT_DEFAULT = "work-order"
+AGENT_ROOT_LINES = {
+    "work-order": "Your root is this work order: read past it only for what your own work produces from.",
+    "readme": "Your root is %s: its routing region names each record by purpose.",
+}
 
 
 def read_git_stdout(repo: pathlib.Path, *args: str) -> str:
@@ -535,14 +547,68 @@ def render_card_block(root):
     return "## Card\n\n%s\n%s\n%s" % (lines[0], route, lines[-1]) if route else ""
 
 
+def read_agent_root(root, notes):
+    """`builds.agent-root` at `root`'s landed revision (TOOL-dTotalRecall-4 S6): `work-order` or `readme`.
+    The memory-tree kit is found by `resolve_kit_dir` beside this kit, as `roles_lib.read_workflow_order`
+    reaches the loop kit, and its `read_policy_value` reads the key. No kit resolving (LookupError, or an
+    ImportError), a reader that refuses (ValueError) or a value outside the catalogue's two applies the
+    catalogue default and appends one note naming why, as `roles_lib.read_cap_answer` falls back."""
+    try:
+        kit = str(lib.resolve_kit_dir("memory-tree", "tree_lib.py", KIT_DIR.parent))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import tree_lib  # the memory-tree kit's policy reader, found above
+        value = tree_lib.read_policy_value("builds.agent-root", root)
+        if value not in AGENT_ROOT_LINES:
+            raise ValueError("builds.agent-root read %r, outside %s" % (value, ", ".join(AGENT_ROOT_LINES)))
+        return value
+    except (LookupError, ImportError, ValueError) as exc:
+        if notes is not None:
+            notes.append("builds.agent-root did not read, so the root is the default %s: %s"
+                         % (AGENT_ROOT_DEFAULT, exc))
+        return AGENT_ROOT_DEFAULT
+
+
+class ReadRefused(lib.RolesError):
+    """TOOL-dTotalRecall-9 S8: the memory read set refused, so the render is refused, exit 2."""
+
+
+def check_memory_reads(root, role, keys):
+    """`(reads, report)` of `--read`'s keys (TOOL-dTotalRecall-9 S8): the memory-tree kit's `gov_record.py
+    budget` run as a subprocess, the kit found by `resolve_kit_dir` as the load-set check finds its kit;
+    `reads` its `read` lines less the word, `report` its over-budget line where it printed one. Its refusal,
+    or no kit, raises ReadRefused naming why. The slices sit outside the load-set budget and its
+    route-back: their one cap is `memory.item-budget`."""
+    try:
+        kit = lib.resolve_kit_dir("memory-tree", "gov_record.py", KIT_DIR)
+    except LookupError as exc:
+        raise ReadRefused("--read — no memory-tree kit to measure the read set: %s" % exc)
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    try:
+        r = subprocess.run([sys.executable, str(kit / "gov_record.py"), "budget", "--role", role, *keys],
+                           cwd=str(root), env=env, capture_output=True, encoding="utf-8", errors="replace",
+                           stdin=subprocess.DEVNULL, timeout=600)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise ReadRefused("--read — the read budget did not run: %s" % exc)
+    lines = [ln for ln in (r.stdout + r.stderr).splitlines() if ln.strip()]
+    if r.returncode != 0:
+        raise ReadRefused("\n".join(lines) or "--read — the read budget exited %d" % r.returncode)
+    return ([ln[len("read "):] for ln in lines if ln.startswith("read ")],
+            [ln for ln in lines if ln.startswith("memory over budget:")])
+
+
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
-                   notes=None, tail="", upstream=None):
+                   notes=None, tail="", upstream=None, memory_reads=()):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
     The charter library's notes are appended to `notes` when a list is given; `tail` goes before
-    the derived name's `.md`; `upstream` is the rows file `--upstream` names, the `upstream:rows` source."""
+    the derived name's `.md`; `upstream` is the rows file `--upstream` names, the `upstream:rows` source;
+    `memory_reads` the `--read` keys, measured before anything else and written as a `reads:` list."""
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
+    read_lines, report = check_memory_reads(root, role, list(memory_reads)) if memory_reads else ([], [])
+    if notes is not None:
+        notes.extend(report)
     values = {}
     if upstream:
         p = pathlib.Path(os.path.normpath(root / upstream))
@@ -652,6 +718,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         else:
             absent.append(key)
             reasons += [what] if why.get(src) and what not in reasons else []
+    if read_lines:   # TOOL-dTotalRecall-9 S8: one key per line, its bytes and any mark
+        blocks.append("reads:\n" + "\n".join("- " + ln for ln in read_lines))
     doc = charter_path.relative_to(root).as_posix() if root in charter_path.parents else charter_path.as_posix()
     charter_text = lib.load_text(charter_path)
     charter = lib.parse_charter(charter_text, doc)
@@ -673,6 +741,10 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             notes.append(lib.UNRANKED_NOTE % exc)
     opening = ("This handoff is for build `%s`, unit `%s`." % (slug, unit_id) if unit
                else "This handoff is for build `%s`, and names no single unit." % slug)
+    # TOOL-dTotalRecall-4 S6: the agent's root, by `builds.agent-root`.
+    agent_root = read_agent_root(root, notes)
+    opening += "\n" + (AGENT_ROOT_LINES[agent_root] % ("%s/builds/%s/README.md" % (memory_root, slug))
+                       if agent_root == "readme" else AGENT_ROOT_LINES[agent_root])
     if missing:
         opening += "\n" + "\n".join(missing)
     if absent:
@@ -706,8 +778,9 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         "reads": "\n\n".join(blocks), "practices": practices}, wraps)
     marker = "<!-- gov:handoff role=%s build=%s unit=%s path=%s role-sha=%s task-sha=%s -->" % (
         role, slug, unit or "-", rel, derive_section_sha(role_sec), derive_section_sha(task_sec))
-    head = "**Serves:** journal %s\n%s\n# %s handoff — %s\n\n%s\n\n" % (
-        unit_id, "".join(g + "\n" for g in gaps), role, unit_id, marker)
+    # TOOL-dTotalRecall-36 S3: the cause line under the binding, ahead of any load-gaps line
+    head = "**Serves:** log %s\n**Caused-by:** %s\n%s\n# %s handoff — %s\n\n%s\n\n" % (
+        unit_id, unit_id, "".join(g + "\n" for g in gaps), role, unit_id, marker)
     return path, head + role_sec + task_sec, marker + "\n\n" + task_sec
 
 
@@ -1209,11 +1282,18 @@ def write_agent_ledger(root, memory_root, build, lines):
     ids = ["%s-%s-%d" % (fam, build, num) for fam, num in sorted(ids)]
     path = found[0] if found else folder / ("%s-build-%s%s" % (datetime.date.today().isoformat(), ids[0],
                                                                  LEDGER_TAIL))
-    serves = "**Serves:** journal " + " ".join(ids)
+    serves = "**Serves:** log " + " ".join(ids)
+    # TOOL-dTotalRecall-36 S3: the cause line under the Serves line, its first id; a rewrite keeps one
+    # already present and inserts one where none is, since a doubled key is a header the reader refuses
+    cause = "**Caused-by:** " + ids[0]
     old = lib.load_text(path) if path.is_file() else None
-    text = re.sub(r"^\*\*Serves:\*\*.*$", lambda _: serves, old, count=1, flags=re.M) if old is not None else (
-        "# %s — agent ledger\n\n%s\n\nGenerated by the roles kit's `handoff.py agents`: one line per agent "
-        "dispatch and return, each added once and never edited.\n\n" % (build, serves))
+    if old is not None:
+        has_cause = re.search(r"^\*\*Caused-by:\*\*", old, flags=re.M) is not None
+        text = re.sub(r"^\*\*Serves:\*\*.*$", lambda _: serves if has_cause else serves + "\n" + cause, old,
+                      count=1, flags=re.M)
+    else:
+        text = ("# %s — agent ledger\n\n%s\n%s\n\nGenerated by the roles kit's `handoff.py agents`: one line per "
+                "agent dispatch and return, each added once and never edited.\n\n" % (build, serves, cause))
 
     def derive_key(line):
         return line[2:].split(" — ", 1)[0], line.rsplit(" · ", 1)[-1]
@@ -1373,6 +1453,7 @@ def main(argv):
     r.add_argument("--card")
     r.add_argument("--input", action="append", default=[])
     r.add_argument("--upstream")
+    r.add_argument("--read", action="append", default=[])
     dest = r.add_mutually_exclusive_group()
     dest.add_argument("--out")
     dest.add_argument("--stdout", action="store_true")
@@ -1489,12 +1570,15 @@ def main(argv):
         notes = []
         path, text, task_part = render_handoff(root, memory_root, charter_path, a.role, keys, a.build,
                                                a.unit, a.card, inputs, out, notes,
-                                               lib.STAND_IN_TAIL if a.stand_in else "", a.upstream)
+                                               lib.STAND_IN_TAIL if a.stand_in else "", a.upstream, a.read)
         for line in notes:
             print("handoff: note — %s" % line, file=sys.stderr)
         if not a.stand_in:
             print("handoff: description — %s" % render_spawn_name(a.build, a.unit, keys["workflow"]),
                   file=sys.stderr)
+    except ReadRefused as e:
+        print("\n".join("handoff: " + ln for ln in str(e).split("\n")), file=sys.stderr)
+        return 2
     except lib.RolesError as e:
         print("\n".join("handoff: " + ln for ln in str(e).split("\n")), file=sys.stderr)
         return 1

@@ -1,0 +1,841 @@
+# record-kinds.toml — the record-kind registry (TOOL-dTotalRecall-1, -18, -16, -25): one [[record-kind]] row per
+# kind of record the memory tree holds, and one witness row per family of pockets outside it, the
+# memory contract's one declaration of each. Columns, in this order: `name`; `tag`, record.<name>;
+# `layer`, the `layer.<name>` tag of the kit whose writer writes the kind; `home`, one glob or a list:
+# a tracked-path glob (`git ls-files`), `refs/gov/<glob>` or `<git-common-dir>/<glob>`, one tracked glob
+# on a `fields` row; `id-rule`, its name grammar or ""; `schema`, { form, source, fields, validator },
+# `form` one of fields, header, rows, generated, fence, `source` the literal another module declares the
+# fields in, read by `ast`, `validator` a `fence` row's <module>:<function> of this kit grading its
+# records; `writer`, the command that writes it, `generator:<path>` or `hand`; `readers`, the work-order
+# read keys a handoff fills from a record of the kind, or [] beside `readers-none`, the reason no role
+# reads it; `lifecycle`, one of append-only, current-state, frozen, generated, out; `check`, the leg of
+# <prefix>/gate-legs.json grading it; `purpose`, last, { text, source }, one line of at most
+# PURPOSE_BYTES cited <path>:<line> or `owner`, or { pending = "<id>" }, which `memory.map-purpose`
+# grades; `cardinality`, after `purpose` on a row whose `schema.fields` name a bounded edge type, each such
+# type's { per-source, per-target } as the playbook kit's edge registry declares it, compared both ways by
+# `edge_grammar.py --cardinality --registry` (TOOL-dTotalRecall-22); `root`, after `purpose` and before
+# `cardinality`, `true` on a kind whose record is a root of the orphan walk and needs no `Caused-by`, absent
+# read as `false`, a boolean or red, read by the record door's cause refusal (TOOL-dTotalRecall-19);
+# `unarmed`, after them on a typed
+# kind's `fields` or `fence` row whose home holds no record yet, the reason its unarmed line gives, naming
+# the writer that will arm it, red once the row grades a record (TOOL-dTotalRecall-42), set by hand as
+# `cardinality` is; `sections`, after `purpose` on the spec row alone, each section's { tag, required,
+# heading }, `heading` its title with its `<n>. ` stripped, read by `record_kinds.py`'s `read_sections`,
+# the door's scaffold refusing a new record lacking a required one (TOOL-dTotalRecall-9 S2). A
+# tracked-path home names its records' glob, never a directory. Every column but
+# `id-rule`, `root`, `cardinality`, `sections` and `unarmed` is required and non-empty. A kind
+# joins through `python <prefix>/memory-tree/record_kinds.py new`, a `fence` row through its
+# `--form fence --validator <module>:<function>`, a `generated` row through its `--form generated` with no
+# field and no validator (TOOL-dTotalRecall-8), and `record_kinds.py --check` grades
+# the file; `record_kinds.py --purpose-review` derives a missing purpose and writes it as one line of its row.
+# `not-records`, the one top-level list before the rows, `{ glob, why }` per entry: the tracked files under the
+# memory root and outside its builds that are no record, so the homeless arm reads each file outside builds
+# as homed by a row, declared here, or red (TOOL-dTotalRecall-53 S23).
+
+not-records = [
+  { glob = "memory/gotchas/**", why = "a bug class the gotchas checklist reads, written by hand, no record" },
+  { glob = "memory/guides/**", why = "a rendered or authored guide the charter points at, no record" },
+  { glob = "memory/map/**", why = "the codebase map's dossiers and generated indexes, no record" },
+  { glob = "memory/README.md", why = "the memory tree's own front page" },
+  { glob = "memory/DECISIONS.md", why = "the decision register, read by recall as prose, no record" },
+  { glob = "memory/HYGIENE.md", why = "the hygiene contract, rendered from the kit's template" },
+  { glob = "memory/TEMPLATE-SPEC.md", why = "the spec format, rendered from the kit's template" },
+]
+
+[[record-kind]]
+name = "spec"
+tag = "record.spec"
+layer = "layer.memory"
+home = "memory/builds/*/spec/*.md"
+id-rule = "<date>-spec-<unit id>.md"
+schema = { form = "header", fields = [] }
+writer = "gov_record.py new spec"
+readers = ["input:spec"]
+lifecycle = "current-state"
+check = "memory hygiene"
+purpose = { text = "its writer is `design.unit-spec`; the spec redesigned as a structured, tagged contract", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:412" }
+sections = [
+  { tag = "section.goal", required = true, heading = "Goal" },
+  { tag = "section.scope", required = true, heading = "Scope (IN)" },
+  { tag = "section.non-goals", required = true, heading = "Non-goals (OUT)" },
+  { tag = "section.design", required = true, heading = "Design" },
+  { tag = "section.production-readiness-checklist", required = false, heading = "Production-readiness checklist" },
+  { tag = "section.acceptance-criteria", required = true, heading = "Acceptance criteria" },
+  { tag = "section.gates", required = true, heading = "Gates" },
+  { tag = "section.open-questions", required = true, heading = "Open questions" },
+  { tag = "section.revision-log", required = true, heading = "Revision log" },
+  { tag = "section.reuse-audit", required = false, heading = "Reuse audit" },
+]
+
+[[record-kind]]
+name = "build-readme"
+tag = "record.build-readme"
+layer = "layer.memory"
+home = "memory/builds/*/README.md"
+id-rule = "<slug>"
+schema = { form = "header", source = "{prefix}/memory-tree/gen_build_index.py:FRONT_MATTER_KEYS", fields = [
+  "slug", "opened", "ids", "parents", "depends-on", "patches", "amends", "supersedes", "implements",
+  "may", "spec-audit", "authorized-by", "asks", "slug-grammar", "playbook", "pieces", "status", "node",
+  "roster", "streams"] }
+writer = "gov_record.py new build-readme"
+readers = []
+readers-none = "an agent reads it as its root under builds.agent-root, through no work-order read key"
+lifecycle = "current-state"
+check = "memory hygiene"
+purpose = { text = "the build README's declared front-matter schema, with unknown keys refused; writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:467" }
+root = true
+cardinality = { supersedes = { per-source = "many", per-target = "1" } }
+
+[[record-kind]]
+name = "spec-audit"
+tag = "record.spec-audit"
+layer = "layer.roles"
+home = "memory/builds/*/reviews/*.md"
+id-rule = ""
+schema = { form = "fields", fields = ["Serves"] }
+writer = "tier2-review.js"
+readers = []
+readers-none = "a review record is read by the index and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "diff-review"
+tag = "record.diff-review"
+layer = "layer.roles"
+home = "memory/builds/*/reviews/*.md"
+id-rule = ""
+schema = { form = "fields", fields = ["Serves"] }
+writer = "tier2-review.js"
+readers = []
+readers-none = "a review record is read by the index and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "log"
+tag = "record.log"
+layer = "layer.memory"
+home = "memory/builds/*/prompts/*.md"
+id-rule = ""
+schema = { form = "fields", fields = ["Serves"] }
+writer = "gov_record.py new log"
+readers = ["brief:prompt", "brief:goal", "brief:items", "brief:acceptance", "brief:gates", "brief:non-goals", "input:prompt"]
+lifecycle = "append-only"
+check = "memory hygiene"
+purpose = { text = "the journal grammar moved into the core; writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:446" }
+
+[[record-kind]]
+name = "research"
+tag = "record.research"
+layer = "layer.memory"
+home = "memory/builds/*/build/*.md"
+id-rule = ""
+schema = { form = "fields", fields = ["Serves"] }
+writer = "gov_record.py new research"
+readers = []
+readers-none = "a report is cited by a spec's reuse audit, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "run-record"
+tag = "record.run-record"
+layer = "layer.observability"
+home = "memory/builds/*/build/*-runlog-*.md"
+id-rule = ""
+schema = { form = "header", fields = [] }
+writer = "runlog.py record --write"
+readers = []
+readers-none = "a run record is read by the runlog kit's verify, never filled into a work order"
+lifecycle = "generated"
+check = "runlog record schema"
+purpose = { text = "observability's journal reader writes it when the journal shows a run closed, as `observability.run-record` says", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:450" }
+
+[[record-kind]]
+name = "backlog-row"
+tag = "record.backlog-row"
+layer = "layer.memory"
+home = "memory/backlog/*.md"
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "hand"
+readers = []
+readers-none = "an ask row is read by the index generator's ask views, never filled into a work order"
+lifecycle = "current-state"
+check = "memory hygiene"
+purpose = { text = "the ask register's row store; the memory contract declares it; writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:456" }
+
+[[record-kind]]
+name = "design-record"
+tag = "record.design-record"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-architecture-v*.md"
+id-rule = ""
+schema = { form = "fields", fields = ["Serves"] }
+writer = "gov_record.py new design-record"
+readers = []
+readers-none = "a design record is read by the deviation join, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "a core memory kind with no writer item; the memory contract declares it", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:454" }
+
+[[record-kind]]
+name = "dossier"
+tag = "record.dossier"
+layer = "layer.memory.map"
+home = "memory/map/features/*.md"
+id-rule = ""
+schema = { form = "header", fields = [] }
+writer = "hand"
+readers = []
+readers-none = "a dossier is consulted through the map's lookups, never filled into a work order"
+lifecycle = "current-state"
+check = "codebase-map gate coverage"
+purpose = { text = "dossiers anchored to symbol keys; its writer, where the map is installed, is `build.unit-pass`, the claiming dossier's", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:459" }
+
+[[record-kind]]
+name = "deviation"
+tag = "record.deviation"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-build-*-deviation-*.md"
+id-rule = "<date>-build-<unit id>-deviation-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.deviation.required", fields = ["Departs from", "Hand-off", "Before", "After", "Cause", "Reason", "Evidence", "Risk", "Approver", "Follow-through", "Caused-by"] }
+writer = "gov_record.py new deviation"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "the record kept in its departing build's `build/` folder, read by the deviation join, the as-built view", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:399" }
+cardinality = { caused-by = { per-source = "1", per-target = "many" } }
+
+[[record-kind]]
+name = "exception"
+tag = "record.exception"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-build-*-exception-*.md"
+id-rule = "<date>-build-<unit id>-exception-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.exception.required", fields = ["Principle", "Excuses", "Reason", "Caused-by"] }
+writer = "build_records.py new exception"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "the exception register, kept in the building build's `build/` folder as a deviation record is; writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:400" }
+cardinality = { caused-by = { per-source = "1", per-target = "many" } }
+
+[[record-kind]]
+name = "override"
+tag = "record.override"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-build-*-override-*.md"
+id-rule = "<date>-build-<unit id>-override-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.override.required", fields = ["Rule", "Words", "Session", "Value", "Caused-by"] }
+writer = "build_records.py new override"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "`charter.override` and its record, under the precedence and override rule, the record kept in the building build's", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:401" }
+cardinality = { caused-by = { per-source = "1", per-target = "many" } }
+
+[[record-kind]]
+name = "change"
+tag = "record.change"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-build-*-change-*.md"
+id-rule = "<date>-build-<unit id>-change-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.change.required", fields = ["Unit", "Action", "Before", "After", "Mark", "Proof", "Caused-by"] }
+writer = "build_records.py new change"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+cardinality = { caused-by = { per-source = "1", per-target = "many" } }
+
+[[record-kind]]
+name = "red-fix"
+tag = "record.red-fix"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-build-*-red-fix-*.md"
+id-rule = "<date>-build-<unit id>-red-fix-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.red-fix.required", fields = ["Leg", "Red line", "Files", "Commit", "Rerun", "Caused-by"] }
+writer = "build_records.py new red-fix"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+cardinality = { caused-by = { per-source = "1", per-target = "many" } }
+
+[[record-kind]]
+name = "disposition"
+tag = "record.disposition"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-build-*-disposition-*.md"
+id-rule = "<date>-build-<unit id>-disposition-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.disposition.required", fields = ["Item", "Disposition", "Channel", "Caused-by"] }
+writer = "build_records.py new disposition"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt.", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:442" }
+cardinality = { caused-by = { per-source = "1", per-target = "many" } }
+
+[[record-kind]]
+name = "acceptance"
+tag = "record.acceptance"
+layer = "layer.flow"
+home = "memory/builds/*/build/*-build-*-acceptance-*.md"
+id-rule = "<date>-build-<unit id>-acceptance-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.acceptance.required", fields = ["Sha", "Writer", "Caused-by"] }
+writer = "loop_witness.py acceptance"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "its writer is `build.acceptance`; dDeclaredLoop builds the witnesses computed rather than typed, the acceptance re-run", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:420" }
+cardinality = { caused-by = { per-source = "1", per-target = "many" } }
+
+[[record-kind]]
+name = "transition"
+tag = "record.transition"
+layer = "layer.flow"
+home = "memory/builds/*/build/*-build-*-transition-*.md"
+id-rule = "<date>-build-<unit id>-transition-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.transition.required", fields = ["Build", "From", "To", "Item", "Sha"] }
+writer = "loop_transition.py record"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "the transition record three ways; every step's exit item writes it: `plan.exit`, `design.exit`, `build.exit`", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:439" }
+
+[[record-kind]]
+name = "recommendation"
+tag = "record.recommendation"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-build-*-recommendation-*.md"
+id-rule = "<date>-build-<unit id>-recommendation-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.recommendation.required", fields = ["Stage", "Score", "Source", "Binds", "Reason", "Role", "Caused-by"] }
+writer = "build_records.py new recommendation"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "every `*.recommend` item writes it; the stage-exit recommendation is one mechanism, dDeclaredLoop's (AF-1)", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:470" }
+cardinality = { caused-by = { per-source = "1", per-target = "many" } }
+
+[[record-kind]]
+name = "widen"
+tag = "record.widen"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-build-*-widen-*.md"
+id-rule = "<date>-build-<unit id>-widen-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.widen.required", fields = ["Population", "Keys", "Reason", "Caused-by"] }
+writer = "ratchet.py widen"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+cardinality = { caused-by = { per-source = "1", per-target = "many" } }
+
+[[record-kind]]
+name = "leg-tail"
+tag = "record.leg-tail"
+layer = "layer.flow"
+home = "memory/builds/*/build/*-build-*-leg-tail-*.md"
+id-rule = "<date>-build-<unit id>-leg-tail-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.leg-tail.required", fields = ["Leg", "Hash", "Run", "Sha", "Cause"] }
+writer = "keep_tails.py"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "flake"
+tag = "record.flake"
+layer = "layer.flow"
+home = "memory/builds/*/build/*-build-*-flake-*.md"
+id-rule = "<date>-build-<unit id>-flake-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.flake.required", fields = ["Run", "Ended", "Sha", "Tree", "Legs"] }
+writer = "verdict_flow.py flakes"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "its writer is `test.flakes`; flake quarantine", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:425" }
+
+[[record-kind]]
+name = "gate-health"
+tag = "record.gate-health"
+layer = "layer.observability"
+home = "memory/builds/*/build/*-build-*-gate-health-*.md"
+id-rule = "<date>-build-<unit id>-gate-health-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.gate-health.required", fields = ["Measured", "Verdicts", "Legs"] }
+writer = "drift_report.py --gate-health --write"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "card"
+tag = "record.card"
+layer = "layer.instruction"
+home = "memory/builds/*/build/*-build-*-card-*.md"
+id-rule = "<date>-build-<unit id>-card-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.card.required", fields = ["Build", "Step", "Ref"] }
+writer = "manifest-check.sh --card --follow"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "the build's orientation card at level 1, its stores and snapshot; its writer is `entry.orient`, which composes it", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:406" }
+
+[[record-kind]]
+name = "probe-trigger"
+tag = "record.probe-trigger"
+layer = "layer.flow"
+home = "memory/builds/*/build/*-build-*-probe-trigger-*.md"
+id-rule = "<date>-build-<unit id>-probe-trigger-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.probe-trigger.required", fields = ["Cause", "Asker", "Subject", "At", "Key"] }
+writer = "probe.py trigger"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "its writer is `probe.trigger`: why the probe opened, keyed by the boundary or the raising return, or by content for a", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:472" }
+
+[[record-kind]]
+name = "probe"
+tag = "record.probe"
+layer = "layer.flow"
+home = "memory/builds/*/build/*-build-*-probe-*.md"
+id-rule = "<date>-build-<unit id>-probe-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.probe.required", fields = ["Sha", "Kind", "Question", "Losing", "Asker", "Trigger"] }
+writer = "probe.py pin"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "its writer is `probe.return`: one record per probe, its kind a verification, a reproduction or an experiment, an", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:471" }
+
+[[record-kind]]
+name = "mailbox-message"
+tag = "record.mailbox-message"
+layer = "layer.flow"
+home = "memory/builds/*/build/*-build-*-mailbox-message-*.md"
+id-rule = "<date>-build-<unit id>-mailbox-message-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.mailbox-message.required", fields = ["Id", "From", "To", "Kind", "Subject", "Answers", "State", "Reply", "Ref"] }
+writer = "loop_transition.py record"
+readers = []
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "one mailbox message a build's transition disposed, its fields and its body in one fenced block", source = "owner" }
+unarmed = "its writer is the loop kit's transition writer, loop_transition.py"
+
+[[record-kind]]
+name = "view"
+tag = "record.view"
+layer = "layer.memory"
+home = ["memory/LIVE.md", "memory/ledger/*.md", "memory/map/generated/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "gen_build_index.py --write"
+readers = []
+readers-none = "a generated view is read by people and its own generator's check, never filled into a work order"
+lifecycle = "generated"
+check = "memory hygiene"
+purpose = { text = "a generated view: LIVE.md, the ledger, the ask views; re-rendered, never merged (the away pass); writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:477" }
+
+[[record-kind]]
+name = "registry"
+tag = "record.registry"
+layer = "layer.memory"
+home = ["memory/project/*.txt", "memory/project/*.toml"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "hand"
+readers = []
+readers-none = "a row registry is read by the gate that registers it, never filled into a work order"
+lifecycle = "current-state"
+check = "ratchet (never gains)"
+purpose = { text = "a gate's row registry under `memory/project/`, written by its gate's pin emitter (the away pass); writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:478" }
+
+[[record-kind]]
+name = "archive"
+tag = "record.archive"
+layer = "layer.memory"
+home = ["memory/archive/**"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "hand"
+readers = []
+readers-none = "a rotated record is read only by a reader that asks for history, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "a rotated record under `memory/archive/`, written by rotation (the away pass); writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:479" }
+
+[[record-kind]]
+name = "instrument"
+tag = "record.instrument"
+layer = "layer.memory"
+home = ["memory/builds/*/build/*.py", "memory/builds/*/build/*.sh", "memory/builds/*/build/*.js", "memory/builds/*/build/*.json", "memory/builds/*/build/*.tsv", "memory/builds/*/build/*.txt", "memory/builds/*/build/*.svg", "memory/builds/*/build/*.html", "memory/builds/*/build/*.log", "memory/builds/*/build/*.out"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "hand"
+readers = []
+readers-none = "an instrument is run or read beside the record it serves, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+purpose = { text = "a script, table or drawing kept beside the record it serves (the away pass); writer item not named: the session that", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:480" }
+
+[[record-kind]]
+name = "witness"
+tag = "record.witness"
+layer = "layer.runtime"
+home = ["refs/gov/**"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "gov-ref.sh"
+readers = []
+readers-none = "a witness is joined by its key in its owner's check, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { text = "a declared pocket outside the tree, such as a transcript, a Codex rollout, the auto-memory, the live inbox or a", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:481" }
+
+[[record-kind]]
+name = "claim"
+tag = "record.claim"
+layer = "layer.memory"
+home = ["refs/gov/claims/**"]
+id-rule = "refs/gov/claims/<slug> | refs/gov/claims/asks/<FAMILY>-<slug>"
+schema = { form = "header", fields = ["claimant-key", "session", "family", "seq"] }
+writer = "gov-claim.sh"
+readers = []
+readers-none = "a claim is read by its writers' replay and the orphan check, never filled into a work order"
+lifecycle = "append-only"
+check = "build-index selftest"
+purpose = { text = "the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:468" }
+root = true
+
+[[record-kind]]
+name = "orientation-cards"
+tag = "record.orientation-cards"
+layer = "layer.instruction"
+home = ["<git-common-dir>/orientation/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "manifest-check.sh --card"
+readers = ["card:route", "card:reuse", "task:in", "task:todo", "task:reuse"]
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "unattended-sidecars"
+tag = "record.unattended-sidecars"
+layer = "layer.runtime"
+home = ["<git-common-dir>/unattended/*", "<git-common-dir>/unattended-landed"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "unattended.sh"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "runlog-journal"
+tag = "record.runlog-journal"
+layer = "layer.observability"
+home = ["<git-common-dir>/runlog/*", "<git-common-dir>/runlog-stamp-*"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "runlog.py"
+readers = []
+readers-none = "a store is read by its own kit's reader, never filled into a work order"
+lifecycle = "append-only"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "drift-history"
+tag = "record.drift-history"
+layer = "layer.observability"
+home = ["<git-common-dir>/drift-history.tsv"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "drift_report.py"
+readers = []
+readers-none = "a store is read by its own kit's reader, never filled into a work order"
+lifecycle = "append-only"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "gate-ledger"
+tag = "record.gate-ledger"
+layer = "layer.flow"
+home = ["<git-common-dir>/gate-*", "<git-common-dir>/pre-push-*", "<git-common-dir>/selftest-baseline"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "run-gates.sh"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "history-verdicts"
+tag = "record.history-verdicts"
+layer = "layer.flow"
+home = ["<git-common-dir>/history-verdicts/*"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "history_store.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "health-logs"
+tag = "record.health-logs"
+layer = "layer.runtime"
+home = ["<git-common-dir>/health.log", "<git-common-dir>/procmon-stamp"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "health-log.sh"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "hook-state"
+tag = "record.hook-state"
+layer = "layer.runtime"
+home = ["<git-common-dir>/agent-cap/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "agent-cap.js"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "reuse-lookups"
+tag = "record.reuse-lookups"
+layer = "layer.memory.map"
+home = ["<git-common-dir>/codebase-map/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "reuse_lookup.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "recall-cache"
+tag = "record.recall-cache"
+layer = "layer.memory.recall"
+home = ["<git-common-dir>/recall/*"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "query.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "review-lenses"
+tag = "record.review-lenses"
+layer = "layer.roles"
+home = ["<git-common-dir>/review-lenses/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "tier2-review.js"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "transition-cache"
+tag = "record.transition-cache"
+layer = "layer.memory"
+home = ["<git-common-dir>/transition-audit-cache"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "transition_audit.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "recovery-manifests"
+tag = "record.recovery-manifests"
+layer = "layer.observability"
+home = ["<git-common-dir>/recovery-manifests/*"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "branch_reconcile.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "gov-index"
+tag = "record.gov-index"
+layer = "layer.instruction"
+home = ["<git-common-dir>/gov/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "tag_index.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "generated"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "gov-feed"
+tag = "record.gov-feed"
+layer = "layer.runtime"
+home = ["<git-common-dir>/gov-feed.*", "<git-common-dir>/gov-last-fetch"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "gov-feed.sh"
+readers = []
+readers-none = "a store is read by its own kit's reader, never filled into a work order"
+lifecycle = "append-only"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "handoff-calls"
+tag = "record.handoff-calls"
+layer = "layer.roles"
+home = ["<git-common-dir>/handoff-calls/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "handoff.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "index-render-stamp"
+tag = "record.index-render-stamp"
+layer = "layer.memory"
+home = ["<git-common-dir>/gen-build-index-render-stamp"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "gen_build_index.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "git-client-state"
+tag = "record.git-client-state"
+layer = "layer.integrations"
+home = ["<git-common-dir>/sourcetreeconfig.json"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "hand"
+readers = []
+readers-none = "a desktop git client's own state, read by that client alone"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "stream-plan"
+tag = "record.stream-plan"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-stream-plan-*.md"
+id-rule = "<date>-build-<unit id>-stream-plan-<n>.md"
+schema = { form = "fence", source = "{prefix}/memory-tree/build_records.py:KINDS.stream-plan.required", fields = [], validator = "record_kinds:check_stream_plan" }
+writer = "hand"
+readers = []
+readers-none = "no role's reads: names a stream plan until dWellOiledMachine's pick lands"
+lifecycle = "current-state"
+check = "record-kinds"
+purpose = { text = "a build's units grouped into ordered streams, written by dIndexedDesign's planner, read by dWellOiledMachine's pick", source = "owner" }
+unarmed = "its writer is dIndexedDesign's planner"
+
+[[record-kind]]
+name = "ask"
+tag = "record.ask"
+layer = "layer.memory"
+home = "memory/builds/*/BACKLOG.md"
+id-rule = "<FAMILY>-<slug>-<seq>"
+schema = { form = "rows", fields = [] }
+writer = "gov_record.py new ask"
+readers = []
+readers-none = "an ask row is read by backlog.py's fold and the index generator's views, never filled into a work order"
+lifecycle = "current-state"
+check = "memory hygiene"
+purpose = { text = "the ask kind's acceptance at filing; its writers are the items that file asks, each filing stating its acceptance", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:455" }
+
+[[record-kind]]
+name = "shape-run"
+tag = "record.shape-run"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-build-*-shape-run-*.md"
+id-rule = "<date>-build-<unit id>-shape-run-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.shape-run.required", fields = ["Kind", "Round", "Intensity", "At", "Raw", "Confirmed", "Refuted", "Unverified", "Blocker", "High", "Medium", "Low", "Agents", "Out-tokens", "Caused-by"] }
+writer = "gov_record.py new shape-run"
+readers = []
+readers-none = "a shape-run record is read by shape_run.py's check and the Loop Review, never filled into a work order"
+lifecycle = "append-only"
+check = "shape-run records (each record equals its review line)"
+purpose = { text = "one review exit's review-shape line as typed fields, compared back to that line by shape_run.py", source = "owner" }
+cardinality = { caused-by = { per-source = "1", per-target = "many" } }
+unarmed = "no writer calls gov_record.py new shape-run yet"
+
+[[record-kind]]
+name = "code"
+tag = "record.code"
+layer = "layer.instruction"
+home = "<git-common-dir>/gov/index-s*.db"
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "generator:{prefix}/playbook/code_record.py"
+readers = []
+readers-none = "its first role reader is the work order's code slot, which TOOL-dFurnishedOrders-17 builds"
+lifecycle = "generated"
+check = "code record"
+purpose = { text = "what a tree's code defines, calls, invokes and registers, derived per blob and cached by tree hash", source = "owner" }

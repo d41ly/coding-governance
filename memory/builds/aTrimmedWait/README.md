@@ -124,9 +124,23 @@ Ids whose spec moved past its audited revision: none — 0 of 15 unit id(s) carr
 | 12 | `TOOL-aTrimmedWait-13` | no |
 | 13 | `TOOL-aTrimmedWait-18` | no |
 | 14 | `TOOL-aTrimmedWait-19` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-18-prompt-TOOL-aTrimmedWait-19-brief.md`, `2026-11-18-prompt-TOOL-aTrimmedWait-19-1-spec-writer.md` and 56 more under prompts/ |
+| reviews | `2026-11-14-review-TOOL-aTrimmedWait-1-diff-review-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-11-18-build-TOOL-aTrimmedWait-19-1-acceptance-ledger.md`, `2026-11-17-build-TOOL-aTrimmedWait-18-1-acceptance-ledger.md` and 14 more under build/ |
+| open asks | `BACKLOG.md`, 4 open |
+| card ref | `refs/gov/builds/aTrimmedWait/card` |
+<!-- /gen:build-routes -->

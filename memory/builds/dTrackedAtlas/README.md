@@ -106,9 +106,26 @@ Ids whose spec moved past its audited revision: none — 0 of 10 unit id(s) carr
 | 8 | `TOOL-dTrackedAtlas-11` | no |
 | 9 | `TOOL-dTrackedAtlas-12` | no |
 | 11 | `TOOL-dTrackedAtlas-18` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-19-prompt-TOOL-dTrackedAtlas-9-build-brief.md`, `2026-11-19-prompt-TOOL-dTrackedAtlas-8-spec-brief.md` and 31 more under prompts/ |
+| reviews | `2026-11-19-review-TOOL-dTrackedAtlas-8-9-10-11-diff-review-round2.md`, `2026-11-19-review-TOOL-dTrackedAtlas-1-2-3-4-diff-review-round1.md` (CLEAN WITH FIXES) |
+| red-fix | `2026-11-19-build-TOOL-dTrackedAtlas-8-red-fix-9.md`, `2026-11-19-build-TOOL-dTrackedAtlas-8-red-fix-8.md` and 2 more under build/ |
+| research | `2026-11-19-build-TOOL-dTrackedAtlas-4-regen.json`, `2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js` and 2 more under build/ |
+| logs | `2026-11-19-build-TOOL-dTrackedAtlas-9-ledger.md`, `2026-11-19-build-TOOL-dTrackedAtlas-8-ledger.md` and 9 more under build/ |
+| open asks | `BACKLOG.md`, 5 open |
+| card ref | `refs/gov/builds/dTrackedAtlas/card` |
+<!-- /gen:build-routes -->

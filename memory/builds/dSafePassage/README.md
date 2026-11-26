@@ -346,6 +346,8 @@ Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 99 spec(s) at 
 | 14 | `TOOL-dSafePassage-51`, `TOOL-dSafePassage-57`, `TOOL-dSafePassage-58` | no |
 | 15 | `TOOL-dSafePassage-53`, `TOOL-dSafePassage-54`, `TOOL-dSafePassage-55`, `TOOL-dSafePassage-56`, `TOOL-dSafePassage-59` | unknown |
 | 16 | `TOOL-dSafePassage-100`, `TOOL-dSafePassage-101`, `TOOL-dSafePassage-102`, `TOOL-dSafePassage-103`, `TOOL-dSafePassage-104`, `TOOL-dSafePassage-61`, `TOOL-dSafePassage-72`, `TOOL-dSafePassage-73`, `TOOL-dSafePassage-74`, `TOOL-dSafePassage-75`, `TOOL-dSafePassage-76`, `TOOL-dSafePassage-77`, `TOOL-dSafePassage-78`, `TOOL-dSafePassage-80`, `TOOL-dSafePassage-81`, `TOOL-dSafePassage-82`, `TOOL-dSafePassage-83`, `TOOL-dSafePassage-84`, `TOOL-dSafePassage-86`, `TOOL-dSafePassage-87`, `TOOL-dSafePassage-88`, `TOOL-dSafePassage-89`, `TOOL-dSafePassage-90`, `TOOL-dSafePassage-91`, `TOOL-dSafePassage-92`, `TOOL-dSafePassage-93`, `TOOL-dSafePassage-94`, `TOOL-dSafePassage-95`, `TOOL-dSafePassage-96`, `TOOL-dSafePassage-97`, `TOOL-dSafePassage-98`, `TOOL-dSafePassage-99` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
@@ -353,3 +355,18 @@ Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 99 spec(s) at 
 - **Parent builds:** [dGroundRules](../dGroundRules/README.md)
 - **Child builds:** [dFairHearing](../dFairHearing/README.md), [dOrderedCharter](../dOrderedCharter/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-02-prompt-TOOL-dSafePassage-104-spec-brief.md`, `2026-11-02-prompt-TOOL-dSafePassage-104-build-brief.md` and 264 more under prompts/ |
+| reviews | `2026-11-02-review-TOOL-dSafePassage-104-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md` and 27 more under reviews/ |
+| deviation | `2026-10-28-build-TOOL-dSafePassage-53-deviation-1.md`, `2026-10-28-build-TOOL-dSafePassage-51-deviation-182.md` and 126 more under build/ |
+| research | `2026-10-25-build-TOOL-dSafePassage-1-parent-fixes-return.md`, `2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md` |
+| logs | `2026-11-02-build-TOOL-dSafePassage-104-ledger.md`, `2026-11-01-build-TOOL-dSafePassage-99-ledger.md` and 100 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dSafePassage/card` |
+<!-- /gen:build-routes -->

@@ -89,3 +89,13 @@ Ids whose spec moved past its audited revision: none — 0 of 9 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-08-review-TOOL-aDrainedSluice-5-2.md`, `2026-08-08-review-TOOL-aDrainedSluice-2-1.md` and 1 more under reviews/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aDrainedSluice/card` |
+<!-- /gen:build-routes -->

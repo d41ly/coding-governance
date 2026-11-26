@@ -119,6 +119,7 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).resolve().parent
 if str(KIT) not in sys.path:
     sys.path.append(str(KIT))
+from tree_lib import read_slug_class  # noqa: E402  the slug grammar's class
 from tree_lib import (GIT_ENV_LEAKS, RED_FIX_TRAILER, build_git_env, build_spec_path_re, parse_conf,  # noqa: E402
                       parse_leg_names, parse_spec_h1, read_policy_value)
 from commit_trailers import derive_attribution, read_commits, read_key_table  # noqa: E402  the kit's one trailer reader
@@ -177,7 +178,8 @@ def load_conf(repo: pathlib.Path) -> dict:
 def build_id_re(families):
     """A unit id as a whole token, over the declared family prefixes."""
     alt = "|".join(sorted(set(families))) or "(?!)"
-    return re.compile(r"(?<![A-Za-z0-9-])(?:" + alt + r")-[A-Za-z0-9]+-\d+(?![A-Za-z0-9-])")
+    slug = read_slug_class()   # the slug grammar's class (TOOL-dTotalRecall-5 S7)
+    return re.compile(r"(?<![A-Za-z0-9-])(?:" + alt + r")-(?:" + slug + r")-\d+(?![A-Za-z0-9-])")
 
 
 def extract_unit_ids(text: str, id_re) -> list:

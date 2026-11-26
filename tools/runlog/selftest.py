@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""selftest.py — the runlog kit's arms. gov:kit runlog@1.19
+"""selftest.py — the runlog kit's arms. gov:kit runlog@1.20
 
     python <this kit>/selftest.py
 
@@ -542,7 +542,22 @@ from collections import Counter  # noqa: E402
 # alone in a child with neither set and in one with both planted (AC4), and a bare-`del` copy graded
 # raising (liveness). Its decoy checks move it by 3.
 # 4 + 3 = 7
-ASSERTION_FLOOR = 1658
+# RAISED 1658 -> 1711 by TOOL-dTotalRecall-12, the memory re-measure: SEVEN new arms over the `memory
+# --fixture` plants, each aimed at its own scratch — AC1's read channel with 8 checks (read-memory's bytes,
+# its zero shell bytes and its torn line; grep-memory's bytes and zero shell; read-other's zero, its agent
+# and its zero readers), AC2's shell channel with 7 (record-show's bytes and zero Read total, gov-tag,
+# recall-query and shell-path, shell-other's zero and its agent), AC3 with 3, AC4 with 4, AC6 with 4, AC7
+# with 4 and AC9 with 2. Their decoy checks move it by 21, and the three helpers they arrive with carry none.
+# 8 + 7 + 3 + 4 + 4 + 4 + 2 + 21 = 53
+# RAISED 1711 -> 1724 by TOOL-dTotalRecall-118, the whole-root search: ONE new arm with 10 checks —
+# `test_memory_dtr118_root`'s column and its liveness over each of the five `root-` plants. Its decoy checks
+# move it by 3. The nine memory arms a merge dropped come back with it: the seven of TOOL-dTotalRecall-12 were
+# counted in the 1711 above, and the two path arms were not.
+# 10 + 3 = 13
+# RAISED 1724 -> 1746 by TOOL-dTotalRecall-122: the two path arms the raise above left out, counted by reading:
+# `test_memory_dtr43_paths` with 10 checks and 3 decoy checks, 13, and `test_memory_dtr53_paths` with 6 and 3, 9.
+# 13 + 9 = 22
+ASSERTION_FLOOR = 1746
 
 PASS = []
 FAIL = []
@@ -5250,17 +5265,24 @@ def test_model_driver_sets():
         print("  SKIP extract slug grammar: no bash that shares this filesystem is on PATH, or no function "
               "to run, so the driver cannot grade the kit's grammar here")
         return
-    names = ("dLoggedFlight", "my-build", "a", "Z9", "trailing-", "a--b", "9lives", "-lead", "", "a_b", "a.b",
+    names = ("dLoggedFlight", "myBuild", "aFix", "Z9", "trailing-", "a--b", "9lives", "-lead", "", "a_b", "a.b",
              "ab/c")
-    script = shape + '\nfor s; do if check_slug_shape "$s"; then printf 1; else printf 0; fi; printf "\\0"; done'
-    got = subprocess.run([bash, "-c", script, "_", *names], capture_output=True)
+    # The driver's function reads the slug grammar's BUILD_SLUG_RE through `load_slug_class`, the kit
+    # library's, which this script stands in for with the ERE the memory-tree module prints, so the
+    # driver's bash `=~` is graded against this kit's Python `fullmatch` over one class (TOOL-dTotalRecall-5 S7).
+    ere = ("^(" + rl._SLUG_GRAMMAR.derive_slug_grammar().slug_ere + ")$" if rl._SLUG_GRAMMAR is not None
+           else "^(" + rl.SLUG_LEGACY % "a-z" + ")$")
+    script = ('load_slug_class() { SLUG_RE_ERE=$GOV_SLUG_RE_ERE; return 0; }\n' + shape
+              + '\nfor s; do if check_slug_shape "$s"; then printf 1; else printf 0; fi; printf "\\0"; done')
+    got = subprocess.run([bash, "-c", script, "_", *names], capture_output=True,
+                         env=dict(os.environ, GOV_SLUG_RE_ERE=ere))
     fields = got.stdout.split(b"\0")
     check("extract slug grammar: bash answered once per name, NUL-framed, and exited 0",
           (got.returncode, len(fields), fields[-1:]), (0, len(names) + 1, [b""]))
     driver_ok = [f == b"1" for f in fields[:len(names)]]
-    check_true("extract slug grammar liveness: the driver accepts a dashed and a single-letter name, and "
-               "refuses a digit-first one, so the table has both sides", driver_ok[1:3] == [True, True]
-               and driver_ok[6] is False, str(driver_ok))
+    check_true("extract slug grammar liveness: the driver accepts myBuild and aFix, two names the slug "
+               "class admits, and refuses a digit-first one, so the table has both sides",
+               driver_ok[1:3] == [True, True] and driver_ok[6] is False, str(driver_ok))
     check("extract slug grammar: SLUG_RE accepts exactly the names check_slug_shape accepts",
           [bool(rl.SLUG_RE.fullmatch(s)) for s in names], driver_ok)
     read = [rx.derive_tool_class("Bash", {"command": f"bash unattended.sh --preflight {s} --mode prompt",
@@ -5456,7 +5478,7 @@ def test_record_ac1_names():
         kind, ids = read_serves_ids(text)
         check(f"record AC1: {n[:40]} passes check 5's recording-name grammar", bool(CHECK5_RE.fullmatch(n)), True)
         check(f"record AC1: {n[:40]} projects an id its own Serves line lists", check_projection(n, ids), True)
-        check(f"record AC1: {n[:40]} binds as a journal", kind, "journal")
+        check(f"record AC1: {n[:40]} binds as a log", kind, "log")
     # THE GRADERS' OWN NEAR MISSES, so each is seen able to fail: a name with no family projects no id,
     # one naming an id its head does not serve fails the projection, and a free name fails check 5.
     check("record AC1 liveness: a name dropping the family fails the projection",
@@ -5524,7 +5546,7 @@ def test_record_ac2_serves():
     text = rl_record.render_record(model)
     kind, ids = read_serves_ids(text)
     check("record AC2: the record's head binds exactly those ids, read as check 21 reads them",
-          (kind, ids), ("journal", [units[1], units[2], units[4]]))
+          (kind, ids), ("log", [units[1], units[2], units[4]]))
     check_true("record AC2: the undefined id reaches the head nowhere", f"X-{FX_SLUG}-9" not in text.split("\n")[2],
                text.split("\n")[2])
     # CLOSED and named by an own commit is served; CLOSED and named by none is not.
@@ -5574,7 +5596,7 @@ def test_record_ac3_shape():
           {k: [(t["header"], t["rows"]) for t in v["tables"]] for k, v in twin.items()},
           {k: [(t["header"], t["rows"]) for t in md[k]["tables"]] for k in twin})
     check("record AC3: the record's first line is its title and its Serves line is in its head",
-          (text.split("\n")[0], read_serves_ids(text)[0]), (rl_record.TITLE, "journal"))
+          (text.split("\n")[0], read_serves_ids(text)[0]), (rl_record.TITLE, "log"))
 
 
 # ONE EVENT SHAPE PER RETIRED KIND, so the class model can carry a real instance of each and AC1 can
@@ -7842,6 +7864,47 @@ def test_record_duration_derived_mark():
           (marked, rl_record.check_record_lines(bare.split("\n"), checks, FX_SLUG, own)), ([], []))
 
 
+def test_record_cause_line():
+    """TOOL-dTotalRecall-36 AC4: the run record's cause is the first served id, bare and never a run.
+    TOOL-dTotalRecall-48 AC3: its check grades SHAPE, never absence: an unserved cause reds, a cut cause
+    line and a cause opening a served `N..M` run do not."""
+    ids = [f"X-{FX_SLUG}-2", f"X-{FX_SLUG}-1"]
+    check("cause AC4: render_cause_line names the first served id, bare",
+          rl_record.render_cause_line(ids), f"**Caused-by:** X-{FX_SLUG}-1")
+    check("cause AC4 liveness: render_serves writes the same ids as a run",
+          rl_record.render_serves(ids), f"X-{FX_SLUG}-1..2")
+    served = [f"X-{FX_SLUG}-1"]
+    unserved = rl_record.check_cause_line(4, f"**Caused-by:** X-{FX_SLUG}-9", served)
+    check("cause AC3: an unserved cause is one finding naming it",
+          ([f[:2] for f in unserved], all(f"X-{FX_SLUG}-9" in f[2] for f in unserved)), ([(4, "cause")], True))
+    check("cause AC3: a cut cause line and a cause opening a served run pass, absence is not shape",
+          (rl_record.check_cause_line(4, "", served), rl_record.check_cause_line(4, None, served),
+           rl_record.check_cause_line(4, f"**Caused-by:** X-{FX_SLUG}-1", [f"X-{FX_SLUG}-1..2"])),
+          ([], [], []))
+
+
+def test_record_cause_head():
+    """TOOL-dTotalRecall-48 AC1 and AC3: the landed fixture's render carries its cause at line 4 under a
+    head that admits it and grades clean; the same render with the cause cut, the head every tracked
+    record carries, grades clean too; and a doubled cause line is the fixed-text finding at line 5."""
+    fx = build_landed_fixture()
+    j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    model = build_model(fx["repo"], journals=j)
+    lines = rl_record.render_record(model, "memory", rl_record.measure_commitment(model, j)).split("\n")
+    own = [u["id"] for u in dataclasses.asdict(model)["units"] if u.get("id")]
+    checks = rl_record.build_record_checks(FX_SLUG, "memory", own)
+    check("cause AC1: the render's line 4 is its cause, and the record's check grades it clean",
+          (lines[3], rl_record.check_record_lines(lines, checks, FX_SLUG, own)),
+          (f"**Caused-by:** X-{FX_SLUG}-1", []))
+    cut = lines[:3] + lines[4:]
+    check("cause AC3: the render with its cause line cut grades clean",
+          rl_record.check_record_lines(cut, checks, FX_SLUG, own), [])
+    doubled = lines[:4] + lines[3:]
+    check_true("cause AC3: a doubled cause line is the fixed-text finding at line 5",
+               (5, "line") in [f[:2] for f in rl_record.check_record_lines(doubled, checks, FX_SLUG, own)],
+               str(rl_record.check_record_lines(doubled, checks, FX_SLUG, own)[:3]))
+
+
 
 # ======================================================= the window's closer (TOOL-dLoggedFlight-25)
 #
@@ -8563,6 +8626,9 @@ def test_schema_ac2_refusals():
                                              lambda ln: "**Serves:** journal " + other)),
         ("serves undefined-id", build_variant(clean, lambda ln: ln.startswith("**Serves:** "),
                                               lambda ln: f"**Serves:** journal X-{FX_SLUG}-99")),
+        # TOOL-dTotalRecall-48 S2: the cause line the head admits names an id the record does not serve.
+        ("cause unserved", build_variant(clean, lambda ln: ln.startswith("**Caused-by:** "),
+                                         lambda ln: f"**Caused-by:** X-{FX_SLUG}-9")),
         ("line free-text", (free_text, free_line + 1)),
     ]
     variants = [(label, (text.encode("utf-8"), line)) for label, (text, line) in variants]
@@ -9601,6 +9667,156 @@ def test_prose_ac4_ac5_refusals():
     check("prose AC5: a session with no transcript exits 2", r.returncode, 2)
     check_true("prose AC5: ...naming the projects root it searched", pathlib.Path(projects).as_posix() in r.stderr,
                r.stderr)
+
+
+# ---------------------------------------------------------------------------------- memory (TOOL-dTotalRecall-12)
+
+# The report's columns after the type label, typed here rather than imported, so a moved column reds.
+MEMORY_COLUMNS = ("agents", "reading", "median B", "p90 B", "read med", "read p90", "shell med", "shell p90",
+                  "slice med", "slice p90", "read B", "shell B", "slice B")
+
+
+def run_memory_plant(case, prefix):
+    """`memory --fixture --plant <case>` under an arm's own scratch and roots: (rc, rows, lines, output)."""
+    base, _projects = build_projects(prefix)
+    r = run_runlog(["memory", "--fixture", "--plant", case], base, build_arm_env(base))
+    lines = r.stdout.splitlines()
+    return r.returncode, read_memory_rows(lines), lines, r.stdout + r.stderr
+
+
+def read_memory_rows(lines):
+    """`{label: {column: cell}}` for each type row, the pooled row included; a figure's commas dropped."""
+    rows = {}
+    for ln in lines:
+        if not ln.startswith("memory: ") or ln.startswith(("memory: window", "memory: verdict", "memory: no ")):
+            continue
+        label, cells = ln[8:28].strip(), ln[28:].split()
+        if label == "agent type" or len(cells) != len(MEMORY_COLUMNS):
+            continue
+        rows[label] = {k: (int(v.replace(",", "")) if v.replace(",", "").isdigit() else v)
+                       for k, v in zip(MEMORY_COLUMNS, cells)}
+    return rows
+
+
+def read_memory_cell(rows, column):
+    return rows.get("all, pooled", {}).get(column)
+
+
+def test_memory_ac1_read_channel():
+    rc, rows, lines, _out = run_memory_plant("read-memory", "runlog-mem-ac1-")
+    check("memory AC1: a Read under the memory root carries its result's bytes on the read channel",
+          read_memory_cell(rows, "read B"), 1200)
+    check("memory AC1: ...and none on the shell channel", read_memory_cell(rows, "shell B"), 0)
+    check_true("memory AC1: ...and the planted torn line is counted on the window line",
+               any(ln.startswith("memory: window ") and "· torn 1 ·" in ln for ln in lines), "\n".join(lines))
+    _rc, rows, _lines, _out = run_memory_plant("grep-memory", "runlog-mem-ac1g-")
+    check("memory AC1: a Grep under the memory root counts its text items' bytes the same way",
+          read_memory_cell(rows, "read B"), 700)
+    check("memory AC1: ...and none on the shell channel", read_memory_cell(rows, "shell B"), 0)
+    _rc, rows, _lines, _out = run_memory_plant("read-other", "runlog-mem-ac1o-")
+    check("memory AC1: a Read outside the memory root, a kit dir named memory-something included, counts zero",
+          read_memory_cell(rows, "read B"), 0)
+    check("memory AC1 liveness: ...over an agent the measure did read", read_memory_cell(rows, "agents"), 1)
+    check("memory AC1: ...which reads no memory", read_memory_cell(rows, "reading"), 0)
+
+
+def test_memory_ac2_shell_channel():
+    _rc, rows, _lines, _out = run_memory_plant("record-show", "runlog-mem-ac2-")
+    check("memory AC2: a `gov_record.py show` call carries its result's bytes on the shell channel",
+          read_memory_cell(rows, "shell B"), 1500)
+    check("memory AC2: ...and the Read-only total is zero", read_memory_cell(rows, "read B"), 0)
+    for case, want in (("gov-tag", 700), ("recall-query", 800), ("shell-path", 800)):
+        _rc, rows, _lines, _out = run_memory_plant(case, "runlog-mem-ac2-")
+        check(f"memory AC2: the {case} plant counts its results on the shell channel",
+              read_memory_cell(rows, "shell B"), want)
+    _rc, rows, _lines, _out = run_memory_plant("shell-other", "runlog-mem-ac2o-")
+    check("memory AC2: a shell call naming no memory path and no read verb counts zero",
+          read_memory_cell(rows, "shell B"), 0)
+    check("memory AC2 liveness: ...over an agent the measure did read", read_memory_cell(rows, "agents"), 1)
+
+
+def test_memory_ac3_unarmed():
+    rc, _rows, lines, _out = run_memory_plant("unarmed", "runlog-mem-ac3-")
+    body = [ln for ln in lines if not ln.startswith("memory: agent type")]
+    check("memory AC3: the stand-in slice reader exits 3", rc, 3)
+    check_true("memory AC3: ...its verdict line reads unarmed",
+               bool(body) and body[-1].startswith("memory: verdict unarmed · "), "\n".join(lines))
+    check_true("memory AC3: ...and every report line shows the slice channel unarmed, never zero bytes",
+               len(body) >= 4 and all("unarmed" in ln for ln in body), "\n".join(lines))
+
+
+def test_memory_ac4_population():
+    _rc, rows, _lines, _out = run_memory_plant("foreign-dir", "runlog-mem-ac4-")
+    check("memory AC4: an agent under another project's directory is not in the population",
+          read_memory_cell(rows, "agents"), 1)
+    check("memory AC4: ...and its bytes are not counted", read_memory_cell(rows, "read B"), 600)
+    _rc, rows, _lines, _out = run_memory_plant("outside-window", "runlog-mem-ac4w-")
+    check("memory AC4: an agent that started before the window is not in the population",
+          read_memory_cell(rows, "agents"), 1)
+    check("memory AC4: ...and its bytes are not counted", read_memory_cell(rows, "read B"), 600)
+
+
+def test_memory_ac6_verdict():
+    rc, _rows, lines, _out = run_memory_plant("median-under", "runlog-mem-ac6-")
+    check("memory AC6: a planted median of 32,000 B passes with exit 0", rc, 0)
+    check_true("memory AC6: ...its verdict line reading pass over that median",
+               bool(lines) and lines[-1].startswith("memory: verdict pass · median 32000 B · target 33000 B"),
+               "\n".join(lines))
+    rc, _rows, lines, _out = run_memory_plant("median-over", "runlog-mem-ac6o-")
+    check("memory AC6: a planted median of 34,000 B fails with exit 1", rc, 1)
+    check_true("memory AC6: ...its verdict line reading fail over that median",
+               bool(lines) and lines[-1].startswith("memory: verdict fail · median 34000 B · target 33000 B"),
+               "\n".join(lines))
+
+
+def test_memory_ac7_states():
+    for case in ("not-due", "empty"):
+        rc, _rows, lines, _out = run_memory_plant(case, "runlog-mem-ac7-")
+        check(f"memory AC7: the {case} plant exits 3, no verdict", rc, 3)
+        check_true(f"memory AC7: ...its verdict line reads {case}",
+                   bool(lines) and lines[-1].startswith(f"memory: verdict {case} · "), "\n".join(lines))
+
+
+def test_memory_dtr43_paths():
+    # TOOL-dTotalRecall-43 S16, S17: the match counts this clone's memory tree alone, an MSYS spelling and
+    # a linked worktree of it included; the staged break matches any `/memory/`, which counts the first two.
+    for case, column, want in (("harness-memory", "read B", 0), ("foreign-memory-path", "read B", 0),
+                               ("foreign-memory-path", "shell B", 0), ("msys-path", "read B", 500),
+                               ("bare-root", "shell B", 350)):
+        _rc, rows, _lines, _out = run_memory_plant(case, "runlog-mem-dtr43-")
+        check(f"memory dTR-43: the {case} plant counts {want} on {column}", read_memory_cell(rows, column), want)
+        check(f"memory dTR-43 liveness: ...over the {case} plant's one agent", read_memory_cell(rows, "agents"), 1)
+
+
+def test_memory_dtr53_paths():
+    # TOOL-dTotalRecall-53 S24 AC24: a clone on another drive read through its MSYS root, `./memory/x` and
+    # `../../memory/x` resolved against the call's recorded working directory each count; the staged break,
+    # the drive-only case fold with no working directory read, counts the relative ones zero.
+    for case, column, want in (("msys-d-drive", "read B", 450), ("dot-relative", "shell B", 300),
+                               ("parent-relative", "shell B", 250)):
+        _rc, rows, _lines, _out = run_memory_plant(case, "runlog-mem-dtr53-")
+        check(f"memory dTR-53: the {case} plant counts {want} on {column}", read_memory_cell(rows, column), want)
+        check(f"memory dTR-53 liveness: ...over the {case} plant's one agent", read_memory_cell(rows, "agents"), 1)
+
+
+def test_memory_ac9_privacy():
+    _rc, rows, _lines, out = run_memory_plant("privacy", "runlog-mem-ac9-")
+    check("memory AC9: no planted command, path or result text reaches the output",
+          "TOTALRECALL-12-MARKER" in out, False)
+    check("memory AC9 liveness: ...over an agent whose planted calls were counted",
+          read_memory_cell(rows, "reading"), 1)
+
+
+def test_memory_dtr118_root():
+    # TOOL-dTotalRecall-118: a search of the whole memory root, the widest read, counts in every spelling
+    # that resolves to it, and a sibling whose name begins with the root's counts zero; the staged break
+    # asks an absolute word for a path BELOW the root, which counts the first four zero.
+    for case, column, want in (("root-grep", "read B", 400), ("root-shell", "shell B", 350),
+                               ("root-absolute", "read B", 300), ("root-worktree", "shell B", 250),
+                               ("root-sibling", "read B", 0)):
+        _rc, rows, _lines, _out = run_memory_plant(case, "runlog-mem-dtr118-")
+        check(f"memory dTR-118: the {case} plant counts {want} on {column}", read_memory_cell(rows, column), want)
+        check(f"memory dTR-118 liveness: ...over the {case} plant's one agent", read_memory_cell(rows, "agents"), 1)
 
 
 def main():

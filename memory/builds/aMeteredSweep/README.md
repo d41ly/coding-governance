@@ -70,9 +70,21 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aMeteredSweep-1` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 - **Child builds:** [aSparedSpawn](../aSparedSpawn/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| research | `2026-10-09-build-TOOL-aMeteredSweep-1-research2-wsl.md`, `2026-10-09-build-TOOL-aMeteredSweep-1-research2-spawns.md` and 11 more under build/ |
+| logs | `2026-10-09-build-TOOL-aMeteredSweep-1-acceptance-ledger.md`, `2026-10-08-build-TOOL-aMeteredSweep-1-legtable.py` and 1 more under build/ |
+| card ref | `refs/gov/builds/aMeteredSweep/card` |
+<!-- /gen:build-routes -->

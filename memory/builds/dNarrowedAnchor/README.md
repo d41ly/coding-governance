@@ -90,3 +90,14 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-13-prompt-TOOL-dNarrowedAnchor-4-brief.md`, `2026-11-13-prompt-TOOL-dNarrowedAnchor-4-3-builder.md` and 2 more under prompts/ |
+| logs | `2026-11-13-build-TOOL-dNarrowedAnchor-1-agent-ledger.md`, `2026-11-13-build-TOOL-dNarrowedAnchor-1-1-journal.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dNarrowedAnchor/card` |
+<!-- /gen:build-routes -->

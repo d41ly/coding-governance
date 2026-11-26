@@ -90,3 +90,13 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-25-review-TOOL-dPromptedSeam-1-spec-audit.md` (BLOCKED), `2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-2.md` (BLOCKED) and 3 more under reviews/ |
+| card ref | `refs/gov/builds/dPromptedSeam/card` |
+<!-- /gen:build-routes -->

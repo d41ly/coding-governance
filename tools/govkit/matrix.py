@@ -88,6 +88,9 @@ SCRATCH_EXPECT = {
     "micro-format definitions": "microformats OK —",
     "micro-format gate selftest": "PASS (",
     "line length": "NOT ADOPTED — no declaration at",
+    # The install's HEAD is the governance commit, which tracks no code file, so the record has
+    # nothing to read and says so rather than grading an empty population green (TOOL-dTotalRecall-8).
+    "code record": "code-record: unarmed — the tree holds no code file the record reads",
     # `line-length gate selftest` USED to be here and its removal is the point. The suite it runs is
     # withheld from every target now: TOOL-aQuenchedHarness-6 ported it onto `<prefix>/lib/lib-selftest.sh`,
     # which is gov-internal and travels to nobody, so a shipped copy would red on arrival with
@@ -97,43 +100,11 @@ SCRATCH_EXPECT = {
     # table quietly describe a leg that had stopped being emitted.
 }
 
-#: The six answers shapes 6 and 7 fix over the stubs (PLAY-dOrderedCharter-80 S7), one constant so the
-#: default install and the aged one cannot drift apart; `preset` is the policy kit's, which the
-#: registry default selects and intake never defaults (KICK-dKeptSession-4 S4).
-INSTALL_ANSWERS = {"memory_root": "memory", "playbook_path": "docs/PARALLEL.md", "playbook_dir": "docs",
-                   "manifest_path": "docs/SESSION-KICKOFF.md", "user_skills": "~/.claude/skills",
-                   "preset": "standard"}
-
-
-def derive_bullet_placeholders() -> set[str]:
-    """PLAY-dOrderedCharter-81 S2, PLAY-dOrderedCharter-82 S2. The lowercased keys whose token is a
-    whole line inside a one-line region of gov's charter template, as the renderer's `--bullet-keys`
-    prints them. A child process, so no import edge joins the renderer's closure to this one."""
-    kd = govkit.resolve_kit_dir("playbook", "render_playbook.py", HERE)
-    p = subprocess.run([sys.executable, str(kd / "render_playbook.py"), "--bullet-keys"], capture_output=True,
-                       text=True, encoding="utf-8", stdin=subprocess.DEVNULL)
-    if p.returncode:
-        raise RuntimeError(f"render_playbook.py --bullet-keys exited {p.returncode}: {p.stderr.strip()}")
-    return set(p.stdout.split())
-
-
-def render_deploy_tail(kits, fixed: dict) -> str:
-    """A scratch deploy file's tail: the `kits` line, the `[answers]` header and one stub per
-    placeholder the playbook entry declares, with `fixed` over the stubs. PLAY-dOrderedCharter-80 S7.
-
-    The answers are DERIVED from the descriptor's own placeholder rows, never listed. Every key gets
-    a stub, whatever its class: for a `derived` row the probe still wins when it can see, and the stub
-    is only the override the engine already honours when it cannot. A hand list here would go stale
-    the first time the charter grew a placeholder. A placeholder whose token is a whole line inside a
-    one-line region the render grades (aDistilledCharter) takes a `- ` bullet stub: the template,
-    not the row's default, decides the bullet shape."""
-    pdesc = govkit.load_toml(ROOT / PFX / KIT_NAMES["govkit"] / "entries" / "playbook.kit.toml")
-    bullets = derive_bullet_placeholders()
-    ans = {r["key"].lower(): ("- stated" if r["key"].lower() in bullets else "stated")
-           for r in pdesc.get("placeholder", [])}
-    ans.update(fixed)
-    return ("kits = [" + ", ".join('"%s"' % k for k in kits) + "]" + NL + "[answers]" + NL
-            + NL.join('%s = "%s"' % (k, v) for k, v in sorted(ans.items())) + NL)
+#: The deploy-tail factory, `INSTALL_ANSWERS`, `derive_bullet_placeholders` and `render_deploy_tail`,
+#: lives in `fixture_target.py` beside `build_target` since its second consumer, the deployer
+#: suite's recall closure (TOOL-dTotalRecall-21 S11).
+from fixture_target import (INSTALL_ANSWERS, derive_bullet_placeholders,  # noqa: E402,F401 — re-exported
+                            render_deploy_tail)
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:

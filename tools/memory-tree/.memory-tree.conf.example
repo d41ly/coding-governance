@@ -274,11 +274,6 @@ UNIVERSAL_BUDGET="3"
 # fallback from the hooks kit: blank, its lane opens on that manifest and stays closed with none.
 LEG_MANIFEST=""
 
-# memory-recall only (safe to delete if that kit is not adopted): the cache budget over the whole
-# `<git-common-dir>/recall/cache/` tree, in megabytes. ABSENT = the kit's default (512 MB);
-# BLANK = uncapped.
-RECALL_CACHE_BUDGET_MB="512"
-
 # memory-recall only (safe to delete if that kit is not adopted): the optional keys below.
 # `id_grammar.py` in this kit is their reader, and the memory-recall kit's README owns the full text.
 #
@@ -357,8 +352,9 @@ REFUSAL_CEILINGS=""
 ARMS_REFUSALS=""
 
 # ACCEPTANCE_LEDGER_CUTOFF — the date from which a CLOSED Tier-2 spec owes an acceptance ledger: one
-# line per numbered criterion, in a record whose `**Serves:**` kind is `journal`. The grammar is in
-# HYGIENE.md under "Acceptance ledger", and the check reads SHAPE and COVERAGE only.
+# line per numbered criterion, in a record whose `**Serves:**` kind is `log`, or its read-only alias
+# `journal`. The grammar is in HYGIENE.md under "Acceptance ledger", and the check reads SHAPE and
+# COVERAGE only.
 #
 # BLANK GRANDFATHERS EVERYTHING AND THE CHECK RUNS DARK — set it to the date you adopt the grammar,
 # not to a date in the past, or every spec that closed before it reds and the adoption is unlandable.
@@ -378,10 +374,9 @@ ACCEPTANCE_LEDGER_GRANDFATHER=""
 # than quietly grading nothing. Blank and invalid are different answers and the checker keeps them
 # apart.
 
-# BUILD_SLUG_RE — the pattern a build folder name must match. Blank = ^[A-Za-z][A-Za-z0-9-]*$
-# MUST be anchored at both ends, and MUST NOT match the empty string: a pattern matching "" admits
-# every folder name and check 4 then passes everything. The checker refuses all three cases.
-BUILD_SLUG_RE=""
+# The pattern a build folder name must match is no conf key: it is derived from the slug grammar's
+# policy keys, builds.slug-words, builds.slug-style and builds.slug-date in .governance/policy.toml,
+# by id_grammar.py's derive_slug_grammar. The retired BUILD_SLUG_RE, set here, refuses by name.
 
 # PROJECT_REGISTRY_EXTRA — whitespace-separated extra filenames legal directly under
 # <MEMORY_ROOT>/project/. This only WIDENS the whitelist and is bounded by what your tree actually

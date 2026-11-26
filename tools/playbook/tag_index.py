@@ -2,11 +2,14 @@
 
 THE GRAMMAR. A tag is `<ns>.<seg>(.<seg>)*`, each `seg` `[a-z0-9][a-z0-9-]*`, at most TAG_MAX_BYTES bytes;
 `<ns>` is a word the registry, `namespaces.toml` beside this file, declares, never one typed here. A
-document section is `doc.<name>#<seg>`, its `<seg>` the `##` heading folded by `derive_heading_seg`.
+document section is `doc.<name>#<seg>`, its `<seg>` the `##` heading folded by `derive_heading_seg`,
+a repeat suffixed by `derive_anchor`.
 
 THE INDEX is `<git-common-dir>/gov/index-s<INDEX_SCHEMA>.db`, `derive_index_path`'s, one file per node
-that every worktree of the repository shares, written by the extractors alone through `build_index`, never committed: deleting it costs one
-rebuild. Its tables, keyed by blob or by path and blob so a later build can add its own beside them:
+that every worktree of the repository shares, its tag rows written by the extractors through `build_index`, never committed: deleting it costs one
+rebuild. memory-recall writes its own `fts_*` tables on the same file (TOOL-dTotalRecall-21 F5): two FTS5
+tables, `fts_record` and `fts_chunk`, and `fts_blob`, `fts_supersession` and `fts_digest` beside them,
+created at recall's next open after a reset. Its tables, keyed by blob or by path and blob so a later build can add its own beside them:
 
   tree_path(tree, path, blob)                               the paths a built tree holds
   blob_row(blob, extractor, version, tag, kind, line, end_line, text)  what a blob holds, at any path
@@ -14,6 +17,8 @@ rebuild. Its tables, keyed by blob or by path and blob so a later build can add 
   dirty_path(worktree, path, blob)                           a worktree's uncommitted edits to tracked files
   tree_built(tree, versions, built_at)                       the freshness key of a tree
   blob_parsed(blob, extractor, version)                      the freshness key of a blob (PLAY-dOrderedCharter-44)
+  leg_row(blob, reader, version, payload)                    a memory leg reader's product, memory-tree's
+                                                             `build_leg_rows` writing it here (TOOL-dTotalRecall-23)
 
 A blob row's tag `""` or `#<seg>` is relative to the name its path gives it (a document's `doc.<name>`),
 so one blob at two paths is parsed once and named twice; every other tag is whole. A `blob_parsed` row
@@ -23,7 +28,9 @@ reads old blobs. A `parsed` path row marks a (path, blob, extractor, version) qu
 stamped `PRAGMA user_version = INDEX_SCHEMA`, and the schema is in its name, so two schemas never share one
 file; a file of another stamp is rebuilt in place, its tables dropped and created again inside one
 `BEGIN IMMEDIATE` transaction and the file never unlinked, so a reader holding it keeps it
-(PLAY-dOrderedCharter-55 S16).
+(PLAY-dOrderedCharter-55 S16). The drop order: every virtual table first, each drop removing its shadow
+tables, then the table list read again and every name it still holds dropped (TOOL-dTotalRecall-21 S10),
+so a reset never names an FTS5 shadow table.
 
 EACH VERSION'S ROWS STAND APART (PLAY-dOrderedCharter-51). Every worktree shares the file and two of them
 can carry different extractor bytes, so a build never deletes a row of another version: the rows of two
@@ -193,11 +200,8 @@ def derive_extractor_versions(namespaces, registry_dir) -> dict:
     for name, ns in [(CITATIONS, "")] + [(r["extractor"], r["ns"]) for r in namespaces]:
         src = resolve_extractor_module(name.partition(":")[0], registry_dir)
         if src not in by_file:
-            try:
-                digest = hashlib.sha256()
-                for path in import_walk.derive_module_closure(str(src), [str(src.parent), mt]):
-                    digest.update(pathlib.Path(path).read_bytes())
-                by_file[src] = digest.hexdigest()[:12]
+            try:   # memory-tree's one closure-version rule (TOOL-dTotalRecall-43 S21), no key
+                by_file[src] = import_walk.derive_closure_version([str(src)], [str(src.parent), mt])
             except (OSError, SyntaxError, ValueError) as exc:
                 raise TagError(f"namespace '{ns}' extractor {name}: its module {src.as_posix()} or a module it "
                                f"imports is unreadable: {getattr(exc, 'strerror', None) or exc}") from None
@@ -248,6 +252,32 @@ def derive_heading_seg(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
 
 
+#: an authored section tag opening a heading's text, `[section.<seg>] ` (TOOL-dTotalRecall-9 S1)
+AUTHORED_SECTION_RE = re.compile(r"\[section\.(?P<seg>[a-z0-9][a-z0-9-]*)\](?:[ \t]|$)")
+
+
+def read_authored_anchors(headings) -> set:
+    """The `<seg>` of every heading text in `headings` that opens an authored `[section.<seg>] ` tag: the set
+    each caller of `derive_anchor` seeds its `seen` with before deriving any heading (TOOL-dTotalRecall-43 S44)."""
+    return {m.group("seg") for h in headings for m in [AUTHORED_SECTION_RE.match(h or "")] if m}
+
+
+def derive_anchor(heading: str, seen: set) -> str:
+    """One heading's derived anchor in one document. `seen` holds, first, the anchors the document's authored
+    `[section.<seg>]` tags already take (`read_authored_anchors`, every caller seeding it before its first
+    heading, TOOL-dTotalRecall-43 S44), then the anchors derived before this heading, and this extends it: a
+    repeat of a fold takes `-2`, `-3`, the search running past a natural suffix another heading or an authored
+    tag already took; an empty fold is returned empty and never recorded (TOOL-dTotalRecall-10 S1)."""
+    base = derive_heading_seg(heading)
+    if not base:
+        return ""
+    anchor, n = base, 2
+    while anchor in seen:
+        anchor, n = f"{base}-{n}", n + 1
+    seen.add(anchor)
+    return anchor
+
+
 def scan_unfenced(text: str, unclosed: list | None = None):
     """(line number, line) for every line of Markdown `text` outside a fence, through memory-tree's one fence
     reader; the line an unclosed fence opens at goes to `unclosed`, a caller that does not ask reading on.
@@ -292,9 +322,10 @@ def extract_doc(ctx, path, text=None):
     lines = text.splitlines()
     heads = [(n, line[3:].strip()) for n, line in scan_unfenced(text) if line.startswith("## ")]
     rows = [("", "doc", 1, len(lines), lines[0] if lines else "")]
+    seen = read_authored_anchors(h for _n, h in heads)
     for i, (n, head) in enumerate(heads):
         end = heads[i + 1][0] - 1 if i + 1 < len(heads) else len(lines)
-        seg = derive_heading_seg(head)
+        seg = derive_anchor(head, seen)
         if seg:
             rows.append((f"#{seg}", "section", n, end, "\n".join(lines[n - 1:end])))
     return rows
@@ -653,6 +684,11 @@ def load_index(root, reset=False) -> sqlite3.Connection:
             try:
                 old = con.execute("PRAGMA user_version").fetchone()[0]  # read again under the write lock
                 if reset or old != INDEX_SCHEMA:
+                    # virtual tables first, each drop taking its shadow tables, then the list read again
+                    # (TOOL-dTotalRecall-21 S10): a shadow table is never named, so none is dropped twice
+                    for (name,) in con.execute("SELECT name FROM sqlite_master WHERE type='table' "
+                                               "AND sql LIKE 'CREATE VIRTUAL TABLE%'").fetchall():
+                        con.execute(f'DROP TABLE "{name}"')
                     for (name,) in con.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall():
                         con.execute(f'DROP TABLE "{name}"')
                     for statement in SCHEMA.split(";"):
@@ -803,6 +839,8 @@ def build_index(root, tree, ctx, con, stats) -> None:
             _write_path_rows(con, pairs, ctx["versions"], ctx["conf"])
             con.execute("INSERT OR REPLACE INTO tree_built VALUES (?,?,?)", (tree, ctx["digest"], time.time()))
             remove_unheld_rows(con, root, keep={tree})
+            # memory-tree's leg rows, written when a tree is first built (TOOL-dTotalRecall-23 S1, F5)
+            tree_lib.build_leg_rows(con, root, tree, entries)
     except sqlite3.OperationalError as exc:
         raise TagError(f"the tag index is locked or unwritable: {exc}") from None
 
@@ -1146,7 +1184,8 @@ def check_retired(con, ctx, mode, base_spans, armed, base_sections=None, aliases
     under `refuse-new`, a WARN line under `warn`, silent under `allow`. -> (reds, warns, cited).
     PLAY-dOrderedCharter-29 S8, over sections: a `doc.<name>#<seg>` of `base_sections` (the compare base's
     section rows, None for no base) gone at the tip with no `[[alias]]` row is red, and a section an alias
-    row retires minted again at the tip is red, under every value."""
+    row retires minted again at the tip is red, under every value. A section row with no `#` is a record
+    heading, which a revision renames freely, and is never read as retired (TOOL-dTotalRecall-114 S26)."""
     retired = {}
     for tag, path, line, *_ in read_rows(con, ("retired",)):
         retired.setdefault(tag, (path, line))
@@ -1155,7 +1194,7 @@ def check_retired(con, ctx, mode, base_spans, armed, base_sections=None, aliases
     tip = {}
     for tag, path, line, *_ in read_rows(con, ("section",)):
         tip.setdefault(tag, (path, line))
-    for tag in sorted(set(base_sections or ()) - set(tip) - set(aliases)):
+    for tag in sorted(t for t in set(base_sections or ()) - set(tip) - set(aliases) if "#" in t):
         reds.append(f"tags: retired section · {tag} is at the compare base and gone at the tip with no [[alias]] "
                     "row: add one in aliases.toml naming where it went")
     for ref in sorted(r for r in aliases if r in tip):
@@ -1192,9 +1231,10 @@ def read_layer_kinds(path) -> dict:
 
 def check_owned(con, ctx, layers_path) -> list:
     """S14 `owned`: a tag minted in a namespace whose row's layer is a core layer, by a source sitting in
-    a kit whose descriptor's layer is an `optional` or `expansion` row, is red."""
+    a kit whose descriptor's layer is an `optional` or `expansion` row, is red. A namespace whose row reads
+    `minted = "anywhere"` is passed over: any tracked file mints its tags (TOOL-dTotalRecall-114 S26)."""
     kinds = read_layer_kinds(layers_path)
-    core_ns = {r["ns"] for r in ctx["namespaces"] if kinds.get(r["layer"]) == "core"}
+    core_ns = {r["ns"] for r in ctx["namespaces"] if kinds.get(r["layer"]) == "core" and r.get("minted") != "anywhere"}
     kit_of: dict = {}
 
     def read_kit_layer(path):
@@ -1224,9 +1264,10 @@ def check_owned(con, ctx, layers_path) -> list:
     return reds
 
 
-def derive_tag_fault(head: str, words) -> str | None:
+def derive_tag_fault(head: str, words, cap=TAG_MAX_BYTES) -> str | None:
     """S3's rule for one tag `head`, no `#<seg>`, against the registry's namespace `words`: the rule it
-    breaks, or None. The shape check and the memory index's promotion both grade through it."""
+    breaks, or None. The shape check and the memory index's promotion both grade through it. A `cap` of
+    None grades no length (TOOL-dTotalRecall-114 S26)."""
     ns, _, rest = head.partition(".")
     segs = rest.split(".") if rest else []
     bad = next((s for s in segs if not SEG_RE.fullmatch(s)), None)
@@ -1234,8 +1275,8 @@ def derive_tag_fault(head: str, words) -> str | None:
         return f"namespace '{ns}' is not registered"
     if not segs or bad is not None:
         return f"segment '{bad or ''}' is outside {SEG}"
-    if len(head.encode("utf-8")) > TAG_MAX_BYTES:
-        return f"over {TAG_MAX_BYTES} bytes ({len(head.encode('utf-8'))})"
+    if cap is not None and len(head.encode("utf-8")) > cap:
+        return f"over {cap} bytes ({len(head.encode('utf-8'))})"
     if len(segs) > 1 and segs[0] in words:  # a one-segment name's bare form is no citation (TOOL-dDeclaredLoop-18 S10)
         return f"first segment '{segs[0]}' is a namespace word"
     return None
@@ -1244,14 +1285,19 @@ def derive_tag_fault(head: str, words) -> str | None:
 def check_tag_shape(con, ctx) -> tuple[list, list]:
     """S3, the shape check, over every defining row, every unit row's selector value and every `family`
     prefix: each graded before any `#<seg>`, against the registry's words, a word outside `seg` a red
-    naming its row and never a word. -> (reds, the tags graded)."""
+    naming its row and never a word. The byte cap passes over a derived heading anchor, a `section` row whose
+    tag opens with its heading's own fold: no author spelled it, and `record show` compares the whole fold. An
+    authored or mapped section tag is still graded (TOOL-dTotalRecall-114 S26). -> (reds, the tags graded)."""
     words = {r["ns"] for r in ctx["namespaces"]}
     reds = [f"tags: {ctx['registry']} · shape · namespace row '{ns}' is outside seg, so no tag is graded "
             f"against it" for ns in ctx["malformed"]]
     graded = []
-    for tag, path, line, *_ in read_rows(con, DEFINE_KINDS + ("selector", "family")):
+    for tag, path, line, kind, blob, ex in read_rows(con, DEFINE_KINDS + ("selector", "family")):
         head = tag.split("#")[0]
         reason = derive_tag_fault(head, words)
+        if reason and kind == "section" and "#" not in tag and derive_tag_fault(head, words, None) is None:
+            fold = derive_heading_seg(read_text_of(con, blob, ex, kind, line)[1])
+            reason = None if fold and head.startswith("section." + fold) else reason
         if reason:
             reds.append(f"tags: {path}:{line} · shape · {head} · {reason}")
         graded.append(head)
@@ -1456,7 +1502,8 @@ def check_namespace_purpose(con, ctx, chain_rows) -> tuple[list, dict]:
 def check_chain_registry(root, conf, chain_rows, chain_rel) -> tuple[list, dict | None]:
     """S3 and S4 of PLAY-dOrderedCharter-22: the registry's slugs joined both ways with the design view's
     builds, and a row with no `purpose` legal only for a build of v2's `[chain]` at the design baseline,
-    printed as awaiting PM-5's review. `conf`'s DESIGN_* keys all blank is no chain to read, (reds, None);
+    printed as awaiting PM-5's review, and never where `memory.map-purpose` is `refuse`
+    (TOOL-dTotalRecall-43 S24). `conf`'s DESIGN_* keys all blank is no chain to read, (reds, None);
     a half-declared design is a TagError. -> (reds, {"rows", "builds", "awaiting": [slug]})."""
     load_memory_tree()
     import design_lib
@@ -1479,13 +1526,26 @@ def check_chain_registry(root, conf, chain_rows, chain_rel) -> tuple[list, dict 
             for s in slugs if s not in builds]
     reds += [f"tags: {chain_rel} · purpose · chain build '{b}' of the design view has no registry row"
              for b in sorted(builds - set(slugs))]
+    # TOOL-dTotalRecall-43 S24: `memory.map-purpose` drives the arm. Under `refuse` the baseline's awaiting
+    # exemption ends, so a purposeless row reds there too; where no policy kit resolves, the catalogue default
+    # `review` keeps the exemption. A refused read is the TagError of the read.
+    tree_lib, _ = load_memory_tree()
+    try:
+        value = tree_lib.read_policy_value("memory.map-purpose", root)
+    except LookupError:
+        value = "review"
+    except ValueError as exc:
+        raise TagError(f"the chain registry's purpose arm cannot read memory.map-purpose: {exc}") from None
     awaiting = []
     for row in chain_rows:
         purpose = row.get("purpose")
         if isinstance(purpose, str) and purpose.strip():
             continue
-        if row["slug"] in baseline:
+        if row["slug"] in baseline and value != "refuse":
             awaiting.append(row["slug"])
+        elif row["slug"] in baseline:
+            reds.append(f"tags: {chain_rel} · purpose · registry row '{row['slug']}' carries no purpose, and "
+                        "memory.map-purpose is refuse, which ends the baseline's awaiting exemption")
         else:
             reds.append(f"tags: {chain_rel} · purpose · registry row '{row['slug']}' carries no purpose, and no "
                         "baseline [chain] row names it")

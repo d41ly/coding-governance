@@ -64,7 +64,7 @@ unregistered, its schema is absent or HEAD holds no pack, and on a usage error. 
 the tree, then every plant through `loop_lib.run_selftest_cases`.
 
 `--fixture --plant <case>` runs `then-cycle` and `extends-cycle` over rows in memory; every other plant
-runs in one scratch repository, `composition.py`'s `build_composition_base` with a second build `tFix2`,
+runs in one scratch repository, `composition.py`'s `build_composition_base` with a second build `tFixTwo`,
 reset per plant: it commits the plant's overlay rows and policy values, runs `select`, `check`, the
 transition writer and the position engine of this tree as subprocesses there, and closes with
 `loop: fixture · <case> · held` or `· MISSED <why>`. The cases are `PLANTS`.
@@ -109,13 +109,13 @@ INHERITED = ("admits", "entry", "activates", "then", "preset", "overrides")
 SLOT = ("preset", "overrides")
 OVERLAY = ".governance/instructions.toml"
 POLICY_FILE = ".governance/policy.toml"
-FX_BUILD_2 = "tFix2"
+FX_BUILD_2 = "tFixTwo"
 HANDOVER = "GOV_POSITION_STATES"
 OUT_OF_NONE = ("--from", ENTRY, "--item", "item.entry.claim", "--outcome", "claimed", "--fact", "disposition=new")
 PLAN_EXIT = ("--from", "planning", "--item", "item.plan.exit", "--outcome", "recorded")
 FARM = "item.test.adopter.device-farm"
 PLANTS = {
-    "two-builds": "scenario.adopter.mobile activating a device farm; tFix placed under entry=feature, tFix2 under "
+    "two-builds": "scenario.adopter.mobile activating a device farm; tFix placed under entry=feature, tFixTwo under "
                   "entry=feature and platform=mobile, each position read",
     "drops-stage": "a scenario activating an item row that supersedes item.test.exit at its pin",
     "reorders-stage": "a scenario activating an amends of item.test.select setting step = step.deploy",
@@ -125,7 +125,7 @@ PLANTS = {
     "bad-default": "flow.scenario-default = nowhere, the policy file's one revision",
     "default-excluded": "flow.scenario-default = patch, instructions.exclude = [scenario.patch]",
     "then": "scenario.adopter.a giving way to scenario.adopter.b at step.plan; out of none, then planning -> designing",
-    "mid-step-switch": "two-builds' tFix2, a second activated row committed, then planning -> designing",
+    "mid-step-switch": "two-builds' tFixTwo, a second activated row committed, then planning -> designing",
     "derived-field": "one move out of none with --field scenario=scenario.patch",
     "then-cycle": "two rows whose then names each other, in memory",
     "extends-cycle": "two rows whose extends names each other, in memory",
@@ -529,12 +529,12 @@ def derive_farm_row(actor="command:device-farm", name="device-farm"):
 
 
 def build_scenario_base():
-    """`(top, base sha, gov item pins)`: `build_composition_base`'s scratch with the build `tFix2` committed."""
+    """`(top, base sha, gov item pins)`: `build_composition_base`'s scratch with the build `tFixTwo` committed."""
     top, _sha = build_composition_base()
     try:
         write_fixture_files(top, {"memory/builds/%s/README.md" % FX_BUILD_2:
                                   "---\nslug: %s\nnode: a\nopened: 2026-01-01\nstreams: tooling\nroster: TOOL\n"
-                                  "ids: TOOL-tFix2-1\n---\n\n# %s\n" % (FX_BUILD_2, FX_BUILD_2)})
+                                  "ids: TOOL-tFixTwo-1\n---\n\n# %s\n" % (FX_BUILD_2, FX_BUILD_2)})
         run_fixture_git(top, "add", "-A")
         run_fixture_git(top, "commit", "-qm", "the build %s" % FX_BUILD_2)
         rc, payload, lines = read_composition(top)

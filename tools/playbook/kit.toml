@@ -219,19 +219,45 @@ unguarded_why = "an adopter receives no guard: gov's names the render engine's g
 stage = ["step.test"]
 enforces = ["practice.gate"]
 
+# TOOL-dTotalRecall-125 S5: the suite drives the code record, so its guard takes the `code record` leg's
+# directories, the closure `py_reads.py --guards "code record"` prints, beside its own reads.
 [gate_leg.gov]
 guard = [
   "{prefix}/playbook/",
-  "{prefix}/memory-tree/import_walk.py",
-  "{prefix}/memory-tree/check-arms.py",
-  "{prefix}/memory-tree/tree_lib.py",
-  "{prefix}/memory-tree/id_grammar.py",
-  "{prefix}/memory-tree/coverage_join.py",
-  "{prefix}/memory-tree/design_lib.py",
-  "{prefix}/memory-tree/corpus_ids.py",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
   "{prefix}/lexicon/",
   "{prefix}/govkit/entries/playbook.kit.toml",
   "coding-governance-agents.template.md",
 ]
 chunk = "selftests"
 ceiling = 300
+
+# THE CODE RECORD'S FRESHNESS (TOOL-dTotalRecall-8 S13). Gov's guard is the closure `py_reads.py --guards "code
+# record"` prints, by its directories; an adopter's row carries none, since its whole tree is what it grades.
+[[gate_leg]]
+name = "code record"
+tag = "leg.playbook-render.code-record"
+tests = ["feature.playbook"]
+purpose = "holds HEAD's code record equal to its re-derivation"
+argv = ["python3", "{prefix}/playbook/code_record.py", "--check"]
+subject = "repo"
+enforces = ["principle.p32"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "product"
+ceiling = 157
+guard = [
+  "{prefix}/playbook/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/memory-recall/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
+]

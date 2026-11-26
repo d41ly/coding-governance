@@ -2793,7 +2793,7 @@ for _c in verdict manifest reused_cache keyless reused selftests tree seledit se
     reused) remove_bg_key "$BG_VF" reused_cache; set_bg_key "$BG_VF" reused 1; _want="says its run reused 1 leg(s), and" ;;
     selftests) _e=(GATE_SELFTESTS=1); _want="self-tests HELD" ;;
     tree) set_bg_key "$BG_VF" tree ""; _want="could not be read" ;;
-    seledit) write_bg_selection $'x\tquarantine\tTOOL-x-7'; awk -F'\t' '$1=="selection.1"{$0="selection.1\tx\tquarantine\tTOOL-x-8"} {print}' "$BG_VF" > "$BG_VF.x" && mv "$BG_VF.x" "$BG_VF"
+    seledit) write_bg_selection $'x\tquarantine\tTOOL-xFix-7'; awk -F'\t' '$1=="selection.1"{$0="selection.1\tx\tquarantine\tTOOL-xFix-8"} {print}' "$BG_VF" > "$BG_VF.x" && mv "$BG_VF.x" "$BG_VF"
              _want="selection rows do not hash to" ;;
     selkeyless) remove_bg_key "$BG_VF" selection; _want="carries no selection, so it cannot say whether its bar held legs" ;;
     control) _want="pre-push: covered on main push" ;;
@@ -2841,10 +2841,10 @@ git checkout -q -b M main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1; 
 git checkout -q main; git worktree add -q --detach "$BG_D/w2" "$_mg" >/dev/null 2>&1
 cd "$BG_D/w2" || exit 2
 bg_gd=$(git rev-parse --git-dir)
-_sel_add=$'x\tquarantine\tTOOL-x-7'; _sel_lvl=$'x\tlevel\te2e, outside tests.landing-levels unit integration'
+_sel_add=$'x\tquarantine\tTOOL-xFix-7'; _sel_lvl=$'x\tlevel\te2e, outside tests.landing-levels unit integration'
 # TOOL-dWitnessedBar-56 S1: a note holding ` · ` round-trips, so its row reaches R's check and is named
 # there, where a rebuild turning ` · ` back into a TAB refuses it as rows that do not hash.
-_sel_dot=$'x\tquarantine\tTOOL-x-7 · 3/10'
+_sel_dot=$'x\tquarantine\tTOOL-xFix-7 · 3/10'
 # TOOL-dWitnessedBar-62 S13: a `quarantine` row whose note is EMPTY, its last field, rebuilds to its hash
 # and is judged at R by its whole row, as the ` · ` row is, never refused as rows that do not hash. R
 # derives no empty-note row, so it is judged and never adopted. Red against a rebuild that reads
@@ -2857,9 +2857,9 @@ for _c in adds dot empty derived; do
   _m0=$(read_bg_marks); run_bg_push
   _sel_hk[$_c]=NONE; [ "$(read_bg_marks)" = "$_m0" ] && _sel_hk[$_c]=GREEN
   case "$_c|$(read_bg_marks)|$BG_OUT" in
-    "adds|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · TOOL-x-7"*)
+    "adds|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · TOOL-xFix-7"*)
       ok "BG TOOL-dWitnessedBar-41 AC2 from a second worktree, a verdict whose selection R does not derive is not adopted, names the row, and the bar runs" ;;
-    "dot|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · TOOL-x-7 · 3/10"*)
+    "dot|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · TOOL-xFix-7 · 3/10"*)
       ok "BG TOOL-dWitnessedBar-56 AC1 a selection row whose note holds ' · ' rebuilds to its hash and is judged at R by its whole note" ;;
     "empty|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · , which"*)
       ok "BG TOOL-dWitnessedBar-62 AC8 a selection row whose note is empty rebuilds to its hash and is judged at R by its whole row" ;;

@@ -158,7 +158,7 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-10 · streams tooling
 ids TOOL-aUnmannedHelm-1 TOOL-aUnmannedHelm-2 TOOL-aUnmannedHelm-3 TOOL-aUnmannedHelm-4 TOOL-aUnmannedHelm-5 TOOL-aUnmannedHelm-6 TOOL-aUnmannedHelm-7 TOOL-aUnmannedHelm-8 TOOL-aUnmannedHelm-9 TOOL-aUnmannedHelm-10
 
 <!-- gen:build-units -->
@@ -191,3 +191,13 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-10-review-TOOL-aUnmannedHelm-1-2.md`, `2026-08-10-review-TOOL-aUnmannedHelm-1-1.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aUnmannedHelm/card` |
+<!-- /gen:build-routes -->

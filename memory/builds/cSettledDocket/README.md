@@ -83,7 +83,7 @@ Each unit is one cBriefedPilot backlog row, carried over with its measurement:
 
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 6 unit(s) · node c · opened 2026-08-16 · streams tooling
+**Build status:** CLOSED · 6 unit(s) · node c · opened 2026-08-16 · streams kickoff+tooling
 ids KICK-cSettledDocket-1 TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 TOOL-cSettledDocket-7 TOOL-cSettledDocket-8 TOOL-cSettledDocket-9 TOOL-cSettledDocket-10 TOOL-cSettledDocket-11 TOOL-cSettledDocket-12
 ids TOOL-cSettledDocket-13 TOOL-cSettledDocket-14 TOOL-cSettledDocket-15 TOOL-cSettledDocket-16
 
@@ -116,3 +116,13 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-17-review-TOOL-cSettledDocket-1-2.md` (CHANGES REQUESTED), `2026-08-16-review-TOOL-cSettledDocket-1-1.md` (CHANGES REQUESTED) |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/cSettledDocket/card` |
+<!-- /gen:build-routes -->

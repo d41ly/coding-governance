@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""branch_reconcile.py — every worktree, branch and stash entry, with one verdict each. gov:kit branch-reconcile@1.8
+"""branch_reconcile.py — every worktree, branch and stash entry, with one verdict each. gov:kit branch-reconcile@1.9
 
     python <this kit>/branch_reconcile.py [--root <path>] [--fresh-hours <n>] [--write [--remote]]
 
@@ -36,7 +36,78 @@ import sys
 import tempfile
 import time
 
-KIT_BRANCH_RECONCILE_VERSION = "1.8"
+
+# THE SLUG GRAMMAR (TOOL-dTotalRecall-5 S8). Every slug and id reader in this kit reads the memory-tree
+# kit's `id_grammar`, found through the resolver above; this kit does not require that kit, so where it
+# does not resolve the inline legacy shape below applies, said once on stderr, at import.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+# >>> slug_legacy_py — canonical copy: id_grammar.py in the memory-tree kit (byte-identical; gated)
+SLUG_LEGACY = "[%s][A-Za-z]{2,}"
+# <<< slug_legacy_py
+
+
+def load_slug_grammar():
+    """The memory-tree kit's `id_grammar` module, or None where that kit does not resolve, with one
+    stderr line saying the legacy shape applies. Asked once, at import, and never a guessed path."""
+    try:
+        kit = resolve_kit_dir("memory-tree", "id_grammar.py", pathlib.Path(__file__).resolve().parent)
+    except LookupError:
+        print("slug grammar: memory-tree not installed, the legacy shape applies", file=sys.stderr)
+        return None
+    if str(kit) not in sys.path:
+        sys.path.append(str(kit))
+    import id_grammar  # noqa: PLC0415 — the sibling kit, reached through the resolver above
+    return id_grammar
+
+
+_SLUG_GRAMMAR = load_slug_grammar()
+
+
+def derive_slug_pattern(build, flags=0):
+    """A pattern whose slug is the slug grammar's class, `build` taking that class and returning the
+    pattern text: bound at first use where memory-tree resolves, the legacy shape where it does not."""
+    if _SLUG_GRAMMAR is None:
+        return re.compile(build(SLUG_LEGACY % "a-z"), flags)
+    return _SLUG_GRAMMAR.SlugPattern(lambda g: build(g.slug_class), flags)
+
+KIT_BRANCH_RECONCILE_VERSION = "1.9"
 
 MERGED = "MERGED"
 EQUIVALENT = "EQUIVALENT"
@@ -507,17 +578,33 @@ def derive_row_lines(lines):
     return rows
 
 
-ID_RE = re.compile(r"(?<![A-Za-z0-9-])[A-Z][A-Z0-9]{1,9}-[a-z][A-Za-z0-9]*-\d+(?![A-Za-z0-9])")
+# The family class a unit id carries here, spliced by `ID_RE` and passed to the id parser as its
+# family alternation, so both read one spelling (TOOL-dTotalRecall-45 S1).
+FAMILY_CLASS = r"[A-Z][A-Z0-9]{1,9}"
+# A unit id and a `type(slug):` scope, each slug the slug grammar's class (TOOL-dTotalRecall-5 S7).
+ID_RE = derive_slug_pattern(lambda c: r"(?<![A-Za-z0-9-])" + FAMILY_CLASS + r"-(?:" + c + r")-\d+(?![A-Za-z0-9])")
 # A row's head: optional list or table markup, an optional link bracket, then the id.
 ROW_HEAD = r"^[ \t]*([-*|][ \t]*)?\[?"
-SCOPE_RE = re.compile(r"^[a-z][a-z-]*\(([A-Za-z0-9]+)\)")
+SCOPE_RE = derive_slug_pattern(lambda c: r"^[a-z][a-z-]*\(((?:" + c + r"))\)")
 DRIFT_LINES = 4
 
 
 def derive_names(subject):
-    """-> the unit ids and slugs a commit subject names: `FAMILY-slug-seq` ids and a `type(slug):` scope."""
+    """-> the unit ids and slugs a commit subject names: `FAMILY-slug-seq` ids and a `type(slug):` scope.
+
+    Each id's slug is the id parser's, under the default tree's slug class `ID_RE` was bound by and
+    `FAMILY_CLASS` (TOOL-dTotalRecall-45 S1); an id it refuses adds no slug. Where memory-tree does
+    not resolve, the slug is the text between the first and the last hyphen, the legacy shape
+    admitting none inside a slug."""
     names = set(ID_RE.findall(subject))
-    names |= {i.split("-")[1] for i in list(names)}
+    for i in list(names):
+        if _SLUG_GRAMMAR is None:
+            names.add(i[i.index("-") + 1:i.rindex("-")])
+            continue
+        try:
+            names.add(_SLUG_GRAMMAR.parse_id_parts(i, None, alt=FAMILY_CLASS)[1])
+        except ValueError:
+            pass
     m = SCOPE_RE.match(subject)
     if m:
         names.add(m.group(1))

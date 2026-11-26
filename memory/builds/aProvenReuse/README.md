@@ -121,9 +121,24 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-aProvenReuse-1` | no |
 | 2 | `TOOL-aProvenReuse-2` | no |
 | 3 | `TOOL-aProvenReuse-5` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-08-31-prompt-TOOL-aProvenReuse-1.md` |
+| reviews | `2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md`, `2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md` (BLOCKED) and 3 more under reviews/ |
+| logs | `2026-08-31-build-TOOL-aProvenReuse-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aProvenReuse/card` |
+<!-- /gen:build-routes -->

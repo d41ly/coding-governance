@@ -27,8 +27,9 @@ answer who a commit is attributed to, and each consumer names its own:
     python commit_trailers.py unchecked <git-log revision arguments>   # each pass commit with no Commit-Checked:
     python commit_trailers.py message <file>                        # a message not yet committed
     python commit_trailers.py attribution <file> <charter file>    # the message's agent trailer, last
+    python commit_trailers.py decided <file>                        # every `Decided:` line in the final trailer block
     python commit_trailers.py --print-commits                       # the commit class's members
-    python commit_trailers.py --fixture                             # three planted commits, both views, and the attribution cases
+    python commit_trailers.py --fixture                             # three planted commits, both views, and the attribution and decision cases
 """
 from __future__ import annotations
 
@@ -164,6 +165,16 @@ _ATTRIBUTION_FIXTURE = ("Co-Authored-By: Fx <fx@example.invalid>", (
     ("no agent trailer", "s\n\nPass: none\n", "none"),
     ("the charter's trailer last, then a space and a tab",
      "s\n\nPass: none\nCo-Authored-By: Fx <fx@example.invalid> \t\n", "ok")))
+#: The `(name, message, state)` decision cases `--fixture` checks (TOOL-dTotalRecall-122 S9).
+_DECISIONS_FIXTURE = (
+    ("above the trailer block", "s\n\nDecided: a choice - why\n\nPass: none\n", "refused"),
+    ("in the trailer block", "s\n\nPass: none\nDecided: a choice - why\n", "ok"),
+    ("no decision", "s\n\nPass: none\n", "ok"),
+    ("one of two above the block", "s\n\nDecided: a choice - why\n\nPass: none\nDecided: another - why\n", "refused"),
+    ("indented in prose", "s\n\n  Decided: a quoted line\n\nPass: none\n", "ok"),
+    # TOOL-dTotalRecall-125 S2: matched one to one against git's parse, never counted against it
+    ("a spaced key in the block beside one above it", "s\n\nDecided: lost - why\n\nPass: none\nDecided : kept\n", "refused"),
+    ("a value folded onto the next line", "s\n\nPass: none\nDecided: a choice\n  - why continued\n", "ok"))
 
 
 def run_git(repo, argv, stdin=None):
@@ -383,6 +394,35 @@ def check_message_attribution(text, expected) -> tuple:
     return "ok", f"the message ends with the charter's '{expected}'"
 
 
+#: TOOL-dTotalRecall-125 S2: a `Decided` line, its key in any case and blanks allowed before its colon, as git reads it.
+DECIDED_LINE = re.compile(r"(?i)^decided[ \t]*:[ \t]*(.*)$")
+
+
+def check_message_decisions(raw) -> tuple:
+    """`(state, detail)` of a commit message's decisions (TOOL-dTotalRecall-122 S9): each line of
+    `extract_message_lines` that DECIDED_LINE matches, matched one to one against the `Decided` values of
+    git's own trailer parse of the message, which reads the final block alone (TOOL-dTotalRecall-125 S2).
+    A said value takes an equal parsed value first, else one it opens followed by a space, a value git
+    folded from a continuation line. `refused` naming the first said line no parsed value is left for,
+    else `ok`.
+    WHAT IT DOES NOT CHECK: a said value that prefixes another decision's folded value where both are
+    folded; a `Decided:` line git parses with another key's value folded into it; and a prose line opening
+    any case of `decided:`, which is refused until it is indented."""
+    raw = raw if isinstance(raw, bytes) else raw.encode("utf-8", "surrogateescape")
+    said = [(line, m.group(1).strip()) for line in extract_message_lines(raw) if (m := DECIDED_LINE.match(line))]
+    proc = subprocess.run(["git", "interpret-trailers", "--parse"], input=raw, capture_output=True)
+    parsed = [m.group(1).strip() for line in proc.stdout.decode("utf-8", "replace").split("\n")
+              if (m := DECIDED_LINE.match(line.rstrip()))]
+    for line, value in said:
+        hit = next((i for i, p in enumerate(parsed) if p == value), None)
+        if hit is None:
+            hit = next((i for i, p in enumerate(parsed) if p.startswith(value + " ")), None)
+        if hit is None:
+            return "refused", f"git reads no trailer in '{line}'"
+        del parsed[hit]
+    return "ok", f"{len(said)} decision(s), each in the final trailer block"
+
+
 def build_fixture(top) -> pathlib.Path:
     """The three planted commits, oldest first, in a fresh repository under `top`: a subject id with no
     trailer, a subject id with `Pass: none`, and no subject id with a trailer id. The caller's git
@@ -410,6 +450,20 @@ def check_attribution_fixture() -> tuple:
     for name, message, planted in cases:
         state, _detail = check_message_attribution(message, expected)
         line = f"{SAY}: fixture · attribution · {name} · {state}"
+        if state != planted:
+            failed += 1
+            line += f" · FAIL, the case plants {planted}"
+        lines.append(line)
+    return lines, failed
+
+
+def check_decisions_fixture() -> tuple:
+    """`(lines, failed)`: `check_message_decisions` run over each `_DECISIONS_FIXTURE` case, as
+    `check_attribution_fixture` runs its own (TOOL-dTotalRecall-122 S9)."""
+    lines, failed = [], 0
+    for name, message, planted in _DECISIONS_FIXTURE:
+        state, _detail = check_message_decisions(message)
+        line = f"{SAY}: fixture · decided · {name} · {state}"
         if state != planted:
             failed += 1
             line += f" · FAIL, the case plants {planted}"
@@ -458,6 +512,18 @@ def main(argv=None) -> int:
             state, detail = check_message_attribution(text, expected)
             print(f"ATTRIBUTION {state} · {why or detail}")
             return 1 if state == "refused" else 0
+        if args[:1] == ["decided"] and len(args) == 2:
+            # 0 for ok, 1 for refused, 2 for a message file that cannot be read. UTF-8, since the detail quotes
+            # the message and a character the console's code page lacks would read as exit 2, a check not run.
+            sys.stdout.reconfigure(encoding="utf-8")
+            try:
+                raw = pathlib.Path(args[1]).read_bytes()
+            except OSError as exc:
+                print(f"DECIDED unreadable · the message {args[1]} could not be read: {exc}")
+                return 2
+            state, detail = check_message_decisions(raw)
+            print(f"DECIDED {state} · {detail}")
+            return 1 if state == "refused" else 0
         if args == ["--print-commits"]:
             try:
                 out = run_git(os.getcwd(), ["rev-list", "HEAD"])
@@ -466,22 +532,23 @@ def main(argv=None) -> int:
             sys.stdout.write(out.decode("ascii", "replace"))
             return 0
         if args == ["--fixture"]:
-            top = tempfile.mkdtemp(prefix="commit-trailers-")
+            top, failed = tempfile.mkdtemp(prefix="commit-trailers-"), 0
             try:
                 for c in read_commits(build_fixture(top), ["--reverse", "HEAD"], ("Pass",)):
                     print(f"{SAY}: fixture · {c['subject']} · " + " · ".join(
                         f"{view} {' '.join(derive_attribution(c, view, _FIXTURE_ID)) or '(nothing)'}" for view in VIEWS))
             finally:
                 remove_tree(top)
-            lines, failed = check_attribution_fixture()
-            for line in lines:
-                print(line)
+            for check in (check_attribution_fixture, check_decisions_fixture):
+                lines, missed = check()
+                print("\n".join(lines))
+                failed += missed
             return 1 if failed else 0
     except (LookupError, ValueError, OSError) as exc:
         print(f"{SAY}: refused · {exc}", file=sys.stderr)
         return 2
     print(f"{SAY}: usage: tokens <git-log revision arguments> | unchecked <git-log revision arguments>"
-          " | message <file> | attribution <file> <charter file> | --print-commits | --fixture",
+          " | message <file> | attribution <file> <charter file> | decided <file> | --print-commits | --fixture",
           file=sys.stderr)
     return 2
 # <<< commit_trailers_py

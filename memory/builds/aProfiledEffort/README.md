@@ -85,9 +85,24 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 | 2 | `TOOL-aProfiledEffort-2` | no |
 | 3 | `TOOL-aProfiledEffort-3` | no |
 | 4 | `TOOL-aProfiledEffort-4` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-10-prompt-TOOL-aProfiledEffort-4-round1-fix-brief.md`, `2026-11-10-prompt-TOOL-aProfiledEffort-4-build-brief.md` and 9 more under prompts/ |
+| reviews | `2026-11-10-review-TOOL-aProfiledEffort-1-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-11-10-build-TOOL-aProfiledEffort-4-1-acceptance-ledger.md`, `2026-11-10-build-TOOL-aProfiledEffort-3-1-acceptance-ledger.md` and 4 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aProfiledEffort/card` |
+<!-- /gen:build-routes -->

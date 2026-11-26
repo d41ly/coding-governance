@@ -1,0 +1,13 @@
+# TOOL-dTotalRecall-54 — acceptance ledger, build pass 1
+
+**Serves:** log TOOL-dTotalRecall-54
+
+No merge bar, no self-test suite and no gate leg ran in this pass. Every probe below ran on node d, 2026-11-22, from base `c3bee259d`, over the worktree with the pass applied and before the pass commit, or over a scratch tree under the run's scratch directory: a git repository whose `.memory-tree.conf` declares `FAMILIES="tooling:TOOL"`, `RECALL_CITED_FAMILIES="ZED"` and `RECALL_NODE_TAG_CLASS="a-f"`, with a copy of the memory-tree kit's `*.py`. The `_PARSER_PROBE` text of the new arm in `tools/memory-recall/selftest.py` was cut out by `ast` and run alone over that tree, the suite itself never imported. Every line marked OWED is the main loop's at the close, after the last unit is terminal, and so is the `New arm:` RED-first observation of §7.
+
+**Evidences:** TOOL-dTotalRecall-54
+- AC1 — `("TOOL", "dTotalRecall", 38)` — `parse_id_parts("TOOL-dTotalRecall-38", ".")` and the call with root `None` both returned it; this worktree's parser over the scratch root returned `("ZED", "aFoo", 2)` on `ZED-aFoo-2` and raised `ValueError` on `TOOL-xFoo-3`, which the same parser over its own tree returns as `("TOOL", "xFoo", 3)`; `inspect.getsource(parse_id_parts).count("ID_RE")` printed 0 (DERIVED 2026-11-22, the probe's output). OWED: the new arm's RED-first observation at the close.
+- AC2 — `TOOL-aDrainedSluice-9b` — returned `("TOOL", "aDrainedSluice", 9)` under this tree and under the scratch tree's own copy.
+- AC3 — `TOOL-dTotalRecall-38@rev-2` — it, `TOOL-001`, `TOOL-d119`, `ARCH-aFix-3` and `TOOL-x` each raised `ValueError` whose text names the id, under this tree; the scratch tree's copy refused the same shapes with `TOOL-aFoo-2@rev-2` as the pinned case.
+- AC4 — `build_id_token_re` — `inspect.getsource(parse_id_parts).count("build_id_token_re")` printed 2 at this pass (DERIVED 2026-11-22, the probe's output). OWED: the commit order and the count at unit 38's pass tip, which only that pass can observe.
+- AC5 — `sys.path.append` — `grep -c "sys.path.append" tools/memory-tree/id_grammar.py` printed 1 (DERIVED 2026-11-22); a probe importing `id_grammar` alone printed `"tree_lib" in sys.modules` as `False`, and `True` after one `parse_id_parts` call; `derive_slug_grammar(None)` and `extract_records` over this unit's spec still answered, and `read_recorded_grammars` over the scratch tree read its one committed `slug-grammar:` line through `load_sibling`. OWED: the `memory-recall kit selftest` leg at the close.
+- AC6 — `EXMP-aFoo-2` — `parse_id_parts("EXMP-aFoo-2", None)` raised `ValueError`, the call with `alt="EXMP|OTHR"` returned `("EXMP", "aFoo", 2)`, and passing `alt` positionally raised `TypeError`.

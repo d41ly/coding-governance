@@ -145,9 +145,24 @@ Ids whose spec moved past its audited revision: none — 0 of 14 unit id(s) carr
 | 5 | `TOOL-aSurfacedLexicon-13`, `TOOL-aSurfacedLexicon-7` | no |
 | 6 | `TOOL-aSurfacedLexicon-10`, `TOOL-aSurfacedLexicon-11`, `TOOL-aSurfacedLexicon-8` | no |
 | 7 | `TOOL-aSurfacedLexicon-12` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-09-06-review-TOOL-aSurfacedLexicon-2-diff-review-round2.md` (CLEAN WITH FIXES), `2026-09-06-review-TOOL-aSurfacedLexicon-2-diff-review-round1.md` (BLOCKED) and 11 more under reviews/ |
+| research | `2026-09-04-build-TOOL-aSurfacedLexicon-1-rebuild-research.md`, `2026-09-04-build-TOOL-aSurfacedLexicon-1-convention-predicate-probe.md` |
+| logs | `2026-09-06-build-TOOL-aSurfacedLexicon-10-acceptance-ledger.md`, `2026-09-05-build-TOOL-aSurfacedLexicon-8-acceptance-ledger.md` and 5 more under build/ |
+| open asks | `BACKLOG.md`, 5 open |
+| card ref | `refs/gov/builds/aSurfacedLexicon/card` |
+<!-- /gen:build-routes -->

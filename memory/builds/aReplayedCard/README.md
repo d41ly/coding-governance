@@ -114,9 +114,25 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 | 4 | `TOOL-aReplayedCard-2` | no |
 | 5 | `KICK-aReplayedCard-3` | no |
 | 6 | `TOOL-aReplayedCard-3` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-14-prompt-TOOL-aReplayedCard-5-brief.md`, `2026-09-14-prompt-TOOL-aReplayedCard-4-brief.md` and 7 more under prompts/ |
+| reviews | `2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md`, `2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md` and 2 more under reviews/ |
+| research | `2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md` |
+| logs | `2026-09-14-build-TOOL-aReplayedCard-5-2-counterfactual-explore-arm.md`, `2026-09-14-build-TOOL-aReplayedCard-5-1-acceptance-ledger.md` and 8 more under build/ |
+| open asks | `BACKLOG.md`, 13 open |
+| card ref | `refs/gov/builds/aReplayedCard/card` |
+<!-- /gen:build-routes -->

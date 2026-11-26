@@ -87,9 +87,23 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 | 3 | `TOOL-dLandedOwners-3` | no |
 | 4 | `TOOL-dLandedOwners-4` | no |
 | 5 | `TOOL-dLandedOwners-6` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-19-prompt-TOOL-dLandedOwners-6-spec-brief.md`, `2026-11-19-prompt-TOOL-dLandedOwners-6-build-brief.md` and 18 more under prompts/ |
+| reviews | `2026-11-19-review-TOOL-dLandedOwners-1-3-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-11-20-build-TOOL-dLandedOwners-1-agent-ledger.md`, `2026-11-19-build-TOOL-dLandedOwners-6-ledger.md` and 4 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dLandedOwners/card` |
+<!-- /gen:build-routes -->

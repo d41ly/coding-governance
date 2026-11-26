@@ -1711,7 +1711,8 @@ if (badSubject !== -1) {
 }
 // TOOL-dTrueNorth-5 S2 - the pin fields, under the grammar `tier2-review.js` refuses them by, so a
 // caller-supplied set is refused here, naming the field and the stage, before the callee is spawned.
-const UNIT_ID = /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/
+// A unit id; its slug is the slug grammar's class, rendered as `[a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3}` (TOOL-dTotalRecall-5 S5).
+const UNIT_ID = /^[A-Z]+-([a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3})-[0-9]+$/
 const unpinned = !specAudit ? null : subjects.reduce(function (hit, s, i) {
   if (hit) return hit
   if (typeof s.id !== 'string' || !UNIT_ID.test(s.id)) return { i: i, field: 'id', got: s.id }
@@ -3217,7 +3218,7 @@ const handOut = {
 if (!specAudit && specCommit) handOut.specCommit = specCommit
 // A CLEAN ROUND LEAVES NO RECORD, AND THE ROSTER IS WITHHELD UNTIL ONE EXISTS (closing review round
 // 2, cluster D). `tier2-review.js` returns `report: null` on both clean paths — zero findings, every
-// finding refuted — and writes the `**Serves:** spec-audit` binding line only in the synthesis pass
+// finding refuted — and writes the `**Serves:** spec-audit` binding line only in the synthesis pass  // census: kept cause-writer a comment naming the binding line
 // those paths skip. `specs-audited` is a machine DoD term at `--close` WHEN THE BUILD DECLARED THE
 // AUDIT (opt-in since TOOL-aBlindedTrial-3; `cleanRound` is false with it off, so this block is never
 // entered then): it joins every CLOSED unit id
@@ -3248,7 +3249,7 @@ if (cleanRound && !attended) {
   // TOOL-dTrueNorth-5 S2 - line 1 PINS each owed unit at the revision its subject carried, the line
   // `renderAuditBinding` gives a record the callee writes: this caller is the one other writer of a
   // spec-audit record, and a bare id here would read as audited at every later revision.
-  const pinnedLine = '**Serves:** spec-audit ' + owed.map(function (id) {
+  const pinnedLine = '**Serves:** spec-audit ' + owed.map(function (id) {  // census: kept cause-writer its cause line is spelled in the prompt below it
     const u = auditUnits.find(function (x) { return x.id === id })
     const s = subjects.find(function (x) { return x.path === u.specPath })
     return id + '@rev-' + s.rev
@@ -3262,7 +3263,10 @@ if (cleanRound && !attended) {
     '` and `specs-audited` refuses every one of those units at --close. Author `' + reviewDir +
     '/<date>-review-' + owed[0] + '-spec-audit-round' + (roundNo - subjectRound + 1) +
     '.md` in this order, which is the order the callee\'s own synthesis writes and hygiene check 22 ' +
-    'reads: line 1 exactly `' + pinnedLine + '`; a title line; a line that is exactly `' + reviewedLine +
+    // TOOL-dTotalRecall-36 S2 - line 2 is the record's cause, the first owed unit, bare: the memory
+    // tree's causes check reds a new record naming no resolving cause.
+    'reads: line 1 exactly `' + pinnedLine + '`; line 2 exactly `**Caused-by:** ' + owed[0] +
+    '`, the cause line; a title line; a line that is exactly `' + reviewedLine +
     '`, with nothing added to it; a line stating the round; then a heading that is exactly ' +
     '`## Verdict: CLEAN`; then the body quoting the callee (the callee said: ' +
     (typeof auRaw.note === 'string' ? auRaw.note : 'no note') + '). ' +

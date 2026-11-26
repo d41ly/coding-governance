@@ -74,6 +74,7 @@ are registered unseeded populations now (TOOL-dWitnessedBar-17 S2). Measurements
 """
 import os
 import re
+import sqlite3
 import subprocess
 import sys
 
@@ -90,6 +91,7 @@ from tree_lib import (  # noqa: E402  the kit's shared helpers
 # TOOL-dWitnessedBar-48: the one bash rule; `cmd_selftest`'s `resolve_shell_ere` is its adapter. The
 # `resolve_bash_py` block is carried once in `tree_lib.py` (TOOL-dWitnessedBar-57 S7).
 from tree_lib import scan_bash  # noqa: E402  the kit's one resolve_bash_py block
+from tree_lib import read_slug_class  # noqa: E402  the slug grammar's class (TOOL-dTotalRecall-5 S7)
 
 
 CHECK = 20
@@ -202,7 +204,8 @@ def id_pattern(conf):
     # line", where it is. Two questions, two predicates, stated here so the difference is not read as
     # drift. Without the suffix the numeric prefix matches inside a revision id and 42 real archive
     # rows report as unkeyable.
-    return re.compile(r"(?:" + "|".join(sorted(re.escape(f) for f in fams)) + r")-[A-Za-z0-9]+-\d+[a-z]*")
+    slug = read_slug_class()   # the slug grammar's class (TOOL-dTotalRecall-5 S7)
+    return re.compile(r"(?:" + "|".join(sorted(re.escape(f) for f in fams)) + r")-(?:" + slug + r")-\d+[a-z]*")
 
 
 def derive_row_re(conf):
@@ -223,7 +226,11 @@ def derive_row_re(conf):
 # Written with a real string builder, never a shell heredoc: the first cut of this line carried a
 # word-boundary escape that reached the file as a literal BACKSPACE byte, so the pattern compiled,
 # printed correctly, and matched nothing. Only repr() showed it.
-GENERIC_ID = re.compile(r"[A-Z][A-Z0-9]{1,9}-[A-Za-z0-9]+-[0-9]+[a-z]*")
+def derive_generic_id_re():
+    """The generic id pattern over the slug grammar's class (TOOL-dTotalRecall-5 S7), read at the call through
+    `tree_lib.read_slug_class`: an import of `id_grammar` here would stop this module, and check 27's named
+    refusal with it, in an install whose `id_grammar.py` is absent or too old."""
+    return re.compile(r"[A-Z][A-Z0-9]{1,9}-(?:" + read_slug_class() + r")-[0-9]+[a-z]*")
 
 
 # A rotated archive, by the name of the document it ROTATED: `<STEM>.<iso-date><suffix?>.md`, flat.
@@ -354,7 +361,7 @@ def scan(root, conf):
     idre = id_pattern(conf)
     # A ROW leads with a dash and then an id, optionally emphasised. Anything else on the line is
     # prose and is not this check's business.
-    rowre = derive_row_re(conf)
+    rowre, generic = derive_row_re(conf), derive_generic_id_re()
     rows = loose = 0
     unkeyed, dupes, open_fences = [], [], []
     for p in row_docs(root, m, conf):
@@ -373,7 +380,7 @@ def scan(root, conf):
             if line is None:          # the document ended inside a fence; n is where it opened
                 open_fences.append((p, n))
                 continue
-            if GENERIC_ID.search(line):
+            if generic.search(line):
                 loose += 1
             mm = rowre.match(line)
             if not mm:
@@ -916,7 +923,7 @@ def load_index_builder():
     except Exception as exc:  # noqa: BLE001 — a traceback here would be the finding
         raise Problem(f"row-grammar: check {RELATION_CHECK} could not import this kit's "
                       f"id_grammar.py from {here}: {type(exc).__name__}: {exc}") from None
-    missing = [n for n in ("build_index", "match_expr", "terms", "ALIAS_WEIGHT")
+    missing = [n for n in ("build_fts_rows", "match_expr", "terms", "ALIAS_WEIGHT")
                if not hasattr(id_grammar, n)]
     if missing:
         raise Problem(f"row-grammar: check {RELATION_CHECK} is armed by {RELATION_KEY}, but this "
@@ -928,11 +935,12 @@ def load_index_builder():
 def derive_relation_successors(root):
     """-> `{old id: [[new id, 'whole'|'partial'], ...]}`, the map `TOOL-aGraftedHelix-4` serves.
 
-    That unit's two functions and no third, called the way its cache builder in `query.py` calls
-    them: `extract_supersessions` over every file `id_grammar.corpus_inputs` lists, then one
-    `derive_supersession_map` with every anchored id as defined. Read directly rather than from the
-    query cache's manifest, because `query.ensure_cache` rebuilds that cache whenever the corpus
-    moved, and a hygiene leg must not write a shared cache as a side effect of grading.
+    That unit's two functions and no third, called the way `query.py`'s row writer calls them:
+    `extract_supersessions` over every file `id_grammar.corpus_inputs` lists, then one
+    `derive_supersession_map` with every anchored id as defined. Read directly rather than from
+    recall's rows in the shared tag index, because `query.load_served_set` writes those rows for any
+    pair it has not extracted, and a hygiene leg must not write a shared index as a side effect of
+    grading.
 
     `id_grammar` binds its default grammar to the repository this kit is INSTALLED in, which is the
     audited one on every real run (`grammar-bound-to-the-wrong-root`). The self-test's arms that
@@ -983,6 +991,13 @@ def scan_records(root, conf):
     """
     m = conf["MEMORY_ROOT"]
     rowre = derive_row_re(conf)
+    # A row's slug is the id parser's, under the default tree's slug class the row regex bound and
+    # any family (TOOL-dTotalRecall-45 S3); `backlog` is imported late, as `read_backlog_mode` says.
+    _here = os.path.dirname(os.path.abspath(__file__))
+    if _here not in sys.path:
+        sys.path.insert(0, _here)
+    import backlog  # noqa: E402  (deliberately late: see `read_backlog_mode`)
+    parse_id_parts = backlog.load_id_grammar().parse_id_parts
     out = []
     for p in row_docs(root, m, conf):
         if os.path.basename(p).split(".")[0] != "DECISIONS":
@@ -996,9 +1011,12 @@ def scan_records(root, conf):
             mm = rowre.match(line) if line is not None else None
             if mm:
                 rid = mm.group(1)
+                try:
+                    slug = parse_id_parts(rid, None, alt=backlog.ANY_FAMILY)[1]
+                except ValueError:
+                    slug = ""
                 out.append({"kind": "row", "ident": rid, "names": [rid], "where": f"{p}:{n}",
-                            "path": p, "summary": line[mm.end():], "full": line,
-                            "slug": rid.split("-")[1]})
+                            "path": p, "summary": line[mm.end():], "full": line, "slug": slug})
     gdir = f"{m}/gotchas/"
     for p in run("git", "ls-files", "--", gdir, cwd=root).split("\n"):
         if not p.endswith(".md") or "/" in p[len(gdir):] or p == f"{gdir}INDEX.md":
@@ -1183,8 +1201,9 @@ def check_relations(root, conf, base, gate, ig):
     stats = {"graded": len(added), "base": len(eligible), "near": 0, "satisfied": 0, "own": 0}
     if not added:
         return [], stats
-    db = ig.build_index([{"id": r["ident"] if r["kind"] == "row" else "", "path": r["path"],
-                             "text": r["summary"]} for r in recs])
+    db = ig.build_fts_rows(sqlite3.connect(":memory:"), "d", [
+        {"id": r["ident"] if r["kind"] == "row" else "", "path": r["path"], "text": r["summary"]}
+        for r in recs])
     tsets = [set(ig.terms(r["summary"])) for r in recs]
     pos = {id(r): i for i, r in enumerate(recs)}
     ok = {pos[id(r)] for r in eligible}
@@ -1297,8 +1316,9 @@ def cmd_measure_relations(root, conf, floor=None, base=None):
                     and "/" not in line[len(gdir):]:
                 times.setdefault(("gotcha", os.path.basename(line)[:-3]), cur)
     t = [times.get((r["kind"], r["ident"])) for r in recs]
-    db = ig.build_index([{"id": r["ident"] if r["kind"] == "row" else "", "path": r["path"],
-                             "text": r["summary"]} for r in recs])
+    db = ig.build_fts_rows(sqlite3.connect(":memory:"), "d", [
+        {"id": r["ident"] if r["kind"] == "row" else "", "path": r["path"], "text": r["summary"]}
+        for r in recs])
     tsets = [set(ig.terms(r["summary"])) for r in recs]
     pairs, graded, own, smap = [], 0, 0, None
     for i, r in enumerate(recs):
@@ -1606,7 +1626,7 @@ def cmd_ages(root, conf):
         if d is None:
             undated.append((rel, n, r.id))
             continue
-        y, mo, dy = (int(x) for x in d.split("-"))
+        y, mo, dy = (int(x) for x in d.split("-"))  # census: kept slug-grammar not a unit id: a date
         dated.append(((today - datetime.date(y, mo, dy)).days, r.id, d))
     dated.sort()
     print(f"live keyed rows : {len(live)}")
@@ -1636,7 +1656,8 @@ def scan_engine_imports(kit_dir):
     of either engine cannot kill its siblings on import; a later edit re-adding `from corpus_ids
     import ...` to a sibling would reopen that silently, because in THIS tree the import resolves.
     The two owners' use of each other is exempt, as the spec states. Parsed with `ast`, so a
-    comment or a docstring naming the module is not an import.
+    comment or a docstring naming the module is not an import. An import in a function body runs at
+    the call and kills no sibling on import, so it is no hit (TOOL-dTotalRecall-2, -19).
 
     NOT CHECKED: a load by path (`importlib.util.spec_from_file_location`), which `gotchas.py` uses
     to ASK `corpus_ids` a question at run time and which degrades to a named failure rather than an
@@ -1653,7 +1674,11 @@ def scan_engine_imports(kit_dir):
         graded += 1
         if stem in ENGINE_OWNERS:
             continue
+        late = {id(n) for f in ast.walk(tree) if isinstance(f, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda))
+                for n in ast.walk(f)}
         for node in ast.walk(tree):
+            if id(node) in late:
+                continue
             if isinstance(node, ast.ImportFrom) and node.level == 0:
                 mods = [node.module or ""]
             elif isinstance(node, ast.Import):
@@ -2408,11 +2433,15 @@ def cmd_selftest():
             fh.write("# a docstring naming corpus_ids is not an import\nimport os\n")
         with open(os.path.join(staged, "check-arms.py"), "w", encoding="utf-8") as fh:
             fh.write("from corpus_ids import parse_conf\n")
+        with open(os.path.join(staged, "late.py"), "w", encoding="utf-8") as fh:
+            fh.write("def read_late():\n    import corpus_ids\n    return corpus_ids\n")
         with open(os.path.join(staged, "gen_build_index.py"), "w", encoding="utf-8") as fh:
             fh.write("from corpus_ids import parse_conf\n")
         arm("a staged sibling re-import is named with its file, line and module",
             "('check-arms.py', 1, 'corpus_ids')",
             lambda: repr(scan_engine_imports(staged)[0]))
+        arm("...and an import in a function body, which no sibling's import runs, is no hit", "late-exempt",
+            lambda: "late-exempt" if not [h for h in scan_engine_imports(staged)[0] if h[0] == "late.py"] else "FLAGGED")
         arm("...and the two owners' own mutual use is exempt", "owner-exempt",
             lambda: "owner-exempt" if not [h for h in scan_engine_imports(staged)[0]
                                            if h[0] == "gen_build_index.py"] else "FLAGGED")
@@ -2650,12 +2679,30 @@ def cmd_selftest():
         with open(stub, "w", encoding="utf-8") as fh:
             fh.write("ALIAS_WEIGHT = 0.4\n")
         arm("check 27: an id_grammar.py that predates the index builder refuses by name",
-            "predates build_index, match_expr, terms", lambda: run_fixture(f2, "--check-relations", b2))
+            "predates build_fts_rows, match_expr, terms", lambda: run_fixture(f2, "--check-relations", b2))
         with open(stub, "w", encoding="utf-8") as fh:
             fh.write("raise RuntimeError('half-installed')\n")
         arm("check 27: an id_grammar.py that cannot be imported refuses by name",
             "could not import this kit's id_grammar.py",
             lambda: run_fixture(f2, "--check-relations", b2))
+
+        # TOOL-dTotalRecall-45 AC3 — `scan_records` keys a row's slug through the id parser, so a
+        # hyphenated slug is taken whole. Copy-install, because the row regex binds the slug class of
+        # the tree its module sits in: the build README's recorded grammar admits the slug there with
+        # no policy kit, and a `python -c` in the fixture imports the copy. The split answered `d2026`.
+        f3, b3 = build_fixture("slug-hyphenated")
+        set_branch(f3, b3, dict(add_rows("- ARCH-d2026-10-26ClosedLoop-3 · a decision of a hyphenated slug"), **{
+            "memory/builds/d2026-10-26ClosedLoop/README.md":
+                "---\nslug: d2026-10-26ClosedLoop\nslug-grammar: words=1-3 style=humorous date=in-slug\n"
+                "opened: 2026-10-26\n---\n\n# d2026-10-26ClosedLoop\n"}))
+        arm("scan_records keys a hyphenated slug whole, through the id parser",
+            "['d2026-10-26ClosedLoop']",
+            lambda: (lambda p: p.stdout + p.stderr)(subprocess.run(
+                [sys.executable, "-c", "import sys; sys.path.insert(0, sys.argv[1]); import row_grammar as r; "
+                 "print([x['slug'] for x in r.scan_records('.', r.load_conf('.')) "
+                 "if x['ident'] == 'ARCH-d2026-10-26ClosedLoop-3'])", os.path.join(f3, mrel)],
+                cwd=f3, capture_output=True, text=True, encoding="utf-8",
+                env={k: v for k, v in os.environ.items() if k != "GOV_DEFAULT_BRANCH"})))
 
         # ------------------------------------------------- CHECK 28 (TOOL-aGraftedHelix-6)
         # In-process: the check reads no sibling kit, so no copy-install fixture is owed. Each
@@ -2688,12 +2735,12 @@ def cmd_selftest():
         arm("check 28: ...in exactly one finding line", "findings=1",
             lambda: f"findings={run_content(t28, c28, b28).count('check 28:')}")
         # AC2 — a row re-minted in the decision index's other shape.
-        t28, c28, b28 = build_content("contentshape", "- ARCH-tA-1 · a row the other shape re-mints\n", {
-            "memory/DECISIONS.md": "- ARCH-tA-1 · a row the other shape re-mints\n"
-                                   "- **ARCH-tB-1** — **a row the other shape re-mints**\n"})
+        t28, c28, b28 = build_content("contentshape", "- ARCH-tAFix-1 · a row the other shape re-mints\n", {
+            "memory/DECISIONS.md": "- ARCH-tAFix-1 · a row the other shape re-mints\n"
+                                   "- **ARCH-tBFix-1** — **a row the other shape re-mints**\n"})
         arm("check 28: a row re-minted in the bold-and-dash shape reds naming both locations",
-            "rc=1 check 28: 2 records hold one content key — memory/DECISIONS.md:1 (ARCH-tA-1), "
-            "memory/DECISIONS.md:2 (ARCH-tB-1)", lambda: run_content(t28, c28, b28))
+            "rc=1 check 28: 2 records hold one content key — memory/DECISIONS.md:1 (ARCH-tAFix-1), "
+            "memory/DECISIONS.md:2 (ARCH-tBFix-1)", lambda: run_content(t28, c28, b28))
         # AC3 — one identity across a snapshot rotation, and two distinct bodies: neither is graded.
         snap = "- ARCH-tSnap-1 · a row a snapshot rotation carries forward\n"
         t28, c28, b28 = build_content("contentsnap", "", {
@@ -2710,7 +2757,7 @@ def cmd_selftest():
             f"rc=0 row-grammar: check 28 graded 0 record(s) in {b28[:8]}..HEAD — 0 row(s), 0 gotcha(s)",
             lambda: run_content(t28, c28, b28))
         # AC10 — a pair landed at the base is counted, never reported; an added restatement reds.
-        landed = "- ARCH-tL-{} · a text two ids already hold at the base\n"
+        landed = "- ARCH-tLFix-{} · a text two ids already hold at the base\n"
         t28, c28, b28 = build_content("contentlanded", landed.format(1) + landed.format(2), {})
         arm("check 28: a duplicate landed at the base is counted and not reported",
             "rc=0 row-grammar: check 28 graded 2 record(s) in " + b28[:8] + "..HEAD — 2 row(s), "
@@ -2718,22 +2765,22 @@ def cmd_selftest():
             "not reported", lambda: run_content(t28, c28, b28))
         _write_commit(t28, "2026-02-01", {"memory/DECISIONS.md": "".join(landed.format(n) for n in (1, 2, 3))})
         arm("check 28: an added restatement of a landed pair reds naming all three holders",
-            "rc=1 check 28: 3 records hold one content key — memory/DECISIONS.md:1 (ARCH-tL-1), "
-            "memory/DECISIONS.md:2 (ARCH-tL-2), memory/DECISIONS.md:3 (ARCH-tL-3)",
+            "rc=1 check 28: 3 records hold one content key — memory/DECISIONS.md:1 (ARCH-tLFix-1), "
+            "memory/DECISIONS.md:2 (ARCH-tLFix-2), memory/DECISIONS.md:3 (ARCH-tLFix-3)",
             lambda: run_content(t28, c28, b28))
         # AC11 — two empty keys are counted and never compared; three holders across two kinds.
         t28, c28, b28 = build_content("contentblank", "", {
-            "memory/DECISIONS.md": "- ARCH-tE-1 · 2026-01-01\n- ARCH-tE-2 · **2026-02-02**\n"})
+            "memory/DECISIONS.md": "- ARCH-tEFix-1 · 2026-01-01\n- ARCH-tEFix-2 · **2026-02-02**\n"})
         arm("check 28: two records whose keys are empty do not red each other, and are counted",
             "rc=0 row-grammar: check 28 graded 2 record(s) in " + b28[:8] + "..HEAD — 2 row(s), "
             "0 gotcha(s), 2 with an empty key, 0 key(s) held twice", lambda: run_content(t28, c28, b28))
         t28, c28, b28 = build_content("contentthree", "", {
-            "memory/DECISIONS.md": "- ARCH-tT-1 · three records hold this text\n"
-                                   "- ARCH-tT-2 · **three  records hold this text**\n",
+            "memory/DECISIONS.md": "- ARCH-tTFix-1 · three records hold this text\n"
+                                   "- ARCH-tTFix-2 · **three  records hold this text**\n",
             "memory/gotchas/three.md": build_body("three", "Three records hold this text\n")})
         arm("check 28: three holders across a row and a gotcha are all named",
-            "rc=1 check 28: 3 records hold one content key — memory/DECISIONS.md:1 (ARCH-tT-1), "
-            "memory/DECISIONS.md:2 (ARCH-tT-2), memory/gotchas/three.md (three)",
+            "rc=1 check 28: 3 records hold one content key — memory/DECISIONS.md:1 (ARCH-tTFix-1), "
+            "memory/DECISIONS.md:2 (ARCH-tTFix-2), memory/gotchas/three.md (three)",
             lambda: run_content(t28, c28, b28))
         # No mainline base: every key is graded as added, and the summary says so.
         run("git", "branch", "-m", "no-mainline", cwd=t28)

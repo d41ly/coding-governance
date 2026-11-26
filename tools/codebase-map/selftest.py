@@ -1568,6 +1568,134 @@ def test_dossier_staleness_from_git(tmp: Path):
         "a whole history touching no claimed path is not a clean all-fresh answer"
 
 
+def test_anchored_dossier_staleness(tmp: Path):
+    """TOOL-dTotalRecall-8 S12: a dossier anchoring `a.py::f` is stale when f's body changes and fresh when
+    another definition of the same file does, over a REAL git fixture; a key HEAD does not define answers
+    None, which `main` turns into exit 1. Staged red by reading anchors at path granularity: the change
+    beside f then stales it. A second claimed file, `b.py`, no anchor names, stales it by ancestry
+    (TOOL-dTotalRecall-125 S3), staged red by grading the whole dossier by the hashes."""
+    import os
+    import subprocess
+
+    import map_diff as md
+
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+               GIT_CONFIG_NOSYSTEM="1")
+
+    def run_git(*a):
+        r = subprocess.run(["git", "-C", str(tmp), *a], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
+        return r.stdout.strip()
+
+    def write_commit(rel, text):
+        (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp / rel).write_text(text, encoding="utf-8", newline="\n")
+        run_git("add", "-A")
+        run_git("commit", "-qm", rel)
+        return run_git("rev-parse", "HEAD")
+
+    run_git("init", "--template=", "-q")
+    run_git("config", "user.email", "t@t")
+    run_git("config", "user.name", "t")
+    run_git("config", "commit.gpgsign", "false")
+    body = "def f():\n    return {}\n\n\ndef g():\n    return {}\n"
+    write_commit("a.py", body.format(1, 1))
+    refreshed = write_commit("map/features/x.md", "x\n")
+    text = DOSSIER.replace('globs = ["src/x/**"]', 'globs = ["a.py", "b.py"]\nsymbols = ["a.py::f"]')
+    f = m.parse_dossier(DOSSIER.replace('feature = "x"', 'feature = "foundation"'), IDS, source="f")
+
+    def measure(dossier_text=text):
+        tree = m.MapTree(foundation=f, dossiers=(m.parse_dossier(dossier_text, IDS, source="t"),),
+                         baseline=EMPTY_BASE)
+        commits, scope = md.read_commit_paths(tmp, None)
+        anchors = md.read_anchor_hashes(tmp, commits, tree, "map")
+        return m.measure_dossier_staleness(commits, tree, "map", scope=scope, anchors=anchors)[0], anchors
+
+    row, anchors = measure()
+    assert not row["stale"] and list(anchors) == ["x"], (row, anchors)
+    write_commit("a.py", body.format(1, 2))
+    row, _ = measure()
+    assert row["refreshed"] == refreshed and row["behind"] == 1 and not row["stale"], f"g alone moved: {row}"
+    plain, _ = measure(text.replace('\nsymbols = ["a.py::f"]', ""))
+    assert plain["stale"], f"an unanchored dossier still reads at path granularity: {plain}"
+    # TOOL-dTotalRecall-125 S3: the anchors grade a.py alone, so a second claimed file's move stales it by ancestry
+    write_commit("b.py", "x = 1\n")
+    row, _ = measure()
+    assert row["behind"] == 2 and row["stale"], f"b.py moved and the anchored dossier read fresh: {row}"
+    write_commit("a.py", body.format(2, 2))
+    assert measure()[0]["stale"], "f's body moved and the anchored dossier read fresh"
+    _row, gone = measure(text.replace("a.py::f", "a.py::gone"))
+    assert gone["x"][0] == {"a.py::gone": None}, gone
+    expect_maperror(text.replace("a.py::f", "a.py"), "paths.symbols")
+
+
+def test_unheld_anchor_exits_one(tmp: Path):
+    """TOOL-dTotalRecall-125 S8: `map_diff.py --stale-dossiers` over an adopted fixture root whose dossier anchors
+    `a.py::gone`, which HEAD does not define, exits 1 naming the key on stderr, and exits 0 once the key is
+    `a.py::f`. The dossiers carry the project layer's inventory ids, so `main` reaches the anchor read rather than
+    exiting 1 through a MapError. Staged red by deleting the unheld branch's `return 1`."""
+    import contextlib
+    import io
+    import subprocess
+    import sys as _sys
+
+    import map_diff as md
+    import map_extractors as ext
+
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+               GIT_CONFIG_NOSYSTEM="1")
+
+    def run_git(*a):
+        r = subprocess.run(["git", "-C", str(tmp), *a], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
+
+    def write_commit(files):
+        for rel, body in files.items():
+            (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
+            (tmp / rel).write_text(body, encoding="utf-8", newline="\n")
+        run_git("add", "-A")
+        run_git("commit", "-qm", "fixture")
+
+    claims_block = "[claims]\n" + "".join(f"{inv} = []\n" for inv in ext.inventory_ids()) + "\n"
+    base = re.sub(r"\[claims\]\n.*?\n\n", lambda _m: claims_block, DOSSIER, flags=re.S)
+
+    def render_dossier(key):
+        return base.replace('globs = ["src/x/**"]', f'globs = ["a.py"]\nsymbols = ["{key}"]')
+
+    run_git("init", "--template=", "-q")
+    run_git("config", "user.email", "t@t")
+    run_git("config", "user.name", "t")
+    run_git("config", "commit.gpgsign", "false")
+    write_commit({m.CONF_NAME: "MAP_ROOT=map\n", "a.py": "def f():\n    return 1\n",
+                  "map/FOUNDATION.md": base.replace('feature = "x"', 'feature = "foundation"'),
+                  "map/features/x.md": render_dossier("a.py::gone")})
+
+    def run_main():
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = md.main()
+        return rc, err.getvalue()
+
+    saved_argv, saved_root = _sys.argv, os.environ.get("CODEBASE_MAP_ROOT")
+    os.environ["CODEBASE_MAP_ROOT"] = str(tmp)
+    _sys.argv = ["map_diff.py", "--stale-dossiers"]
+    try:
+        rc, err = run_main()
+        assert rc == 1, f"an unheld anchor exited {rc}, not 1: {err}"
+        assert "anchors a.py::gone, which HEAD does not define" in err, err
+        write_commit({"map/features/x.md": render_dossier("a.py::f")})
+        rc, err = run_main()
+        assert rc == 0, f"a held anchor exited {rc}, not 0: {err}"
+    finally:
+        _sys.argv = saved_argv
+        if saved_root is None:
+            os.environ.pop("CODEBASE_MAP_ROOT", None)
+        else:
+            os.environ["CODEBASE_MAP_ROOT"] = saved_root
+
+
 def test_record_roots_split_code_from_records(tmp: Path):
     """TOOL-aMendedFleet-86 S2-S4: RECORD_ROOTS partitions the digest's population, over a REAL git
     fixture because a root is live only when `git ls-files` names a path under it. One code file and
@@ -1993,6 +2121,9 @@ def main() -> int:
         failures += check("shell layer: public definitions only, untokenizable refuses (aMendedFleet-35)",
                           lambda: test_shell_layer_indexes_public_definitions_only(Path(td)))
     with tempfile.TemporaryDirectory() as td:
+        failures += check("shell layer: builds with no lexicon kit reachable (dTotalRecall-13 S5)",
+                          lambda: test_shell_layer_needs_no_lexicon_kit(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
         failures += check("gate-coverage: an uncompared artifact fails (AC1)",
                           lambda: test_gate_coverage_fails_on_an_uncompared_artifact(Path(td)))
     with tempfile.TemporaryDirectory() as td:
@@ -2024,6 +2155,16 @@ def main() -> int:
         failures += check(
             "stale dossiers: ancestry, whole and by range, map-root excluded (aMendedFleet-37)",
             lambda: test_dossier_staleness_from_git(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "stale dossiers: an anchored dossier reads its definitions' hashes (dTotalRecall-8)",
+            lambda: test_anchored_dossier_staleness(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "stale dossiers: an anchor HEAD does not define exits 1 naming it (dTotalRecall-125)",
+            lambda: test_unheld_anchor_exits_one(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(
@@ -2473,6 +2614,41 @@ def test_shell_layer_indexes_public_definitions_only(tmp: Path):
         assert "bad/broken.sh" in str(exc), exc
     else:
         raise AssertionError("an untokenizable shell file was indexed as nothing, not refused")
+
+
+def test_shell_layer_needs_no_lexicon_kit(tmp: Path):
+    """TOOL-dTotalRecall-13 S5 — the `kit-sh` layer reads this kit's OWN `extract_code.py`, so it builds
+    in a tree holding no lexicon kit at all, the tree an adopter taking the map alone has.
+
+    A tool root carrying this kit and the memory-tree kit it requires, and nothing else, runs
+    `scan_shell_layer` in a CHILD over one fixture shell file: a child, because this process already
+    holds the lexicon kit beside this one, and an in-process call could reach it. The public
+    definition is the one row. Staged by restoring the `from lexicon import` line, under which the
+    child cannot import the tokenizer and prints no row.
+    """
+    import shutil
+    import subprocess
+
+    repo = tmp / "repo"
+    kit = repo / PFX / KIT_NAME
+    shutil.copytree(Path(os.path.abspath(__file__)).parent, kit,
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    shutil.copytree(m.MEMORY_TREE_DIR, kit.parent / Path(m.MEMORY_TREE_DIR).name,
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    assert sorted(p.name for p in kit.parent.iterdir()) == sorted([KIT_NAME, Path(m.MEMORY_TREE_DIR).name]),         "the fixture tool root holds a kit beyond this one and the memory tree"
+    (repo / ".git").mkdir()
+    (repo / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+    (repo / "sh").mkdir()
+    (repo / "sh" / "lib.sh").write_text("build_thing() {\n  echo hi\n}\n", encoding="utf-8")
+    env = {k: v for k, v in os.environ.items() if k != "CODEBASE_MAP_ROOT"}
+    got = subprocess.run(
+        [sys.executable, "-c",
+         "import sys; sys.path.insert(0, sys.argv[1]); import pathlib, map_extractors as mx; "
+         "r = pathlib.Path(sys.argv[2]); print(mx.scan_shell_layer('kit-sh', (r / 'sh',), root=r))",
+         str(kit), str(repo)],
+        cwd=str(repo), env=env, capture_output=True, text=True, encoding="utf-8")
+    want = str([{"id": "build_thing", "kind": "function", "file": "sh/lib.sh"}])
+    assert got.returncode == 0 and got.stdout.strip() == want, got.stdout + got.stderr
 
 
 # --- left-shifts from the closing diff review (dTracedLattice round 1) ----------------------------

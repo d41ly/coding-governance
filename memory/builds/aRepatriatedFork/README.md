@@ -132,7 +132,7 @@ with no hand edit between the update and the bar.** One observation at each adop
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 51 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
+**Build status:** CLOSED · 51 unit(s) · node a · opened 2026-09-23 · streams deployer+tooling
 ids DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5
 ids TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20
 ids TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31
@@ -240,9 +240,25 @@ Ids whose spec moved past its audited revision: none — 0 of 51 unit id(s) carr
 | 25 | `TOOL-aRepatriatedFork-52` | no |
 | 26 | `TOOL-aRepatriatedFork-55` | no |
 | 27 | `TOOL-aRepatriatedFork-56` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-02-prompt-TOOL-aRepatriatedFork-56-build-brief.md`, `2026-10-02-prompt-TOOL-aRepatriatedFork-55-build-brief.md` and 51 more under prompts/ |
+| reviews | `2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round2.md`, `2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md` and 4 more under reviews/ |
+| research | `2026-10-01-build-TOOL-aRepatriatedFork-52-redeclare-patch.md`, `2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md` and 1 more under build/ |
+| logs | `2026-10-01-build-TOOL-aRepatriatedFork-53-1-acceptance-ledger.md`, `2026-10-01-build-TOOL-aRepatriatedFork-52-verifying-repair-r3.md` and 57 more under build/ |
+| open asks | `BACKLOG.md`, 9 open |
+| card ref | `refs/gov/builds/aRepatriatedFork/card` |
+<!-- /gen:build-routes -->

@@ -302,3 +302,4 @@ tools/workflows/unattended-build.test.sh	path-subst	6	ef4d5554d8e7475fc1fe2e78af
 tools/workflows/unattended-build.test.sh	printf-subst	83	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/workflows/unattended-build.test.sh	pure-fn-subst	36	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/workflows/unattended-build.test.sh	var-pipe	64	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/gov-claim.sh	var-pipe	3	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-17

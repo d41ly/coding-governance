@@ -168,3 +168,13 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-17-review-TOOL-aTetheredRecord-1-1.md` (BLOCKED) |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aTetheredRecord/card` |
+<!-- /gen:build-routes -->

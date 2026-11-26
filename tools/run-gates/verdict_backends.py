@@ -1017,7 +1017,7 @@ def run_local_plant(case, top, run_scenario):
         run_scenario(name, work, [*me, "read", "--backend", "local-hook", "--sha", sha], 0 if state == "GREEN" else 1,
                      [f"verdict: local-hook · {state} · {sha[:8]}", *needles])
 
-    underived = "x\tquarantine\tTOOL-x-7 · 3/10"
+    underived = "x\tquarantine\tTOOL-xFix-7 · 3/10"
     if case == "reused-cache":
         write_record(pair=("reused\t1\n", "reused_cache\t1\n"))
         read_local("reused_cache 1", "NONE", ["reused 1 leg(s) from the cache"])
@@ -1043,7 +1043,7 @@ def run_local_plant(case, top, run_scenario):
         read_local("selection.1 edited after its hash", "NONE", ["do not hash to"])
     elif case == "underived-selection":
         write_record(selection=(derive_rows_hash([underived]), [underived]))
-        read_local("a row R does not derive", "NONE", [f"is not what {sha[:8]} derives", "TOOL-x-7"])
+        read_local("a row R does not derive", "NONE", [f"is not what {sha[:8]} derives", "TOOL-xFix-7"])
     else:
         write_record()
         read_local("the pair at 0, selection none", "GREEN", ["witness witnessed"])

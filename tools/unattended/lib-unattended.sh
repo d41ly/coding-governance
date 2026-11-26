@@ -197,6 +197,35 @@ resolve_index_generator() {
   esac
 }
 
+# THE SLUG GRAMMAR (TOOL-dTotalRecall-5 S7). Every slug and id reader of this kit splices the memory-tree
+# kit's slug class, which that kit's hygiene script prints as `--print-slug-re`, `^(<class>)$`: asked
+# once per shell and kept, SLUG_RE_ERE for a slug reader and SLUG_CLASS for an id reader, which wraps it
+# in a group of its own, and UNIT_ID_ERE the unit id they share. Called at the top of each reader, so a
+# caller that loaded it first pays nothing in the subshells below it. This kit requires memory-tree, so
+# a miss is a named refusal, status 2, never a guessed shape.
+SLUG_CLASS="" SLUG_RE_ERE="" UNIT_ID_ERE=""
+load_slug_class() {
+  [ -n "$SLUG_CLASS" ] && return 0
+  local py="" here d top re=""
+  declare -F resolve_python >/dev/null && py=$(resolve_python 2>/dev/null) || py=""
+  case "${BASH_SOURCE[0]}" in */*) here=${BASH_SOURCE[0]%/*} ;; *) here=. ;; esac
+  # Anchored on the module, and asked of it: the hygiene script's `--print-slug-re` is an exec of this very
+  # command, so its bytes are these, and its prologue's forks are not spent here (TOOL-dTotalRecall-5 AC5, -114 S19).
+  if [ -n "$py" ] && d=$(resolve_kit_dir "$py" memory-tree id_grammar.py "$here" 2>/dev/null); then
+    top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$here" rev-parse --show-toplevel 2>/dev/null) || top=$here
+    re=$("$py" "$top/$d/id_grammar.py" --print slug-re "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null) || re=""
+    re=${re%$'\r'}
+  fi
+  case "$re" in
+    '^('*')$') ;;
+    *) printf '%s\n' "lib-unattended: the memory-tree kit's slug grammar did not answer --print-slug-re, so no slug or id is read: ${re:-no answer}" >&2
+       return 2 ;;
+  esac
+  SLUG_RE_ERE=$re; SLUG_CLASS=${re#'^('}; SLUG_CLASS=${SLUG_CLASS%')$'}
+  UNIT_ID_ERE="[A-Z]+-($SLUG_CLASS)-[0-9]+"
+  return 0
+}
+
 # A LEDGER'S RECORD KEYS AT A REVISION, read through the memory-tree kit's ledger factory, this kit's
 # required sibling (TOOL-dWitnessedBar-16 S4): the waiver registries of the pass-order and brief-recorded
 # legs are ledger populations, keyed by unit, and no leg here parses their grammar itself.
@@ -397,7 +426,8 @@ read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes 
   local mode=ids
   if [ "${1:-}" = --scan ]; then mode=scan; shift; else [ -r "${1:-}" ] || return 0; fi
   [ "$#" -gt 0 ] || return 0
-  awk -v mode="$mode" '
+  load_slug_class || return 2
+  awk -v mode="$mode" -v slug="$SLUG_CLASS" '
     # The held `none` bullet ends here: unreadable when a backtick follows the word anywhere in it.
     function print_held() {
       if (held && mode == "scan" && rest ~ /`/) printf "%s\t\n", heldfile
@@ -423,7 +453,7 @@ read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes 
         }
         if (t ~ /^`/) {
           sub(/^`/, "", t); sub(/`.*$/, "", t)
-          if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) id = t
+          if (t ~ ("^[A-Z]+-(" slug ")-[0-9]+$")) id = t
         }
       }
       if (mode == "ids") { if (id != "") print id; next }
@@ -1683,13 +1713,14 @@ check_touching_commit_reachable() { # commit · base · path -> status 0 yes · 
 # be a glob is refused as the token it is rather than expanded into file names.
 parse_grants() { # may: value -> status 0 the grants (or `none`) · status 1 the refused token
   local _pg_w _pg_t _pg_s _pg_out=""
+  load_slug_class || return 2
   read -r -a _pg_w <<<"$1"
   [ "${#_pg_w[@]}" -gt 0 ] || return 1
   if [ "${#_pg_w[@]}" = 1 ] && [ "${_pg_w[0]}" = none ]; then printf 'none'; return 0; fi
   for _pg_t in "${_pg_w[@]}"; do
     _pg_s=$_pg_t
     case $_pg_s in \`?*\`) _pg_s=${_pg_s#\`}; _pg_s=${_pg_s%\`} ;; esac
-    if ! [[ $_pg_s =~ ^[A-Z]+-[A-Za-z0-9]+-[0-9]+$ ]]; then
+    if ! [[ $_pg_s =~ ^${UNIT_ID_ERE}$ ]]; then
       case $_pg_s in
         /*|*\\*|*\`*|..|../*|*/..|*/../*) printf '%s' "$_pg_t"; return 1 ;;
         */*|*?.?*) ;;
@@ -2247,6 +2278,7 @@ next_anchor() {  # anchor · newline-separated candidate anchors
 # header records from an empty base turning a provenance test into a read of the git index.
 pinned_units() {  # commit · build-README-path · [cutoff-date]
   _pu_c=$1; _pu_bre=$2; _pu_cut=${3:-}
+  load_slug_class || return 1
   command -v region >/dev/null 2>&1 || {
     echo "pinned_units needs a region() in the calling shell and this one has none, so the units region would read as empty and be reported as an empty roster"
     return 1
@@ -2285,7 +2317,7 @@ pinned_units() {  # commit · build-README-path · [cutoff-date]
   # state at ed281374b (2026-08-31).
   # Counting the two functions' refusal branches would NOT catch this: both have seven,
   # and the sets differ rather than the sizes.
-  _pu_ids=$(printf '%s\n' "$_pu_was" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u)
+  _pu_ids=$(printf '%s\n' "$_pu_was" | grep -oE "$UNIT_ID_ERE" | sort -u)
   if [ -z "$_pu_ids" ]; then
     echo "the roster at the pinned commit names no unit, so every membership test against it answers absent and the comparison would be vacuous rather than clean"
     return 1
@@ -2303,6 +2335,7 @@ extract_run_facts() { awk '/^## /{ sec = (index($0, "## Run facts") == 1); next 
 
 baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [fallback-commit]
   _bu_rel=$1; _bu_bre=$2; _bu_cut=${3:-}; _bu_fb=${4:-}
+  load_slug_class || return 1
   # IT CALLS `region`, WHICH THIS LIBRARY DOES NOT DEFINE. Both current callers define their own —
   # two spellings, in the driver and in the checker, and the legs that compare them are the marker
   # contract's, which this build moved off and back onto the automatic bar. A third caller that
@@ -2362,7 +2395,7 @@ baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [f
   # The ids are derived only to decide EMPTINESS. An empty baseline is not a comparison and is not
   # vacuously true either — it is vacuously accusatory, because every unit the build has would read
   # as added.
-  _bu_ids=$(printf '%s\n' "$_bu_was" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u)
+  _bu_ids=$(printf '%s\n' "$_bu_was" | grep -oE "$UNIT_ID_ERE" | sort -u)
   if [ -z "$_bu_ids" ]; then
     # S2 - the authored pair at the SAME commit, ids one per line (the header above says why).
     if _bu_rr=$(read_roster_at "$_bu_base" "$_bu_bre"); then
@@ -2450,15 +2483,17 @@ ask_filed_in() { # BACKLOG.md text · ask id -> 0 when that text FILES the ask
 # the SET (the asks filed in a build's own folder), and deriving it by calling the match above once
 # per candidate id would need a candidate list, which is the thing this answers.
 asks_filed_in() { # BACKLOG.md text -> every filed ask id, one per line, in file order
+  load_slug_class || return 2
   printf '%s\n' "$1" \
-    | sed -n 's/^- \([A-Z][A-Z]*-[A-Za-z0-9][A-Za-z0-9]*-[0-9][0-9]*\) · filed .*/\1/p'
+    | sed -nE "s/^- ($UNIT_ID_ERE) · filed .*/\\1/p"
 }
 # ...and the `unit` SUBSET. `- <ID> · filed <DATE> · unit · <TEXT>` is an ask that IS a unit of the
 # build whose folder files it, so design section 19.4 makes it roster. `unit` is recognised as the
 # WHOLE field after the date and never as a prefix of the text, which is the memory kit's own rule.
 asks_unit_in() { # BACKLOG.md text -> every filed `unit` ask id, one per line, in file order
+  load_slug_class || return 2
   printf '%s\n' "$1" \
-    | sed -n 's/^- \([A-Z][A-Z]*-[A-Za-z0-9][A-Za-z0-9]*-[0-9][0-9]*\) · filed [0-9][0-9-]* · unit · .*/\1/p'
+    | sed -nE "s/^- ($UNIT_ID_ERE) · filed [0-9][0-9-]* · unit · .*/\\1/p"
 }
 # ------------------------------------------------------------ the id-run expander, and the home
 # MOVED HERE FROM THE DRIVER by TOOL-dDerivedDocket-18, unchanged, for the reason the ask match
@@ -2483,7 +2518,8 @@ asks_unit_in() { # BACKLOG.md text -> every filed `unit` ask id, one per line, i
 expand_id_runs() { # [--keyed] · stdin: binding-line text, or keyed rows -> stdout: ids, ranges expanded, one per line
   local _keyed=""
   [ "${1:-}" != --keyed ] || _keyed=1
-  awk -v keyed="$_keyed" '{
+  load_slug_class || return 2
+  awk -v keyed="$_keyed" -v idre="^$UNIT_ID_ERE\$" -v runre="^$UNIT_ID_ERE[.][.][0-9]+\$" '{
     s = $0; pre = ""
     if (keyed) {
       p = index(s, "\t"); if (p == 0) next
@@ -2495,13 +2531,13 @@ expand_id_runs() { # [--keyed] · stdin: binding-line text, or keyed rows -> std
     for (i = 1; i <= n; i++) {
       t = w[i]
       sub(/@rev-[0-9]+$/, "", t)
-      if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+\.\.[0-9]+$/) {
+      if (t ~ runre) {
         p = index(t, "..")
         head = substr(t, 1, p - 1); hi = substr(t, p + 2) + 0
         match(head, /[0-9]+$/); lo = substr(head, RSTART) + 0
         stem = substr(head, 1, RSTART - 1)
         for (k = lo; k <= hi; k++) print pre stem k
-      } else if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print pre t
+      } else if (t ~ idre) print pre t
     }
   }'
 }
@@ -2548,7 +2584,8 @@ read_spec_audit_ids() { # build folder -> stdout: ids its tracked spec-audit bin
 # returns the owner's own listing, and a caller that needs a set collapses it (`read_ask_scope` does).
 # The parity arm compares the two after that collapse.
 read_id_tokens() { # stdin: an IDLIST value -> `id<TAB><id>` and `bad<TAB><token><TAB><why>` lines, in token order
-  awk '
+  load_slug_class || return 2
+  awk -v idre="^$UNIT_ID_ERE(@rev-[0-9]+)?\$" -v runre="^$UNIT_ID_ERE[.][.][0-9]+\$" '
     function refuse(t, why) { printf "bad\t%s\t%s\n", t, why }
     {
       n = split($0, w, /[ \t\r]+/)
@@ -2566,13 +2603,13 @@ read_id_tokens() { # stdin: an IDLIST value -> `id<TAB><id>` and `bad<TAB><token
           for (k = lo + 0; k <= hi + 0; k++) printf "id\t%s-%d\n", stem, k
           continue
         }
-        if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+(@rev-[0-9]+)?$/) {
+        if (t ~ idre) {
           sub(/@rev-[0-9]+$/, "", t)
           printf "id\t%s\n", t
           stem = t; sub(/-[0-9]+$/, "", stem)
           continue
         }
-        if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+\.\.[0-9]+$/) {
+        if (t ~ runre) {
           p = index(t, ".."); head = substr(t, 1, p - 1); hi = substr(t, p + 2) + 0
           match(head, /[0-9]+$/); lo = substr(head, RSTART) + 0; s = substr(head, 1, RSTART - 2)
           if (hi < lo) { refuse(t, "a range that counts backwards"); continue }
@@ -2601,7 +2638,7 @@ read_id_list_refusals() { # IDLIST value -> every refused token and why, on ONE 
 # from the driver with the expander above, and for the same reason: the leg reads the same blob per
 # home and a second spelling of "which folder" would send the two readers at different files.
 ask_home_of() { # ask id -> the slug segment, printed and left in `_ask_home` (TOOL-aSparedSpawn-8)
-  local _t="${1#*-}"; _ask_home=${_t%-*}; printf '%s' "$_ask_home"
+  local _t="${1#*-}"; _ask_home=${_t%-*}; printf '%s' "$_ask_home"  # census: kept slug-grammar the first and the last segment stripped
 }
 # The history store's bash face and its one `cat-file --batch` coprocess (TOOL-dQuietDisk-1 S8, S10),
 # inline because `<prefix>/lib/` travels to nobody: the store's items and tip through this kit's own

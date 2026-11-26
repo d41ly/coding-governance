@@ -125,3 +125,14 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-17-review-TOOL-dClosedLexicon-11-9.md` (BLOCKED), `2026-08-17-review-TOOL-dClosedLexicon-11-10.md` (CLEAN WITH FIXES) and 8 more under reviews/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dClosedLexicon/card` |
+<!-- /gen:build-routes -->

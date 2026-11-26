@@ -613,6 +613,27 @@ else
   done
   [ -n "$MTD" ] || MTD_SKIP="neither the memory-tree kit's gotchas.py (through the install receipt, or beside this kit) nor ${TOOLROOT}gotchas.py is tracked in this repo"
 fi
+# {{SLUG_CLASS}} (TOOL-dTotalRecall-5 S5): the slug grammar's ERE class, which the two harness templates
+# splice into their id and slug patterns, answered by `--print-slug-class` of the memory-tree kit's
+# hygiene script beside the gotchas.py the probe above found, as {{FANOUT_CAP}} is answered by the
+# policy reader. Where the probe found no memory-tree kit it renders the inline legacy shape and says
+# so, as it skips the MEMORY_TREE_DIR pairs out loud; a kit found that answers nothing refuses.
+# >>> slug_legacy_sh — canonical copy: check-memory-hygiene.sh in the memory-tree kit (byte-identical; gated)
+SLUG_LEGACY_ERE='[a-z][A-Za-z]{2,}'
+# <<< slug_legacy_sh
+SLUG_CLASS=""
+if [ -n "$MTD" ]; then
+  SLUG_CLASS=$("${BASH:-bash}" "$MTD/check-memory-hygiene.sh" --print-slug-class 2>/dev/null | tr -d '\r')
+  if [ -z "$SLUG_CLASS" ]; then
+    echo "protocol-parity: the memory-tree kit's check-memory-hygiene.sh beside '$MTD/gotchas.py' printed no"
+    echo "  slug class, so {{SLUG_CLASS}} cannot be rendered. Nothing was written."
+    exit 2
+  fi
+else
+  SLUG_CLASS=$SLUG_LEGACY_ERE
+  echo "protocol-parity: SKIP the slug grammar — $MTD_SKIP — so {{SLUG_CLASS}} renders the legacy shape"
+fi
+
 # AN UNSUPPORTED CHARACTER IS A REFUSAL. Both values land inside a single-quoted JS string in the
 # harness and inside a shell command an agent runs, so a quote ends the string early and a space
 # splits the command. The set is a path's, and no install measured so far needs more. A citation's
@@ -639,6 +660,7 @@ render() { # template -> stdout
   render_kit_cites
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOLROOT"}
   out=${out//\{\{MEMORY_TREE_DIR\}\}/"$MTD"}
+  out=${out//\{\{SLUG_CLASS\}\}/"$SLUG_CLASS"}
   # THE VERIFIER-BOUNDED FALLBACK (TOOL-dGroundRules-30 S3), when the hook's verdict below set
   # WRITER_SPLIT=0: three spans of the build harness's template, before the cap token, so the fallback
   # is this one template rendered and never a second copy. A span a template edit moved keeps the agent

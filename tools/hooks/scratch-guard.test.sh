@@ -357,7 +357,7 @@ run "  near-miss: redirect to /dev/null -> allow" 0 'cmd > /dev/null 2>&1'
 run "tee -> deny"                                 2 'echo x | tee ~/.a'
 run "touch -> deny"                               2 'touch ~/.a'
 run "mkdir -> deny"                               2 'mkdir -p ~/.gov-push'
-run "  near-miss: mkdir in repo -> allow"         0 'mkdir -p memory/builds/x'
+run "  near-miss: mkdir in repo -> allow"         0 'mkdir -p memory/builds/xFix'
 run "cp destination -> deny"                      2 'cp memory/x.md ~/.backup.md'
 run "cp home-rooted SOURCE -> allow"              0 'cp ~/.merge-bar.log memory/inv/'
 run "mv destination -> deny"                      2 'mv memory/x.md ~/.backup.md'
@@ -717,37 +717,37 @@ run_card "AC3 the cell rewritten to B -> allow, stderr EMPTY" 0 empty 'git commi
 
 # ---- AC4: the exemption — a NEW build README carrying an accepted authorized-by: value -----------
 write_card sgtest-d1 "$SG_TOP_WT" write 'READY — none yet'
-mkdir -p "$SGWT/builds/x" && printf -- '---\nslug: x\nauthorized-by: prompt\n---\n' > "$SGWT/builds/x/README.md" && git -C "$SGWT" add builds/x/README.md
-run_card "AC4 staged NEW builds/x/README.md authorized-by: prompt -> allow, exemption line" 0 "one;;exempt;;builds/x/README.md;;prompt" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
+mkdir -p "$SGWT/builds/xFix" && printf -- '---\nslug: x\nauthorized-by: prompt\n---\n' > "$SGWT/builds/xFix/README.md" && git -C "$SGWT" add builds/xFix/README.md
+run_card "AC4 staged NEW builds/xFix/README.md authorized-by: prompt -> allow, exemption line" 0 "one;;exempt;;builds/xFix/README.md;;prompt" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
 # `-f` on every cleanup: `git rm --cached` REFUSES a file whose index blob differs from both HEAD and
 # the worktree — exactly the state the staged-versus-worktree pair below builds — and the refusal
 # left the README staged, so AC8 measured a fixture with an index that was not empty. Found RED.
-git -C "$SGWT" rm -q -f --cached builds/x/README.md && rm -rf "$SGWT/builds"
-mkdir -p "$SGWT/memory/builds/y" && printf -- '---\nslug: y\nauthorized-by: prompt\n---\n' > "$SGWT/memory/builds/y/README.md" && git -C "$SGWT" add memory/builds/y/README.md
-run_card "AC4 staged NEW memory/builds/y/README.md authorized-by: prompt -> allow, exemption line" 0 "one;;exempt;;memory/builds/y/README.md;;prompt" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
-printf -- '---\nslug: y\nauthorized-by: recipe\n---\n' > "$SGWT/memory/builds/y/README.md" && git -C "$SGWT" add memory/builds/y/README.md
+git -C "$SGWT" rm -q -f --cached builds/xFix/README.md && rm -rf "$SGWT/builds"
+mkdir -p "$SGWT/memory/builds/yFix" && printf -- '---\nslug: y\nauthorized-by: prompt\n---\n' > "$SGWT/memory/builds/yFix/README.md" && git -C "$SGWT" add memory/builds/yFix/README.md
+run_card "AC4 staged NEW memory/builds/yFix/README.md authorized-by: prompt -> allow, exemption line" 0 "one;;exempt;;memory/builds/yFix/README.md;;prompt" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
+printf -- '---\nslug: y\nauthorized-by: recipe\n---\n' > "$SGWT/memory/builds/yFix/README.md" && git -C "$SGWT" add memory/builds/yFix/README.md
 run_card "AC4 the same with authorized-by: recipe -> allow, exemption line" 0 "one;;exempt;;recipe" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
-printf -- '---\nslug: y\n---\n' > "$SGWT/memory/builds/y/README.md"   # the index still holds the recipe blob
+printf -- '---\nslug: y\n---\n' > "$SGWT/memory/builds/yFix/README.md"   # the index still holds the recipe blob
 run_card "AC4 staged blob carries the key, worktree copy does not -> allow (the BLOB is read)" 0 "one;;exempt" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
-git -C "$SGWT" add memory/builds/y/README.md && printf -- '---\nslug: y\nauthorized-by: prompt\n---\n' > "$SGWT/memory/builds/y/README.md"
+git -C "$SGWT" add memory/builds/yFix/README.md && printf -- '---\nslug: y\nauthorized-by: prompt\n---\n' > "$SGWT/memory/builds/yFix/README.md"
 run_card "AC4 staged blob lacks the key, worktree copy carries it -> deny" 2 "any;;sentinel" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
 # F10 (the aReplayedCard closing review): the key OUTSIDE the front matter — a column-0 line in the
 # body, the shape a fenced example or copied prose leaves — exempts nothing, because the unattended
 # driver reads the key between line 1's `---` and the next `---` and nowhere else.
-printf -- '---\nslug: y\n---\n\n```\nauthorized-by: prompt\n```\n' > "$SGWT/memory/builds/y/README.md" && git -C "$SGWT" add memory/builds/y/README.md
+printf -- '---\nslug: y\n---\n\n```\nauthorized-by: prompt\n```\n' > "$SGWT/memory/builds/yFix/README.md" && git -C "$SGWT" add memory/builds/yFix/README.md
 run_card "AC4 staged NEW README with authorized-by: prompt in the BODY only, front matter without it -> deny (F10)" 2 "any;;sentinel" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
-git -C "$SGWT" rm -q -f --cached memory/builds/y/README.md && rm -rf "$SGWT/memory"
+git -C "$SGWT" rm -q -f --cached memory/builds/yFix/README.md && rm -rf "$SGWT/memory"
 mkdir -p "$SGWT/docs" && printf -- '---\nauthorized-by: prompt\n---\n' > "$SGWT/docs/README.md" && git -C "$SGWT" add docs/README.md
 run_card "AC4 NEW docs/README.md carrying the key -> deny (outside the rule)" 2 "any;;sentinel" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
 git -C "$SGWT" rm -q -f --cached docs/README.md && rm -rf "$SGWT/docs"
-mkdir -p "$SGWT/rebuilds/z" && printf -- '---\nauthorized-by: prompt\n---\n' > "$SGWT/rebuilds/z/README.md" && git -C "$SGWT" add rebuilds/z/README.md
-run_card "AC4 NEW rebuilds/z/README.md carrying the key -> deny (the pathspec lists it, the rule rejects it)" 2 "any;;sentinel" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
-git -C "$SGWT" rm -q -f --cached rebuilds/z/README.md && rm -rf "$SGWT/rebuilds"
+mkdir -p "$SGWT/rebuilds/zFix" && printf -- '---\nauthorized-by: prompt\n---\n' > "$SGWT/rebuilds/zFix/README.md" && git -C "$SGWT" add rebuilds/zFix/README.md
+run_card "AC4 NEW rebuilds/zFix/README.md carrying the key -> deny (the pathspec lists it, the rule rejects it)" 2 "any;;sentinel" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
+git -C "$SGWT" rm -q -f --cached rebuilds/zFix/README.md && rm -rf "$SGWT/rebuilds"
 
 # ---- AC8: an UNTRACKED authorized README and the single-call add-and-commit from a subdirectory --
-mkdir -p "$SGWT/memory/builds/y" && printf -- '---\nslug: y\nauthorized-by: prompt\n---\n' > "$SGWT/memory/builds/y/README.md"
+mkdir -p "$SGWT/memory/builds/yFix" && printf -- '---\nslug: y\nauthorized-by: prompt\n---\n' > "$SGWT/memory/builds/yFix/README.md"
 SG_CWD_SUB=$(cd "$SGWT/memory" && node -p 'process.cwd()')
-run_card "AC8 untracked memory/builds/y/README.md, nothing staged, add-and-commit from a subdirectory -> allow, exemption line" 0 "one;;exempt;;memory/builds/y/README.md" 'git add memory && git commit -m z' session_id=sgtest-d1 "cwd=$SG_CWD_SUB"
+run_card "AC8 untracked memory/builds/yFix/README.md, nothing staged, add-and-commit from a subdirectory -> allow, exemption line" 0 "one;;exempt;;memory/builds/yFix/README.md" 'git add memory && git commit -m z' session_id=sgtest-d1 "cwd=$SG_CWD_SUB"
 
 # ---- AC5: the folder COMMITTED in HEAD exempts nothing — the exemption is the commit that CREATES it
 git -C "$SGWT" add memory && $SGGIT -C "$SGWT" commit -q -m "an authorized build folder, landed"
@@ -927,21 +927,21 @@ write_spec() {
   mkdir -p "$SGWT/$(dirname "$1")"
   printf '# %s — a fixture unit\n\n**Status:** %s · rev-1 · 2026-10-09 · node a · %s · base 0000000 · streams tooling · order 1\n' "$2" "$3" "$4" > "$SGWT/$1"
 }
-SG_SPECS=mem/builds/bx/spec
-write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-1.md" TOOL-x-1 INPROGRESS Tier-2
-write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-2.md" TOOL-x-2 SPECCED Tier-2
-write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-3.md" TOOL-x-3 SPECCED Tier-1
-write_spec "$SG_SPECS/2026-09-01-spec-TOOL-x-4.md" TOOL-x-4 SPECCED Tier-1
-write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-5.md" TOOL-x-9 INPROGRESS Tier-2
-write_spec "mem/builds/other/spec/2026-10-09-spec-TOOL-x-6.md" TOOL-x-6 INPROGRESS Tier-2
+SG_SPECS=mem/builds/bxFix/spec
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-xFix-1.md" TOOL-xFix-1 INPROGRESS Tier-2
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-xFix-2.md" TOOL-xFix-2 SPECCED Tier-2
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-xFix-3.md" TOOL-xFix-3 SPECCED Tier-1
+write_spec "$SG_SPECS/2026-09-01-spec-TOOL-xFix-4.md" TOOL-xFix-4 SPECCED Tier-1
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-xFix-5.md" TOOL-xFix-9 INPROGRESS Tier-2
+write_spec "mem/builds/other/spec/2026-10-09-spec-TOOL-xFix-6.md" TOOL-xFix-6 INPROGRESS Tier-2
 # write_route_card <sid> <writer-verb> <unit>=<spec path> ... — the writer's card with a real READY
 # line, then a `## route` of one build, the given units and a brief, in KICK-aRoutedQuill-1's shape.
 write_route_card() {
   local sid=$1 verb=$2; shift 2
   write_card "$sid" "$SG_TOP_WT" "$verb" "$SG_READY"
-  { printf '## route\n- build: bx\n'
+  { printf '## route\n- build: bxFix\n'
     for u in "$@"; do printf -- '- unit: %s · spec %s\n' "${u%%=*}" "${u#*=}"; done
-    printf -- '- brief: mem/builds/bx/prompts/b.md\n'; } >> "$SG_CARDS/$sid.md"
+    printf -- '- brief: mem/builds/bxFix/prompts/b.md\n'; } >> "$SG_CARDS/$sid.md"
 }
 # run_write <name> <want_exit> <stderr-expect> <tool> <target|-> [<field>=<value> ...] — <target> is
 # the payload's file_path (notebook_path for NotebookEdit), `-` for neither; fields join the payload
@@ -960,31 +960,31 @@ run_write() {
 SG_T="$SG_CWD_WT/$SGP/a.js"   # the product target, as node spells the worktree
 
 # ---- AC1: the admission table, per tier and status, and a route of two units ---------------------
-write_route_card sgtest-r1 write "TOOL-x-1=$SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
+write_route_card sgtest-r1 write "TOOL-xFix-1=$SG_SPECS/2026-10-09-spec-TOOL-xFix-1.md"
 run_write "W-AC1 Tier-2 at INPROGRESS -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
-write_route_card sgtest-r2 write "TOOL-x-3=$SG_SPECS/2026-10-09-spec-TOOL-x-3.md"
+write_route_card sgtest-r2 write "TOOL-xFix-3=$SG_SPECS/2026-10-09-spec-TOOL-xFix-3.md"
 run_write "W-AC1 Tier-1 at SPECCED dated on or after SPEC_TIER1_CUTOFF -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-r2 "cwd=$SG_CWD_WT"
-write_route_card sgtest-r3 write "TOOL-x-2=$SG_SPECS/2026-10-09-spec-TOOL-x-2.md"
-run_write "W-AC1 Tier-2 at SPECCED -> deny naming the unit, Tier-2 and INPROGRESS" 2 "any;;TOOL-x-2;;Tier-2;;INPROGRESS" Write "$SG_T" session_id=sgtest-r3 "cwd=$SG_CWD_WT"
-write_route_card sgtest-r4 write "TOOL-x-4=$SG_SPECS/2026-09-01-spec-TOOL-x-4.md"
-run_write "W-AC1 Tier-1 at SPECCED dated before SPEC_TIER1_CUTOFF -> deny naming the key" 2 "any;;TOOL-x-4;;SPEC_TIER1_CUTOFF" Write "$SG_T" session_id=sgtest-r4 "cwd=$SG_CWD_WT"
+write_route_card sgtest-r3 write "TOOL-xFix-2=$SG_SPECS/2026-10-09-spec-TOOL-xFix-2.md"
+run_write "W-AC1 Tier-2 at SPECCED -> deny naming the unit, Tier-2 and INPROGRESS" 2 "any;;TOOL-xFix-2;;Tier-2;;INPROGRESS" Write "$SG_T" session_id=sgtest-r3 "cwd=$SG_CWD_WT"
+write_route_card sgtest-r4 write "TOOL-xFix-4=$SG_SPECS/2026-09-01-spec-TOOL-xFix-4.md"
+run_write "W-AC1 Tier-1 at SPECCED dated before SPEC_TIER1_CUTOFF -> deny naming the key" 2 "any;;TOOL-xFix-4;;SPEC_TIER1_CUTOFF" Write "$SG_T" session_id=sgtest-r4 "cwd=$SG_CWD_WT"
 write_conf "$SGP/ app.md" mem ""
-run_write "W-AC1 Tier-1 at SPECCED with SPEC_TIER1_CUTOFF blank -> deny naming the key" 2 "any;;TOOL-x-3;;SPEC_TIER1_CUTOFF;;blank" Write "$SG_T" session_id=sgtest-r2 "cwd=$SG_CWD_WT"
+run_write "W-AC1 Tier-1 at SPECCED with SPEC_TIER1_CUTOFF blank -> deny naming the key" 2 "any;;TOOL-xFix-3;;SPEC_TIER1_CUTOFF;;blank" Write "$SG_T" session_id=sgtest-r2 "cwd=$SG_CWD_WT"
 write_conf "$SGP/ app.md"
-write_route_card sgtest-r5 write "TOOL-x-2=$SG_SPECS/2026-10-09-spec-TOOL-x-2.md" "TOOL-x-1=$SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
+write_route_card sgtest-r5 write "TOOL-xFix-2=$SG_SPECS/2026-10-09-spec-TOOL-xFix-2.md" "TOOL-xFix-1=$SG_SPECS/2026-10-09-spec-TOOL-xFix-1.md"
 run_write "W-AC1 a route of two units, the first unbuildable, the second buildable -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-r5 "cwd=$SG_CWD_WT"
 
 # ---- AC2: an absent card, an unrouted one, untrustworthy route lines, and a replay-written card ---
 run_write "W-AC2 no card for the session -> deny naming the card path, the session and --card --write" 2 "any;;$SG_CARD_FIX/sgtest-r0.md;;sgtest-r0;;--card --write --session sgtest-r0" Write "$SG_T" session_id=sgtest-r0 "cwd=$SG_CWD_WT"
 write_card sgtest-r6 "$SG_TOP_WT" write "$SG_READY"
 run_write "W-AC2 a card with no ## route -> deny naming ## route and /session-kickoff" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
-write_route_card sgtest-r7 write "TOOL-x-7=$SG_SPECS/2026-10-09-spec-TOOL-x-7.md"
-run_write "W-AC2 a route line naming a missing spec -> deny naming the unit and the reason" 2 "any;;TOOL-x-7;;does not exist" Write "$SG_T" session_id=sgtest-r7 "cwd=$SG_CWD_WT"
-write_route_card sgtest-r8 write "TOOL-x-6=mem/builds/other/spec/2026-10-09-spec-TOOL-x-6.md"
-run_write "W-AC2 a spec outside builds/<slug>/spec/ -> deny naming the unit and the reason" 2 "any;;TOOL-x-6;;outside" Write "$SG_T" session_id=sgtest-r8 "cwd=$SG_CWD_WT"
-write_route_card sgtest-r9 write "TOOL-x-5=$SG_SPECS/2026-10-09-spec-TOOL-x-5.md"
-run_write "W-AC2 a spec whose H1 names another unit -> deny naming the unit and the reason" 2 "any;;TOOL-x-5;;H1 naming TOOL-x-9" Write "$SG_T" session_id=sgtest-r9 "cwd=$SG_CWD_WT"
-write_route_card sgtest-ra replay "TOOL-x-1=$SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
+write_route_card sgtest-r7 write "TOOL-xFix-7=$SG_SPECS/2026-10-09-spec-TOOL-xFix-7.md"
+run_write "W-AC2 a route line naming a missing spec -> deny naming the unit and the reason" 2 "any;;TOOL-xFix-7;;does not exist" Write "$SG_T" session_id=sgtest-r7 "cwd=$SG_CWD_WT"
+write_route_card sgtest-r8 write "TOOL-xFix-6=mem/builds/other/spec/2026-10-09-spec-TOOL-xFix-6.md"
+run_write "W-AC2 a spec outside builds/<slug>/spec/ -> deny naming the unit and the reason" 2 "any;;TOOL-xFix-6;;outside" Write "$SG_T" session_id=sgtest-r8 "cwd=$SG_CWD_WT"
+write_route_card sgtest-r9 write "TOOL-xFix-5=$SG_SPECS/2026-10-09-spec-TOOL-xFix-5.md"
+run_write "W-AC2 a spec whose H1 names another unit -> deny naming the unit and the reason" 2 "any;;TOOL-xFix-5;;H1 naming TOOL-xFix-9" Write "$SG_T" session_id=sgtest-r9 "cwd=$SG_CWD_WT"
+write_route_card sgtest-ra replay "TOOL-xFix-1=$SG_SPECS/2026-10-09-spec-TOOL-xFix-1.md"
 run_write "W-AC2 a replay-written card routing a buildable unit -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-ra "cwd=$SG_CWD_WT"
 
 # ---- AC3: what is not the session's product is not gated; a linked worktree of it is -----------
@@ -1047,32 +1047,32 @@ run_write "W-AC7 agent_id with the parent's session_id, unrouted card -> deny" 2
 # ---- two-way MEMORY_ROOT test and the fail-closed catch -------------------------------------------
 # AC13 — the H1 read is R4's: the first UNFENCED `#` line, its token stripped of `*`, backticks and
 # trailing `:.,;`. Each spelling below was refused by the raw-token read.
-printf '# TOOL-x-11: title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-11.md"
-printf '# **TOOL-x-12** — title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-12.md"
-printf '```\n# TOOL-y-1\n```\n# TOOL-x-14 — title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-14.md"
+printf '# TOOL-xFix-11: title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-xFix-11.md"
+printf '# **TOOL-xFix-12** — title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-xFix-12.md"
+printf '```\n# TOOL-yFix-1\n```\n# TOOL-xFix-14 — title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-xFix-14.md"
 for sg_u in 11 12 14; do
-  write_route_card "sgtest-h$sg_u" write "TOOL-x-$sg_u=$SG_SPECS/2026-10-09-spec-TOOL-x-$sg_u.md"
-  run_write "W-RQ12 AC13 the H1 spelling of TOOL-x-$sg_u reads as the unit -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id="sgtest-h$sg_u" "cwd=$SG_CWD_WT"
+  write_route_card "sgtest-h$sg_u" write "TOOL-xFix-$sg_u=$SG_SPECS/2026-10-09-spec-TOOL-xFix-$sg_u.md"
+  run_write "W-RQ12 AC13 the H1 spelling of TOOL-xFix-$sg_u reads as the unit -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id="sgtest-h$sg_u" "cwd=$SG_CWD_WT"
 done
 # AC15 — a spec at any depth under the build's spec folder.
-write_spec "$SG_SPECS/units/2026-10-09-spec-TOOL-x-15.md" TOOL-x-15 INPROGRESS Tier-2
-write_route_card sgtest-h15 write "TOOL-x-15=$SG_SPECS/units/2026-10-09-spec-TOOL-x-15.md"
+write_spec "$SG_SPECS/units/2026-10-09-spec-TOOL-xFix-15.md" TOOL-xFix-15 INPROGRESS Tier-2
+write_route_card sgtest-h15 write "TOOL-xFix-15=$SG_SPECS/units/2026-10-09-spec-TOOL-xFix-15.md"
 run_write "W-RQ12 AC15 a spec one folder below the spec folder -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-h15 "cwd=$SG_CWD_WT"
 # AC17 — every buildable verdict this suite had not driven, one arm each.
-write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-13.md" TOOL-x-13 INPROGRESS Tier-1
-write_route_card sgtest-h13 write "TOOL-x-13=$SG_SPECS/2026-10-09-spec-TOOL-x-13.md"
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-xFix-13.md" TOOL-xFix-13 INPROGRESS Tier-1
+write_route_card sgtest-h13 write "TOOL-xFix-13=$SG_SPECS/2026-10-09-spec-TOOL-xFix-13.md"
 run_write "W-RQ12 AC17 Tier-1 at INPROGRESS -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-h13 "cwd=$SG_CWD_WT"
-printf '# TOOL-x-16 — no tier\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-16.md"
-write_route_card sgtest-h16 write "TOOL-x-16=$SG_SPECS/2026-10-09-spec-TOOL-x-16.md"
-run_write "W-RQ12 AC17 a spec with no Tier cell -> deny naming the missing tier" 2 "any;;TOOL-x-16;;names no Tier-1 or Tier-2" Write "$SG_T" session_id=sgtest-h16 "cwd=$SG_CWD_WT"
-write_route_card sgtest-h17 write "TOOL-x-1=/$SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
-run_write "W-RQ12 AC17 an absolute spec path -> deny naming it not repo-relative" 2 "any;;TOOL-x-1;;is not a repo-relative path" Write "$SG_T" session_id=sgtest-h17 "cwd=$SG_CWD_WT"
+printf '# TOOL-xFix-16 — no tier\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-xFix-16.md"
+write_route_card sgtest-h16 write "TOOL-xFix-16=$SG_SPECS/2026-10-09-spec-TOOL-xFix-16.md"
+run_write "W-RQ12 AC17 a spec with no Tier cell -> deny naming the missing tier" 2 "any;;TOOL-xFix-16;;names no Tier-1 or Tier-2" Write "$SG_T" session_id=sgtest-h16 "cwd=$SG_CWD_WT"
+write_route_card sgtest-h17 write "TOOL-xFix-1=/$SG_SPECS/2026-10-09-spec-TOOL-xFix-1.md"
+run_write "W-RQ12 AC17 an absolute spec path -> deny naming it not repo-relative" 2 "any;;TOOL-xFix-1;;is not a repo-relative path" Write "$SG_T" session_id=sgtest-h17 "cwd=$SG_CWD_WT"
 write_card sgtest-h18 "$SG_TOP_WT" write "$SG_READY"
-printf '## route\n- unit: TOOL-x-1 · spec %s/2026-10-09-spec-TOOL-x-1.md\n' "$SG_SPECS" >> "$SG_CARDS/sgtest-h18.md"
-run_write "W-RQ12 AC17 a route with no - build: line -> deny naming it" 2 "any;;TOOL-x-1;;names no - build: line" Write "$SG_T" session_id=sgtest-h18 "cwd=$SG_CWD_WT"
+printf '## route\n- unit: TOOL-xFix-1 · spec %s/2026-10-09-spec-TOOL-xFix-1.md\n' "$SG_SPECS" >> "$SG_CARDS/sgtest-h18.md"
+run_write "W-RQ12 AC17 a route with no - build: line -> deny naming it" 2 "any;;TOOL-xFix-1;;names no - build: line" Write "$SG_T" session_id=sgtest-h18 "cwd=$SG_CWD_WT"
 write_card sgtest-h19 "$SG_TOP_WT" write "$SG_READY"
-printf '## route\n- build: bx\n- unit: TOOL-x-1\n' >> "$SG_CARDS/sgtest-h19.md"
-run_write "W-RQ12 AC17 a unit line with no spec -> deny naming it" 2 "any;;TOOL-x-1;;the route line names no spec" Write "$SG_T" session_id=sgtest-h19 "cwd=$SG_CWD_WT"
+printf '## route\n- build: bxFix\n- unit: TOOL-xFix-1\n' >> "$SG_CARDS/sgtest-h19.md"
+run_write "W-RQ12 AC17 a unit line with no spec -> deny naming it" 2 "any;;TOOL-xFix-1;;the route line names no spec" Write "$SG_T" session_id=sgtest-h19 "cwd=$SG_CWD_WT"
 # AC8 — an entry UNDER MEMORY_ROOT covers it, as surely as one above it.
 write_conf "$SGP/ mem/builds/"
 run_write "W-RQ12 AC8 an entry under MEMORY_ROOT -> deny naming UNARMED and the entry" 2 "any;;UNARMED;;mem/builds/ covers MEMORY_ROOT" Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
@@ -1132,12 +1132,12 @@ write_roles() {
     absent) rm -f "$SG_ROLES" ;;
   esac
 }
-# A spec with a section line beside its status, routed by sgtest-o1; TOOL-x-2's spec is routed by no card here.
-SG_OSPEC="$SG_SPECS/2026-10-09-spec-TOOL-x-20.md"
-printf '# TOOL-x-20 — a role-arm fixture unit\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2 · base 0000000 · streams tooling · order 1\n\n## 2. Scope (IN)\n\n- **S1** — a line beside the status\n' > "$SGWT/$SG_OSPEC"
-write_route_card sgtest-o1 write "TOOL-x-20=$SG_OSPEC"
+# A spec with a section line beside its status, routed by sgtest-o1; TOOL-xFix-2's spec is routed by no card here.
+SG_OSPEC="$SG_SPECS/2026-10-09-spec-TOOL-xFix-20.md"
+printf '# TOOL-xFix-20 — a role-arm fixture unit\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2 · base 0000000 · streams tooling · order 1\n\n## 2. Scope (IN)\n\n- **S1** — a line beside the status\n' > "$SGWT/$SG_OSPEC"
+write_route_card sgtest-o1 write "TOOL-xFix-20=$SG_OSPEC"
 SG_OS="$SG_CWD_WT/$SG_OSPEC"
-SG_O2="$SG_CWD_WT/$SG_SPECS/2026-10-09-spec-TOOL-x-2.md"
+SG_O2="$SG_CWD_WT/$SG_SPECS/2026-10-09-spec-TOOL-xFix-2.md"
 # run_edit <name> <want_exit> <stderr-expect> <tool> <target> <edit> [<field>=<value> ...] — <edit> is
 # `old>>new` for an Edit, `old>>new;;old>>new` for a MultiEdit's edits, `@<file>` for a Write's
 # content and `-` for a Write of `x`; fields join the payload top level. Graded as run_write grades.
@@ -1162,7 +1162,7 @@ d={"tool_name":t,"tool_input":ti}; d.update(kv.split("=",1) for kv in sys.argv[4
 write_roles ok
 # ---- AC1: a spec write from the spec-writer only ------------------------------------------------
 run_edit "R-AC1 gov-spec-writer writes a spec -> allow, stderr EMPTY" 0 empty Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-spec-writer
-run_edit "R-AC1 the main loop writes a spec -> deny naming gov-spec-writer, the index and handoff.py render" 2 "any;;gov-spec-writer;;$SG_ROLES_SHOWN;;handoff.py render;;--build bx" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC1 the main loop writes a spec -> deny naming gov-spec-writer, the index and handoff.py render" 2 "any;;gov-spec-writer;;$SG_ROLES_SHOWN;;handoff.py render;;--build bxFix" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
 run_edit "R-AC1 workflow-subagent writes a spec -> deny naming gov-spec-writer, the index and handoff.py render" 2 "any;;gov-spec-writer;;$SG_ROLES_SHOWN;;handoff.py render" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=workflow-subagent
 run_edit "R-AC1 gov-builder writes a spec -> deny naming gov-spec-writer, the index and handoff.py render" 2 "any;;gov-spec-writer;;$SG_ROLES_SHOWN;;handoff.py render" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
 # ---- AC2: a product write needs the buildable route AND the builder ------------------------------
@@ -1190,7 +1190,7 @@ run_edit "R-AC4 no index: the main loop's product write over a buildable route -
 write_roles broken
 run_edit "R-AC4 an index holding { : the main loop writes a spec -> deny naming the index" 2 "any;;$SG_ROLES_SHOWN;;is not JSON" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
 run_edit "R-AC4 an index holding { : the main loop's product write -> deny naming the index" 2 "any;;$SG_ROLES_SHOWN;;is not JSON" Write "$SG_T" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
-run_edit "R-AC4 an index holding { : a Write to the build's README.md -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/mem/builds/bx/README.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC4 an index holding { : a Write to the build's README.md -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/mem/builds/bxFix/README.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
 write_roles nospec
 run_edit "R-AC4 an index naming no spec role: gov-spec-writer writes a spec -> deny naming UNARMED and the class" 2 "any;;UNARMED;;spec class;;$SG_ROLES_SHOWN" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-spec-writer
 run_edit "R-AC4 an index naming no spec role: gov-builder's product write -> allow, stderr EMPTY" 0 empty Write "$SG_T" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
@@ -1203,12 +1203,12 @@ write_roles absent
 # the hook at ae6735c1 the D-AC1, D-AC4 and D-AC6 rows read RED (it reads the card alone and exports
 # no RUN_STATE_FILE); the D-AC2 and D-AC3 rows are staged RED by a fallback that admits any unit a
 # dispatch row names.
-SG_RUNMD="$SGWT/mem/builds/bx/RUN.md"
-write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-30.md" TOOL-x-30 CLOSED Tier-2
-write_route_card sgtest-q1 write "TOOL-x-30=$SG_SPECS/2026-10-09-spec-TOOL-x-30.md"
+SG_RUNMD="$SGWT/mem/builds/bxFix/RUN.md"
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-xFix-30.md" TOOL-xFix-30 CLOSED Tier-2
+write_route_card sgtest-q1 write "TOOL-xFix-30=$SG_SPECS/2026-10-09-spec-TOOL-xFix-30.md"
 # write_run_state <unit>... — a run-state file holding one driver dispatch row per unit; none → no row.
 write_run_state() {
-  { printf '# RUN — bx\n\n## Run facts\nphase: BUILDING\n\n## Log\n'
+  { printf '# RUN — bxFix\n\n## Run facts\nphase: BUILDING\n\n## Log\n'
     for u in "$@"; do printf '2026-11-10T04:00:00Z dispatch · item 0123abcd %s · reason %s/a.js\n' "$u" "$SGP"; done; } > "$SG_RUNMD"
 }
 # check_no_runstate <name> — the last refusal carries no run-state file line.
@@ -1216,17 +1216,17 @@ check_no_runstate() {
   if grep -q 'run-state file' "$TMP/err"; then echo "FAIL $1"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
   else echo "ok   $1"; pass=$((pass+1)); fi
 }
-write_run_state TOOL-x-1
-run_write "D-AC1 a CLOSED card unit, a dispatch row for the INPROGRESS TOOL-x-1 -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+write_run_state TOOL-xFix-1
+run_write "D-AC1 a CLOSED card unit, a dispatch row for the INPROGRESS TOOL-xFix-1 -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
 rm -f "$SG_RUNMD"
-run_write "D-AC2 the same card, no run-state file -> deny naming the CLOSED unit" 2 "any;;TOOL-x-30;;Tier-2 at CLOSED" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+run_write "D-AC2 the same card, no run-state file -> deny naming the CLOSED unit" 2 "any;;TOOL-xFix-30;;Tier-2 at CLOSED" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
 check_no_runstate "D-AC2 no run-state file: the refusal carries no run-state file line"
 write_run_state
-run_write "D-AC2 the same card, a run-state file with no dispatch row -> deny naming the CLOSED unit" 2 "any;;TOOL-x-30;;Tier-2 at CLOSED" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+run_write "D-AC2 the same card, a run-state file with no dispatch row -> deny naming the CLOSED unit" 2 "any;;TOOL-xFix-30;;Tier-2 at CLOSED" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
 check_no_runstate "D-AC2 a row-less run-state file: the refusal carries no run-state file line"
-write_run_state TOOL-x-2 TOOL-x-6
-run_write "D-AC3 dispatch rows for a SPECCED Tier-2 unit and one whose spec is another build's -> deny naming the file and the count" 2 "any;;TOOL-x-30;;the run-state file;;2 unit(s)" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
-write_run_state TOOL-x-1
+write_run_state TOOL-xFix-2 TOOL-xFix-6
+run_write "D-AC3 dispatch rows for a SPECCED Tier-2 unit and one whose spec is another build's -> deny naming the file and the count" 2 "any;;TOOL-xFix-30;;the run-state file;;2 unit(s)" Write "$SG_T" session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+write_run_state TOOL-xFix-1
 write_roles ok
 run_edit "D-AC4 gov-builder under the dispatch fallback -> allow, stderr EMPTY" 0 empty Write "$SG_T" - session_id=sgtest-q1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
 run_edit "D-AC4 the main loop under the dispatch fallback -> deny naming gov-builder" 2 "any;;gov-builder;;$SG_ROLES_SHOWN" Write "$SG_T" - session_id=sgtest-q1 "cwd=$SG_CWD_WT"
@@ -1382,7 +1382,7 @@ run_edit "L-AC2 a role index, the main loop on a buildable route (the role arm's
 run_edit "L-AC2 gov-builder, an unrouted card, a red open -> allow, the witness line" 0 "one;;red-fix lane;;leg one" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
 run_edit "L-AC2 gov-spec-writer on a product path, a red open -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-spec-writer
 run_edit "L-AC2 the untyped harness agent, a red open -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=workflow-subagent
-run_edit "L-AC3 gov-builder writing a spec, a red open -> deny by the role arm: a spec write never reaches the lane" 2 "any;;a spec path;;gov-spec-writer" Write "$SG_CWD_WT/$SG_SPECS/2026-10-09-spec-TOOL-x-2.md" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+run_edit "L-AC3 gov-builder writing a spec, a red open -> deny by the role arm: a spec write never reaches the lane" 2 "any;;a spec path;;gov-spec-writer" Write "$SG_CWD_WT/$SG_SPECS/2026-10-09-spec-TOOL-xFix-2.md" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
 write_roles broken
 run_edit "L-AC2 a broken role index, the main loop, a red open -> deny with the ## route refusal" 2 "any;;## route" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT"
 write_roles absent
@@ -1471,7 +1471,7 @@ run_role_bash "G-AC1 gov-spec-writer runs the spec-token suite -> deny naming G3
 # ---- AC2: the NEAR-MISSES — a mention, a scoped variant or a render is not a gate run --------------
 run_role_bash "G-AC2 gotchas.py --for-diff -> allow, stderr EMPTY" 0 empty gov-builder Bash "python3 kit/$SG_K_MEMORY_TREE/gotchas.py --for-diff HEAD~1..HEAD"
 run_role_bash "G-AC2 lexicon.py --suggest -> allow, stderr EMPTY" 0 empty gov-builder Bash "python3 kit/$SG_K_LEXICON/lexicon.py --suggest checkRoleGate --as js.function"
-run_role_bash "G-AC2 gov-spec-writer runs the spec-token checker with --spec -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash "python kit/check-spec-tokens.py --spec memory/builds/x/spec/y.md"
+run_role_bash "G-AC2 gov-spec-writer runs the spec-token checker with --spec -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash "python kit/check-spec-tokens.py --spec memory/builds/xFix/spec/y.md"
 run_role_bash "G-AC2 a *.test.sh carrying --render -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$SG_K_WORKFLOWS/check-protocol-parity.test.sh --render"
 run_role_bash "G-AC2 bash -n on a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -n kit/$SG_K_HOOKS/agent-cap.test.sh"
 run_role_bash "G-AC2 git log naming a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "git log --oneline -- kit/$SG_K_HOOKS/agent-cap.test.sh"
@@ -1619,28 +1619,28 @@ SG_RP_SHOWN="$SGP/ app.md"   # the conf's ROUTED_PATHS value as write_conf wrote
 
 # ---- AC1: a routed card's lines byte-identical, each unit's verdict, and ROUTED_PATHS ------------
 run_sub "S-AC1 a route to a Tier-2 unit at INPROGRESS -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
-check_ctx "S-AC1 every ## route line of the card, byte-identical" lines '## route' '- build: bx' "- unit: TOOL-x-1 · spec $SG_SPECS/2026-10-09-spec-TOOL-x-1.md" '- brief: mem/builds/bx/prompts/b.md'
-check_ctx "S-AC1 the card path, the unit named buildable and the ROUTED_PATHS value" has "$SG_CARD_FIX/sgtest-r1.md" 'TOOL-x-1 is buildable' "$SG_RP_SHOWN"
+check_ctx "S-AC1 every ## route line of the card, byte-identical" lines '## route' '- build: bxFix' "- unit: TOOL-xFix-1 · spec $SG_SPECS/2026-10-09-spec-TOOL-xFix-1.md" '- brief: mem/builds/bxFix/prompts/b.md'
+check_ctx "S-AC1 the card path, the unit named buildable and the ROUTED_PATHS value" has "$SG_CARD_FIX/sgtest-r1.md" 'TOOL-xFix-1 is buildable' "$SG_RP_SHOWN"
 run_sub "S-AC1 a route to a Tier-2 unit at SPECCED -> the SubagentStart JSON" json session_id=sgtest-r3 "cwd=$SG_CWD_WT"
-check_ctx "S-AC1 the Tier-2 SPECCED unit is named not buildable, with INPROGRESS" has 'TOOL-x-2 is not buildable' 'INPROGRESS'
+check_ctx "S-AC1 the Tier-2 SPECCED unit is named not buildable, with INPROGRESS" has 'TOOL-xFix-2 is not buildable' 'INPROGRESS'
 # The verdict must agree with the gate on the SAME fixture: the write the gate admits is the unit the
 # context calls buildable, and the one it refuses is the one called not buildable.
 run_write "S-AC1 agreement: the gate admits a Write under sgtest-r1's route" 0 empty Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
-run_write "S-AC1 agreement: the gate refuses a Write under sgtest-r3's route" 2 "any;;TOOL-x-2;;INPROGRESS" Write "$SG_T" session_id=sgtest-r3 "cwd=$SG_CWD_WT"
+run_write "S-AC1 agreement: the gate refuses a Write under sgtest-r3's route" 2 "any;;TOOL-xFix-2;;INPROGRESS" Write "$SG_T" session_id=sgtest-r3 "cwd=$SG_CWD_WT"
 # TOOL-aSmoothedDispatch-6 AC5: the dispatched unit the gate admits is named buildable, through its row.
-write_run_state TOOL-x-1
-run_sub "D-AC5 a CLOSED card unit and a dispatch row for TOOL-x-1 -> the SubagentStart JSON" json session_id=sgtest-q1 "cwd=$SG_CWD_WT"
-check_ctx "D-AC5 the dispatched unit is named buildable through its dispatch row" has 'TOOL-x-1 is buildable' 'dispatch row'
+write_run_state TOOL-xFix-1
+run_sub "D-AC5 a CLOSED card unit and a dispatch row for TOOL-xFix-1 -> the SubagentStart JSON" json session_id=sgtest-q1 "cwd=$SG_CWD_WT"
+check_ctx "D-AC5 the dispatched unit is named buildable through its dispatch row" has 'TOOL-xFix-1 is buildable' 'dispatch row'
 rm -f "$SG_RUNMD"
 run_sub "D-AC5 the same card, no run-state file -> the SubagentStart JSON" json session_id=sgtest-q1 "cwd=$SG_CWD_WT"
-if grep -Fq 'TOOL-x-1 is buildable' "$TMP/ctx" || grep -Fq 'dispatch row' "$TMP/ctx"; then
-  echo "FAIL D-AC5 no run-state file: the context still names TOOL-x-1 buildable or a dispatch row"; sed 's/^/     /' "$TMP/ctx" | head -8; fail=$((fail+1))
-else echo "ok   D-AC5 no run-state file: the context names neither TOOL-x-1 buildable nor a dispatch row"; pass=$((pass+1)); fi
+if grep -Fq 'TOOL-xFix-1 is buildable' "$TMP/ctx" || grep -Fq 'dispatch row' "$TMP/ctx"; then
+  echo "FAIL D-AC5 no run-state file: the context still names TOOL-xFix-1 buildable or a dispatch row"; sed 's/^/     /' "$TMP/ctx" | head -8; fail=$((fail+1))
+else echo "ok   D-AC5 no run-state file: the context names neither TOOL-xFix-1 buildable nor a dispatch row"; pass=$((pass+1)); fi
 # TOOL-aSmoothedDispatch-8 AC6: a buildable card unit admits at step 9a, so the context reads no dispatch
-# row, even one naming the buildable Tier-1 TOOL-x-13.
-write_run_state TOOL-x-13
-run_sub "SD8 AC6 a buildable card unit and a dispatch row for TOOL-x-13 -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
-check_ctx "SD8 AC6 the card unit is named buildable" has 'TOOL-x-1 is buildable'
+# row, even one naming the buildable Tier-1 TOOL-xFix-13.
+write_run_state TOOL-xFix-13
+run_sub "SD8 AC6 a buildable card unit and a dispatch row for TOOL-xFix-13 -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+check_ctx "SD8 AC6 the card unit is named buildable" has 'TOOL-xFix-1 is buildable'
 if grep -Fq 'dispatch row' "$TMP/ctx"; then
   echo "FAIL SD8 AC6 a buildable card unit: the context still names a dispatch row"; sed 's/^/     /' "$TMP/ctx" | head -8; fail=$((fail+1))
 else echo "ok   SD8 AC6 a buildable card unit: the context names no dispatch row"; pass=$((pass+1)); fi
@@ -1686,10 +1686,10 @@ SG_CAP=$(node -p "require(process.argv[1]).ROUTE_CONTEXT_CAP" "$HOOK")
 # A hook exporting no numeric cap is a failure here, and the arms below still run on the harness's.
 case "$SG_CAP" in ''|*[!0-9]*) echo "FAIL S-AC5 the hook exports no numeric ROUTE_CONTEXT_CAP ('$SG_CAP')"; fail=$((fail+1)); SG_CAP=10000 ;; esac
 write_card sgtest-s5 "$SG_TOP_WT" write "$SG_READY"
-{ printf '## route\n- build: bx\n'
-  sg_len=0; sg_unit="- unit: TOOL-x-1 · spec $SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
+{ printf '## route\n- build: bxFix\n'
+  sg_len=0; sg_unit="- unit: TOOL-xFix-1 · spec $SG_SPECS/2026-10-09-spec-TOOL-xFix-1.md"
   while [ "$sg_len" -le $(( SG_CAP * 13 / 10 )) ]; do printf '%s\n' "$sg_unit"; sg_len=$(( sg_len + ${#sg_unit} + 1 )); done
-  printf -- '- brief: mem/builds/bx/prompts/b.md\n'; } >> "$SG_CARDS/sgtest-s5.md"
+  printf -- '- brief: mem/builds/bxFix/prompts/b.md\n'; } >> "$SG_CARDS/sgtest-s5.md"
 sed -n '/^## route$/,$p' "$SG_CARDS/sgtest-s5.md" > "$TMP/route-s5"
 run_sub "S-AC5 a route padded past the cap -> the SubagentStart JSON" json session_id=sgtest-s5 "cwd=$SG_CWD_WT"
 sg_chars=$(node -p "require('fs').readFileSync(process.argv[1],'utf8').length" "$TMP/ctx")
@@ -1723,7 +1723,7 @@ SG_CF_OPEN='[.claude/orientation-card.md · Level 1 · a fixture direction]'
 run_sub "S-AC8 setup: the bare context with no card file" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
 cp "$TMP/ctx" "$TMP/ctx-bare"
 mkdir -p "$SG_TOP_WT/.claude"
-printf '%s\n## route\n- build: bx\n[/.claude/orientation-card.md]\n' "$SG_CF_OPEN" > "$SG_CF"
+printf '%s\n## route\n- build: bxFix\n[/.claude/orientation-card.md]\n' "$SG_CF_OPEN" > "$SG_CF"
 run_sub "S-AC8 a card file in the session tree -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
 { printf '%s\n' "$SG_CF_OPEN"; cat "$TMP/ctx-bare"; printf '\n[/.claude/orientation-card.md]'; } > "$TMP/ctx-want"
 if cmp -s "$TMP/ctx-want" "$TMP/ctx"; then echo "ok   S-AC8 the file's first and last lines wrap the bare context, byte for byte"; pass=$((pass+1))

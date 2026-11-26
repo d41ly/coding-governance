@@ -421,14 +421,14 @@ U="$TMP/nodef"
 mkdir -p "$U/memory/backlog"
 write_hooks "$U"
 printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE="builds"\n' > "$U/.memory-tree.conf"
-printf '# TOOL backlog\n\n- TOOL-x-1 - a row\n' > "$U/memory/backlog/TOOL.md"
+printf '# TOOL backlog\n\n- TOOL-xFix-1 - a row\n' > "$U/memory/backlog/TOOL.md"
 git init -q -b trunk "$U"
 git -C "$U" config user.email arms@example.invalid; git -C "$U" config user.name arms
 git -C "$U" config core.autocrlf false; git -C "$U" config commit.gpgsign false
 git -C "$U" config core.hooksPath "$U/hk"
 git -C "$U" add -A >/dev/null 2>&1; git -C "$U" commit -q --no-verify -m base
 UW=$(git -C "$U" worktree add -q -b side "$U-wt" >/dev/null 2>&1; printf '%s' "$U-wt")
-printf -- '- TOOL-x-2 - another row\n' >> "$UW/memory/backlog/TOOL.md"
+printf -- '- TOOL-xFix-2 - another row\n' >> "$UW/memory/backlog/TOOL.md"
 git -C "$UW" add memory/backlog/TOOL.md
 out=$(run_in "$UW" git commit -m "a commit with no default branch anywhere"); rc=$?
 [ "$rc" = 0 ] || print_failure "AC11: an unresolvable default branch REFUSED a commit (rc=$rc): $out"; add_arm
@@ -440,7 +440,7 @@ S="$TMP/shards"
 mkdir -p "$S/memory/backlog"
 write_hooks "$S"
 printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE="shards"\n' > "$S/.memory-tree.conf"
-printf '# TOOL backlog\n\n- TOOL-x-1 - a row\n' > "$S/memory/backlog/TOOL.md"
+printf '# TOOL backlog\n\n- TOOL-xFix-1 - a row\n' > "$S/memory/backlog/TOOL.md"
 git init -q -b main "$S"
 git -C "$S" config user.email arms@example.invalid; git -C "$S" config user.name arms
 git -C "$S" config core.autocrlf false; git -C "$S" config commit.gpgsign false
@@ -448,14 +448,14 @@ git -C "$S" config core.hooksPath "$S/hk"
 git -C "$S" add -A >/dev/null 2>&1; git -C "$S" commit -q --no-verify -m base
 git init -q --bare -b main "$S.git"; git -C "$S" remote add origin "$S.git"
 add_origin_head "$S"
-printf -- '- TOOL-x-2 - another row\n' >> "$S/memory/backlog/TOOL.md"
+printf -- '- TOOL-xFix-2 - another row\n' >> "$S/memory/backlog/TOOL.md"
 git -C "$S" add memory/backlog/TOOL.md
 out=$(run_in "$S" git commit -m "a shard edit on a shards-mode default"); rc=$?
 [ "$rc" = 0 ] || print_failure "AC7: a shards-mode default refused a shard edit (rc=$rc): $out"; add_arm
 printf '%s' "$out" | grep -q 'straggler-guard\|pre-commit: note\|pre-commit: REFUSING' \
   && print_failure "AC7: the dormant path printed a line in a repository that has not flipped: $out"; add_arm
 git -C "$S" checkout -q -b featshards
-printf -- '- TOOL-x-3 - a third row\n' >> "$S/memory/backlog/TOOL.md"
+printf -- '- TOOL-xFix-3 - a third row\n' >> "$S/memory/backlog/TOOL.md"
 git -C "$S" commit -q --no-verify -am "a feature commit"
 out=$(run_in "$S" git push origin featshards); rc=$?
 [ "$rc" = 0 ] || print_failure "AC7: a shards-mode default refused a feature push (rc=$rc): $out"; add_arm
@@ -470,7 +470,7 @@ mkdir -p "$N/hk" "$N/memory/backlog" "$N/memory/builds/aFlip"
 cp "$HOOKDIR/pre-push" "$N/hk/pre-push"; chmod +x "$N/hk/pre-push"
 printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE="builds"\n' > "$N/.memory-tree.conf"
 printf '# aFlip\n' > "$N/memory/builds/aFlip/BACKLOG.md"
-printf '# TOOL backlog\n\n- TOOL-x-1 - a row\n' > "$N/memory/backlog/TOOL.md"
+printf '# TOOL backlog\n\n- TOOL-xFix-1 - a row\n' > "$N/memory/backlog/TOOL.md"
 git init -q -b main "$N"
 git -C "$N" config user.email arms@example.invalid; git -C "$N" config user.name arms
 git -C "$N" config core.autocrlf false; git -C "$N" config commit.gpgsign false
@@ -480,7 +480,7 @@ git init -q --bare -b main "$N.git"; git -C "$N" remote add origin "$N.git"
 add_origin_head "$N"
 [ -f "$N/hk/straggler-guard.sh" ] && print_failure "AC7: the library-absent fixture carries the library, so its arm proves nothing"; add_arm
 git -C "$N" checkout -q -b featn
-printf -- '- TOOL-x-9 - a feature row\n' >> "$N/memory/backlog/TOOL.md"
+printf -- '- TOOL-xFix-9 - a feature row\n' >> "$N/memory/backlog/TOOL.md"
 git -C "$N" commit -q --no-verify -am "a feature commit"
 out=$(run_in "$N" git push origin featn); rc=$?
 [ "$rc" = 0 ] || print_failure "AC7: with no straggler-guard.sh beside it the shipped pre-push refused a feature push — every push-main adopter (rc=$rc): $out"; add_arm
@@ -578,7 +578,7 @@ E="$TMP/spell"
 mkdir -p "$E/memory/backlog"
 write_hooks "$E"
 printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE="shards"\n' > "$E/.memory-tree.conf"
-printf '# TOOL backlog\n\n- TOOL-x-1 - a row\n' > "$E/memory/backlog/TOOL.md"
+printf '# TOOL backlog\n\n- TOOL-xFix-1 - a row\n' > "$E/memory/backlog/TOOL.md"
 git init -q -b main "$E"
 git -C "$E" config user.email arms@example.invalid; git -C "$E" config user.name arms
 git -C "$E" config core.autocrlf false; git -C "$E" config commit.gpgsign false
@@ -588,7 +588,7 @@ git -C "$E" branch -q spellstrag
 printf 'MEMORY_ROOT=memory   # the root\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE=builds   # flipped by the switch-over\n' > "$E/.memory-tree.conf"
 git -C "$E" commit -q --no-verify -am "the flip, spelled with trailing comments"
 EW=$(add_topology_worktree "$E" spellstrag)
-printf -- '- TOOL-x-2 - a late row\n' >> "$EW/memory/backlog/TOOL.md"
+printf -- '- TOOL-xFix-2 - a late row\n' >> "$EW/memory/backlog/TOOL.md"
 git -C "$EW" add memory/backlog/TOOL.md
 out=$(run_in "$EW" git commit -m "a shard edit under a commented flip"); rc=$?
 [ "$rc" != 0 ] || print_failure "F6: a default branch flipped as 'BACKLOG_MODE=builds   # …' left the straggler layer dormant — the shard edit was COMMITTED"; add_arm
@@ -597,7 +597,7 @@ printf 'MEMORY_ROOT=memory\nexport FAMILIES="tooling:TOOL"\nexport BACKLOG_MODE=
 git -C "$E" commit -q --no-verify -am "the flip, respelled with export"
 # A FRESH EDIT, staged whatever the arm above did: had the commented flip been committed, a bare retry
 # would exit 1 on "nothing to commit" and read as a refusal. Measured, with the old reader staged.
-printf -- '- TOOL-x-3 - another late row\n' >> "$EW/memory/backlog/TOOL.md"
+printf -- '- TOOL-xFix-3 - another late row\n' >> "$EW/memory/backlog/TOOL.md"
 git -C "$EW" add memory/backlog/TOOL.md
 out=$(run_in "$EW" git commit -m "a shard edit under an exported flip"); rc=$?
 [ "$rc" != 0 ] || print_failure "F6: a default branch flipped as 'export BACKLOG_MODE=builds' left the straggler layer dormant — the shard edit was COMMITTED"; add_arm

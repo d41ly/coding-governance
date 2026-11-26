@@ -197,6 +197,8 @@ Coverage of dMindYourWords's 17 clause(s) and 6 owned node(s), over 48 spec(s) a
 | 20 | `TOOL-dMindYourWords-31`, `TOOL-dMindYourWords-36` | no |
 | 21 | `TOOL-dMindYourWords-37`, `TOOL-dMindYourWords-43`, `TOOL-dMindYourWords-44`, `TOOL-dMindYourWords-45`, `TOOL-dMindYourWords-46`, `TOOL-dMindYourWords-47`, `TOOL-dMindYourWords-48`, `TOOL-dMindYourWords-49`, `TOOL-dMindYourWords-50` | no |
 | 22 | `TOOL-dMindYourWords-52` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
@@ -204,3 +206,18 @@ Coverage of dMindYourWords's 17 clause(s) and 6 owned node(s), over 48 spec(s) a
 - **Parent builds:** [dFurnishedOrders](../dFurnishedOrders/README.md), [dLinkedLibrary](../dLinkedLibrary/README.md), [dWellOiledMachine](../dWellOiledMachine/README.md), [dWitnessedBar](../dWitnessedBar/README.md)
 - **Child builds:** [dConvergedCharter](../dConvergedCharter/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-03-prompt-TOOL-dMindYourWords-11-2-spec-writer.md`, `2026-11-03-prompt-TOOL-dMindYourWords-11-1-spec-reviewer.md` and 19 more under prompts/ |
+| reviews | `2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md` (CLEAN WITH FIXES) and 1 more under reviews/ |
+| deviation | `2026-11-03-build-TOOL-dMindYourWords-11-deviation-114.md`, `2026-10-29-build-TOOL-dMindYourWords-9-deviation-92.md` and 59 more under build/ |
+| research | `2026-11-03-build-TOOL-dMindYourWords-1-reground-returns.md`, `2026-11-03-build-TOOL-dMindYourWords-1-parents-crosscheck.md` and 6 more under build/ |
+| logs | `2026-10-30-build-TOOL-dMindYourWords-1-departures-spec.md`, `2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dMindYourWords/card` |
+<!-- /gen:build-routes -->

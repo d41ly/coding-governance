@@ -149,3 +149,13 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| logs | `2026-08-29-build-TOOL-aGradedDoorway-7-1-s3-cost-split.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aGradedDoorway/card` |
+<!-- /gen:build-routes -->

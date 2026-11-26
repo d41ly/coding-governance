@@ -311,3 +311,14 @@ Ids whose spec moved past its audited revision: TOOL-aPacedTurnstile-14@rev-2.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-20-review-TOOL-aPacedTurnstile-2.md`, `2026-08-20-review-TOOL-aPacedTurnstile-2-round2.md` and 6 more under reviews/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aPacedTurnstile/card` |
+<!-- /gen:build-routes -->

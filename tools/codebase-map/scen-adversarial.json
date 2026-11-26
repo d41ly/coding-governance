@@ -185,17 +185,17 @@
   },
   {
    "query": "query the full-text index and get ranked passages back",
-   "expected_file": "{prefix}/memory-recall/query.py",
+   "expected_file": "{prefix}/memory-tree/record_find.py",
    "expected_symbol": "search",
    "why_it_is_a_real_seam": "The kit's ONE FTS5 read path: opens the db read-only by URI, orders by bm25 with B.ALIAS_WEIGHT as the third column weight, and returns the dict shape rrf() fuses. A second query that omits the weight or the snippet columns silently changes ranking and breaks fusion.",
    "name_class": "common-word-stdlib-shadow",
    "id": "ADV-05",
    "adversarial_role": "harm-if-demoted",
-   "expected_line": 647,
+   "expected_line": 125,
    "also_acceptable": [],
    "same_name_definers": 1,
    "same_name_definer_files": [
-    "{prefix}/memory-recall/query.py"
+    "{prefix}/memory-tree/record_find.py"
    ],
    "shipped_fan_in": 23,
    "seam_by_shipped_threshold": true,
@@ -223,7 +223,7 @@
      "_numv": 3
     }
    },
-   "established_by": "read <prefix>/memory-recall/query.py:647-674; both rrf call sites at query.py:1177,1181 consume its output",
+   "established_by": "read <prefix>/memory-tree/record_find.py:125-155, where TOOL-dTotalRecall-9 moved it from memory-recall's query.py; both search call sites at record_find.py:267-268 feed rrf",
    "shipped_rank": null,
    "shipped_points_at_file": null,
    "shipped_file_correct": false,
@@ -231,20 +231,20 @@
   },
   {
    "query": "combine two ranked result lists into one ordering",
-   "expected_file": "{prefix}/memory-recall/query.py",
+   "expected_file": "{prefix}/memory-tree/record_find.py",
    "expected_symbol": "rrf",
    "why_it_is_a_real_seam": "Reciprocal-rank fusion at bench.RRF_K, the instrument's own constant, keyed on (path, line) rather than rowid because two FTS sets' rowids are unrelated integers. A second fusion would grade differently from the benchmark that sets the recall floor.",
    "name_class": "short-abbrev",
    "id": "ADV-06",
    "adversarial_role": "harm-low-fanin",
-   "expected_line": 675,
+   "expected_line": 156,
    "also_acceptable": [
     "{prefix}/memory-recall/bench.py::rrf"
    ],
    "same_name_definers": 2,
    "same_name_definer_files": [
     "{prefix}/memory-recall/bench.py",
-    "{prefix}/memory-recall/query.py"
+    "{prefix}/memory-tree/record_find.py"
    ],
    "shipped_fan_in": 1,
    "seam_by_shipped_threshold": false,
@@ -265,7 +265,7 @@
     "kwarg_label_files": 0,
     "attribute_receivers": {}
    },
-   "established_by": "read <prefix>/memory-recall/query.py:675-690 and the sibling copy at <prefix>/memory-recall/bench.py:284",
+   "established_by": "read <prefix>/memory-tree/record_find.py:156-175, where TOOL-dTotalRecall-9 moved it from memory-recall's query.py, and the sibling copy at <prefix>/memory-recall/bench.py:284",
    "shipped_rank": null,
    "shipped_points_at_file": null,
    "shipped_file_correct": false,

@@ -69,7 +69,7 @@ the same checklist path, and it breaks the same way.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-09-12 · streams tooling+deployer
+**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-09-12 · streams deployer+tooling
 ids DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9
 ids TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 TOOL-dPolishedVitrine-13 TOOL-dPolishedVitrine-14 TOOL-dPolishedVitrine-15 TOOL-dPolishedVitrine-16
 
@@ -98,3 +98,15 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-09-13-prompt-TOOL-dPolishedVitrine-14-0-owner-ruling.md`, `2026-09-12-prompt-TOOL-dPolishedVitrine-1-0-owner-ruling.md` |
+| reviews | `2026-09-13-review-TOOL-dPolishedVitrine-1-diff-review-round3.md`, `2026-09-13-review-TOOL-dPolishedVitrine-1-diff-review-round2.md` and 1 more under reviews/ |
+| logs | `2026-09-13-build-TOOL-dPolishedVitrine-14-1-journal.md`, `2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md` |
+| open asks | `BACKLOG.md`, 11 open |
+| card ref | `refs/gov/builds/dPolishedVitrine/card` |
+<!-- /gen:build-routes -->

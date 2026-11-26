@@ -34,7 +34,14 @@ CLI, its printer and its corpus listing as the instance's adapter. A spec ref th
 candidate ref cites no `[tag]` of its row. `scouted-seam` is aScoutedSeam's
 grader (`check_hit`, `check_case` and the `grade`, `compare` and `judged` readings), ported from the
 grader blob a03896116e3c5cbf853affda241c22d8408cb945 at b0fe68f30; a result row without a `seams` list,
-or a judged cell without `primary` and `covered`, is a refusal naming the arm and the case.
+or a judged cell without `primary` and `covered`, is a refusal naming the arm and the case. `map-replay`
+(TOOL-dTotalRecall-17) scores a project map's losing test, runs of past audits with the map and without, as
+`--experiment` alone: its known sets are each audit's `### <item>.` headings' findings, read by
+`extract_item_findings` against the confirmed appendix rows, and its transcripts are read through the runlog
+kit, found by the inline `resolve_kit_dir` under a `requires_if` row and imported at use; where none resolves
+it refuses `unarmed`. `derive_map_verdict` reads the three terms, recall, searches and bytes, the recall rise
+against `measure_rise_noise`'s two standard errors plus RECALL_MARGIN; one run count per audit and arm is declared
+and held (TOOL-dTotalRecall-123).
 
 THE EXPERIMENT SHAPE. `check_experiment` reads one committed JSON manifest (`--experiment <src>`) and
 runs every rule of aScoutedSeam's method before the first figure line, a broken one exiting 2 by name:
@@ -70,6 +77,7 @@ import contextlib
 import hashlib
 import io
 import json
+import math
 import os
 import pathlib
 import re
@@ -80,8 +88,8 @@ import tempfile
 
 # ---- the review-replay instance's constants, moved from review_replay.py with its core.
 APPENDIX_HEADING = "## Appendix — every finding"
-SERVES_PREFIX = "**Serves:** diff-review"
-SPEC_SERVES_PREFIX = "**Serves:** spec-audit"
+SERVES_PREFIX = "**Serves:** diff-review"  # census: kept cause-writer reader-prefix: the diff-review binding prefix it reads
+SPEC_SERVES_PREFIX = "**Serves:** spec-audit"  # census: kept cause-writer reader-prefix: the spec-audit binding prefix it reads
 SECTION_REF = re.compile(r"(?:§|\bsection\s+)\s*(\d+)", re.IGNORECASE)
 ITEM_SECTION = re.compile(r"\b(S|AC|F)(\d+)\b")
 #: The spec format's section for each item kind: scope §2, acceptance §6, open questions §8.
@@ -114,14 +122,17 @@ CODE_TOKEN = re.compile(r"-{0,2}[A-Za-z_][\w-]*")
 
 HEX40 = re.compile(r"[0-9a-fA-F]{40}")
 KIT_DIR = pathlib.Path(__file__).resolve().parent
-#: The two instances the factory exists for; `check_instances` reds when the table lacks one.
-INSTANCE_KEYS = ("review-replay", "scouted-seam")
+#: The instances the factory exists for; `check_instances` reds when the table lacks one. `map-replay` joined
+#: with TOOL-dTotalRecall-17 S1.
+INSTANCE_KEYS = ("review-replay", "scouted-seam", "map-replay")
 #: The arm count `run_selftest` must reach, as review_replay.py declares its own. Raised 18 -> 21 by
 #: TOOL-dFairHearing-27 S19: its three arms, tag-item, experiment-freeze-spelling and pairing-walk. Raised 21 -> 24
 #: by TOOL-dFairHearing-32 S9: replay-subject, experiment-references and held-out-pathspec. Raised 24 -> 25 by
 #: TOOL-dFairHearing-37 S5: held-out-tracked. Raised 25 -> 26 by TOOL-dFairHearing-46 S5: stated-shape. Raised 26 -> 29
-#: by TOOL-dFairHearing-48 S3, S5: appendix-pipe, appendix-break and proof-pinned.
-ARMS_DECLARED = 29
+#: by TOOL-dFairHearing-48 S3, S5: appendix-pipe, appendix-break and proof-pinned. Raised 29 -> 32 by
+#: TOOL-dTotalRecall-17 section 7: map-known, map-verdict and map-transcript. Raised 32 -> 33 by TOOL-dTotalRecall-122
+#: S4: map-experiment. Raised 33 -> 34 by TOOL-dTotalRecall-123 S3: map-noise.
+ARMS_DECLARED = 34
 
 
 class Refusal(Exception):
@@ -1066,6 +1077,21 @@ def read_replay_cases(candidates, arms):
     return runs
 
 
+def read_run_reports(instance, runs, arms, repo="."):
+    """`{<arm>: [(entry, report text), ...]}`, each run-case's subject, pinned in its own report, checked by
+    `instance`'s `case_evidence` hook before any run is scored (TOOL-dFairHearing-32 S11): its `Reviewed:`
+    pins as `<path>@<blob>`, else a diff review's `<base>..<head>` range."""
+    reports = {a["name"]: [(c, read_raw_output(c["report"], repo)) for c in runs[a["name"]]] for a in arms}
+    run_cases = []
+    for pairs in reports.values():
+        for c, text in pairs:
+            rng = extract_range(text)
+            run_cases.append({"id": c["case"], "subject": [f"{p}@{b}" for p, b in extract_subject_pins(text)]
+                              or ([f"{rng[0]}..{rng[1]}"] if rng else [])})
+    check_case_evidence(instance, run_cases)
+    return reports
+
+
 def measure_replay_experiment(manifest, arms, repo="."):
     """The review-replay experiment's lines (TOOL-dFairHearing-23 S4). A case is one review run of one subject
     record; `dispatched` counts an arm's dispatched runs, and `parsed` the runs whose report holds an appendix
@@ -1083,15 +1109,7 @@ def measure_replay_experiment(manifest, arms, repo="."):
         if err:
             raise Refusal(f"known {manifest['known']}: {err}")
         check_case_evidence("review-replay", [{**it, "record": manifest["known"]} for it in known["items"] if it["path"]])
-    # TOOL-dFairHearing-32 S11: each run-case's subject, pinned in its own report, before any run is scored.
-    reports = {a["name"]: [(c, read_raw_output(c["report"], repo)) for c in runs[a["name"]]] for a in arms}
-    run_cases = []
-    for pairs in reports.values():
-        for c, text in pairs:
-            rng = extract_range(text)
-            run_cases.append({"id": c["case"], "subject": [f"{p}@{b}" for p, b in extract_subject_pins(text)]
-                              or ([f"{rng[0]}..{rng[1]}"] if rng else [])})
-    check_case_evidence("review-replay", run_cases)
+    reports = read_run_reports("review-replay", runs, arms, repo)
     head = check_one_variable(arms)
     parsed, figures = {}, []
     for a in arms:
@@ -1114,6 +1132,397 @@ def measure_replay_experiment(manifest, arms, repo="."):
     head += measure_parsed(arms, parsed)
     head.append(check_judge_rotation(None))
     return head + figures
+
+
+# ---- the map-replay instance (TOOL-dTotalRecall-17): a project map's losing test, its runs scored with the map and without.
+
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+#: An audit's item heading, `### <item>. <title> (finding|findings|id|ids <n>[, <n>]...)`, its LAST parenthesis read.
+ITEM_HEADING = re.compile(r"^###[ \t]+([A-Za-z]{0,3}\d+)\.[ \t].*\((?:findings?|ids?)[ \t]+(\d+(?:[ \t]*,[ \t]*\d+)*)\)[ \t]*$", re.MULTILINE)
+#: An existence search: one of these tool calls, or a shell segment running one of these programs or `git` one of these.
+SEARCH_TOOLS = frozenset({"Grep", "Glob"})
+SEARCH_PROGRAMS = frozenset({"grep", "rg", "find", "ls"})
+GIT_SEARCHES = frozenset({"grep", "ls-files"})
+#: TOOL-dTotalRecall-121 S10: what a lens may run before its first act and still be reading. A shell call is a
+#: read when every segment's program is one of these and nothing in it redirects to a file.
+READ_PROGRAMS = SEARCH_PROGRAMS | {"cat", "head", "tail", "sed", "wc", "cd", "echo"}
+GIT_READS = GIT_SEARCHES | {"diff", "show", "log", "blame", "status", "cat-file", "rev-parse"}
+NON_ACTING_TOOLS = frozenset({"ToolSearch"})
+#: TOOL-dTotalRecall-122 S10: what makes an admitted program write, beside `sed`'s in-place option.
+GIT_WRITE_OPTION = re.compile(r"--output(?:=.*)?", re.S)     # never `-o`: `git grep -o` and `git ls-files -o` read
+FIND_WRITE_OPTIONS = frozenset({"-delete", "-fprint", "-fprint0", "-fprintf", "-fls", "-exec", "-execdir", "-ok", "-okdir"})
+SAFE_REDIRECT = re.compile(r"[0-9]*>&[0-9-]|[0-9&*]*>>?[ \t]*(?:/dev/null|\$null)(?![\w./-])")   # `2>&1` and the null device
+QUOTED_SPAN = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"|\\.", re.S)   # what a shell takes whole, so its `>` is text
+#: TOOL-dTotalRecall-125 S1: the git options a read may carry before its subcommand. Any other, and any env
+#: assignment ahead of a read program, makes the segment the act: deny by default.
+GIT_GLOBAL_READS = frozenset({"-C", "--no-pager"})
+#: The options that make an admitted program run another, each `(name, the shortest spelling its parser takes)`:
+#: `git grep` reads any unambiguous prefix of a long option, and `rg`, `diff`, `log` and `show` read none.
+RUN_OPTIONS = {("rg", ""): (("--pre", "--pre"), ("--hostname-bin", "--hostname-bin")),
+               ("git", "grep"): (("--open-files-in-pager", "--op"), ("--textconv", "--textc")),
+               **{("git", sub): (("--ext-diff", "--ext-diff"), ("--textconv", "--textconv")) for sub in ("diff", "log", "show")}}
+GIT_GREP_PAGER = re.compile(r"-[^-efmABC]*O.*", re.S)   # `-O`, alone or behind short options that take no argument
+#: The map's losing terms (the project map's `[test]`): the recall rise must reach `measure_rise_noise` plus
+#: RECALL_MARGIN, the median search fall SEARCH_FLOOR, and the median bytes rise stay within the map's own bytes.
+RECALL_MARGIN = 5
+#: TOOL-dTotalRecall-123 S1: how many standard errors of the recall rise `measure_rise_noise` answers.
+NOISE_FACTOR = 2
+SEARCH_FLOOR = 1
+
+
+def extract_item_findings(text):
+    """`{item: [finding id, ...]}` from every `### <item>. ... (finding|findings|id|ids <n>[, <n>]...)` heading, in file order."""
+    found = {}
+    for m in ITEM_HEADING.finditer(text.replace("\r\n", "\n")):
+        found.setdefault(m.group(1), []).extend(n.strip() for n in m.group(2).split(","))
+    return found
+
+
+def read_map_known(known, repo="."):
+    """`(lines, sets)`: each audit's `known <case>: <items> item(s) over <findings> finding(s)` line, and per case
+    `{mode, record, items: {item: [finding id]}, findings: [confirmed appendix row]}`.
+
+    The known set is DERIVED, never typed: the manifest names item ids, each item's findings are the ids its
+    heading names, and each finding is the record's confirmed appendix row, read by `parse_record_findings` in
+    the record's own mode. Refused: `known` not a non-empty list of `{case, record, items}`; a case named twice;
+    an empty or repeated item list; a record `parse_record_findings` refuses; a heading naming a finding id no
+    confirmed appendix row holds; and an item no heading names.
+    """
+    if not isinstance(known, list) or not known:
+        raise Refusal("known: not a non-empty list of {case, record, items}, one per audit")
+    lines, sets = [], {}
+    for i, k in enumerate(known):
+        if not isinstance(k, dict) or set(k) != {"case", "record", "items"}:
+            raise Refusal(f"known[{i}]: not an object of exactly case, record and items")
+        case, items = k["case"], k["items"]
+        if not isinstance(case, str) or not case or case in sets:
+            raise Refusal(f"known[{i}]: case {case!r} is empty, not a string, or named twice")
+        if (not isinstance(items, list) or not items or not all(isinstance(x, str) and x for x in items)
+                or len(set(items)) != len(items)):
+            raise Refusal(f"known {case}: `items` is not a non-empty list of distinct item ids, so its known set is empty or typed twice")
+        if not isinstance(k["record"], str):
+            raise Refusal(f"known {case}: `record` is not a source")
+        text = read_raw_output(k["record"], repo)
+        mode = read_record_kind(text) or "diff-review"
+        parsed, err = parse_record_findings(text, mode)
+        if err:
+            raise Refusal(f"known {case} {k['record']}: {err}")
+        rows = {r["id"]: r for r in parsed["items"]}
+        headings = extract_item_findings(text)
+        for item, ids in headings.items():
+            stray = [n for n in ids if n not in rows]
+            if stray:
+                raise Refusal(f"known {case}: heading {item} names finding id(s) {', '.join(stray)}, which no confirmed "
+                              f"appendix row of {k['record']} holds")
+        unheaded = [x for x in items if x not in headings]
+        if unheaded:
+            raise Refusal(f"known {case}: item(s) {', '.join(unheaded)} have no `### <item>.` heading naming findings in {k['record']}")
+        wanted = {x: headings[x] for x in items}
+        findings = list(dict.fromkeys(n for ids in wanted.values() for n in ids))
+        sets[case] = {"mode": mode, "record": k["record"], "items": wanted, "findings": [rows[n] for n in findings]}
+        lines.append(f"known {case}: {len(wanted)} item(s) over {len(findings)} finding(s)")
+    return lines, sets
+
+
+def resolve_runlog_extract():
+    """The runlog kit's `extract` module, found through the inline `resolve_kit_dir` and imported at use, as the
+    loop kit's placement reaches runlog. Refused `unarmed` where no runlog kit resolves, so an unread
+    transcript is never read as a zero."""
+    try:
+        runlog = resolve_kit_dir("runlog", "extract.py", pathlib.Path(__file__).absolute().parent)
+    except LookupError as exc:
+        raise Refusal(f"unarmed: {exc}") from None
+    if str(runlog) not in sys.path:
+        sys.path.insert(0, str(runlog))
+    import extract  # noqa: E402  the runlog kit's, on the path just added
+    return extract
+
+
+def read_transcript_calls(path):
+    """One lens transcript as `(kind, id, name, value)` events in file order: `use` per tool call, its value the
+    call's input, and `result` per tool result, its value the result's UTF-8 bytes. Read by runlog's
+    `read_records` over a one-file `SessionTree`, `main` the transcript; a torn line, an unreadable file or a
+    transcript holding no record is refused naming the path, never read as a zero."""
+    ex = resolve_runlog_extract()
+    path = pathlib.Path(path)
+    coverage = {}
+    records = [rec for _src, _file, _line, rec in ex.read_records(ex.SessionTree(sid=path.stem, main=path), coverage)]
+    # TOOL-dTotalRecall-43 S53: runlog's one tool-result byte counter, shared with the memory measure
+    events = [(kind, tid, name, value if kind == "result" or isinstance(value, dict) else {})
+              for kind, tid, name, value in ex.read_result_bytes(records)]
+    records = len(records)
+    if coverage.get("unreadable") or coverage.get("torn"):
+        raise Refusal(f"transcript {path.as_posix()}: {coverage.get('unreadable', 0)} unreadable file(s) and "
+                      f"{coverage.get('torn', 0)} torn line(s) in its coverage")
+    if not records:
+        raise Refusal(f"transcript {path.as_posix()}: no record, so the lens left nothing to count")
+    return events
+
+
+def derive_segment_program(ex, words):
+    """`(program, subcommand, lead)` of one shell segment, past env assignments and wrappers: the program's
+    lower-cased base name, and for `git` its first word that is no option; an empty string for each the segment
+    lacks. `lead` is the env assignments passed and, for `git`, each option word ahead of the subcommand, without
+    the argument GIT_OPTS_WITH_ARG gives an option (TOOL-dTotalRecall-125 S1)."""
+    k, lead = 0, []
+    while k < len(words) and (ex.ENV_ASSIGN_RE.fullmatch(words[k]) or words[k] in ex.WRAPPERS or words[k] == "timeout"
+                              or (k and words[k - 1] == "timeout" and words[k][:1].isdigit())):
+        if ex.ENV_ASSIGN_RE.fullmatch(words[k]):
+            lead.append(words[k])
+        k += 1
+    if k >= len(words):
+        return "", "", lead
+    program = words[k].replace("\\", "/").rsplit("/", 1)[-1].lower().removesuffix(".exe")
+    if program not in ex.GIT_NAMES:
+        return program, "", lead
+    j = k + 1
+    while j < len(words) and words[j].startswith("-"):
+        lead.append(words[j])
+        j += 2 if words[j] in ex.GIT_OPTS_WITH_ARG else 1
+    return program, words[j] if j < len(words) else "", lead
+
+
+def measure_call_searches(ex, name, tool_input):
+    """The existence searches one tool call makes: 1 for a `Grep` or `Glob`; for a shell call, each segment
+    `extract_segments` reads whose program, past env assignments and wrappers, is a search program or `git`
+    running a search subcommand; else 0."""
+    if name in SEARCH_TOOLS:
+        return 1
+    command = tool_input.get("command") if name in ex.SHELL_TOOLS else None
+    if not isinstance(command, str):
+        return 0
+    count = 0
+    for words, _sep in ex.extract_segments(command):
+        program, sub, _lead = derive_segment_program(ex, words)
+        count += program in SEARCH_PROGRAMS or sub in GIT_SEARCHES
+    return count
+
+
+def check_git_option(word, options):
+    """True where `word` spells one of `options` as its parser reads it, from the shortest spelling up to the whole
+    name, with an optional `=value`."""
+    head = word.split("=", 1)[0]
+    return any(len(head) >= len(least) and name.startswith(head) for name, least in options)
+
+
+def check_read_call(ex, name, tool_input):
+    """True for a call a lens makes before its first act (TOOL-dTotalRecall-121 S10): a runlog `read` tool, a
+    search tool, a NON_ACTING_TOOLS member, or a shell call that redirects to no file but the null device, runs
+    a READ_PROGRAMS program or a GIT_READS subcommand in every segment, and hands `sed` no in-place option, a git
+    read no GIT_WRITE_OPTION and `find` no FIND_WRITE_OPTIONS member (TOOL-dTotalRecall-122 S10), with no env
+    assignment ahead of its program, no git option but GIT_GLOBAL_READS ahead of a git subcommand, and no
+    RUN_OPTIONS member or `git grep` GIT_GREP_PAGER cluster handed to the program (TOOL-dTotalRecall-125 S1). Any
+    other call is the act. The redirect is read off the command, its heredoc bodies, SAFE_REDIRECT and quoted
+    spans out, so one glued behind its word is seen and a quoted `>` is not. Not read: a `>` in an unquoted
+    comment or an unquoted comparison, read as a redirect; a quoted null device, read as a file; a quote a
+    comment leaves open, and PowerShell's own quoting, whose spans may pair wrongly; `sed`'s `w` and `e`
+    commands; `rg --search-zip`, whose decompressors are fixed programs that read; a run option written after
+    `--`, which is read as a path and refused all the same; and a call nested in `bash -c`. GIT_GLOBAL_READS is
+    the whole of what may precede a git subcommand."""
+    if name in NON_ACTING_TOOLS or name in SEARCH_TOOLS or ex.TOOL_CLASSES.get(name) == "read":
+        return True
+    command = tool_input.get("command") if name in ex.SHELL_TOOLS else None
+    if not isinstance(command, str):
+        return False
+    bare = SAFE_REDIRECT.sub(" ", ex._remove_heredocs(command))
+    if ">" in QUOTED_SPAN.sub("q", bare):                      # a redirect to a file, wherever it stands in its word
+        return False
+    segments = [words for words, _sep in ex.extract_segments(bare) if words]
+    for words in segments:
+        program, sub, lead = derive_segment_program(ex, words)
+        if program not in READ_PROGRAMS and sub not in GIT_READS:
+            return False
+        if any(not w.startswith("-") or w not in GIT_GLOBAL_READS for w in lead):
+            return False
+        if any(check_git_option(w, RUN_OPTIONS.get((program, sub), ())) for w in words):
+            return False
+        if (program, sub) == ("git", "grep") and any(GIT_GREP_PAGER.fullmatch(w) for w in words):
+            return False
+        if program == "sed" and any(re.match(r"-[A-Za-z]*i|--in-place", w) for w in words):
+            return False
+        if sub in GIT_READS and any(GIT_WRITE_OPTION.fullmatch(w) for w in words):
+            return False
+        if program == "find" and FIND_WRITE_OPTIONS.intersection(words):
+            return False
+    return bool(segments)
+
+
+def measure_existence_searches(path):
+    """The existence searches one lens transcript makes, summed over its tool calls by `measure_call_searches`."""
+    ex = resolve_runlog_extract()
+    return sum(measure_call_searches(ex, name, value) for kind, _id, name, value in read_transcript_calls(path) if kind == "use")
+
+
+def measure_bytes_before_act(path):
+    """The tool-result bytes one lens transcript received before its first ACT, the first tool call
+    `check_read_call` answers False for (TOOL-dTotalRecall-121 S10). With no act, every result counts. Bytes
+    handed in the prompt are never counted, and what `check_read_call` does not read is said there."""
+    ex = resolve_runlog_extract()
+    total = 0
+    for kind, _id, name, value in read_transcript_calls(path):
+        if kind == "result":
+            total += value
+        elif not check_read_call(ex, name, value):
+            break
+    return total
+
+
+def measure_rise_noise(runs):
+    """NOISE_FACTOR standard errors of the recall rise, `runs` one list of known items found per arm and audit."""
+    return NOISE_FACTOR * math.sqrt(sum(statistics.variance(counts) / len(counts) for counts in runs))
+
+
+def derive_map_verdict(figures):
+    """`("win", [])`, or `("lose", [term, ...])` naming each losing term in `recall`, `searches`, `bytes` order,
+    or `("unarmed", ["bytes"])` in place of a win no run measured (TOOL-dTotalRecall-121 S10).
+
+    `figures` holds `recall` (the with-map arm's known items found less the without arm's), `noise`
+    (`measure_rise_noise` over every arm and audit), `searches` (the without arm's median existence searches less the with arm's), `bytes` (the with
+    arm's median bytes before the first act less the without arm's), `map` (the map's own bytes) and `armed`
+    (False where every run of both arms read zero bytes before its first act). A term loses strictly past its boundary: recall below noise plus RECALL_MARGIN, searches below SEARCH_FLOOR, bytes
+    above the map's."""
+    lost = [term for term, held in (("recall", figures["recall"] < figures["noise"] + RECALL_MARGIN),
+                                    ("searches", figures["searches"] < SEARCH_FLOOR),
+                                    ("bytes", figures["bytes"] > figures["map"])) if held]
+    if lost:
+        return "lose", lost
+    return ("win", []) if figures["armed"] else ("unarmed", ["bytes"])
+
+
+def measure_map_experiment(manifest, arms, repo="."):
+    """The map-replay experiment's lines (TOOL-dTotalRecall-17): the factory's head, each audit's `known` line,
+    each run's recall, each term's figures, then `verdict win`, `verdict lose <terms>` or `verdict unarmed bytes`,
+    the bytes line `term bytes: unarmed` where every lens run of both arms read zero before its first act.
+
+    Two arms, one declaring `settings.map` true and one false. Each `candidates` entry is one harness run of
+    one audit's `case`, its `transcripts` `{<lens>: <path>}` naming every scored lens; the scored candidates
+    are its report's confirmed rows from those lenses, matched by `measure_recall` at window 0 on a spec
+    audit and 10 on a diff review, and a diff review's every reporting lens is scored, so one with no
+    transcript is refused. A known item is found when any finding its heading names is matched. Refused, never
+    a zero: a report `parse_candidates` cannot read, a transcript unread, two arms with different `dispatched`
+    counts, a count the audits do not divide into two runs or more, an audit and arm whose parsed runs are not
+    exactly that count, an empty map, and no runlog kit (`unarmed`).
+    """
+    known_lines, sets = read_map_known(manifest["known"], repo)
+    check_case_evidence("map-replay", [{**row, "record": s["record"]} for s in sets.values() for row in s["findings"] if row["path"]])
+    candidates = manifest["candidates"]
+    if not isinstance(candidates, list):
+        raise Refusal(f"candidates {candidates!r}: not a list of {{case, arm, report, matched, transcripts}}, one per harness run")
+    plain, scored = [], []
+    for i, c in enumerate(candidates):
+        lenses = c.get("transcripts") if isinstance(c, dict) else None
+        if not isinstance(lenses, dict) or not lenses or not all(isinstance(k, str) and k and isinstance(v, str) and v
+                                                                  for k, v in lenses.items()):
+            raise Refusal(f"candidates[{i}]: `transcripts` is not a non-empty {{<lens>: <path>}}, one per scored lens")
+        plain.append({k: v for k, v in c.items() if k != "transcripts"})
+        scored.append(lenses)
+    runs = read_replay_cases(plain, arms)
+    for entry, lenses in zip(plain, scored):
+        if entry["case"] not in sets:
+            raise Refusal(f"candidates case {entry['case']}: no `known` audit names that case")
+        entry["transcripts"] = lenses
+    flags = {a["name"]: a["settings"].get("map") for a in arms}
+    if len(arms) != 2 or not any(v is True for v in flags.values()) or not any(v is False for v in flags.values()):
+        raise Refusal(f"arms: {json.dumps(flags)} — the map experiment takes two arms, `settings.map` false in one and true in the other")
+    with_map = next(n for n, v in flags.items() if v is True)
+    without = next(n for n, v in flags.items() if v is False)
+    map_bytes = len(read_raw_output(manifest["map"], repo).encode("utf-8")) if isinstance(manifest["map"], str) else 0
+    if not map_bytes:
+        raise Refusal(f"map {manifest['map']!r}: not a source of a non-empty map, so it has no bytes to allow")
+    reports = read_run_reports("map-replay", runs, arms, repo)
+    head = check_one_variable(arms)
+    parsed, recalls, found = {}, [], {}
+    searches, before = {with_map: [], without: []}, {with_map: [], without: []}
+    for a in arms:
+        name = a["name"]
+        parsed[name] = []
+        for c, text in reports[name]:
+            audit = sets[c["case"]]
+            cands, err = parse_candidates(text, audit["mode"])
+            if err:
+                raise Refusal(f"candidates case {c['case']} arm {name}: {err}")
+            parsed[name].append(c)
+            if audit["mode"] == "diff-review":
+                bare = sorted({x["lens"] or "-" for x in cands} - set(c["transcripts"]))
+                if bare:
+                    raise Refusal(f"candidates case {c['case']} arm {name}: scored lens(es) {', '.join(bare)} have no transcript")
+            mine = [x for x in cands if x["lens"] in c["transcripts"]]
+            score = measure_recall(audit["findings"], mine, 0 if audit["mode"] == "spec-audit" else 10)
+            hit = {item["id"] for item, _ in score["matched"]}
+            n = sum(1 for ids in audit["items"].values() if hit.intersection(ids))
+            found.setdefault((name, c["case"]), []).append(n)
+            recalls.append(f"recall {name} {c['case']}: {n} of {len(audit['items'])} known item(s) · "
+                           f"{len(mine)} scored candidate(s) from {', '.join(sorted(c['transcripts']))}")
+            for lens in sorted(c["transcripts"]):
+                transcript = pathlib.Path(repo, c["transcripts"][lens])
+                searches[name].append(measure_existence_searches(transcript))
+                before[name].append(measure_bytes_before_act(transcript))
+    head += measure_parsed(arms, parsed)
+    sent = {a["dispatched"] for a in arms}
+    want, rest = divmod(min(sent), len(sets))
+    if len(sent) > 1 or rest or want < 2:
+        raise Refusal(f"arms: dispatched {', '.join(map(str, sorted(sent)))} over {len(sets)} audit(s): both arms take one "
+                      "count, the audits times one run count of at least two")
+    for case in sets:
+        for name in (without, with_map):
+            n = len(found.get((name, case), []))
+            if n != want:
+                raise Refusal(f"arm {name} case {case}: {n} parsed run(s), not the {want} the manifest declares")
+    head.append(check_judge_rotation(None))
+    mean = {name: sum(statistics.mean(found[(name, case)]) for case in sets) for name in (without, with_map)}
+    figures = {"recall": mean[with_map] - mean[without],
+               "noise": measure_rise_noise(found.values()),
+               "searches": statistics.median(searches[without]) - statistics.median(searches[with_map]),
+               "bytes": statistics.median(before[with_map]) - statistics.median(before[without]), "map": map_bytes,
+               "armed": any(n for reads in before.values() for n in reads)}
+    verdict, lost = derive_map_verdict(figures)
+    terms = [f"term recall: known items found {with_map} {mean[with_map]:g} · {without} {mean[without]:g} · rise {figures['recall']:g} · "
+             f"noise {figures['noise']:g} at {want} run(s) per arm · loses below {figures['noise'] + RECALL_MARGIN:g}",
+             f"term searches: median existence searches {with_map} {statistics.median(searches[with_map]):g} over {len(searches[with_map])} lens run(s) · "
+             f"{without} {statistics.median(searches[without]):g} over {len(searches[without])} · fall {figures['searches']:g} · loses below {SEARCH_FLOOR}",
+             f"term bytes: median bytes before the first act {with_map} {statistics.median(before[with_map]):g} · "
+             f"{without} {statistics.median(before[without]):g} · rise {figures['bytes']:g} · map {map_bytes} byte(s) · loses above {map_bytes}"
+             if figures["armed"] else "term bytes: unarmed · every lens run read 0 before its first act"]
+    return head + known_lines + recalls + terms + [f"verdict {verdict}" + (f" {', '.join(lost)}" if lost else "")]
 
 
 def check_experiment(manifest, repo="."):
@@ -1177,6 +1586,10 @@ INSTANCES = {
                                  "judged": measure_scouted_judged},
                      "case_evidence": derive_scouted_evidence, "experiment": measure_scouted_experiment,
                      "manifest": ({"instance", "cases", "results", "arms"}, {"heldOut", "judge", "union"})},
+    "map-replay": {"readers": (read_raw_output, read_map_known, parse_record_findings, parse_candidates, read_transcript_calls),
+                   "measure": derive_map_verdict,
+                   "case_evidence": derive_replay_evidence, "experiment": measure_map_experiment,
+                   "manifest": ({"instance", "known", "candidates", "arms", "map"}, set())},
 }
 
 
@@ -1184,7 +1597,7 @@ def check_instances():
     """None when the table holds every instance the factory exists for, each with its `case_evidence` hook, else a refusal naming the gap."""
     missing = [k for k in INSTANCE_KEYS if k not in INSTANCES]
     if missing:
-        return f"INSTANCES lacks {', '.join(missing)}: the factory needs both of {', '.join(INSTANCE_KEYS)}"
+        return f"INSTANCES lacks {', '.join(missing)}: the factory needs every one of {', '.join(INSTANCE_KEYS)}"
     hookless = [k for k, v in INSTANCES.items() if not callable(v.get("case_evidence"))]
     return f"INSTANCES entry {', '.join(hookless)} declares no `case_evidence` hook, so its cases' evidence is unread" if hookless else None
 
@@ -1583,7 +1996,7 @@ def run_selftest():
     def check_known_set_arm():
         """TOOL-dFairHearing-1 AC1, AC2: a known set whole, one row cut, one tag repeated, and a pair crossing sections."""
         rows = ["| a | x.md:[supervise] | high | no |", "| b | x.md:[act] | medium | no |", "| c | x.md:[spawn] | ungraded | yes |"]
-        head = "**Serves:** research X-1\n\n**Population:** {n} · reviewed 2 · escaped 1 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
+        head = "**Serves:** research X-1\n\n**Population:** {n} · reviewed 2 · escaped 1 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"  # census: kept cause-writer fixture: a record head its fixture plants
         whole = head.format(n=3) + "\n".join(rows) + "\n"
         known = parse_known_set(whole)
         if [(r["tag"], r["line"], r["escaped"]) for r in known["rows"]] != [("a", "[supervise]", False), ("b", "[act]", False), ("c", "[spawn]", True)]:
@@ -1604,8 +2017,8 @@ def run_selftest():
     def check_replay_manifest_arm():
         """TOOL-dFairHearing-23 AC2: four review runs, each with a report and a matched list, parse 4 of 4; one
         report's appendix cut parses 3 of 4; an unknown key still refuses by name."""
-        head = "**Serves:** research X-1\n\n**Population:** 2 · reviewed 2 · escaped 0 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
-        report = (f"**Serves:** spec-audit X-1\n\nReviewed: x.md@{'a' * 40}\n\nReview shape: raw 1, confirmed 1, refuted 0.\n\n" + APPENDIX_HEADING +
+        head = "**Serves:** research X-1\n\n**Population:** 2 · reviewed 2 · escaped 0 · high 1\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"  # census: kept cause-writer fixture: a record head its fixture plants
+        report = (f"**Serves:** spec-audit X-1\n\nReviewed: x.md@{'a' * 40}\n\nReview shape: raw 1, confirmed 1, refuted 0.\n\n" + APPENDIX_HEADING +  # census: kept cause-writer fixture: a record head its fixture plants
                   "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n| 1 | l | x.md:[act] lifetime | confirmed |\n")
         with tempfile.TemporaryDirectory() as tmp:
             pathlib.Path(tmp, "known.md").write_text(head + "| a | x.md:[supervise] | high | no |\n| b | x.md:[act] | medium | no |\n", encoding="utf-8")
@@ -1630,14 +2043,14 @@ def run_selftest():
         """TOOL-dFairHearing-32 AC6: a run-case's subject is its report's `Reviewed:` pin or its range. A report
         whose subject blob is blanked refuses naming its case and `case_evidence`, and a known row with no
         source record refuses naming the row."""
-        head = "**Serves:** research X-1\n\n**Population:** 1 · reviewed 1 · escaped 0 · high 0\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"
+        head = "**Serves:** research X-1\n\n**Population:** 1 · reviewed 1 · escaped 0 · high 0\n\n| tag | address | grade | escaped |\n|---|---|---|---|\n"  # census: kept cause-writer fixture: a record head its fixture plants
         rows = APPENDIX_HEADING + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n| 1 | l | x.md:[act] lifetime | confirmed |\n"
         with tempfile.TemporaryDirectory() as tmp:
             known = pathlib.Path(tmp, "known.md")
             known.write_text(head + "| a | x.md:[act] | medium | no |\n", encoding="utf-8")
             for name, pin in (("spec", f"Reviewed: x.md@{'a' * 40}"), ("diff", f"Range: {'b' * 40}...{'c' * 40} (round 1)"),
                               ("bare", "Reviewed: x.md@")):
-                pathlib.Path(tmp, f"{name}.md").write_text(f"**Serves:** spec-audit X-1\n\n{pin}\n\n"
+                pathlib.Path(tmp, f"{name}.md").write_text(f"**Serves:** spec-audit X-1\n\n{pin}\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                                                            f"Review shape: raw 1, confirmed 1, refuted 0.\n\n{rows}", encoding="utf-8")
 
             def derive_run_entry(n):
@@ -1710,7 +2123,7 @@ def run_selftest():
         """A key of three escaped plants and two run records pinning its SHA-256: the key path and the two record paths."""
         key = pathlib.Path(tmp, "key.md")
         reviewed = 1 if plant_c_escaped == "no" else 0
-        key.write_bytes((f"**Serves:** research X-1\n\n**Population:** 3 · reviewed {reviewed} · escaped {3 - reviewed} · high 0\n\n"
+        key.write_bytes((f"**Serves:** research X-1\n\n**Population:** 3 · reviewed {reviewed} · escaped {3 - reviewed} · high 0\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                          "| tag | address | grade | escaped |\n|---|---|---|---|\n| a | d.md:[plan] | high | yes |\n"
                          f"| b | d.md:[act] | medium | yes |\n| c | d.md:[spawn] | ungraded | {plant_c_escaped} |\n").encode("utf-8"))
         sha = hashlib.sha256(key.read_bytes()).hexdigest()
@@ -1719,7 +2132,7 @@ def run_selftest():
             refs = ["d.md:[plan] input", "d.md:[act] lifetime"] + (["d.md:[spawn] relaunch"] if r == 2 and run2_hits_c else [])
             rows = "".join(f"| {i} | walk-{i} | {ref} | high | confirmed |\n" for i, ref in enumerate(refs, 1))
             path = pathlib.Path(tmp, f"run{r}.md")
-            path.write_text(f"**Serves:** spec-audit PLAY-dX-1\n\n## Verdict: CLEAN WITH FIXES\n\nReview shape: confirmed {len(refs)}.\n\n"
+            path.write_text(f"**Serves:** spec-audit PLAY-dXFix-1\n\n## Verdict: CLEAN WITH FIXES\n\nReview shape: confirmed {len(refs)}.\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
                             f"## Walk table — run {r} of 2, sliced by {('scenario', 'step')[r - 1]}\n"
                             f"walk-seed mode=reverted-escapes key-sha256={sha}\n\n| Item | Scenario | Actor | Needs | Witness | Route | Verdict |\n"
                             f"|---|---|---|---|---|---|---|\n| `plan` | S1 | = | = | = | = | holds |\n\n{APPENDIX_HEADING}\n\n"
@@ -1819,6 +2232,210 @@ def run_selftest():
             return (check_refused(lambda: derive_proof_path(root, "HEAD", "-x-cases.json"), "2 record(s)", "not one")
                     or check_refused(lambda: derive_proof_path(root, "0" * 40, "-x-cases.json"), "git ls-tree"))
 
+    def check_map_known_arm():
+        """TOOL-dTotalRecall-17 AC1: an audit's known set is its headings' findings. A known item no heading names
+        refuses naming it, and so does a heading naming a finding id no confirmed row holds; with both gone the
+        `known` line counts the headings' items and the findings `parse_record_findings` reads."""
+        rows = (APPENDIX_HEADING + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n"
+                + "".join(f"| {i} | l | a.py:{i} | confirmed |\n" for i in (1, 2, 3)))
+        audit = (f"**Serves:** diff-review X-1\n\nRange: {'a' * 40}..{'b' * 40}\n\n### H1. one (finding 1)\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
+                 "### M1. two (h) (findings 2, 3)\n\n{extra}Review shape: raw 3, confirmed 3, refuted 0.\n\n" + rows)
+        if extract_item_findings(audit.format(extra="")) != {"H1": ["1"], "M1": ["2", "3"]}:
+            return f"the headings read {extract_item_findings(audit.format(extra=''))!r}"
+        with tempfile.TemporaryDirectory() as tmp:
+            record = pathlib.Path(tmp, "audit.md")
+            record.write_text(audit.format(extra=""), encoding="utf-8")
+            manifest = {"instance": "map-replay", "known": [{"case": "r1", "record": str(record), "items": ["H1", "M1", "M9"]}],
+                        "candidates": [], "map": str(record),
+                        "arms": [{"name": "without", "settings": {"map": False}, "dispatched": 0},
+                                 {"name": "with", "base": "without", "settings": {"map": True}, "dispatched": 0}]}
+            why = check_refused(lambda: check_experiment(manifest), "M9", "no `### <item>.` heading")
+            if why:
+                return why
+            manifest["known"][0]["items"] = ["H1", "M1"]
+            record.write_text(audit.format(extra="### L1. three (finding 7)\n\n"), encoding="utf-8")
+            why = check_refused(lambda: check_experiment(manifest), "heading L1", "7")
+            if why:
+                return why
+            record.write_text(audit.format(extra=""), encoding="utf-8")
+            lines, _ = read_map_known(manifest["known"])
+        return None if lines == ["known r1: 2 item(s) over 3 finding(s)"] else f"the known set read {lines!r}"
+
+    def check_map_verdict_arm():
+        """TOOL-dTotalRecall-17 AC2: each planted set fails one term and loses on it alone; the set on every
+        boundary wins, and reads unarmed where no run measured the bytes (TOOL-dTotalRecall-121 AC10). Each
+        planted value is PINNED here. The first experiment's six count lists, without and then with, audits r1 to r3,
+        are PINNED from its verdict record, `2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict.md`, and read
+        the noise 15.46 that spec 123 AC3 pins (TOOL-dTotalRecall-125 S10)."""
+        noise = measure_rise_noise([[18, 29], [3, 8], [7, 7], [28, 20], [10, 5], [5, 3]])
+        if round(noise, 2) != 15.46:
+            return f"the first experiment's counts read noise {noise!r}, not 15.46"
+        edge = {"recall": 5, "noise": 0, "searches": 1, "bytes": 100, "map": 100, "armed": True}
+        planted = [("recall", {**edge, "recall": 4}), ("recall", {**edge, "noise": 1}),
+                   ("searches", {**edge, "searches": 0.5}), ("bytes", {**edge, "bytes": 101})]
+        bad = next((f"a set failing {term} alone read {derive_map_verdict(f)!r}" for term, f in planted
+                    if derive_map_verdict(f) != ("lose", [term])), None)
+        unarmed = derive_map_verdict({**edge, "armed": False})
+        if not bad and unarmed != ("unarmed", ["bytes"]):
+            bad = f"the boundary set with no run measured read {unarmed!r}"
+        lost = derive_map_verdict({**edge, "recall": 4, "armed": False})
+        if not bad and lost != ("lose", ["recall"]):
+            bad = f"a set failing recall alone with no run measured read {lost!r}"
+        return bad or (None if derive_map_verdict(edge) == ("win", []) else f"the boundary set read {derive_map_verdict(edge)!r}")
+
+    def render_transcript(calls):
+        """One transcript's text: each `(id, (tool, input), result)` as the assistant line carrying the call, then
+        the user line carrying its result."""
+        return "".join(json.dumps({"type": kind, "message": {"content": [body]}}) + "\n" for tid, (name, given), result in calls
+                       for kind, body in (("assistant", {"type": "tool_use", "id": tid, "name": name, "input": given}),
+                                          ("user", {"type": "tool_result", "tool_use_id": tid, "content": result})))
+
+    def render_map_report(ids):
+        head = f"**Serves:** diff-review X-1\n\nRange: {'a' * 40}..{'b' * 40}\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
+        return (head + "".join(f"### H{i}. item {i} (finding {i})\n\n" for i in ids)
+                + f"Review shape: raw {len(ids)}, confirmed {len(ids)}, refuted 0.\n\n" + APPENDIX_HEADING
+                + "\n\n| id | lens | ref | verdict |\n|---|---|---|---|\n"
+                + "".join(f"| {i} | l | a.py:{i * 100} | confirmed |\n" for i in ids))
+
+    def build_map_manifest(tmp, items, counts, calls, cases=("r1",)):
+        """One map-replay manifest over one audit of `items` per name in `cases`, each over the one record, its sources
+        under `tmp`: per case and arm, one run confirming the first n items for each n of `counts[arm]`, its one lens
+        transcript `calls[arm]`, `dispatched` the run count times the cases (TOOL-dTotalRecall-125 S7)."""
+        def write_source(name, text):
+            path = pathlib.Path(tmp, name)
+            path.write_text(text, encoding="utf-8", newline="\n")
+            return str(path)
+        record = write_source("known.md", render_map_report(items))
+        return {"instance": "map-replay", "map": record,
+                "known": [{"case": case, "record": record, "items": [f"H{i}" for i in items]} for case in cases],
+                "candidates": [{"case": case, "arm": arm, "matched": None,
+                                "report": write_source(f"{arm}-{case}-{run}.md", render_map_report(items[:n])),
+                                "transcripts": {"l": write_source(f"{arm}-{case}-{run}.jsonl", render_transcript(calls[arm]))}}
+                               for case in cases for arm, ns in counts.items() for run, n in enumerate(ns, 1)],
+                "arms": [{"name": "without", "settings": {"map": False}, "dispatched": len(counts["without"]) * len(cases)},
+                         {"name": "with", "base": "without", "settings": {"map": True},
+                          "dispatched": len(counts["with"]) * len(cases)}]}
+
+    def check_map_experiment_arm():
+        """TOOL-dTotalRecall-122 S4: `check_experiment` over a known set of six items (PINNED), the with-map runs
+        confirming all six and the without runs one, each without run's one search past its act, so recall and
+        searches pass. With every run's act first the byte term and the verdict read `unarmed`; with a ten-byte
+        `Read` (PINNED) ahead of each act the figures line and `verdict win`."""
+        try:
+            resolve_runlog_extract()
+        except Refusal as exc:
+            return ("skip", f"no runlog kit resolves beside this kit, so no transcript can be read: {exc}")
+        items = [1, 2, 3, 4, 5, 6]
+        size = len(render_map_report(items).encode("utf-8"))
+        with tempfile.TemporaryDirectory() as tmp:
+            want = (([], ["term bytes: unarmed · every lens run read 0 before its first act", "verdict unarmed bytes"]),
+                    ([("t1", ("Read", {"file_path": "a.py"}), "r" * 10)], [
+                        "term bytes: median bytes before the first act with 10 · without 10 · rise 0 · "
+                        f"map {size} byte(s) · loses above {size}", "verdict win"]))
+            for first, lines in want:
+                act = [*first, ("t2", ("Edit", {"file_path": "a.py"}), "ok")]
+                got = check_experiment(build_map_manifest(tmp, items, {"without": [1, 1], "with": [6, 6]}, {
+                    "without": [*act, ("t3", ("Grep", {"pattern": "x"}), "a.py:1:x\n")], "with": act}))
+                if got[-2:] != lines:
+                    return f"with {len(first)} read(s) ahead of each act the last lines read {got[-2:]!r}, not {lines!r}"
+        return None
+
+    def check_map_noise_arm():
+        """TOOL-dTotalRecall-123 AC1, AC2: over one audit of seven items (PINNED), both arms alike, counts 2 and 6,
+        then 2, 6, 1 and 7, read the two whole `term recall` lines below, so more runs lower the line; with one run
+        of the four dropped the refusal names 3 and 4, and with two declared counts it names both; a count of 5 over two
+        audits and a one-run set are each refused naming the count (PINNED, TOOL-dTotalRecall-125 S7)."""
+        try:
+            resolve_runlog_extract()
+        except Refusal as exc:
+            return ("skip", f"no runlog kit resolves beside this kit, so no transcript can be read: {exc}")
+        items = [1, 2, 3, 4, 5, 6, 7]
+        act = [("t1", ("Edit", {"file_path": "a.py"}), "ok")]
+        with tempfile.TemporaryDirectory() as tmp:
+            for counts, tail in (([2, 6], "noise 5.65685 at 2 run(s) per arm · loses below 10.6569"),
+                                 ([2, 6, 1, 7], "noise 4.16333 at 4 run(s) per arm · loses below 9.16333")):
+                manifest = build_map_manifest(tmp, items, {"without": counts, "with": counts}, {"without": act, "with": act})
+                want = f"term recall: known items found with 4 · without 4 · rise 0 · {tail}"
+                got = [line for line in check_experiment(manifest) if line.startswith("term recall")]
+                if got != [want]:
+                    return f"counts {counts} read {got!r}, not {[want]!r}"
+            whole = manifest["candidates"]
+            manifest["candidates"] = whole[:-1]
+            why = check_refused(lambda: check_experiment(manifest), "3 parsed run(s)", "not the 4")
+            if why:
+                return why
+            manifest["candidates"] = whole
+            manifest["arms"][0]["dispatched"] = 5
+            why = check_refused(lambda: check_experiment(manifest), "dispatched 4, 5")
+            if why:
+                return why
+            # TOOL-dTotalRecall-125 S7: a count the audits do not divide, and a one-run set, each refused by its count
+            manifest = build_map_manifest(tmp, items, {"without": [2, 6], "with": [2, 6]}, {"without": act, "with": act},
+                                          cases=("r1", "r2"))
+            for arm in manifest["arms"]:
+                arm["dispatched"] = 5
+            why = check_refused(lambda: check_experiment(manifest), "dispatched 5", "over 2 audit(s)")
+            if why:
+                return why
+            manifest = build_map_manifest(tmp, items, {"without": [2], "with": [2]}, {"without": act, "with": act})
+            return check_refused(lambda: check_experiment(manifest), "dispatched 1", "over 1 audit(s)")
+
+    def check_map_transcript_arm():
+        """TOOL-dTotalRecall-17 AC3, TOOL-dTotalRecall-121 AC10: a 500-byte `git diff` (PINNED), a `sed -n` pipe, a
+        `ToolSearch`, a `Grep`, a piped shell `git grep`, a 900-byte `Read` (PINNED), a `grep` for a quoted `>` and a
+        heredoc holding one (TOOL-dTotalRecall-122 S10), then a `sed -i` count 3 searches, and every result before the
+        `sed -i`; a file redirect, glued or not, is the act and one to `/dev/null` is not; a read program's or a git
+        read's writing option is the act, and so is an option that runs a program, an env assignment ahead of a read
+        and a git option outside GIT_GLOBAL_READS ahead of its subcommand, while seven reads beside them each read
+        their own 30 bytes (PINNED, TOOL-dTotalRecall-125 S1); a torn line refuses."""
+        try:
+            resolve_runlog_extract()
+        except Refusal as exc:
+            return ("skip", f"no runlog kit resolves beside this kit, so no transcript can be read: {exc}")
+        calls = [("t6", ("Bash", {"command": "git diff a..b 2>&1"}), "d" * 500),
+                 ("t7", ("Bash", {"command": "sed -n 1,5p a.py 2>/dev/null | head"}), "h" * 20),
+                 ("t8", ("ToolSearch", {"query": "select:Read"}), "q" * 30),
+                 ("t1", ("Grep", {"pattern": "x"}), "a.py:1:x\n"),
+                 ("t2", ("Bash", {"command": "git grep -n x -- '*.py' | wc -l"}), [{"type": "text", "text": "3\n"}]),
+                 ("t9", ("Bash", {"command": 'grep -n "a > b" f'}), "g" * 40),
+                 ("t10", ("Bash", {"command": "cat <<'EOF'\na > b\nEOF"}), "c" * 60),
+                 ("t3", ("Read", {"file_path": "a.py"}), "r" * 900), ("t4", ("Bash", {"command": "sed -i s/a/b/ a.py"}), "e" * 50),
+                 ("t5", ("Read", {"file_path": "b.py"}), "s" * 70)]
+        text = render_transcript(calls)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = pathlib.Path(tmp, "lens.jsonl")
+            for command in ("git diff a..b --output=x.txt", "git diff --output x a b", "find . -delete", "find . -fprint x",
+                            "find . -fprint0 x", "find . -fprintf x %p", "find . -fls x", "find . -exec rm {} ;",
+                            "find . -execdir rm {} ;", "find . -ok rm {} ;", "find . -okdir rm {} ;",
+                            # TOOL-dTotalRecall-125 S1: an option that runs a program, and what precedes a subcommand
+                            "rg --pre rm x .", "rg --pre=rm x", "rg --hostname-bin=rm x", "git grep -Orm x",
+                            "git grep -nOrm x", "git grep --open-files-in-pager=rm x", "git grep --op=rm x",
+                            "git grep --textc x", "git -c core.pager=rm log", "git --config-env=core.fsmonitor=X status",
+                            "GIT_PAGER=rm git log", "env GIT_EXTERNAL_DIFF=rm git diff", "RIPGREP_CONFIG_PATH=x rg y",
+                            "git diff --ext-diff", "git log -p --textconv", "git show --ext-diff x"):
+                path.write_text(render_transcript([("t1", ("Bash", {"command": command}), "w" * 30), *calls]), encoding="utf-8")
+                got = measure_bytes_before_act(path)
+                if got != 0:
+                    return f"the writing {command!r} read {got!r} bytes before the act, not 0"
+            for command in ("git -C sub log -1", "git --no-pager log -1", "git grep -eOops x", "git grep -o x",
+                            "git grep --or -e a -e b", "git grep --no-textconv x", "rg --pre-glob '*.gz' x"):
+                path.write_text(render_transcript([("t1", ("Bash", {"command": command}), "w" * 30),
+                                                   ("t2", ("Edit", {"file_path": "a.py"}), "ok")]), encoding="utf-8")
+                got = measure_bytes_before_act(path)
+                if got != 30:
+                    return f"the read {command!r} read {got!r} bytes before the act, not its own 30"
+            path.write_text(text, encoding="utf-8")
+            got = (measure_existence_searches(path), measure_bytes_before_act(path))
+            if got != (3, 500 + 20 + 30 + 9 + 2 + 40 + 60 + 900):
+                return f"the transcript read {got!r} searches and bytes, not (3, 1561)"
+            for redirect in (" > b.py", ">b.py"):
+                path.write_text(text.replace("sed -n 1,5p a.py 2>/dev/null", "sed -n 1,5p a.py" + redirect), encoding="utf-8")
+                got = measure_bytes_before_act(path)
+                if got != 500:
+                    return f"a shell read redirected by {redirect!r} read {got!r} bytes before the act, not 500"
+            path.write_text(text + "{torn\n", encoding="utf-8")
+            return check_refused(lambda: measure_bytes_before_act(path), "torn line")
+
     arms = [("paired-refuses", check_paired_refuses), ("row-refuses", check_row_refuses), ("tag-section", check_tag_section),
             ("instances", check_instances_arm), ("scouted-proof", check_scouted_proof), ("conformance", check_conformance),
             ("deterministic", check_deterministic), ("experiment-evidence", check_evidence_arm),
@@ -1831,7 +2448,9 @@ def run_selftest():
             ("experiment-references", check_references_arm), ("held-out-pathspec", check_held_out_pathspec_arm),
             ("held-out-tracked", check_held_out_tracked_arm), ("stated-shape", check_stated_shape_arm),
             ("appendix-pipe", check_appendix_pipe_arm), ("appendix-break", check_appendix_break_arm),
-            ("proof-pinned", check_proof_pinned_arm)]
+            ("proof-pinned", check_proof_pinned_arm), ("map-known", check_map_known_arm), ("map-verdict", check_map_verdict_arm),
+            ("map-experiment", check_map_experiment_arm), ("map-noise", check_map_noise_arm),
+            ("map-transcript", check_map_transcript_arm)]
     passed = skipped = ran = 0
     for name, arm in arms:
         ran += 1
@@ -1915,6 +2534,8 @@ def main(argv):
     instance = INSTANCES.get(args.instance)
     if instance is None:
         ap.error(f"--instance must name one of {', '.join(INSTANCES)}, not {args.instance!r}")
+    if args.instance == "map-replay":
+        ap.error("map-replay is scored as --experiment <src> alone, over a manifest whose instance is map-replay")
     try:
         if args.instance == "scouted-seam":
             verb = next((v for v in ("grade", "compare", "judged") if getattr(args, v)), None)

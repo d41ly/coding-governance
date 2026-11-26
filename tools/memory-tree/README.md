@@ -26,6 +26,9 @@ ARCH-bOrderlyAtlas-1.)
 | `routed_commits.py` | the `routed commits name a specced unit` leg (TOOL-aRoutedQuill-3): every non-merge commit committed on or after `ROUTED_COMMIT_CUTOFF` that touches `ROUTED_PATHS` names a unit id, in its subject or a `Pass:` trailer, whose spec existed at its first parent. RANGE over `$GATE_PUSH_BASE..HEAD` at the pre-push hook, graded with the WHOLE history beside it so the push sees what remote CI grades (TOOL-aRoutedQuill-10), else WHOLE history with its reason printed; `ROUTED_COMMIT_WAIVED` is read wherever WHOLE is graded and never by the RANGE half, and a stale sha reds. Constant git spawns. Exit 2 refuses an unarmed conf, an empty id map, a truncated log and a SHALLOW clone, so CI checks out with `fetch-depth: 0`. `--newest-unit <range>` is the lander's mint-subject reader; `--selftest` is its own held leg, and runs `deviation_join.py`'s plant arms. It HOSTS the deviation join (TOOL-dTrueNorth-4) over the two populations it already reads, under `routed-commits: deviation` lines and the chain's `report` value, so the join never moves its exit: off in one line, with no git call, unless all four DESIGN_* keys are declared, the key rule `design_lib.read_design_keys` states (TOOL-dTrueNorth-16), a partial set refused, exit 2; armed, its spawns grow with the chain-build specs' revisions beside the constant ones, and a declared design it cannot measure is refused, exit 2. It also grades THE INLINE LANE'S LIMITS (TOOL-aNimbleMend-10): every non-merge commit carrying a `Red-fix:` trailer, whether or not it names a unit, against four limits, and a finding reds the leg. L1 size, at most 3 paths under `ROUTED_PATHS` and at most 60 lines over them, added plus deleted, a binary path over the bound; L2, no path the policy kit's `guarded-paths.txt` lists, and no path under `.governance/` where no policy kit resolves; L3, no path under any build's `spec/` folder; L4, no path added under `ROUTED_PATHS`, a rename included. `ROUTED_COMMIT_WAIVED` excuses a finding in WHOLE and never in RANGE. One `red-fix limits` line per population names the count graded and the bound, a population holding no fix commit costs no git call and any other exactly one. `--red-fix-limits <rev>` grades one commit with the same predicate and no waiver, the probe to run straight after a fix commit: exit 0 inside the limits, 1 over one, 2 when the rev names no commit or the commit carries no trailer. The limits do not check whether the change is a fix, a new surface made inside an existing file, or a deleted path. |
 | `deviation_join.py` | the deviation join (TOOL-dTrueNorth-4), the product successor of the bootstrap instrument `deviations.py`'s population and join: every departure from the frozen design, or from a spec once its code has started, computed from history and joined to a `deviation` record (`<date>-build-<unit id>-deviation-<n>.md` in the departing build's `build/` folder, its grammar `HYGIENE.md`, "Record bindings"). Six arms over the chain builds' specs, the chain builds being `DESIGN_VIEW`'s Build column: a revision past the unit's first pass, a revision past its `@rev-N` audit pin, an `amended rev-N` ledger line, a divergence hand-back, a rescope row, and a `[chain]` clause-hash or `Baseline:` move since `DESIGN_BASELINE`; a revision changing only its status line and generated regions is no member, by the unattended kit's `GEN_REGION_AWK`, and neither is an audit's own fold, by `design_lib.check_audit_fold`: a commit moving the spec's header, every revision it moved holding a revision-log entry that cites by file stem a bound `spec-audit` record of the unit's build whose text names the unit, pinned or not, joins neither revision arm and owes no record. A move with no such citation is still reported, and so is a material edit moving no header. A unit's first pass is read by THE UNATTENDED DRIVER'S PASS RULE, the instrument's `read_first_pass` and the driver's `read_attribution_tokens` and `pass_commit`: a `Pass:` trailer replaces the subject, so a commit whose subject names X and whose trailer names Y is Y's pass and no pass of X, deliberately not the union `routed_commits.py` attributes by (TOOL-dTrueNorth-16). Its revisions come from `design_lib.read_spec_revisions`, the one reader the carries join reads too. `routed_commits.py` hosts it at the commit and at the close. Its own CLI takes `--policy`, `report` by default or `refuse`, and `--approval`, `author-recorded` by default or `by-risk`, which also refuses an approver below the record's risk class, then `--range`, `--fixture [--plant <case>]`, `--host routed-commits` and `--selftest`. Exit 0 green or `report`, 1 a finding under `refuse`, 2 nothing measured, each cause on its own: a partial `DESIGN_*` key set, a pin naming no commit, or a readable pin with no chain-build spec. Its states are the key rule's: the `DESIGN_*` keys are gov's, declared blank in the kit's example conf, which is off, so in an adopter they are blank and the join is off, one line. |
 | `asbuilt_view.py` | the as-built view (TOOL-dTrueNorth-6), the product successor of the bootstrap instrument `asbuilt.py`: `DESIGN_VIEW` rendered from `DESIGN_RECORD`'s `[chain]` at `DESIGN_BASELINE`, read through `design_lib.py`, with each `deviation_join.py` record's `amends` or `supersedes` row from its `**Follow-through:**` applied and each changed clause citing the record; it renders byte for byte what the instrument renders, head included, until the report-switch step. Its host is `gen_build_index.py`: `--write` writes the view BEFORE every other artifact, so the coverage regions read the view just written and one `--write` is a fixed point, and `--check` lists its drift, a hand edit named at its first differing line, under `build-index DRIFT`, exiting 1, and nothing `--write` cannot cure; `--check-asbuilt`, hygiene check 30's delegate, prints a deviation with no row, the head rule's findings, a pipe in an `**After:**`, a pinned hash the clause does not carry, a moved `Baseline:` line and a view `git check-attr merge` does not answer `merge: ours` for (TOOL-dTrueNorth-26 S16) under an `as-built VERDICT` block, exiting 1 (TOOL-dTrueNorth-16). The head's two names, its `**Serves:**` id and its instrument's file, are read from `DESIGN_VIEW`'s dated record name, `<date>-build-<unit id>-as-built.md`, by `derive_head_names`, never from the design record, and a view not so named is refused at render (TOOL-dTrueNorth-27 S7). Its own CLI takes `--write` or `--check` with `--out`, `--fixture [--plant <case>]` and `--selftest`; the fixture writes its own design through `design_lib.write_design_fixture`, so it reads nothing of the tree's. Exit 0 green, 1 a finding, 2 when the key rule refuses, the pin's design record cannot be read or `DESIGN_VIEW` is not named as a dated record. Its states are the key rule's, `design_lib.read_design_keys`: the `DESIGN_*` keys are gov's, declared blank in the kit's example conf, which is off, so in an adopter they are blank and the view is off, the generator and its host each printing one `as-built view: off` line and reading nothing; a partial set is a refusal naming each blank key. The rule that keeps it true (TOOL-dTrueNorth-8, widened by TOOL-dTrueNorth-17): the view's inputs are `DESIGN_RECORD` at `DESIGN_BASELINE`, every TRACKED record the glob `*/build/*-deviation-*.md` matches (TOOL-dTrueNorth-26 S7), and the render's code, which renders and compares it — `asbuilt_view.py`, `design_lib.py`, `deviation_join.py` and the host calls in `gen_build_index.py` — so a commit that changes any view input, a record matching the glob added, edited, moved or taken out, a `DESIGN_*` key changed, or the render's code changed (TOOL-dTrueNorth-20 S38), re-renders `DESIGN_VIEW` in that same commit through `gen_build_index.py --write`, its one writer, and no byte of the view is edited by hand; check 9 holds it at the commit, a staged record and a staged path under this kit's directory each being a build-index input, so `--check --staged` renders rather than skips and lists a stale view under `build-index DRIFT`. The transition's owner (TOOL-dTrueNorth-17): when the records and the render's code land in two passes at one order, as TOOL-dTrueNorth-4's records and TOOL-dTrueNorth-6's render did at order 3, the second order-3 pass to land runs `gen_build_index.py --write`, stages `DESIGN_VIEW` in its own commit, and was dispatched with `DESIGN_VIEW` among its `--dispatch --writes` paths; since TOOL-dTrueNorth-16 the view is a declared generated output of `asbuilt_view.py` and the generator, so a pass re-rendering it stages it without declaring it, and declaring it beside either generator is the pairing `--dispatch` refuses. The head rule beside it (TOOL-dTrueNorth-18), `resolve_clause_rows`: a clause's set is the records whose `**Follow-through:**` row names it; when every `**After:**` in the set agrees, the later file by path cites it, as the instrument's ordering does, so the view keeps its bytes, and when they differ the head supplies the row's text and citation whatever its path, the one member no other member names in `**Supersedes:**`, the optional record field `deviation_join.py`'s `read_record` reads as one record's stem and names malformed otherwise; a set left with two or more unsuperseded members, or none, is an `unordered amends of <clause>` finding naming every member, and a `**Supersedes:**` naming a record outside its clause's set is a finding naming both, each under the `as-built VERDICT` block and each rendering the clause's row from the baseline, so neither path order nor a commit date decides. |
+| `shape_run.py` | the `review-shape` line's one grammar, `SHAPE_RE`, and the shape-run kind's conformance (TOOL-dTotalRecall-11): `--parse-line <line>` prints its fields as `key=value` lines, exit 2 naming the first field that does not match; `--parse-file <path>` parses every non-empty line, `<n> parsed · <m> refused`; `--check`, the `shape-run records (each record equals its review line)` leg, compares every tracked shape-run record with the line of the review record its `Caused-by` names, exit 1 naming the record, the field and both values, and prints `unarmed` with no record; `--fixture --plant <case>` runs that check over one planted case in a scratch repository, one per red branch and a green one. `gov_record.py new shape-run --review <path>` is the kind's door. |
+| `record_find.py` | `record find`, `record show` and the per-item read budget over the one tag index (TOOL-dTotalRecall-9), the verbs `find`, `show` and `budget` of `gov_record.py`; the fusion `query.py` imports; `--fixture --plant <case>` runs its plants. |
+| `record_causes.py` | every record names its cause (TOOL-dTotalRecall-19): `--check`, gov's `record causes (causes and orphans over the legacy population)` leg, reds a record outside the `causes` slice of the `record-kinds-legacy` population with no resolving `Caused-by` or that no root reaches, and prints `unarmed` where no population is registered; `--measure` prints that slice's rows, `<path> TAB <section> TAB causes TAB 1`; `--print-stand-ins` and `--print-record-keys` print the `made-by-stand-in` and `record-key` native classes' members; `--fixture --plant <case>` builds its plants under the system temp directory. |
 | `check-verdict-epoch.sh` | the kit version DATES the engine's verdicts: across a range, the newest bump of `KIT_MEMORY_TREE_VERSION` must come at or after the newest commit moving a behaviour-bearing line of the engine or a delegate it names. It refuses, exit 2 on and off the push boundary, a delegate list its delegates' imports outgrow (TOOL-dTrueNorth-25): one python run walks every `import` and `from … import` in the scanned `.py` files with `ast`, nested ones included, follows each that names a sibling `<name>.py` of this kit, and names each sibling outside `DELEGATES` with its importer, or a scanned module that does not parse; otherwise it prints the import closure's module count before the verdict. A module loaded by computed path, through `importlib` or by a shell invocation, is no edge, and with no python one note line says the closure was not checked. |
 | `check-verdict-epoch.test.sh` | its arms, over synthetic engines in throwaway repositories. |
 | `check-method-carriers.sh` | every file that points at the build method is declared, and points rather than copies. Structural: a fluent paraphrase under new headings passes. |
@@ -279,6 +282,189 @@ row: `never gains` admits a widened row only where that record is tracked, names
 the key, and gives a reason. Under `retrofit.widen = "refuse"` the door writes nothing and the leg
 admits only a record the compare base already tracks. A widened row's count is not checked.
 
+## The record-kind registry — one declaration per kind (TOOL-dTotalRecall-1, -18, -25)
+
+`<prefix>/memory-tree/record-kinds.toml` declares every kind of record the memory tree holds, and one
+witness row per family of pockets outside it, one `[[record-kind]]` row each, and
+`<prefix>/memory-tree/record_kinds.py` is its reader, gate, view and factory. Its columns, in order:
+`name`; `tag`, `record.<name>`; `layer`, the `layer.<name>` tag of the kit whose writer writes the
+kind; `home`, one glob or a list, each a tracked-path glob, `refs/gov/<glob>` or
+`<git-common-dir>/<glob>`, a `fields` row's one tracked glob, the population it grades; `id-rule`,
+the name grammar or `""`; `schema`, `{ form, source, fields, validator }`, `form` one of `fields`,
+`header`, `rows`, `generated` or `fence`, `source` an optional `<path>:<NAME>[.<key>]...` literal another
+module declares the same fields in, read by `ast` and never imported, `validator`, on a `fence` row alone
+and required there, `<module>:<function>`, a `<module>.py` of this kit's directory and a function at
+its top level that takes a record's text and returns its reds; `writer`, the door writing the kind,
+`generator:<path>` or `hand`; `readers`, the work-order read keys a handoff fills from a record of the
+kind, or `[]` beside `readers-none`, the reason no role reads it; `lifecycle`, one of `append-only`,
+`current-state`, `frozen`, `generated` or `out`; `check`, the leg grading it; `purpose`, last,
+`{ text, source }`, one line of at most `PURPOSE_BYTES` bytes, cited `<path>:<line>` or `owner`, or
+`{ pending = "<id>" }` (TOOL-dTotalRecall-16). The four columns
+`home`, `lifecycle`, `readers` (or `readers-none`) and `layer` are REQUIRED on every row, as are
+`name`, `tag`, `schema`, `writer`, `check` and `purpose`; `root`, `sections` and `cardinality` are admitted
+for their owners, and `unarmed`, set by hand on a typed kind's `fields` or `fence` row whose home holds no
+record yet, is the reason its unarmed line gives, naming the writer that will arm it (TOOL-dTotalRecall-42):
+red on an untyped row, on any other form, as an empty or non-string value, and once the row grades a
+record. A tracked-path home names its records' glob: one ending in `/`, or one with no `**` segment for
+which `<glob>/**` lists a tracked file, names a directory, which `:(glob)` reads as no file, and is red.
+A `pending` is graded by the policy key `memory.map-purpose`: under `review`, its default, an open
+ask of a tracked `BACKLOG.md`; under `ledger` `purpose-pending`, the node a row of that ledger
+population, which the repository setting `ledger` registers; under `derive` `none-found`; under
+`refuse` none. The view renders each `text`, or `—` for a pending.
+
+The view's `Read by` cell names the roles whose `reads:` holds one of a row's `readers` and the loop
+items whose `inputs` hold a typed record reference `<layer tag>:record-kind.<name>[@<n>]`; its
+`Written by` cell the roles whose `writes:` folder covers a row's home and the items whose `returns`
+is `record-kind.<name>`. Both are read afresh from the roles and loop kits, each a `requires_if` row
+of this kit's `kit.toml`, on every `--check`, `--write` and `new`, so the byte compare is with a live
+re-derivation; an unresolved kit, an empty role population or a definition that does not read is
+`unarmed`, red under `--check`. The kind once named `journal` is `log`: `tree_lib.KIND_ALIASES` keeps
+`journal` a read-only alias, bound as written and compared through `resolve_kind`, and the runlog
+kit's `SERVES_ALIASES` is held to it.
+
+| Verb | What it does |
+|---|---|
+| `--check` | the `record-kinds` leg: every row's columns and their grammar, its readers against the roles, its `check` leg and its `source` both ways, the factory's `TYPED_RECORD_KINDS` joined to the rows both ways, every `fields` record outside the legacy ledger carrying its fields in order, each deviation's `Follow-through: gap <key>` resolved, the view byte for byte against a fresh read of the roles and items, the common git dir's entries each matched by a witness row's home, and the runlog kit's alias literal; one `view · <kind> · read by … · written by …` line per row |
+| `--write` | renders the `gen:record-kinds` region of `HYGIENE.template.md`, which `adopt-memory-tree.sh --render` carries into `<memory root>/HYGIENE.md` |
+| `--template <kind>` | prints the skeleton one `fields` row defines, the layout `build_records.py` writes |
+| `new <name> --tag record.<name> --writer <door> --check <leg> --home <glob> --layer <tag> --lifecycle <value> --purpose <text> (--reader <key>... \| --readers-none <reason>) (--field <Key>... \| --form fence --validator <module>:<function> \| --form generated)` | the factory: appends one conforming `fields` row, with `--form fence` a `fence` row naming its validator, or with `--form generated` a row carrying no field, which its writer's own check grades, its purpose `source = "owner"`, a typed kind's `source` the factory's `KINDS.<name>.required` and its `id-rule` the typed name, and re-renders the view, exit 2 writing nothing on a missing column or one outside its grammar, a `--field` on a `fence` or a `generated` row, a `--validator` on a `fields` or a `generated` row, or a validator that does not resolve |
+| `--purpose-review [--from <path>]` | the purpose review: each registry row with no `text` and each chain registry row with no `purpose`, tried by the H1 of its file, then the `--from` record's table row naming the kind; one `derived <node> · <text> · <source>` or `none <node> · <found>` line each and one `ask <namespace> · …` draft per namespace holding a `none` node; `unarmed chain` where the playbook kit's CHAIN_REGISTRY does not resolve |
+| `--purpose-review … --write [--ask <id>]` | writes each derived purpose into its node's own field, one inserted line each, and each `none` registry row's pending by `memory.map-purpose`: `--ask`'s open ask, `purpose-pending` or `none-found`; exit 2 writing nothing on a closed or unknown ask, or `ledger` with no registration |
+| `--print-purpose-pending` | prints the `purpose-pending` population, `<node> TAB 1` per registry row pending on it and per chain row with no purpose, for `legacy_ledger.py seed` |
+| `--seed-legacy` | prints the `record-kinds-legacy` population keyed by path, section and check, `check` each row's third key field: its `kind-schema` slice, `<path> TAB <row name> TAB kind-schema TAB 1` per record a `fields` row grades, then its `causes` slice, `record_causes.py`'s rows, `<path> TAB <section> TAB causes TAB 1`, for `legacy_ledger.py seed` (TOOL-dTotalRecall-52) |
+| `--print-gap-keys` | the `gap-key` native class's members, the first cells of every tracked gap register; exit 3 where none is tracked |
+| `--fixture [--plant <case>]` | builds a throwaway repository and runs `--check` there, its registry holding a typed `stream-plan` `fence` row and one well-formed plan of two streams; the `stream-unordered`, `stream-empty`, `stream-order-text`, `stream-unit-twice`, `stream-fence-missing` and `stream-validator-missing` plants each red the plan or the row; `unarmed-reason` prints the stream-plan row's key on its unarmed line, `unarmed-with-record` and `unarmed-untyped` red the key beside a plan and on the `research` row, `home-slash` and `home-directory` red a directory home, and `shared-home` grades a `log` record under the research home by the `log` row alone; `--selftest` asserts every plant red and `new`'s two `fence` refusals |
+
+A typed kind's row grades only the records its `build_records.py` name grammar matches, so a
+`…-probe-design.md` its glob also matches falls to the `research` row. An untyped `fields` row grades a
+record its home admits unless the record's Serves kind names another row whose home admits it too
+(`derive_record_kind`), so `spec-audit` and `diff-review`, sharing one home, each grade their own; such a
+record is counted `<kind> <n> graded <m> legacy <k> other-kind`, and a home every record of which is
+another kind's reds nothing. A typed kind with no record yet prints `<kind>: unarmed — no record yet`,
+then `; <reason>` from its row's `unarmed` key, and passes; any other empty population reds. A `fence`
+row's records are graded by its validator, each red prefixed `row <kind>: <path>:` and the row counted
+`<kind> fence <n> graded`; the `stream-plan` kind's, `check_stream_plan`, reds a missing or unparseable
+fence, a stream with no units, a unit with no `order` or one that is no whole number the spec header's
+`· order <n>` grammar reads, and a unit id in two streams, and while no plan exists its unarmed line
+gives the reason its row's `unarmed` key holds. The step
+gate's `record-kind-schema` class holds `<kind>.<field>` per field of every row, so a removed field is
+a vanished member; `journal.Serves`, which left with the rename, is named by a `[[retired]]` row of
+the govkit registry. What it does not check: whether a `writer` writes its kind, a field's value, a
+`header`, `rows` or `generated` row's records, which its `check` leg's owner grades, a pocket's
+contents, whether a `layer` tag is a row of the layer register, whether a derived purpose describes
+its node, and an ask closed only by a spec header's `closes`, which reads as open.
+
+### The record door — `gov_record.py new <kind>` (TOOL-dTotalRecall-2)
+
+```
+python <prefix>/memory-tree/gov_record.py new <kind> --build <slug> --unit <id> --title <text> [--caused-by <target>] [--name <stem>] [--field <Name>=<value>]... [--edge "<anchor> <type>=<target>[,<target>]"]...
+python <prefix>/memory-tree/gov_record.py new build-readme <slug> --asks <IDLIST>
+python <prefix>/memory-tree/gov_record.py new spec <id> --tier 1|2 [--order <n>] [--base <sha>]
+```
+
+The one write door of every kind whose registry row names `gov_record.py new <kind>` its `writer`:
+`deviation`, `research`, `log` and `design-record`, and the two scaffolds as kinds, `build-readme` and
+`spec`, which run `gen_build_index.py`'s `--new-build` and `--new-spec` with every flag passed through. A
+kind with no row, or whose row names another door, exits 2 naming it, so a factory door's kind
+(`build_records.py new exception`) stays that door's. A `fields` kind is `build_records.write_new_record`:
+the row's `--template` skeleton filled with each `--field`, a key the row does not name following; the
+bytes parsed back by the kind's own check before anything is written (`check_typed_record` for a typed
+kind, the row's field lines for any other); then the kind's home is listed, and a record whose content
+key (`derive_content_key`, over the kind, a given `--name`, the build, the unit, the title, the cause, the edge
+lines and the field values in schema order, so everything the caller supplies) matches
+is the same write, `exists`, while a different value under a given name is refused. The build's
+authority is read next, `check_mint_authority`: the build lease, classed by the loop kit's
+`read_lease_class` where the unattended driver resolves, `mine` admitting and a holder or an unread lease
+refusing; then the claim's `session` in this node's cache ref `refs/gov/remote/claims/<slug>`, this
+session's admitting and a named other's refusing; with neither, `minted under the session rule: no claim or
+lease for <slug>`, and where the claim names no session, `minted under the session rule: the claim of <slug>
+names no session`. A field name outside the key grammar or given twice is refused before any other read. A typed
+kind's `<n>` is `write_record`'s, a row with an empty `id-rule` takes `--name`, one path segment placed in
+the row's home and refused where a typed kind's name grammar matches it, and a `<FAMILY>-<slug>-<seq>`
+rule is minted by `gov-claim.sh ask` with the content key as its claimant, the family the unit's; a clone
+with no remote takes the unattended driver's `derive_ask_seq`. The file is staged, never committed, and one
+git will not stage is refused naming git's refusal, with nothing left written, unless another writer moved
+the file since the write: that file is left as it stands, unstaged, and the refusal says so.
+Exit: 0 `wrote <path> key <key>` or `exists <path> key <key>`; 2 `refused <kind>: <why>`, nothing
+written; 4 `waiting offline <ref>`, a counter mint offline under `warn` or `follow-leases`.
+`new shape-run --review <path>` (TOOL-dTotalRecall-11) takes no other flag: a tracked review record of a
+build's `reviews/` folder, its one `review-shape` line parsed by `shape_run.py`, written as a typed
+`shape-run` record of that build serving the first id of its `**Serves:**` line, `Caused-by` its stem.
+WHAT IT DOES NOT CHECK: whether a record's cause is reached from a root, which the causes check below
+grades; whether a record written by hand in a spelling the door does not render says what a call says,
+since it keys as another record.
+
+### Finding and reading records — `gov_record.py find`, `show` and `budget` (TOOL-dTotalRecall-9)
+
+```
+python <prefix>/memory-tree/gov_record.py find [<question> --terms <words>] [--kind <k>] [--tag <t>] [--build <slug>] [--paths <glob>]
+python <prefix>/memory-tree/gov_record.py show <key>[#<tag>][@<blob>]
+python <prefix>/memory-tree/gov_record.py budget --role <role> <key>...
+```
+
+Three read verbs over the one tag index, held in `record_find.py` beside the door and writing nothing in
+the tree. A record is keyed by its id (an id-anchored entry, a spec's defining H1 among them) or, for a
+file under a build's `build`, `reviews` or `prompts` folder, by its file stem; the playbook-render kit's
+`record` and `section` namespaces index them, `memory/archive/` included. `find` lists at most 40 records,
+`key · kind · build · bytes · path:line`, by build then key, never their content and never a superseded
+one; past 40 its last line names the total and the three narrowing flags. A question ranks by the fusion
+memory-recall's `query.py` used to hold, now `record_find.py`'s and imported back there, over that kit's
+FTS tables. `show` prints one record, or with `#<tag>` one section inside that record's own lines,
+`TOOL-dTotalRecall-9#section.goal` say; `@<blob>` reads that blob, one no live tree holds sectioned from git. `budget` sums each key's
+`show` slice against the role's `memory.item-budget` and answers as `memory.over-budget` says, a key the
+supersession map names superseded refused or marked as `memory.superseded-slices` says; `handoff.py
+render --read <key>` runs it before rendering a work order. A spec's required sections are the
+`sections` column of `record-kinds.toml`, `record_kinds.py`'s `read_sections`, and `new spec` refuses a
+skeleton lacking one by its tag, nothing written. Exit: 0 an answer; 2 `refused <verb>: <why>` naming
+the key, tag, blob, policy key or kit that refused. `record_find.py --fixture --plant <case>` runs one
+plant in a scratch repository, its kits copy-installed. WHAT IT DOES NOT CHECK: a per-role
+`memory.item-budget` value, which the catalogue's values cannot spell.
+
+### Every record names its cause — the header, edge lines and `record_causes.py` (TOOL-dTotalRecall-19)
+
+```markdown
+# <title>
+
+**Serves:** log TOOL-dTotalRecall-19
+**Made-by:** owner
+**Caused-by:** TOOL-dTotalRecall-19
+```
+
+The door writes each record's header: `**Made-by:**` and `**Caused-by:**` after the Serves line, each a
+line of its own, and for a typed kind `- **Made-by:**` and `- **Caused-by:**` among its fields after the
+row's own. `Caused-by` is `--caused-by <target>` or a `Caused-by` field, one target: a family id the corpus
+defines, or a record key, the stem of a tracked Markdown record (the `record-key` native class). It is
+required on every kind whose registry row is not `root = true`, so `new log` with none exits 2 naming
+`log` and `Caused-by`, nothing written; `build-readme` and `claim` are the roots, standing in until the
+intake and binding kinds land. `Made-by` is `lease-<slug>` where the mint runs under the build lease this
+session holds and `owner` otherwise (the `made-by-stand-in` class, which the `made-by` edge row admits).
+Each `--edge "<anchor> <type>=<target>[,<target>]"` is a column-0 `**Edges:** <type>=<targets>` line under
+the heading of that derived anchor, one line per type; an unregistered type, an anchor the record lacks,
+a second line of one type under one heading and a target the edge grammar cannot classify each exit 2.
+The render is read back through `tree_lib.read_header_edges`, the one header reader (both forms, a key
+given twice refused naming both lines), and the edge parser before any write; `Made-by` is never part of
+the content key.
+
+```
+python <prefix>/memory-tree/record_causes.py --check               # the record causes leg (gov's own)
+python <prefix>/memory-tree/record_causes.py --measure             # the legacy population's causes rows
+python <prefix>/memory-tree/record_causes.py --fixture --plant legacy|causeless|typed-causeless|orphan|claim-root|none
+```
+
+The causes check reds a tracked Markdown record with no `<path> -` row of the `record-kinds-legacy`
+population's `causes` slice whose kind is no root and which carries no resolving `Caused-by`; a typed kind whose row
+declares no `Caused-by` (a card, a probe, a flake record) is graded on its Serves units instead. The
+orphan check walks from the roots, each build whose `README.md` is tracked and each whose claim this
+clone's cache holds at `refs/gov/remote/claims/<slug>`, where the claim CLI's fetch and its own writes put it
+(the check fetches nothing), through the README's `ids:` and each record's cause, and reds a new
+record no root reaches, so two records caused by each other are both orphans. The population is gov's
+own, a `[[ledger]]` table of govkit's registry keyed by path, section and check, whose `causes` slice
+was seeded with today's records (`legacy_ledger.py seed --population record-kinds-legacy`, the
+`kind-schema` slice beside it): one row per record and, under `memory.legacy-anchors = "derived"` (the
+default), one per untagged `##` or `###` heading, its anchor `derive_anchor`'s; `none` seeds no section
+row and reads a legacy record as reached, `retag` reads authored `[section.<anchor>]` tags alone. No
+record is rewritten. An adopter's tree registers no population, so the check prints `unarmed` there.
+
 ## Backlog modes — authored shards and per-build asks
 
 Where an ask lives, and who decides its status, is one conf key. This section is the author-facing
@@ -377,7 +563,11 @@ Forward-only means graded only for an ask filed on or after `ASK_CUTOFF`.
 - `V13` — the clause tail's grammar: an empty clause, one label twice on a row, a malformed `seen` or
   `may`, a `may` on a `SCOPE` row, a `SCOPE` row naming an unfiled ask, or two `SCOPE` rows for one
   target in one file.
-- `V14` — forward-only: an ask whose merged clauses carry neither `accept` nor a `seen … run`.
+- `V14` — forward-only: an ask whose merged clauses carry neither `accept` nor a `seen … run`. The one
+  predicate is `backlog.py`'s `check_ask_acceptable`, which READY's R5 and the filing path call too: an ask
+  is filed through `gov_record.py new ask --build <slug> --family <FAMILY> --text <text> --sev <LEVEL> <why>
+  [--clause <label> <value>]...`, which grades its clauses under `asks.acceptance` before any id is minted,
+  refusing (`refuse`, the default) or filing it graded not ready (`grade`).
 - `V15` — `ASK_CUTOFF` blank under `builds`, which disarms the forward-only verdicts.
 - `V16` — `ASK_CUTOFF` not a zero-padded date, which disarms them the same way.
 
@@ -843,7 +1033,17 @@ unchanged:
 
 Two things are not carve-outs at all. A value in the rendered `HYGIENE.md` that states the shipping
 repo's figure is a render gap, and `INDEX_CAP_LINES` and `ENTRY_CAP_UNIT` now render from your conf.
-A registry a KIT ships, such as `pass-order-waiver.txt`, is admitted by name.
+A registry a KIT ships, such as `pass-order-waiver.txt`, or reads at its default path, such as
+`census-kept-paths.txt`, is admitted by name.
+
+**Keeping a census hit in your own build folders.** The writer census (`record_causes.py`) and the
+alias census (`record_kinds.py`) read the scripts under `<MEMORY_ROOT>/builds/*/build/`. A hit in one of
+them is kept by a row naming that file in `<MEMORY_ROOT>/project/census-kept-paths.txt`, since no pass may edit
+a landed build's script; the kit ships no row. A row is seven TAB-separated fields, the ledger factory's
+grammar: the census (`check_cause_writers` or `check_alias_compares`), the file's path, the reason,
+`-`, `1`, a commit sha and `seeded`. A pinned writer gives the glob of the records it writes in
+place of `-`, and `keep:<ask id>` in place of `seeded`. One row per census and path; a `#` line is
+skipped. A file a pass may edit keeps its hit by the census marker on its line instead.
 
 **The worked instance is adopter nc**, measured 2026-09-23 by running gov's engine over its tree:
 its registries under `project/` go to `PROJECT_REGISTRY_EXTRA`; its ten build-root status

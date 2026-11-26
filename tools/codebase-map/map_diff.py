@@ -37,6 +37,11 @@ which lists the dossiers a range touched and did not refresh. Paths under the ma
 claim, and a merge commit carries no paths (a conflict-resolution-only change is not seen). A
 shallow clone prints `live` false instead of a count over an amputated history. `--json` prints
 one object: scope, of, stale, live, note, dossiers. Exit 1 when git cannot read the range.
+A dossier whose `[paths]` carries `symbols`, `<path>::<qualified name>` keys, grades each anchored file
+by its anchored definitions' hashes: a change to that file stales it only when an anchored definition's
+body hash at HEAD differs from its hash at the dossier's last commit, read from both blobs through this
+kit's `extract_ranges`. Every other claimed path stays on commit ancestry (TOOL-dTotalRecall-125 S3). A key
+HEAD's blob does not define exits 1 naming it (TOOL-dTotalRecall-8 S12).
 
 Exit 2 is the one exception, and it is a REFUSAL rather than a result: the resolved repo root
 carries no .codebase-map.conf. At a root that was never adopted the digest would report every
@@ -65,6 +70,7 @@ try:  # a non-UTF-8 stdout (stripped CI locale) must degrade a non-ASCII print, 
 except (AttributeError, ValueError):
     pass
 
+import extract_code as xc  # noqa: E402
 import map_lib as m  # noqa: E402
 import coverage_join as cj  # noqa: E402 - memory-tree's, on the path map_lib's import appends
 
@@ -203,6 +209,47 @@ def read_commit_paths(root: Path, base: str | None, head: str = "HEAD"):
     return [c for c in commits if c[0] in from_head], frozenset(from_head - from_base)
 
 
+def read_anchor_hashes(root: Path, commits, tree, map_rel: str, head: str = "HEAD") -> dict:
+    """``measure_dossier_staleness``'s ``anchors``: each anchored dossier's `(hashes at head, hashes at the
+    dossier's own last commit)`, `{symbol key: body hash, or None where that blob defines no such name}`.
+    Every blob comes from ONE `git cat-file --batch`; a dossier no commit carries is left out.
+    Raises ``MapError`` when git cannot answer."""
+    wanted = []
+    for d in tree.dossiers:
+        refreshed = m.read_refreshed(commits, map_rel, d.feature) if d.symbols else None
+        if refreshed:
+            wanted.append((d, refreshed))
+    specs = sorted({(rev, key.split("::")[0]) for d, at in wanted for key in d.symbols for rev in (head, at)})
+    if not specs:
+        return {}
+    out = subprocess.run(["git", "-C", str(root), "cat-file", "--batch"], capture_output=True,
+                         input="".join(f"{rev}:{path}\n" for rev, path in specs).encode("utf-8"))
+    if out.returncode != 0:
+        raise m.MapError("git cat-file --batch failed: "
+                         f"{(out.stderr.decode('utf-8', 'replace').strip().splitlines() or ['no output'])[-1]}")
+    held, at = {}, 0
+    for rev, path in specs:
+        end = out.stdout.find(b"\n", at)
+        if end < 0:
+            raise m.MapError(f"git cat-file --batch ended before {rev}:{path}")
+        fields = out.stdout[at:end].rsplit(b" ", 2)
+        at, held[(rev, path)] = end + 1, {}
+        if len(fields) != 3 or not fields[2].isdigit():
+            continue  # `<rev>:<path> missing`: the rev holds no such path, so it defines nothing
+        body, at = out.stdout[at:at + int(fields[2])], at + int(fields[2]) + 1
+        try:
+            got = xc.extract_ranges(body.decode("utf-8"), xc.ext_of(path))
+        except (SyntaxError, ValueError, RecursionError):
+            got = None
+        for name, _kind, _line, _end, digest in (got or {"defs": []})["defs"]:
+            held[(rev, path)].setdefault(name, digest)
+
+    def read_hashes(d, rev):
+        return {key: held[(rev, key.split("::")[0])].get(key.split("::")[1]) for key in d.symbols}
+
+    return {d.feature: (read_hashes(d, head), read_hashes(d, at)) for d, at in wanted}
+
+
 def render_stale_dossiers(scope: str, rows: list[dict] | None, *, as_json: bool) -> str:
     """The ``--stale-dossiers`` answer as text or as one JSON object, from the measured rows.
 
@@ -239,7 +286,7 @@ def render_stale_dossiers(scope: str, rows: list[dict] | None, *, as_json: bool)
         return f"# map-diff --stale-dossiers {scope}: DEAD PROBE - {doc['note']}"
     lines = [f"# map-diff --stale-dossiers {scope}: {doc['stale']} of {doc['of']} dossiers older "
              "than their paths (report only)"]
-    lines += [f"- {r['feature']} · {r['dossier']} · {r['behind']} behind · newest {r['newest'][:8]}"
+    lines += [f"- {r['feature']} · {r['dossier']} · {r['behind']} behind · newest {(r['newest'] or 'none')[:8]}"
               for r in doc["dossiers"] if r["stale"]]
     if doc["note"]:
         lines.append(f"note: {doc['note']}")
@@ -339,9 +386,17 @@ def main() -> int:
 
                 tree = m.load_map_tree(ext.inventory_ids(), root=root, decision_id_re=getattr(
                     ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE))
+                map_rel = m.load_conf(root)["MAP_ROOT"]
+                anchors = read_anchor_hashes(root, read[0], tree, map_rel, head or "HEAD")
+                unheld = [(f, key) for f, (now, _then) in sorted(anchors.items()) for key in now if now[key] is None]
+                for feature, key in unheld:
+                    print(f"map-diff: dossier {feature} anchors {key}, which {head or 'HEAD'} does not define",
+                          file=sys.stderr)
+                if unheld:
+                    return 1
                 rows = m.measure_dossier_staleness(
-                    read[0], tree, m.load_conf(root)["MAP_ROOT"],
-                    keyed_attributors=getattr(ext, "KEYED_ATTRIBUTORS", ()), scope=read[1])
+                    read[0], tree, map_rel, keyed_attributors=getattr(ext, "KEYED_ATTRIBUTORS", ()),
+                    scope=read[1], anchors=anchors)
         except m.MapError as exc:
             print(f"map-diff: {exc}", file=sys.stderr)
             return 1

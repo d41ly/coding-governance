@@ -102,9 +102,25 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 | 4 | `TOOL-aReapedSpinner-3` | no |
 | 5 | `TOOL-aReapedSpinner-4` | no |
 | 6 | `TOOL-aReapedSpinner-5`, `TOOL-aReapedSpinner-7` | yes |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-08-prompt-TOOL-aReapedSpinner-7-brief.md`, `2026-09-08-prompt-TOOL-aReapedSpinner-6-brief.md` and 6 more under prompts/ |
+| reviews | `2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md` (BLOCKED), `2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md` (BLOCKED) and 3 more under reviews/ |
+| research | `2026-09-08-build-TOOL-aReapedSpinner-4-signal-namespace-measured.md`, `2026-09-08-build-TOOL-aReapedSpinner-2-union-graph-measured.md` and 2 more under build/ |
+| logs | `2026-09-08-build-TOOL-aReapedSpinner-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 6 open |
+| card ref | `refs/gov/builds/aReapedSpinner/card` |
+<!-- /gen:build-routes -->

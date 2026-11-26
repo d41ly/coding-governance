@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-91 — unit 69's AC1 is answered only from a read in which C5 ran, classified by the read's exit status and the checks that failed before it
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-3 · 2026-11-24 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,13 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-91-deviation-911.md](../build/2026-10-26-build-TOOL-dTotalRecall-91-deviation-911.md) | deviation | — |
+| [2026-11-24-build-TOOL-dTotalRecall-91-1-acceptance-ledger.md](../build/2026-11-24-build-TOOL-dTotalRecall-91-1-acceptance-ledger.md) | log | — |
+| [2026-11-24-build-TOOL-dTotalRecall-91-1-builder-return.md](../build/2026-11-24-build-TOOL-dTotalRecall-91-1-builder-return.md) | journal | — |
+| [2026-11-24-prompt-TOOL-dTotalRecall-91-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-91-build-brief.md) | journal | — |
+| [2026-11-24-prompt-TOOL-dTotalRecall-91-reground-brief.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-91-reground-brief.md) | journal | — |
+| [2026-11-24-prompt-TOOL-dTotalRecall-91-reground-spec-writer.md](../prompts/2026-11-24-prompt-TOOL-dTotalRecall-91-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-90 TOOL-dTotalRecall-89 TOOL-dTotalRecall-92 |
+| [2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md](../reviews/2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md) | diff-review | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-36 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-114 |
 
 <!-- /gen:spec-records -->
 
@@ -21,14 +27,17 @@ The round-1 spec audit of units 77 to 88
 confirmed finding **id 23 at HIGH**, its item **H3**, alone in that item.
 
 `TOOL-dTotalRecall-80` (order 36) answers unit 69's AC1 from its `p69` read by one key: whether the
-read printed a `MANIFEST check 5 FAILED` line (spec 80 §2 S2 and §4 "The answer"). Nothing reads the
-`p69 rc=` line `TOOL-dTotalRecall-77`'s `read_checker` prints. The checker reaches C5 only on some
-paths. Its environment errors print `MANIFEST env ERROR` and `exit 2` before any check
-(`skills/session-kickoff/manifest-check.sh:205`, `:207`, `:337`, `:345`). C5's `fail 5` (`:1473`)
-runs only under `BLOCK_OK=1` (`:1359-1392`), which every `fail 2` of the block parse clears
-(`:1351-1384`), and only under `SKIP_RANGE=0` (`:1461`), which every `fail 3` sets (`:1438-1450`), as
-does a shallow clone missing the stamp's sha (`:1442`). A `p69` read on any of those paths prints no
-check-5 line, and unit 80 answers "green, the re-stamp cleared C5" although C5 never ran.
+read printed a `MANIFEST check 5 FAILED` line (spec 80 rev-4 S2 and its §4 "The answer"). Its AC1 wants
+exactly one `p69 rc=` line, and nothing reads the status that line holds; its §3 leaves that to this
+unit. The checker reaches C5 only on some paths. Its environment errors `exit 2` before any check:
+`skills/session-kickoff/manifest-check.sh@f7011dd6f:236`, and lines 239, 1349, 2351 and 2360 of that
+blob (DERIVED 2026-11-24, `grep -n "exit 2"` over it). C5's `fail 5`
+(`skills/session-kickoff/manifest-check.sh@f7011dd6f:2656`) runs only under `BLOCK_OK=1`, which every
+`fail 2` of the block parse clears (`skills/session-kickoff/manifest-check.sh@f7011dd6f:2527-2570`), and
+only under `SKIP_RANGE=0`, which every `fail 3` sets, as does a shallow clone missing the stamp's sha
+(`skills/session-kickoff/manifest-check.sh@f7011dd6f:2618-2644`). A `p69` read on any of those paths
+prints no check-5 line, and unit 80 answers green although C5 never ran. Unit 69 is CLOSED and stamped
+nothing: its pass(69) is `f7011dd6f`, the parent is `ff3c1b93a`, and the checker is one blob at both.
 
 This unit classifies each of unit 80's two recorded reads by its status line and the checks that
 failed before C5, and answers unit 69's AC1 only from a read in which C5 ran. A read in which it did
@@ -43,15 +52,18 @@ not is "unresolved: C5 not evaluated", named in the ledger and never answered gr
 - **S2** — Its liveness. Over §4's fixture reads it prints the eight verdicts §4 pins, among them
   `not-evaluated` for an exit status of 2, for a check-2 line, for a check-3 line and for a shallow
   repository. Observed by AC1.
-- **S3** — The answer. `c5_of` runs over the `p69` and `p69^` lines unit 80's acceptance ledger
-  recorded, with `git rev-parse --is-shallow-repository` read at this pass's base. Unit 69's AC1 is
+- **S3** — The answer. `c5_of` runs over unit 80's acceptance ledger by §4 "The answer", for the `p69`
+  and `p69^` lines its one fenced block holds verbatim, with `git rev-parse --is-shallow-repository`
+  read at this pass's base, in the repository both reads were made from. Unit 69's AC1 is
   green where `p69` reads `passed`, red where it reads `failed`, and "unresolved: C5 not evaluated"
   where it reads `not-evaluated`. The `p69^` verdict is stated beside it. Observed by AC2.
 - **S4** — The records, once. Where unit 80's answer differs from S3's, a deviation record of
   `TOOL-dTotalRecall-80` names its answer, the classified read and item H3. Where S3 is unresolved, a
   deviation record of `TOOL-dTotalRecall-69` names AC1 as not observed at `pass(69)`, with the read's
-  status and failure lines. Each is written only where `has_deviation` prints 0 for its unit and the
-  token `audit-77 id 23`, by `TOOL-dTotalRecall-90` §4's recipe. Observed by AC3.
+  status and failure lines. Each is written only where `has_deviation`, as `TOOL-dTotalRecall-93`
+  re-keys it, prints 0 for its unit and the token `audit-77 id 23 s4`, by `TOOL-dTotalRecall-90` §4's
+  recipe with §4's values. No record unit 80 writes is the same departure: its record of unit 69 stands
+  on a check-5 line, which S3 never reads as unresolved at status 1. Observed by AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -60,6 +72,12 @@ not is "unresolved: C5 not evaluated", named in the ledger and never answered gr
 - Answering unit 69's AC1 at any commit but `pass(69)`. A read at another commit is not unit 69's
   pass, so an unresolved answer stays unresolved.
 - Remedying a red at this build's tip: `TOOL-dTotalRecall-79` owns the tip's verdict.
+- A status that disagrees with its failure lines, `rc=1` with none or `rc=0` with one, and two status
+  lines under one label: `TOOL-dTotalRecall-96`, which corrects this table's rows and answers again.
+- Read lines wrapped in a bullet, a quote or an indent: `TOOL-dTotalRecall-97`'s extraction. Unit 80
+  holds its reads bare in one fence, at the start of a line, where this classifier reads them.
+- A checker that skipped every check on a manifest with no marker, at exit 0, and a record of unit 69
+  written from a parse failure: `TOOL-dTotalRecall-100`.
 - Editing unit 80's or unit 69's spec, each frozen once its unit builds.
 - The checklist entry the report suggests as the left-shift gate: the close's left-shift step
   (BUILD-METHOD M8).
@@ -91,6 +109,12 @@ not is "unresolved: C5 not evaluated", named in the ledger and never answered gr
 A shallow repository reads `not-evaluated` even where its stamp's sha is present and C5 ran. That
 errs toward unresolved and never toward green, since `read_checker` drops the `WARN` line that would
 tell the two apart.
+
+The two reads are of commits that cannot move. `memory/guides/SESSION-KICKOFF.md` carries its
+`kickoff-manifest:` marker at each, so neither read is the unmanaged exit 0
+(`skills/session-kickoff/manifest-check.sh@f7011dd6f:2359`): `git show <sha>:<path> | grep -c` printed
+1 at `f7011dd6f` and 1 at `ff3c1b93a` (DERIVED 2026-11-24, that command). `TOOL-dTotalRecall-100` S5
+makes that check.
 
 ### The classifier
 
@@ -142,17 +166,48 @@ t MANIFEST check 3 FAILED — last-audit sha is not an ancestor of HEAD
 READS
 ```
 
-PINNED, measured 2026-10-26 with this classifier: over this file with shallow `false`, `p69`, `p69^`,
-`q`, `r`, `s` and `t` printed `passed`, `failed`, `not-evaluated rc=2`, `not-evaluated check-2`,
-`passed` and `not-evaluated check-3`; label `none` printed `not-evaluated no-status-line`; and `p69`
-with shallow `true` printed `not-evaluated shallow`. `git rev-parse --is-shallow-repository` printed
-`false` at `1e255b0c6`.
+PINNED, measured 2026-10-26 and again 2026-11-24 at `02e6a8172` with this classifier: over this file
+with shallow `false`, `p69`, `p69^`, `q`, `r`, `s` and `t` printed `passed`, `failed`,
+`not-evaluated rc=2`, `not-evaluated check-2`, `passed` and `not-evaluated check-3`; label `none`
+printed `not-evaluated no-status-line`; and `p69` with shallow `true` printed `not-evaluated shallow`.
+`git rev-parse --is-shallow-repository` printed `false` at `02e6a8172` on node a.
+
+### The answer
+
+```bash
+# run from the repository root, with c5_of sourced
+LEDGER80=$(git grep -l "Evidences:\*\* TOOL-dTotalRecall-80" -- memory/builds/dTotalRecall/build)
+SH=$(git rev-parse --is-shallow-repository)
+for L in p69 'p69^'; do c5_of "$LEDGER80" "$L" "$SH"; done
+```
+
+The grep lists one file, as it does for unit 69's ledger today (DERIVED 2026-11-24, the same command
+with that id). Over a scratch ledger whose fence held a `p69 rc=1` line, a `p69` check-9 line, a
+`parent` line and a `p69^ rc=0` line, the two calls each printed `passed` (DERIVED 2026-11-24, node a),
+so the fence, the prose and the `parent` line are skipped. A `no-status-line` verdict contradicts unit
+80's AC1, which wants exactly one status line per read, and the ledger names it so.
+
+### The records
+
+`TOOL-dTotalRecall-90` §4 "The deviation record" gives each field. These are the values this unit sets:
+
+| Field | A record of `TOOL-dTotalRecall-80` | A record of `TOOL-dTotalRecall-69` |
+|---|---|---|
+| Departs from | `TOOL-dTotalRecall-80@rev-<N> [§6 AC2]` | `TOOL-dTotalRecall-69@rev-<N> [§6 AC1]` |
+| Before | the answer its ledger states | AC1 as its ledger records it, from the copied pair |
+| After | S3's answer and the classified read | AC1 not observed at pass(69), the read's status and failure lines |
+| Risk | `loosening` where it answered green, else `editorial` | `loosening` |
+
+Its Evidence carries the token `audit-77 id 23 s4`. With that token unit 90's probe printed 0 for unit 80
+and for unit 69 at `02e6a8172`, and with `spec changed at` it printed 1 for unit 70 (PINNED 2026-11-24,
+these calls), so the probe reads both ways over the real folder.
 
 ### Why order 37
 
-Unit 80 records its two reads and its answer at order 36. The driver runs units sharing an order in
-id order (`tools/workflows/unattended-build.js:76-80`), so this unit runs after unit 88 at 37, which
-reads neither unit 80's answer nor this one.
+Unit 80 records its two reads and its answer at order 36, and the guards are `TOOL-dTotalRecall-93`'s,
+at this order. The §3 edges run both first: `--dispatch` refuses a unit while a unit of its build it
+consumes from is neither CLOSED nor WONTDO (`tools/unattended/unattended.sh#verb_dispatch`, reading
+`tools/unattended/lib-unattended.sh#read_consumes_from`). No edge joins this unit to units 88, 94 or 95.
 
 ### Inventory
 
@@ -170,6 +225,8 @@ Minted: the probe function `c5_of`, spec text only; at most one deviation record
 - **Read the checker's full output for its `WARN` line.** `read_checker` keeps only failure lines,
   and re-running the checker is the main loop's. The shallow probe answers the same question from the
   repository.
+- **Take unit 96's agreement rows here.** That unit's goal and fixture are written on this table, and
+  it answers again at order 38. Nothing landed in the tree forces the change, so the rows stay its own.
 - **Re-read at the tip when `p69` is unresolved.** The tip is not unit 69's pass, so its verdict
   answers a different question.
 
@@ -180,7 +237,9 @@ Minted: the probe function `c5_of`, spec text only; at most one deviation record
 - error / empty / loading states — a read with no status line, a non-0-or-1 status, a check-2 or
   check-3 line and a shallow repository each read `not-evaluated`, never `passed`.
 - observability — the ledger quotes both reads beside their verdicts.
-- risks — the shallow row is conservative, as §4 states.
+- risks — the shallow row is conservative, as §4 states. A checker that dies between a failure of
+  another check and C5 exits 1 as a finished run does, since it runs under `set -u`, and the two
+  recorded line shapes cannot tell them apart.
 - testing — AC1 to AC3 by the pass.
 - migration — none.
 - user docs — none under `help/`.
@@ -192,15 +251,17 @@ Minted: the probe function `c5_of`, spec text only; at most one deviation record
   `passed` and `not-evaluated check-3`, label `none` prints `not-evaluated no-status-line`, and `p69`
   with shallow `true` prints `not-evaluated shallow`.
   Red when: a read with a non-0-or-1 status, a check-2 or check-3 line, or no status reads `passed`.
-  figure: the verdicts are PINNED in §4, measured 2026-10-26.
-- **AC2** — When `git grep -n "Evidences:\*\* TOOL-dTotalRecall-91" -- memory/builds/dTotalRecall/build`
-  runs after the pass, its AC2 line quotes unit 80's `p69` and `p69^` reads, `c5_of`'s verdict on each,
-  the `git rev-parse --is-shallow-repository` value, and unit 69's AC1 answered from `p69`'s verdict.
-  Red when: unit 69's AC1 is answered green from a read whose verdict is not `passed`.
-- **AC3** — When `has_deviation memory/builds/dTotalRecall/build 80 'audit-77 id 23'` runs after the
+  figure: the verdicts are PINNED in §4, measured 2026-10-26 and 2026-11-24.
+- **AC2** — When `git grep --untracked -n "Evidences:\*\* TOOL-dTotalRecall-91" -- memory/builds/dTotalRecall/build`
+  runs after the pass, the ledger it names has an AC2 line quoting unit 80's `p69` and `p69^` reads, the
+  path §4's `LEDGER80` held, `c5_of`'s verdict on each read, the `git rev-parse --is-shallow-repository`
+  value, unit 69's AC1 answered from `p69`'s verdict, and unit 80's answer beside it.
+  Red when: unit 69's AC1 is answered green from a read whose verdict is not `passed`, or a read is
+  classified from anything but unit 80's ledger.
+- **AC3** — When `has_deviation memory/builds/dTotalRecall/build 80 'audit-77 id 23 s4'` runs after the
   pass, it prints 1 where unit 80's answer differs from AC2's, else 0, and the same for unit 69 prints
-  1 where AC2's answer is unresolved, else 0.
-  Red when: an owed record is absent, or a record is written twice.
+  1 where AC2's answer is unresolved, else 0. Run before any write, both print 0.
+  Red when: an owed record is absent, a record no answer owes is written, or a record is written twice.
 
 ## 7. Gates
 
@@ -223,15 +284,26 @@ No new arm: the classifier's liveness is its fixture, and the reads it classifie
   (HIGH, item H3).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the consumes-from edge to TOOL-dTotalRecall-93, the mirror of TOOL-dTotalRecall-96, the mirror of TOOL-dTotalRecall-100, each the other end of an edge a unit the
   round-1 spec audit of units 89 to 92 promoted wrote; nothing else moved.
+- rev-3 · 2026-11-24 · §1 · S3 · S4 · §3 · §4 · §5 · AC1 · AC2 · AC3 · §10 · re-grounded at `02e6a8172` per
+  `2026-11-24-prompt-TOOL-dTotalRecall-91-reground-brief`, over unit 69 as built, unit 80 rev-4 and unit
+  90 rev-3: the checker's citations are pinned at pass(69); the answer's command and the records' values
+  are spelled; the token gains its label; the fixture is re-measured; the order rests on the dispatch
+  edge check; what units 96, 97 and 100 correct is a named non-goal. No scope item or criterion is cut.
 
 ## 10. Reuse audit
 
-The seams are `TOOL-dTotalRecall-77`'s `read_checker` line format, whose labelled lines `c5_of`
-parses as `TOOL-dTotalRecall-79`'s span script parses them, and `TOOL-dTotalRecall-90`'s
-`has_deviation` with its record recipe. `python tools/codebase-map/reuse_lookup.py "run a checker at each historical commit in a scratch worktree"`
-ranked `add_scratch_worktree` among its SEAM candidates, the checkout unit 80 already used; nothing
-in the tree classifies the checker's exit status. The recall query below found this audit's item H3,
-`TOOL-dTotalRecall-77` and `TOOL-dTotalRecall-80`, and no reader of `manifest-check.sh` that keys a
-verdict on its status. No existing seam fits beyond them.
+The seams, re-read at `02e6a8172`, are `TOOL-dTotalRecall-77` rev-4's two line shapes, which `c5_of`
+parses as `TOOL-dTotalRecall-79` rev-3's span script parses them, unit 80 rev-4's fenced block, and
+`TOOL-dTotalRecall-90`'s record recipe with `has_deviation` as `TOOL-dTotalRecall-93` re-keys it.
+`python tools/codebase-map/reuse_lookup.py "run a checker at each historical commit in a scratch worktree"`,
+re-run 2026-11-24, ranks `add_scratch_worktree` among its SEAM candidates, the checkout unit 80's parent
+read already uses; asked to classify a recorded exit status and its failure lines, it ranks name-stem
+neighbours of `check` and `record` and nothing that reads a checker's status. The recall query below was
+made when the spec was written. It found this audit's item H3, `TOOL-dTotalRecall-77` and
+`TOOL-dTotalRecall-80`, and no reader of `manifest-check.sh` that keys a verdict on its status. Its
+re-run on 2026-11-24 found them again with units 96 and 97. No existing seam fits beyond them.
+`tools/memory-tree/id_grammar.py#read_kept_reason` and the build-folder walks of
+`record_causes.py#check_cause_writers` and `record_kinds.py#check_alias_compares` are no seam here: this
+unit reads no marker and no registry.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a manifest-check verdict read so an exit 2 or a skipped check is never green" --terms "manifest-check exit status env ERROR BLOCK_OK SKIP_RANGE C5 check 5 FAILED read_checker p69 not evaluated"`

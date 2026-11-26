@@ -323,17 +323,18 @@ mark_case_n=0
 # as `zero`, case 3 as `items`. Grading was unaffected - the fixture index drives it - so the
 # misattribution surfaced only on the run where a row goes red, which is the one run the label has
 # to be right on. It surfaced on exactly such a run: a real failure reported itself as `[mark/on]`.
-MARK_NAMES=(); MARK_DATES=(); MARK_WANT_HYG=""; MARK_WANT_PLAN=""
+MARK_NAMES=(); MARK_DATES=(); MARK_SLUGS=(); MARK_WANT_HYG=""; MARK_WANT_PLAN=""
 # The FILENAME DATE is the fifth argument, 2026-08-09 by default, and BOTH copies carry it: the
 # planning copy is named `<date>-plan-<n>.md` because `plan_state` reads the date from the basename,
 # exactly as the engine does, and a dateless name would grade every row under the old reading.
 mark_case() { # name · want_hygiene(red|silent) · want_plan(READY|FORKED) · section-8 body · [date]
   mark_case_n=$((mark_case_n+1))
-  local slug="tMark$mark_case_n" d="${5:-2026-08-09}"
-  mkdir -p "$FT/memory/builds/$slug/spec"
+  # the case number in two letters: a build slug holds no digit under the slug grammar (TOOL-dTotalRecall-5)
+  local l=abcdefghijklmnopqrstuvwxyz d="${5:-2026-08-09}" slug
+  slug="tMark${l:mark_case_n/26:1}${l:mark_case_n%26:1}"; mkdir -p "$FT/memory/builds/$slug/spec"
   spec_doc "CLOSED" "$4" > "$FT/memory/builds/$slug/spec/$d-spec-ARCH-$slug-1.md"
   spec_doc "SPECCED" "$4" > "$T/$d-plan-$mark_case_n.md"
-  MARK_NAMES+=("$1"); MARK_DATES+=("$d")
+  MARK_NAMES+=("$1"); MARK_DATES+=("$d"); MARK_SLUGS+=("$slug")
   MARK_WANT_HYG="$MARK_WANT_HYG $2"
   MARK_WANT_PLAN="$MARK_WANT_PLAN $3"
 }
@@ -458,7 +459,7 @@ for want_h in $MARK_WANT_HYG; do
   # Only the section-8 verdict is read. The scratch tree reds other checks on purpose and that noise
   # is ignored, exactly as this kit's sibling test documents — but the grep is anchored on the FILE
   # plus the section-8 reason, so an unrelated fault on the same file cannot forge a hit.
-  if printf '%s\n' "$hyg_out" | grep -q "tMark$i-1.md (terminal Status.*§8\|tMark$i-1.md (terminal Status and a §8\|tMark$i-1.md (§8 is not F-item shaped"; then got_h=red; else got_h=silent; fi
+  if printf '%s\n' "$hyg_out" | grep -q "${MARK_SLUGS[i-1]}-1.md (terminal Status.*§8\|${MARK_SLUGS[i-1]}-1.md (terminal Status and a §8\|${MARK_SLUGS[i-1]}-1.md (§8 is not F-item shaped"; then got_h=red; else got_h=silent; fi
   [ "$got_h" = "$want_h" ] || { echo "FAIL [mark/$nm] hygiene said $got_h, contract says $want_h"; st=1; }
 done
 
@@ -490,7 +491,7 @@ for _off in blank absent; do
   ncase=$((ncase+1))
   [ "$_crc" = 0 ] && [ -z "$_cut" ] || { echo "FAIL [item/$_off] the planning reader returned rc=$_crc [$_cut] for a conf whose key is $_off"; st=1; }
   ncase=$((ncase+1))
-  if printf '%s\n' "$_ho" | grep -q "tMark$_f2-1.md (terminal Status.*§8\|tMark$_f2-1.md (§8 is not F-item shaped"; then
+  if printf '%s\n' "$_ho" | grep -q "${MARK_SLUGS[_f2-1]}-1.md (terminal Status.*§8\|${MARK_SLUGS[_f2-1]}-1.md (§8 is not F-item shaped"; then
     echo "FAIL [item/$_off] with FORK_ITEM_CUTOFF $_off the hygiene side still graded the post-cutoff F2 row per item"; st=1
   fi
   ncase=$((ncase+1))

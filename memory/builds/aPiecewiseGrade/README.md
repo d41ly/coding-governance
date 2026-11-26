@@ -88,9 +88,24 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 | 4 | `TOOL-aPiecewiseGrade-2` | no |
 | 5 | `TOOL-aPiecewiseGrade-5`, `TOOL-aPiecewiseGrade-6` | yes |
 | 6 | `TOOL-aPiecewiseGrade-7`, `TOOL-aPiecewiseGrade-8` | yes |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-16-prompt-TOOL-aPiecewiseGrade-8-review-brief.md`, `2026-11-16-prompt-TOOL-aPiecewiseGrade-8-1-spec-writer.md` and 19 more under prompts/ |
+| reviews | `2026-11-16-review-TOOL-aPiecewiseGrade-5-diff-review-round2.md` (CLEAN WITH FIXES), `2026-11-16-review-TOOL-aPiecewiseGrade-1-diff-review-round1.md` (CLEAN WITH FIXES) |
+| red-fix | `2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-4.md`, `2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-3.md` and 2 more under build/ |
+| logs | `2026-11-16-build-TOOL-aPiecewiseGrade-8-1-acceptance-ledger.md`, `2026-11-16-build-TOOL-aPiecewiseGrade-7-1-acceptance-ledger.md` and 9 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aPiecewiseGrade/card` |
+<!-- /gen:build-routes -->

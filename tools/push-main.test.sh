@@ -224,7 +224,9 @@ fail=0
 # every later unit adding an `ok` row that runs there raises it.
 # 103 = 101 + TOOL-dPlacedRequest-99 S3's two fenced-landing rows, 55 and 56, one `ok` call site run
 # twice by its loop, counted off the block; no suite ran in the pass.
-FLOOR_ASSERTIONS=103
+# 105 = 103 + TOOL-dTotalRecall-24's two RE AC7 rows, one per landing path, counted off the block; no
+# suite ran in the pass.
+FLOOR_ASSERTIONS=105
 n=0; skipped=0
 ok()  { echo "  ok   — $1"; n=$((n + 1)); }
 bad() { echo "  FAIL — $1"; fail=1; }
@@ -824,6 +826,29 @@ out21b=$( cd "$tmp/work2" && bash "$lander" 2>&1 ); rc21b=$?
 [ "$rc21b" = 0 ] && case "$out21b" in *"landed main on origin"*) true ;; *) false ;; esac \
   && ok "21b the no-argument invocation still lands from the primary tree" || bad "21b rc=$rc21b $out21b"
 
+# RE AC7 (TOOL-dTotalRecall-24 S5) — EACH LANDING PATH APPENDS THE LANDED RANGE'S RECORD EVENTS to the
+#      node's change feed, the common dir's `gov-feed.log` the worktree and the primary tree share: a
+#      run branch carrying a record commit lands through --land, then a record commit on the primary
+#      tree's default branch lands through the attended path. Staged RED by deleting either success
+#      branch's `add_record_events` call: that landing's line is absent.
+re_feed="$(git -C "$tmp/work2" rev-parse --path-format=absolute --git-common-dir)/gov-feed.log"
+build_main; build_feat
+mkdir -p "$tmp/wt/memory"; echo "r $RANDOM" > "$tmp/wt/memory/land.md"; git -C "$tmp/wt" add memory/land.md
+git -C "$tmp/wt" commit -q -m "TOOL-tFix-5: a record"; re_c=$(git -C "$tmp/wt" rev-parse HEAD)
+re_out=$(run_wt --prepare --slug tFix 2>&1 && run_wt --land --slug tFix 2>&1); re_rc=$?
+printf -v re_l 'refs/heads/main\trecord\t%s\t%s' "$(git -C "$tmp/wt" rev-parse "$re_c:memory/land.md")" "$re_c"
+[ "$re_rc" = 0 ] && cut -f2-5 "$re_feed" 2>/dev/null | grep -qxF "$re_l" \
+  && ok "RE AC7 --land appends the landed record commit's event to the feed" \
+  || bad "RE AC7 --land (rc $re_rc) left no record event for ${re_c:0:8} in the feed: $re_out"
+build_main; git -C "$tmp/work2" checkout -q main
+mkdir -p "$tmp/work2/memory"; echo "a $RANDOM" > "$tmp/work2/memory/attended.md"; git -C "$tmp/work2" add memory/attended.md
+git -C "$tmp/work2" commit -q -m "a record, landed attended"; re_c=$(git -C "$tmp/work2" rev-parse HEAD)
+re_out=$( cd "$tmp/work2" && bash "$lander" 2>&1 ); re_rc=$?
+printf -v re_l 'refs/heads/main\trecord\t%s\t%s' "$(git -C "$tmp/work2" rev-parse "$re_c:memory/attended.md")" "$re_c"
+[ "$re_rc" = 0 ] && cut -f2-5 "$re_feed" 2>/dev/null | grep -qxF "$re_l" \
+  && ok "RE AC7 the attended path appends the landed record commit's event to the feed" \
+  || bad "RE AC7 the attended landing (rc $re_rc) left no record event for ${re_c:0:8} in the feed: $re_out"
+
 # 22 — an OBSERVATION failure exits 3 and never 2, so a driver cannot read a network fault as a
 #      misdeclared flag. Two causes, one code.
 git -C "$tmp/wt" symbolic-ref -d refs/remotes/origin/HEAD 2>/dev/null || true
@@ -868,7 +893,7 @@ if [ -n "$_ml_lex" ]; then
   git merge -q --no-ff --no-commit sideB >/dev/null 2>&1
   printf 'fa() { echo A; }\n' > a.sh; git add a.sh; git commit -q -m "merge sideB, taking side A"
   before23=$(git rev-parse refs/heads/feat)
-  out23=$(bash "$lander" --prepare --slug fx 2>&1); rc23=$?
+  out23=$(bash "$lander" --prepare --slug fxFix 2>&1); rc23=$?
   [ "$rc23" = 1 ] && [ "$(git rev-parse refs/heads/feat)" = "$before23" ] \
     && [ "$(git symbolic-ref --short HEAD 2>/dev/null)" = feat ] \
     && case "$out23" in *"a.sh: fb"*) true ;; *) false ;; esac \
@@ -992,8 +1017,8 @@ git checkout -q HEAD~1 -- "$pmk/post-merge.sh"
 git add -A; git commit -q -m "stub back"; git push -q --no-verify origin main
 git worktree add -q "$tmp/wt6" -b feat6 main
 export MARK="$tmp/pm-mark-p8"
-o8=$(cd "$tmp/wt6" && echo u8 > src-u8.txt && git add src-u8.txt && git commit -q -m "TOOL-tB-1: unit" \
-  && bash "$lander" --prepare --slug tB >/dev/null 2>&1 && bash "$lander" --land --slug tB 2>&1)
+o8=$(cd "$tmp/wt6" && echo u8 > src-u8.txt && git add src-u8.txt && git commit -q -m "TOOL-tBFix-1: unit" \
+  && bash "$lander" --prepare --slug tBFix >/dev/null 2>&1 && bash "$lander" --land --slug tBFix 2>&1)
 h8=$(git -C "$tmp/wt6" rev-parse HEAD)
 sleep 12
 read_pm_mark() { [ -f "$tmp/pm-mark-$1" ] && cat "$tmp/pm-mark-$1" || echo absent; }
@@ -1110,10 +1135,10 @@ out27=$(
   top="$tmp/mint27"; self_dir="$top"; mkdir -p "$top/k"
   printf 'echo "routed-commits REFUSED — x"; exit 2\n' > "$top/k/routed_commits.py"
   printf 'refused=[%s]\n' "$(read_mint_unit HEAD~1..HEAD)"
-  printf 'echo TOOL-x-1; exit 0\n' > "$top/k/routed_commits.py"
+  printf 'echo TOOL-xFix-1; exit 0\n' > "$top/k/routed_commits.py"
   printf 'named=[%s]\n' "$(read_mint_unit HEAD~1..HEAD)"
 )
-printf '%s\n' "$out27" | grep -qx 'refused=\[\]' && printf '%s\n' "$out27" | grep -qx 'named=\[TOOL-x-1\]' \
+printf '%s\n' "$out27" | grep -qx 'refused=\[\]' && printf '%s\n' "$out27" | grep -qx 'named=\[TOOL-xFix-1\]' \
   && ok "27 a refusing --newest-unit mints no unit, and an answering one mints its id" \
   || bad "27 read_mint_unit kept a refusal or lost an answer: $out27"
 
@@ -1426,7 +1451,7 @@ PY
     git commit -q --no-verify --allow-empty -m "TOOL-tFix-39: a unit"
     B39=$(git rev-parse HEAD)
     : > "$tmp/tmpdir39"
-    unset GATE_PUSH_BASE; TMPDIR="$tmp/tmpdir39" bash "$lander" --prepare --slug fx 2>&1 >/dev/null; echo "rc=$?"
+    unset GATE_PUSH_BASE; TMPDIR="$tmp/tmpdir39" bash "$lander" --prepare --slug fxFix 2>&1 >/dev/null; echo "rc=$?"
     [ "$(git rev-parse refs/heads/feat)" = "$B39" ] && echo unmoved=1
     { [ -e .governance/install.json ] || [ -n "$(git ls-tree -r --name-only HEAD -- .governance/install.json)" ]; } \
       && echo receipt=present || echo receipt=absent
@@ -1594,7 +1619,7 @@ PY
       *) echo "unknown-plant=$pl37"; exit 0 ;;
     esac
     oldb=$(git rev-parse refs/heads/feat)
-    unset GATE_PUSH_BASE; e37=$(bash "$lander" --prepare --slug fx 2>&1 >/dev/null); echo "rc=$?"
+    unset GATE_PUSH_BASE; e37=$(bash "$lander" --prepare --slug fxFix 2>&1 >/dev/null); echo "rc=$?"
     # the refusal is the row's own stage, or a case refused earlier would pass for it
     case "$e37" in *"$want37"*) echo stage=refused ;; *) echo "stage-missing=[$e37]" ;; esac
     nowb=$(git rev-parse refs/heads/feat)
@@ -1810,7 +1835,7 @@ fi
 #      that writes the allow record `check_push_allow` reads and exits 0, the unattended kit beside
 #      this lander standing at the fixture's own `<prefix>unattended/` as a one-line launcher of a
 #      copy of it in the fixture's own kit tree (below),
-#      leases on, and clone A's session `sA` holding the build lease `fx` under fleet tag `a`. Clone B
+#      leases on, and clone A's session `sA` holding the build lease `fxFix` under fleet tag `a`. Clone B
 #      takes the lease over as fleet tag `b`, same session, which the `lease` column reads `same`.
 #      A planted fence read stands in a stub driver committed at the same place. Staged against the
 #      base lander, which pushes one ref and reads no fence: 42 moves no lease, 43 lands, 44 to 47
@@ -1828,8 +1853,8 @@ fi
 #      fixture's acquire, the lander's fence reads and the hook's take-over, ignores the ambient node.
 _fn_k=$(cd "$HERE" && for d in */; do [ -f "$d/unattended.sh" ] && [ -f "$d/lib-unattended.sh" ] && { printf '%s' "${d%/}"; break; }; done)
 _fn_pb=$(cd "$HERE" && for d in */; do [ -f "$d/render_playbook.py" ] && { printf '%s' "${d%/}"; break; }; done)
-FX="$tmp/fx"
-write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fx, FX/b; rc 1 with the failed step's own line in fx_line
+FX="$tmp/fxFix"
+write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fxFix, FX/b; rc 1 with the failed step's own line in fx_line
   rm -rf "$FX"; mkdir -p "$FX"
   fx_line="no playbook kit holding render_playbook.py beside this lander, so the fixture's registry has no reader to copy"
   [ -n "$_fn_pb" ] || return 1
@@ -1837,35 +1862,36 @@ write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fx, FX/b; rc 1 wit
   git init -q --template= "$FX/kit" && cp -R "$HERE/$_fn_k" "$FX/kit/$_fn_k" && cp -R "$HERE/$_fn_pb" "$FX/kit/$_fn_pb" \
     && printf '[[node]]\ntag = "%s"\nuser = "%s"\nhost = ""\nprojects_root = "%s"\nvariances = ""\n\n' a daily-agent "$FX" b agent5 "$FX" \
       > "$FX/kit/$_fn_pb/fleet.toml" || return 1
-  for _fn_s in policy loop; do # the driver's optional siblings its lease verbs resolve, where this install has them
+  # memory-tree since TOOL-dTotalRecall-5: the driver reads every slug through that kit's slug grammar.
+  for _fn_s in policy loop memory-tree; do # the driver's siblings its lease verbs resolve, where this install has them
     [ ! -d "$HERE/$_fn_s" ] || cp -R "$HERE/$_fn_s" "$FX/kit/$_fn_s" || return 1
   done
   fx_line="the fixture's remote and clones could not be made under $FX"
   git init -q --template= --bare -b main "$FX/o.git"
   git init -q --template= -b main "$FX/a"
   ( cd "$FX/a" || exit 1
-    mkdir -p "./${KIT_REL}$_fn_k" .githooks memory/builds/fx
+    mkdir -p "./${KIT_REL}$_fn_k" .githooks memory/builds/fxFix
     cp "$HERE/push-main.sh" "$lander"
     printf '#!/usr/bin/env bash\nexec env -u GOV_NODE bash "%s" "$@"\n' "$FX/kit/$_fn_k/unattended.sh" > "${KIT_REL}$_fn_k/unattended.sh"
-    printf '#!/usr/bin/env bash\ngd=$(git rev-parse --git-dir)\nwhile read -r _l s r _o; do [ "$r" = refs/heads/main ] && printf "%%s\\tstub\\n" "$s" > "$gd/pre-push-allow"; done\nif [ -f "%s/take-once" ]; then rm -f "%s/take-once"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && USERNAME=agent5 bash "%s" --lease take-over build fx >&2 ); fi\nif [ -f "%s/plant-once" ]; then mv -f "%s/plant-once" "%s/plant-ran"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && bash "%s/plant-ran" >&2 ); fi\nexit 0\n' \
+    printf '#!/usr/bin/env bash\ngd=$(git rev-parse --git-dir)\nwhile read -r _l s r _o; do [ "$r" = refs/heads/main ] && printf "%%s\\tstub\\n" "$s" > "$gd/pre-push-allow"; done\nif [ -f "%s/take-once" ]; then rm -f "%s/take-once"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && USERNAME=agent5 bash "%s" --lease take-over build fxFix >&2 ); fi\nif [ -f "%s/plant-once" ]; then mv -f "%s/plant-once" "%s/plant-ran"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && bash "%s/plant-ran" >&2 ); fi\nexit 0\n' \
       "$FX" "$FX" "$FX" "${KIT_REL}$_fn_k/unattended.sh" "$FX" "$FX" "$FX" "$FX" "$FX" > .githooks/pre-push
     printf '%s\n' 'MEMORY_ROOT=memory' 'RUN_CLAIMS="on"' 'LANDER="echo land"' 'LANDER_MODE="primary"' 'BYPASS_BAN="--no-verify"' \
       'GATE_CMD="true"' 'GATE_WALL="21600"' 'RESUME_SCHEDULE="off"' 'RESUME_SCHEDULE_DELAY=1800' 'RESUME_SCHEDULE_LIMIT=6' \
       'GATE_BOUND=3600' 'UNIT_STALL_BOUND=1800' 'RESUME_STALE_BOUND=5400' > .unattended.conf
-    echo x > memory/builds/fx/README.md
+    echo x > memory/builds/fxFix/README.md
     git config core.hooksPath .githooks
     git add -A && git commit -q -m base && git remote add origin "$FX/o.git" \
       && git push -q --no-verify origin main && git remote set-head origin -a >/dev/null ) || return 1
   git clone -q "$FX/o.git" "$FX/b" && git -C "$FX/b" config core.hooksPath .githooks || return 1
-  fx_line=$(cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --lease acquire build fx 2>&1)
-  [[ $'\n'$fx_line == *$'\n''lease — fx/build · create'* ]]
+  fx_line=$(cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --lease acquire build fxFix 2>&1)
+  [[ $'\n'$fx_line == *$'\n''lease — fxFix/build · create'* ]]
 }
-read_fence_tips() { echo "main $(git --git-dir="$FX/o.git" rev-parse refs/heads/main) lease $(git --git-dir="$FX/o.git" rev-parse -q --verify refs/gov/leases/fx/build)"; }
+read_fence_tips() { echo "main $(git --git-dir="$FX/o.git" rev-parse refs/heads/main) lease $(git --git-dir="$FX/o.git" rev-parse -q --verify refs/gov/leases/fxFix/build)"; }
 run_fence_land() { ( cd "$FX/a" && bash "$lander" "$@" 2>&1 ); }
 write_fence_stub() { # stub driver body -> committed in clone A, the branch prepared again
   printf '#!/usr/bin/env bash\n%s\n' "$1" > "$FX/a/${KIT_REL}$_fn_k/unattended.sh"
-  git -C "$FX/a" commit -qam "TOOL-fx-9: a planted fence read"
-  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+  git -C "$FX/a" commit -qam "TOOL-fxFix-9: a planted fence read"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fxFix >/dev/null 2>&1 )
 }
 _fn_u=${USERNAME-}; _fn_sid=${CLAUDE_CODE_SESSION_ID-}; _fn_gct=${GOV_GATE_CMD_TEST-}
 export GOV_RUNLOG=0 USERNAME=daily-agent CLAUDE_CODE_SESSION_ID=sA; unset GOV_GATE_CMD_TEST GATE_PUSH_BASE
@@ -1876,43 +1902,43 @@ elif ! write_fence_fixture; then
 else
   # 42 — AC4: a fenced landing moves the branch and the lease together, the beat on the tip read,
   #      `renews: no`, and clone A's feed holds one event for the lease at the beat.
-  tip42=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
-  git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-1: work"
-  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
-  out42=$(run_fence_land --land --slug fx); rc42=$?
-  b42=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
-  g42="$rc42 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse HEAD)" ] && echo main) $([ "$b42" != "$tip42" ] && [ "$(git --git-dir="$FX/o.git" rev-parse "$b42^")" = "$tip42" ] && echo beat) $(git --git-dir="$FX/o.git" log -1 --format=%B "$b42" | sed -n 's/^renews: //p') $(grep -c "refs/gov/leases/fx/build.*$b42" "$FX/a/.git/gov-feed.log" 2>/dev/null)"
+  tip42=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)
+  git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fxFix-1: work"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fxFix >/dev/null 2>&1 )
+  out42=$(run_fence_land --land --slug fxFix); rc42=$?
+  b42=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)
+  g42="$rc42 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse HEAD)" ] && echo main) $([ "$b42" != "$tip42" ] && [ "$(git --git-dir="$FX/o.git" rev-parse "$b42^")" = "$tip42" ] && echo beat) $(git --git-dir="$FX/o.git" log -1 --format=%B "$b42" | sed -n 's/^renews: //p') $(grep -c "refs/gov/leases/fxFix/build.*$b42" "$FX/a/.git/gov-feed.log" 2>/dev/null)"
   [ "$g42" = "0 main beat no 1" ] && ok "42 a fenced landing pushes the branch and a beat parented on the tip read, renews: no, one feed event" \
     || bad "42 the fenced landing did not move the branch and the lease together, or the feed missed the beat: [$g42] $out42"
   # 42b — TOOL-dPlacedRequest-34 AC6 (S6): the landing's beat is clone A's cache ref, so its feed checks
   #       clean. Staged against `add_feed_event` alone in the lander's fenced push: the cache stays on
   #       the tip the fence read, and `--feed check` exits 1 printing `extra` for the beat.
-  c42=$(git -C "$FX/a" rev-parse -q --verify refs/gov/remote/leases/fx/build)
+  c42=$(git -C "$FX/a" rev-parse -q --verify refs/gov/remote/leases/fxFix/build)
   f42=$(cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --feed check 2>&1); fr42=$?
   [ -n "$b42" ] && [ "$c42 $fr42" = "$b42 0" ] && ok "42b the fenced landing sets the cache ref to its beat and the feed checks clean" \
     || bad "42b the cache ref does not name the landed beat, or the feed check refused: [$c42 $fr42, beat $b42] $f42"
   # 43 — AC2: clone B takes the lease over inside A's hook, after the fence read; A's atomic push lands
   #      nothing and the lander exits 1 naming `fenced`, the branch unchanged and the lease B's.
-  git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-2: more"
-  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+  git -C "$FX/a" commit -q --allow-empty -m "TOOL-fxFix-2: more"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fxFix >/dev/null 2>&1 )
   m43=$(git --git-dir="$FX/o.git" rev-parse main); : > "$FX/take-once"
-  out43=$(run_fence_land --land --slug fx); rc43=$?
-  g43="$rc43 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m43" ] && echo unchanged) $(git --git-dir="$FX/o.git" log -1 --format=%B refs/gov/leases/fx/build | sed -n 's/^fleet-tag: //p')"
+  out43=$(run_fence_land --land --slug fxFix); rc43=$?
+  g43="$rc43 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m43" ] && echo unchanged) $(git --git-dir="$FX/o.git" log -1 --format=%B refs/gov/leases/fxFix/build | sed -n 's/^fleet-tag: //p')"
   case "$g43|$out43" in
     "1 unchanged b|"*"push-main: fenced — the lease"*) ok "43 a lease taken over after the fence read lands nothing: exit 1, fenced, the branch unchanged, the lease B's" ;;
     *) bad "43 a lease taken over mid-push did not refuse as fenced with the branch unchanged: [$g43] $out43" ;;
   esac
   # 44 — AC5: against the lease B now holds, the fence read refuses `live-holder` and nothing moves.
-  t44=$(read_fence_tips); out44=$(run_fence_land --land --slug fx); rc44=$?
+  t44=$(read_fence_tips); out44=$(run_fence_land --land --slug fxFix); rc44=$?
   case "$rc44 $([ "$(read_fence_tips)" = "$t44" ] && echo unchanged)|$out44" in
-    "1 unchanged|"*"lease refused — live-holder · fx/build"*) ok "44 a lease another holds refuses the landing live-holder and pushes nothing" ;;
+    "1 unchanged|"*"lease refused — live-holder · fxFix/build"*) ok "44 a lease another holds refuses the landing live-holder and pushes nothing" ;;
     *) bad "44 a lease clone B holds did not refuse the landing: $out44" ;;
   esac
   # 45 — AC6: a remote that advertises no `--atomic` refuses the fenced push, `unfenced`, never a fallback.
-  ( cd "$FX/b" && USERNAME=agent5 bash "${KIT_REL}$_fn_k/unattended.sh" --lease release build fx >/dev/null 2>&1 )
-  ( cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --lease acquire build fx >/dev/null 2>&1 )
+  ( cd "$FX/b" && USERNAME=agent5 bash "${KIT_REL}$_fn_k/unattended.sh" --lease release build fxFix >/dev/null 2>&1 )
+  ( cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --lease acquire build fxFix >/dev/null 2>&1 )
   git --git-dir="$FX/o.git" config receive.advertiseAtomic false
-  t45=$(read_fence_tips); out45=$(run_fence_land --land --slug fx); rc45=$?
+  t45=$(read_fence_tips); out45=$(run_fence_land --land --slug fxFix); rc45=$?
   git --git-dir="$FX/o.git" config --unset receive.advertiseAtomic
   case "$rc45 $([ "$(read_fence_tips)" = "$t45" ] && echo unchanged)|$out45" in
     "1 unchanged|"*"push-main: unfenced — the remote refused the atomic push"*) ok "45 a remote without atomic pushes refuses the fenced landing as unfenced, the branch and the lease unchanged" ;;
@@ -1921,18 +1947,18 @@ else
   # 46 — AC9: a driver exiting 2 with nothing, and one exiting 0 with two fence lines, refuse unparsed.
   cp "$FX/a/${KIT_REL}$_fn_k/unattended.sh" "$FX/real-driver"
   t46=$(read_fence_tips)
-  write_fence_stub 'exit 2'; out46=$(run_fence_land --land --slug fx); rc46=$?
+  write_fence_stub 'exit 2'; out46=$(run_fence_land --land --slug fxFix); rc46=$?
   write_fence_stub 'echo "fence — none · leases are off"; echo "fence — none · leases are off"'
-  out46b=$(run_fence_land --land --slug fx); rc46b=$?
+  out46b=$(run_fence_land --land --slug fxFix); rc46b=$?
   case "$rc46 $rc46b $([ "$(read_fence_tips)" = "$t46" ] && echo unchanged)|$out46|$out46b" in
     "1 1 unchanged|"*"push-main: fence read unparsed — exit 2 · (empty)"*"|"*"push-main: fence read unparsed — exit 0 · fence — none"*)
       ok "46 an empty odd-exit fence read and a two-line one each refuse unparsed, nothing pushed" ;;
     *) bad "46 an unparsed fence read landed or was not named: $out46 | $out46b" ;;
   esac
   # 47 — AC3: a fence line whose beat IS its tip, the unchanged re-push no remote checks, refuses first.
-  lt47=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
-  write_fence_stub "echo \"fence — refs/gov/leases/fx/build $lt47 $lt47\""
-  out47=$(run_fence_land --land --slug fx); rc47=$?
+  lt47=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)
+  write_fence_stub "echo \"fence — refs/gov/leases/fxFix/build $lt47 $lt47\""
+  out47=$(run_fence_land --land --slug fxFix); rc47=$?
   case "$rc47 $([ "$(read_fence_tips)" = "$t46" ] && echo unchanged)|$out47" in
     "1 unchanged|"*"IS the lease tip, an unchanged lease ref the remote never checks"*) ok "47 check_fence_beat refuses a beat equal to the tip before any push" ;;
     *) bad "47 a fence beat equal to its tip was not refused before the push: $out47" ;;
@@ -1941,24 +1967,24 @@ else
   #      single-ref push; the attended `--slug` fences as --land does, and no argument reads no fence.
   cp "$FX/real-driver" "$FX/a/${KIT_REL}$_fn_k/unattended.sh"
   sed -i 's/^RUN_CLAIMS="on"/RUN_CLAIMS="off"/' "$FX/a/.unattended.conf"
-  git -C "$FX/a" commit -qam "TOOL-fx-9: leases off"
-  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
-  lb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
-  out48=$(run_fence_land --land --slug fx); rc48=$?
-  case "$rc48 $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$lb48" ] && echo unmoved)|$out48" in
+  git -C "$FX/a" commit -qam "TOOL-fxFix-9: leases off"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fxFix >/dev/null 2>&1 )
+  lb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)
+  out48=$(run_fence_land --land --slug fxFix); rc48=$?
+  case "$rc48 $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)" = "$lb48" ] && echo unmoved)|$out48" in
     "0 unmoved|"*"push-main: fence — none · leases are off"*"landed main"*) ok "48 with leases off the landing reads fence — none and pushes the branch alone" ;;
     *) bad "48 a landing with leases off was refused or moved the lease: $out48" ;;
   esac
   ( cd "$FX/a" && git checkout -q main && git fetch -q origin && git reset -q --hard origin/main \
-      && sed -i 's/^RUN_CLAIMS="off"/RUN_CLAIMS="on"/' .unattended.conf && git commit -qam "TOOL-fx-9: leases on" \
-      && git commit -q --allow-empty -m "TOOL-fx-3: attended" )
-  lb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
-  out48b=$(run_fence_land --slug fx); rc48b=$?
-  nb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
-  git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-4: attended plain"
+      && sed -i 's/^RUN_CLAIMS="off"/RUN_CLAIMS="on"/' .unattended.conf && git commit -qam "TOOL-fxFix-9: leases on" \
+      && git commit -q --allow-empty -m "TOOL-fxFix-3: attended" )
+  lb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)
+  out48b=$(run_fence_land --slug fxFix); rc48b=$?
+  nb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)
+  git -C "$FX/a" commit -q --allow-empty -m "TOOL-fxFix-4: attended plain"
   out48c=$(run_fence_land); rc48c=$?
-  case "$rc48b $rc48c $([ "$(git --git-dir="$FX/o.git" rev-parse "$nb48^")" = "$lb48" ] && echo fenced) $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$nb48" ] && echo unmoved) $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse main)" ] && echo main)|$out48b|$out48c" in
-    "0 0 fenced unmoved main|"*"push-main: fence — refs/gov/leases/fx/build"*"|"*)
+  case "$rc48b $rc48c $([ "$(git --git-dir="$FX/o.git" rev-parse "$nb48^")" = "$lb48" ] && echo fenced) $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)" = "$nb48" ] && echo unmoved) $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse main)" ] && echo main)|$out48b|$out48c" in
+    "0 0 fenced unmoved main|"*"push-main: fence — refs/gov/leases/fxFix/build"*"|"*)
       case "$out48c" in *"fence"*) bad "48 the attended landing with no argument read a fence: $out48c" ;;
         *) ok "48 the attended --slug fences on the build's lease, and no argument lands with no fence read" ;; esac ;;
     *) bad "48 the attended --slug was refused or did not fence, or no argument moved the lease: $out48b | $out48c" ;;
@@ -1971,22 +1997,22 @@ else
   esac
   # 50 — S3: a fence line naming another lease ref refuses unparsed, and a beat not parented on the
   #      tip refuses at check_fence_beat; the attended `--slug` pushes nothing either time.
-  t50=$(read_fence_tips); lt50=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  t50=$(read_fence_tips); lt50=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)
   m50=$(git --git-dir="$FX/o.git" rev-parse main)
   write_fence_stub "echo \"fence — refs/gov/leases/other/build $lt50 $m50\""
-  out50=$(run_fence_land --slug fx); rc50=$?
-  write_fence_stub "echo \"fence — refs/gov/leases/fx/build $lt50 $m50\""
-  out50b=$(run_fence_land --slug fx); rc50b=$?
+  out50=$(run_fence_land --slug fxFix); rc50=$?
+  write_fence_stub "echo \"fence — refs/gov/leases/fxFix/build $lt50 $m50\""
+  out50b=$(run_fence_land --slug fxFix); rc50b=$?
   case "$rc50 $rc50b $([ "$(read_fence_tips)" = "$t50" ] && echo unchanged)|$out50|$out50b" in
     "1 1 unchanged|"*"push-main: fence read unparsed — exit 0 · fence — refs/gov/leases/other/build"*"|"*"so it does not stand on the tip the fence read"*)
       ok "50 a fence line naming another lease, and a beat not parented on the tip, each refuse with nothing pushed" ;;
     *) bad "50 a foreign lease ref or an unparented beat was not refused before the push: $out50 | $out50b" ;;
   esac
   # 51 — S3: no unattended driver beside the lander is no fence, and the attended `--slug` lands alone.
-  git -C "$FX/a" rm -rq "${KIT_REL}$_fn_k" && git -C "$FX/a" commit -qm "TOOL-fx-9: no driver"
-  lb51=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
-  out51=$(run_fence_land --slug fx); rc51=$?
-  case "$rc51 $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$lb51" ] && echo unmoved)|$out51" in
+  git -C "$FX/a" rm -rq "${KIT_REL}$_fn_k" && git -C "$FX/a" commit -qm "TOOL-fxFix-9: no driver"
+  lb51=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)
+  out51=$(run_fence_land --slug fxFix); rc51=$?
+  case "$rc51 $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)" = "$lb51" ] && echo unmoved)|$out51" in
     "0 unmoved|"*"push-main: fence — none · no unattended driver beside this lander"*"landed main"*) ok "51 with no driver beside the lander the --slug landing reads no fence and lands the branch alone" ;;
     *) bad "51 a lander with no driver beside it refused or moved the lease: $out51" ;;
   esac
@@ -1996,14 +2022,14 @@ else
     #      epoch. The atomic push fails its compare-and-swap, the re-fence reads `refenced`, and the
     #      retry lands without re-preparing: the branch at the prepared merge, the lease the landing's
     #      beat parented on the planted commit.
-    git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-1: work"
-    ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+    git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fxFix-1: work"
+    ( cd "$FX/a" && bash "$lander" --prepare --slug fxFix >/dev/null 2>&1 )
     m52=$(git --git-dir="$FX/o.git" rev-parse main)
-    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fxFix/build:refs/plant/tip || exit 1' \
       'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
-      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
-    out52=$(run_fence_land --land --slug fx); rc52=$?
-    p52=""; [ ! -f "$FX/planted" ] || p52=$(<"$FX/planted"); l52=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fxFix/build"' > "$FX/plant-once"
+    out52=$(run_fence_land --land --slug fxFix); rc52=$?
+    p52=""; [ ! -f "$FX/planted" ] || p52=$(<"$FX/planted"); l52=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)
     g52="$rc52 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse HEAD)" ] && [ "$(git -C "$FX/a" rev-parse HEAD^1)" = "$m52" ] && echo main) $([ -n "$p52" ] && [ "$l52" != "$p52" ] && [ "$(git --git-dir="$FX/o.git" rev-parse "$l52^")" = "$p52" ] && echo beat)"
     case "$g52|$out52" in
       *"re-preparing"*) bad "52 a same-holder lease move re-prepared the landing: [$g52] $out52" ;;
@@ -2013,16 +2039,16 @@ else
     esac
     # 53 — TOOL-dPlacedRequest-29 AC2: the planted commit raises the epoch under another session, a
     #      take-over; the re-fence is refused, the landing exits 1 `fenced` and the branch is unmoved.
-    git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-2: more"
-    ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+    git -C "$FX/a" commit -q --allow-empty -m "TOOL-fxFix-2: more"
+    ( cd "$FX/a" && bash "$lander" --prepare --slug fxFix >/dev/null 2>&1 )
     m53=$(git --git-dir="$FX/o.git" rev-parse main)
-    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fxFix/build:refs/plant/tip || exit 1' \
       'e=$(git log -1 --format=%B refs/plant/tip | sed -n "s/^epoch: //p")' \
       'git log -1 --format=%B refs/plant/tip | sed -e "s/^epoch: .*/epoch: $((e + 1))/" -e "s/^session: .*/session: sB/" | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
-      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
-    out53=$(run_fence_land --land --slug fx); rc53=$?
+      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fxFix/build"' > "$FX/plant-once"
+    out53=$(run_fence_land --land --slug fxFix); rc53=$?
     p53=""; [ ! -f "$FX/planted" ] || p53=$(<"$FX/planted")
-    g53="$rc53 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m53" ] && echo unchanged) $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$p53" ] && echo planted)"
+    g53="$rc53 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m53" ] && echo unchanged) $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fxFix/build)" = "$p53" ] && echo planted)"
     case "$g53|$out53" in
       *"re-fencing on"*) bad "53 a take-over at the epoch plus one was retried as the holder's own write: [$g53] $out53" ;;
       "1 unchanged planted|"*"push-main: fenced — the lease"*) ok "53 a take-over at the epoch plus one under another session refuses the landing fenced, the branch unmoved" ;;
@@ -2037,19 +2063,19 @@ else
     #      line for a read that did not answer, passing every other call to the fixture's launcher. The
     #      landing exits 1 `unreachable`, no abort remedy and never `fenced`, the branch unmoved.
     #      Staged against TOOL-dPlacedRequest-29's lander, which reads every refusal there `fenced`.
-    git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-1: work"
+    git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fxFix-1: work"
     cp "$FX/a/${KIT_REL}$_fn_k/unattended.sh" "$FX/real-driver"
-    write_fence_stub "case \" \$* \" in *' --after '*) echo 'lease refused — offline · fx/build · the remote did not answer the claim read'; exit 1 ;; esac
+    write_fence_stub "case \" \$* \" in *' --after '*) echo 'lease refused — offline · fxFix/build · the remote did not answer the claim read'; exit 1 ;; esac
 exec bash \"$FX/real-driver\" \"\$@\""
     m54=$(git --git-dir="$FX/o.git" rev-parse main)
-    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fxFix/build:refs/plant/tip || exit 1' \
       'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
-      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
-    out54=$(run_fence_land --land --slug fx); rc54=$?
+      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fxFix/build"' > "$FX/plant-once"
+    out54=$(run_fence_land --land --slug fxFix); rc54=$?
     g54="$rc54 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m54" ] && echo unchanged)"
     case "$g54|$out54" in
       *"push-main: fenced —"*|*"claim-lost"*) bad "54 a re-fence read that did not answer told the holder to abort: [$g54] $out54" ;;
-      "1 unchanged|"*"push-main: unreachable — the lease refs/gov/leases/fx/build moved"*)
+      "1 unchanged|"*"push-main: unreachable — the lease refs/gov/leases/fxFix/build moved"*)
         ok "54 a killed --after read refuses the landing unreachable, no abort remedy, the branch unmoved" ;;
       *) bad "54 a killed --after read did not refuse as unreachable with the branch unmoved: [$g54] $out54" ;;
     esac
@@ -2065,18 +2091,18 @@ exec bash \"$FX/real-driver\" \"\$@\""
 exec bash \"$FX/real-driver\" \"\$@\""
       else
         m56=$(git --git-dir="$FX/o.git" rev-parse main)
-        write_fence_stub "case \" \$* \" in *' --after '*) a=\"\$*\"; a=\${a##*--after }; echo \"fence — refs/gov/leases/fx/build \${a%% *} $m56\"; exit 0 ;; esac
+        write_fence_stub "case \" \$* \" in *' --after '*) a=\"\$*\"; a=\${a##*--after }; echo \"fence — refs/gov/leases/fxFix/build \${a%% *} $m56\"; exit 0 ;; esac
 exec bash \"$FX/real-driver\" \"\$@\""
       fi
       m55=$(git --git-dir="$FX/o.git" rev-parse main)
-      printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+      printf '%s\n' 'git fetch -q origin +refs/gov/leases/fxFix/build:refs/plant/tip || exit 1' \
         'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
-        'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
-      out55=$(run_fence_land --land --slug fx); rc55=$?
+        'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fxFix/build"' > "$FX/plant-once"
+      out55=$(run_fence_land --land --slug fxFix); rc55=$?
       g55="$rc55 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m55" ] && echo unchanged)"
       case "$g55|$out55" in
         *"push-main: fenced —"*|*"claim-lost"*) bad "$a55 TOOL-dPlacedRequest-99 S3 a re-fence read that is no refusal by the lease told the holder to abort: [$g55] $out55" ;;
-        "1 unchanged|"*"push-main: unreachable — the lease refs/gov/leases/fx/build moved"*)
+        "1 unchanged|"*"push-main: unreachable — the lease refs/gov/leases/fxFix/build moved"*)
           ok "$a55 TOOL-dPlacedRequest-99 S3 an --after read answering $([ "$a55" = 55 ] && echo 'lease not written' || echo 'a bad beat') refuses the landing unreachable, never claim-lost, the branch unmoved" ;;
         *) bad "$a55 TOOL-dPlacedRequest-99 S3 an --after read that is no refusal did not refuse as unreachable with the branch unmoved: [$g55] $out55" ;;
       esac

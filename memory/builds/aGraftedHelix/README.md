@@ -111,7 +111,7 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 44 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
+**Build status:** CLOSED · 44 unit(s) · node a · opened 2026-10-04 · streams tooling
 ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13
 ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26
 ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39
@@ -208,9 +208,24 @@ Ids whose spec moved past its audited revision: none — 0 of 44 unit id(s) carr
 | 26 | `TOOL-aGraftedHelix-45` | no |
 | 27 | `TOOL-aGraftedHelix-46` | no |
 | 28 | `TOOL-aGraftedHelix-47` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-07-prompt-TOOL-aGraftedHelix-45-1-spec-brief.md`, `2026-10-06-prompt-TOOL-aGraftedHelix-40-1-spec-brief.md` and 12 more under prompts/ |
+| reviews | `2026-10-06-review-TOOL-aGraftedHelix-29-closing-diff-round1.md`, `2026-10-05-review-TOOL-aGraftedHelix-25-spec-audit-round1.md` and 7 more under reviews/ |
+| logs | `2026-10-06-build-TOOL-aGraftedHelix-29-runlog-b9bb22c3.md`, `2026-10-04-build-TOOL-aGraftedHelix-9-1-acceptance-ledger.md` and 43 more under build/ |
+| open asks | `BACKLOG.md`, 3 open |
+| card ref | `refs/gov/builds/aGraftedHelix/card` |
+<!-- /gen:build-routes -->
