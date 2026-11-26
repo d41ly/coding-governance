@@ -89,8 +89,349 @@
    ]
   }
  ],
- "candidates": [],
- "map": null,
+ "candidates": [
+  {
+   "case": "r2",
+   "arm": "without",
+   "report": "C:/Temp/f2n3/memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_060b4a87-f94/agent-a25983412b38eb5e7.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_060b4a87-f94/agent-a2d7c1fbe51b9f4d6.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_060b4a87-f94/agent-afc00fbbf4819eb06.jsonl"
+   }
+  },
+  {
+   "case": "r3",
+   "arm": "without",
+   "report": "C:/Temp/f3n3/memory/builds/dClosedLoop/reviews/2026-11-26-review-PLAY-dClosedLoop-1-debt-fold.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_e76c6170-94a/agent-a93d4e1bfdd71a7de.jsonl",
+    "intent": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_e76c6170-94a/agent-ab3a4956360e426a3.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_e76c6170-94a/agent-af8efbb9fc4d9c3e1.jsonl",
+    "security": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_e76c6170-94a/agent-ae88b1afb93bafe72.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_e76c6170-94a/agent-a7aec0991dea94434.jsonl"
+   }
+  },
+  {
+   "case": "r1",
+   "arm": "without",
+   "report": "C:/Temp/f1n4/memory/builds/dFairHearing/reviews/2026-11-26-spec-audit-PLAY-dClosedLoop-1.md",
+   "matched": null,
+   "transcripts": {
+    "coherence": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_87fed594-cf5/agent-a7462c3780c2bfdfc.jsonl",
+    "reuse": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_87fed594-cf5/agent-a18ae50a3da611184.jsonl"
+   }
+  },
+  {
+   "case": "r2",
+   "arm": "with",
+   "report": "C:/Temp/f2m3/memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_5f1b07ec-2ea/agent-a5c410f486df581d6.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_5f1b07ec-2ea/agent-a807d93188690c798.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_5f1b07ec-2ea/agent-abcec4ee930ecd65b.jsonl"
+   }
+  },
+  {
+   "case": "r3",
+   "arm": "with",
+   "report": "C:/Temp/f3m3/memory/builds/dClosedLoop/reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_f4386942-c99/agent-a67822806a8d86a6d.jsonl",
+    "intent": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_f4386942-c99/agent-a7b96ba97aa4fd7df.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_f4386942-c99/agent-acb598ff7c25521b5.jsonl",
+    "security": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_f4386942-c99/agent-a50fc404d5b4d7d07.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_f4386942-c99/agent-a0e9a82a773c0d6d8.jsonl"
+   }
+  },
+  {
+   "case": "r1",
+   "arm": "with",
+   "report": "C:/Temp/f1m3/memory/builds/dFairHearing/reviews/2026-11-26-spec-audit-PLAY-dClosedLoop-1.md",
+   "matched": null,
+   "transcripts": {
+    "coherence": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_69c47050-f1b/agent-a922d41d07336bc33.jsonl",
+    "reuse": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_69c47050-f1b/agent-ae0d242973e60a324.jsonl"
+   }
+  },
+  {
+   "case": "r2",
+   "arm": "without",
+   "report": "C:/Temp/f2n4/memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_f5705b29-ad7/agent-acc5e91f26493e89c.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_f5705b29-ad7/agent-ac87adda48cd391c7.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_f5705b29-ad7/agent-a58c24a432eb32d03.jsonl"
+   }
+  },
+  {
+   "case": "r3",
+   "arm": "without",
+   "report": "C:/Temp/f3n4/memory/builds/dClosedLoop/reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-fold-closing.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_971eedce-ec8/agent-ab4637d8c99317078.jsonl",
+    "intent": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_971eedce-ec8/agent-a9e23151080187e24.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_971eedce-ec8/agent-a1b295f8f026cf40d.jsonl",
+    "security": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_971eedce-ec8/agent-a184b64432322a6d3.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_971eedce-ec8/agent-ac2e9969f08abe120.jsonl"
+   }
+  },
+  {
+   "case": "r1",
+   "arm": "without",
+   "report": "C:/Temp/f1n5/memory/builds/dFairHearing/reviews/2026-11-26-spec-audit-PLAY-dClosedLoop-1-systems-retrofit.md",
+   "matched": null,
+   "transcripts": {
+    "coherence": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_27dbe093-f79/agent-aa4ff9b02fd6ee5ef.jsonl",
+    "reuse": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_27dbe093-f79/agent-a261e845dd0faaee8.jsonl"
+   }
+  },
+  {
+   "case": "r2",
+   "arm": "with",
+   "report": "C:/Temp/f2m4/memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_bf544ebc-aaf/agent-aa8f92ebc8fc3f370.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_bf544ebc-aaf/agent-a250cd8aa87863535.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_bf544ebc-aaf/agent-a6ada3401ada835bc.jsonl"
+   }
+  },
+  {
+   "case": "r2",
+   "arm": "without",
+   "report": "C:/Temp/f2n5/memory/builds/dClosedLoop/reviews/2026-11-26-review-PLAY-dClosedLoop-1-library.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_8cdaf0a8-b8f/agent-a74a2ad524a682b47.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_8cdaf0a8-b8f/agent-a80160c739f68bcf8.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_8cdaf0a8-b8f/agent-a638c26af458479af.jsonl"
+   }
+  },
+  {
+   "case": "r3",
+   "arm": "with",
+   "report": "C:/Temp/f3m4/memory/builds/dClosedLoop/reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_c75e2291-b9e/agent-a3b73a2c3f4b395d8.jsonl",
+    "intent": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_c75e2291-b9e/agent-af3fa8c6073b6d57f.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_c75e2291-b9e/agent-a269fcdd831c40294.jsonl",
+    "security": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_c75e2291-b9e/agent-a9198ec2894eb7ca4.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_c75e2291-b9e/agent-ae812c4287ee6d7f0.jsonl"
+   }
+  },
+  {
+   "case": "r1",
+   "arm": "with",
+   "report": "C:/Temp/f1m4/memory/builds/dFairHearing/reviews/2026-11-26-review-PLAY-dClosedLoop-1-spec-audit.md",
+   "matched": null,
+   "transcripts": {
+    "coherence": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_8c4f6ddd-3e5/agent-a21d2a17afb852d23.jsonl",
+    "reuse": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_8c4f6ddd-3e5/agent-a972951c167364874.jsonl"
+   }
+  },
+  {
+   "case": "r2",
+   "arm": "with",
+   "report": "C:/Temp/f2m5/memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_7564c556-822/agent-a3123a296280af7e7.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_7564c556-822/agent-ad92d5c2d09ed3294.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_7564c556-822/agent-a6a1b32c549892e8b.jsonl"
+   }
+  },
+  {
+   "case": "r3",
+   "arm": "without",
+   "report": "C:/Temp/f3n5/memory/builds/dClosedLoop/reviews/2026-11-26-review-PLAY-dClosedLoop-1-debt-folds-closing.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_132ff504-a89/agent-a435cb4da2ec39125.jsonl",
+    "intent": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_132ff504-a89/agent-a245a7af5f97fff01.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_132ff504-a89/agent-a30f8ab656fb52a23.jsonl",
+    "security": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_132ff504-a89/agent-af9239b43f2232f14.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_132ff504-a89/agent-a299aaf62d8fab80a.jsonl"
+   }
+  },
+  {
+   "case": "r1",
+   "arm": "without",
+   "report": "C:/Temp/f1n6/memory/builds/dFairHearing/reviews/2026-11-26-spec-audit-PLAY-dClosedLoop-1-round-1.md",
+   "matched": null,
+   "transcripts": {
+    "coherence": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_de87148f-eb8/agent-a2b6e56d6ee89f159.jsonl",
+    "reuse": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_de87148f-eb8/agent-a60c1094ed78e16bd.jsonl"
+   }
+  },
+  {
+   "case": "r1",
+   "arm": "with",
+   "report": "C:/Temp/f1m5/memory/builds/dFairHearing/reviews/2026-11-26-review-PLAY-dClosedLoop-1-spec-audit-round1.md",
+   "matched": null,
+   "transcripts": {
+    "coherence": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_7ad35cdd-71a/agent-a2ae00ea43cc3f5cd.jsonl",
+    "reuse": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_7ad35cdd-71a/agent-a257b97f48d28ce39.jsonl"
+   }
+  },
+  {
+   "case": "r2",
+   "arm": "without",
+   "report": "C:/Temp/f2n6/memory/builds/dClosedLoop/reviews/2026-11-26-review-PLAY-dClosedLoop-1-library.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_b520af36-07a/agent-a58a928fdb213bd58.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_b520af36-07a/agent-a7f28db2a30ece854.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_b520af36-07a/agent-a4ee31a6577067cc6.jsonl"
+   }
+  },
+  {
+   "case": "r3",
+   "arm": "with",
+   "report": "C:/Temp/f3m5/memory/builds/dClosedLoop/reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_a3caa7f7-bf8/agent-a6063262a42d0937d.jsonl",
+    "intent": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_a3caa7f7-bf8/agent-ac4392ee21f78bc2c.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_a3caa7f7-bf8/agent-acf8767f399a53bd0.jsonl",
+    "security": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_a3caa7f7-bf8/agent-a2f62ff60895046ea.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_a3caa7f7-bf8/agent-ad4e44c203ed7a518.jsonl"
+   }
+  },
+  {
+   "case": "r1",
+   "arm": "without",
+   "report": "C:/Temp/f1n7/memory/builds/dFairHearing/reviews/2026-11-26-spec-audit-PLAY-dClosedLoop-1-round-1.md",
+   "matched": null,
+   "transcripts": {
+    "coherence": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_3cef961d-a17/agent-a3442b5109b0bff5c.jsonl",
+    "reuse": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_3cef961d-a17/agent-aab516beb73176d78.jsonl"
+   }
+  },
+  {
+   "case": "r2",
+   "arm": "with",
+   "report": "C:/Temp/f2m6/memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_c69ea283-ab3/agent-af57ae9825af412fa.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_c69ea283-ab3/agent-a3254e262a5f47085.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_c69ea283-ab3/agent-afcf5a5d615c416b4.jsonl"
+   }
+  },
+  {
+   "case": "r3",
+   "arm": "without",
+   "report": "C:/Temp/f3n6/memory/builds/dClosedLoop/reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds-closing.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_3c221a5a-d35/agent-a76bd41cfa70ae1a5.jsonl",
+    "intent": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_3c221a5a-d35/agent-a1f5f7e3a615f0d04.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_3c221a5a-d35/agent-a253ab85c94c5e316.jsonl",
+    "security": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_3c221a5a-d35/agent-a53d181187bdacad8.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_3c221a5a-d35/agent-af38f7162a05d0ccf.jsonl"
+   }
+  },
+  {
+   "case": "r1",
+   "arm": "with",
+   "report": "C:/Temp/f1m6/memory/builds/dFairHearing/reviews/2026-11-26-spec-audit-PLAY-dClosedLoop-1-round1.md",
+   "matched": null,
+   "transcripts": {
+    "coherence": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_bdecb87e-989/agent-ac885c5eceebee420.jsonl",
+    "reuse": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_bdecb87e-989/agent-ac7871eeb66a51431.jsonl"
+   }
+  },
+  {
+   "case": "r2",
+   "arm": "without",
+   "report": "C:/Temp/f2n7/memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_afac5f3e-823/agent-ade1b6b9c336af989.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_afac5f3e-823/agent-a63fb75048ef83ce8.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_afac5f3e-823/agent-a81216e19efe879f1.jsonl"
+   }
+  },
+  {
+   "case": "r3",
+   "arm": "with",
+   "report": "C:/Temp/f3m6/memory/builds/dClosedLoop/reviews/2026-11-26-review-PLAY-dClosedLoop-1-debt-fold-closing.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_4a090f31-70e/agent-abd2a723a1209832e.jsonl",
+    "intent": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_4a090f31-70e/agent-aa707994e22da661a.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_4a090f31-70e/agent-a5cd1ad98064773fe.jsonl",
+    "security": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_4a090f31-70e/agent-ada658879d54718fe.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_4a090f31-70e/agent-aea0a333c9cc451c1.jsonl"
+   }
+  },
+  {
+   "case": "r1",
+   "arm": "without",
+   "report": "C:/Temp/f1n8/memory/builds/dFairHearing/reviews/2026-11-26-spec-audit-PLAY-dClosedLoop-1-systems-retrofit-r1.md",
+   "matched": null,
+   "transcripts": {
+    "coherence": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_9305a09b-59c/agent-a69987b64d8a68c61.jsonl",
+    "reuse": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_9305a09b-59c/agent-aecd380c32722ad91.jsonl"
+   }
+  },
+  {
+   "case": "r2",
+   "arm": "with",
+   "report": "C:/Temp/f2m7/memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_afbda4cf-f75/agent-a0814a11d3863e4b3.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_afbda4cf-f75/agent-ad018a782944ece0c.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_afbda4cf-f75/agent-afcbaf058a89f5c0a.jsonl"
+   }
+  },
+  {
+   "case": "r3",
+   "arm": "without",
+   "report": "C:/Temp/f3n7/memory/builds/dClosedLoop/reviews/2026-11-26-review-PLAY-dClosedLoop-1-debt-folds-closing.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_8262b674-f92/agent-ad0bc05cf515f3fa5.jsonl",
+    "intent": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_8262b674-f92/agent-acdb392444f51debf.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_8262b674-f92/agent-a9db4c4e0f7397c5c.jsonl",
+    "security": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_8262b674-f92/agent-aadd88823db97ffb9.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_8262b674-f92/agent-a9c3ed7e82ad91950.jsonl"
+   }
+  },
+  {
+   "case": "r1",
+   "arm": "with",
+   "report": "C:/Temp/f1m7/memory/builds/dFairHearing/reviews/2026-11-26-review-PLAY-dClosedLoop-1-spec-audit.md",
+   "matched": null,
+   "transcripts": {
+    "coherence": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_4b892a7b-deb/agent-a31a13b7f2e69f884.jsonl",
+    "reuse": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_4b892a7b-deb/agent-ab651e0280b208f76.jsonl"
+   }
+  },
+  {
+   "case": "r3",
+   "arm": "with",
+   "report": "C:/Temp/f3m7/memory/builds/dClosedLoop/reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md",
+   "matched": null,
+   "transcripts": {
+    "correctness": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_48919174-44c/agent-aa0580d40f475906d.jsonl",
+    "intent": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_48919174-44c/agent-aec81a0f71bf7ec35.jsonl",
+    "seams": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_48919174-44c/agent-a0a8fe536dcf7630b.jsonl",
+    "security": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_48919174-44c/agent-aa7a34cb3370f489a.jsonl",
+    "verification": "C:/Users/daily-agent/.claude/projects/C--projects-coding-governance--claude-worktrees-unattended-dtotalrecall-ae256e/9067262b-db21-4497-8ba8-ef2deab46f53/subagents/workflows/wf_48919174-44c/agent-a247852a64a650730.jsonl"
+   }
+  }
+ ],
+ "map": "C:/Temp/claude/7a8436c9e3b87ce5/9067262b-db21-4497-8ba8-ef2deab46f53/scratchpad/map.md",
  "arms": [
   {
    "name": "without",

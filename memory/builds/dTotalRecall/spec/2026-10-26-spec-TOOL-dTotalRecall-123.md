@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-123 — the map replay run again: more runs per arm, a noise term more runs tighten, and the verdict rule fixed before the first run
 
-**Status:** INPROGRESS · rev-3 · 2026-11-26 · node d · Tier-2 · base fbe06249 · streams tooling · order 51 · advances TOOL-dTotalRecall-111
+**Status:** CLOSED · rev-3 · 2026-11-26 · node d · Tier-2 · base fbe06249 · streams tooling · order 51 · advances TOOL-dTotalRecall-111
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-11-25-build-TOOL-dTotalRecall-123-widen-35.md](../build/2026-11-25-build-TOOL-dTotalRecall-123-widen-35.md) | widen | — |
 | [2026-11-26-build-TOOL-dTotalRecall-123-deviation-1021.md](../build/2026-11-26-build-TOOL-dTotalRecall-123-deviation-1021.md) | deviation | — |
 | [2026-11-26-build-TOOL-dTotalRecall-123-map-replay-manifest.json](../build/2026-11-26-build-TOOL-dTotalRecall-123-map-replay-manifest.json) | research | — |
+| [2026-11-26-build-TOOL-dTotalRecall-123-map-replay-verdict.md](../build/2026-11-26-build-TOOL-dTotalRecall-123-map-replay-verdict.md) | research | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-123-build-2-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-2-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-123-build-3-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-3-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-123-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-brief.md) | journal | — |
