@@ -746,7 +746,7 @@ def read_held_git(repo, *args, held, reader):
 @contextlib.contextmanager
 def set_git_held():
     """`tag_index`'s two git readers, `read_git_stdout` and `git`, set to one `read_held_git` over a store the
-    block owns, both put back on every exit by `patch.object`, the swap `tools/loop/guard.py` makes (S2);
+    block owns, both put back on every exit by `patch.object`, the swap the loop kit's `guard.py` makes (S2);
     `tag_index.py` itself is never edited (section 3)."""
     held = functools.partial(read_held_git, held={}, reader=ti.read_git_stdout)
     with unittest.mock.patch.object(ti, "read_git_stdout", held), unittest.mock.patch.object(ti, "git", held):
