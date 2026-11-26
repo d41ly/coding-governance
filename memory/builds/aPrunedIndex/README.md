@@ -68,7 +68,7 @@ ids TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16
 | [TOOL-aPrunedIndex-10 — the closing review's four lows: the sweep's cost stated as its ceiling, a named plant helper, and two steps whose HEAD git cannot read](spec/2026-11-26-spec-TOOL-aPrunedIndex-10.md) | 5 | 1 | CLOSED | rev-2 | 2026-11-26 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 4 record folder(s).
+Records: 17 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
