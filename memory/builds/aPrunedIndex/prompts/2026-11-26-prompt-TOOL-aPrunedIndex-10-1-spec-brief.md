@@ -7,7 +7,7 @@
 > Fix lows first
 
 The owner's answer in the building session, 2026-11-26, to "Land aPrunedIndex now, with the four low findings as a
-follow-up unit, or fix them first?". BUILD-METHOD M4 promotes a DIFF exit's lows into ONE unit naming them all; this is
+follow-up unit, or fix them first?". `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it` promotes a DIFF exit's lows into ONE unit naming them all; this is
 that unit. The findings are L1 to L4 of
 `memory/builds/aPrunedIndex/reviews/2026-11-26-review-TOOL-aPrunedIndex-1-2-3-4-diff-review-round1.md`; read them whole.
 

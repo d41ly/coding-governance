@@ -15,7 +15,7 @@
 ## 1. Goal
 
 The closing diff review, `2026-11-26-review-TOOL-aPrunedIndex-1-2-3-4-diff-review-round1`, confirmed four low
-findings, L1 to L4, and the owner answered "Fix lows first". BUILD-METHOD M4 promotes them into one unit,
+findings, L1 to L4, and the owner answered "Fix lows first". `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it` promotes them into one unit,
 and this is it. After it, the README states the release sweep's cost as the ceiling the code states. The
 plant helper the naming leg could not see becomes a named `def`. Two `gc-predates` steps make each HEAD
 probe's git call fail. One review class no fix here gates is filed as an ask for the owner; the other's gate
