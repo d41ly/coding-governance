@@ -29,3 +29,8 @@ This unit is the pool. It is the hand-off named in the Edges of `memory/builds/a
 - No change to which plants the leg runs, or to the leg's 300 s ceiling.
 - `tools/loop/position.py` and `tools/memory-tree/routed_commits.py` stay untouched.
 - Tier: 1. A runner's scheduling, with output order and verdicts fixed.
+
+## Owner confirmation
+
+Asked: Which scope do you approve for making the tag plants cheaper? (unit 17 plus the pool as a second unit, or unit 17 only)
+Answer: Unit 17 plus pool

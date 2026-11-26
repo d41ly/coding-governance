@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-20 — the tag plants of `tags bundle selftest` run on a bounded pool, graded in row order
 
-**Status:** SPECCED · rev-2 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 7
+**Status:** INPROGRESS · rev-2 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
