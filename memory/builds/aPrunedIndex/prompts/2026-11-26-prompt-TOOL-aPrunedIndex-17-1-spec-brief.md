@@ -62,3 +62,8 @@ the leg took 22 s. Unit 4's five plants (`dead-versions`, `named-probe`, `releas
   under.
 - `tools/loop/position.py` and `tools/memory-tree/routed_commits.py` stay untouched.
 - Tier: 2. The change rewrites test arms that certify what `--gc` and a build delete.
+
+## Owner confirmation
+
+Asked: Which scope do you approve for making the tag plants cheaper? (unit 17 plus the pool as a second unit, or unit 17 only)
+Answer: Unit 17 plus pool
