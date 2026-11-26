@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-25
 streams: tooling
 roster: TOOL
-ids: TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23
+ids: TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23 TOOL-aPrunedIndex-24
 spec-audit: 2026-11-25
 ---
 
@@ -53,12 +53,13 @@ None.
 | 5 | `TOOL-aPrunedIndex-10` | the closing review's four lows, batched (M4): the README's sweep cost stated as its ceiling, the lambda-bound plant helper a named `def`, and two `gc-predates` steps whose HEAD git cannot read |
 | 6 | `TOOL-aPrunedIndex-17` | the five tag plants this build added hold the git answers that cannot change while they run, so they spawn fewer git processes; whether `tags bundle selftest` then fits its ceiling under load is AC8's reading at the close, and the remainder is handed to a pool unit (closing review round 2, id 1) |
 | 7 | `TOOL-aPrunedIndex-20` | `tags bundle selftest` runs its plants on a bounded pool of workers with output in row order, so the leg's wall is near its slowest plant (unit 17's hand-off) |
+| 8 | `TOOL-aPrunedIndex-24` | the held-answer rules get arms `tags bundle selftest` runs: the key table and the never-store-a-failure rule, and `HELD_FLAGS` loses its dead `"--"` (closing review round 3, items 1, 4, 5) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-11-25 · streams tooling
 ids TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14
-ids TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23
+ids TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23 TOOL-aPrunedIndex-24
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -72,7 +73,7 @@ ids TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedI
 | [TOOL-aPrunedIndex-20 — the tag plants of `tags bundle selftest` run on a bounded pool, graded in row order](spec/2026-11-26-spec-TOOL-aPrunedIndex-20.md) | 7 | 1 | CLOSED | rev-2 | 2026-11-26 |
 <!-- /gen:build-units -->
 
-Records: 29 bound to this build, across 4 record folder(s).
+Records: 30 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
