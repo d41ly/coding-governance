@@ -1,11 +1,12 @@
 # TOOL-aPrunedIndex-20 — the tag plants of `tags bundle selftest` run on a bounded pool, graded in row order
 
-**Status:** INPROGRESS · rev-2 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 7
+**Status:** CLOSED · rev-2 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-26-build-TOOL-aPrunedIndex-20-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-aPrunedIndex-20-1-acceptance-ledger.md) | journal | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md) | research | TOOL-aPrunedIndex-17 |
 | [2026-11-26-review-TOOL-aPrunedIndex-17-20-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-17 |
 

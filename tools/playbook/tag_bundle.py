@@ -26,6 +26,7 @@ Exit 0 green, 1 red or an address that resolves to no row, 2 a refusal.
 """
 from __future__ import annotations
 
+import concurrent.futures
 import os
 import pathlib
 import subprocess
@@ -388,15 +389,23 @@ gc-predates|0|refused on wt4, wt3 read and then skipped by name, refused on none
 """
 
 
+def run_plant_process(plant: str) -> subprocess.CompletedProcess:
+    """One `gov_tag.py --fixture --plant <plant>` run; a raise becomes the plant's output, rc None."""
+    argv = [sys.executable, str(KIT_DIR / "gov_tag.py"), "--fixture", "--plant", *plant.split()]
+    try:
+        return subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    except Exception as exc:  # a raise in a worker would lose every other plant's result from pool.map
+        return subprocess.CompletedProcess(argv, None, stdout="", stderr=f"{type(exc).__name__}: {exc}")
+
+
 def run_selftest() -> int:
     """The `tags bundle selftest` leg: every tag plant `SELFTEST_ROWS` names, each row's exit and line."""
-    failed, runs = 0, {}
+    failed = 0
     rows = [r.split("|") for r in SELFTEST_ROWS.splitlines() if r.strip()]
-    for plant, rc, want in rows:
-        if plant not in runs:  # one run per plant and flags, read by each of its rows
-            runs[plant] = subprocess.run([sys.executable, str(KIT_DIR / "gov_tag.py"), "--fixture", "--plant",
-                                          *plant.split()], capture_output=True, text=True, encoding="utf-8",
-                                         errors="replace")
+    plants = list(dict.fromkeys(plant for plant, _rc, _want in rows))  # one run per plant and flags
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:  # the govkit docs leg's width
+        runs = dict(zip(plants, pool.map(run_plant_process, plants)))
+    for plant, rc, want in rows:  # graded in row order, never finish order
         p = runs[plant]
         out = p.stdout + p.stderr
         if p.returncode == int(rc) and want in out:
