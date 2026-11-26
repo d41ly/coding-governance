@@ -9,9 +9,9 @@
 | [2026-11-26-build-TOOL-aPrunedIndex-10-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-aPrunedIndex-10-1-acceptance-ledger.md) | journal | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-10-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-10-1-spec-brief.md) | research | TOOL-aPrunedIndex-4 |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md) | research | TOOL-aPrunedIndex-17 |
-| [2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23 |
-| [2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23 TOOL-aPrunedIndex-24 TOOL-aPrunedIndex-25 TOOL-aPrunedIndex-26 PLAY-dClosedLoop-1 TOOL-aTwinnedPass-1 TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-105 TOOL-dSettledStage-1 |
-| [2026-11-26-review-TOOL-aPrunedIndex-4-10-diff-review-round2.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-4-10-diff-review-round2.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 |
+| [2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 |
+| [2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-24 |
+| [2026-11-26-review-TOOL-aPrunedIndex-4-10-diff-review-round2.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-4-10-diff-review-round2.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 |
 | [2026-11-26-review-TOOL-aPrunedIndex-4-10-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-4-10-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-4 |
 
 <!-- /gen:spec-records -->
@@ -289,7 +289,7 @@ none
 - rev-1 · 2026-11-26 · initial draft.
 - rev-2 · 2026-11-26 · §1 §2 §3 §4 §5 §6 S1 S5 AC1 AC2 AC4 AC7 AC8 AC9 · folded
   `2026-11-26-review-TOOL-aPrunedIndex-4-10-spec-audit-round1`: finding 1 (AC2 tells a `def` from a
-  lambda), 2 (the ask opens `THE CLASS`), 3 (Timing cites unit 4's measured 46 s), 4 (the rows keep spec
+  lambda), 2 (the ask opens `THE CLASS`), 3 (Timing cites unit 4's measured 46 s), 4 (the rows keep spec (PINNED, 2026-11-26)
   4's `d5288a92d` reading, replacing its "after the last unit" clause for unit 10), 6 (section 3 narrowed
   to section 5's observations), 7 and 11 (the Migration subsection and AC9 measure the `instruction_units`
   re-parse), 8 and 15 (the cost sentence keeps the comment's "each"), 9 (L4's class is

@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-11-26-build-TOOL-aPrunedIndex-24-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-aPrunedIndex-24-1-acceptance-ledger.md) | journal | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-24-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-24-1-spec-brief.md) | research | TOOL-aPrunedIndex-17 |
-| [2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23 TOOL-aPrunedIndex-25 TOOL-aPrunedIndex-26 PLAY-dClosedLoop-1 TOOL-aTwinnedPass-1 TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-105 TOOL-dSettledStage-1 |
+| [2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 |
 | [2026-11-26-review-TOOL-aPrunedIndex-24-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -188,13 +188,13 @@ none.
 - **AC5** — When the main loop, at the close, takes the load gauge, the mean wall of 20
   `git --version` spawns as units 17 and 20 took it, and then runs
   `python tools/playbook/tag_bundle.py --selftest` once on the built tree, it exits 0, prints
-  `PASS — the tag plants, 15 rows`, and its wall is under the 159 s of the `tags bundle selftest` row
+  `PASS — the tag plants, 15 rows`, and its wall is under the 159 s of the `tags bundle selftest` row (PINNED, 2026-11-26)
   of `tools/run-gates/selftest-budgets.txt`. The ledger records the wall with the gauge beside it. A
-  wall at or over 159 s taken at a gauge over 0.10 s is a re-read, not a red: the main loop retakes
-  the gauge and the reading, at most twice. A wall under 159 s is green at any gauge, since load only
-  lengthens it. Where all three readings reach 159 s and every gauge is over 0.10 s, AC5 is recorded
+  wall at or over 159 s taken at a gauge over 0.10 s is a re-read, not a red: the main loop retakes (PINNED, 2026-11-26)
+  the gauge and the reading, at most twice. A wall under 159 s is green at any gauge, since load only (PINNED, 2026-11-26)
+  lengthens it. Where all three readings reach 159 s and every gauge is over 0.10 s, AC5 is recorded (PINNED, 2026-11-26)
   UNGRADED with its readings and gauges, and goes to the owner.
-  Red when: a row fails, the count is not the built row count, or the wall reaches 159 s at a gauge
+  Red when: a row fails, the count is not the built row count, or the wall reaches 159 s at a gauge (PINNED, 2026-11-26)
   at or under 0.10 s.
   permission: a pass runs no self-test leg, so this reading is the main loop's.
   figure: the 15 is DERIVED from `SELFTEST_ROWS` at observation time; the 159 s is PINNED from the

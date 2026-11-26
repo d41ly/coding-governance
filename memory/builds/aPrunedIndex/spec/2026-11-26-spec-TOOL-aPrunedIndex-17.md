@@ -8,16 +8,17 @@
 |---|---|---|
 | [2026-11-26-build-TOOL-aPrunedIndex-17-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-aPrunedIndex-17-1-acceptance-ledger.md) | journal | — |
 | [2026-11-26-build-TOOL-aPrunedIndex-17-deviation-1.md](../build/2026-11-26-build-TOOL-aPrunedIndex-17-deviation-1.md) | deviation | — |
+| [2026-11-27-build-TOOL-aPrunedIndex-17-red-fix-1.md](../build/2026-11-27-build-TOOL-aPrunedIndex-17-red-fix-1.md) | red-fix | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md) | research | TOOL-aPrunedIndex-10 |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-17-2-revision.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-2-revision.md) | research | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-17-4-spec-writer.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-4-spec-writer.md) | journal | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-17-5-owner-waiver.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-5-owner-waiver.md) | research | TOOL-aPrunedIndex-20 |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md) | research | TOOL-aPrunedIndex-20 |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-24-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-24-1-spec-brief.md) | research | TOOL-aPrunedIndex-24 |
-| [2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23 |
+| [2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-20 |
 | [2026-11-26-review-TOOL-aPrunedIndex-17-20-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-20 |
 | [2026-11-26-review-TOOL-aPrunedIndex-17-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-spec-audit-round1.md) | spec-audit | — |
-| [2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23 TOOL-aPrunedIndex-24 TOOL-aPrunedIndex-25 TOOL-aPrunedIndex-26 PLAY-dClosedLoop-1 TOOL-aTwinnedPass-1 TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-105 TOOL-dSettledStage-1 |
+| [2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-24 |
 
 <!-- /gen:spec-records -->
 
@@ -78,7 +79,7 @@ of that, AC8 reads the leg at the close, and the rest is `TOOL-aPrunedIndex-20`'
   rejected" gives the measured reason for each.
 - Running the leg's plants concurrently in `tools/playbook/tag_bundle.py#run_selftest`. It is a second
   mechanism, in another file, and it is `TOOL-aPrunedIndex-20`, handed off below.
-- Moving any ceiling or budget up. The leg's 300 s `ceiling` in `tools/gate-legs.json` keeps its value.
+- Moving any ceiling or budget up. The leg's 300 s `ceiling` in `tools/gate-legs.json` keeps its value. (PINNED, 2026-11-26)
 - `tools/loop/position.py` and `tools/memory-tree/routed_commits.py`, which other sessions are landing.
 - Any `gov_tag.py` verb outside `--fixture` in a pass. Every pass observation runs in a fixture's own
   scratch repository or is a `python -c` probe that opens no index.
@@ -145,8 +146,8 @@ gauge of 0.21 to 0.23 s per spawn, summed 223.6 s without and 157.7 s with, a ra
 is noisy: two of the small plants ran slower with the copy than without it. The spawn counts are the
 stable measure.
 
-**What this does not reach.** The brief's target is the five plants at about 40 s on a quiet node, from
-about 84 s, a ratio near 0.48. This unit measures near 0.71, so on its own it leaves the five near 60 s
+**What this does not reach.** The brief's target is the five plants at about 40 s on a quiet node, from (PINNED, 2026-11-26)
+about 84 s, a ratio near 0.48. This unit measures near 0.71, so on its own it leaves the five near 60 s (PINNED, 2026-11-26)
 quiet. Under the load of the 521 s reading it would leave the leg near 400 s, still over its 300 s (PINNED, 2026-11-26)
 ceiling. The remaining gap is wall time spent on reads that are not held, and only running the plants
 side by side shortens that: "Alternatives rejected" below measures a pool near 0.49 on its own. That
@@ -331,7 +332,7 @@ Live at landing. The held answers exist only inside a `--fixture` run of the fiv
   The wall is noisy and AC4's spawn counts remain the stable measure; AC7 only shows the saving
   reaches the wall.
   cost: three pairs of the five plants, about 19 minutes at a 0.21 s gauge, three times section 4's
-  381 s round; it scales with the gauge.
+  381 s round; it scales with the gauge. (PINNED, 2026-11-26)
   figure: the walls and gauges are PINNED when measured, in the ledger.
 - **AC8** — When the main loop, at the close, times `python tools/playbook/tag_bundle.py --selftest`
   alone three times on the tree before the edit and three times on the built tree, back to back in one
@@ -340,7 +341,7 @@ Live at landing. The held answers exist only inside a `--fixture` run of the fiv
   the parent of the unit's build commit, under `"$TEMP/pi17-base"`. The built tree is at the unit's
   build commit itself, under `"$TEMP/pi17-after"`, so no later commit at the tip reaches either
   reading, `TOOL-aPrunedIndex-20`'s pool among them. AC8 is green when all four hold: every reading
-  exits 0 and stays under the leg's 300 s `ceiling` in `tools/gate-legs.json`; the largest of the six gauges is at most
+  exits 0 and stays under the leg's 300 s `ceiling` in `tools/gate-legs.json`; the largest of the six gauges is at most (PINNED, 2026-11-26)
   1.5 times the smallest; the worst reading after over the worst reading before is at most 0.90; and
   the worst reading after is at most 106 s, so the budget row cannot pass the 159 it reads today. (PINNED, 2026-11-26)
   A set whose gauges fall outside that band is retaken, at most twice, and a third such set is red.
@@ -379,7 +380,7 @@ Live at landing. The held answers exist only inside a `--fixture` run of the fiv
   cost: six readings of the leg. At a 0.21 s gauge, section 4's sums for the five plants put them at no
   less than 3 times 223.6 s before and 3 times 157.7 s after, about 19 minutes, plus the eight `bundle-*`
   plants, which nothing here has timed. The cost scales with the gauge. At that gauge a reading after is
-  at least 157.7 s, so the 106 s bound is reachable only at a gauge near or under 0.14 s, which is 0.21
+  at least 157.7 s, so the 106 s bound is reachable only at a gauge near or under 0.14 s, which is 0.21 (PINNED, 2026-11-26)
   times 106 over 157.7. The 106 s row at `tools/run-gates/ceiling-evidence.txt@a8ce27b0:149` records no (PINNED, 2026-11-26)
   gauge.
   figure: DERIVED at observation time.
@@ -428,7 +429,7 @@ none
   §3, §4 and AC8, and the hands-off edge names it), 1 (S5 asks for AC7's interleaved pairs, the half
   rev-3 left standing), 21 (AC8's built tree is pinned to the build commit in its own worktree), 10
   (the worktrees spelled `"$TEMP/..."`), 11 (AC8's cost derived from section 4's timed sums, with the
-  gauge at which 106 s is reachable), 7 and 12 (AC4's 90 and 210 named as slack over 86 and 207), 6
+  gauge at which 106 s is reachable), 7 and 12 (AC4's 90 and 210 named as slack over 86 and 207), 6 (PINNED, 2026-11-26)
   (AC2 probes `--show-toplevel`, eleven reads), 8 (AC6 states the eight `seen-red` lines), 16 (S2's
   swap is `patch.object`, after `tools/loop/guard.py`, and §10's grep is widened).
 

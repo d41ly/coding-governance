@@ -10,9 +10,9 @@
 | [2026-11-26-build-TOOL-aPrunedIndex-20-deviation-1.md](../build/2026-11-26-build-TOOL-aPrunedIndex-20-deviation-1.md) | deviation | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-17-5-owner-waiver.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-5-owner-waiver.md) | research | TOOL-aPrunedIndex-17 |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md) | research | TOOL-aPrunedIndex-17 |
-| [2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23 |
+| [2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-17 |
 | [2026-11-26-review-TOOL-aPrunedIndex-17-20-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-17 |
-| [2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23 TOOL-aPrunedIndex-24 TOOL-aPrunedIndex-25 TOOL-aPrunedIndex-26 PLAY-dClosedLoop-1 TOOL-aTwinnedPass-1 TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-105 TOOL-dSettledStage-1 |
+| [2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-24 |
 
 <!-- /gen:spec-records -->
 
@@ -41,7 +41,7 @@ section 3 hands off, and the owner approved it as a second unit on 2026-11-26.
   summary line with the bytes they have today. Observed by AC2 and AC3.
 - **S4** — The bound is the one `max_workers=4` literal at the one pool call, the width of the docs
   leg's pool in `tools/govkit/selftest.py@daac944b:21214`. No constant, knob or conf key is added.
-  `SELFTEST_ROWS`, which plants the leg runs and the leg's 300 s `ceiling` in `tools/gate-legs.json`
+  `SELFTEST_ROWS`, which plants the leg runs and the leg's 300 s `ceiling` in `tools/gate-legs.json` (PINNED, 2026-11-26)
   do not change. Observed by AC4.
 - **S5** — The main loop re-times the leg at the close, on the tree with units 17 and 20 together
   and on that tree with this unit's build commit reverted. On green it rewrites the
@@ -60,8 +60,8 @@ section 3 hands off, and the owner approved it as a second unit on 2026-11-26.
 - The twin runner `tools/playbook/positional.py#run_selftest`, which runs `gov_tag.py --fixture --plant`
   plants with the same lazy `subprocess.run` and the same `out = p.stdout + p.stderr`. It keeps its
   serial runner. The brief scopes this unit to `tools/playbook/tag_bundle.py`, and the
-  `tags positional selftest` row of `tools/run-gates/selftest-budgets.txt@d09d433d:147` reads 108 s
-  under a 170 s budget, so no reading asks for a pool there.
+  `tags positional selftest` row of `tools/run-gates/selftest-budgets.txt@d09d433d:147` reads 108 s (PINNED, 2026-11-26)
+  under a 170 s budget, so no reading asks for a pool there. (PINNED, 2026-11-26)
 - `tools/loop/position.py` and `tools/memory-tree/routed_commits.py`, which other sessions are landing.
 - A per-plant timeout. The leg's `ceiling` bounds it today and still does.
 - Printing each row as its plant finishes. Rows print after the pool returns, so an interactive run
@@ -169,7 +169,7 @@ each node re-parses their rows once, the cost unit 17's section 4 accepts for it
   and every other row prints `arm ok`.
   Red when: the exception escapes `run_selftest` as a traceback, or the plant's rows print `arm ok`.
 - **AC4** — When `git grep -c "max_workers" -- tools/playbook/tag_bundle.py` runs on the built tree it
-  prints `tools/playbook/tag_bundle.py:1`. `git diff --name-only <parent> <build commit>` names
+  prints `tools/playbook/tag_bundle.py@8a284c47:1`. `git diff --name-only <parent> <build commit>` names
   `tools/playbook/tag_bundle.py` and none of `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`,
   `tools/gate-legs.json`, `tools/playbook/positional.py`, `tools/loop/position.py` or
   `tools/memory-tree/routed_commits.py`. The AC2
@@ -181,7 +181,7 @@ each node re-parses their rows once, the cost unit 17's section 4 accepts for it
   back to back in one session with unit 17's AC7 gauge beside each, the ledger records the six
   readings and the six gauges. The reverted tree holds unit 17 and not this unit. AC5 is green when
   all four hold: every reading exits 0 and prints `PASS — the tag plants, 14 rows`, under the leg's
-  300 s `ceiling` in `tools/gate-legs.json`; the largest gauge is at most 1.5 times the smallest; the
+  300 s `ceiling` in `tools/gate-legs.json`; the largest gauge is at most 1.5 times the smallest; the (PINNED, 2026-11-26)
   worst reading after over the worst reading before is at most 0.75; and the worst reading after is at
   most 106 s. A set whose gauges fall outside that band is retaken, at most twice. On green the main (PINNED, 2026-11-26)
   loop runs the call unit 17's AC8 spells, with this AC's worst reading after, and only where that
@@ -196,14 +196,14 @@ each node re-parses their rows once, the cost unit 17's section 4 accepts for it
   On red it writes neither row and records the readings, the gauges and the failed condition. On either
   verdict the ledger records the diff of the other legs' rows, which every `--write` re-derives.
   Red when: a reading exits non-zero, fails a row, or reaches the ceiling; the gauges stay out of
-  band; the ratio exceeds 0.75; the worst reading after exceeds 106 s; or the `tags bundle selftest`
+  band; the ratio exceeds 0.75; the worst reading after exceeds 106 s; or the `tags bundle selftest` (PINNED, 2026-11-26)
   row of either file reads higher after the write than before it. Another leg's row moving is not red.
   permission: a pass runs no self-test leg, so the readings and both writes are the main loop's.
   cost: six readings of the leg. At a 0.21 s gauge the reverted tree runs the five plants one after
   another in no less than unit 17's section 4 sum of 157.7 s, and the tip near 0.49 of that, about
-  77 s, from section 4's pool ratio. The six readings take at least about 12 minutes, plus the eight
-  `bundle-*` plants, which nothing has timed. The cost scales with the gauge. At that gauge the 106 s
-  bound is reachable only if the eight `bundle-*` plants add under about 29 s to a pooled reading.
+  77 s, from section 4's pool ratio. The six readings take at least about 12 minutes, plus the eight (PINNED, 2026-11-26)
+  `bundle-*` plants, which nothing has timed. The cost scales with the gauge. At that gauge the 106 s (PINNED, 2026-11-26)
+  bound is reachable only if the eight `bundle-*` plants add under about 29 s to a pooled reading. (PINNED, 2026-11-26)
   figure: the readings are DERIVED at observation time. The 0.75 bound is PINNED: it leaves the
   section 4 pool ratio of 0.49 room for the eight `bundle-*` plants, which nothing has timed under a
   pool.
@@ -235,7 +235,7 @@ none
   `--reset` deletes the leg's non-ok run rows before any refusal, and a MONOTONE refusal leaves the
   evidence row as it stood), 2 (the budget value derives from the evidence row as the call leaves it,
   and each write follows the test it can trip), 10 (the worktree spelled `"$TEMP/pi20-base"`), 11
-  (AC5's cost derived from unit 17's timed sums and the pool ratio, with what makes 106 s reachable),
+  (AC5's cost derived from unit 17's timed sums and the pool ratio, with what makes 106 s reachable), (PINNED, 2026-11-26)
   14 (the twin runner in `tools/playbook/positional.py` named in §3 and §9 and kept serial, with
   AC4's cut line holding it), 15 (the WONTDO ask no longer cited; the bar-slot risk is this unit's,
   accepted), 18 (the `tags` and `edges` legs owed, under unit 17's timing sentence), 23 (AC5's red
@@ -253,6 +253,6 @@ none is a pool. `git grep -n "max_workers"` over `tools/` found the same literal
 knob, so no shared width exists to reuse. A grep for the call shape the edit changes,
 `git grep -n -- '"--fixture", "--plant"' -- 'tools/*.py'`, found one twin that runs `gov_tag.py`
 plants: `tools/playbook/positional.py#run_selftest`, at `tools/playbook/positional.py@3bbaecc5:750`.
-Section 3 records why it keeps its serial runner. The recall answered unit 17's section 4 pool
+Section 3 records why it keeps its serial runner. The recall answered unit 17's section 4 pool (PINNED, 2026-11-26)
 measurement first, then `TOOL-aTimedTurnstile-5`, whose audit found no shell concurrency seam.
 Recall terms used: selftest plant fixture ThreadPoolExecutor max_workers pool row order leg ceiling budget concurrency

@@ -26,7 +26,7 @@ This unit is the pool. It is the hand-off named in the Edges of `memory/builds/a
 ## Cut-line
 
 - No edit to `tools/playbook/tag_index.py` or its import closure, and none to `gov_tag.py`, which unit 17 owns. The two units' write sets are disjoint, so they may build concurrently.
-- No change to which plants the leg runs, or to the leg's 300 s ceiling.
+- No change to which plants the leg runs, or to the leg's 300 s ceiling. (PINNED, 2026-11-26)
 - `tools/loop/position.py` and `tools/memory-tree/routed_commits.py` stay untouched.
 - Tier: 1. A runner's scheduling, with output order and verdicts fixed.
 

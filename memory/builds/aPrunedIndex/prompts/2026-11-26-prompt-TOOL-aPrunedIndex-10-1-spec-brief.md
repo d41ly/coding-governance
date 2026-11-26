@@ -42,7 +42,7 @@ that unit. The findings are L1 to L4 of
   - `backlog`, `coverage_join`, `design_lib`, `id_grammar`, `import_walk`, `legacy_ledger`, `policy_value`, `tag_index`,
     `tree_lib`.
   - Every edit there is a new version of the `tag_index:*` extractors. Each node then pays a full re-parse at its next
-    check, measured at 441 s on node a.
+    check, measured at 441 s on node a. (PINNED, 2026-11-26)
 - `gov_tag.py` is in `instruction_units`' closure, beside `routed_commits.py`, which other sessions are landing. An edit
   to it therefore re-versions only the `instruction_units:*` extractors, and those already re-version at every such
   landing. That cost is accepted here. The main loop measures it at the close on the private copy.

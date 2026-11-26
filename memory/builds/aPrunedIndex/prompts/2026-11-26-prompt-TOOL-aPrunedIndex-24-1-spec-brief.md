@@ -6,7 +6,7 @@
 
 > Build them first
 
-The owner gave this answer in the building session on 2026-11-26. The question was "How should the three small code findings be handled?", with the choices "File as asks, land" and "Build them first". The findings are items 1, 4 and 5 of `memory/builds/aPrunedIndex/reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md`; read them whole. This is the one unit BUILD-METHOD M4 batches them into.
+The owner gave this answer in the building session on 2026-11-26. The question was "How should the three small code findings be handled?", with the choices "File as asks, land" and "Build them first". The findings are items 1, 4 and 5 of `memory/builds/aPrunedIndex/reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-diff-review-round3.md`; read them whole. This is the one unit `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it` batches them into.
 
 ## The brief
 
@@ -19,7 +19,7 @@ The rules unit 17 states for its held git answers each have an arm that the `tag
 3. `"--"` leaves `HELD_FLAGS`, which then holds `{"--full-tree", "--name-only", "-r", "-z"}` (review item 5, id 4). The arm of item 1 shows the key table unchanged.
 
 ### Acceptance
-Each arm passes on the built tree and is seen red under a staged break of the rule it guards: the `.git`-exists guard removed, a failed read stored, and a wrong key for a listed read. `tags bundle selftest` still prints `PASS — the tag plants, <n> rows` with the new row count, and its wall stays within its 159 s budget row.
+Each arm passes on the built tree and is seen red under a staged break of the rule it guards: the `.git`-exists guard removed, a failed read stored, and a wrong key for a listed read. `tags bundle selftest` still prints `PASS — the tag plants, <n> rows` with the new row count, and its wall stays within its 159 s budget row. (PINNED, 2026-11-26)
 
 ### Gates
 tags bundle selftest; lexicon naming predicates; memory hygiene; spec tokens (a spec's own names resolve)
