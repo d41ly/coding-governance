@@ -1,6 +1,6 @@
 # TOOL-aPrunedIndex-4 — `--gc` skips a worktree that predates the tag registry, and still refuses one it cannot read
 
-**Status:** SPECCED · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 4 · closes KICK-dKeptSession-87
+**Status:** INPROGRESS · rev-4 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 4 · closes KICK-dKeptSession-87
 
 <!-- gen:spec-records -->
 
