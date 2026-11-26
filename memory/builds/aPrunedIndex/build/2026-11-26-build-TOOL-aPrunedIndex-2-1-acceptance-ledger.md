@@ -5,7 +5,7 @@
 No merge bar, no self-test suite and no gate leg ran in this pass, and nothing here opened either live index
 file. Every reading is node a's, 2026-11-26, SQLite 3.53.4, from base `336dc9e66`, by `--fixture` plants and by
 probes over private copies in the run's scratch, each opened through `load_index` with `derive_index_path`
-pointed at the copy. The `named-probe` row's five staged reds, and the legs of section 6, are owed at the close.
+pointed at the copy. The `named-probe` row's five staged reds, and the legs of section 6, are owed at the close. The staged reds were observed afterwards at `57c8f95e6`, as the seen-red lines below record.
 
 **Evidences:** TOOL-aPrunedIndex-2
 - AC1 — `python tools/playbook/gov_tag.py --fixture --plant named-probe` — exit 0 over 6 probes: 125 steps with no pad, 126 under the dead pad, 126 under both pads, each within 1.1 times the first. (PINNED, 2026-11-26)
@@ -17,3 +17,5 @@ pointed at the copy. The `named-probe` row's five staged reds, and the legs of s
 - AC7 — a child opening AC5's copy through `load_index`, both SQL indexes dropped, printed its `tag-index — building:` line naming both, and was killed 29 s later, once `path_row_version` had committed. After the kill the file held a hot journal, `path_row_version` stood and `path_row_named` did not, over 5,976,942 path rows. The next open through `load_index` printed a building line naming `path_row_named` alone, returned in 4 s, and left both indexes, the same 5,976,942 rows and stamp 3. (PINNED, 2026-11-26)
 - AC8 — `SELFTEST_ROWS` — the probe printed one `named-probe` row, 0 and `within a tenth under every pad`.
 - AC9 — `PRAGMA max_page_count` over unit 1's probe of 5,000 rows, both statements in `SCHEMA` and both SQL indexes dropped, page count 262 — the PINNED cap of 35 pages above it, and 40 to 55, left neither index and raised `cannot be opened: database or disk is full`, so the cap moved as the criterion allows. At 60 pages above it `load_index` raised the same `TagError`, `path_row_version` stood, `path_row_named` did not, `PRAGMA integrity_check` read `ok` and 5,000 rows stood. At 70 the open returned with both. With no cap the next open built both over 5,000 rows. (PINNED, 2026-11-26)
+- seen-red — `tags bundle selftest` — red `57c8f95e6` — green `57c8f95e6` — `named-probe`: the dead pad on unprobed paths, the own pad under another extractor, the early return removed, and the early return unconditional each exit 1 on the plant's own test (PINNED, 2026-11-26)
+- seen-red — `tags bundle selftest` — red `57c8f95e6` — green `57c8f95e6` — `named-probe`: the `path_row_named` statement removed from `SCHEMA`, `path_row_version` standing, exits 1 on the plant's own `DROP INDEX path_row_named` (`no such index`), a crash rather than its count test (PINNED, 2026-11-26)

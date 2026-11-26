@@ -6,7 +6,7 @@ No merge bar, no self-test suite and no gate leg ran in this pass, and nothing h
 file. Every reading is node a's, 2026-11-26, SQLite 3.53.4, Python 3.15.2, from base `47bd7e5b9`, by
 `--fixture` plants and by one probe over a private copy in the run's scratch, opened through `load_index` with
 `derive_index_path` pointed at the copy. Both new arms' staged reds, the legs of section 7, and AC4 and AC9
-are owed at the close.
+are owed at the close. The staged reds were observed afterwards at `57c8f95e6`, as the seen-red lines below record.
 
 **Evidences:** TOOL-aPrunedIndex-3
 - AC1 — `python tools/playbook/gov_tag.py --fixture --plant released-rows` — exit 0, one line per step, `lost` `[0, 0]` after every step. `left` read zero after steps 1 to 7, 14 and 17, and `[5, 3, 2]` at 8, `[10, 6, 4]` at 9, `[15, 6, 4]` at 10 and 11, `[10, 6, 4]` at 12, `[16, 10, 7]` at 13 and `[32, 18, 14]` at 16, each equal to the rows it named; both dumps equal; 49 s. Its staged reds are owed at the close. (PINNED, 2026-11-26)
@@ -20,3 +20,5 @@ are owed at the close.
 - AC9 — owed at the close: two `check` runs over a private copy of the 12.6 GB index.
 - AC10 — `released-rows` — each of the six texts of step 15 was served as itself once put back, each staged save fired once, the failed read refused naming `memory/guides/ALPHA.md` with no row moved, the bytes that are not UTF-8 held `[2, 0, 2]` rows with no refusal, and after step 17 the dumps were equal. (PINNED, 2026-11-26)
 - AC11 — `SELFTEST_ROWS` — the probe printed `released-rows|0|only replaced edits left, and nothing lost` and `released-cost|0|a sweep costs what was released`.
+- seen-red — `tags bundle selftest` — red `57c8f95e6` — green `57c8f95e6` — `released-rows`: the overlay releasing the pairs it replaces, the pair filter absent, no set from a gone worktree, `remove_dead_versions` calling no full sweep, today's overlay, the path hashed before and after the bytes are read, a failed read recorded with no text, and non-UTF-8 bytes refused each exit 1 (PINNED, 2026-11-26)
+- seen-red — `tags bundle selftest` — red `57c8f95e6` — green `57c8f95e6` — `released-cost`: `remove_unheld_rows` called from `build_index` (1228 then 5788 steps), and the pad written for a blob no table holds (the full sweep 469 then 469), each exit 1 (PINNED, 2026-11-26)

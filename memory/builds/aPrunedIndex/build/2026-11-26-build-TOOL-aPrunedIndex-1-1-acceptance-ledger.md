@@ -5,7 +5,7 @@
 No merge bar, no self-test suite and no gate leg ran in this pass, and nothing here opened either live index
 file: its mtime reads 2026-11-25 22:11:27 before the pass and after it. Every reading is node a's, 2026-11-26,
 from base `b1f8fcccf`, by `--fixture` plants and by probes over private copies in the run's scratch. The
-`dead-versions` row's RED-first observation, and the legs of section 7, are owed at the close.
+`dead-versions` row's RED-first observation, and the legs of section 7, are owed at the close. The staged reds were observed afterwards at `57c8f95e6`, as the seen-red lines below record.
 
 The four runs of AC4 print `RED · 9 red` under both sources. The nine are unlisted file:line citations in the
 diagnosis and the two audit records of this build, committed before this pass. They are owed a
@@ -22,3 +22,4 @@ diagnosis and the two audit records of this build, committed before this pass. T
 - AC8 — `dead-versions` — its building lines count 0 at the first build, 1 at the reopen, naming `path_row_version`, and 0 on the complete file. With `load_index` printing at every open, patched in memory, they counted 1, 1 and 1, and with it printing none 0, 0 and 0, and the plant exited 1 each time.
 - AC9 — `PRAGMA max_page_count` — under the cap `load_index` raised a `TagError` reading `cannot be opened: database or disk is full`, the file held no `path_row_version`, `PRAGMA integrity_check` read `ok` and 5,000 rows stood. With no cap the same open returned and the index was back over 5,000 rows. (PINNED, 2026-11-26)
 - AC10 — `SELFTEST_ROWS` — the probe printed one `dead-versions` row, 0 and `reads cost their own version's rows`. `grep -c "bundle plant" tools/playbook/tag_bundle.py` printed 0, `tag plant` is in the docstring, the two arm lines and the two summary lines, `the tag index's row plants` counted 1 in each of `tools/gate-legs.json` and `tools/govkit/registry.toml`, and the old words counted 0 in the second.
+- seen-red — `tags bundle selftest` — red `57c8f95e6` — green `57c8f95e6` — `dead-versions`: `VIEW_JOIN` alone in today's order; the `path_row_version` statement removed from `SCHEMA`; `read_rows` building a tag read on `VIEW_ROWS`; the dead pad rolled back after its rows are counted; `load_index` printing its line at every open; and printing none: each exits 1 (PINNED, 2026-11-26)
