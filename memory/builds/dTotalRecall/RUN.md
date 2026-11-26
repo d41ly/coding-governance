@@ -787,3 +787,9 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-25T22:25:00Z draw · re-dispatch · TOOL-dTotalRecall-123 · 90/186 · 20261125T222500Z-c71acc
 
 2026-11-25T22:25:00Z dispatch · item 688a6f19 TOOL-dTotalRecall-123 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dTotalRecall/build memory/map/generated tools/workflows/replay_scorer.py tools/workflows/README.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-123.md memory/builds/dTotalRecall/build/2026-11-25-build-TOOL-dTotalRecall-123-3-acceptance-ledger.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md
+
+2026-11-26T02:58:56Z rescope · item defer TOOL-dTotalRecall-14 · reason held after the second map replay also lost, on recall and searches (verdict record 2026-11-26-build-TOOL-dTotalRecall-123-map-replay-verdict); its lose route retires the unit and re-homes its clause, which ask TOOL-dTotalRecall-111 leaves to the owner
+
+2026-11-26T02:59:00Z rescope · item defer TOOL-dTotalRecall-15 · reason held after the second map replay also lost, on recall and searches (verdict record 2026-11-26-build-TOOL-dTotalRecall-123-map-replay-verdict); its lose route retires the unit and re-homes its clause, which ask TOOL-dTotalRecall-111 leaves to the owner
+
+2026-11-26T02:59:03Z rescope · item defer TOOL-dTotalRecall-26 · reason held after the second map replay also lost, on recall and searches (verdict record 2026-11-26-build-TOOL-dTotalRecall-123-map-replay-verdict); its lose route retires the unit and re-homes its clause, which ask TOOL-dTotalRecall-111 leaves to the owner
