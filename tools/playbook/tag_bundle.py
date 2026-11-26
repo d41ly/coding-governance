@@ -381,6 +381,7 @@ bundle-unregistered-type|1|type-registered: rc=1, named memory/notes/site.md:1 a
 bundle-dangling-target|1|target-resolves: rc=1, named memory/notes/site.md:1 and instructs=practice.nosuch; with instructs=practice.land: rc=0
 bundle-empty-sections|0|empty sections: instructions searched-empty, regions not-installed naming its fallback
 dead-versions|0|reads cost their own version's rows
+named-probe|0|within a tenth under every pad
 """
 
 

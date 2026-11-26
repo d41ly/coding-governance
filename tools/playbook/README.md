@@ -323,7 +323,9 @@ the version, a build never deletes another version's rows, and every read is joi
 worktree's own `{extractor: version}` map, so a worktree is served only rows its own extractors wrote. A
 read of the whole view starts from that worktree's versions and reaches `path_row` through the SQL index
 `path_row_version`, so stored versions it does not derive cost it nothing; a read of one tag or one path
-starts from that name's own index (TOOL-aPrunedIndex-1). A tree is fresh under `tree_built(tree, versions)`, `versions` the first 12 hex of the SHA-256 of that map's
+starts from that name's own index (TOOL-aPrunedIndex-1). A build finds a path already named through
+the partial SQL index `path_row_named` over the `parsed` rows, one seek however many versions are stored,
+and a build or overlay with no blob reads no `blob_parsed` (TOOL-aPrunedIndex-2). A tree is fresh under `tree_built(tree, versions)`, `versions` the first 12 hex of the SHA-256 of that map's
 sorted `extractor=version` lines and a `conf=<key>` line. The key is the conf's `MEMORY_ROOT` and `CHARTER`
 hashed, since they decide which path is the charter and which are guides: every `path_row` carries it, every
 read joins the reading worktree's own key, and a conf edit, committed or not, is served its own names

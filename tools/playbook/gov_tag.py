@@ -430,7 +430,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
           "positional-spec-revbump", "positional-bulk-move", "positional-archived", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
-          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "dead-versions")
+          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "dead-versions", "named-probe")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -1112,6 +1112,79 @@ def run_plant(root, top, plant, sets) -> int:
             con.close()
         if ok:
             say("reads cost their own version's rows")
+        return 0 if ok else 1
+    # TOOL-aPrunedIndex-2: a build's name probe is one seek under a dead pad and an own pad, and an overlay with no
+    # blob reads no parse ledger. What it does not check: wall time, and a planner holding `sqlite_stat` tables
+    if plant == "named-probe":
+        import collections
+        row = "INSERT INTO path_row VALUES (?,?,?,?,?,?,?,?)"
+        run_verb(root, "rebuild", None, sets=sets)
+        ctx = ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml")
+        versions, tree = ctx["versions"], ti.read_git(root, "rev-parse", "HEAD^{tree}").strip()
+        drops = {"": (), "named": ("path_row_named",), "both": ("path_row_named", "path_row_version")}
+        steps, written = {}, {}
+        con = ti.load_index(root)
+        try:
+            pairs = ti._derive_applicable(ctx, con.execute("SELECT path, blob FROM tree_path WHERE tree=?",
+                                                           (tree,)).fetchall())
+            for pad in ("no", "dead", "own"):
+                if pad != "no":
+                    con.execute("BEGIN IMMEDIATE")
+                    stored = con.execute("SELECT * FROM path_row").fetchall()
+                    if pad == "dead":  # the fixture's own rows under 50 versions nothing derives, on the probed paths
+                        padded = [(p, b, ex, f"dead{n}-{v}", *rest) for n in range(50) for p, b, ex, v, *rest in stored]
+                    else:  # the reading versions' rows at 20 new paths each, which only `path_row_named` hides
+                        padded = [(f"pad{n}/{p}", b, ex, v, *rest) for n in range(20)
+                                  for p, b, ex, v, *rest in stored if versions.get(ex) == v]
+                    con.executemany(row, padded)
+                    con.execute("COMMIT")
+                    written[pad] = len(padded)
+                for drop, names in drops.items():  # a count without an index drops it, and SCHEMA puts it back
+                    for name in names:
+                        con.execute(f"DROP INDEX IF EXISTS {name}")
+                    steps[pad, drop] = read_step_count(con, lambda: ti._write_path_rows(con, pairs, versions,
+                                                                                         ctx["conf"]))[0]
+                    con.executescript(ti.SCHEMA)
+                    say(f"{len(pairs)} probes, {pad} pad, without {' and '.join(names) or 'no index'}:",
+                        f"{steps[pad, drop]} steps")
+            first = steps["no", ""]
+            ok = (first > 0 and written["dead"] > 0 and written["own"] > 0
+                  and steps["dead", ""] <= 1.1 * first and steps["own", ""] <= 1.1 * first
+                  and steps["dead", "both"] > 2 * steps["no", "both"]
+                  and steps["own", "named"] > 2 * steps["no", "named"] and steps["own", "named"] > 2 * first)
+            say(f"pads: {written['dead']} dead rows, {written['own']} own rows;", "held" if ok else "FAILED")
+            rows = con.execute("SELECT COUNT(*) FROM path_row").fetchone()[0]
+            con.execute("DROP INDEX path_row_named")
+            con.close()
+            con = ti.load_index(root)
+            back = con.execute("SELECT 1 FROM sqlite_master WHERE type='index' AND name='path_row_named'").fetchone()
+            again = con.execute("SELECT COUNT(*) FROM path_row").fetchone()[0]
+            stamp = con.execute("PRAGMA user_version").fetchone()[0]
+            held = bool(back) and again == rows and stamp == ti.INDEX_SCHEMA
+            ok = ok and held
+            say(f"reopened: the named index {'back' if back else 'MISSING'}, {again} path rows of {rows},",
+                f"stamp {stamp};", "held" if held else "FAILED")
+            ledger = []
+            for edit in (None, GUIDE + "\nedited\n"):  # a clean worktree, then one with one guide edited
+                if edit:
+                    write_files(root, {"memory/guides/ALPHA.md": edit})
+                traced = []
+                con.set_trace_callback(traced.append)
+                try:
+                    ti.build_overlay(root, ctx, con, {"parsed": 0, "runs": collections.Counter(),
+                                                      "skipped": collections.Counter()})
+                finally:
+                    con.set_trace_callback(None)
+                ledger.append(sum(1 for sql in traced if sql.lstrip().upper().startswith("SELECT")
+                                  and "blob_parsed" in sql))
+            held = ledger == [0, 1]
+            ok = ok and held
+            say(f"the overlay read blob_parsed {ledger[0]} time(s) clean, {ledger[1]} with one guide edited;",
+                "held" if held else "FAILED")
+        finally:
+            con.close()
+        if ok:
+            say(f"ledger reads {ledger[0]} and {ledger[1]}; the probe within a tenth under every pad")
         return 0 if ok else 1
     # PLAY-dOrderedCharter-70's four: a TOML row placed on its own line, a staged rename, and a conf edit
     if plant == "toml-row":

@@ -1,0 +1,19 @@
+# TOOL-aPrunedIndex-2 — acceptance ledger
+
+**Serves:** journal TOOL-aPrunedIndex-2
+
+No merge bar, no self-test suite and no gate leg ran in this pass, and nothing here opened either live index
+file. Every reading is node a's, 2026-11-26, SQLite 3.53.4, from base `336dc9e66`, by `--fixture` plants and by
+probes over private copies in the run's scratch, each opened through `load_index` with `derive_index_path`
+pointed at the copy. The `named-probe` row's five staged reds, and the legs of section 6, are owed at the close.
+
+**Evidences:** TOOL-aPrunedIndex-2
+- AC1 — `python tools/playbook/gov_tag.py --fixture --plant named-probe` — exit 0 over 6 probes: 125 steps with no pad, 126 under the dead pad, 126 under both pads, each within 1.1 times the first. (PINNED, 2026-11-26)
+- AC2 — `named-probe` — without both SQL indexes the probe went from 317 steps unpadded to 7,817 under the dead pad, and without `path_row_named` from 346 to 3,348 under the own pad, over 750 dead rows and 300 own rows. Dropping `path_row_named` and reopening through `load_index` gave it back over 1,065 path rows of 1,065, stamp 3. (PINNED, 2026-11-26)
+- AC3 — `named-probe` — the traced `build_overlay` read `blob_parsed` 0 times on the clean worktree and 1 time with one guide edited. (PINNED, 2026-11-26)
+- AC4 — `python tools/playbook/gov_tag.py --fixture --plant <case>` — `two-paths`, `tagless`, `new-extractor`, `dirty` and `charter-dirty` each exited 0.
+- AC5 — `_write_path_rows` over the HEAD tree's 15,122 pairs on one private copy of the clean 270,147,584-byte file, built at this worktree's versions and padded with 12 dead versions to 5,976,942 path rows and 3,706,642,432 bytes, `path_row_version` present throughout, each pass its own process. With `path_row_named` the plan read `SEARCH path_row USING COVERING INDEX path_row_named`; dropped, it read `SEARCH path_row USING INDEX path_row_version`. Pass 1, with: 1.0 s wall, 0.8 s CPU. Pass 2, without: stopped at 570 s wall, 541.5 s CPU, the floor the criterion allows. Pass 3, with: 0.8 s wall, 0.7 s CPU. Pass 4, without: stopped at 570 s wall, 521.8 s CPU. Each pass with the index is the faster of its pair. Pass 1 wrote 7 `parsed` rows of `instruction_units`, whose version moved when `gov_tag.py` was edited between the copy's build and the passes, and every later pass wrote none. (PINNED, 2026-11-26)
+- AC6 — `grep -c path_row_named` — prints 2 over `tools/playbook/tag_index.py` and 1 over `tools/playbook/README.md`.
+- AC7 — a child opening AC5's copy through `load_index`, both SQL indexes dropped, printed its `tag-index — building:` line naming both, and was killed 29 s later, once `path_row_version` had committed. After the kill the file held a hot journal, `path_row_version` stood and `path_row_named` did not, over 5,976,942 path rows. The next open through `load_index` printed a building line naming `path_row_named` alone, returned in 4 s, and left both indexes, the same 5,976,942 rows and stamp 3. (PINNED, 2026-11-26)
+- AC8 — `SELFTEST_ROWS` — the probe printed one `named-probe` row, 0 and `within a tenth under every pad`.
+- AC9 — `PRAGMA max_page_count` over unit 1's probe of 5,000 rows, both statements in `SCHEMA` and both SQL indexes dropped, page count 262 — the PINNED cap of 35 pages above it, and 40 to 55, left neither index and raised `cannot be opened: database or disk is full`, so the cap moved as the criterion allows. At 60 pages above it `load_index` raised the same `TagError`, `path_row_version` stood, `path_row_named` did not, `PRAGMA integrity_check` read `ok` and 5,000 rows stood. At 70 the open returned with both. With no cap the next open built both over 5,000 rows. (PINNED, 2026-11-26)

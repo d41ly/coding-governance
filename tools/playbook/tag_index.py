@@ -19,7 +19,9 @@ A blob row's tag `""` or `#<seg>` is relative to the name its path gives it (a d
 so one blob at two paths is parsed once and named twice; every other tag is whole. A `blob_parsed` row
 marks a blob read by one extractor at one version, written when the run yields nothing too, so a build
 runs each extractor over the blobs it has not read at its current version: a newly registered extractor
-reads old blobs. A `parsed` path row marks a (path, blob, extractor, version) quadruple named. The file is
+reads old blobs. A `parsed` path row marks a (path, blob, extractor, version) quadruple named, and a build
+finds it through the partial SQL index `path_row_named` over the `parsed` rows alone, one seek however many
+versions are stored; a build or overlay with no blob reads no `blob_parsed` (TOOL-aPrunedIndex-2). The file is
 stamped `PRAGMA user_version = INDEX_SCHEMA`, and the schema is in its name, so two schemas never share one
 file; a file of another stamp is rebuilt in place, its tables dropped and created again inside one
 `BEGIN IMMEDIATE` transaction and the file never unlinked, so a reader holding it keeps it
@@ -109,6 +111,7 @@ CREATE TABLE IF NOT EXISTS path_row(path TEXT, blob TEXT, extractor TEXT, versio
 CREATE INDEX IF NOT EXISTS path_row_key ON path_row(path, blob);
 CREATE INDEX IF NOT EXISTS path_row_tag ON path_row(tag);
 CREATE INDEX IF NOT EXISTS path_row_version ON path_row(extractor, version);
+CREATE INDEX IF NOT EXISTS path_row_named ON path_row(path, blob, extractor, version, conf) WHERE kind='parsed';
 CREATE TABLE IF NOT EXISTS dirty_path(worktree TEXT, path TEXT, blob TEXT, PRIMARY KEY(worktree, path));
 CREATE TABLE IF NOT EXISTS tree_built(tree TEXT NOT NULL, versions TEXT NOT NULL, built_at TEXT NOT NULL,
                                       PRIMARY KEY(tree, versions));
@@ -719,7 +722,10 @@ def derive_worktree_key(path) -> str:
 def _write_parsed(con, ctx, blobs: dict, read_text, stats) -> None:
     """Run each extractor over each blob `blob_parsed` holds no row for at the extractor's current version;
     `blobs` maps blob -> [(path, extractor)]. A row of another version is never deleted: another worktree
-    may derive it (PLAY-dOrderedCharter-51 S2). Counts into `stats`, load_view's."""
+    may derive it (PLAY-dOrderedCharter-51 S2). Counts into `stats`, load_view's. No blob reads no ledger
+    (TOOL-aPrunedIndex-2 S2)."""
+    if not blobs:
+        return
     versions = ctx["versions"]
     held = set(con.execute("SELECT blob, extractor, version FROM blob_parsed"))
     todo: dict = {}
