@@ -55,7 +55,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 5 unit(s) · node a · opened 2026-11-25 · streams tooling
+**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-11-25 · streams tooling
 ids TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14
 ids TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17
 
@@ -67,15 +67,16 @@ ids TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17
 | [TOOL-aPrunedIndex-3 — a build's sweep touches only the rows that the trees and gone worktrees' edits it lets go of held](spec/2026-11-25-spec-TOOL-aPrunedIndex-3.md) | 3 | 2 | CLOSED | rev-4 | 2026-11-26 |
 | [TOOL-aPrunedIndex-4 — `--gc` skips a worktree that predates the tag registry, and still refuses one it cannot read](spec/2026-11-25-spec-TOOL-aPrunedIndex-4.md) | 4 | 2 | CLOSED | rev-4 | 2026-11-26 |
 | [TOOL-aPrunedIndex-10 — the closing review's four lows: the sweep's cost stated as its ceiling, a named plant helper, and two steps whose HEAD git cannot read](spec/2026-11-26-spec-TOOL-aPrunedIndex-10.md) | 5 | 1 | CLOSED | rev-2 | 2026-11-26 |
+| [TOOL-aPrunedIndex-17 — the five tag plants hold the git answers that cannot change while they run](spec/2026-11-26-spec-TOOL-aPrunedIndex-17.md) | 6 | 2 | SPECCED | rev-1 | 2026-11-26 |
 <!-- /gen:build-units -->
 
 Records: 18 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aPrunedIndex-17.
 
-Ids whose spec moved past its audited revision: none — 5 of 5 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 5 of 6 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -87,6 +88,7 @@ Ids whose spec moved past its audited revision: none — 5 of 5 unit id(s) carry
 | 3 | `TOOL-aPrunedIndex-3` | no |
 | 4 | `TOOL-aPrunedIndex-4` | no |
 | 5 | `TOOL-aPrunedIndex-10` | no |
+| 6 | `TOOL-aPrunedIndex-17` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
