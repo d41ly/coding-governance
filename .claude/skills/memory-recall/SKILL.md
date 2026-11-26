@@ -26,12 +26,13 @@ python3 tools/memory-recall/query.py "<the question, in plain English>" --terms 
 
 Run it from the root of the tree you are **working in** — your worktree, not the primary tree.
 The corpus is the tracked `memory/` of `git rev-parse --show-toplevel` from the cwd, so
-it includes notes you have staged but not committed, and the cache is keyed per worktree. It
+it includes notes you have staged but not committed, and an untracked note is served to its own
+worktree alone. It
 ALSO carries the declarations of any file named in `RECALL_EXTRA_SOURCES` — a constraint set in
 a conf is an answer, and confs sit outside `memory` by construction, so a question about
 a declared budget used to return everything that mentioned it and never the declaration itself. It
 writes nothing inside the worktree: the index, the query log and every aggregate live under the
-common git dir.
+common git dir, the rows in the one tag index every worktree shares.
 
 ## Writing the terms — the half that does the work
 
@@ -86,11 +87,10 @@ does write, so a hand record is never lost or double-counted.
 - `--k <n>` — depth PER SOURCE (default 20); the merged pool is up to 2×.
 - `--budget <bytes>` — the output size cap.
 - `--no-terms` — the un-rewritten baseline, logged as such.
-- `--rebuild` — force a cold index, ignoring the freshness manifest. This is the escape hatch the
-  zero-records diagnosis names.
-- `--stats` — print the **cache manifest** (version, chunk max, file count, record and chunk
-  counts, corpus digest, alias digest, supersession map, build seconds, build timestamp). It does
-  not read the query log.
+- `--rebuild` — re-extract every file the query serves, ignoring the rows the index already
+  holds. This is the escape hatch the zero-records diagnosis names.
+- `--stats` — print the **served set** as JSON: the tree, the extraction digest, the record and
+  chunk counts, the alias join counts and the supersession counts. It does not read the query log.
 - `--export --tag <letter>` — aggregate the query log into a readable table **beside the log,
   under the common git dir**, never into the worktree unless `.memory-tree.conf` declares
   `RECALL_EXPORT_DIR`. `--tag` is required: the log is per node and so is its aggregate.

@@ -218,7 +218,7 @@ TYPED_TYPES = (DIRECTIVE, CONSTRAINT, DEFINITION, POINTER, ADOPTER_RULE)
 ENDING_ACTIONS = ("remove", "rename", "split")
 ACTIVE = "active"
 #: A change record's name under `<memory_root>/builds/*/build/`, and its one field shape, the factory's bullet.
-CHANGE_RECORD_RE = re.compile(r"(?:^|/)builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-[A-Za-z]+-[A-Za-z0-9]+-\d+-change-\d+\.md$")
+CHANGE_RECORD_RE = None   # bound below, once `load_memory_tree_path` is defined (TOOL-dTotalRecall-5 S7)
 CHANGE_FIELD_RE = re.compile(r"^- \*\*([A-Z][a-z-]+(?: [a-z]+)?):\*\* (.+)$")
 
 INSTRUCTION_PATHSPECS = (
@@ -872,6 +872,19 @@ def load_memory_tree_path():
         sys.path.append(mt)
 
 
+def load_slug_patterns():
+    """`CHANGE_RECORD_RE` and `HOLD_RE`, each slug the memory-tree kit's slug grammar's class
+    (TOOL-dTotalRecall-5 S7), bound at first use; importing the grammar resolves no conf."""
+    load_memory_tree_path()
+    from id_grammar import SlugPattern  # noqa: PLC0415 — the kit beside this one, put on the path above
+    return (SlugPattern(lambda g: r"(?:^|/)builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-[A-Za-z]+-(?:" + g.slug_class
+                        + r")-\d+-change-\d+\.md$"),
+            SlugPattern(lambda g: r"[A-Z]+-(?:" + g.slug_class + r")-\d+ F\d+"))
+
+
+CHANGE_RECORD_RE, HOLD_RE = load_slug_patterns()
+
+
 def derive_unit_pin(text) -> str:
     """Unit 24's `derive_pin_hash` of `text`, read from the memory-tree kit beside this one."""
     load_memory_tree_path()
@@ -1243,7 +1256,7 @@ DOCUMENT_REQUIRED = ("tag", "path", "level", "direction", "source")
 #: PLAY-dOrderedCharter-8 S9: `untracked`, a boolean, absent read as false, marks a per-worktree file no clone tracks
 DOCUMENT_FLAGS = ("untracked",)
 DOCUMENT_KEYS = frozenset((*DOCUMENT_REQUIRED, "h1", "hold", *DOCUMENT_FLAGS))
-HOLD_RE = re.compile(r"[A-Z]+-[A-Za-z0-9]+-\d+ F\d+")
+# HOLD_RE is bound above, with CHANGE_RECORD_RE, by load_slug_patterns (TOOL-dTotalRecall-5 S7)
 PROTOCOLS_HEAD = "## Protocols"
 
 
@@ -2099,7 +2112,7 @@ ORDER_ROLE = ("---\nname: gov-fixture\ndescription: A fixture role.\nworkflow: f
               "You are the fixture role of {{{{MEMORY_ROOT}}}}.\n")
 ORDER_CHARTER = ("## 1. Governing practices\n\n- [alpha] The first rule.\n- [beta] The second rule.\n\n"
                  "## Protocols\n\n- A protocol line.\n\n## Facts\n\n- A fact line.\n")
-ORDER_HEAD = ("**Serves:** journal PLAY-fixture-1\n\n# gov-fixture handoff — PLAY-fixture-1\n\n"
+ORDER_HEAD = ("**Serves:** journal PLAY-fixture-1\n\n# gov-fixture handoff — PLAY-fixture-1\n\n"  # census: kept cause-writer fixture: the handoff head its fixture plants
               "<!-- gov:handoff role=gov-fixture build=fixture unit=PLAY-fixture-1 path=memory/builds/fixture/prompts/"
               "{date}-prompt-PLAY-fixture-1-1-fixture.md role-sha=e883c92f6c96 task-sha=TASK -->\n\n"
               "## Role\n\nYou are the fixture role of memory.\n\n## Task\n\n"
@@ -2222,8 +2235,8 @@ def arm_status(c):
     rc, said = run_render(c.top, "--check-render")
     c.check("the gate is green and prints no status line", rc == 0
             and not any(ln.startswith("render-playbook: status") for ln in said.splitlines()), said)
-    (c.top / "memory/builds/fx").mkdir(parents=True)
-    rel = build_records.write_change(c.top, "fx", "ARCH-fx-1", "unit.sub", "remove", "semantic",
+    (c.top / "memory/builds/fxFix").mkdir(parents=True)
+    rel = build_records.write_change(c.top, "fxFix", "ARCH-fxFix-1", "unit.sub", "remove", "semantic",
                                      f"unit.sub@{derive_unit_pin('MUST answer the subagent.')}", "none",
                                      build_records.DOOR_PROOF, "none")
     run_git(c.top, "add", "--", rel)
@@ -2588,7 +2601,7 @@ def arm_hold_second(c):
     write_envelope_tree(c)
     rows = ENV_ROWS.replace("HOLD", ENV_HOLD)
     c.write_file(derive_kit_rel(DOCUMENTS), rows.replace('source = "{memory_root}/guides/A.md"\n',
-                                                         'source = "{memory_root}/guides/A.md"\nhold = "PLAY-x-1 F2"\n'))
+                                                         'source = "{memory_root}/guides/A.md"\nhold = "PLAY-xFix-1 F2"\n'))
     check_envelopes_red(c, "a second row declaring a hold", ENV_GUIDE)
     c.write_file(derive_kit_rel(DOCUMENTS), rows)
     check_envelopes_green(c, "the field gone")
@@ -2599,7 +2612,7 @@ def arm_hold_refused(c):
     check_envelopes_red(c, "a hold of F5 alone", ENV_HELD, 2)
     c.write_file(derive_kit_rel(DOCUMENTS), ENV_ROWS.replace("HOLD", ENV_HOLD) + '\n[[document]]\ntag = "doc.rules"\n'
                  'path = ".claude/rules/*.md"\nlevel = 4\ndirection = "A rule"\nsource = ".claude/rules/*.md"\n'
-                 'h1 = "rules"\nhold = "PLAY-x-1 F2"\n')
+                 'h1 = "rules"\nhold = "PLAY-xFix-1 F2"\n')
     check_envelopes_red(c, "a hold on a row whose path holds a `*`", ".claude/rules/*.md", 2)
     c.write_file(derive_kit_rel(DOCUMENTS), ENV_ROWS.replace("HOLD", ENV_HOLD))
     write_limits_row(c, None)
@@ -2624,7 +2637,7 @@ def write_card_plant(c, level):
     """The card file in its envelope at `level`, on disk and outside the index, as the card engine leaves it."""
     path = c.top / ENV_CARD
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render_envelope(ENV_CARD, level, ENV_CARD_DIRECTION, "## route\n- build: x\n"),
+    path.write_text(render_envelope(ENV_CARD, level, ENV_CARD_DIRECTION, "## route\n- build: xFix\n"),
                     encoding="utf-8", newline="")
 
 

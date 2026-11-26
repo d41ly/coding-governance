@@ -751,10 +751,10 @@ rm -rf "$REC_T.wt"; rec_done
 # written. Red against a writer that drops the `selection` keys.
 rec_repo
 sl_f="$REC_GD/gate-verdict/$(git -C "$REC_T" rev-parse 'HEAD^{tree}')"; sl_sel="$REC_T.sel"
-printf '# planted\nheld\tguarded\tquarantine\tTOOL-x-7\n' > "$sl_sel"
-sl_want=$(printf 'held\tguarded\tquarantine\tTOOL-x-7\n' | git hash-object --stdin)
+printf '# planted\nheld\tguarded\tquarantine\tTOOL-xFix-7\n' > "$sl_sel"
+sl_want=$(printf 'held\tguarded\tquarantine\tTOOL-xFix-7\n' | git hash-object --stdin)
 rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
-[ "$(awk -F'\t' '$1=="selection.1"{sub(/^[^\t]*\t/, ""); print}' "$sl_f" 2>/dev/null)" = $'guarded\tquarantine\tTOOL-x-7' ] \
+[ "$(awk -F'\t' '$1=="selection.1"{sub(/^[^\t]*\t/, ""); print}' "$sl_f" 2>/dev/null)" = $'guarded\tquarantine\tTOOL-xFix-7' ] \
   && [ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = "$sl_want" ] \
   && ok "TOOL-dWitnessedBar-41 AC1 a run under a one-row selection writes selection.1 naming the held leg and selection as the hash of its canonical text" \
   || { nope "TOOL-dWitnessedBar-41 AC1 the per-tree verdict omits the selection, or its hash is not the canonical text's"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
@@ -768,8 +768,8 @@ rec_run GATE_FULL=1 >/dev/null
 # hash is the LF canonical text of that row alone, the two others are counted as `selection_ignored`, and
 # the LF twin holding the accepted row alone yields the same `selection`. Red against a writer joining
 # `selection.<n>` with ` · `, or one hashing an ignored row.
-printf '# planted\r\nheld\tguarded\tquarantine\tTOOL-x-7 · 3/10\r\nheld\tone\tquarantine\r\nheld\tone\tbogus\tnote\r\n' > "$sl_sel"
-sl_want=$(printf 'held\tguarded\tquarantine\tTOOL-x-7 · 3/10\n' | git hash-object --stdin)
+printf '# planted\r\nheld\tguarded\tquarantine\tTOOL-xFix-7 · 3/10\r\nheld\tone\tquarantine\r\nheld\tone\tbogus\tnote\r\n' > "$sl_sel"
+sl_want=$(printf 'held\tguarded\tquarantine\tTOOL-xFix-7 · 3/10\n' | git hash-object --stdin)
 rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
 sl_got=$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)
 [ "$(awk -F'\t' '$1=="selection.1"{print NF}' "$sl_f" 2>/dev/null)" = 4 ] && [ "$sl_got" = "$sl_want" ] \
@@ -778,7 +778,7 @@ sl_got=$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)
 [ "$(grep -c '^selection\.[0-9]' "$sl_f" 2>/dev/null)|$(awk -F'\t' '$1=="selection_ignored"{print $2}' "$sl_f" 2>/dev/null)" = "1|2" ] \
   && ok "TOOL-dWitnessedBar-56 AC2 the three-field row and the bogus-source row are left out of the keys and counted as selection_ignored 2" \
   || { nope "TOOL-dWitnessedBar-56 AC2 an ignored row entered the keys, or selection_ignored does not read 2"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
-printf '# planted\nheld\tguarded\tquarantine\tTOOL-x-7 · 3/10\n' > "$sl_sel"
+printf '# planted\nheld\tguarded\tquarantine\tTOOL-xFix-7 · 3/10\n' > "$sl_sel"
 rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
 [ -n "$sl_got" ] && [ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = "$sl_got" ] \
   && ok "TOOL-dWitnessedBar-56 AC1 the LF twin of the selection yields the same selection hash" \
@@ -1172,7 +1172,7 @@ cn_lines=$(wc -l < "$d/census" 2>/dev/null | tr -d ' ')
   && ok "AC2 control: the census took $cn_lines samples, so a snapshot held the leg and its nested run" \
   || nope "AC2 the census holds ${cn_lines:-0} line(s), so no snapshot ever held the leg — the arm below would pass by finding nothing"
 cn_bad=""
-for cn_p in "$(cat "$REC_GD/cn-wrapper.pid" 2>/dev/null)" "${cn_id##*-}" "$(cat "$REC_GD/cn-leg.pid" 2>/dev/null)" "$(cat "$REC_GD/cn-nested.pid" 2>/dev/null)"; do
+for cn_p in "$(cat "$REC_GD/cn-wrapper.pid" 2>/dev/null)" "${cn_id##*-}" "$(cat "$REC_GD/cn-leg.pid" 2>/dev/null)" "$(cat "$REC_GD/cn-nested.pid" 2>/dev/null)"; do  # census: kept slug-grammar not a unit id: a process id
   [ -n "$cn_p" ] || { cn_bad="$cn_bad (a pid file is missing)"; continue; }
   awk -F'\t' -v p="$cn_p" '{ n = split($3, r, " "); for (i = 1; i <= n; i++) if (r[i] ~ "^" p ":") f = 1 } END { exit !f }' "$d/census" 2>/dev/null \
     && cn_bad="$cn_bad $cn_p"

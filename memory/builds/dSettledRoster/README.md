@@ -81,7 +81,7 @@ Recorded because the value is in the misses, not the hits.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-20 · streams tooling+deployer
+**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-20 · streams deployer+tooling
 ids DEPL-dSettledRoster-1 DEPL-dSettledRoster-2 TOOL-dSettledRoster-1 TOOL-dSettledRoster-2 TOOL-dSettledRoster-3 TOOL-dSettledRoster-4 TOOL-dSettledRoster-5 TOOL-dSettledRoster-6
 
 <!-- gen:build-units -->
@@ -108,3 +108,12 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dSettledRoster/card` |
+<!-- /gen:build-routes -->

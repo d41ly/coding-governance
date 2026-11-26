@@ -126,9 +126,22 @@ Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carr
 | 7 | `DEPL-dGaugedVintage-2`, `DEPL-dGaugedVintage-6` | unknown |
 | 8 | `DEPL-dGaugedVintage-12` | no |
 | 9 | `DEPL-dGaugedVintage-13` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md` |
+| logs | `2026-09-01-build-DEPL-dGaugedVintage-9-acceptance-ledger.md`, `2026-09-01-build-DEPL-dGaugedVintage-8-acceptance-ledger.md` and 11 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dGaugedVintage/card` |
+<!-- /gen:build-routes -->

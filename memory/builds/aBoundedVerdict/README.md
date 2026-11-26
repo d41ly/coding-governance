@@ -483,3 +483,16 @@ Ids whose spec moved past its audited revision: none — 0 of 16 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-22-review-TOOL-aBoundedVerdict-1-merge.md`, `2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md` (BLOCKED) and 6 more under reviews/ |
+| research | `2026-08-18-build-TOOL-aBoundedVerdict-1-review-loop-design.md`, `2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md` |
+| logs | `2026-08-22-build-TOOL-aBoundedVerdict-22-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aBoundedVerdict/card` |
+<!-- /gen:build-routes -->

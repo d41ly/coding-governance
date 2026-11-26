@@ -111,9 +111,24 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 | 6 | `TOOL-dFramedEntrypoint-5` | no |
 | 7 | `TOOL-dFramedEntrypoint-6` | no |
 | 8 | `TOOL-dFramedEntrypoint-7` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 - **Child builds:** [dHonouredPark](../dHonouredPark/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-25-review-TOOL-dFramedEntrypoint-1-diff-review-round3.md`, `2026-08-25-review-TOOL-dFramedEntrypoint-1-diff-review-round2.md` (BLOCKED) and 4 more under reviews/ |
+| research | `2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md`, `2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md` and 3 more under build/ |
+| logs | `2026-08-25-build-TOOL-dFramedEntrypoint-7-acceptance.md`, `2026-08-25-build-TOOL-dFramedEntrypoint-6-acceptance.md` and 9 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dFramedEntrypoint/card` |
+<!-- /gen:build-routes -->

@@ -23,7 +23,9 @@ fact, read and written through `positional.read_list` and `write_list` (TOOL-dWi
 a listed one gone from the tree red as stale until `--shrink` takes it off; `--seed` writes the list once, and
 `--list` prints the population's seed, each fact of the tree as its key fields and the count.
 `one-door`: `doors.toml`, one `[[door]]` row per kind of DOOR_KINDS, each writer a tracked file and each node of a
-kind with a witness carrying it. `rationale-apart`: a unit's `help` inside a registered document, and a build
+kind with a witness carrying it; a record kind's door is its row's `writer` in the memory-tree kit's
+`record-kinds.toml`, read through that kit's `record_kinds.read_record_kinds` and printed, and a `[[door]]` row
+naming a record kind is red, since one door is declared once. `rationale-apart`: a unit's `help` inside a registered document, and a build
 record's path in the registry or a unit's text or source, are red. `one-owner`: every namespace, kind and kit unit
 row names exactly one owner, a build row of the chain registry `memory/project/chain.toml` holds; a
 repository unit names none. `check` with no arm runs the first four, the `writing practice (records and units)` leg; `check
@@ -91,9 +93,11 @@ FACT_UNITS = ("bytes", "B", "KB", "KiB", "MB", "lines", "files", "legs", "units"
 FACT_RE = re.compile(r"(?<![\w.#@/-])(\d[\d,]*) ?(" + "|".join(FACT_UNITS) + r")\b")
 PIN_RE = re.compile(r"\b[0-9a-f]{8,40}\b|[A-Za-z0-9_./-]+\.[A-Za-z0-9]+(?:@[0-9a-f]{8,40})?:\d+|\b(?:PINNED|DERIVED)\b")
 CODE_SPAN_RE = re.compile(r"(`+).+?\1")
-#: the memory plan's edge-site door kinds, each one `[[door]]` row of doors.toml until dTotalRecall's kind registry
-DOOR_KINDS = ("instruction-unit", "instruction-change", "work-order", "override", "exception", "record", "trailer",
-              "act")
+#: the memory plan's edge-site door kinds that are no record, each one `[[door]]` row of doors.toml; a record kind's
+#: door is its row's `writer` in the memory-tree kit's record-kind registry (TOOL-dTotalRecall-18 S4)
+DOOR_KINDS = ("instruction-unit", "work-order", "trailer", "act")
+#: the memory-tree kit's record-kind registry, read through its own reader
+RECORD_KINDS_FILE = "record-kinds.toml"
 FIRST_UNIT_WRITER = "PLAY-dOrderedCharter-40"
 EXPLAIN = {
     "one-subject": ("a unit tag on two unit rows; a `##` heading slug twice in one record or one registered "
@@ -107,10 +111,12 @@ EXPLAIN = {
                      "a fact spelled in words (\"eight legs\"), a percentage, a number inside code or a fence, a "
                      "pin on a neighbouring line, whether a pin is true, and a number that is no derived fact"),
     "one-door": ("each kind of DOOR_KINDS has one `[[door]]` row; a row's writer is a tracked file; each node its "
-                 "population matches carries its witness, where the row declares one",
+                 "population matches carries its witness, where the row declares one; no `[[door]]` row names a "
+                 "record kind of record-kinds.toml, whose `writer` column is printed as that kind's door",
                  "whether the writer wrote a node (only its witness is read); a kind whose row declares no witness "
-                 "(unobserved); a `pending` row's kind (named, never graded)"),
-    "rationale-apart": ("a unit's `help` text inside a registered document's tracked file; a build record's path "
+                 "(unobserved); a `pending` row's kind (named, never graded); whether a registry row's writer "
+                 "writes its kind (the cell is printed, never run)"),
+    "rationale-apart":("a unit's `help` text inside a registered document's tracked file; a build record's path "
                         "in a document registry row or in a unit's text or source",
                         "a paraphrase of a help text; an untracked registry row's file; a record path reached "
                         "through a pointer the document follows"),
@@ -318,10 +324,33 @@ def read_doors(pop) -> list:
     return rows
 
 
+def read_record_doors(root, reds, lines) -> dict:
+    """`{record kind: writer}` of the memory-tree kit's record-kind registry in the tree at `root`, read through
+    that kit's `record_kinds.read_record_kinds`, the kit put on the path by `load_memory_tree_path`; each row's
+    writer printed as its kind's door. An absent registry prints `unarmed` and reads as no record kind; one that
+    does not parse is a red."""
+    iu.load_memory_tree_path()
+    import record_kinds
+    kit_rel = ti.resolve_prefix_token("{prefix}/memory-tree", iu.derive_kit_prefix())
+    try:
+        rows = record_kinds.read_record_kinds(root, kit_rel)
+    except record_kinds.RecordKindsError as exc:
+        reds.append(f"one-door: red · {exc}")
+        return {}
+    if rows is None:
+        lines.append(f"one-door: unarmed · no {kit_rel}/{RECORD_KINDS_FILE}, so no record kind's door is printed")
+        return {}
+    doors = {r.get("name"): r.get("writer") for r in rows if isinstance(r.get("name"), str)}
+    for kind, writer in doors.items():
+        lines.append(f"one-door: {kind} · door {writer or '(none)'} · the writer of {RECORD_KINDS_FILE}")
+    return doors
+
+
 def check_one_door(pop, opts) -> tuple:
     root, reds, lines = pop["root"], [], []
     rows = read_doors(pop)
     tracked = set(p for p in iu.run_git(root, "ls-files", "-z").split("\0") if p)
+    record_doors = read_record_doors(root, reds, lines)
     kinds = {}
     for row in rows:
         kinds.setdefault(row.get("kind"), []).append(row)
@@ -329,7 +358,11 @@ def check_one_door(pop, opts) -> tuple:
         if len(kinds.get(kind, ())) != 1:
             reds.append(f"one-door: red · kind {kind} has {len(kinds.get(kind, ()))} rows in {DOORS}: one door per kind")
     for kind in sorted(set(kinds) - set(DOOR_KINDS), key=str):
-        reds.append(f"one-door: red · kind {kind} of {DOORS} is no kind of DOOR_KINDS")
+        if kind in record_doors:
+            reds.append(f"one-door: red · kind {kind} of {DOORS} is a record kind of {RECORD_KINDS_FILE}, whose "
+                        f"writer column is its door: one door per kind, declared once")
+        else:
+            reds.append(f"one-door: red · kind {kind} of {DOORS} is no kind of DOOR_KINDS")
     fill = lambda s: ti.resolve_prefix_token(s, iu.derive_kit_prefix()).replace(  # noqa: E731
         "{memory_root}", pop["memory_root"])
     for row in rows:
@@ -455,12 +488,11 @@ def run_check(root, arm, opts) -> int:
 FX_DOORS = "".join(
     f'[[door]]\nkind = "{k}"\npopulation = "{p}"\nwriter = "{w}"\nwitness = "{x}"\n\n' for k, p, w, x in (
         ("instruction-unit", "{prefix}/*/instructions.toml", "{prefix}/playbook/instructions_edit.py", ""),
-        ("instruction-change", "{memory_root}/builds/*/build/*-change-*.md", "{prefix}/playbook/instructions_edit.py",
-         ""),
-        ("work-order", "{memory_root}/orders/*.md", "{prefix}/roles/handoff.py", "<!-- gov:handoff "),
-        ("override", "{memory_root}/builds/*/build/*-override-*.md", "{prefix}/memory-tree/build_records.py", ""),
-        ("exception", "{memory_root}/builds/*/build/*-exception-*.md", "{prefix}/memory-tree/build_records.py", ""))
-) + "".join(f'[[door]]\nkind = "{k}"\npending = "dFx"\n\n' for k in ("record", "trailer", "act"))
+        ("work-order", "{memory_root}/orders/*.md", "{prefix}/roles/handoff.py", "<!-- gov:handoff "))
+) + "".join(f'[[door]]\nkind = "{k}"\npending = "dFx"\n\n' for k in ("trailer", "act"))
+#: the fixture's record-kind registry: one record kind, whose writer is its door (TOOL-dTotalRecall-18 S4)
+FX_RECORD_KINDS = ('[[record-kind]]\nname = "deviation"\ntag = "record.deviation"\n'
+                   'writer = "build_records.py new deviation"\n')
 FX_UNITS = ('[[unit]]\ntag = "unit.fx-one"\nlevel = 3\ntype = "directive"\nscope = ["reader.every"]\n'
             'text = "MUST read the fixture first."\nowner = "dFx"\nhelp = "the fixture rationale, never loaded"\n')
 FX_HELP = "the fixture rationale, never loaded"
@@ -476,6 +508,7 @@ FX_FILES = {
     "{prefix}/playbook/instructions_edit.py": "# the fixture writer\n",
     "{prefix}/roles/handoff.py": "# the fixture writer\n",
     "{prefix}/memory-tree/build_records.py": "# the fixture writer\n",
+    "{prefix}/memory-tree/" + RECORD_KINDS_FILE: FX_RECORD_KINDS,
     "{prefix}/fx/kit.toml": 'id = "fx-kit"\n',
     "{prefix}/fx/instructions.toml": FX_UNITS,
     "memory/guides/ALPHA.md": "# Alpha\n\n## Scope\n\nThe alpha guide.\n\n## Steps\n\n- read it\n",
@@ -505,6 +538,10 @@ PLANTS = {
     "door-twice": ("one-door", {"{prefix}/playbook/doors.toml": FX_DOORS + '[[door]]\nkind = "act"\npending = "dFy"\n'}),
     "door-untracked-writer": ("one-door", {"{prefix}/playbook/doors.toml": FX_DOORS.replace(
         "{prefix}/roles/handoff.py", "{prefix}/roles/absent.py")}),
+    # TOOL-dTotalRecall-18 S4: a record kind's door declared a second time, here beside the registry's writer
+    "door-in-registry": ("one-door", {"{prefix}/playbook/doors.toml": FX_DOORS + (
+        '[[door]]\nkind = "deviation"\npopulation = "{memory_root}/builds/*/build/*-deviation-*.md"\n'
+        'writer = "{prefix}/memory-tree/build_records.py"\nwitness = ""\n')}),
     "help-rendered": ("rationale-apart", {"AGENTS.md": FX_FILES["AGENTS.md"] + f"\n{FX_HELP}\n"}),
     "record-loaded": ("rationale-apart", {"{prefix}/playbook/documents.toml": FX_FILES["{prefix}/playbook/documents.toml"]
                       + '\n[[document]]\ntag = "doc.fx-record"\npath = "{memory_root}/builds/dFx/README.md"\n'

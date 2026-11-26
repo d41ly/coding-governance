@@ -70,3 +70,13 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-09-review-TOOL-aBatchedTribunal-1-7.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aBatchedTribunal/card` |
+<!-- /gen:build-routes -->

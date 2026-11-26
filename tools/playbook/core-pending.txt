@@ -19,9 +19,7 @@ principle	principle.p25	dBoundRoles
 principle	principle.p27	dOrderedCharter
 principle	principle.p29	dBoundRoles
 principle	principle.p30	dTotalRecall
-principle	principle.p32	dPlacedRequest
 principle	principle.p34	dOrderedCharter
-principle	principle.p35	dTrueNorth
 principle	principle.p36	dWellOiledMachine
 principle	principle.p37	dSafePassage
 principle	principle.p41	dTrueNorth
@@ -121,5 +119,4 @@ leg	roles adopter self-test	dWitnessedBar
 leg	positional (the citation check alone)	dWitnessedBar
 leg	receipt sync (installed files match the receipt)	dWitnessedBar
 kind	kind.tool-kit	dShippedRelease
-kind	kind.record-kind	dConvergedCharter
 kind	kind.lens	dCalibratedLens

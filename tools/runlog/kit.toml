@@ -10,6 +10,7 @@ scope = "repo"
 # pattern reads exists from the first commit. The process-monitor descriptor records the defect a
 # pin at a not-yet-landed file causes; this one cannot have it.
 version_from = { file = "runlog_lib.py", pattern = "^KIT_RUNLOG_VERSION = " }
+requires_if = [{ kit = "memory-tree", why = "TOOL-dTotalRecall-5 S8: every slug and id reader of this kit, runlog_lib.py's SLUG_RE and record.py's and model.py's unit ids, reads the memory-tree kit's slug grammar, its id_grammar.py found through the inline resolve_kit_dir block in runlog_lib.py and bound at first use. Where the kit does not resolve, the inline slug_legacy_py block, the legacy shape, applies and one stderr line says so. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it SELECTS no kit, since a plain `requires` would add an install dependency to a kit an adopter may run alone (§8 F2 of that spec)" }]
 
 [[files]]
 include = "**"

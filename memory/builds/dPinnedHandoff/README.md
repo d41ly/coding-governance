@@ -98,9 +98,19 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-dPinnedHandoff-1` | no |
 | 2 | `TOOL-dPinnedHandoff-2` | no |
 | 3 | `TOOL-dPinnedHandoff-3` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| card ref | `refs/gov/builds/dPinnedHandoff/card` |
+<!-- /gen:build-routes -->

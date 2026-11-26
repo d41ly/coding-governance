@@ -15,3 +15,4 @@ tools/runlog/adopt-runlog.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d
 tools/unattended/adopt-unattended.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/unattended/lib-unattended.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/run-gates/run-selftests.sh	fixed-temp	1	40607fd2a4765daba384ddfd0917bea00d70ed80	widened:2026-11-22-build-TOOL-dQuietDisk-9-widen-26
+tools/memory-tree/gov-claim.sh	fixed-temp	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	widened:2026-11-25-build-TOOL-dTotalRecall-114-widen-18

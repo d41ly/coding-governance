@@ -121,3 +121,12 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-14-review-TOOL-cSteadyMetronome-1-1.md` (BLOCKED) |
+| card ref | `refs/gov/builds/cSteadyMetronome/card` |
+<!-- /gen:build-routes -->

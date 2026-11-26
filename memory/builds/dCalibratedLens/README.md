@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-18 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 TOOL-dCalibratedLens-49 TOOL-dCalibratedLens-50 TOOL-dCalibratedLens-51 TOOL-dCalibratedLens-52 TOOL-dCalibratedLens-53 TOOL-dCalibratedLens-54 TOOL-dCalibratedLens-55 TOOL-dCalibratedLens-56
+ids: TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-18 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36 TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48 TOOL-dCalibratedLens-49 TOOL-dCalibratedLens-50 TOOL-dCalibratedLens-51 TOOL-dCalibratedLens-52 TOOL-dCalibratedLens-53 TOOL-dCalibratedLens-54 TOOL-dCalibratedLens-55 TOOL-dCalibratedLens-56 TOOL-dCalibratedLens-57
 parents: dTendedCadence dFairHearing
 may: PLAY-dClosedLoop-3
 ---
@@ -81,7 +81,7 @@ ids TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dC
 ids TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-18 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24
 ids TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 TOOL-dCalibratedLens-31 TOOL-dCalibratedLens-32 TOOL-dCalibratedLens-33 TOOL-dCalibratedLens-34 TOOL-dCalibratedLens-35 TOOL-dCalibratedLens-36
 ids TOOL-dCalibratedLens-37 TOOL-dCalibratedLens-38 TOOL-dCalibratedLens-39 TOOL-dCalibratedLens-40 TOOL-dCalibratedLens-41 TOOL-dCalibratedLens-42 TOOL-dCalibratedLens-43 TOOL-dCalibratedLens-44 TOOL-dCalibratedLens-45 TOOL-dCalibratedLens-46 TOOL-dCalibratedLens-47 TOOL-dCalibratedLens-48
-ids TOOL-dCalibratedLens-49 TOOL-dCalibratedLens-50 TOOL-dCalibratedLens-51 TOOL-dCalibratedLens-52 TOOL-dCalibratedLens-53 TOOL-dCalibratedLens-54 TOOL-dCalibratedLens-55 TOOL-dCalibratedLens-56
+ids TOOL-dCalibratedLens-49 TOOL-dCalibratedLens-50 TOOL-dCalibratedLens-51 TOOL-dCalibratedLens-52 TOOL-dCalibratedLens-53 TOOL-dCalibratedLens-54 TOOL-dCalibratedLens-55 TOOL-dCalibratedLens-56 TOOL-dCalibratedLens-57
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -191,6 +191,8 @@ Coverage of dCalibratedLens's 17 clause(s) and 15 owned node(s), over 47 spec(s)
 | 19 | `TOOL-dCalibratedLens-41` | no |
 | 20 | `TOOL-dCalibratedLens-46` | no |
 | 21 | `TOOL-dCalibratedLens-48` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
@@ -198,3 +200,18 @@ Coverage of dCalibratedLens's 17 clause(s) and 15 owned node(s), over 47 spec(s)
 - **Parent builds:** [dFairHearing](../dFairHearing/README.md), [dTendedCadence](../dTendedCadence/README.md)
 - **Child builds:** [dConvergedCharter](../dConvergedCharter/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-04-prompt-TOOL-dCalibratedLens-9-1-spec-writer.md`, `2026-11-04-prompt-TOOL-dCalibratedLens-3-1-spec-writer.md` and 45 more under prompts/ |
+| reviews | `2026-11-04-review-TOOL-dCalibratedLens-1-crosscheck-spec-audit.md` (CLEAN WITH FIXES), `2026-11-03-review-TOOL-dCalibratedLens-31-spec-audit.md` (CLEAN WITH FIXES) and 2 more under reviews/ |
+| deviation | `2026-11-04-build-TOOL-dCalibratedLens-9-deviation-95.md`, `2026-11-04-build-TOOL-dCalibratedLens-8-deviation-87.md` and 123 more under build/ |
+| research | `2026-11-04-build-TOOL-dCalibratedLens-1-audit-disposal-returns.md`, `2026-11-03-build-TOOL-dCalibratedLens-1-reground-returns.md` and 5 more under build/ |
+| logs | `2026-11-03-build-TOOL-dCalibratedLens-1-departures-spec.md`, `2026-11-03-build-TOOL-dCalibratedLens-1-agent-ledger.md` and 1 more under build/ |
+| open asks | `BACKLOG.md`, 9 open |
+| card ref | `refs/gov/builds/dCalibratedLens/card` |
+<!-- /gen:build-routes -->

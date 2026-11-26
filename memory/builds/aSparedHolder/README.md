@@ -79,9 +79,20 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aSparedHolder-1` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-10-11-prompt-TOOL-aSparedHolder-1-build-brief.md` |
+| card ref | `refs/gov/builds/aSparedHolder/card` |
+<!-- /gen:build-routes -->

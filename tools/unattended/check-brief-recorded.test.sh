@@ -334,10 +334,7 @@ CONF
     cat > memory/builds/tBrief/README.md <<'RM'
 ---
 slug: tBrief
-node: t
 opened: 2026-06-01
-streams: tooling
-roster: ARCH
 ids: ARCH-tBrief-1
 ---
 # tBrief

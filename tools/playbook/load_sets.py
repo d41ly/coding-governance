@@ -605,7 +605,7 @@ def build_plant_tree(top, plant) -> tuple[pathlib.Path, pathlib.Path]:
              + (derive_fixture_row(ns, "fixture_tags:extract_declared", "selects") if ns else ""),
              ".memory-tree.conf": 'MEMORY_ROOT=memory\nCHARTER="AGENTS.md"\n',
              "AGENTS.md": "x" * (PLANT_CHARTER_BYTES - 1 if plant == "charter-over" else 10) + "\n",
-             "memory/builds/bx/README.md": "# bx\n"}
+             "memory/builds/bxFix/README.md": "# bxFix\n"}
     if units:
         files[iu.derive_tool_rel("kitx", iu.MANIFEST)] = PLANT_UNITS[units]
     if plant == "charter-over":
@@ -684,11 +684,11 @@ def run_plant(plant, extra) -> int:
         if rc == 1:
             from policy_value import resolve_kit_dir
             handoff = resolve_kit_dir("roles", "handoff.py", KIT_DIR) / "handoff.py"
-            p = subprocess.run([sys.executable, str(handoff), "render", "--role", "gov-builder", "--build", "bx",
-                                "--unit", "PLAY-bx-1", "--input", "spec=AGENTS.md"], cwd=str(root),
+            p = subprocess.run([sys.executable, str(handoff), "render", "--role", "gov-builder", "--build", "bxFix",
+                                "--unit", "PLAY-bxFix-1", "--input", "spec=AGENTS.md"], cwd=str(root),
                                capture_output=True, text=True, encoding="utf-8", errors="replace",
                                stdin=subprocess.DEVNULL, timeout=120)
-            prompts = list((root / "memory" / "builds" / "bx" / "prompts").glob("*.md"))
+            prompts = list((root / "memory" / "builds" / "bxFix" / "prompts").glob("*.md"))
             said = (p.stderr.strip().splitlines() or ["(nothing)"])[0]
             print(f"handoff: exit {p.returncode} · {said}")
             print("handoff: WROTE a prompt file" if prompts else "handoff: no prompt file written")

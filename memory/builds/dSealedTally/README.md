@@ -77,7 +77,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 6 unit(s) · node d · opened 2026-09-04 · streams tooling+deployer
+**Build status:** CLOSED · 6 unit(s) · node d · opened 2026-09-04 · streams deployer+tooling
 ids DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 DEPL-dSealedTally-6 TOOL-dSealedTally-1 TOOL-dSealedTally-2
 
 <!-- gen:build-units -->
@@ -109,9 +109,24 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 | 3 | `DEPL-dSealedTally-1` | no |
 | 4 | `DEPL-dSealedTally-3` | no |
 | 5 | `DEPL-dSealedTally-5` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md` |
+| reviews | `2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round3.md` (BLOCKED), `2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round2.md` and 3 more under reviews/ |
+| logs | `2026-09-04-build-TOOL-dSealedTally-1-1-landed-ordering-probe.sh`, `2026-09-04-build-TOOL-dSealedTally-1-1-acceptance-ledger.md` and 5 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dSealedTally/card` |
+<!-- /gen:build-routes -->

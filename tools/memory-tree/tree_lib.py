@@ -18,10 +18,14 @@ The module name follows the codebase-map kit's `map_lib.py` and the runlog kit's
 """
 from __future__ import annotations
 
+import itertools
+import json
 import os
 import pathlib
 import re
+import sqlite3
 import subprocess
+import sys
 
 # The lifecycle vocabulary, one declaration for the index generator's front-matter check, check 24's
 # rotation grading and the backlog-row census.
@@ -221,9 +225,10 @@ def derive_constant_charges(tree, module, is_needle) -> list:
 
 
 def read_policy_value(key, root):
-    """`key` at `root`'s landed revision, through the policy kit's `policy.py get`, found beside this
-    kit since a kit imports no sibling. LookupError where no policy kit resolves; ValueError, the
-    reader's last line in it, where the reader refuses. The kit's one policy read
+    """`key` at `root`'s landed revision, through the policy kit's `policy.py get`, run as a process and
+    found beside this kit by the inline resolver: memory-tree's `requires` is empty, so the policy kit may
+    be absent, and that is a LookupError its caller degrades on (TOOL-dTotalRecall-43 S50); ValueError,
+    the reader's last line in it, where the reader refuses. The kit's one policy read
     (TOOL-aNimbleMend-8 S7): each caller passes the key as a literal first argument."""
     import sys
     from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
@@ -396,6 +401,14 @@ def build_spec_path_re(memory_root: str):
     return re.compile(r"^" + re.escape(memory_root) + r"/builds/[^/]+/spec/")
 
 
+def build_kept_path_re(memory_root: str):
+    """The files a `census-kept-paths.txt` row may keep (TOOL-dTotalRecall-57 S1, TOOL-dTotalRecall-66 S11 S13
+    S37): the build folders' files no pass of a build may edit, matched segment by segment under `memory_root`;
+    every other file keeps its hit by the census marker on its line. A `..` segment, which a slug's place admits
+    here, is the reader's refusal (`read_kept_rows`)."""
+    return re.compile(r"^" + re.escape(memory_root) + r"/builds/[^/]+/build/[^/]+$")
+
+
 def parse_spec_h1(rel: str, text: str, memory_root: str, families) -> tuple[int, str] | None:
     """`(lineno, id)` of the H1 that DEFINES a unit id in a spec file, or None.
 
@@ -412,7 +425,7 @@ def parse_spec_h1(rel: str, text: str, memory_root: str, families) -> tuple[int,
     if not build_spec_path_re(memory_root).match(rel):
         return None
     alt = "|".join(sorted(set(families))) or "(?!)"
-    pat = re.compile(r"^#\s+[`*]*(?P<id>(?:" + alt + r")-[A-Za-z0-9]+-\d+)\b")
+    pat = re.compile(r"^#\s+[`*]*(?P<id>(?:" + alt + r")-(?:" + read_slug_class() + r")-\d+)\b")
     for n, line in unfenced_lines(text):
         if line is None:
             continue
@@ -528,21 +541,37 @@ def read_blobs_at(root, requests) -> dict:
     (`missing`, `ambiguous`), for one that is not a blob, its body skipped so the next header is read
     where it starts, and for one that is not UTF-8. A failed call, a stream ending before a request's
     header, or a header of no known shape is `OSError` naming it, never a partial answer.
+
+    A request whose `<rev>:<path>` holds a line feed or a carriage return is never written to the batch,
+    where a line feed splits it in two and shifts every later answer, and git drops a closing CR: it is
+    read through its own `git cat-file blob` spawn instead, one spawn per such request, as
+    `history_store`'s one-shot reads such a name (TOOL-dTotalRecall-124). That spawn failing is None,
+    so a git that could not start reads as a path the rev lacks.
     """
     requests = list(dict.fromkeys((str(rev), str(path)) for rev, path in requests))
     if not requests:
         return {}
-    data = read_git_output(root, ("cat-file", "--batch"),
-                            "".join(f"{rev}:{path}\n" for rev, path in requests).encode("utf-8"))
-    out: dict = {}
-    at = 0
+    bodies: dict = {}
+    sent = []
     for rev, path in requests:
+        spec = f"{rev}:{path}"
+        if "\n" not in spec and "\r" not in spec:
+            sent.append((rev, path))
+            continue
+        try:   # off the batch: a line feed splits the request in two, and git drops a closing CR
+            bodies[(rev, path)] = read_git_output(root, ("cat-file", "blob", spec))
+        except OSError:
+            bodies[(rev, path)] = None
+    data = read_git_output(root, ("cat-file", "--batch"),
+                           "".join(f"{rev}:{path}\n" for rev, path in sent).encode("utf-8")) if sent else b""
+    at = 0
+    for rev, path in sent:
         end = data.find(b"\n", at)
         if end < 0:
             raise OSError(f"`git cat-file --batch` ended before {rev}:{path}, so its blob cannot be read")
         head, at = data[at:end], end + 1
         if head.endswith((b" missing", b" ambiguous")):
-            out[(rev, path)] = None
+            bodies[(rev, path)] = None
             continue
         fields = head.rsplit(b" ", 2)
         if len(fields) != 3 or not fields[2].isdigit():
@@ -550,13 +579,13 @@ def read_blobs_at(root, requests) -> dict:
                           "so its blob cannot be read")
         size = int(fields[2])
         body, at = data[at:at + size], at + size + 1
-        if fields[1] != b"blob":
-            out[(rev, path)] = None
-            continue
+        bodies[(rev, path)] = body if fields[1] == b"blob" else None
+    out: dict = {}
+    for key, body in bodies.items():
         try:
-            out[(rev, path)] = body.decode("utf-8").replace("\r\n", "\n")
+            out[key] = None if body is None else body.decode("utf-8").replace("\r\n", "\n")
         except UnicodeDecodeError:
-            out[(rev, path)] = None
+            out[key] = None
     return out
 
 
@@ -616,21 +645,178 @@ BIND_HEAD_LINES = 12
 # kickoff engine through the factory's `write_record`, no door. `probe-trigger` and `probe`
 # (TOOL-dPlacedRequest-7 S6) are a probe opened at an item boundary and the probe it opened, its head, its
 # method, its run lines and its verdict, written by the loop kit's probe.py through `write_record`, no door.
+# `stream-plan` (TOOL-dTotalRecall-25 S6) is a build's units grouped into ordered streams, one TOML fence and
+# no field, graded by `record_kinds.check_stream_plan`, written by dIndexedDesign's planner, no door.
+# `shape-run` (TOOL-dTotalRecall-11) is one review exit's `review-shape` line as typed fields, written by
+# `gov_record.py new shape-run` from the review record and compared back to that line by `shape_run.py --check`.
 # `mailbox-message` (KICK-dKeptSession-5 S12) is one mailbox message a build's transition disposed, its
 # fields and its body in one fenced block, written by the loop kit's transition writer through
 # `write_record`, no door.
 TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition", "acceptance",
                       "transition", "recommendation", "widen", "leg-tail", "flake", "gate-health", "card",
-                      "probe-trigger", "probe", "mailbox-message")
-RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
+                      "probe-trigger", "probe", "stream-plan", "shape-run", "mailbox-message")
+RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "log", "research") + TYPED_RECORD_KINDS
+# TOOL-dTotalRecall-18 S7: `journal` was the evidence kind's name until the kind became `log`. The old
+# token is a READ-ONLY alias: a record written under it is bound as written, so no records region
+# re-renders, and every comparison by value reads it through `resolve_kind`. No writer emits it.
+KIND_ALIASES = {"journal": "log"}  # census: kept alias-compare the alias table itself
+
+
+def resolve_kind(token):
+    """The kind `token` names: an alias's target, any other token unchanged."""
+    return KIND_ALIASES.get(token, token)
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally
-# exclude the one file most easily forgotten.
-BIND_RE = re.compile(
-    r"^[ \t]*(?:#+|//|;)?[ \t]*\*\*(?P<key>Serves|Commissions):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$"
-)
+# exclude the one file most easily forgotten. TOOL-dTotalRecall-51 S1: the marker is the named group `prefix`,
+# spelled once here, so the header edge lines' prefix and the Serves line's cannot drift.
+BIND_PREFIX = r"^[ \t]*(?P<prefix>#+|//|;)?[ \t]*"
+BIND_RE = re.compile(BIND_PREFIX + r"\*\*(?P<key>Serves|Commissions):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$")
 UNBOUND_RE = re.compile(r"^none\b[\s—–:-]*(?P<reason>\S.*)$")
 EVIDENCES_RE = re.compile(r"^\*\*Evidences:\*\* `?([^`\s]+)`?")
+# TOOL-dTotalRecall-19 S5: a record's key is its file stem, a dated stem whose kind word is `build`, `review` or
+# `prompt`; the `record-key` native class of the playbook kit's namespace registry matches its targets with it.
+RECORD_KEY_RE = re.compile(r"\d{4}-\d{2}-\d{2}-(?:build|review|prompt)-[A-Za-z0-9_-]+")
+# TOOL-dTotalRecall-19 S1, TOOL-dTotalRecall-51 S1: an untyped record's header edge lines in its head, behind
+# the prefix its Serves line wears
+HEAD_EDGE_RE = re.compile(BIND_PREFIX + r"\*\*(?P<key>Made-by|Caused-by):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$")
+# TOOL-dTotalRecall-55 S1 S3: a census keeps a hit in a file no pass may edit by one path-keyed row held
+# outside the file's bytes, in the ledger factory's row grammar (TOOL-dTotalRecall-68 S2): the key fields
+# `KEPT_FIELDS`, then the count, the sha and the disposition. The census is named by its function, the path is one
+# tracked file, the reason is printed beside the hit, and `records` is `-` for a plain keep, or a pinned
+# writer's record glob (`record_causes.read_pinned_rows`, TOOL-dTotalRecall-66 S36). The rows are the
+# project's, in this registry under its memory root, and this kit ships none (TOOL-dTotalRecall-65 S1 S3). A file
+# a pass may edit keeps its hit by the census marker on its line instead (`id_grammar.read_kept_reason`,
+# TOOL-dTotalRecall-53 S34).
+CENSUS_KEPT_REGISTRY = "census-kept-paths.txt"
+KEPT_FIELDS = ("census", "path", "reason", "records")
+KEPT_CENSUSES = ("check_cause_writers", "check_alias_compares")   # the column's domain (TOOL-dTotalRecall-70 S11)
+
+
+def resolve_memory_root(conf: dict) -> str:
+    """The memory tree's repo-relative root from a parsed `.memory-tree.conf`: the kit default where
+    the key is absent, else the value with `\\` folded to `/` and empty and `.` segments dropped.
+    `ValueError` naming the key for a blank, absolute or `..`-holding value (TOOL-dTotalRecall-87 S1).
+
+    It diverges from `runlog_lib`'s reader of the same name, which refuses any backslash or `:`, strips a
+    leading slash and keeps inner empty and `.` segments and outer whitespace. This one folds a backslash, as
+    the kit's `design_lib` does, so one root is one path here. `loop_lib` and the `memory-recall` self-test
+    define the name too (TOOL-dTotalRecall-92 S23)."""
+    if "MEMORY_ROOT" not in conf:
+        return "memory"
+    raw = conf["MEMORY_ROOT"]
+    value = raw.strip().replace("\\", "/")
+    if value.startswith("/") or re.match(r"[A-Za-z]:", value):
+        raise ValueError(f"MEMORY_ROOT={raw!r} is absolute, and a memory root is repo-relative")
+    parts = [p for p in value.split("/") if p not in ("", ".")]
+    if not parts:
+        raise ValueError(f"MEMORY_ROOT={raw!r} names no directory")
+    if ".." in parts:
+        raise ValueError(f"MEMORY_ROOT={raw!r} leaves the repository")
+    return "/".join(parts)
+
+
+def resolve_kept_home(root) -> str:
+    """The keep registry's one path, repo-relative under `root`'s memory root (TOOL-dTotalRecall-73 S1), which
+    `resolve_memory_root` resolves or refuses with a ValueError. It reads no registration:
+    `record_causes.check_kept_home` joins those to it."""
+    from design_lib import read_design_conf   # noqa: E402  the conf's one reader; at call time, no cycle
+    return f"{resolve_memory_root(read_design_conf(root))}/project/{CENSUS_KEPT_REGISTRY}"
+
+
+def read_kept_rows(census, root) -> dict:
+    """`{path: row}`: the rows of `root`'s `resolve_kept_home` file naming `census`, `{}` where it is absent;
+    its one reader (TOOL-dTotalRecall-55 S1, TOOL-dTotalRecall-65 S2), through the ledger factory's `read_rows`
+    (TOOL-dTotalRecall-68 S3). A row is a mapping of `KEPT_FIELDS` and `count`, `sha` and `disposition`.
+    ValueError naming the registry where any row of it, whatever census asked, is malformed, every refused line
+    named, or names a census outside `KEPT_CENSUSES` or a `(census, path)` pair an earlier row holds, whatever
+    its reason, each such line named (TOOL-dTotalRecall-70 S11), or
+    names a path holding a `..` segment or outside `build_kept_path_re` over the conf's memory root
+    (TOOL-dTotalRecall-57 S1, TOOL-dTotalRecall-66 S11 S13); and where the memory root does not resolve, naming
+    `MEMORY_ROOT` (TOOL-dTotalRecall-87 S2). It does not check that a row's
+    file exists, is tracked or is pinned, nor that a row is filed under the right census of the two."""
+    import legacy_ledger as ll   # noqa: E402  the ledger factory; at call time, as it imports this kit's engines
+    home = resolve_kept_home(root)
+    memory = str(pathlib.PurePosixPath(home).parents[1])   # TOOL-dTotalRecall-73 S2: the domain's root is the home's
+    registry = pathlib.Path(root, home)
+    if not registry.is_file():
+        return {}
+    rows, bad = ll.read_rows(registry, len(KEPT_FIELDS))
+    if bad:
+        raise ValueError(f"{CENSUS_KEPT_REGISTRY}: " + "; ".join(ll.render_malformed(b) for b in bad))
+    first, bad = {}, []
+    for key, (_n, _tail, line, _row) in rows.items():
+        census_, path = key[:2]
+        if census_ not in KEPT_CENSUSES:
+            bad.append(f"line {line}: census {census_!r} is none of {', '.join(KEPT_CENSUSES)}")
+        at = first.setdefault((census_, path), line)
+        if at != line:
+            bad.append(f"line {line}: a second row for {census_} {path}, the first at line {at}")
+    if bad:
+        raise ValueError(f"{CENSUS_KEPT_REGISTRY}: " + "; ".join(bad))
+    kept = [dict(zip(KEPT_FIELDS, key), count=n, sha=sha, disposition=disposition)
+            for key, (n, (sha, disposition), *_rest) in rows.items()]
+    domain = build_kept_path_re(memory)
+    for row in kept:
+        if ".." in pathlib.PurePosixPath(row["path"]).parts or not domain.fullmatch(row["path"]):
+            raise ValueError(f"{CENSUS_KEPT_REGISTRY} row {row['path']}: is no file under {memory}/builds/*/build/*, and an editable "
+                             "file is kept by its census marker: mark the kept line `# census: kept <census> <reason>`")
+    return {row["path"]: row for row in kept if row["census"] == census}
+
+
+def read_kept_path(census, path, root):
+    """The row `root`'s registry keeps `path` by for `census`, or None (TOOL-dTotalRecall-55 S1)."""
+    return read_kept_rows(census, root).get(path)
+
+
+def read_header_edges(text: str, path: str, binding=None) -> list:
+    """A record header's edges, `{path, line, type, targets, site}` each, `site` `header`: the `**Serves:**`
+    line as `serves`, its ids `binding`'s (the record's `read_bindings` row, None for a text it did not read,
+    its kind carried as `kind`), and one `made-by` and one `caused-by` edge where the record names them,
+    backticks cut (TOOL-dTotalRecall-19 S1). An untyped record names them as the lines
+    `**Made-by:** <target>` and `**Caused-by:** <target>` in its first `BIND_HEAD_LINES` unfenced lines, read
+    by `HEAD_EDGE_RE` behind the comment prefix its first Serves line wears, bare where that line is bare or
+    absent (TOOL-dTotalRecall-51 S1); a record whose name a typed kind's grammar matches
+    (`build_records.derive_record_name`) as its `- **Made-by:**` and `- **Caused-by:**` fields wherever they
+    sit, read with `build_records.FIELD`. ValueError naming both lines where one key is given twice, or
+    where an edge line's prefix differs from its Serves line's, whitespace ignored (TOOL-dTotalRecall-51 S2)."""
+    import build_records   # noqa: E402  the factory's name grammar and field grammar; at call time, no cycle
+    lines = text.replace("\r\n", "\n").split("\n")
+    typed = any(build_records.derive_record_name(k).search(path) for k in TYPED_RECORD_KINDS)
+    edges, seen, serves = [], {}, None
+    head = [(n, ln) for n, ln in unfenced_lines("\n".join(lines))][:BIND_HEAD_LINES]
+    for n, line in head:
+        if line is None:
+            break
+        mb = BIND_RE.match(line)
+        if mb and mb.group("key") == "Serves" and serves is None:
+            serves = (n, line, mb.group("prefix") or "")
+        if binding and binding.get("ids") and mb and mb.group("key") == "Serves":
+            edges.append({"path": path, "line": n, "type": "serves", "targets": list(binding["ids"]),
+                          "site": "header", "kind": binding.get("kind")})
+            binding = None
+    found = []
+    if typed:
+        for n, line in enumerate(lines, 1):
+            m = build_records.FIELD.match(line)
+            if m and m.group(1) in ("Made-by", "Caused-by"):
+                found.append((n, m.group(1), m.group(2).strip()))
+    else:
+        for n, line in head:
+            if line is None:
+                break
+            m = HEAD_EDGE_RE.match(line)
+            if not m:
+                continue
+            if (m.group("prefix") or "") != (serves[2] if serves else ""):
+                said = f"its Serves line {serves[0]} `{serves[1].strip()}`" if serves else "no Serves line, so the bare form"
+                raise ValueError(f"{path}: {m.group('key')} line {n} `{line.strip()}` wears a prefix other than {said}")
+            found.append((n, m.group("key"), m.group("rest")))
+    for n, key, target in found:
+        if key in seen:
+            raise ValueError(f"{path}: {key} is given twice, at lines {seen[key]} and {n}")
+        seen[key] = n
+        edges.append({"path": path, "line": n, "type": key.lower(), "targets": [target.strip("`")], "site": "header"})
+    return edges
 
 
 def read_evidence_lines(text: str) -> list:
@@ -638,7 +824,7 @@ def read_evidence_lines(text: str) -> list:
     block opens at its `**Evidences:**` line and ends at the next one or at a line opening `#`, a
     heading. The walk `deviation_join.read_population`'s ledger arm did inline, extracted at its second
     Python instance, `seen_red.read_seen_red_records` (TOOL-dWitnessedBar-7 S2). It reads no binding:
-    whether the text is a `journal` record is each caller's test, through `read_bindings`."""
+    whether the text is a `log` record is each caller's test, through `read_bindings`."""
     out, unit = [], None
     for n, line in enumerate(text.split("\n"), 1):
         ev = EVIDENCES_RE.match(line)
@@ -662,22 +848,30 @@ def record_paths(tracked: list, m: str) -> list:
     return [p for p in tracked if sel.match(p)]
 
 
-def build_id_token_re(alt: str):
+def read_slug_class(root=None) -> str:
+    """The slug grammar's `slug_class` for `root`, None the default tree (TOOL-dTotalRecall-5 S13):
+    the sibling `id_grammar`, imported at first call as `read_policy_value` imports `backlog`."""
+    from id_grammar import derive_slug_grammar   # noqa: E402  the sibling, deliberately not at import
+    return derive_slug_grammar(root).slug_class
+
+
+def build_id_token_re(alt: str, root=None):
     """One id token with its optional `@rev-N` pin (TOOL-dTrueNorth-9 S3). The one spelling
     `_expand_ids` and `read_id_pins` both match through, so the reader of the ids and the reader of
-    their pins cannot disagree on what an id is."""
-    return re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<seq>\d+)(?:@rev-(?P<rev>\d+))?$")
+    their pins cannot disagree on what an id is. Its slug is the slug grammar's class for `root`, None
+    the default tree (TOOL-dTotalRecall-5 S13), never a looser literal."""
+    return re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>" + read_slug_class(root) + r")-(?P<seq>\d+)(?:@rev-(?P<rev>\d+))?$")
 
 
-def _expand_ids(rest: str, alt: str) -> tuple:
+def _expand_ids(rest: str, alt: str, root=None) -> tuple:
     """Return (ids, bad_tokens). A contiguous run may be written N..M and EXPANDS here, at authoring
     time, to a fixed set — unlike a wildcard it cannot rot when the build later gains a unit.
 
     TWO VALUES, for all four callers (TOOL-dTrueNorth-9 S1): `backlog.read_header_verbs` and
     `read_idlist` unpack a pair, and a third value stranded both. A pin is `read_id_pins`' to read."""
     ids, bad = [], []
-    one = build_id_token_re(alt)
-    rng = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<lo>\d+)\.\.(?P<hi>\d+)$")
+    one = build_id_token_re(alt, root)
+    rng = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>" + read_slug_class(root) + r")-(?P<lo>\d+)\.\.(?P<hi>\d+)$")
     for tok in rest.split():
         mo = one.match(tok)
         if mo:
@@ -692,11 +886,11 @@ def _expand_ids(rest: str, alt: str) -> tuple:
     return ids, bad
 
 
-def read_id_pins(rest: str, alt: str) -> dict:
+def read_id_pins(rest: str, alt: str, root=None) -> dict:
     """`{id: N}`, the highest N each id carries as `@rev-N` on the line (TOOL-dTrueNorth-9 S2), the
     revision a spec-audit record read. A range token carries no pin, so its ids get none."""
     pins: dict = {}
-    one = build_id_token_re(alt)
+    one = build_id_token_re(alt, root)
     for tok in rest.split():
         mo = one.match(tok)
         if mo and mo.group("rev") is not None:
@@ -705,8 +899,12 @@ def read_id_pins(rest: str, alt: str) -> dict:
     return pins
 
 
-def read_bindings(root: str, tracked: list, conf: dict) -> dict:
+def read_bindings(root: str, tracked: list, conf: dict, *, counts=None) -> dict:
     """path -> {state, kind, ids, pins, commissions, reason, bad}.
+
+    Each record's head is its `unfenced-head` leg row where the index holds its unchanged blob, else
+    its text parsed (TOOL-dTotalRecall-23 S4); `counts`, when passed, gains the call's `read_rows_at`
+    counts.
 
     `ids` is the kind line's ids once each, in first-seen order (TOOL-dTrueNorth-20 S9). `pins` is the
     kind line's `{id: N}`, the highest `@rev-N` each id carries there, empty when none
@@ -728,15 +926,18 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
     m = conf["MEMORY_ROOT"]
     alt = _id_alternation(conf)
     typed_name = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-(?:" + alt
-                            + r")-[A-Za-z0-9]+-\d+-(?P<kind>" + "|".join(map(re.escape, TYPED_RECORD_KINDS))
+                            + r")-(?:" + read_slug_class(root) + r")-\d+-(?P<kind>" + "|".join(map(re.escape, TYPED_RECORD_KINDS))
                             + r")-\d+\.md$")
     out = {}
-    for rel in record_paths(tracked, m):
+    rels = record_paths(tracked, m)
+    heads, got = read_rows_at(root, rels, "unfenced-head")
+    if counts is not None:
+        add_leg_counts(counts, got)
+    for rel in rels:
         rec = {"state": "absent", "kind": None, "ids": [], "pins": {}, "commissions": [], "reason": None,
                "bad": [], "why": "no Serves line in the first %d unfenced lines" % BIND_HEAD_LINES}
-        try:
-            text = read_text(os.path.join(root, rel))
-        except UnicodeDecodeError:
+        head = heads[rel]
+        if head.get("undecodable"):
             # NOT TEXT, so NOT A RECORD (TOOL-dScrubbedConduit-1 S1). A record is prose that carries a
             # `**Serves:**` line binding it to a spec; a file that does not decode cannot carry one,
             # and emitting it as an `A` row only moves the failure to hygiene check 21, which would
@@ -746,12 +947,12 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
             #
             # An adopter carrying a UI review screenshot under `reviews/` is the case this serves.
             continue
-        except OSError as exc:
+        if "unreadable" in head:
             # Present in the index and unreadable from disk is a REAL anomaly and stays a row.
-            rec["why"] = f"unreadable: {exc}"
+            rec["why"] = f"unreadable: {head['unreadable']}"
             out[rel] = rec
             continue
-        for line in list(unfenced(text))[:BIND_HEAD_LINES]:
+        for line in head["head"]:
             mo = BIND_RE.match(line)
             if not mo:
                 continue
@@ -763,7 +964,7 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
             if not rest:
                 continue
             if mo.group("key") == "Commissions":
-                cids, bad = _expand_ids(rest, alt)
+                cids, bad = _expand_ids(rest, alt, root)
                 rec["commissions"] = cids
                 rec["bad"] += bad
                 continue
@@ -780,16 +981,16 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                 rec["why"] = ""
                 continue
             toks = rest.split()
-            if toks and toks[0] in RECORD_KIND_TOKENS:
+            if toks and (toks[0] in RECORD_KIND_TOKENS or toks[0] in KIND_ALIASES):
                 served = " ".join(toks[1:])
-                ids, bad = _expand_ids(served, alt)
+                ids, bad = _expand_ids(served, alt, root)
                 rec["kind"] = toks[0]
                 # TOOL-dTrueNorth-20 S9, S36 — A REPEATED ID FOLDS HERE, in first-seen order, and never in
                 # `_expand_ids`, whose base return its four callers keep: a record serving one id twice,
                 # pinned at two revisions say, then renders it once in a records table and counts once in
                 # the ids joins. Its pins are `read_id_pins`' below, the highest kept.
                 rec["ids"] = list(dict.fromkeys(ids))
-                rec["pins"] = read_id_pins(served, alt)
+                rec["pins"] = read_id_pins(served, alt, root)
                 rec["bad"] += bad
                 if not ids:
                     rec["state"] = "malformed"
@@ -801,7 +1002,9 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                 rec["state"] = "malformed"
                 got = toks[0] if toks else "(empty)"
                 rec["why"] = (f"first token {got} is not one of "
-                              + " ".join(RECORD_KIND_TOKENS) + ", and the line is not the none form")
+                              + " ".join(RECORD_KIND_TOKENS) + " (" + ", ".join(
+                                  f"{a} a read-only alias of {t}" for a, t in KIND_ALIASES.items())
+                              + "), and the line is not the none form")
         # TOOL-dTrueNorth-4 S2, every typed kind by PLAY-dOrderedCharter-42 S3 — the kind joined to the
         # file name, both ways: a file on a typed kind's stem must say it is one, and a record saying so
         # must be on its stem. A record with no Serves line keeps its own reason.
@@ -817,3 +1020,303 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                           f"<date>-build-<unit id>-{rec['kind']}-<n>.md in a build's build/ folder")
         out[rel] = rec
     return out
+
+
+# ------------------------------------------------------------------------------ the memory legs' rows
+# TOOL-dTotalRecall-23 — a memory leg's per-record parse is a pure READER of a blob's text and its
+# params, and its product is stored as a row in the tag index, keyed by blob, so a leg reads rows for
+# every unchanged blob the index holds and parses only the blobs that changed. The index's one writer,
+# the playbook kit's `tag_index.build_index`, calls `build_leg_rows` in its transaction when a tree is
+# first built (S1); a leg only reads, through `read_rows_at` (S3), so a cold or absent index costs the
+# full parse it cost before, announced by `render_leg_line` (S6).
+#
+#: reader name -> (`<module>:<function>` reader, `<module>:<function>` params, None for an empty key),
+#: the tag index's extractor spelling (S2). Each module is loaded from this kit's directory by a
+#: COMPUTED path in `load_leg_module`, never imported here, so the tag index's closure, which takes this
+#: file in, does not take the readers' modules in with it.
+LEG_READERS = {
+    "unfenced-head": ("tree_lib:extract_head_lines", None),
+    "id-harvest": ("corpus_ids:extract_ids", "corpus_ids:derive_id_params"),
+    "spec-head": ("design_lib:extract_spec_head", None),
+}
+LEG_TABLE = ("CREATE TABLE IF NOT EXISTS leg_row(blob TEXT, reader TEXT, version TEXT, payload TEXT, "
+             "PRIMARY KEY (blob, reader, version))")
+#: blobs per `SELECT ... IN (...)` in `read_leg_payloads` (S3)
+LEG_QUERY_CHUNK = 999
+#: blobs per `read_blobs_at` batch in `build_leg_rows`, so a cold build never holds every memory blob at once
+LEG_READ_CHUNK = 500
+_LEG_MODULES: dict = {}
+_LEG_CLOSURES: dict = {}
+
+
+def load_leg_module(mod_name):
+    """The module `<mod_name>.py` of this kit's own directory: this one, one already loaded from that
+    file under its own name or as `__main__`, else that file loaded by its computed path, once."""
+    src = os.path.normcase(os.path.join(os.path.dirname(os.path.abspath(__file__)), mod_name + ".py"))
+    for mod in (sys.modules.get(__name__), sys.modules.get(mod_name), sys.modules.get("__main__")):
+        at = getattr(mod, "__file__", None)
+        if at and os.path.normcase(os.path.abspath(at)) == src:
+            return mod
+    if src not in _LEG_MODULES:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("leg_reader_" + mod_name, src)
+        if spec is None or not os.path.isfile(src):
+            raise ImportError(f"leg reader module {mod_name}: no file {src}")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _LEG_MODULES[src] = mod
+    return _LEG_MODULES[src]
+
+
+def load_leg_reader(name, root) -> tuple:
+    """`(reader, arg, version)` for the `LEG_READERS` row `name` at `root`: the version is
+    `derive_leg_version`'s, `import_walk.derive_closure_version` over the module's closure keyed by the
+    params' key, once per process per key."""
+    spelled, params = LEG_READERS[name]
+    mod_name, _, fn_name = spelled.partition(":")
+    fn = getattr(load_leg_module(mod_name), fn_name)
+    key, arg = "", None
+    if params:
+        p_mod, _, p_fn = params.partition(":")
+        key, arg = getattr(load_leg_module(p_mod), p_fn)(root)
+    src = os.path.join(os.path.dirname(os.path.abspath(__file__)), mod_name + ".py")
+    if (src, key) not in _LEG_CLOSURES:
+        import import_walk  # noqa: E402  the one closure-version rule, the tag index's (TOOL-dTotalRecall-43 S21)
+        _LEG_CLOSURES[(src, key)] = import_walk.derive_closure_version([src], [os.path.dirname(src)], key)
+    return fn, arg, _LEG_CLOSURES[(src, key)]
+
+
+def derive_leg_version(name, root) -> str:
+    """The reader's version, DERIVED (S2): the first 12 hex of the SHA-256 over the bytes of every module
+    of its module's closure under `import_walk.derive_module_closure`, in path order, then its params' key:
+    `import_walk.derive_closure_version`, the one rule (TOOL-dTotalRecall-43 S21)."""
+    return load_leg_reader(name, root)[2]
+
+
+def extract_head_lines(text, _arg=None) -> dict:
+    """The `unfenced-head` reader: the first `BIND_HEAD_LINES` lines `unfenced` yields, which
+    `read_bindings` classifies, or `{"undecodable": true}` for a blob that is not UTF-8."""
+    if text is None:
+        return {"undecodable": True}
+    return {"head": list(itertools.islice(unfenced(text), BIND_HEAD_LINES))}
+
+
+def load_tag_index():
+    """The playbook kit's `tag_index`, reached at call time through this kit's inline `resolve_kit_dir`;
+    LookupError where that kit does not resolve."""
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    kit = resolve_kit_dir("playbook", "tag_index.py", pathlib.Path(__file__).resolve().parent)
+    if str(kit) not in sys.path:
+        sys.path.append(str(kit))
+    import tag_index  # noqa: E402
+    return tag_index
+
+
+def read_leg_payloads(root, reader, version, blobs):
+    """`{blob: payload}` for each of `blobs` `leg_row` holds under `reader` at `version`, the index
+    opened read-only, one `SELECT` per `LEG_QUERY_CHUNK` blobs; None for the index-absent case: an absent
+    playbook kit, an absent file, a file without `leg_row`, or any `sqlite3.Error` (S3)."""
+    try:
+        db = load_tag_index().derive_index_path(root)
+        if not db.is_file():
+            return None
+        con = sqlite3.connect(db.as_uri() + "?mode=ro", uri=True)
+    except (LookupError, ImportError, OSError, ValueError, subprocess.CalledProcessError, sqlite3.Error):
+        return None
+    try:
+        con.execute("SELECT 1 FROM leg_row LIMIT 0")
+        out = {}
+        for at in range(0, len(blobs), LEG_QUERY_CHUNK):
+            part = blobs[at:at + LEG_QUERY_CHUNK]
+            out.update(con.execute("SELECT blob, payload FROM leg_row WHERE reader = ? AND version = ? AND blob IN ("
+                                   + ",".join("?" * len(part)) + ")", (reader, version, *part)).fetchall())
+        return out
+    except sqlite3.Error:
+        return None
+    finally:
+        con.close()
+
+
+def read_rows_at(root, paths, reader) -> tuple:
+    """`({path: product}, {"index": n, "parsed": m, "absent": bool})` over working-tree `paths` (S3).
+
+    One `git ls-files -s -z` names each path's blob and one `git diff --name-only --no-renames -z HEAD`
+    the paths that differ from HEAD. A path absent from that diff whose blob `leg_row` holds at the
+    reader's current version is answered from the row; every other path, edited, staged, untracked or
+    absent from git's index, is read through `read_text` and parsed, a `UnicodeDecodeError` handing the
+    reader None and an `OSError` standing as `{"unreadable": "<message>"}`. A git read that fails, an
+    unborn HEAD say, parses every path."""
+    fn, arg, version = load_leg_reader(reader, root)
+    paths = list(dict.fromkeys(paths))
+    blob_of: dict = {}
+    try:
+        for rec in read_git_output(root, ("ls-files", "-s", "-z")).decode("utf-8", "replace").split("\0"):
+            meta, _, path = rec.partition("\t")
+            fields = meta.split()
+            if path and len(fields) == 3:
+                blob_of[path] = fields[1]
+        changed = {p for p in read_git_output(root, ("diff", "--name-only", "--no-renames", "-z", "HEAD"))
+                   .decode("utf-8", "replace").split("\0") if p}
+    except OSError:
+        blob_of, changed = {}, set()
+    held = {p: blob_of[p] for p in paths if p in blob_of and p not in changed}
+    rows = read_leg_payloads(root, reader, version, sorted(set(held.values())))
+    counts = {"index": 0, "parsed": 0, "absent": rows is None}
+    rows = rows or {}
+    out = {}
+    for p in paths:
+        payload = rows.get(held.get(p))
+        if payload is not None:
+            out[p] = json.loads(payload)
+            counts["index"] += 1
+            continue
+        counts["parsed"] += 1
+        try:
+            text = read_text(os.path.join(root, p))
+        except UnicodeDecodeError:
+            text = None
+        except OSError as exc:
+            out[p] = {"unreadable": str(exc)}
+            continue
+        out[p] = fn(text, arg)
+    return out, counts
+
+
+def add_leg_counts(total: dict, got: dict) -> dict:
+    """`total` gaining one `read_rows_at` call's counts: the two numbers summed, `absent` if any call's was."""
+    total["index"] = total.get("index", 0) + got["index"]
+    total["parsed"] = total.get("parsed", 0) + got["parsed"]
+    total["absent"] = total.get("absent", False) or got["absent"]
+    return total
+
+
+def render_leg_line(reader, counts) -> str:
+    """The announce line (S6): `leg rows: <reader> <n> from the index, <m> parsed`, or
+    `leg rows: <reader> index absent, <m> parsed`."""
+    if counts.get("absent"):
+        return f"leg rows: {reader} index absent, {counts.get('parsed', 0)} parsed"
+    return f"leg rows: {reader} {counts.get('index', 0)} from the index, {counts.get('parsed', 0)} parsed"
+
+
+def build_leg_rows(con, root, tree, entries) -> None:
+    """The one writer of `leg_row` (S1), inside `tag_index.build_index`'s `BEGIN IMMEDIATE` block after its
+    sweep, over the tree's `(path, blob)` entries. For each blob under the conf's `MEMORY_ROOT` that
+    `leg_row` lacks at a reader's current version, it reads the blob through `read_blobs_at` at `tree` and
+    writes the reader's row; then it clears every row whose blob no `tree_path` or `dirty_path` row holds.
+    A reader whose module, params or call raises writes no row for it and never fails the build."""
+    con.execute(LEG_TABLE)
+    try:
+        conf = parse_conf(read_text(os.path.join(root, ".memory-tree.conf")), {})
+    except (OSError, UnicodeDecodeError):
+        conf = {}
+    m = (conf.get("MEMORY_ROOT") or "memory").strip("/") + "/"
+    blobs: dict = {}
+    for path, blob in entries:
+        if path.startswith(m):
+            blobs.setdefault(blob, path)
+    readers = []
+    for name in LEG_READERS:
+        try:
+            fn, arg, version = load_leg_reader(name, root)
+        except Exception:  # noqa: BLE001  a reader that does not load costs parses, never the tag build (S1)
+            continue
+        held = {b for (b,) in con.execute("SELECT blob FROM leg_row WHERE reader = ? AND version = ?",
+                                          (name, version))}
+        readers.append((name, fn, arg, version, held))
+    todo = [(b, p) for b, p in blobs.items() if any(b not in r[4] for r in readers)]
+    for at in range(0, len(todo), LEG_READ_CHUNK):
+        part = todo[at:at + LEG_READ_CHUNK]
+        try:
+            texts = read_blobs_at(root, [(tree, p) for _b, p in part])
+        except OSError:
+            break
+        rows = []
+        for blob, path in part:
+            for name, fn, arg, version, held in readers:
+                if blob in held:
+                    continue
+                try:
+                    product = fn(texts.get((str(tree), path)), arg)
+                except Exception:  # noqa: BLE001  a reader's raise writes no row for it (S1)
+                    continue
+                rows.append((blob, name, version,
+                             json.dumps(product, sort_keys=True, separators=(",", ":"), ensure_ascii=False)))
+        con.executemany("INSERT OR REPLACE INTO leg_row VALUES (?,?,?,?)", rows)
+    con.execute("DELETE FROM leg_row WHERE NOT EXISTS (SELECT 1 FROM tree_path t WHERE t.blob = leg_row.blob) "
+                "AND NOT EXISTS (SELECT 1 FROM dirty_path d WHERE d.blob = leg_row.blob)")
+
+
+#: the leg fixture's namespace registry, empty, and its planted records by role (S7)
+LEG_FIXTURE_REGISTRY = "namespaces.toml"
+LEG_FIXTURE = {
+    "fenced": "memory/builds/tOne/build/2026-08-02-build-ARCH-tOne-1-fenced.md",
+    "undecodable": "memory/builds/tOne/reviews/2026-08-02-review-shot.png",
+    "crlf": "memory/builds/tOne/build/2026-08-02-build-ARCH-tOne-1-crlf.md",
+    "spec": "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md",
+    "cites": "memory/DECISIONS.md",
+    "edited": "memory/builds/tOne/build/2026-08-02-build-ARCH-tOne-1-edited.md",
+    "untracked": "memory/builds/tOne/build/2026-08-02-build-ARCH-tOne-1-untracked.md",
+}
+
+
+def write_leg_fixture(root) -> None:
+    """A scratch git repository at `root` (S7): a conf, an empty namespace registry and a planted memory
+    tree that `gen_build_index.py --check` accepts, rendered by this kit's own `--write` and committed.
+    `LEG_FIXTURE` names its records: one carries its Serves line inside a fence, one is undecodable, one
+    is CRLF, one is a spec, one cites an id and a dead path, one is edited and uncommitted, and one is
+    untracked. A step that fails raises OSError naming it."""
+    root = pathlib.Path(root)
+    root.mkdir(parents=True, exist_ok=True)
+    plant = {
+        ".memory-tree.conf": 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n',
+        "AGENTS.md": "# charter\n\nRead `memory/README.md` first.\n",
+        LEG_FIXTURE_REGISTRY: "# an empty namespace registry: the tag index runs extract_citations alone\n",
+        "memory/README.md": "# memory\n",
+        "memory/project/stale-header-waiver.txt": "# empty: the mechanism is inert until a header corrupts\n",
+        "memory/builds/tOne/README.md": "---\nslug: tOne\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\n"
+                                        "ids: ARCH-tOne-1\n---\n\n# tOne\n\n<!-- gen:build-index -->\n"
+                                        "<!-- /gen:build-index -->\n",
+        LEG_FIXTURE["spec"]: "# ARCH-tOne-1 — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-08-01 · node a · "
+                             "Tier-2 · base 0123abcd · order 1\n\n## 4. Design\n\n### Files touched (estimate)\n\n"
+                             "- `src/leg.py`\n",
+        LEG_FIXTURE["fenced"]: "# fenced\n\n```\n**Serves:** research ARCH-tOne-9\n```\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
+                               "**Serves:** research ARCH-tOne-1\n",  # census: kept cause-writer fixture: a record head its fixture plants
+        LEG_FIXTURE["crlf"]: "# crlf\r\n\r\n**Serves:** research ARCH-tOne-1\r\n\r\nbody\r\n",  # census: kept cause-writer fixture: a record head its fixture plants
+        LEG_FIXTURE["cites"]: "# d\n\n- ARCH-tOne-1 · a decision, its notes at `memory/nowhere/gone.md`\n",
+        LEG_FIXTURE["edited"]: "# edited\n\n**Serves:** none — a scratch note\n\nfirst\n",  # census: kept cause-writer fixture: a record head its fixture plants
+    }
+    for rel, text in plant.items():
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).write_bytes(text.encode("utf-8"))
+    (root / LEG_FIXTURE["undecodable"]).parent.mkdir(parents=True, exist_ok=True)
+    (root / LEG_FIXTURE["undecodable"]).write_bytes(b"\x89PNG\r\n\x1a\n\xff\xfe\x00 not text")
+    who = ("-c", "user.name=t", "-c", "user.email=t@t.test", "-c", "core.autocrlf=false")
+    read_git_output(str(root), ("init", "-q", "--template="))
+    read_git_output(str(root), ("config", "core.autocrlf", "false"))
+    read_git_output(str(root), ("add", "-A"))
+    read_git_output(str(root), (*who, "commit", "-q", "--no-verify", "-m", "leg fixture"))
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    gbi = os.path.join(os.path.dirname(os.path.abspath(__file__)), "gen_build_index.py")
+    done = subprocess.run([sys.executable, gbi, "--write"], cwd=str(root), env=env, capture_output=True,
+                          text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+    if done.returncode:
+        raise OSError(f"the leg fixture's `gen_build_index.py --write` exited {done.returncode}: "
+                      + (done.stdout + done.stderr).strip()[-400:])
+    read_git_output(str(root), ("add", "-A"))
+    read_git_output(str(root), (*who, "commit", "-q", "--no-verify", "-m", "leg fixture rendered"))
+    with open(root / LEG_FIXTURE["edited"], "ab") as fh:
+        fh.write(b"second\n")
+    (root / LEG_FIXTURE["untracked"]).write_bytes(b"# untracked\n\n**Serves:** research ARCH-tOne-1\n")  # census: kept cause-writer fixture: a record head its fixture plants
+
+
+def build_fixture_index(root) -> pathlib.Path:
+    """Build the node index of a `write_leg_fixture` repository through the playbook kit's `load_view` over
+    `derive_context(root, <its registry>)`, and return the index file's path."""
+    ti = load_tag_index()
+    ctx = ti.derive_context(root, pathlib.Path(root) / LEG_FIXTURE_REGISTRY)
+    con = ti.load_index(root)
+    try:
+        ti.load_view(con, root, ctx)
+    finally:
+        con.close()
+    return ti.derive_index_path(root)

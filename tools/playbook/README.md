@@ -301,6 +301,14 @@ the key, read in process through `policy_value.read_declared_keys`; `check` prin
 `join policy · families` line, and a refused policy read declares nothing. What the family join does not
 check: what a placeholder stands for, so `policy.review.<anything>` is declared by `review.<stage>`.
 
+TOOL-dTotalRecall-9 registers the memory layer's five, their extractors in `record_extract.py` beside the
+registry, reaching memory-tree's modules through `tag_index.load_memory_tree`: `record` (each `[[record-kind]]`
+row of memory-tree's `record-kinds.toml` at its row, and one `record` row per record under the memory root, keyed
+by its id or its file stem, a kind no definition counts), `section` (each heading of a build record or a spec,
+its tag authored, mapped by its kind's `sections` table, or derived as `memory.legacy-anchors` admits),
+`feature` (each feature-tag anchor of tracked code, `unarmed` until one is written), `class` (each gotcha
+record of kind `class`) and `marker` (each `gov` marker word of tracked text, once per file).
+
 The later namespaces are not registered, so their tags red until the build that arms each adds its row:
 
 | Namespace | Armed by |
@@ -408,12 +416,61 @@ register the native-id classes, `family-id` (pattern `id_grammar:grammar_for`, r
 `read_native_classes`; `gov_tag.py check` prints each with its owner and population
 (`check_native_classes`). A pinned tag is legal only where a row's `pin` is `tag` and resolves when some
 committed revision of its unit's text hashes to it (`read_text_history` over `tree_lib.read_blobs_at`);
-a pinned clause id only where `pin` is `clause`, resolving against every committed revision of the
-design view, the baseline's included. One adapter per site reads edges: `read_header_edges`
-(`**Serves:**` through `tree_lib.read_bindings`, `**Caused-by:**`, `**Made-by:**`), `read_section_edges`,
+a pinned clause id only where `pin` is `clause` (`carries-clause`, `caused-by`), resolving against every committed revision of the
+design view, the baseline's included. One adapter per site reads edges: `check_header_edges`
+(memory-tree's one header reader, `tree_lib.read_header_edges`: `**Serves:**` through
+`tree_lib.read_bindings`, an untyped record's column-0 `**Caused-by:**` and `**Made-by:**`, a typed
+record's `- **Caused-by:**` and `- **Made-by:**` fields; its targets graded by `check_site_targets`, a key
+given twice one refusal), `read_section_edges`,
 `read_unit_edges`, `read_note_refs`, `read_trailer_edges`, `read_handoff_edges` (the roles kit's
 `MARKER_RE`) and `read_carries_edges` (`design_lib.parse_binding_lines`, the carries line's one parser).
 `resolve_edge` resolves one target; `--check [--base <rev>]` runs every adapter over the tree and the
 trailers since the compare base, and is the `edges` leg of the `tags` pack. It does not grade an edge's
-`from`, since no source namespace is registered, nor resolve an `id#tag` target, `unarmed` until
-dTotalRecall arms the record namespace; a `serves` id no spec defines is counted, check 21's verdict.
+`from`, since no source namespace is registered; an `id#tag` target resolves through the section
+reader `record show` runs, memory-tree's `record_find.read_section` (TOOL-dTotalRecall-9 S5), and `gov_tag.py
+show <id>#<tag>` prints the same section; a `serves` id no spec defines is counted, check 21's verdict.
+
+## The code record
+
+`code_record.py` derives what a tree's code defines, calls, invokes and registers (TOOL-dTotalRecall-8), one text
+per tree, read from the blobs git tracks and cached in the one index file beside the tag index. It is the core's
+answer to "who calls this" and "what does this file define"; the codebase map's `symbols.json` stays the
+optional map's own.
+
+```bash
+python <prefix>/playbook/code_record.py --check                    # the leg `code record`: the cached text re-derived
+python <prefix>/playbook/code_record.py --dump [--tree <rev>]      # the text itself
+python <prefix>/playbook/code_record.py neighbourhood <path>...    # definitions, callers, callees, tests, siblings
+python <prefix>/playbook/code_record.py --time [--tree <rev>]      # one cold derivation: seconds, bytes, facts
+python <prefix>/playbook/code_record.py --fixture adopter          # the adopter-scale repository, then --time there
+```
+
+The text is UTF-8, LF-ended, its paths sorted, a TAB between cells. An ordinal is a line's place, from 0, among the
+`f` and `d` lines, so an `f` line's is its module's own:
+
+```
+code-record 1	<extractors>	<languages>
+f	<path>                                 a code file
+i	<module>[:<name>,…] …                  its imports, for a shell file the files it sources
+d	<depth>[C]	<name>	<line>-<end>	<hash12>   a definition, C a class, its depth under its file
+c	<ordinal> …                            calls out of the f or d line above
+m	<name> …                               mentions out of it
+x	<ordinal> …                            files it invokes
+r	<leg or kit>	<ordinal>                  a registry edge
+a	<language>	<ambiguous>/<sites>          that language's edges ship as mentions
+s	<path>	<reason>                        a skipped input
+```
+
+A Python call resolves through its enclosing definitions, its module, its imports and, for a method, the class it
+is called on and that class's bases; one that reaches nothing is a mention where some Python definition carries its
+name. A shell word or a JavaScript call resolves in its own file, then in the files it sources, then in its kit,
+and one with two candidates at the first level holding any is ambiguous: past 10% of a language's sites, that
+language's edges all ship as mentions and an `a` line says so. A reader in Python calls `derive_code_record(root)`,
+whose `code_row`, `code_file`, `code_edge` and `code_meta` also answer what the text leaves to the listing: tests,
+kits and a call's line.
+
+`memory.code-languages` says which extractors read the tree; under a ctags value a missing ctags is exit 2 naming
+the key. `linguist-vendored` and `linguist-generated` paths are left out by the tree's own `.gitattributes`, and
+binary, LFS, oversized and unparsed files leave an `s` line. A derivation past its time ceiling prints `degraded`,
+exits 2 and is never cached; its reader uses `git grep`. A cached text that differs from its derivation is red, and
+deleting the index costs one rebuild.

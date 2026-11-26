@@ -10,6 +10,7 @@ scope = "repo"
 # exists from the first commit.
 version_from = { file = "branch_reconcile.py", pattern = "^KIT_BRANCH_RECONCILE_VERSION = " }
 requires = []
+requires_if = [{ kit = "memory-tree", why = "TOOL-dTotalRecall-5 S8: branch_reconcile.py's unit-id and commit-scope readers read the memory-tree kit's slug grammar, its id_grammar.py found through the inline resolve_kit_dir block and bound at first use. Where the kit does not resolve, the inline slug_legacy_py block, the legacy shape, applies and one stderr line says so. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it SELECTS no kit, since a plain `requires` would add an install dependency to a kit an adopter may run alone (§8 F2 of that spec)" }]
 
 [[files]]
 include = "**"

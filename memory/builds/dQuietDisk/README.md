@@ -136,9 +136,32 @@ Ids whose spec moved past its audited revision: none — 0 of 23 unit id(s) carr
 | 7 | `TOOL-dQuietDisk-19` | no |
 | 8 | `TOOL-dQuietDisk-36` | no |
 | 9 | `TOOL-dQuietDisk-37` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-22-prompt-TOOL-dQuietDisk-9-divergence-task.md`, `2026-11-22-prompt-TOOL-dQuietDisk-9-build-brief.md` and 66 more under prompts/ |
+| reviews | `2026-11-22-review-TOOL-dQuietDisk-36-closing-diff-review-round2.md`, `2026-11-22-review-TOOL-dQuietDisk-1-closing-diff-review-round1.md` (CLEAN WITH FIXES) |
+| deviation | `2026-11-22-build-TOOL-dQuietDisk-9-deviation-1.md`, `2026-11-22-build-TOOL-dQuietDisk-8-deviation-1.md` and 12 more under build/ |
+| override | `2026-11-23-build-TOOL-dQuietDisk-1-override-1.md` |
+| red-fix | `2026-11-23-build-TOOL-dQuietDisk-8-red-fix-17.md`, `2026-11-23-build-TOOL-dQuietDisk-7-red-fix-16.md` and 15 more under build/ |
+| recommendation | `2026-11-22-build-TOOL-dQuietDisk-1-recommendation-1.md` |
+| widen | `2026-11-22-build-TOOL-dQuietDisk-9-widen-26.md`, `2026-11-22-build-TOOL-dQuietDisk-9-widen-16.md` and 27 more under build/ |
+| leg-tail | `2026-11-23-build-TOOL-dQuietDisk-1-leg-tail-9.md`, `2026-11-23-build-TOOL-dQuietDisk-1-leg-tail-8.md` and 37 more under build/ |
+| flake | `2026-11-23-build-TOOL-dQuietDisk-1-flake-1.md` |
+| research | `2026-11-20-build-TOOL-dQuietDisk-19-analysis.md` |
+| logs | `2026-11-23-build-TOOL-dQuietDisk-1-runlog-c9768b47.md`, `2026-11-22-build-TOOL-dQuietDisk-9-1-acceptance-ledger.md` and 22 more under build/ |
+| open asks | `BACKLOG.md`, 27 open |
+| card ref | `refs/gov/builds/dQuietDisk/card` |
+<!-- /gen:build-routes -->

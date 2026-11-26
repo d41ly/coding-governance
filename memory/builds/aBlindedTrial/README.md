@@ -78,7 +78,7 @@ kickoff question — a project-wide default, a §7-versus-guards arm, and the en
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 8 unit(s) · node a · opened 2026-09-20 · streams tooling+playbook
+**Build status:** CLOSED · 8 unit(s) · node a · opened 2026-09-20 · streams kickoff+tooling
 ids KICK-aBlindedTrial-1 TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 TOOL-aBlindedTrial-6 TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8
 
 <!-- gen:build-units -->
@@ -109,9 +109,22 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 |---|---|---|
 | 1 | `KICK-aBlindedTrial-1`, `TOOL-aBlindedTrial-1`, `TOOL-aBlindedTrial-2`, `TOOL-aBlindedTrial-7`, `TOOL-aBlindedTrial-8` | unknown |
 | 2 | `TOOL-aBlindedTrial-3`, `TOOL-aBlindedTrial-4`, `TOOL-aBlindedTrial-5` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round3.md` (CLEAN WITH FIXES), `2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md` (CLEAN WITH FIXES) and 3 more under reviews/ |
+| logs | `2026-09-21-build-TOOL-aBlindedTrial-7-followups-ledger.md`, `2026-09-21-build-TOOL-aBlindedTrial-2-opt-in-ledger.md` and 2 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aBlindedTrial/card` |
+<!-- /gen:build-routes -->

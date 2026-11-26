@@ -30,8 +30,8 @@ word or `phase:` fact decides a step.
 
 Each unit's M2 state comes from the unattended driver's `--plan` rows, handed over in the environment
 variable `GOV_POSITION_STATES`, TAB-separated lines: `unit <id> <state>` per row in build order, MISSING
-rows included, `ask <id>` for the first undecided ask, `parent <slug> <derived phase>` per `parents:`
-build, `bound <seconds>` for the driver's `RESUME_STALE_BOUND`, and `owed <PARK_KINDS_OWED>
+rows included, `ask <id>` for the first undecided ask, `parent <slug> <derived phase>` per `parents:` or
+`depends-on:` build, `bound <seconds>` for the driver's `RESUME_STALE_BOUND`, and `owed <PARK_KINDS_OWED>
 <PARK_ACTS_OWED>`, the two space-joined sets. Where the variable is unset or empty, this runs the driver's
 `--plan <slug>` with it set empty, which prints those lines in place of its `next:` line, so the driver
 keeps the one M2 classifier and the call is not circular.
@@ -77,8 +77,9 @@ ref's `read —` line ends `fetched <n>s ago · from FETCH_HEAD|reflog|clone`, o
 ` · core.logAllRefUpdates=false` where the repository's setting reads false (TOOL-dDeclaredLoop-75 S34), and each
 skipped `FETCH_HEAD` follows it as `read — <name> · skipped — empty`, `no line for <branch> of <remote>`
 or `unreadable`), `terminal` (the state is a `[states]` terminal, or every unit is deployed
-and no ask stands), `awaiting` on an owed parked entry or an unpassed hold, `blocked` on a `parents:`
-build neither recorded nor derived `LANDED` whose cause holds the build's step, `act` with a next item, `awaiting` on an undecided ask, and
+and no ask stands), `awaiting` on an owed parked entry or an unpassed hold, `blocked` on a `parents:` or
+`depends-on:` build neither recorded nor derived `LANDED` whose cause holds the build's step, `act` with a
+next item, `awaiting` on an undecided ask, and
 `stuck` naming the step's unwitnessed exit. Line output is §4's six line kinds; `--json` the same fields
 as one object, each unit carrying `acceptance_armed`, false exactly where its line ends `· acceptance
 unarmed` (TOOL-dDeclaredLoop-67 S50); `--next-line` the `next:` shape `render_next_line` picks from `NEXT_SHAPES`. Exit 0 for
@@ -202,7 +203,9 @@ NEXT_SHAPES = {"live-unit": "<id> (READY - build it)",
                "nothing-graded": "none - no tracked spec grades as a unit (see the NOT A UNIT rows above)",
                "everything-terminal": "none - every tracked spec is terminal",
                "other": "none - <answer>: <reason>"}
-UNIT_ID = re.compile(r"[A-Za-z]+-[A-Za-z0-9]+-\d+")
+read_memory_tree("id_grammar.py")
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
+UNIT_ID = SlugPattern(lambda g: r"[A-Za-z]+-(?:" + g.slug_class + r")-\d+")
 PARKED_ROW = re.compile(r"^[0-9][0-9-]*T[0-9:]*Z (\S+) · item (\S+)")
 #: `--plant`'s cases and what each owes.
 PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 3's step",
@@ -790,7 +793,7 @@ def derive_position_into(pos, repo, slug, definition):
     read_memory_tree("gen_build_index.py")
     from build_records import read_acceptance, read_records
     from commit_trailers import derive_attribution, read_commits
-    from gen_build_index import Problem, parse_front_matter
+    from gen_build_index import ORDER_TYPE, Problem, parse_front_matter, parse_relations, read_relation_rows
     now = datetime.datetime.now(datetime.timezone.utc)
     root = resolve_memory_root(repo)
     builds = repo / root / "builds"
@@ -799,6 +802,8 @@ def derive_position_into(pos, repo, slug, definition):
         raise ValueError("the slug %s names no build README under %s" % (slug, builds.as_posix()))
     try:
         fm = parse_front_matter(str(folder / "README.md"), slug)
+        # TOOL-dTotalRecall-6 S9 — `parents:` or `depends-on:`, the `after` targets in written order
+        parents = [e["target"] for e in parse_relations(fm, read_relation_rows(), str(repo)) if e["type"] == ORDER_TYPE]
     except Problem as e:
         raise ValueError("the build README does not parse: %s" % e) from None
     pos["read"].append("%s@%s" % ((folder / "README.md").relative_to(repo).as_posix(), read_blob_id(folder / "README.md")))
@@ -917,7 +922,7 @@ def derive_position_into(pos, repo, slug, definition):
     # two keys at the landed revision in the build's slot, a refused read holding Build as `policy unread`
     # with one NOTE per key; a row holds where the table holds Build and the build's step is Build or later
     reaches = [(p, "landed" if handover["parents"].get(p) == "LANDED" else derive_parent_reach(repo, p))
-               for p in (fm.get("parents") or "").split()]
+               for p in parents]
     reaches = [(p, r) for p, r in reaches if r != "landed"]
     keys = dict.fromkeys(("deps.coordination", "deps.early-build"))
     if reaches:

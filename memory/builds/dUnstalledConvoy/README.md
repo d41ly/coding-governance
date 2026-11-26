@@ -226,7 +226,7 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 24 unit(s) · node d · opened 2026-08-20 · streams tooling+playbook
+**Build status:** CLOSED · 24 unit(s) · node d · opened 2026-08-20 · streams playbook+tooling
 ids PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11
 ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-22 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24
 ids TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33 TOOL-dUnstalledConvoy-34 TOOL-dUnstalledConvoy-35
@@ -280,3 +280,15 @@ Ids whose spec moved past its audited revision: none — 0 of 24 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md` (BLOCKED), `2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md` and 9 more under reviews/ |
+| logs | `2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md`, `2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md` and 11 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dUnstalledConvoy/card` |
+<!-- /gen:build-routes -->

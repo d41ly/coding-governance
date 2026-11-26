@@ -125,6 +125,7 @@ def read(path) -> str:
 sys.path.insert(0, str(HERE))
 from tree_lib import parse_conf, parse_conf_line  # noqa: E402,F401  the kit's ONE conf parser
 from tree_lib import scan_missing_citations  # noqa: E402  the `missing:` citation form
+from tree_lib import read_rows_at, render_leg_line  # noqa: E402  the leg rows (TOOL-dTotalRecall-23)
 
 
 def load_conf(root: str) -> dict:
@@ -391,6 +392,7 @@ def ask_shell(flag: str, root: str) -> str:
 # A trailing `:12` or `:12-30` on a cited path. Cut ONLY for the advisory population below: cutting it
 # inside check 15 proper would move a gated verdict, which is the open ask TOOL-aProbedToolkit-17.
 LINE_LOCATOR = re.compile(r":\d+(?:-\d+)?$")
+SYMBOL_LOCATOR = re.compile(r"(?<=\w)#[A-Za-z_]\w*$")   # `path#symbol`: the path half is what check 15 resolves
 
 
 def read_live_readmes(root: str, m: str, tracked_set: set) -> tuple:
@@ -425,19 +427,15 @@ def walk(root: str, conf: dict) -> dict:
         memo_key = (root, tuple(sorted(conf.items())))
         if memo_key in _WALK_MEMO:
             return copy.deepcopy(_WALK_MEMO[memo_key])
+    # The bundle, resolved ONCE: an undecodable or unreadable path is harvested from `read` with it below,
+    # and `extract_ids` hands it to the kit's one anchor route.
     E = grammar(root)
-    # The kit's one route from a bundle to an answer, HANDED the bundle this function already holds.
-    # `resolve_anchor(root)` with no bundle would re-resolve the conf at that root a second time per
-    # walk, and both resolves would answer the same — the cost the route's optional bundle exists to
-    # avoid. `E` is kept because two further uses below need the bundle itself, not the predicate.
-    anchor_of = resolve_anchor(root, E)
     m = conf["MEMORY_ROOT"]
     tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
     tracked_set = set(tracked)
     roots = _roots(tracked_set)   # once per walk: _roots is pure and the loop never changes tracked_set (TOOL-aHastenedSweep-2 S2)
     corpus = [p for p in tracked if p.startswith(m + "/")]
     build_re = re.compile(r"^" + re.escape(m) + r"/builds/([^/]+)/")
-    h1_re = re.compile(r"^#\s+[`*]*(" + E.ID + r")\b")
 
     append_only = re.compile(ask_shell("--print-append-only-ere", root).strip() or r"(?!)")
     excluded = tuple(x for x in conf.get("DEAD_PATH_EXCLUDE", "").split() if x)
@@ -473,8 +471,14 @@ def walk(root: str, conf: dict) -> dict:
     live_readmes, live_links = read_live_readmes(root, m, tracked_set)
 
     waiver = m + "/" + WAIVER
+    # TOOL-dTotalRecall-23 S4: each file's path-independent harvest is its `id-harvest` leg row where the
+    # index holds its unchanged blob, else `extract_ids` over its text; the classification by path stays here.
+    harvests, legs = read_rows_at(root, corpus, "id-harvest")
     for p in corpus:
-        text = read(os.path.join(root, p))
+        harvest = harvests[p]
+        if "lines" not in harvest:
+            # undecodable or unreadable: read by `read` as before, which replaces a bad byte or raises
+            harvest = extract_ids(read(os.path.join(root, p)), E)
         b = build_re.match(p)
         # A build's own ask file, and only under `builds`. Its rows are the one anchored line in this
         # corpus that is a FILING rather than a CLAIM, and the test is the whole path so a
@@ -490,24 +494,11 @@ def walk(root: str, conf: dict) -> dict:
         # A live build README is ADMITTED to the path harvest only: no id citation, no check 15 key.
         admitted = not now and p in live_readmes
         sink = dead if now else advisory
-        # A FENCED BLOCK HOLDS NO HEADING: a `#` comment line inside ``` or ~~~ is code, so it is never
-        # an H1 anchor claiming an id for this folder; citations in it still count.
-        fence = ""
-        for lineno, line in enumerate(text.split("\n"), 1):
-            opener = FENCE_RE.match(line)
-            if opener and (not fence or (opener.group(1)[0] == fence[0] and len(opener.group(1)) >= len(fence))):
-                fence = "" if fence else opener.group(1)
-            # The `missing:` form (TOOL-aMendedFleet-26) is blanked out of the line before anything
-            # reads it, so a marked id is neither a citation for check 14 nor an anchor.
-            marked, line = scan_missing_citations(line, E.ID_RE)
+        for lineno, marked, anchor, line, ids, toks in harvest["lines"]:
             for i in marked:
                 missing.setdefault(i, set()).add(p)
                 if now:
                     missing_now.setdefault(i, set()).add(p)
-            anchor = anchor_of(line)
-            if anchor is None:
-                h = h1_re.match(line) if not fence else None
-                anchor = h.group(1) if h else None
             if anchor:
                 defs.setdefault(anchor, set()).add(p)
                 claims = bool(b)
@@ -537,10 +528,10 @@ def walk(root: str, conf: dict) -> dict:
             # The waiver is check 14's INPUT, not a citation: counted as one, every row kept its own
             # id alive and the stale guard could never fire for an id nothing else cites.
             if now and p != waiver:
-                for mm in E.ID_RE.finditer(line):
-                    cites.setdefault(mm.group(0), set()).add(p)
-            for tok in list(BACKTICKED.findall(line)) + list(MD_LINK_TARGET.findall(line)):
-                cited = (LINE_LOCATOR.sub("", tok) if admitted else tok).rstrip("/")
+                for i in ids:
+                    cites.setdefault(i, set()).add(p)
+            for tok in toks:
+                cited = SYMBOL_LOCATOR.sub("", LINE_LOCATOR.sub("", tok) if admitted else tok).rstrip("/")
                 if any(e in cited for e in ELISION) or "/" not in cited:
                     continue
                 # A token counts as a repo-path citation two ways. (1) Its first segment is a real
@@ -610,12 +601,54 @@ def walk(root: str, conf: dict) -> dict:
     w = {
         "tracked": tracked_set, "corpus": corpus, "defs": defs, "def_builds": def_builds,
         "cites": cites, "missing": missing, "missing_now": missing_now, "dead": dead, "advisory": advisory, "root": root, "conf": conf, "m": m,
-        "notes": notes,
+        "notes": notes, "legs": legs,
     }
     if memo_key is None:
         return w
     _WALK_MEMO[memo_key] = w
     return copy.deepcopy(w)
+
+
+def derive_id_params(root):
+    """The `id-harvest` reader's params (TOOL-dTotalRecall-23 S2): `(key, bundle)`, the bundle `grammar`
+    builds for `root` and, as the key, its `ID` pattern and its four anchor patterns, so every conf input
+    the grammar folds in moves the reader's version."""
+    E = grammar(root)
+    return "\n".join([E.ID] + [a.pattern for a in E.anchors]), E
+
+
+def extract_ids(text, grammar):
+    """The `id-harvest` leg reader (TOOL-dTotalRecall-23 S4), `walk`'s per-line loop with nothing of a path:
+    `{"lines": [[lineno, missing ids, anchor, line, cited ids, tokens], ...]}` for each line holding any,
+    each read from the line with its `missing:` forms blanked: the ids it marks `missing:`, the id it
+    defines with the line's text (check 13's ask row reads it), else None twice, the ids it cites, and its
+    backticked and link-target tokens in order, repeats kept. `{"undecodable": true}` for no text."""
+    if text is None:
+        return {"undecodable": True}
+    # The kit's one route from a bundle to an answer, HANDED the bundle: `resolve_anchor(root)` with no
+    # bundle would re-resolve the conf a second time per walk, the cost the route's optional bundle avoids.
+    anchor_of = resolve_anchor(None, grammar)
+    h1_re = re.compile(r"^#\s+[`*]*(" + grammar.ID + r")\b")
+    lines = []
+    # A FENCED BLOCK HOLDS NO HEADING: a `#` comment line inside ``` or ~~~ is code, so it is never
+    # an H1 anchor claiming an id for this folder; citations in it still count.
+    fence = ""
+    for lineno, line in enumerate(text.split("\n"), 1):
+        opener = FENCE_RE.match(line)
+        if opener and (not fence or (opener.group(1)[0] == fence[0] and len(opener.group(1)) >= len(fence))):
+            fence = "" if fence else opener.group(1)
+        # The `missing:` form (TOOL-aMendedFleet-26) is blanked out of the line before anything
+        # reads it, so a marked id is neither a citation for check 14 nor an anchor.
+        marked, line = scan_missing_citations(line, grammar.ID_RE)
+        anchor = anchor_of(line)
+        if anchor is None:
+            h = h1_re.match(line) if not fence else None
+            anchor = h.group(1) if h else None
+        ids = list(dict.fromkeys(mm.group(0) for mm in grammar.ID_RE.finditer(line)))
+        toks = BACKTICKED.findall(line) + MD_LINK_TARGET.findall(line)
+        if marked or anchor or ids or toks:
+            lines.append([lineno, list(marked), anchor, line if anchor else None, ids, toks])
+    return {"lines": lines}
 
 
 def _anchor(E, line):
@@ -994,6 +1027,41 @@ def _walk_continues() -> set:
     return {n.lineno + off for n in ast.walk(tree) if isinstance(n, ast.Continue)}
 
 
+def check_leg_harvest(base) -> str:
+    """TOOL-dTotalRecall-23 AC7, the selftest's leg arm: `--check` over the leg fixture reads alike from
+    `id-harvest` rows and from text, and once FAMILIES gains a family every path is parsed, none answered from
+    rows its old params wrote. Staged red by `derive_id_params` leaving the family list out of its key."""
+    import tree_lib as tl
+    t = os.path.join(base, "legs")
+    tl.write_leg_fixture(t)
+    for rel, body in _EMPTY_HOMES.items():
+        _w(t, "memory/" + rel, body)
+    run("git", "add", "-A", "--", "memory/project", cwd=t)
+    run("git", "-c", "user.name=t", "-c", "user.email=t@t.test", "commit", "-q", "-m", "homes",
+        "--no-verify", cwd=t)
+    n = len([p for p in run("git", "ls-files", "--", "memory/", cwd=t).split("\n") if p])
+    db = str(tl.build_fixture_index(t))
+
+    def read_leg_check():
+        p = subprocess.run([sys.executable, os.path.abspath(__file__), "--check"], cwd=t,
+                           capture_output=True, text=True, encoding="utf-8")
+        lines = p.stdout.splitlines()
+        legs = [ln for ln in lines if "leg rows:" in ln]
+        return p.returncode, [ln for ln in lines if ln not in legs], legs
+    with_ix = read_leg_check()
+    os.replace(db, db + ".aside")
+    without = read_leg_check()
+    os.replace(db + ".aside", db)
+    _w(t, ".memory-tree.conf", read(os.path.join(t, ".memory-tree.conf")).replace(
+        'FAMILIES="arch:ARCH"', 'FAMILIES="arch:ARCH arch:XTRA"'))
+    flipped = read_leg_check()
+    say = "HYGIENE advisory leg rows: id-harvest "
+    return (f"same={with_ix[:2] == without[:2]} "
+            f"with={with_ix[2] == [say + f'{n - 1} from the index, 1 parsed']} "
+            f"without={without[2] == [say + f'index absent, {n} parsed']} "
+            f"flipped={flipped[2] == [say + f'0 from the index, {n} parsed']} {with_ix[2]} {flipped[2]}")
+
+
 def derive_install_prefix() -> str:
     """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
     root install. Every fixture and host path the self-test builds is spelled through it, never
@@ -1135,15 +1203,17 @@ def cmd_selftest() -> int:
                         _callers.add(_fn.name)
                     if isinstance(_f, _ast.Name) and _f.id == "grammar" and _fn.name == "walk":
                         _in_walk += 1
+                    # TOOL-dTotalRecall-23 S4: the per-line loop is `extract_ids`', which takes the bundle
+                    # walk() resolved, or the reader's params resolved, and hands it to the route.
                     if (isinstance(_f, _ast.Name) and _f.id == "resolve_anchor"
-                            and _fn.name == "walk"):
-                        _route_args.append(len(_n.args) + len(_n.keywords))
-            return "anchor_at=%d _anchor callers=%r grammar( in walk=%d route args in walk=%r" % (
+                            and _fn.name in ("walk", "extract_ids")):
+                        _route_args.append(f"{_fn.name}:{len(_n.args) + len(_n.keywords)}")
+            return "anchor_at=%d _anchor callers=%r grammar( in walk=%d route args=%r" % (
                 _named, sorted(_callers), _in_walk, _route_args)
         arm("anchor_at is named ONCE, _anchor's only caller is the route, walk() resolves one bundle "
-            "and hands it over",
+            "and extract_ids hands it over",
             "anchor_at=1 _anchor callers=['resolve_anchor'] grammar( in walk=1 "
-            "route args in walk=[2]", _graph)
+            "route args=['extract_ids:2']", _graph)
 
         # ---- THE ROUTE'S OWN REFUSAL, at BOTH of the installed-check's points, and `grammar()`'s
         # ---- beside it. The second fixture needs `id_grammar` out of sys.modules or the real module
@@ -1752,6 +1822,10 @@ def cmd_selftest() -> int:
         arm("a working GOV_BASH is returned unchanged", "OK",
             lambda: "OK" if _with_gov_bash(resolve_bash()) else "")
 
+        arm("TOOL-dTotalRecall-23 AC7 — the walk reads alike from rows and text, and a changed id grammar "
+            "parses every path", "same=True with=True without=True flipped=True",
+            lambda: check_leg_harvest(base))
+
     sys.settrace(None)
     want = _walk_continues()
     missed = sorted(want - _hit)
@@ -1811,6 +1885,8 @@ def main(argv: list) -> int:
         if armed(root, conf):
             w = walk(root, conf)
             notes += w["notes"]     # non-gating, and printed through the same channel as check 16's
+            # TOOL-dTotalRecall-23 S6: the announce line, non-gating, keyed by no offender as `advisory`
+            notes.append("advisory " + render_leg_line("id-harvest", w["legs"]))
             bad += checks(w)
         for line in notes:
             print("HYGIENE " + line)

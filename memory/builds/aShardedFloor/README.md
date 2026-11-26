@@ -132,3 +132,15 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-21-review-TOOL-aShardedFloor-1.md` (BLOCKED) |
+| research | `2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md` |
+| logs | `2026-08-21-build-TOOL-aShardedFloor-4-repricing.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aShardedFloor/card` |
+<!-- /gen:build-routes -->

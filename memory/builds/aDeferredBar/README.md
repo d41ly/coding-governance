@@ -96,9 +96,25 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-aDeferredBar-1` | no |
 | 2 | `TOOL-aDeferredBar-2` | no |
 | 3 | `TOOL-aDeferredBar-3` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-14-prompt-TOOL-aDeferredBar-3-2-build-brief.md`, `2026-09-14-prompt-TOOL-aDeferredBar-2-2-build-brief.md` and 5 more under prompts/ |
+| reviews | `2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round2.md`, `2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md` and 3 more under reviews/ |
+| research | `2026-09-13-build-TOOL-aDeferredBar-1-1-research-bar-in-a-pass.md` |
+| logs | `2026-09-14-build-TOOL-aDeferredBar-3-2-corpus-measurement.md`, `2026-09-14-build-TOOL-aDeferredBar-3-1-acceptance-ledger.md` and 2 more under build/ |
+| open asks | `BACKLOG.md`, 17 open |
+| card ref | `refs/gov/builds/aDeferredBar/card` |
+<!-- /gen:build-routes -->

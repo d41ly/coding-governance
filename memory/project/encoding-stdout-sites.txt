@@ -17,7 +17,6 @@ tools/govkit/fixtures/make_adopter_receipt.py	stdout	1	85a1c45076fd9093f1b9a08a2
 tools/govkit/matrix.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/govkit/refusal_join.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lexicon/scaffold_lexicon.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/lib/commit_trailers.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/legacy_ledger.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-recall/bench.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-recall/check-recall.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
@@ -29,7 +28,6 @@ tools/memory-recall/test_recall_floor.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c
 tools/memory-recall/union.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-tree/backlog.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-tree/check-arms.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/memory-tree/commit_trailers.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-tree/design_lib.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-tree/gen_build_index.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-tree/legacy_ledger.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
@@ -52,6 +50,5 @@ tools/run-gates/derive-ceilings.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa
 tools/run-gates/held_halves.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/measure_legs.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/profile_bar.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/unattended/commit_trailers.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/replay_scorer.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/review_replay.py	stdout	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded

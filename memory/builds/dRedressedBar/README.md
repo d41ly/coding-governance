@@ -159,9 +159,23 @@ Ids whose spec moved past its audited revision: none — 0 of 28 unit id(s) carr
 | 20 | `TOOL-dRedressedBar-26` | no |
 | 21 | `TOOL-dRedressedBar-27` | no |
 | 22 | `TOOL-dRedressedBar-28` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-10-16-prompt-TOOL-dRedressedBar-28-brief.md`, `2026-10-16-prompt-TOOL-dRedressedBar-28-1-spec-writer.md` and 92 more under prompts/ |
+| reviews | `2026-10-15-review-TOOL-dRedressedBar-25-26-diff-review-round3.md` (CLEAN WITH FIXES), `2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md` (CLEAN WITH FIXES) and 5 more under reviews/ |
+| research | `2026-10-16-build-TOOL-dRedressedBar-28-1-amendments.md`, `2026-10-16-build-TOOL-dRedressedBar-27-1-set-aside-work.md` and 1 more under build/ |
+| logs | `2026-10-16-build-TOOL-dRedressedBar-28-2-acceptance-ledger.md`, `2026-10-16-build-TOOL-dRedressedBar-27-2-acceptance-ledger.md` and 24 more under build/ |
+| card ref | `refs/gov/builds/dRedressedBar/card` |
+<!-- /gen:build-routes -->

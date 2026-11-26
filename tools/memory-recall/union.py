@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import sqlite3
 import sys
 
 import bench as B
@@ -93,7 +94,7 @@ def main() -> int:
         dfs[n] = B.Counter()
         for r in sets[n]:
             dfs[n].update(set(B.terms(r["text"])[:600]))
-        dbs[n] = B.build_index(sets[n])
+        dbs[n] = B.build_fts_rows(sqlite3.connect(":memory:"), "d", sets[n])
         wants[n] = [B.expected_by_target(sets[n], q, anchors) for q in queries]
 
     def ranked(setname: str, sub: str, query: str) -> list[int]:

@@ -70,9 +70,23 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-dMendedRecall-1`, `TOOL-dMendedRecall-2`, `TOOL-dMendedRecall-3` | yes |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-01-prompt-TOOL-dMendedRecall-2-fold-brief.md`, `2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md` and 1 more under prompts/ |
+| reviews | `2026-10-01-review-TOOL-dMendedRecall-2-closing-diff-round2.md`, `2026-10-01-review-TOOL-dMendedRecall-1-closing-diff-round1.md` |
+| logs | `2026-10-01-build-TOOL-dMendedRecall-3-1-acceptance-ledger.md`, `2026-10-01-build-TOOL-dMendedRecall-2-1-acceptance-ledger.md` and 1 more under build/ |
+| card ref | `refs/gov/builds/dMendedRecall/card` |
+<!-- /gen:build-routes -->

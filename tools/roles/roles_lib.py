@@ -24,7 +24,7 @@ import pathlib
 import re
 import tomllib
 
-KIT_ROLES_VERSION = "1.25"
+KIT_ROLES_VERSION = "1.26"
 
 #: Every front-matter key a role file may carry: Claude Code's own, then gov's.
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
@@ -84,8 +84,8 @@ LEGACY_NOTE = ("%s is a pre-tag charter: it carries `## §<n> — ` headings and
 HARNESS_RE = re.compile(r"^\{prefix\}/([^/{}\s]+)/([^/{}\s]+)$")
 #: A `{{TOOL_ROOT}}<home>/<file>` citation, the shape `derive_kit_paths` reads (render-doc.sh:162).
 TOOL_ROOT_CITE_RE = re.compile(r"\{\{TOOL_ROOT\}\}([\w.-]+)/([\w.-]+)")
-#: A build slug, as `handoff.py render --build` takes it and a stand-in waiver row names it.
-SLUG_RE = re.compile(r"^[A-Za-z]+$")
+#: A build slug, as `handoff.py render --build` takes it and a stand-in waiver row names it: bound
+#: below the resolver, from the memory-tree kit's slug grammar (TOOL-dTotalRecall-5 S7).
 #: The rendered handoff's marker line; `handoff.py` reads this one pattern (TOOL-aOrientedCast-19).
 MARKER_RE = re.compile(r"^<!-- gov:handoff role=(\S+) build=(\S+) unit=(\S+) path=(\S+) "
                        r"role-sha=([0-9a-f]{12}) task-sha=([0-9a-f]{12}) -->$", re.M)
@@ -145,6 +145,21 @@ def resolve_kit_dir(home, anchor, here):
     raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
+
+
+def load_slug_pattern(build, flags=0):
+    """A pattern whose slug is the memory-tree kit's slug grammar's (TOOL-dTotalRecall-5 S7), `build`
+    taking that grammar: found through the resolver above, which this kit requires, and bound at first
+    use, so importing this library resolves no conf and reads no policy."""
+    import sys  # noqa: PLC0415 — only the sibling kit's path needs it
+    kit = str(resolve_kit_dir("memory-tree", "id_grammar.py", pathlib.Path(__file__).resolve().parent))
+    if kit not in sys.path:
+        sys.path.append(kit)
+    import id_grammar  # noqa: PLC0415 — the sibling kit, reached through the resolver above
+    return id_grammar.SlugPattern(build, flags)
+
+
+SLUG_RE = load_slug_pattern(lambda g: g.BUILD_SLUG_RE.pattern)
 
 
 # >>> render_envelope — canonical copy: envelope.py in the gov lib dir (byte-identical; gated)

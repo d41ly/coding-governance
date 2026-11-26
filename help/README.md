@@ -26,6 +26,7 @@ One task-oriented page per user-facing feature: what it is, how to use it, a sho
 - [Composition](composition.md) — where a repository's units render in the charter and the marked parts, how `budgets.enforce` and a harness's own limit act at render, how to read the delta report, and what the practice census moved.
 - [Overlay rows](overlay-rows.md) — how a repository adds, amends, replaces and excludes one of gov's structured rows, what a pin is, and what each `instructions.stale` value does to a row at update.
 - [Tags and the resolver](tags.md) — what a tag and a citation are, how to find, read and cite one with `gov_tag.py`, what `check` reds, and what `tags.slice`, `tags.retired-cites` and `tags.bare-refs` do.
+- [The memory re-measure](memory-measure.md) — how many memory bytes each agent reads over every read channel, how to run `runlog.py memory`, what each verdict word means, and how the thirty-day ask is answered.
 - [The instruction layer](concepts/instruction-layer.md) — the ladder, units, the overlay and composition, and the reference pages rendered from each registry's rows.
 - [Change one of gov's rules](tasks/change-a-gov-rule.md) — amend, replace, exclude and re-pin one of gov's instruction units from your overlay, with the commands.
 - [Adopt gov in an empty repository](tutorial/adopt-gov.md) — install the charter kits, add a rule of your own, render the charter and read the delta report.

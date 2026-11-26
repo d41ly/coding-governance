@@ -33,7 +33,7 @@ both sides.
 When the known set came from an appendix, a `per-lens known:` line follows the candidate-side
 `per-lens:` line, giving each known-side lens its confirmed count and how many a candidate matched.
 
-SPEC MODE. A known record whose first non-blank line is the `**Serves:** spec-audit` binding is read
+SPEC MODE. A known record whose first non-blank line is the `Serves: spec-audit` binding is read
 from its appendix ONLY: with none it is refused `no-appendix`, never scored as zero, and there is no
 legacy fallback, because no spec-audit record carries the legacy table's raw-id column. A spec ref is
 `<file>:<where>`, split at the first `:` after the path (a drive prefix handled as above). Its KEY
@@ -202,8 +202,8 @@ def print_corpus(listed, refused, scanned):
 
 
 # ---- self-test fixtures: inline, no file or git access. No path here leaves a fixture namespace.
-LEGACY = """**Serves:** diff-review X-1
-
+LEGACY = ("**Serves:** diff-review X-1\n"  # census: kept cause-writer reader-prefix: a legacy fixture's binding, no record written
+          """
 **Range reviewed: `1234567...89abcde`** · Raw 5, confirmed {stated}, refuted 2
 
 | # | Sev | Where | What | Raw ids |
@@ -211,7 +211,7 @@ LEGACY = """**Serves:** diff-review X-1
 | F1 | **BLOCKER** | `src/a.sh:10` | the claim, quoting `spec/s.md:4` | 1, 2 |
 | M1 | medium | `mod/b.py:40` | the claim | 3 |
 | B1 | BLOCKER | 8 | §2 S6, §6 AC6 | the claim |
-{extra}"""
+{extra}""")
 
 APPENDIX = """Review shape: raw 3, confirmed {stated}, refuted 1. Range `1234567..89abcde`.
 
@@ -255,7 +255,7 @@ ROUND1_PINS = "**Round: 1.** Range reviewed: the eleven subjects below, each pin
         (5, "6d1c0773338495d741eccfa96cb18b2573507948"), (7, "7d4dce07d8899d54bfff2a1e1515aa297b090950"),
         (9, "9e4e4704eaa6dd5ea1795bcce1019ac1ea03e28a"), (8, "629cc42227ce6bb803160f25f74a9ce1fc3db2c4"),
         (11, "69275b8ac283e870a83a368db20a8222fa0263fc")))
-ROUND1_BINDING = "**Serves:** spec-audit " + " ".join(f"TOOL-aEvidencedLens-{n}" for n in range(1, 12))
+ROUND1_BINDING = "**Serves:** spec-audit " + " ".join(f"TOOL-aEvidencedLens-{n}" for n in range(1, 12))  # census: kept cause-writer reader-prefix: the spec mode binding of its round-1 fixture
 
 
 def run_selftest():

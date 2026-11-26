@@ -75,3 +75,14 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-09-16-review-TOOL-dMergedTally-1-diff-review-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-09-16-build-TOOL-dMergedTally-1-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dMergedTally/card` |
+<!-- /gen:build-routes -->

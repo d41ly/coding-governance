@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29 TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 TOOL-dBoundRoles-70 TOOL-dBoundRoles-71 TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles-75 TOOL-dBoundRoles-76
+ids: TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29 TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 TOOL-dBoundRoles-70 TOOL-dBoundRoles-71 TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles-75 TOOL-dBoundRoles-76 TOOL-dBoundRoles-77
 parents: dDeclaredLoop dWitnessedBar dPlacedRequest
 may: PLAY-dClosedLoop-3
 ---
@@ -92,7 +92,7 @@ ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
 ids TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57
 ids TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 TOOL-dBoundRoles-70 TOOL-dBoundRoles-71
-ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles-75 TOOL-dBoundRoles-76
+ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles-75 TOOL-dBoundRoles-76 TOOL-dBoundRoles-77
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -238,6 +238,8 @@ Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 59 spec(s) at 
 | 37 | `TOOL-dBoundRoles-65`, `TOOL-dBoundRoles-66` | yes |
 | 38 | `TOOL-dBoundRoles-67`, `TOOL-dBoundRoles-68` | yes |
 | 39 | `TOOL-dBoundRoles-69` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
@@ -245,3 +247,18 @@ Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 59 spec(s) at 
 - **Parent builds:** [dDeclaredLoop](../dDeclaredLoop/README.md), [dPlacedRequest](../dPlacedRequest/README.md), [dWitnessedBar](../dWitnessedBar/README.md)
 - **Child builds:** [dFurnishedOrders](../dFurnishedOrders/README.md), [dIndexedDesign](../dIndexedDesign/README.md), [dRankedPlan](../dRankedPlan/README.md), [dShippedRelease](../dShippedRelease/README.md), [dWellOiledMachine](../dWellOiledMachine/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks.md`, `2026-11-05-prompt-TOOL-dBoundRoles-3-1-spec-writer.md` and 33 more under prompts/ |
+| reviews | `2026-10-26-review-TOOL-dBoundRoles-65-66-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dBoundRoles-64-spec-audit-round1.md` (CLEAN WITH FIXES) and 6 more under reviews/ |
+| deviation | `2026-11-05-build-TOOL-dBoundRoles-6-deviation-63.md`, `2026-11-05-build-TOOL-dBoundRoles-43-deviation-434.md` and 109 more under build/ |
+| research | `2026-10-26-build-TOOL-dBoundRoles-65-round7-fix-return.md`, `2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md` and 14 more under build/ |
+| logs | `2026-10-26-build-TOOL-dBoundRoles-1-departures-spec.md`, `2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 8 open |
+| card ref | `refs/gov/builds/dBoundRoles/card` |
+<!-- /gen:build-routes -->
