@@ -21,6 +21,7 @@
 | [2026-11-25-prompt-TOOL-dTotalRecall-37-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-37-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md) | journal | TOOL-dTotalRecall-8 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 |
 | [2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-38 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-36 TOOL-dTotalRecall-39 TOOL-dTotalRecall-43 |
+| [2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md](../reviews/2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md) | diff-review | TOOL-dTotalRecall-122 TOOL-dTotalRecall-8 TOOL-dTotalRecall-123 |
 
 <!-- /gen:spec-records -->
 

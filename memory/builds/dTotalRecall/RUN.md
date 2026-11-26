@@ -793,3 +793,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-26T02:59:00Z rescope · item defer TOOL-dTotalRecall-15 · reason held after the second map replay also lost, on recall and searches (verdict record 2026-11-26-build-TOOL-dTotalRecall-123-map-replay-verdict); its lose route retires the unit and re-homes its clause, which ask TOOL-dTotalRecall-111 leaves to the owner
 
 2026-11-26T02:59:03Z rescope · item defer TOOL-dTotalRecall-26 · reason held after the second map replay also lost, on recall and searches (verdict record 2026-11-26-build-TOOL-dTotalRecall-123-map-replay-verdict); its lose route retires the unit and re-homes its clause, which ask TOOL-dTotalRecall-111 leaves to the owner
+
+2026-11-26T03:13:45Z rescope · item add TOOL-dTotalRecall-124 · reason promoted from the closing diff review round 3, item H1 of 2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3, by M4's severity rule after the loop ended at round 2
+
+2026-11-26T03:13:58Z rescope · item add TOOL-dTotalRecall-125 · reason promoted from the closing diff review round 3, items M1-M8+L1-L3 of 2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3, one minors batch by M4's severity rule

@@ -20,6 +20,7 @@
 | [2026-11-25-prompt-TOOL-dTotalRecall-123-build-3-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-3-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-123-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-123-divergence-fold-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-123-divergence-fold-brief.md) | journal | — |
+| [2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md](../reviews/2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md) | diff-review | TOOL-dTotalRecall-122 TOOL-dTotalRecall-8 TOOL-dTotalRecall-37 |
 
 <!-- /gen:spec-records -->
 

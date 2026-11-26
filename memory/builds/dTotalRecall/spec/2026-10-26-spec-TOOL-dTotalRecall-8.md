@@ -58,6 +58,7 @@
 | [2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-owner-ruling-brief.md) | journal | TOOL-dTotalRecall-37 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 |
 | [2026-11-25-prompt-TOOL-dTotalRecall-8-spec-writer.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-8-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
+| [2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md](../reviews/2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md) | diff-review | TOOL-dTotalRecall-122 TOOL-dTotalRecall-37 TOOL-dTotalRecall-123 |
 
 <!-- /gen:spec-records -->
 

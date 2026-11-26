@@ -16,6 +16,7 @@
 | [2026-11-25-build-TOOL-dTotalRecall-122-widen-34.md](../build/2026-11-25-build-TOOL-dTotalRecall-122-widen-34.md) | widen | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-122-build-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-122-build-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dTotalRecall-122-spec-brief.md](../prompts/2026-11-25-prompt-TOOL-dTotalRecall-122-spec-brief.md) | journal | — |
+| [2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md](../reviews/2026-11-26-review-TOOL-dTotalRecall-122-closing-diff-review-round3.md) | diff-review | TOOL-dTotalRecall-8 TOOL-dTotalRecall-37 TOOL-dTotalRecall-123 |
 
 <!-- /gen:spec-records -->
 
