@@ -715,7 +715,7 @@ Cite ids, never line numbers.
 | [TOOL-dTotalRecall-107](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE ITEM BUDGET HAS NO PER-ROLE FORM. v2:1370 gives memory.item-budget… |
 | [TOOL-dTotalRecall-108](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE RECORD-KIND CHECK READS NO SERVES LINE OUTSIDE THE BUILD FOLDERS.… |
 | [TOOL-dTotalRecall-110](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE RECORD KINDS WITH NO PURPOSE. TOOL-dTotalRecall-16's… |
-| [TOOL-dTotalRecall-111](../builds/dTotalRecall/BACKLOG.md) | INPROGRESS | HIGH | TOOL-dTotalRecall-123 | 2026-11-23 | THE MAP LOST ITS REPLAY. TOOL-dTotalRecall-17's map-replay verdict is… |
+| [TOOL-dTotalRecall-111](../builds/dTotalRecall/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | THE MAP LOST ITS REPLAY. TOOL-dTotalRecall-17's map-replay verdict is… |
 | [TOOL-dTotalRecall-112](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | THE THIRTY-DAY MEMORY VERDICT IS OWED. TOOL-dTotalRecall-12 lands the… |
 | [TOOL-dTotalRecall-113](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE BUILD METHOD HAS NO ROOM FOR ITS OWN CAUSE LINE.… |
 | [TOOL-dTracedLedger-2](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aSparedSpawn's owner: memory hygiene check 23 is red at origin/main… |
