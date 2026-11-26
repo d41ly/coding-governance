@@ -13,6 +13,7 @@
 | [2026-11-26-prompt-TOOL-aPrunedIndex-10-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-10-1-spec-brief.md) | research | TOOL-aPrunedIndex-10 |
 | [2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md](../reviews/2026-11-25-review-TOOL-aPrunedIndex-1-2-3-4-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 |
 | [2026-11-26-review-TOOL-aPrunedIndex-1-2-3-4-diff-review-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-1-2-3-4-diff-review-round1.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 |
+| [2026-11-26-review-TOOL-aPrunedIndex-4-10-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-4-10-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-10 |
 
 <!-- /gen:spec-records -->
 
