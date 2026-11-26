@@ -1126,7 +1126,22 @@ def run_plant(root, top, plant, sets) -> int:
         ok6 = named > 0 and on_four == 3 and rc == 0 and counts == [named] * 4
         say(f"step 6: {on_four} of 3 conf breaks refused on four, rc={rc} once restored;",
             f"{counts} rows of its conf key of {named};", "held" if ok6 else "FAILED")
-        if ok and ok2 and ok3 and ok4 and ok5 and ok6:
+        # an orphan worktree's listed HEAD is the all-zero sha, so each HEAD probe's `git ls-tree` fails
+        fifth, counted = top / "wt5", (measure_version(live), measure_version(key=key))
+        run_git(root, "worktree", "add", "-q", "--orphan", "-b", "five", str(fifth))
+        rc, _ = run_collect()  # no registry and no conf on disk: the registry probe's git call fails
+        moved = (measure_version(live), measure_version(key=key))
+        ok7 = (check_refused(rc, "/wt5 cannot be read") and check_refused(rc, "namespaces.toml") and min(counted) > 0
+               and moved == counted)
+        say(f"step 7: {rc}; {moved} rows of one's version and four's conf key of {counted};",
+            "held" if ok7 else "FAILED")
+        shutil.copytree(root / FIXTURE_KIT, fifth / FIXTURE_KIT)  # the registry reads, uncommitted; still no conf
+        rc, _ = run_collect()
+        moved = (measure_version(live), measure_version(key=key))
+        ok8 = check_refused(rc, "/wt5 cannot be read") and check_refused(rc, conf) and moved == counted
+        say(f"step 8: {rc}; {moved} rows of one's version and four's conf key of {counted};",
+            "held" if ok8 else "FAILED")
+        if ok and ok2 and ok3 and ok4 and ok5 and ok6 and ok7 and ok8:
             say("refused on wt4, wt3 read and then skipped by name, refused on none, refused on a conf")
             return 0
         return 1
@@ -1362,25 +1377,27 @@ def run_plant(root, top, plant, sets) -> int:
         def read_intro(con):
             return [(r["path"], r["text"]) for r in ti.resolve_address(con, "doc.alpha#intro")]
         write_text = lambda where, word, path=alpha: write_files(where, derive_texts({path: word}))  # noqa: E731
-        commit_texts = lambda files: write_commit(root, derive_texts(files), "texts")  # noqa: E731
+
+        def write_commit_texts(files):
+            return write_commit(root, derive_texts(files), "texts")
         write_commit(root, {beta: GUIDE}, "a twin")
         run_verb(root, "rebuild", None, sets=sets)
-        commit_texts({alpha: "apart"})
+        write_commit_texts({alpha: "apart"})
         check_step(1)
         for where, branch in ((other, "two"), (gone, "three")):
             run_git(root, "worktree", "add", "-q", str(where), "-b", branch)
-        commit_texts({alpha: "e1"})
+        write_commit_texts({alpha: "e1"})
         check_step(2)
         write_text(other, "e1")
         write_text(gone, "f1", beta)
         check_step(3, rebuild=(other, gone))
-        commit_texts({alpha: "f1"})
+        write_commit_texts({alpha: "f1"})
         check_step(4)
-        commit_texts({alpha: "f2"})
+        write_commit_texts({alpha: "f2"})
         check_step(5)
         run_git(root, "worktree", "remove", "--force", str(gone))
         run_git(root, "worktree", "prune")
-        commit_texts({alpha: "c6"})
+        write_commit_texts({alpha: "c6"})
         check_step(6)
         write_text(root, "g1")
         run_verb(root, "rebuild", None, sets=sets)
@@ -1403,9 +1420,9 @@ def run_plant(root, top, plant, sets) -> int:
         bad.extend([] if kept else ["the open view"])
         say("the open view of step 7", "still served g1" if kept else f"served {still}, not {served}")
         run_git(root, "checkout", "-q", "--", alpha)
-        commit_texts({beta: "g1"})
+        write_commit_texts({beta: "g1"})
         check_step(10, add(g2, e1, [g1[0], 0, 0]))
-        commit_texts({beta: "b11"})
+        write_commit_texts({beta: "b11"})
         check_step(11, add(g2, e1, [g1[0], 0, 0]))
         write_text(root, "g1")
         check_step(12, add(g2, e1))
@@ -1418,7 +1435,7 @@ def run_plant(root, top, plant, sets) -> int:
                          ("blob_parsed", "'nohold',extractor,version")):
                 con.execute(f"INSERT INTO {t} SELECT {c} FROM {t} LIMIT 1")
         con.close()
-        commit_texts({alpha: "c13"})
+        write_commit_texts({alpha: "c13"})
         check_step(13, add(g1, g2, e1, [1, 1, 1]))
         run_git(other, "checkout", "-q", "--detach", "main")
         run_gc(root, FIXTURE_KIT)
@@ -1500,7 +1517,7 @@ def run_plant(root, top, plant, sets) -> int:
         write_text(root, "h3")
         check_step(16, add(*texts.values(), raw))
         run_git(root, "checkout", "-q", "--", alpha)
-        commit_texts({alpha: "race2a", beta: "k1"})
+        write_commit_texts({alpha: "race2a", beta: "k1"})
         run_git(other, "checkout", "-q", "--detach", "main")
         run_verb(root, "rebuild", None, sets=sets)  # the revert recorded first, so its edit is one `--gc` collects
         run_gc(root, FIXTURE_KIT)

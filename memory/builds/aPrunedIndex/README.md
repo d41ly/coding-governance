@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-25
 streams: tooling
 roster: TOOL
-ids: TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15
+ids: TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16
 spec-audit: 2026-11-25
 ---
 
@@ -54,9 +54,9 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-11-25 · streams tooling
+**Build status:** CLOSED · 5 unit(s) · node a · opened 2026-11-25 · streams tooling
 ids TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14
-ids TOOL-aPrunedIndex-15
+ids TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -65,10 +65,10 @@ ids TOOL-aPrunedIndex-15
 | [TOOL-aPrunedIndex-2 — a build finds an already-named path through a partial index, and reads no parse ledger without a blob](spec/2026-11-25-spec-TOOL-aPrunedIndex-2.md) | 2 | 1 | CLOSED | rev-4 | 2026-11-26 |
 | [TOOL-aPrunedIndex-3 — a build's sweep touches only the rows that the trees and gone worktrees' edits it lets go of held](spec/2026-11-25-spec-TOOL-aPrunedIndex-3.md) | 3 | 2 | CLOSED | rev-4 | 2026-11-26 |
 | [TOOL-aPrunedIndex-4 — `--gc` skips a worktree that predates the tag registry, and still refuses one it cannot read](spec/2026-11-25-spec-TOOL-aPrunedIndex-4.md) | 4 | 2 | CLOSED | rev-4 | 2026-11-26 |
-| [TOOL-aPrunedIndex-10 — the closing review's four lows: the sweep's cost stated as its ceiling, a named plant helper, and two steps whose HEAD git cannot read](spec/2026-11-26-spec-TOOL-aPrunedIndex-10.md) | 5 | 1 | SPECCED | rev-2 | 2026-11-26 |
+| [TOOL-aPrunedIndex-10 — the closing review's four lows: the sweep's cost stated as its ceiling, a named plant helper, and two steps whose HEAD git cannot read](spec/2026-11-26-spec-TOOL-aPrunedIndex-10.md) | 5 | 1 | CLOSED | rev-2 | 2026-11-26 |
 <!-- /gen:build-units -->
 
-Records: 15 bound to this build, across 4 record folder(s).
+Records: 16 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

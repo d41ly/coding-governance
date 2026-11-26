@@ -254,6 +254,7 @@ Cite ids, never line numbers.
 | [TOOL-aPrunedIndex-13](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS amendment-leaves-its-other-half-standing EARNED A GATE AT ITS… |
 | [TOOL-aPrunedIndex-14](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS hand-named-gate-list-green-while-the-bar-reds EARNED A GATE… |
 | [TOOL-aPrunedIndex-15](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS a-merge-of-the-default-branch-read-as-additions EARNED A GATE… |
+| [TOOL-aPrunedIndex-16](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS naming-leg-grades-what-python-named HAS NO GATE, SO A… |
 | [TOOL-aQuenchedHarness-9](../builds/aQuenchedHarness/BACKLOG.md) | OPEN | — | — | 2026-09-07 | govkit selftest HAS TWO ARMS RED AT 274aa39b AND NOBODY KNEW, which is… |
 | [TOOL-aQuenchedHarness-12](../builds/aQuenchedHarness/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE REUSE PROBE CANNOT SEE SIBLING WORKTREES, so it cannot answer the… |
 | [TOOL-aReapedSpinner-11](../builds/aReapedSpinner/BACKLOG.md) | OPEN | — | — | 2026-09-08 | run-selftests.sh:37 CARRIES THE BANNED PYTHON-LAUNCHER IDIOM, AND THE… |
