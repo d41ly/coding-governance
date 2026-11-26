@@ -41,6 +41,7 @@
 | [2026-11-22-build-TOOL-dTotalRecall-1-red-fix-4.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-red-fix-4.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-red-fix-5.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-red-fix-5.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-reground-return.md) | research | — |
+| [2026-11-27-build-TOOL-dTotalRecall-1-red-fix-33.md](../build/2026-11-27-build-TOOL-dTotalRecall-1-red-fix-33.md) | red-fix | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-3-reuse-scout.md) | journal | — |
