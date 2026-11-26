@@ -1,12 +1,13 @@
 # TOOL-aPrunedIndex-17 — the five tag plants hold the git answers that cannot change while they run
 
-**Status:** SPECCED · rev-1 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-11-26 · node a · Tier-2 · base 3d6c1702 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-17-1-spec-brief.md) | research | TOOL-aPrunedIndex-10 |
+| [2026-11-26-review-TOOL-aPrunedIndex-17-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -18,6 +19,11 @@ cheaper". The five plants this build added spend most of their wall starting git
 of those processes ask git a question whose answer cannot change while the plant runs. After this unit
 those five plants answer such a question once and reuse the answer. Every verdict they give stays
 the same.
+
+This unit delivers fewer spawns in those five plants and nothing more. It does not merge verb runs, and
+it does not promise that `tags bundle selftest` fits its ceiling under load: section 4 measures it short
+of that, AC8 reads the leg at the close, and the rest is the hand-off of section 3. The build README's
+row 6 is stated to match.
 
 ## 2. Scope (IN)
 
@@ -37,9 +43,13 @@ the same.
   its plant red. Observed by AC1, AC5 and AC6.
 - **S5** — The builder times the five plants before and after the edit, back to back, with a load
   gauge beside each reading. Observed by AC7.
-- **S6** — The main loop re-times the leg at the close. It rewrites the `tags bundle selftest` row of
-  `tools/run-gates/selftest-budgets.txt` and that leg's row of `tools/run-gates/ceiling-evidence.txt`
-  from the new readings, and neither row moves up. Observed by AC8.
+- **S6** — The main loop re-times the leg at the close, on the tree before the edit and on the built
+  tree. When AC8 is green it rewrites the `tags bundle selftest` row of
+  `tools/run-gates/selftest-budgets.txt` and that leg's node-a row of
+  `tools/run-gates/ceiling-evidence.txt` from the worst reading on the built tree. The evidence row is
+  lowered through `--reset` with `--observed`, because the file is monotone and a plain `--observed`
+  at or under its stored maximum is refused. Neither row moves up. When AC8 is red it writes neither
+  row. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -106,12 +116,13 @@ copy of S1 and S2 patched in:
 | `released-cost` | 34 | 31 |
 | `gc-predates` | 152 | 86 |
 | `released-rows` | 331 | 207 |
+| `rebuild`, outside the five | 32 | not held |
 
 The five plants spawn 561 times without held answers and 361 times with them, 36 % fewer. On the same (PINNED, 2026-11-26)
 box, at that time, one `git --version` spawn took 0.21 to 0.68 s, so spawns account for most of each (PINNED, 2026-11-26)
 plant's wall. The two large plants carry most of the saving. The three small ones are held too, so one
 rule covers the build's five. With the scratch copy in place each plant exited 0, and its printed lines
-matched the run without it once the scratch path was replaced.
+matched the run without it once AC5's normaliser replaced the scratch path.
 
 One round of the five, each plant run without and then with the scratch copy, back to back under a
 gauge of 0.21 to 0.23 s per spawn, summed 223.6 s without and 157.7 s with, a ratio of 0.71. The wall (PINNED, 2026-11-26)
@@ -131,8 +142,13 @@ is the hand-off of section 3, and AC8 is the reading that shows whether it is ow
    - `args` is `("rev-parse", "--git-common-dir")` or `("rev-parse", "--show-toplevel")`, and a `.git`
      entry stands at `repo`. With no `.git` there, the read is not held, so a removed worktree, or a
      path below a worktree's top, still asks git.
-   - `args[0]` is `rev-parse` or `ls-tree`, and another element of `args` is a full 40-hex object id,
-     alone or followed by `^{tree}`. A full id names one object, so the answer is fixed.
+   - `args[0]` is `rev-parse` or `ls-tree`, exactly one later element is a full 40-hex object id, alone
+     or followed by `^{tree}`, and it is the only revision argument. Every other element is a flag from
+     `--full-tree`, `--name-only`, `-r`, `-z` and `--`, or a path after `--`. A full id names one
+     object, so the answer is fixed. A read with any other element, such as `rev-parse <id> HEAD`, is
+     not held, because part of its answer moves. The rule is an allow-list of every element, and the
+     reads today's callers make, in `tools/playbook/tag_index.py#read_worktree_trees` and
+     `tools/playbook/tag_index.py#read_live_versions` among them, each fall inside it.
 2. `read_held_git(repo, *args)` derives the key. With no key it calls the real reader. With a key it
    returns the stored answer, or calls the real reader and stores what it returns. A reader that raises
    stores nothing, so a failed read, such as the all-zero sha of `gc-predates` steps 7 and 8, asks git
@@ -181,8 +197,8 @@ Live at landing. The held answers exist only inside a `--fixture` run of the fiv
   three new functions
 - the unit's acceptance ledger under `memory/builds/aPrunedIndex/build/`, one line per criterion, with
   AC7's readings
-- by the main loop at the close: `tools/run-gates/selftest-budgets.txt` and
-  `tools/run-gates/ceiling-evidence.txt`
+- by the main loop at the close, on AC8's green only: `tools/run-gates/selftest-budgets.txt` and
+  `tools/run-gates/ceiling-evidence.txt`. On AC8's red neither file is touched.
 
 ### Alternatives rejected
 
@@ -228,30 +244,43 @@ Live at landing. The held answers exist only inside a `--fixture` run of the fiv
   Red when: a held answer goes stale, so a step's count moves, the step prints `FAILED` and the plant
   exits 1.
 - **AC2** — When a `python -c` probe imports `gov_tag` from `tools/playbook` and calls `derive_held_key`
-  with this repository's top for each of eight reads, it prints
-  `[True, False, False, False, True, True, False, False]`, where `True` means a key came back. The reads
-  are `rev-parse --git-common-dir`, the same read at `tools/`, `rev-parse HEAD^{tree}`,
+  with this repository's top for each of nine reads, it prints
+  `[True, False, False, False, True, True, False, False, False]`, where `True` means a key came back. The
+  reads are `rev-parse --git-common-dir`, the same read at `tools/`, `rev-parse HEAD^{tree}`,
   `worktree list --porcelain`, `ls-tree --full-tree --name-only <id> -- x`, `rev-parse <id>^{tree}`,
-  `diff --name-only HEAD` and `hash-object <id>`. Each `<id>` is the output of
+  `diff --name-only HEAD`, `hash-object <id>` and `rev-parse <id> HEAD`. Each `<id>` is the output of
   `git rev-parse HEAD`.
-  Red when: the rule holds `HEAD^{tree}` or the worktree listing, whose answers move inside a plant, or
-  holds `--git-common-dir` where no `.git` entry stands.
+  Red when: the rule holds `HEAD^{tree}` or the worktree listing, whose answers move inside a plant,
+  holds `--git-common-dir` where no `.git` entry stands, or holds `rev-parse <id> HEAD`, which mixes a
+  full id with a moving ref.
 - **AC3** — When a `python -c` probe counts `subprocess.Popen` calls inside `with gov_tag.set_git_held():`,
   `ti.read_git` of the all-zero sha followed by `^{tree}` raises `TagError` twice and spawns twice. Then
   `rev-parse <id>^{tree}` for `git rev-parse HEAD`'s id returns one answer twice and spawns once. After
   the block, `ti.read_git_stdout` and `ti.git` are the functions they were before it.
   Red when: a failure is stored, so the second failing read spawns nothing, or the readers outlive the
   block.
-- **AC4** — When the AC3 probe's spawn count wraps `gov_tag.main(["--fixture", "--plant", "gc-predates"])`,
-  it prints at most 90 spawns, from 152, and for `released-rows` at most 210, from 331. For the
-  `rebuild` plant, outside the five, it prints 32, as before the edit.
-  Red when: `run_fixture` skips `set_git_held()` for a plant of `HELD_PLANTS`, so the count stays at
-  152, or enters it for every plant, so `rebuild` drops below 32.
+- **AC4** — When a `python -c` probe prints `set(gov_tag.HELD_PLANTS) == {"dead-versions",
+  "named-probe", "released-rows", "released-cost", "gc-predates"}` and
+  `set(gov_tag.HELD_PLANTS) <= set(gov_tag.PLANTS)`, both print `True`. When the AC3 probe's spawn
+  count wraps `gov_tag.main(["--fixture", "--plant", <plant>])` for each of the five, it prints at most
+  section 4's 'with' column: `dead-versions` 20, from 24, `named-probe` 17, from 20, `released-cost` 31,
+  from 34, `gc-predates` 90, from 152, and `released-rows` 210, from 331. For the `rebuild` plant,
+  outside the five, it prints 32, as before the edit.
+  Red when: either set probe prints `False`, any of the five plants' counts stays at its 'without'
+  value because `run_fixture` skips `set_git_held()` for it, or `run_fixture` enters it for every plant,
+  so `rebuild` drops below 32.
   figure: the before counts are PINNED at `f963331d`, on 2026-11-26. They are the same on each run.
 - **AC5** — When the builder runs each of the five plants once before the edit and once after, and
-  replaces each run's scratch directory path with one token, `diff` of the two outputs prints nothing.
+  passes each line of each run's stdout and stderr through one normaliser,
+  `re.sub(r'(?i)[a-z]:[\\/].*?[\\/]gt[a-z0-9_]+', '<SCRATCH>', line)`, `diff` of the two outputs
+  prints nothing. The normaliser is needed because `run_fixture` in `tools/playbook/gov_tag.py` makes the
+  scratch top with `tempfile.mkdtemp(prefix="gt")`, whose suffix is random on every run, and
+  `derive_worktree_key` in `tools/playbook/tag_index.py` prints it with forward slashes and a lower-cased
+  drive letter. Before the edit the builder confirms the normaliser: two pre-edit runs of `gc-predates`
+  already diff empty through it.
   Red when: a held answer changes any printed count or line, so a step prints other numbers than before.
-  cost: two runs of the five, about five minutes on a loaded node.
+  cost: two runs of the five, about 6.5 minutes at a 0.21 s gauge, from section 4's 223.6 s and 157.7 s;
+  it scales with the gauge.
 - **AC6** — When the main loop, at the close, re-stages each break that a `seen-red` line of the build's
   acceptance ledgers records for the five plants, `python tools/playbook/gov_tag.py --fixture --plant <plant>`
   exits 1 under each break and 0 with it removed. The ledger records one `seen-red` line per plant.
@@ -264,18 +293,39 @@ Live at landing. The held answers exist only inside a `--fixture` run of the fiv
   back to back on one box, the ledger records each run's wall. Beside each it records a load gauge: the
   mean wall of 20 `git --version` spawns, taken just before the reading. The ledger also records the sum
   of the five walls per round, and that sum after over before.
-  Red when: the fastest round after is not faster than the slowest round before, so the change is lost
-  inside the spread.
-  cost: six rounds of the five plants, ten to fifteen minutes.
+  Red when: the slowest round after is not faster than the fastest round before, so the two spreads
+  overlap. A no-op build passes this only when all three rounds after happen to sit below all three
+  before, probability 1/20 for six readings from one distribution.
+  cost: six rounds of the five plants, about 19 minutes at a 0.21 s gauge, three times section 4's
+  381 s round; it scales with the gauge.
   figure: the walls and gauges are PINNED when measured, in the ledger.
-- **AC8** — When the main loop times `python tools/playbook/tag_bundle.py --selftest` alone three times at
-  the close, with the AC7 gauge beside each, each reading exits 0 and stays under the leg's 300 s `ceiling`
-  in `tools/gate-legs.json`. The budget row is rewritten by hand as 1.5 times the worst reading, floored
-  at 60, naming the readings and their gauges. It must not exceed the 159 it reads today. The evidence (PINNED, 2026-11-26)
-  row is written by `python tools/run-gates/derive-ceilings.py --write --observed`.
-  Red when: the worst reading exceeds 106 s, so the budget row would move up, or a reading reaches the (PINNED, 2026-11-26)
-  ceiling. Either red is the hand-off of section 3.
-  permission: a pass runs no self-test leg, so these readings are the main loop's, at the close.
+- **AC8** — When the main loop, at the close, times `python tools/playbook/tag_bundle.py --selftest`
+  alone three times on the tree before the edit and three times on the built tree, back to back in one
+  session, with the AC7 gauge beside each, the ledger records the six readings and the six gauges. The
+  tree before the edit is a detached worktree at the parent of the unit's build commit, under
+  `%TEMP%/pi17-base`, removed after. AC8 is green when all four hold: every reading exits 0 and stays
+  under the leg's 300 s `ceiling` in `tools/gate-legs.json`; the largest of the six gauges is at most
+  1.5 times the smallest; the worst reading after over the worst reading before is at most 0.90; and
+  the worst reading after is at most 106 s, so the budget row cannot pass the 159 it reads today. (PINNED, 2026-11-26)
+  A set whose gauges fall outside that band is retaken, at most twice, and a third such set is red.
+  On green, the evidence row is written by one call:
+  `GOV_NODE=a python tools/run-gates/derive-ceilings.py --write --reset 'tags bundle selftest' --observed 'tags bundle selftest=<worst after>' --how '<the three readings after and their gauges>'`.
+  The reset drops node a's row before the observed block, so the reading lands. Like every `--write`,
+  the call also re-derives the other legs' rows from the retained gate runs, and the ledger records the
+  file's diff. Where a finished bar run left a retained reading of this leg above the worst after, the
+  call exits 1 with its MONOTONE line and writes nothing, and the evidence row stands. Either way the
+  budget row is rewritten by hand as 1.5 times the larger of the worst reading after and the evidence row's
+  value, floored at 60, naming the readings and their gauges.
+  On red, the main loop writes neither row, records the readings, the gauges and the failed condition in
+  the ledger, and opens the hand-off of section 3.
+  Red when: a reading exits non-zero or reaches the ceiling, the gauges stay out of band, the ratio
+  exceeds 0.90, or the worst reading after exceeds 106 s. On green, also red when the call exits (PINNED, 2026-11-26)
+  non-zero with no MONOTONE line, when the leg's node-a row afterwards reads neither `<worst after>` nor
+  the retained maximum the MONOTONE line names, or when the budget row exceeds 159.
+  permission: a pass runs no self-test leg, so these readings and both writes are the main loop's, at
+  the close.
+  cost: six readings of the leg, about 10 minutes at a 0.21 s gauge from the 106 s reading; it scales
+  with the gauge.
   figure: DERIVED at observation time.
 
 ## 7. Gates
@@ -300,6 +350,18 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-26 · initial draft.
+- rev-2 · 2026-11-26 · §1 §2 §4 §6 §10 S6 AC2 AC4 AC5 AC7 AC8 · folded
+  `2026-11-26-review-TOOL-aPrunedIndex-17-spec-audit-round1`: findings 1, 6, 9 and 12 (AC8's evidence
+  write spelled in full as `--reset` with `--observed`, so the monotone refusal cannot fire on the green
+  path, and S6 says the row is lowered; lowering is taken because it keeps S6's own promise, where
+  leaving the row would narrow it), 4 and 13 (AC4 asserts `HELD_PLANTS` equals the five and sits in
+  `PLANTS`, and bounds all five counts; the `rebuild` row joins section 4's table), 2 (AC7 reds when
+  the spreads overlap, with a no-op's pass probability), 3 (AC8 compares before and after in one
+  session, inside a gauge band, at a ratio of at most 0.90), 14 (AC8 and S6 state what is written on
+  red: neither row), 5 (section 1 says what the unit delivers, and the README's row 6 is restated), 7
+  (AC5 names its normaliser and proves it on two pre-edit runs), 8 (AC5's and AC7's costs from section
+  4's pinned sums), 11 (section 10 cites the two prior reader swaps and the grep that found them), 15
+  (the hold key is an allow-list of every element, with a ninth AC2 read).
 
 ## 10. Reuse audit
 
@@ -308,7 +370,14 @@ for a plant's block through `tools/memory-tree/deviation_join.py#set_env_aside`;
 second such block beside it. The probe
 `python tools/codebase-map/reuse_lookup.py "hold a per-worktree git answer constant across a fixture plant so each index open spawns no git"`
 ranked generic git readers: `git`, `run_git`, `read_git` and `read_git_output`. Each starts a process
-per call and none holds an answer, so no existing seam stores a git answer. The recall answered this
+per call and none holds an answer. A grep for assignments to a module's `git`, `read_git` or
+`read_git_stdout` attribute, `git grep -nE "^\s*[A-Za-z_]+\.(git|read_git|read_git_stdout) = " -- '*.py'`,
+found two prior instances of rebinding a module's git reader for a block. `tools/chain-packet.py#set_reads`
+keeps a `cache = {}`, answers `show` reads from it and installs `schedule.git = read_git`; it is a
+hyphenated script no module imports by name, and its cache keys one read kind. The `worktree-spelling`
+step of `tools/playbook/gov_tag.py#run_plant` swaps `ti.read_git` for one call inside an inline
+try/finally that stores nothing. S2 lifts neither and follows their shape: one reader rebound for a
+block and put back in a `finally`. The recall answered this
 unit's brief first, then round 1's closing review on the five plants' serial cost, then
 `PLAY-dOrderedCharter-25`, the leg's origin. The candidates tested and rejected are under section 4's
 "Alternatives rejected": the memo of `derive_index_path` alone cut `gc-predates` from 152 spawns to (PINNED, 2026-11-26)
