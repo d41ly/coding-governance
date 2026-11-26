@@ -74,8 +74,10 @@ again; past that wait it exits 2 saying the index is locked.
   against; without it the merge bar's compare base is used. <!-- usage: script:tools/playbook/gov_tag.py#check 5c4c67e4 -->
 - **Rebuild, collect, list, plant:** `python tools/playbook/gov_tag.py --rebuild` rebuilds the index
   from nothing; `python tools/playbook/gov_tag.py --gc` deletes the rows of extractor code no live
-  worktree carries any more, and the rows of old uncommitted edits a build leaves, printing `tag-index — collected: <n> rows of <m> versions`, and refuses
-  when a worktree's registry cannot be read; `python tools/playbook/gov_tag.py --list-positional`
+  worktree carries any more, and the rows of old uncommitted edits a build leaves, printing `tag-index — collected: <n> rows of <m> versions`. It skips a
+  worktree that predates the tag registry, one with no `namespaces.toml` on disk or in its last commit,
+  printing `tag-index — skipped: worktree <path> predates <kit>/namespaces.toml`, and refuses when any
+  other worktree's registry or `.memory-tree.conf` cannot be read, or when no worktree holds a registry; `python tools/playbook/gov_tag.py --list-positional`
   prints one `<path>` TAB `<ref>` row per positional reference, the keys
   `memory/project/positional-refs.txt` keeps as ledger rows; and
   `python tools/playbook/gov_tag.py --fixture --plant scope` runs one planted case in a scratch

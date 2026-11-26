@@ -823,16 +823,24 @@ def build_index(root, tree, ctx, con, stats) -> None:
         raise TagError(f"the tag index is locked or unwritable: {exc}") from None
 
 
-def read_worktree_trees(root) -> tuple[set, set]:
-    """(the tree each worktree's HEAD names, the worktrees' top-level paths, each `derive_worktree_key`'s)."""
-    trees, tops = set(), set()
+def read_worktree_heads(root) -> list[tuple[str, str]]:
+    """One (top-level path, `derive_worktree_key`'s, HEAD sha or "") per entry `git worktree list` names."""
+    heads = []
     for block in read_git(root, "worktree", "list", "--porcelain").split("\n\n"):
         fields = dict(ln.split(" ", 1) for ln in block.splitlines() if " " in ln)
         if "worktree" in fields:
-            tops.add(derive_worktree_key(fields["worktree"]))
-        if fields.get("HEAD"):
+            heads.append((derive_worktree_key(fields["worktree"]), fields.get("HEAD", "")))
+    return heads
+
+
+def read_worktree_trees(root) -> tuple[set, set]:
+    """(the tree each worktree's HEAD names, the worktrees' top-level paths, each `derive_worktree_key`'s)."""
+    trees, tops = set(), set()
+    for top, head in read_worktree_heads(root):
+        tops.add(top)
+        if head:
             try:
-                trees.add(read_git(root, "rev-parse", fields["HEAD"] + "^{tree}").strip())
+                trees.add(read_git(root, "rev-parse", head + "^{tree}").strip())
             except TagError:
                 pass
     return trees, tops
@@ -933,34 +941,51 @@ def build_overlay(root, ctx, con, stats) -> None:
         raise TagError(f"the tag index is locked or unwritable: {exc}") from None
 
 
-def read_live_versions(root, kit_rel) -> tuple[set, set, set]:
-    """(every (extractor, version) pair, every `versions` digest, every conf key) a live worktree derives:
-    each worktree `git worktree list` names, its map from its own registry and module files under `kit_rel`
-    and its key from its own conf. A worktree whose registry or a module cannot be read refuses, naming it,
-    rather than having its versions collected (PLAY-dOrderedCharter-51 S5)."""
+def read_live_versions(root, kit_rel) -> tuple[set, set, set, list]:
+    """(every (extractor, version) pair, every `versions` digest, every conf key) a live worktree derives,
+    and the worktrees skipped: each worktree `git worktree list` names, its map from its own registry and
+    module files under `kit_rel` and its key from its own conf. A worktree with no registry on disk whose
+    HEAD tree holds none either predates it and is skipped, deriving nothing (TOOL-aPrunedIndex-4). Any
+    other whose registry, a module or its conf cannot be read refuses, naming it, rather than having its
+    versions collected (PLAY-dOrderedCharter-51 S5), and so does a set no worktree yields a version to."""
     _tree_lib, id_grammar = load_memory_tree()
-    pairs, digests, keys = set(), set(), set()
-    for top in sorted(read_worktree_trees(root)[1]):
-        registry = pathlib.Path(top) / kit_rel / "namespaces.toml"
+    rel = pathlib.PurePosixPath(kit_rel, "namespaces.toml").as_posix()
+    pairs, digests, keys, skipped = set(), set(), set(), []
+    for top, head in sorted(read_worktree_heads(root)):
+        registry = pathlib.Path(top) / rel
+        conf_path = pathlib.Path(top) / id_grammar.CONF_NAME
         try:
+            # the HEAD is the listing's, read in `root`: git run in a worktree whose `.git` is gone answers
+            # with the checkout around it, and a git failure refuses, never reading as absence
+            if not os.path.lexists(registry) and not read_git(root, "ls-tree", "--full-tree", "--name-only",
+                                                               head, "--", rel).strip():
+                skipped.append(top)
+                continue
             rows = [r for r in read_namespaces(registry) if SEG_RE.fullmatch(r["ns"])]
             versions = derive_extractor_versions(rows, registry.parent)
-        except TagError as exc:
+            # `load_conf` answers the default key for a conf that is no file; one that should be there refuses
+            if not conf_path.is_file() and (os.path.lexists(conf_path) or read_git(
+                    root, "ls-tree", "--full-tree", "--name-only", head, "--", id_grammar.CONF_NAME).strip()):
+                raise TagError(f"{id_grammar.CONF_NAME} is no readable file there")
+            conf = id_grammar.load_conf(pathlib.Path(top))
+        except (TagError, OSError, UnicodeDecodeError) as exc:
             raise TagError(f"--gc: worktree {top} cannot be read, so nothing is collected: {exc}") from None
-        conf = id_grammar.load_conf(pathlib.Path(top))
         key = derive_conf_key((conf.get("MEMORY_ROOT") or "memory").strip("/"), conf.get("CHARTER") or "AGENTS.md")
         pairs |= set(versions.items())
         digests.add(derive_versions_digest(versions, key))
         keys.add(key)
-    return pairs, digests, keys
+    if not pairs:  # an empty live set would collect the whole index
+        raise TagError(f"--gc: no worktree holds {rel}, so nothing is collected")
+    return pairs, digests, keys, skipped
 
 
-def remove_dead_versions(con, root, kit_rel) -> tuple[int, int]:
+def remove_dead_versions(con, root, kit_rel) -> tuple[int, int, list]:
     """`--gc` (PLAY-dOrderedCharter-51 S5): delete the blob, path and `blob_parsed` rows of every (extractor,
     version) pair no live worktree derives and the `tree_built` rows of every digest none does, then lets go
     of the dead trees and gone worktrees and sweeps the row tables whole, the rows of every old edit among
-    them, which a build leaves (TOOL-aPrunedIndex-3 S5). -> (rows, versions) collected."""
-    live, digests, keys = read_live_versions(root, kit_rel)
+    them, which a build leaves (TOOL-aPrunedIndex-3 S5). -> (rows, versions) collected, and the worktrees
+    skipped as predating the registry (TOOL-aPrunedIndex-4)."""
+    live, digests, keys, skipped = read_live_versions(root, kit_rel)
     rows = 0
     try:
         with con:
@@ -980,7 +1005,7 @@ def remove_dead_versions(con, root, kit_rel) -> tuple[int, int]:
             remove_unheld_rows(con)
     except sqlite3.OperationalError as exc:
         raise TagError(f"the tag index is locked or unwritable: {exc}") from None
-    return rows, len(dead)
+    return rows, len(dead), skipped
 
 
 def load_view(con, root, ctx, tree=None, overlay=True) -> dict:

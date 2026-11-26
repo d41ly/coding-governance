@@ -384,6 +384,7 @@ dead-versions|0|reads cost their own version's rows
 named-probe|0|within a tenth under every pad
 released-rows|0|only replaced edits left, and nothing lost
 released-cost|0|a sweep costs what was released
+gc-predates|0|refused on wt4, wt3 read and then skipped by name, refused on none, refused on a conf
 """
 
 

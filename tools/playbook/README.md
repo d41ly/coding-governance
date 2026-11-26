@@ -330,8 +330,11 @@ sorted `extractor=version` lines and a `conf=<key>` line. The key is the conf's 
 hashed, since they decide which path is the charter and which are guides: every `path_row` carries it, every
 read joins the reading worktree's own key, and a conf edit, committed or not, is served its own names
 (PLAY-dOrderedCharter-70). `blob_row` is keyed by text alone. `gov_tag.py --gc` deletes the rows of every version and every conf key no worktree
-`git worktree list` names derives, each read from that worktree's own registry and modules, and refuses,
-exit 2, when one of them cannot be read; it prints `tag-index — collected: <n> rows of <m> versions`. A
+`git worktree list` names derives, each read from that worktree's own registry and modules. It skips a
+worktree that predates the registry, one holding no `namespaces.toml` at the kit path on disk or in its HEAD
+tree, printing `tag-index — skipped: worktree <top> predates <kit>/namespaces.toml` for each; it refuses,
+exit 2, when any other cannot be read, a registry HEAD holds and the disk lacks or a `.memory-tree.conf`
+that should be there among them, and when no worktree yields a version (TOOL-aPrunedIndex-4); it prints `tag-index — collected: <n> rows of <m> versions`. A
 plain build collects nothing, and a worktree deleted without `git worktree prune` keeps its rows until it
 is pruned. A build clears only the rows that the trees and the gone worktrees' dirty rows it let go of held
 and nothing else holds, one seek per released pair, and an overlay clears none, keying each edit by the

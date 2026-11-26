@@ -28413,6 +28413,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "read_worktree_heads",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "read_worktree_status",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

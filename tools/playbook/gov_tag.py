@@ -16,7 +16,9 @@ tree's positional references against `positional-refs.txt` with every pinned lin
 (PLAY-dOrderedCharter-26, `positional.py`), the list under `<MEMORY_ROOT>/project/` (PLAY-dOrderedCharter-72).
 `bundle` prints the node and every inbound edge as ranges to pull, and `check --only` runs one edge arm alone (PLAY-dOrderedCharter-25, `tag_bundle.py`). An address is a tag, `doc.<name>#<seg>`, or a
 positional label `aliases.toml` maps. `--gc` collects the index rows of every extractor version no live
-worktree derives (PLAY-dOrderedCharter-51 S5). Every line opens `tags:`; `--json` is the index's only JSON.
+worktree derives (PLAY-dOrderedCharter-51 S5); it skips, naming it, a worktree that predates the registry,
+holding none on disk or in its HEAD tree, and refuses when any other worktree's registry or conf cannot be
+read (TOOL-aPrunedIndex-4). Every line opens `tags:`; `--json` is the index's only JSON.
 Exit 0 green, 1 red, 2 a refusal (an unreadable registry, a refused policy read, a locked index).
 
 The policy keys are read through `policy_value.read_policy_value`, the committed policy at its landed
@@ -192,12 +194,15 @@ def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel
 
 def run_gc(root, kit_rel) -> int:
     """`--gc`: the rows of every extractor version no live worktree derives leave the index, one line
-    saying how many; a worktree whose registry cannot be read refuses it, a TagError (exit 2)."""
+    saying how many, after one line naming each worktree skipped as predating the registry; a worktree whose
+    registry cannot be read refuses it, a TagError (exit 2), and so does a set no worktree yields a version to."""
     con = ti.load_index(root)
     try:
-        rows, versions = ti.remove_dead_versions(con, root, kit_rel)
+        rows, versions, skipped = ti.remove_dead_versions(con, root, kit_rel)
     finally:
         con.close()
+    for top in skipped:
+        print(f"tag-index — skipped: worktree {top} predates {pathlib.PurePosixPath(kit_rel, 'namespaces.toml')}")
     print(f"tag-index — collected: {rows} rows of {versions} versions")
     return 0
 
@@ -431,7 +436,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "positional-spec-revbump", "positional-bulk-move", "positional-archived", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
           "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "dead-versions", "named-probe", "released-rows",
-          "released-cost")
+          "released-cost", "gc-predates")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -1035,6 +1040,96 @@ def run_plant(root, top, plant, sets) -> int:
         say(f"two parsed {parsed[0]} blobs on the tree one built; served {served[0]} rows of one's version,",
             f"and one serves {served[1]}")
         return 0 if parsed[0] and not served[0] and served[1] else 1
+    # TOOL-aPrunedIndex-4: `--gc` skips a worktree that predates the registry, naming it, and refuses a registry or
+    # conf that should be there and cannot be read, and a set no worktree yields a version to
+    if plant == "gc-predates":
+        import contextlib
+        import io
+        edited, reg, conf = "fixture_tags:extract_declared", f"{FIXTURE_KIT}/namespaces.toml", ".memory-tree.conf"
+        other, third, fourth = top / "wt2", top / "wt3", top / "wt4"
+
+        def measure_version(version=None, key=None):  # the rows of one version in the three tables, or of one conf
+            con = ti.load_index(root)
+            try:
+                if key:
+                    return con.execute("SELECT COUNT(*) FROM path_row WHERE conf=?", (key,)).fetchone()[0]
+                return sum(con.execute(f"SELECT COUNT(*) FROM {t} WHERE extractor=? AND version=?", (edited, version))
+                           .fetchone()[0] for t in ("blob_row", "path_row", "blob_parsed"))
+            finally:
+                con.close()
+
+        def run_collect(kit=FIXTURE_KIT):  # -> (the exit, or the refusal's text, the skipped lines), echoed
+            buf = io.StringIO()
+            try:
+                with contextlib.redirect_stdout(buf):
+                    rc = run_gc(root, kit)
+            except ti.TagError as exc:
+                rc = str(exc)
+            print(buf.getvalue(), end="")
+            return rc, [ln for ln in buf.getvalue().splitlines() if ln.startswith("tag-index — skipped:")]
+
+        def check_refused(rc, name):  # a refusal's text naming `name`
+            return isinstance(rc, str) and name in rc
+        run_verb(root, "rebuild", None, sets=sets)
+        for where, branch in ((other, "two"), (third, "three"), (fourth, "four")):
+            run_git(root, "worktree", "add", "-q", str(where), "-b", branch)
+        write_commit(other, {f"{FIXTURE_KIT}/fixture_tags.py": EDITED_EXTRACTOR}, "edit the extractor in two")
+        run_verb(other, "rebuild", None, sets=sets)
+        dead = ti.derive_context(other, other / reg)["versions"][edited]
+        before = read_dump(root)
+        run_git(root, "worktree", "remove", "--force", str(other))
+        run_git(root, "worktree", "prune")
+        held = measure_version(dead)
+        ok = held > 0
+        say(f"step 1: two removed and pruned, {held} rows of its version dead")
+        write_commit(third, {reg: None}, "three drops the registry")
+        write_files(fourth, {reg: None})
+        rc, _ = run_collect()
+        ok2 = check_refused(rc, "/wt4 cannot be read") and measure_version(dead) == held
+        say(f"step 2: {rc}; {measure_version(dead)} dead rows of {held};", "held" if ok2 else "FAILED")
+        run_git(fourth, "checkout", "-q", "--", reg)
+        write_files(third, {reg: (root / reg).read_text(encoding="utf-8"),
+                            f"{FIXTURE_KIT}/fixture_tags.py": THIRD_EXTRACTOR})
+        run_verb(third, "rebuild", None, sets=sets)
+        own = ti.derive_context(third, third / reg)["versions"][edited]
+        mine = measure_version(own)
+        rc, skipped = run_collect()
+        ok3 = rc == 0 and not skipped and measure_version(dead) == 0 and mine > 0 and measure_version(own) == mine
+        say(f"step 3: rc={rc}, {len(skipped)} skipped, {measure_version(dead)} dead rows,",
+            f"{measure_version(own)} rows of three's of {mine};", "held" if ok3 else "FAILED")
+        write_files(third, {reg: None})
+        rc, skipped = run_collect()
+        kept = read_dump(root) == before
+        ok4 = (rc == 0 and len(skipped) == 1 and "/wt3 predates" in skipped[0] and measure_version(own) == 0
+               and kept)
+        say(f"step 4: rc={rc}, {len(skipped)} skipped, {measure_version(own)} rows of three's version;",
+            "the live dump unchanged" if kept else "the live dump CHANGED", "held" if ok4 else "FAILED")
+        live = ti.derive_context(root, root / reg)["versions"][edited]
+        rows = measure_version(live)
+        rc, _ = run_collect("tools/nokit")
+        ok5 = check_refused(rc, "tools/nokit/namespaces.toml") and rows > 0 and measure_version(live) == rows
+        say(f"step 5: {rc}; {measure_version(live)} rows of one's version of {rows};", "held" if ok5 else "FAILED")
+        write_commit(fourth, {conf: 'MEMORY_ROOT=memory\nCHARTER="CHARTER.md"\n',
+                              "CHARTER.md": "# Charter\n\n## Practices\n\nfour's own charter\n"}, "four's charter")
+        run_verb(fourth, "rebuild", None, sets=sets)
+        key = ti.derive_context(fourth, fourth / reg)["conf"]
+        named = measure_version(key=key)
+        path, refusals, counts = fourth / conf, [], []
+        for act in (path.unlink, path.mkdir, lambda: (path.rmdir(), path.write_bytes(b"CHARTER=\xff\xfe\n"))):
+            act()  # deleted from disk, then a directory at its path, then bytes that do not decode
+            refusals.append(run_collect()[0])
+            counts.append(measure_version(key=key))
+        run_git(fourth, "checkout", "-q", "--", conf)
+        rc, _ = run_collect()
+        counts.append(measure_version(key=key))
+        on_four = sum(check_refused(r, "/wt4 cannot be read") for r in refusals)
+        ok6 = named > 0 and on_four == 3 and rc == 0 and counts == [named] * 4
+        say(f"step 6: {on_four} of 3 conf breaks refused on four, rc={rc} once restored;",
+            f"{counts} rows of its conf key of {named};", "held" if ok6 else "FAILED")
+        if ok and ok2 and ok3 and ok4 and ok5 and ok6:
+            say("refused on wt4, wt3 read and then skipped by name, refused on none, refused on a conf")
+            return 0
+        return 1
     # TOOL-aPrunedIndex-1: a whole-view read costs its own version's rows, a tag read its own tag's. What it does
     # not check: wall time, disk reads, and a planner holding `sqlite_stat` tables
     if plant == "dead-versions":
