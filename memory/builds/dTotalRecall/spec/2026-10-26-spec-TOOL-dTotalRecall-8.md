@@ -258,14 +258,14 @@ tree's listing, a name rule or a blob read at a range, and the two figures leave
 |---|---|---|
 | the clause's `git grep` floor | `degraded`, a language with no extractor | `code_meta`, S9 |
 | the clause's dossiers; TOOL-dTendedCadence-5, -12 | anchored hashes | S12, the block |
-| TOOL-dFurnishedOrders-17, the `code` slot | neighbourhood rows | S14 |
-| TOOL-dLinkedLibrary-14, `gov code`; -2 through it | definitions, callers, tests, mentions with lines | `code_row`, `code_edge` |
-| TOOL-dLinkedLibrary-15, enrichment | key and body hash | `code_row` |
-| TOOL-dLinkedLibrary-17, note spans | `line`, `end_line` | `code_row` |
-| TOOL-dLinkedLibrary-21, the ctags pack | rows, extractors, languages | `code_row`, `code_meta`, S10 |
-| TOOL-dLinkedLibrary-16, TOOL-dScopedBuild-12 | the record at a past tree | `--dump --tree` |
-| TOOL-dRankedPlan-13, affected systems | each tracked path's kit | `code_file`, derived |
-| TOOL-dMindYourWords-12 | the primitive | `extract_ranges` |
+| unit TOOL-dFurnishedOrders-17, the `code` slot | neighbourhood rows | S14 |
+| unit TOOL-dLinkedLibrary-14, `gov code`; -2 through it | definitions, callers, tests, mentions with lines | `code_row`, `code_edge` |
+| unit TOOL-dLinkedLibrary-15, enrichment | key and body hash | `code_row` |
+| unit TOOL-dLinkedLibrary-17, note spans | `line`, `end_line` | `code_row` |
+| unit TOOL-dLinkedLibrary-21, the ctags pack | rows, extractors, languages | `code_row`, `code_meta`, S10 |
+| unit TOOL-dLinkedLibrary-16, TOOL-dScopedBuild-12 | the record at a past tree | `--dump --tree` |
+| unit TOOL-dRankedPlan-13, affected systems | each tracked path's kit | `code_file`, derived |
+| unit TOOL-dMindYourWords-12 | the primitive | `extract_ranges` |
 | P32's check, `record-kind.code` | the leg and the kind | S11, S13 |
 
 `code_row(path, key, kind, name, line, end_line, hash)` is a `d` line; `code_file(path, blob, lang, kit,
