@@ -1,12 +1,13 @@
 # TOOL-aPrunedIndex-20 — the tag plants of `tags bundle selftest` run on a bounded pool, graded in row order
 
-**Status:** SPECCED · rev-1 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-11-26 · node a · Tier-1 · base 3d6c1702 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md) | research | TOOL-aPrunedIndex-17 |
+| [2026-11-26-review-TOOL-aPrunedIndex-17-20-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-17-20-spec-audit-round1.md) | spec-audit | TOOL-aPrunedIndex-17 |
 
 <!-- /gen:spec-records -->
 
@@ -22,9 +23,10 @@ section 3 hands off, and the owner approved it as a second unit on 2026-11-26.
 
 - **S1** — `tools/playbook/tag_bundle.py` gains `run_plant_process(plant)`. It returns the
   `subprocess.run` result of `gov_tag.py --fixture --plant <plant>`, with the arguments
-  `run_selftest` passes today. When that call raises, it returns a
-  `subprocess.CompletedProcess` whose `returncode` is `None` and whose stderr is
-  `<exception type>: <message>`, so the error is the plant's output. Observed by AC3.
+  `run_selftest` passes today. When that call raises, it returns
+  `subprocess.CompletedProcess(argv, None, stdout="", stderr=f"{type(exc).__name__}: {exc}")`, so the
+  error is the plant's output. Both text fields are set, because the grading line reads
+  `p.stdout + p.stderr` and the stdlib defaults `stdout` to `None`. Observed by AC3.
 - **S2** — `run_selftest` collects the distinct plants of its rows in first-appearance order. It
   maps `run_plant_process` over them with `concurrent.futures.ThreadPoolExecutor(max_workers=4)`, and
   builds `runs` from `pool.map`'s results, which come back in input order. Each distinct plant runs
@@ -39,26 +41,36 @@ section 3 hands off, and the owner approved it as a second unit on 2026-11-26.
 - **S5** — The main loop re-times the leg at the close, on the tree with units 17 and 20 together
   and on that tree with this unit's build commit reverted. On green it rewrites the
   `tags bundle selftest` rows of `tools/run-gates/selftest-budgets.txt` and
-  `tools/run-gates/ceiling-evidence.txt` by unit 17's S6, and moves neither row up. Observed by AC5.
+  `tools/run-gates/ceiling-evidence.txt` by unit 17's S6, and moves neither row up. A MONOTONE refusal
+  there leaves the evidence row at its value from before the call. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
 - Any edit to `tools/playbook/tag_index.py` or to a module in its import closure. On 2026-11-26
   `import_walk.derive_module_closure` printed nine modules for it, and `tag_bundle.py` is not one.
-- Any edit to `tools/playbook/gov_tag.py`, which unit 17 owns. The two write sets are disjoint, so
-  the two units may build concurrently.
+- Any edit to `tools/playbook/gov_tag.py`, which unit 17 owns. The two units' product-code files are
+  disjoint, but both write `memory/map/generated/symbols.json` and the same two run-gates rows, and
+  both re-version the same two `instruction_units` extractors. So this unit builds after unit 17's build
+  commit, as the build README's build order says.
+- The twin runner `tools/playbook/positional.py#run_selftest`, which runs `gov_tag.py --fixture --plant`
+  plants with the same lazy `subprocess.run` and the same `out = p.stdout + p.stderr`. It keeps its
+  serial runner. The brief scopes this unit to `tools/playbook/tag_bundle.py`, and the
+  `tags positional selftest` row of `tools/run-gates/selftest-budgets.txt@d09d433d:147` reads 108 s
+  under a 170 s budget, so no reading asks for a pool there.
 - `tools/loop/position.py` and `tools/memory-tree/routed_commits.py`, which other sessions are landing.
 - A per-plant timeout. The leg's `ceiling` bounds it today and still does.
 - Printing each row as its plant finishes. Rows print after the pool returns, so an interactive run
   shows nothing until its slowest plant ends. Under the bar the leg's output is captured whole anyway.
-- Charging the bar's pool more than one slot for this leg. That is the class
-  `TOOL-aReapedSpinner-23` names for every leg that fans out, and it is not this unit's.
+- Charging the bar's pool more than one slot for this leg. Four processes in one bar slot is this
+  unit's accepted risk, stated under section 4's "What it cannot see".
 
 ### Edges
 
 - **consumes-from** `TOOL-aPrunedIndex-17` — AC5 runs after unit 17's AC8, on a tree holding unit 17's
   build, and writes the two rows by the procedure unit 17's AC8 spells. Without unit 17 built, AC5's
-  readings and its row writes have nothing to stand on. The mechanism of S1 to S4 needs nothing from it.
+  readings and its row writes have nothing to stand on. The mechanism of S1 to S4 needs nothing from it,
+  but this unit builds after unit 17's build commit, because the two write the same generated map and
+  the same two run-gates rows.
 
 ## 4. Design
 
@@ -73,7 +85,8 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
 
 The loop body keeps its grading and printing lines and drops only its `if plant not in runs` branch.
 A worker that raises would make `pool.map` raise on iteration and lose every other plant's result,
-so `run_plant_process` catches `Exception` and returns a run whose `returncode` is `None`. That run
+so `run_plant_process` catches `Exception` and returns a run whose `returncode` is `None`, whose
+`stdout` is the empty string and whose `stderr` is the exception's line. That run
 fails each row naming its plant, as `got rc=None` with the exception's line as its output, and the
 other plants are graded as usual. Today the same exception ends the leg with a traceback. A
 `KeyboardInterrupt` is not an `Exception` and still ends the leg.
@@ -153,39 +166,53 @@ each node re-parses their rows once, the cost unit 17's section 4 accepts for it
 - **AC4** — When `git grep -c "max_workers" -- tools/playbook/tag_bundle.py` runs on the built tree it
   prints `tools/playbook/tag_bundle.py:1`. `git diff --name-only <parent> <build commit>` names
   `tools/playbook/tag_bundle.py` and none of `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`,
-  `tools/gate-legs.json`, `tools/loop/position.py` or `tools/memory-tree/routed_commits.py`. The AC2
+  `tools/gate-legs.json`, `tools/playbook/positional.py`, `tools/loop/position.py` or
+  `tools/memory-tree/routed_commits.py`. The AC2
   probe prints `rows same: True` for the two modules' `SELFTEST_ROWS`.
   Red when: a second width is declared, `SELFTEST_ROWS` changes, or the diff touches a cut-line file.
 - **AC5** — When the main loop, at the close and after unit 17's AC8, times
   `python tools/playbook/tag_bundle.py --selftest` three times on a detached worktree under
-  `%TEMP%/pi20-base` at the tip with this unit's build commit reverted, and three times on the tip,
+  `"$TEMP/pi20-base"` at the tip with this unit's build commit reverted, and three times on the tip,
   back to back in one session with unit 17's AC7 gauge beside each, the ledger records the six
   readings and the six gauges. The reverted tree holds unit 17 and not this unit. AC5 is green when
   all four hold: every reading exits 0 and prints `PASS — the tag plants, 14 rows`, under the leg's
   300 s `ceiling` in `tools/gate-legs.json`; the largest gauge is at most 1.5 times the smallest; the
   worst reading after over the worst reading before is at most 0.75; and the worst reading after is at
   most 106 s. A set whose gauges fall outside that band is retaken, at most twice. On green the main (PINNED, 2026-11-26)
-  loop writes the two rows by the call and the budget rule unit 17's AC8 spells, from this AC's worst
-  reading after, and writes a row only where the new value is lower than the row as it then stands.
-  On red it writes neither row and records the readings, the gauges and the failed condition.
+  loop runs the call unit 17's AC8 spells, with this AC's worst reading after, and only where that
+  reading is lower than the node-a row as it then stands. Where it is not, neither row is written, and
+  that is not red. Before anything else,
+  the call's `--reset` deletes the leg's non-ok rows from the retained run files under
+  `<git-dir>/gate-run/`. A retained ok reading at or above the worst after makes the call exit 1 with
+  its MONOTONE line before it writes the evidence file, and the evidence row then keeps its value
+  from before the call. The main loop then derives the budget value by unit 17's AC8 rule, 1.5 times
+  the node-a row as the call leaves it, floored at 60. It writes the budget row only after testing that
+  the value is lower than the row as it then stands.
+  On red it writes neither row and records the readings, the gauges and the failed condition. On either
+  verdict the ledger records the diff of the other legs' rows, which every `--write` re-derives.
   Red when: a reading exits non-zero, fails a row, or reaches the ceiling; the gauges stay out of
-  band; the ratio exceeds 0.75; the worst reading after exceeds 106 s; or a row reads higher after the
-  write than before it.
+  band; the ratio exceeds 0.75; the worst reading after exceeds 106 s; or the `tags bundle selftest`
+  row of either file reads higher after the write than before it. Another leg's row moving is not red.
   permission: a pass runs no self-test leg, so the readings and both writes are the main loop's.
-  cost: six readings of the leg, under 11 minutes at a 0.21 s gauge if each stays near unit 17's 106 s
-  row; it scales with the gauge.
+  cost: six readings of the leg. At a 0.21 s gauge the reverted tree runs the five plants one after
+  another in no less than unit 17's section 4 sum of 157.7 s, and the tip near 0.49 of that, about
+  77 s, from section 4's pool ratio. The six readings take at least about 12 minutes, plus the eight
+  `bundle-*` plants, which nothing has timed. The cost scales with the gauge. At that gauge the 106 s
+  bound is reachable only if the eight `bundle-*` plants add under about 29 s to a pooled reading.
   figure: the readings are DERIVED at observation time. The 0.75 bound is PINNED: it leaves the
   section 4 pool ratio of 0.49 room for the eight `bundle-*` plants, which nothing has timed under a
   pool.
 
 ## 6. Gates
 
-`tags bundle selftest` · `instruction units selftest` · `instruction edits (manifest checks)` · `lexicon naming predicates` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `spec tokens (a spec's own names resolve)` · `memory hygiene`
+`tags bundle selftest` · `tags (the resolver's checks)` · `instruction units selftest` · `instruction edits (manifest checks)` · `edges (every declared edge parses, is registered and resolves)` · `lexicon naming predicates` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `spec tokens (a spec's own names resolve)` · `memory hygiene`
 
-`instruction units selftest` and `instruction edits (manifest checks)` are owed because the edit
-re-versions two `instruction_units` extractors. `playbook render selftest`, `govkit acceptance matrix`
-and `policy fixtures` guard `tools/playbook/tag_bundle.py`. The four after the map legs read the two
-rows AC5 may write.
+`tags (the resolver's checks)`, `instruction units selftest`, `instruction edits (manifest checks)` and
+`edges (every declared edge parses, is registered and resolves)` are owed because the edit re-versions
+two `instruction_units` extractors, as unit 17's section 7 owes them for the same re-version. They are
+the four legs that open the live index, so they are owed at the close once the owner's go holds, and by
+no pass before it. `playbook render selftest`, `govkit acceptance matrix` and `policy fixtures` guard
+`tools/playbook/tag_bundle.py`. The four after the map legs read the two rows AC5 may write.
 
 New arm: tools/playbook/tag_bundle.py · covers AC2 · one `SELFTEST_ROWS` row's wanted line edited to a string its plant never prints, so the leg under the pool prints that plant's output and exits 1 · none
 
@@ -196,6 +223,18 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-26 · initial draft.
+- rev-2 · 2026-11-26 · §2 §3 §4 §5 §6 §9 S1 S5 AC4 AC5 · folded
+  `2026-11-26-review-TOOL-aPrunedIndex-17-20-spec-audit-round1`: findings 5, 13 and 22 (the fallback
+  sets `stdout=""` beside its stderr), 3 and 17 (the "may build concurrently" sentence struck; this
+  unit builds after unit 17's build commit, and the edge says so), 9 and 20 (AC5 and S5 say the
+  `--reset` deletes the leg's non-ok run rows before any refusal, and a MONOTONE refusal leaves the
+  evidence row as it stood), 2 (the budget value derives from the evidence row as the call leaves it,
+  and each write follows the test it can trip), 10 (the worktree spelled `"$TEMP/pi20-base"`), 11
+  (AC5's cost derived from unit 17's timed sums and the pool ratio, with what makes 106 s reachable),
+  14 (the twin runner in `tools/playbook/positional.py` named in §3 and §9 and kept serial, with
+  AC4's cut line holding it), 15 (the WONTDO ask no longer cited; the bar-slot risk is this unit's,
+  accepted), 18 (the `tags` and `edges` legs owed, under unit 17's timing sentence), 23 (AC5's red
+  scoped to the `tags bundle selftest` row of either file).
 
 ## 9. Reuse audit
 
@@ -206,7 +245,9 @@ The seam extended is `tools/playbook/tag_bundle.py#run_selftest`, and the pool s
 ranked name-stem neighbours only, `run`, `fixture`, `run_git` and `run_selftest_cases` among them, and
 none is a pool. `git grep -n "max_workers"` over `tools/` found the same literal at its call in
 `tools/govkit/selftest.py` and `tools/policy/check_policy.py`, and `regen.py`'s pool reading its own
-knob, so no shared width exists to reuse. The recall answered unit 17's section 4 pool measurement
-first, then `TOOL-aTimedTurnstile-5`, whose audit found no shell concurrency seam, and
-`TOOL-aReapedSpinner-23`, which names the bar-slot class section 3 leaves out.
+knob, so no shared width exists to reuse. A grep for the call shape the edit changes,
+`git grep -n -- '"--fixture", "--plant"' -- 'tools/*.py'`, found one twin that runs `gov_tag.py`
+plants: `tools/playbook/positional.py#run_selftest`, at `tools/playbook/positional.py@3bbaecc5:750`.
+Section 3 records why it keeps its serial runner. The recall answered unit 17's section 4 pool
+measurement first, then `TOOL-aTimedTurnstile-5`, whose audit found no shell concurrency seam.
 Recall terms used: selftest plant fixture ThreadPoolExecutor max_workers pool row order leg ceiling budget concurrency

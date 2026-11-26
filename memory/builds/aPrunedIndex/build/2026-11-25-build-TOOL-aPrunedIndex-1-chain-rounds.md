@@ -94,3 +94,32 @@ round 4 · finding 12 · MEDIUM · local · specs TOOL-aPrunedIndex-17 · unit T
 round 4 · finding 13 · MEDIUM · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 2
 round 4 · finding 14 · MEDIUM · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 2
 round 4 · finding 15 · LOW · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 2
+round 5 · subject aPrunedIndex-spec-set-r5 · audited TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20
+round 5 · finding 1 · MEDIUM · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 2 · MEDIUM · local · specs TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 2 · MEDIUM · local · specs TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 3 · MEDIUM · local · specs TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 4 · MEDIUM · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 5 · MEDIUM · local · specs TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 6 · LOW · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 7 · LOW · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 8 · LOW · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 9 · MEDIUM · local · specs TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 9 · MEDIUM · local · specs TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 10 · MEDIUM · local · specs TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 10 · MEDIUM · local · specs TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 11 · LOW · local · specs TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 11 · LOW · local · specs TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 12 · LOW · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 13 · LOW · local · specs TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 14 · LOW · local · specs TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 15 · LOW · local · specs TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 16 · LOW · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 17 · MEDIUM · local · specs TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 18 · LOW · local · specs TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 19 · LOW · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 20 · MEDIUM · local · specs TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 20 · MEDIUM · local · specs TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 21 · MEDIUM · local · specs TOOL-aPrunedIndex-17 · unit TOOL-aPrunedIndex-17 · rev 4
+round 5 · finding 22 · LOW · local · specs TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
+round 5 · finding 23 · LOW · local · specs TOOL-aPrunedIndex-20 · unit TOOL-aPrunedIndex-20 · rev 2
