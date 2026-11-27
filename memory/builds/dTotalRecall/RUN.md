@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-by: attended
+landed-derived: 9dc7c408a5b8bab1919e35a8c19da7f241f118d4 a9dcf93934410b3fc5856acb59c7137e70071316
 asks-at-landing: TOOL-dTotalRecall-27=DEFERRED TOOL-dTotalRecall-28=OPEN TOOL-dTotalRecall-29=CLOSED TOOL-dTotalRecall-30=CLOSED TOOL-dTotalRecall-31=CLOSED TOOL-dTotalRecall-32=CLOSED TOOL-dTotalRecall-33=OPEN TOOL-dTotalRecall-34=OPEN TOOL-dTotalRecall-35=OPEN TOOL-dTotalRecall-101=OPEN TOOL-dTotalRecall-102=CLOSED TOOL-dTotalRecall-103=CLOSED TOOL-dTotalRecall-104=OPEN TOOL-dTotalRecall-105=OPEN TOOL-dTotalRecall-106=OPEN TOOL-dTotalRecall-107=OPEN TOOL-dTotalRecall-108=OPEN TOOL-dTotalRecall-109=CLOSED TOOL-dTotalRecall-110=OPEN TOOL-dTotalRecall-111=OPEN TOOL-dTotalRecall-112=OPEN TOOL-dTotalRecall-113=OPEN TOOL-dTotalRecall-126=OPEN
 units-at-landing: TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-37 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-38 TOOL-dTotalRecall-4 TOOL-dTotalRecall-54 TOOL-dTotalRecall-40 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-6 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-41 TOOL-dTotalRecall-10 TOOL-dTotalRecall-42 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-36 TOOL-dTotalRecall-39 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-61 TOOL-dTotalRecall-24 TOOL-dTotalRecall-67 TOOL-dTotalRecall-20 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-17 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 TOOL-dTotalRecall-43 TOOL-dTotalRecall-52 TOOL-dTotalRecall-62 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-60 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-73 TOOL-dTotalRecall-75 TOOL-dTotalRecall-74 TOOL-dTotalRecall-87 TOOL-dTotalRecall-76 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-90 TOOL-dTotalRecall-88 TOOL-dTotalRecall-91 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-89 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-92 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-114 TOOL-dTotalRecall-115 TOOL-dTotalRecall-116 TOOL-dTotalRecall-117 TOOL-dTotalRecall-118 TOOL-dTotalRecall-119 TOOL-dTotalRecall-120 TOOL-dTotalRecall-121 TOOL-dTotalRecall-122 TOOL-dTotalRecall-123 TOOL-dTotalRecall-124 TOOL-dTotalRecall-125
 hold-run: 
@@ -21,8 +23,8 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: 3d6c1702afb6c2e86638785950d80657a187192c · handoff · ? touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 3123949fe07d403a1da346c865c13bd7acfa6ab2
-phase: HELD
+witness: 9dc7c408a5b8bab1919e35a8c19da7f241f118d4
+phase: LANDED
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dtotalrecall-ae256e
