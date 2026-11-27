@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-26-build-TOOL-aPrunedIndex-24-1-acceptance-ledger.md](../build/2026-11-26-build-TOOL-aPrunedIndex-24-1-acceptance-ledger.md) | journal | — |
+| [2026-11-27-build-TOOL-aPrunedIndex-24-red-fix-2.md](../build/2026-11-27-build-TOOL-aPrunedIndex-24-red-fix-2.md) | red-fix | — |
 | [2026-11-26-prompt-TOOL-aPrunedIndex-24-1-spec-brief.md](../prompts/2026-11-26-prompt-TOOL-aPrunedIndex-24-1-spec-brief.md) | research | TOOL-aPrunedIndex-17 |
 | [2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-diff-review-round4.md) | diff-review | TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20 |
 | [2026-11-26-review-TOOL-aPrunedIndex-24-spec-audit-round1.md](../reviews/2026-11-26-review-TOOL-aPrunedIndex-24-spec-audit-round1.md) | spec-audit | — |

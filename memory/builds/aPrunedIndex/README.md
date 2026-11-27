@@ -71,7 +71,7 @@ ids TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedI
 | [TOOL-aPrunedIndex-24 — the held-answer rules get a `held-key` plant that `tags bundle selftest` runs](spec/2026-11-26-spec-TOOL-aPrunedIndex-24.md) | 8 | 1 | CLOSED | rev-2 | 2026-11-26 |
 <!-- /gen:build-units -->
 
-Records: 34 bound to this build, across 4 record folder(s).
+Records: 35 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -109,7 +109,7 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 | briefs | `2026-11-26-prompt-TOOL-aPrunedIndex-24-1-spec-brief.md`, `2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md` and 8 more under prompts/ |
 | reviews | `2026-11-26-review-TOOL-aPrunedIndex-4-10-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-11-26-review-TOOL-aPrunedIndex-4-10-diff-review-round2.md` (CLEAN WITH FIXES) and 8 more under reviews/ |
 | deviation | `2026-11-26-build-TOOL-aPrunedIndex-20-deviation-1.md`, `2026-11-26-build-TOOL-aPrunedIndex-17-deviation-1.md` |
-| red-fix | `2026-11-27-build-TOOL-aPrunedIndex-17-red-fix-1.md` |
+| red-fix | `2026-11-27-build-TOOL-aPrunedIndex-24-red-fix-2.md`, `2026-11-27-build-TOOL-aPrunedIndex-17-red-fix-1.md` |
 | research | `2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md` |
 | logs | `2026-11-26-build-TOOL-aPrunedIndex-4-1-acceptance-ledger.md`, `2026-11-26-build-TOOL-aPrunedIndex-3-1-acceptance-ledger.md` and 8 more under build/ |
 | open asks | `BACKLOG.md`, 18 open |
