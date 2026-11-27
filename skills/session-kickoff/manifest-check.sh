@@ -289,8 +289,9 @@ CARD_FIXTURE_VERDICT=card-fixture.verdict
 CARD_OVERLAP_BOUND=${CARD_OVERLAP_BOUND:-10}
 CARD_OVERLAP_ROWS=5
 # The replay's `map —` block's bound in seconds (PLAY-dOrderedCharter-4); the env override exists for
-# the self-test's slow-stub arm and is not an adopter knob.
-CARD_MAP_BOUND=${CARD_MAP_BOUND:-5}
+# the self-test's slow-stub arm and is not an adopter knob. It stays above instruction_units.py's
+# MAP_PRESET_SECONDS (10), so a slow preset read costs the map its preset line, never the whole map.
+CARD_MAP_BOUND=${CARD_MAP_BOUND:-15}
 # The `## pockets` section's bound on the playbook kit's `pockets` verb, in seconds (TOOL-dPlacedRequest-9);
 # the env override exists for the self-test's slow-stub arm and is not an adopter knob.
 CARD_POCKETS_BOUND=${CARD_POCKETS_BOUND:-5}
