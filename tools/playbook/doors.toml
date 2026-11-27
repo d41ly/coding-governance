@@ -1,5 +1,7 @@
-# doors.toml — the door list (PLAY-dOrderedCharter-29 S5), the edge sites' doors until dTotalRecall's kind
-# registry joins its writer column. Read by writing_practice.py's `one-door` arm.
+# doors.toml — the door list (PLAY-dOrderedCharter-29 S5): the doors of the edge sites' kinds that are no
+# record. Read by writing_practice.py's `one-door` arm. A kind whose nodes are records takes its door from
+# the memory-tree kit's record-kind registry, `record-kinds.toml`, whose `writer` column is that door
+# (TOOL-dTotalRecall-18 S4): the arm prints it from there and reds a row here naming a registry row.
 #
 # One [[door]] row per node kind of the arm's DOOR_KINDS: `kind`; `population`, a tracked-path glob, `*` within
 # one segment, `{prefix}` the tool root and `{memory_root}` the conf's MEMORY_ROOT; `writer`, the tracked file of
@@ -15,32 +17,10 @@ writer = "{prefix}/playbook/instructions_edit.py"
 witness = ""
 
 [[door]]
-kind = "instruction-change"
-population = "{memory_root}/builds/*/build/*-change-*.md"
-writer = "{prefix}/playbook/instructions_edit.py"
-witness = ""
-
-[[door]]
 kind = "work-order"
 population = "{memory_root}/builds/*/prompts/*-prompt-*[0-9]-[0-9]*-[a-z]*.md"
 writer = "{prefix}/roles/handoff.py"
 witness = "<!-- gov:handoff "
-
-[[door]]
-kind = "override"
-population = "{memory_root}/builds/*/build/*-override-*.md"
-writer = "{prefix}/memory-tree/build_records.py"
-witness = ""
-
-[[door]]
-kind = "exception"
-population = "{memory_root}/builds/*/build/*-exception-*.md"
-writer = "{prefix}/memory-tree/build_records.py"
-witness = ""
-
-[[door]]
-kind = "record"
-pending = "dTotalRecall"
 
 [[door]]
 kind = "trailer"

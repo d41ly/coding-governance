@@ -1,0 +1,25 @@
+# TOOL-dTotalRecall-6 — acceptance ledger, build pass 1
+
+**Serves:** log TOOL-dTotalRecall-6
+
+No merge bar, no self-test suite and no gate leg ran in this pass. Every probe ran on node d, 2026-11-22,
+from base `803a3b802`. The fixture trees are scratch repositories under `%TEMP%`, each holding a
+`.memory-tree.conf` whose `FAMILIES` declares `tool:TOOL`, the empty stale-header waiver, and builds whose
+README carries the relation line under test and whose one spec carries the status named; a lease is a
+commit whose message holds `status: <word>`, written to `refs/gov/leases/<slug>/build` with `git update-ref`.
+Each base red ran the same tree against a scratch clone of `803a3b802`. The gates of §7 and both `New arm:`
+RED-first observations are OWED to the close, after the last unit is terminal.
+
+**Evidences:** TOOL-dTotalRecall-6
+- AC1 — `gen_build_index.py --write` — run in the pass's working tree before the commit, with every pass file staged, it moved no README's `build-edges` region: it rewrote `memory/LIVE.md`, `memory/backlog/TOOL.md`, this build README's status and roster rows and this spec's records region, each from the spec's `CLOSED` header or this pass's three records, and the as-built view's count of deviation records, and no other README; `--print-relations` printed every edge of the tree `after` and `resolved`. The same `--write` in a scratch clone of the pass tip is OWED to the close with the `build-index selftest` and `memory hygiene` legs.
+- AC2 — `xAlpha -> xBeta -> xAlpha` — `--write` over `xAlpha` with `depends-on: xBeta` and `xBeta` with `depends-on: xAlpha` exited 1 naming that cycle, and spelled with `parents:` the same; the base module wrote the `parents:` tree cleanly, exit 0, the red.
+- AC3 — `pending` — with `depends-on: xRemote`, no folder `xRemote` and a `status: held` lease, `--print-relations` printed `xAlpha after xRemote pending refs/gov/leases/xRemote/build` (TAB-separated) and `--write` exited 0, rendering `xRemote (not in this tree)` and no ref; the base module refused the `parents: xRemote` tree naming `xRemote`, the red.
+- AC4 — `found nowhere` — the same tree with no ref printed `pending` and `found nowhere`, and `--write` exited 0.
+- AC5 — `withdrawn` — with the lease's message `status: withdrawn`, `--write` exited 1 naming `xRemote` and `withdrawn`, and `--print-relations` printed the edge `red`.
+- AC6 — `CLOSED` — with `patches: TOOL-xDone-9` and `xDone`'s one spec `CLOSED` defining `TOOL-xDone-1`, `--write` exited 1 naming `TOOL-xDone-9` and `CLOSED`; with that spec `OPEN`, `--write` exited 0 and `--print-relations` printed the edge `pending`.
+- AC7 — `amended-by` — with `xAlpha` declaring `amends: TOOL-xBeta-1`, `--write` rendered an `amended-by` line linking `xAlpha`'s README in `xBeta`'s region and ``- **amends:** `TOOL-xBeta-1` `` in `xAlpha`'s; `--check` read clean, and after the `amended-by` line was hand-deleted it reported `memory/builds/xBeta/README.md (stale — differs from a fresh render)`, exit 1. The base module rendered no inverse in `xBeta`'s region, the red.
+- AC8 — `after` — `parents: xBeta` beside `depends-on: xBeta` exited 1 naming both keys (the base module wrote it, exit 0, the red); `parents:` alone printed `xAlpha after xBeta resolved`; `python tools/memory-tree/id_grammar.py --readers` listed no line of `gen_build_index.py`.
+- AC9 — `tomllib` — a `python -c` probe found six `[[front-matter]]` rows, `depends-on` and `parents` typed `after`, `build` in the `from` of `implements`, `amends` and `supersedes`, and `family-id` in the `to` of `patches`; `edge_grammar.read_edge_types` and `read_trailer_keys` read the file as before.
+- AC10 — `depends-on-parent` — `python tools/loop/loop_parents.py --fixture --plant depends-on-parent` printed `route replan · parent tParent · move designing → planning · item.deploy.parents`, the line the `withdrawn-parent` plant printed in the same run; the `git grep` of the criterion printed nothing, where at base it printed `collect`'s line, the three loop readers' and `derive_front_matter`'s (deviation 63). The position engine's `parent-unlanded` and the budget's `patch-draw` plants answered as before. The `loop parent routes` leg and its new `depends-on-parent` case are OWED to the close.
+- AC11 — `depends-on:` — `grep -n 'depends-on:' help/loop.md` printed lines in the section "When a parent build is withdrawn" and the `blocked` answer's line, and the same grep over `tools/unattended/VERBS.template.md` and `memory/guides/UNATTENDED-VERBS.md` printed the `--plan` hand-over sentence in each; `docs_leg.py --fingerprints` printed the loop scripts' fingerprints unmoved, so no `<!-- usage: -->` marker changed. The `docs` leg is OWED to the close.
+- AC12 — `parent` — in a scratch clone of the worktree with the README's `parents:` line respelled `depends-on:`, `GOV_POSITION_STATES= bash tools/unattended/unattended.sh --plan dTotalRecall` printed one `parent` line for each of `dDeclaredLoop`, `dWitnessedBar` and `dPlacedRequest` with the pass's driver, as it printed for `parents:`, and none with the base driver, the red.

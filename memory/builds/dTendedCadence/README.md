@@ -215,6 +215,8 @@ Coverage of dTendedCadence's 18 clause(s) and 24 owned node(s), over 58 spec(s) 
 | 22 | `TOOL-dTendedCadence-59`, `TOOL-dTendedCadence-64`, `TOOL-dTendedCadence-65`, `TOOL-dTendedCadence-66`, `TOOL-dTendedCadence-69`, `TOOL-dTendedCadence-70`, `TOOL-dTendedCadence-71` | no |
 | 23 | `TOOL-dTendedCadence-72`, `TOOL-dTendedCadence-73` | no |
 | 24 | `TOOL-dTendedCadence-74` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
@@ -222,3 +224,18 @@ Coverage of dTendedCadence's 18 clause(s) and 24 owned node(s), over 58 spec(s) 
 - **Parent builds:** [dFurnishedOrders](../dFurnishedOrders/README.md), [dIndexedDesign](../dIndexedDesign/README.md), [dRankedPlan](../dRankedPlan/README.md), [dWellOiledMachine](../dWellOiledMachine/README.md), [dWitnessedBar](../dWitnessedBar/README.md)
 - **Child builds:** [dCalibratedLens](../dCalibratedLens/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-03-prompt-TOOL-dTendedCadence-1-parents-crosscheck.md`, `2026-11-03-prompt-TOOL-dTendedCadence-1-1-spec-reviewer.md` and 15 more under prompts/ |
+| reviews | `2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-11-01-review-TOOL-dTendedCadence-35-to-48-spec-audit-round1.md` (BLOCKED) and 1 more under reviews/ |
+| deviation | `2026-11-01-build-TOOL-dTendedCadence-9-deviation-91.md`, `2026-11-01-build-TOOL-dTendedCadence-8-deviation-82.md` and 73 more under build/ |
+| research | `2026-11-03-build-TOOL-dTendedCadence-1-parents-crosscheck.md`, `2026-11-03-build-TOOL-dTendedCadence-1-crosscheck-returns.md` and 5 more under build/ |
+| logs | `2026-11-01-build-TOOL-dTendedCadence-1-departures-spec.md`, `2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dTendedCadence/card` |
+<!-- /gen:build-routes -->

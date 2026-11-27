@@ -179,6 +179,12 @@
       "source": "tools/lexicon/canon.py"
     },
     {
+      "path": "tools/lexicon/extract_code.py",
+      "kit": "lexicon",
+      "role": "engine",
+      "source": "tools/lexicon/extract_code.py"
+    },
+    {
       "path": "tools/lexicon/kit.toml",
       "kit": "lexicon",
       "role": "engine",
@@ -377,6 +383,18 @@
       "source": "tools/memory-tree/gotchas.py"
     },
     {
+      "path": "tools/memory-tree/gov-claim.sh",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "path": "tools/memory-tree/gov_record.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/gov_record.py"
+    },
+    {
       "path": "tools/memory-tree/history_store.py",
       "kit": "memory-tree",
       "role": "engine",
@@ -443,6 +461,30 @@
       "source": "tools/memory-tree/ratchet.py"
     },
     {
+      "path": "tools/memory-tree/record-kinds.toml",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/record-kinds.toml"
+    },
+    {
+      "path": "tools/memory-tree/record_causes.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/record_causes.py"
+    },
+    {
+      "path": "tools/memory-tree/record_find.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/record_find.py"
+    },
+    {
+      "path": "tools/memory-tree/record_kinds.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "path": "tools/memory-tree/routed_commits.py",
       "kit": "memory-tree",
       "role": "engine",
@@ -459,6 +501,12 @@
       "kit": "memory-tree",
       "role": "engine",
       "source": "tools/memory-tree/seen_red.py"
+    },
+    {
+      "path": "tools/memory-tree/shape_run.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/shape_run.py"
     },
     {
       "path": "tools/memory-tree/transition_audit.py",
@@ -647,6 +695,12 @@
       "source": "tools/runlog/kit.toml"
     },
     {
+      "path": "tools/runlog/memory_measure.py",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/memory_measure.py"
+    },
+    {
       "path": "tools/runlog/model.py",
       "kit": "runlog",
       "role": "engine",
@@ -761,6 +815,12 @@
       "source": "tools/codebase-map/check_gate_coverage.py"
     },
     {
+      "path": "tools/codebase-map/extract_code.py",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/extract_code.py"
+    },
+    {
       "path": "tools/codebase-map/gen_map.py",
       "kit": "codebase-map",
       "role": "engine",
@@ -863,72 +923,6 @@
       "source": "tools/drift-audit/drift_signals.template.py"
     },
     {
-      "path": "tools/memory-recall/README.md",
-      "kit": "memory-recall",
-      "role": "engine",
-      "source": "tools/memory-recall/README.md"
-    },
-    {
-      "path": "tools/memory-recall/SKILL.template.md",
-      "kit": "memory-recall",
-      "role": "engine",
-      "source": "tools/memory-recall/SKILL.template.md"
-    },
-    {
-      "path": "tools/memory-recall/adopt-memory-recall.sh",
-      "kit": "memory-recall",
-      "role": "engine",
-      "source": "tools/memory-recall/adopt-memory-recall.sh"
-    },
-    {
-      "path": "tools/memory-recall/bench.py",
-      "kit": "memory-recall",
-      "role": "engine",
-      "source": "tools/memory-recall/bench.py"
-    },
-    {
-      "path": "tools/memory-recall/extract.py",
-      "kit": "memory-recall",
-      "role": "engine",
-      "source": "tools/memory-recall/extract.py"
-    },
-    {
-      "path": "tools/memory-recall/kit.toml",
-      "kit": "memory-recall",
-      "role": "engine",
-      "source": "tools/memory-recall/kit.toml"
-    },
-    {
-      "path": "tools/memory-recall/query.py",
-      "kit": "memory-recall",
-      "role": "engine",
-      "source": "tools/memory-recall/query.py"
-    },
-    {
-      "path": "tools/memory-recall/recall-opened.fragment.json",
-      "kit": "memory-recall",
-      "role": "engine",
-      "source": "tools/memory-recall/recall-opened.fragment.json"
-    },
-    {
-      "path": "tools/memory-recall/recall_conf.py",
-      "kit": "memory-recall",
-      "role": "engine",
-      "source": "tools/memory-recall/recall_conf.py"
-    },
-    {
-      "path": "tools/memory-recall/union.py",
-      "kit": "memory-recall",
-      "role": "engine",
-      "source": "tools/memory-recall/union.py"
-    },
-    {
-      "path": "tools/memory-recall/verbatim.json",
-      "kit": "memory-recall",
-      "role": "engine",
-      "source": "tools/memory-recall/verbatim.json"
-    },
-    {
       "path": "tools/playbook/README.md",
       "kit": "playbook-render",
       "role": "engine",
@@ -951,6 +945,12 @@
       "kit": "playbook-render",
       "role": "engine",
       "source": "tools/playbook/check_layers.py"
+    },
+    {
+      "path": "tools/playbook/code_record.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/code_record.py"
     },
     {
       "path": "tools/playbook/core-pending.txt",
@@ -987,6 +987,12 @@
       "kit": "playbook-render",
       "role": "engine",
       "source": "tools/playbook/edges.toml"
+    },
+    {
+      "path": "tools/playbook/extract_code.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/extract_code.py"
     },
     {
       "path": "tools/playbook/fixtures/composition.py",
@@ -1125,6 +1131,12 @@
       "kit": "playbook-render",
       "role": "engine",
       "source": "tools/playbook/readers.toml"
+    },
+    {
+      "path": "tools/playbook/record_extract.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/record_extract.py"
     },
     {
       "path": "tools/playbook/references.toml",
@@ -1455,6 +1467,72 @@
       "kit": "roles",
       "role": "seed",
       "source": "tools/roles/house/policy.toml"
+    },
+    {
+      "path": "tools/memory-recall/README.md",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/README.md"
+    },
+    {
+      "path": "tools/memory-recall/SKILL.template.md",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/SKILL.template.md"
+    },
+    {
+      "path": "tools/memory-recall/adopt-memory-recall.sh",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/adopt-memory-recall.sh"
+    },
+    {
+      "path": "tools/memory-recall/bench.py",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/bench.py"
+    },
+    {
+      "path": "tools/memory-recall/extract.py",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/extract.py"
+    },
+    {
+      "path": "tools/memory-recall/kit.toml",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/kit.toml"
+    },
+    {
+      "path": "tools/memory-recall/query.py",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/query.py"
+    },
+    {
+      "path": "tools/memory-recall/recall-opened.fragment.json",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/recall-opened.fragment.json"
+    },
+    {
+      "path": "tools/memory-recall/recall_conf.py",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/recall_conf.py"
+    },
+    {
+      "path": "tools/memory-recall/union.py",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/union.py"
+    },
+    {
+      "path": "tools/memory-recall/verbatim.json",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/verbatim.json"
     },
     {
       "path": "tools/review-harness/README.md",
@@ -2034,6 +2112,24 @@
     },
     {
       "id": "playbook/adopter-rules-to-overlay-2",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/serves-journal-read-as-log",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/readme-front-matter-graded",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/legacy-anchors-retag",
       "introduced": null,
       "state": "applied",
       "via": "witness"

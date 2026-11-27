@@ -10,7 +10,7 @@ decisions = ["TOOL-aRelaxedShard-1", "TOOL-aWidenedGuide-1", "TOOL-dDerivedDocke
 stage = ["step.build", "step.test"]
 
 [claims]
-gate-legs = ["memory hygiene", "memory hygiene (the pass checks)", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms", "backlog migration selftest", "straggler-guard arms", "routed commits name a specced unit", "routed-commits selftest", "ratchet (never gains)", "ratchet (both ways)", "ratchet (unarmed)", "ratchet (populated)", "ratchet (seed laundering)", "ratchet (rename)", "ratchet (keys, not a scalar)", "ratchet (key shape)", "ratchet selftest"]
+gate-legs = ["memory hygiene", "memory hygiene (the pass checks)", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms", "backlog migration selftest", "straggler-guard arms", "routed commits name a specced unit", "routed-commits selftest", "ratchet (never gains)", "ratchet (both ways)", "ratchet (unarmed)", "ratchet (populated)", "ratchet (seed laundering)", "ratchet (rename)", "ratchet (keys, not a scalar)", "ratchet (key shape)", "ratchet selftest", "record-kinds", "shape-run records (each record equals its review line)", "record causes (causes and orphans over the legacy population)"]
 kits = ["memory-tree"]
 git-hooks = ["commit-msg", "pre-rebase"]
 harness-hooks = []
@@ -28,7 +28,7 @@ gotcha-classes = ["a-grep-for-a-word-is-a-presence-probe.md",
   "insert-after-a-key-that-occurs-twice.md", "pipe-in-a-code-span-splits-a-table-cell.md",
   "unvalidated-arg-reaches-an-agent-shell-line.md", "helper-whose-only-caller-is-its-selftest.md",
   "doc-names-an-argument-the-code-never-reads.md", "comment-claims-a-check-the-case-does-not-run.md",
-  "forwarded-arg-opens-an-unhandled-return-shape.md"]
+  "forwarded-arg-opens-an-unhandled-return-shape.md", "fixture-plants-a-state-no-writer-makes.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

@@ -2383,7 +2383,7 @@ def check_map_arms(check_arm) -> None:
                   'a preset read past MAP_PRESET_SECONDS costs the line, never the map, and says the bound',
                   f'exit {slow_rc}: {slow!r} · stderr {err.getvalue()!r}')
     long = [(f'runbooks/a-long-runbook-document-number-{n}.md', 4, None) for n in range(6)]
-    many = [(f'guides/a-long-held-guide-document-number-{n}.md', 3, f'PLAY-fx-{n} F1') for n in range(9)]
+    many = [(f'guides/a-long-held-guide-document-number-{n}.md', 3, f'PLAY-fxHeld-{n} F1') for n in range(9)]
     for rows, what in ((long, 'cut'), (long + many, 'over')):
         with tempfile.TemporaryDirectory() as td:
             _e, tgt = write_render_target(Path(td), files={reg: build_map_rows(('AGENTS.md', 0, None), *rows)
@@ -4219,4 +4219,4 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.51"  # gov:kit playbook-render@1.51
+KIT_PLAYBOOK_RENDER_VERSION = "1.50"  # gov:kit playbook-render@1.50

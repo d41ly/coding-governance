@@ -5,8 +5,9 @@
     python loop_parents.py --selftest
     python loop_parents.py --fixture --plant <case> [--value <v>] [--state <s>]
 
-`read_withdrawn_parents(build, root)` reads the slugs of the build README's `parents:` front matter
-through the memory-tree kit's `parse_front_matter`, the builds folder `<root>/<records root>/builds` by
+`read_withdrawn_parents(build, root)` reads the slugs of the build README's `parents:` or `depends-on:`
+front matter, the `after` targets of the memory-tree kit's `parse_relations` over its `parse_front_matter`
+(TOOL-dTotalRecall-6 S9), the builds folder `<root>/<records root>/builds` by
 the loop kit's `resolve_memory_root` (TOOL-dDeclaredLoop-116). A parent reads withdrawn on today's
 stand-in for its
 `withdrawn` post: its run-state file `RUN.md`, read at the tip of `refs/remotes/<remote>/<run-branch>`
@@ -29,21 +30,21 @@ admit answers `held`:
     inventory <p> <sha>          (per withdrawn parent: its kept branch tip, design.inventory's input)
     route withdraw-too · parent <p> · owner-item · propose item.life.close withdrawn · left by record-kind.disposition
     route <value> · parent <p> · held: <state> admits no parent row
-    route none                   (no parent reads withdrawn, or no `parents:` key)
+    route none                   (no parent reads withdrawn, or no `parents:` or `depends-on:` key)
 
-`<p>` is each withdrawn parent, space-separated, in `parents:` order. The kept branch is the ref the
-parent's `run-branch:` fact names, else `branch-ref:`, resolved to its commit in `--root`.
+`<p>` is each withdrawn parent, space-separated, in `parents:` or `depends-on:` order. The kept branch is
+the ref the parent's `run-branch:` fact names, else `branch-ref:`, resolved to its commit in `--root`.
 `withdraw-too` proposes the build's withdrawal to the owner and moves nothing; its disposition is the
 owner's record. The route writes nothing: the caller records the move or files the owner item.
 
-`route` exits 0 with its answer; 2 printing `loop: unanswered · <why>` on an unreadable `parents:`
-slug, a state outside the build's open states, a policy refusal, `no kept branch`; and 2 printing
-`loop: unarmed · <why>` where the policy kit or the memory-tree kit does not resolve, never a default.
+`route` exits 0 with its answer; 2 printing `loop: unanswered · <why>` on an unreadable `parents:` or
+`depends-on:` slug, a state outside the build's open states, a policy refusal, `no kept branch`; and 2
+printing `loop: unarmed · <why>` where the policy kit or the memory-tree kit does not resolve, never a default.
 The loop kit takes no edge to the policy kit, which is why.
 
 `--fixture --plant <case>` builds a scratch repository holding the child build `tChild`, whose README
-names `parents: tParent`, and the parent's run-state file, commits `.governance/policy.toml` setting
-the key to `--value` where one is given, runs `route` there in `--state` (default `designing`), prints
+names `parents: tParent` (`depends-on: tParent` under the plant `depends-on-parent`), and the
+parent's run-state file, commits `.governance/policy.toml` setting the key to `--value` where one is given, runs `route` there in `--state` (default `designing`), prints
 whether the tree changed, and removes the scratch. `--selftest` runs every case through
 `run_selftest_cases`. Exit 0 when every case holds, 1 otherwise.
 
@@ -73,6 +74,7 @@ WITHDRAWN_PHASE = "ABORTED"
 #: The run facts naming the kept branch, in the order the unattended driver reads them.
 KEPT_FACTS = ("run-branch", "branch-ref")
 PLANTS = {"withdrawn-parent": "phase: ABORTED, run-branch naming a branch the scratch holds",
+          "depends-on-parent": "withdrawn-parent, the child README naming depends-on: tParent in place of parents:",
           "no-kept-branch": "phase: ABORTED, its run-branch ref deleted from the scratch",
           "live-parent": "phase: BUILDING",
           "no-parents": "the child README carries no parents: key",
@@ -95,7 +97,8 @@ def read_policy_kit():
 
 def read_withdrawn_parents(build, root):
     """`{parent slug: its run-state text, or None for no run record}` for each parent in `build`'s
-    README `parents:` that reads withdrawn or has no run record, in `parents:` order. A parent's text is
+    README `parents:` or `depends-on:`, the `after` targets of the memory-tree kit's `parse_relations`
+    (TOOL-dTotalRecall-6 S9), that reads withdrawn or has no run record, in written order. A parent's text is
     its `RUN.md` at the tip of `refs/remotes/<remote>/<run-branch>` where that ref holds the file, the
     remote by the loop kit's inline ladder and the branch the `run-branch:` fact of the tree's own copy,
     else the tree's copy (TOOL-dDeclaredLoop-56 S39). It reads withdrawn where `derive_phase_position`
@@ -104,20 +107,22 @@ def read_withdrawn_parents(build, root):
     phase the map refuses; LookupError where the memory-tree or policy kit does not resolve."""
     read_memory_tree("gen_build_index.py")
     from claims import resolve_remote
-    from gen_build_index import Problem, parse_front_matter
+    from gen_build_index import ORDER_TYPE, Problem, parse_front_matter, parse_relations, read_relation_rows
     from loop_table import derive_phase_position
     _policy, guard = read_policy_kit()
     memory_root = resolve_memory_root(root)
     builds = pathlib.Path(root) / memory_root / "builds"
     try:
         fm = parse_front_matter(str(builds / build / "README.md"), build)
+        parents = [e["target"] for e in parse_relations(fm, read_relation_rows(), str(root)) if e["type"] == ORDER_TYPE]
     except (Problem, OSError) as e:
         raise ValueError("the build %s's README does not read: %s" % (build, e)) from None
     remote = resolve_remote(root)[0]
     out = {}
-    for slug in fm.get("parents", "").split():
+    for slug in parents:
         if not (builds / slug).is_dir():
-            raise ValueError("parents: names %s, which is not a build folder under %s" % (slug, builds.as_posix()))
+            raise ValueError("parents: or depends-on: names %s, which is not a build folder under %s" % (
+                slug, builds.as_posix()))
         run = builds / slug / "RUN.md"
         text = run.read_bytes().decode("utf-8", "replace") if run.is_file() else None
         branch = (guard.read_run_fact(text, "run-branch") or "").strip().removeprefix("refs/heads/") if text else ""
@@ -196,7 +201,8 @@ def write_parent_plant(top, case, value):
     run_fixture_git(top, "init", "-q", "--template=", "-b", "main")
     write_fixture_files(top, {
         ".memory-tree.conf": "MEMORY_ROOT=memory\n",
-        "memory/builds/tChild/README.md": build_readme("tChild", "" if case == "no-parents" else "parents: tParent\n"),
+        "memory/builds/tChild/README.md": build_readme("tChild", {"no-parents": "", "depends-on-parent": "depends-on: tParent\n"}
+                                                       .get(case, "parents: tParent\n")),
         "memory/builds/tParent/README.md": build_readme("tParent")})
     if case != "no-run-record":
         write_fixture_files(top, {"memory/builds/tParent/RUN.md": run_text % phase})
@@ -263,6 +269,7 @@ def run_selftest():
              ("no run record", fx + ["no-run-record"], 0, "parent tParent · not withdrawn (no run record)", ""),
              ("no run record route", fx + ["no-run-record"], 0, "route none", ""),
              ("default", fx + ["withdrawn-parent"], 0, move % "replan", ""),
+             ("depends-on-parent", fx + ["depends-on-parent"], 0, move % "replan", ""),
              ("extra phase", fx + ["parent-in-extra-phase"], 0, "route none", ""),
              ("bogus", fx + ["withdrawn-parent", "--value", "bogus"], 2, "%s: unanswered" % SAY, KEY)]
     return run_selftest_cases(main, cases, "%s: parents selftest" % SAY)

@@ -107,3 +107,14 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-17-review-TOOL-aWalkedCorpus-3-4.md` (SHIP WITH FIXES), `2026-08-17-review-TOOL-aWalkedCorpus-3-3.md` (BLOCKED) and 2 more under reviews/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aWalkedCorpus/card` |
+<!-- /gen:build-routes -->

@@ -457,6 +457,7 @@ Cite ids, never line numbers.
 | [TOOL-dBoundRoles-74](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE plan WORKFLOW HAS NO LOOP ROW. TOOL-dBoundRoles-1 S4 adds the plan… |
 | [TOOL-dBoundRoles-75](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE BREAKER'S BUDGET DRAW HAS NO DRAWER. cl-dClosedLoop-0327 has an act… |
 | [TOOL-dBoundRoles-76](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE. TOOL-dWitnessedBar-84 S9 put… |
+| [TOOL-dBoundRoles-77](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | TOOL-dTotalRecall-17's map replay lost on recall, so the map renderer… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | DEFERRED | MED | TOOL-dCalibratedLens-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
@@ -468,6 +469,7 @@ Cite ids, never line numbers.
 | [TOOL-dCalibratedLens-54](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite unattended driver selftest shard 4/8 red at 2c50ab31 on… |
 | [TOOL-dCalibratedLens-55](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite unattended runlog-writer selftest red at 2c50ab31 on… |
 | [TOOL-dCalibratedLens-56](../builds/dCalibratedLens/BACKLOG.md) | OPEN | LOW | — | 2026-11-02 | run the losing test of each of the six opt-in review lenses… |
+| [TOOL-dCalibratedLens-57](../builds/dCalibratedLens/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | TOOL-dTotalRecall-17's map replay lost on recall, so no map is built:… |
 | [TOOL-dCarriedReceipt-1](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review's convergence predicate is scoped to ONE run's run-state file… |
 | [TOOL-dCarriedReceipt-2](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review makes CONVERGED terminal for a subject (unattended.sh:3135,… |
 | [TOOL-dCarriedReceipt-3](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a FOLD pass legitimately spans many units, and the dispatch machinery… |
@@ -521,6 +523,7 @@ Cite ids, never line numbers.
 | [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |
 | [TOOL-dFoldedVerdict-9](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-02 | RETIRING ANOTHER BUILD'S UNIT LEFT TWO CONSEQUENCES ON THAT BUILD'S OWN… |
 | [TOOL-dFurnishedOrders-21](../builds/dFurnishedOrders/BACKLOG.md) | DEFERRED | MED | TOOL-dFurnishedOrders-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dFurnishedOrders-62](../builds/dFurnishedOrders/BACKLOG.md) | OPEN | MED | — | 2026-11-22 | THE CODE SLOT HAS NO RECORD. TOOL-dFurnishedOrders-17 renders the work… |
 | [TOOL-dGatedProse-6](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | the join count in memory/map/features/spec-tokens.md is typed prose… |
 | [TOOL-dGatedProse-7](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | tools/template-size-limits.txt lines 69-70 misstate the build method's… |
 | [TOOL-dGatedProse-8](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | every existing memory-tree adopter keeps the retired guide cap after… |
@@ -563,6 +566,7 @@ Cite ids, never line numbers.
 | [TOOL-dIndexedDesign-28](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-14 | 2026-10-28 | THE ### Bug classes FIELD DOES NOT READ THE SCOUT.… |
 | [TOOL-dIndexedDesign-29](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-20 | 2026-10-28 | ROW F6 READS NO FEATURE-LEVEL RE-ENTRY. TOOL-dDeclaredLoop-13's row F6… |
 | [TOOL-dIndexedDesign-30](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-20 | 2026-10-28 | TWO DECLARED-DIRECTION CLASSIFIERS. PLAY-dOrderedCharter-36 S5 specs a… |
+| [TOOL-dIndexedDesign-54](../builds/dIndexedDesign/BACKLOG.md) | OPEN | MED | — | 2026-11-22 | THE CODE RECORD IS NOT BUILT. TOOL-dIndexedDesign-16 cites… |
 | [TOOL-dLandedOwners-5](../builds/dLandedOwners/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | DDECLAREDLOOP'S PENDING REVIEW CYCLE ROW READS STALE NOW THAT ITS BUILD… |
 | [TOOL-dLinkedLibrary-26](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | MED | TOOL-dLinkedLibrary-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dLinkedLibrary-27](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-1 | 2026-10-26 | A REUSE ENTRY BESIDE ITS DOSSIER IS NO OVERLAY PART.… |
@@ -575,6 +579,7 @@ Cite ids, never line numbers.
 | [TOOL-dLinkedLibrary-34](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-20 | 2026-10-26 | THE feature NAMESPACE ROW IS SPECCED WITHOUT ITS ROLE.… |
 | [TOOL-dLinkedLibrary-35](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | MED | TOOL-dLinkedLibrary-24 | 2026-10-26 | --all-ungated READS THE STAND-IN. TOOL-dFairHearing-15 S6 prints every… |
 | [TOOL-dLinkedLibrary-36](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-24 | 2026-10-26 | A GATED OR JUDGEMENT CLASS EARNS A LEFT-SHIFT. TOOL-dDeclaredLoop-20… |
+| [TOOL-dLinkedLibrary-103](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | HIGH | — | 2026-11-22 | THE CODE RECORD IS NOT BUILT. TOOL-dTotalRecall-8 lost its own… |
 | [TOOL-dMindYourWords-18](../builds/dMindYourWords/BACKLOG.md) | DEFERRED | MED | TOOL-dMindYourWords-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dMindYourWords-19](../builds/dMindYourWords/BACKLOG.md) | DEFERRED | LOW | TOOL-dMindYourWords-9 | 2026-10-29 | THE WORK ORDER HAS NO VOCABULARY SLOT. TOOL-dMindYourWords-9 hands the… |
 | [TOOL-dMindYourWords-20](../builds/dMindYourWords/BACKLOG.md) | DEFERRED | LOW | TOOL-dMindYourWords-9 | 2026-10-29 | NO HOOK PACK RENDERS INTO A GIT HOOK. TOOL-dWellOiledMachine-10's… |
@@ -716,23 +721,22 @@ Cite ids, never line numbers.
 | [TOOL-dTieredTribunal-22](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the uncounted filter(Boolean) predicate, the follow-up… |
 | [TOOL-dTieredTribunal-23](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the protocol gate arm TOOL-dTieredTribunal-13's F1 resolved to record… |
 | [TOOL-dTieredTribunal-24](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | two mechanical arms for the amendment-leaves-its-other-half-standing… |
-| [TOOL-dTotalRecall-27](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | MED | TOOL-dTotalRecall-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [TOOL-dTotalRecall-28](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-1 | 2026-10-26 | THE RECORD-KIND FACTORY HAS TWO OWNERS ON PAPER. TOOL-dPlacedRequest-1… |
-| [TOOL-dTotalRecall-29](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | MED | TOOL-dTotalRecall-3 | 2026-10-26 | THE SHARED REF WRITER MAY DELETE A CLAIM REF. TOOL-dTotalRecall-3 never… |
-| [TOOL-dTotalRecall-30](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-24 | 2026-10-26 | THE FEED CENSUS CANNOT SEE A RECORD COMMIT. TOOL-dPlacedRequest-13's… |
-| [TOOL-dTotalRecall-31](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-6 | 2026-10-26 | THE EDGE TABLE HAS NO README SITE. TOOL-dTotalRecall-6's deviation 61… |
-| [TOOL-dTotalRecall-32](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-22 | 2026-10-26 | AN EDGE ROW MAY OMIT ITS CARDINALITY. TOOL-dTotalRecall-22's deviation… |
-| [TOOL-dTotalRecall-33](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-21 | 2026-10-26 | TWO FUNCTIONS ARE NAMED build_index. PLAY-dOrderedCharter-18 moves… |
-| [TOOL-dTotalRecall-34](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-20 | 2026-10-26 | THE SHIM KINDS HAVE NO VERB. TOOL-dTotalRecall-20 forwards --new-build… |
-| [TOOL-dTotalRecall-35](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-12 | 2026-10-26 | THE SLICE CHANNEL HAS NO PRODUCER. TOOL-dTotalRecall-12 counts the work… |
+| [TOOL-dTotalRecall-27](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | MED | TOOL-dTotalRecall-14 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dTotalRecall-28](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE RECORD-KIND FACTORY HAS TWO OWNERS ON PAPER. TOOL-dPlacedRequest-1… |
+| [TOOL-dTotalRecall-33](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | TWO FUNCTIONS ARE NAMED build_index. PLAY-dOrderedCharter-18 moves… |
+| [TOOL-dTotalRecall-34](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SHIM KINDS HAVE NO VERB. TOOL-dTotalRecall-20 forwards --new-build… |
+| [TOOL-dTotalRecall-35](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SLICE CHANNEL HAS NO PRODUCER. TOOL-dTotalRecall-12 counts the work… |
 | [TOOL-dTotalRecall-101](../builds/dTotalRecall/BACKLOG.md) | OPEN | HIGH | — | 2026-10-26 | held red: suite policy fixtures red at 60d90cb7 on the daily held job,… |
-| [TOOL-dTotalRecall-102](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE MAP AND CODE SLOTS NAME dBoundRoles AS THEIR DELIVERY.… |
-| [TOOL-dTotalRecall-103](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE CODE RECORD LANDS NO NEIGHBOURHOOD READER. TOOL-dFurnishedOrders-17… |
 | [TOOL-dTotalRecall-104](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE MEMORY READ LIST IS RENDERED AS A SECOND BLOCK. TOOL-dTotalRecall-9… |
 | [TOOL-dTotalRecall-105](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE SHAPE-RUN KIND HAS NO ACT FORM. TOOL-dTotalRecall-11 admits only a… |
 | [TOOL-dTotalRecall-106](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE CAUSES CHECK READS NO BINDING. TOOL-dTotalRecall-19 S8's… |
 | [TOOL-dTotalRecall-107](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE ITEM BUDGET HAS NO PER-ROLE FORM. v2:1370 gives memory.item-budget… |
 | [TOOL-dTotalRecall-108](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE RECORD-KIND CHECK READS NO SERVES LINE OUTSIDE THE BUILD FOLDERS.… |
+| [TOOL-dTotalRecall-110](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE RECORD KINDS WITH NO PURPOSE. TOOL-dTotalRecall-16's… |
+| [TOOL-dTotalRecall-111](../builds/dTotalRecall/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | THE MAP LOST ITS REPLAY. TOOL-dTotalRecall-17's map-replay verdict is… |
+| [TOOL-dTotalRecall-112](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | THE THIRTY-DAY MEMORY VERDICT IS OWED. TOOL-dTotalRecall-12 lands the… |
+| [TOOL-dTotalRecall-113](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-11-23 | THE BUILD METHOD HAS NO ROOM FOR ITS OWN CAUSE LINE.… |
+| [TOOL-dTotalRecall-126](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE LEGS NOT SEEN RED AT THE CLOSE. python… |
 | [TOOL-dTracedLedger-2](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aSparedSpawn's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTracedLedger-3](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aOrientedCast's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTrackedAtlas-13](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite pre-push run-log line red at 9e21ac76 on the daily held… |
@@ -767,6 +771,7 @@ Cite ids, never line numbers.
 | [TOOL-dWellOiledMachine-129](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | TWO STALL AND LOOP CLASSES HAVE NO WRITER. cl-dClosedLoop-0473 trends… |
 | [TOOL-dWellOiledMachine-130](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE PRE-PUSH HOOK. TOOL-dWitnessedBar-73 S6 put… |
 | [TOOL-dWellOiledMachine-131](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | THE ACT IS THE NINTH FIELD OF derive_message_id. The act joins… |
+| [TOOL-dWellOiledMachine-961](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | TOOL-dTotalRecall-17's map replay lost on recall, so no map is built:… |
 | [TOOL-dWitnessedBar-31](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-28 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dWitnessedBar-32](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | THE enforces EDGE ROW OMITS principle. PLAY-dOrderedCharter-7 S2 admits… |
 | [TOOL-dWitnessedBar-33](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | THE DOSSIERS' gate-legs CLAIMS AND THE LEGS' tests EDGES ARE ONE FACT… |
@@ -786,3 +791,4 @@ Cite ids, never line numbers.
 | [TOOL-dWitnessedBar-113](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE SCRATCH-GUARD'S resolveCardBash PORTS THE OLD BASH ORDER.… |
 | [TOOL-dWitnessedBar-114](../builds/dWitnessedBar/BACKLOG.md) | OPEN | MED | — | 2026-11-21 | AN ADOPTER'S INSTRUCTIONS-LEGACY LIST READS EMPTY AFTER ITS UPDATE.… |
 | [TOOL-dWitnessedBar-1000](../builds/dWitnessedBar/BACKLOG.md) | OPEN | HIGH | — | 2026-11-21 | held red: suite unattended driver selftest shard 6/8 red at c2a407b0 on… |
+| [TOOL-dWitnessedBar-1001](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-24 | THE FACTORY READS A LEDGER HOME LITERALLY. The ratchet pack's never… |

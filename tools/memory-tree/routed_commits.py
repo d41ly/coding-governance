@@ -119,6 +119,7 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).resolve().parent
 if str(KIT) not in sys.path:
     sys.path.append(str(KIT))
+from tree_lib import read_slug_class  # noqa: E402  the slug grammar's class
 from tree_lib import (GIT_ENV_LEAKS, RED_FIX_TRAILER, build_git_env, build_spec_path_re, parse_conf,  # noqa: E402
                       parse_leg_names, parse_spec_h1, read_policy_value)
 from commit_trailers import derive_attribution, read_commits, read_key_table  # noqa: E402  the kit's one trailer reader
@@ -132,8 +133,9 @@ LOG_BATCH_BOUND = 500
 RECORD_BUCKET_HEX = 2
 #: TOOL-aNimbleMend-10 F1: the most paths under ROUTED_PATHS one `Red-fix:` commit may change.
 RED_FIX_MAX_PATHS = 3
-#: TOOL-aNimbleMend-10 F1: the most lines, added plus deleted, it may change over those paths.
-RED_FIX_MAX_LINES = 60
+#: TOOL-aNimbleMend-10 F1: the most lines, added plus deleted, it may change over those paths. Raised from
+#: 60 on the owner's word, 2026-11-26, to admit d0e02120b's 69 lines rather than rewrite pushed history.
+RED_FIX_MAX_LINES = 69
 ZERO_SHA_RE = re.compile(r"^0+$")
 SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
 #: Every git process this module starts, counted so the self-test can hold it constant (AC6).
@@ -177,7 +179,8 @@ def load_conf(repo: pathlib.Path) -> dict:
 def build_id_re(families):
     """A unit id as a whole token, over the declared family prefixes."""
     alt = "|".join(sorted(set(families))) or "(?!)"
-    return re.compile(r"(?<![A-Za-z0-9-])(?:" + alt + r")-[A-Za-z0-9]+-\d+(?![A-Za-z0-9-])")
+    slug = read_slug_class()   # the slug grammar's class (TOOL-dTotalRecall-5 S7)
+    return re.compile(r"(?<![A-Za-z0-9-])(?:" + alt + r")-(?:" + slug + r")-\d+(?![A-Za-z0-9-])")
 
 
 def extract_unit_ids(text: str, id_re) -> list:
@@ -1266,8 +1269,10 @@ def run_selftest() -> int:
             return rc, said.getvalue()
 
         fix_msg = "TOOL-tFix-1: fix {}\n\nRed-fix: leg one"
-        rows = [f"a{k}\n" for k in range(40)]
-        big = ["A0\n"] + [f"B{k}\n" for k in range(1, 31)] + rows[31:] + ["c2\n", "c3\n", "c4\n"]
+        # c4 swaps `half` rows and appends one: 2 * half + 1 lines, one or two over the bound, whatever it is.
+        half = (RED_FIX_MAX_LINES + 1) // 2
+        rows = [f"a{k}\n" for k in range(half + 10)]
+        big = ["A0\n"] + [f"B{k}\n" for k in range(1, half + 1)] + rows[half + 1:] + ["c2\n", "c3\n", "c4\n"]
         policy_toml = ".governance/policy.toml"
         repo, s = build_fixture(root, "limits", [
             {"msg": "init", "date": OLD_EPOCH, "files": {
@@ -1287,11 +1292,11 @@ def run_selftest() -> int:
         bound = f"; the bound is {RED_FIX_MAX_PATHS} and {RED_FIX_MAX_LINES}"
         print_arm(got[1][0] == 0 and "is inside all four" in got[1][1]
             and got[2][0] == 1 and f"L1 size: 4 path(s), 4 line(s){bound}" in got[2][1]
-            and got[3][0] == 1 and f"L1 size: 1 path(s), 61 line(s){bound}" in got[3][1]
+            and got[3][0] == 1 and f"L1 size: 1 path(s), {2 * half + 1} line(s){bound}" in got[3][1]
             and "L1" not in got[4][1] + got[5][1] + got[6][1],
             "TOOL-aNimbleMend-10 AC1 the verb exits 0 for a 3-line fix, and 1 naming L1, both counts and the bound "
-            "for four routed paths and for 30 lines deleted with 31 added; a path outside ROUTED_PATHS counts "
-            "toward neither", "\n".join(out for _rc, out in got))
+            f"for four routed paths and for {half} lines deleted with {half + 1} added; a path outside ROUTED_PATHS "
+            "counts toward neither", "\n".join(out for _rc, out in got))
         orig_guarded = globals()["read_guarded_paths"]
         try:
             globals()["read_guarded_paths"] = lambda: None
@@ -1318,13 +1323,13 @@ def run_selftest() -> int:
         rc, out = run_check(repo)
         under = out.split(limits_head)[-1]
         print_arm(rc == 1 and out.count(limits_head) == 1 and all(f"  {x[:8]} " in under for x in s[2:])
-            and f"  {s[1][:8]} " not in out and "red-fix limits · graded 6 · bound 3 path(s), 60 line(s) · 0 waived" in out
+            and f"  {s[1][:8]} " not in out and f"red-fix limits · graded 6 · bound 3 path(s), {RED_FIX_MAX_LINES} line(s) · 0 waived" in out
             and f"{SAY} FAILED — a commit touching" not in out,
             "TOOL-aNimbleMend-10 AC5 the leg exits 1 listing c3 to c7 under the limits header and not c2, the "
             "routing half green", out)
         set_fixture_conf(repo, ROUTED_COMMIT_WAIVED=" ".join(x[:12] for x in s[2:]))
         rc, out = run_check(repo)
-        print_arm(rc == 0 and "red-fix limits · graded 6 · bound 3 path(s), 60 line(s) · 5 waived" in out
+        print_arm(rc == 0 and f"red-fix limits · graded 6 · bound 3 path(s), {RED_FIX_MAX_LINES} line(s) · 5 waived" in out
             and limits_head not in out and "stale" not in out,
             "TOOL-aNimbleMend-10 AC5 the five shas waived, the leg exits 0, counts them, and reads none as stale", out)
         rc, out = run_check(repo, {"GATE_PUSH_BASE": s[0]})
@@ -1335,18 +1340,20 @@ def run_selftest() -> int:
         rc, out = run_check(repo)
         print_arm(rc == 1 and f"lists {s[1][:12]}" in out and out.count("stale") == 1,
             "TOOL-aNimbleMend-10 AC5 the sha of a fix inside every limit added, the leg reds it alone as stale", out)
-        sixty = "".join(f"n{k}\n" for k in range(20))
-        repo, s = build_fixture(root, "limit60", [
+        # The bound split over three paths, the remainder to the first ones: exactly RED_FIX_MAX_LINES lines.
+        third, extra = divmod(RED_FIX_MAX_LINES, 3)
+        added = ["".join(f"n{k}\n" for k in range(third + (1 if i < extra else 0))) for i in range(3)]
+        repo, s = build_fixture(root, "limitbound", [
             {"msg": "init", "date": OLD_EPOCH, "files": {"src/a.txt": "a\n", "src/b.txt": "b\n", "src/c.txt": "c\n",
                                                          SPEC1: "# TOOL-tFix-1 — one\n"}},
-            {"msg": fix_msg.format("at the bound"), "files": {"src/a.txt": "a\n" + sixty, "src/b.txt": "b\n" + sixty,
-                                                              "src/c.txt": "c\n" + sixty, "README.md": "x\n"}},
+            {"msg": fix_msg.format("at the bound"), "files": {"src/a.txt": "a\n" + added[0], "src/b.txt": "b\n" + added[1],
+                                                              "src/c.txt": "c\n" + added[2], "README.md": "x\n"}},
         ])
         set_fixture_conf(repo)
         rc, out = run_limits_verb(repo, s[1])
         print_arm(rc == 0 and "is inside all four" in out,
-            "TOOL-aNimbleMend-10 AC1 three routed paths and 60 changed lines are at the bound and not over it, a "
-            "fourth path outside ROUTED_PATHS beside them", out)
+            f"TOOL-aNimbleMend-10 AC1 three routed paths and {RED_FIX_MAX_LINES} changed lines are at the bound and "
+            "not over it, a fourth path outside ROUTED_PATHS beside them", out)
 
         # ---- TOOL-dTrueNorth-4 AC1-AC7 AC10 AC13: the deviation join's fixture over every plant, each
         # plant's failing case staged by the plant itself, and the record-late plant through this host.

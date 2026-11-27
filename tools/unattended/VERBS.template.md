@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.138 -->
+<!-- gov:kit unattended@1.139 -->
 [memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 
@@ -113,8 +113,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   what makes one `--paths` invocation the resume path's single source for both "which unit is next" and
   "where is its spec". A `spec-disposal:` line sits between those two, carries no TAB and holds the value
   a caller copies as `disposal`. The `next:` line is the loop kit's position engine's, `position.py
-  <slug> --next-line`, handed this verb's rows, the first undecided ask, each `parents:` build's derived
-  phase, `RESUME_STALE_BOUND` and the owed park sets in `GOV_POSITION_STATES`. It names the
+  <slug> --next-line`, handed this verb's rows, the first undecided ask, each `parents:` or `depends-on:`
+  build's derived phase, `RESUME_STALE_BOUND` and the owed park sets in `GOV_POSITION_STATES`. It names the
   LEAST-ADVANCED unit, a unit's step read from witnesses — its pass commit and acceptance record, the
   bar's `gates-run` tip, the remote-tracking tip — and never from a typed status word, so a MISSING,
   THIN or FORKED unit beside a READY one takes the line and the loop holds on it. A build whose
@@ -515,7 +515,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   run-state file, the unit's brief rows, the generated outputs and gen-region-only changes, must sit
   inside that pass's declarations; otherwise it refuses, naming each path and printing the
   `--dispatch` that widens the declaration while widening is still legal. No trailer on a subject
-  naming an open pass is refused too, asking for `Pass: <unit-id>` or `Pass: none`. It writes
+  naming an open pass is refused too, asking for `Pass: <unit-id>` or `Pass: none`. It also refuses a
+  `Decided:` line outside the message's final trailer block, where git reads no trailer. It writes
   nothing; a `--no-verify` commit skips it, and check 23 still grades that pass at the close. An
   AMEND of a pass commit is graded too, but an undeclared path in it is refused with no widening:
   a `--dispatch` would anchor at the commit the amend replaces, which check 23 never grades.
@@ -852,7 +853,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `extra`, `order` or `torn` line per finding, 0 otherwise. `--feed rebuild` writes the derived feed
   where none is present, `seq` from 1, and exits 2 naming one that is. `--feed print [--from <seq>]`
   replays every event at or after `<seq>`, in file order. It takes no slug and reads no remote;
-  `UNATTENDED-STOPS.md` §7 is what the feed records.
+  `UNATTENDED-STOPS.md` §7 is what the feed records. Every landing the lander makes also appends a
+  `record` event per distinct key of each landed commit touching a record under `MEMORY_ROOT`: ref
+  `refs/heads/<default>`, the record file's blob, `-` where it is absent after the commit, and the
+  commit, each key once: one the feed already holds is left out. `--feed check` also walks from every
+  such event's commit that any branch or remote-tracking branch reaches and holds the events to those
+  walks' keys, as sets, naming `missing`, `extra`, `duplicate` for a key a second line holds, or
+  `unread` for a `MEMORY_ROOT` that is no plain relative path or a walk git refuses; `--feed rebuild`
+  then appends the record events of the remote default branch's tracking ref, and exits 2 with
+  `feed: no record events were rebuilt: <why>` where none resolves.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it

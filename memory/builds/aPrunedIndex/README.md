@@ -1,9 +1,6 @@
 ---
 slug: aPrunedIndex
-node: a
 opened: 2026-11-25
-streams: tooling
-roster: TOOL
 ids: TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4 TOOL-aPrunedIndex-5 TOOL-aPrunedIndex-6 TOOL-aPrunedIndex-7 TOOL-aPrunedIndex-8 TOOL-aPrunedIndex-9 TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-11 TOOL-aPrunedIndex-12 TOOL-aPrunedIndex-13 TOOL-aPrunedIndex-14 TOOL-aPrunedIndex-15 TOOL-aPrunedIndex-16 TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-18 TOOL-aPrunedIndex-19 TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-21 TOOL-aPrunedIndex-22 TOOL-aPrunedIndex-23 TOOL-aPrunedIndex-24 TOOL-aPrunedIndex-25 TOOL-aPrunedIndex-26
 spec-audit: 2026-11-25
 ---
@@ -95,9 +92,26 @@ Ids whose spec moved past its audited revision: none — 8 of 8 unit id(s) carry
 | 6 | `TOOL-aPrunedIndex-17` | no |
 | 7 | `TOOL-aPrunedIndex-20` | no |
 | 8 | `TOOL-aPrunedIndex-24` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-26-prompt-TOOL-aPrunedIndex-24-1-spec-brief.md`, `2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md` and 8 more under prompts/ |
+| reviews | `2026-11-26-review-TOOL-aPrunedIndex-4-10-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-11-26-review-TOOL-aPrunedIndex-4-10-diff-review-round2.md` (CLEAN WITH FIXES) and 8 more under reviews/ |
+| deviation | `2026-11-26-build-TOOL-aPrunedIndex-20-deviation-1.md`, `2026-11-26-build-TOOL-aPrunedIndex-17-deviation-1.md` |
+| red-fix | `2026-11-27-build-TOOL-aPrunedIndex-17-red-fix-1.md` |
+| research | `2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md` |
+| logs | `2026-11-26-build-TOOL-aPrunedIndex-4-1-acceptance-ledger.md`, `2026-11-26-build-TOOL-aPrunedIndex-3-1-acceptance-ledger.md` and 8 more under build/ |
+| open asks | `BACKLOG.md`, 18 open |
+| card ref | `refs/gov/builds/aPrunedIndex/card` |
+<!-- /gen:build-routes -->

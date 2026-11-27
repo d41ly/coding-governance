@@ -425,7 +425,20 @@ _TABLE_HEADER = "[["
 # That difference is structural rather than lexical, which is why it is the one worth standing on: an
 # era can widen again, and a separator cannot be granted by widening one. `merge-rows.test.sh` case
 # 0d asserts both halves live before any arm leans on them.
-_ID_RE = re.compile(r"\b[A-Z]+-[A-Za-z0-9]+-[0-9]+[a-z]*\b")
+_ID_RE = None
+
+
+def read_id_re():
+    """`_ID_RE`, a row-leading id whose slug is the anchor root's slug grammar's (TOOL-dTotalRecall-5
+    S7), bound at first use beside the anchor grammar and through the same deferred sibling import,
+    so a broken grammar raises where `anchors()` raises and becomes a conflict."""
+    global _ID_RE
+    if _ID_RE is None:
+        anchors()
+        import id_grammar as EX  # noqa: PLC0415 — deliberately deferred; see `anchors`
+        slug = EX.derive_slug_grammar(str(_anchor_root())).slug_class
+        _ID_RE = re.compile(r"\b[A-Z]+-(?:" + slug + r")-[0-9]+[a-z]*\b")
+    return _ID_RE
 # A marker line is INVENTED by the merge, so it has no input count to be measured against, and the
 # same three markers legitimately repeat once per conflicting region. `|||||||` is written under
 # diff3 style, which `text_merge` now overrides at the call site — it is still recognised here
@@ -491,7 +504,7 @@ def row_ids(lines: list[str]) -> dict[str, int]:
     for ln in lines:
         if not _ROW_RE.match(ln):
             continue
-        m = _ID_RE.search(ln)
+        m = read_id_re().search(ln)
         if m:
             out[m.group(0)] = out.get(m.group(0), 0) + 1
     return out
@@ -541,7 +554,7 @@ def measure_row_classes(lines: list[str]) -> dict[str, int]:
             continue
         row = bk.extract_row(ln.strip(), grammar)
         if row is None or row.cls == "unknown" or not row.target:
-            m = _ID_RE.search(ln)
+            m = read_id_re().search(ln)
             if m:
                 out["id:" + m.group(0)] = out.get("id:" + m.group(0), 0) + 1
             continue

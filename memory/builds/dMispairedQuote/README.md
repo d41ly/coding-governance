@@ -117,9 +117,24 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-dMispairedQuote-1` | no |
 | 2 | `TOOL-dMispairedQuote-3` | no |
 | 3 | `TOOL-dMispairedQuote-2` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-01-prompt-TOOL-dMispairedQuote-1.md` |
+| reviews | `2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round3.md`, `2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round2.md` and 4 more under reviews/ |
+| logs | `2026-09-01-build-TOOL-dMispairedQuote-3-staged-red.md`, `2026-09-01-build-TOOL-dMispairedQuote-1-staged-red.md` and 1 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dMispairedQuote/card` |
+<!-- /gen:build-routes -->

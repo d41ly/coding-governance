@@ -3,7 +3,9 @@
 # One [[namespace]] row per namespace: `ns`, the word a tag opens with; `owner`, the chain build that owns it;
 # `layer`, the layer register row it belongs to; `source`, what it is minted from; `extractor`, the
 # `<module>:<function>` that reads that source; `role`, `selects` or `describes`; `purpose-source`, where its
-# members' purposes are read; `join-armed-by`, the build that arms its joins. A namespace word is read from here
+# members' purposes are read; `join-armed-by`, the build that arms its joins; and, optional, `minted`, whose one value `anywhere` says any
+# tracked file mints the namespace's tags, so no kit's layer owns them and the `owned` arm passes over it
+# (TOOL-dTotalRecall-114 S26). A namespace word is read from here
 # and never typed beside it. PLAY-dOrderedCharter-10 adds its eight rows; PLAY-dOrderedCharter-22 grades
 # `purpose-source` and `owner`: `owner` names a `[[build]]` row of <MEMORY_ROOT>/project/chain.toml, and `purpose-source`
 # is `<path>` (path-only), `<path>#<field>` (each member at a .toml path carries the field on its row, a .py path
@@ -191,6 +193,58 @@ role = "describes"
 purpose-source = "{prefix}/govkit/registry.toml"
 join-armed-by = "dWitnessedBar"
 
+[[namespace]]
+ns = "record"
+owner = "dTotalRecall"
+layer = "layer.memory"
+source = "each [[record-kind]] row's tag in {prefix}/memory-tree/record-kinds.toml, record.<kind> at its row, and one record row per id-anchored entry of the Markdown under MEMORY_ROOT, archive/ included, and per record file under a build's build, reviews or prompts folder, keyed by its id or its stem"
+extractor = "record_extract:extract_record"
+role = "describes"
+purpose-source = "{prefix}/playbook/record_extract.py"
+join-armed-by = "dTotalRecall"
+
+[[namespace]]
+ns = "section"
+owner = "dTotalRecall"
+layer = "layer.memory"
+source = "each heading of a record file or a spec under MEMORY_ROOT, section.<seg> from its authored tag, its kind's sections table in {prefix}/memory-tree/record-kinds.toml, or its derived anchor as memory.legacy-anchors admits"
+extractor = "record_extract:extract_section"
+role = "describes"
+purpose-source = "{prefix}/playbook/record_extract.py"
+join-armed-by = "dTotalRecall"
+
+[[namespace]]
+ns = "feature"
+owner = "dTotalRecall"
+layer = "layer.memory"
+source = "each feature-tag anchor of tracked code outside Markdown, feature.<seg> at its line"
+extractor = "record_extract:extract_feature"
+role = "describes"
+purpose-source = "{prefix}/playbook/record_extract.py"
+join-armed-by = "dTotalRecall"
+minted = "anywhere"
+
+[[namespace]]
+ns = "class"
+owner = "dTotalRecall"
+layer = "layer.memory"
+source = "each MEMORY_ROOT/gotchas/*.md record whose front matter reads kind class, class.<name> at its name line"
+extractor = "record_extract:extract_class"
+role = "describes"
+purpose-source = "{prefix}/playbook/record_extract.py"
+join-armed-by = "dTotalRecall"
+
+[[namespace]]
+ns = "marker"
+owner = "dTotalRecall"
+layer = "layer.memory"
+source = "each gov marker word of tracked text that fits seg, marker.<word> at its first line in a file"
+extractor = "record_extract:extract_marker"
+role = "describes"
+purpose-source = "{prefix}/playbook/record_extract.py"
+join-armed-by = "dTotalRecall"
+minted = "anywhere"
+
 # The native-id classes (PLAY-dOrderedCharter-28 S2), read by edge_grammar.read_native_classes: one [[native]]
 # row per class, `class`, the word an edge row's `from` or `to` names it by; `owner`, the build that registered
 # it; `pattern`, the `<module>:<name>` that compiles its ids, never a second regex; `resolver`, what prints its
@@ -214,3 +268,24 @@ class = "commit"
 owner = "dDeclaredLoop"
 pattern = "commit_trailers:SHA_RE"
 resolver = "commit_trailers:--print-commits"
+
+[[native]]
+class = "gap-key"
+owner = "dTotalRecall"
+pattern = "record_kinds:GAP_KEY_RE"
+resolver = "record_kinds:--print-gap-keys"
+
+# TOOL-dTotalRecall-19 S4: a record header's `Made-by` stand-in, `owner` or `lease-<slug>`, until the
+# intake and binding kinds name who made a record.
+[[native]]
+class = "made-by-stand-in"
+owner = "dTotalRecall"
+pattern = "record_causes:STAND_IN_RE"
+resolver = "record_causes:--print-stand-ins"
+
+# TOOL-dTotalRecall-19 S5: a record's key, its file stem, so a `Caused-by` names the record it follows.
+[[native]]
+class = "record-key"
+owner = "dTotalRecall"
+pattern = "tree_lib:RECORD_KEY_RE"
+resolver = "record_causes:--print-record-keys"

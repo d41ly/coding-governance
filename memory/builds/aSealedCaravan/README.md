@@ -98,7 +98,7 @@ from the status header of every spec in this folder — do not hand-edit it.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling
+**Build status:** CLOSED · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+playbook+tooling
 ids DEPL-aSealedCaravan-2 DEPL-aSealedCaravan-3 PLAY-aSealedCaravan-1 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2 TOOL-aSealedCaravan-3 TOOL-aSealedCaravan-4 TOOL-aSealedCaravan-5 TOOL-aSealedCaravan-6 TOOL-aSealedCaravan-7
 
 <!-- gen:build-units -->
@@ -126,3 +126,15 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-11-review-DEPL-aSealedCaravan-2-3.md` (BLOCKED), `2026-08-11-review-DEPL-aSealedCaravan-2-2.md` (BLOCKED) and 1 more under reviews/ |
+| logs | `2026-08-10-build-TOOL-aSealedCaravan-1-1.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aSealedCaravan/card` |
+<!-- /gen:build-routes -->

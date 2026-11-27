@@ -2,7 +2,7 @@
 
 **What it is.** A tag names one thing in the repository: `doc.build-method` is the build method
 guide, `doc.build-method#m5-recall-and-reuse` its `## M5` section. A tag is `<ns>.<seg>(.<seg>)*`,
-lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Eighteen
+lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Twenty-three
 namespaces are registered today, each read from the file that declares its members:
 
 | Namespace | Its members come from |
@@ -24,12 +24,18 @@ namespaces are registered today, each read from the file that declares its membe
 | `leg` | each row's `tag` in `tools/gate-legs.json`, as `leg.<owner>.<name>`, beside the leg's free-text `name`, which stays the key every file keyed by leg joins on |
 | `pack` | each distinct `pack` value of the rows of `tools/gate-legs.json`, as `pack.<word>` |
 | `check` | each `[[numbered_check]]` row of a kit descriptor, `id` and `leg`, beside its `[check]` table, as `check.<kit id>.<check id>` |
+| `record` | each `[[record-kind]]` row of `tools/memory-tree/record-kinds.toml`, as `record.<kind>` at its row, so a kind with no record file resolves; beside them each record under `memory/`, `memory/archive/` included, keyed by its id or its file's stem, which defines no tag |
+| `section` | each heading of a build record or a spec, as `section.<seg>`: its authored tag, the tag its kind's `sections` table maps its title to, such as `section.goal` for a spec's `## 1. Goal`, or its derived anchor as `memory.legacy-anchors` admits |
+| `feature` | each feature-tag anchor in tracked code, as `feature.<seg>`; none is written yet |
+| `class` | each `memory/gotchas/*.md` record whose front matter says `kind: class`, as `class.<name>` |
+| `marker` | each `gov:<word>` marker of tracked text, as `marker.<word>` |
 
 A namespace whose file declares nothing yet prints as `unarmed`, and nothing in it is graded: `step`
 and `item` until the loop definition lands, `command` until a descriptor holds a `[[command]]` row,
-`check` until one holds a `[[numbered_check]]` row.
+`check` until one holds a `[[numbered_check]]` row, `feature` until a feature-tag anchor is written.
 `policy` is graded today. A tag in a namespace no row registers is red: `role` joins when dBoundRoles
-registers it and `record` with dTotalRecall.
+registers it. `record` joined with dTotalRecall: `gov_tag.py show <id>#<tag>` prints one section of a
+record, `TOOL-dTotalRecall-9#section.goal` that spec's goal, the same text `gov_record.py show` prints.
 
 A catalogue key whose name carries a placeholder segment, such as `review.<stage>` or `budgets.*`, is
 not a tag. Its literal prefix is a family: a citation under it, such as `policy.review.<a stage>`, is
@@ -45,7 +51,8 @@ edited extractor re-reads the files it reads on the next build, and so does one 
 module was edited. A new format reads a file of its own name; a file stamped with another format is
 rebuilt in place, never deleted, so a session reading it keeps it, printing
 `tag-index — rebuilt: schema <old> to <new>`. An older format's file is left behind, unread, until you
-delete it. Deleting the file costs one rebuild. Two worktrees whose
+delete it. Deleting the file costs one rebuild. The same file holds memory-recall's full-text rows
+beside the tags, so a rebuild drops them too and the next recall query extracts them again. It holds the memory legs' rows too: the build index and the id walk the memory-hygiene check runs read each unchanged memory file's parse from it instead of parsing the file again, and each prints a `leg rows:` line naming how many files it read from the index and how many it parsed. Two worktrees whose
 extractor code differs keep their rows side by side in the one file, and each is served only the rows
 its own extractor code wrote, so switching between them re-parses nothing.
 An open that finds an SQL index missing from the file builds it once, under the write lock, printing
@@ -220,7 +227,7 @@ id pinned to a hash (`kit.y@1a2b3c4d`). The set, as `--list` prints it:
 | `cites` | `cited-by` | any | any | none, and derived from the text |
 | `serves` | `served-by` | `record`, `work-order`, `commit` | `family-id`, `item`, `build` | none |
 | `made-by` | `made` | `commit`, `record` | `act`, `owner` | none |
-| `caused-by` | `causes` | `record` | any | none |
+| `caused-by` | `causes` | `record` | any | clause |
 | `follows` | `followed-by` | `act` | `work-order` | none |
 | `answers` | `answered-by` | `return`, `answer` | `work-order`, `fork` | none |
 | `runs-in` | `hosts` | `act`, `claim`, `commit` | `session` | none |
@@ -251,12 +258,13 @@ resolver, the same way the `purpose` arm prints such an owner unarmed, so its me
 **Pinned forms.** A pin is written `@` and eight hex digits. A pinned tag (`kit.y@1a2b3c4d`) is
 legal only on `amends` and `supersedes`, and resolves when some committed revision of the tag's unit
 text hashes to it. A pinned clause id (`cl-dTrueNorth-0001@1a2b3c4d`) is legal only on
-`carries-clause`, and resolves when the clause's text at the design baseline or in some committed
+`carries-clause` and `caused-by`, and resolves when the clause's text at the design baseline or in some committed
 revision of the design view hashes to it, so a pin written before a deviation moved the clause still
 resolves.
 
 **Where edges are read.** Beyond the `**Edges:**` line: a record's `**Serves:**` line as `serves` and
-its `**Caused-by:**` and `**Made-by:**` lines; a spec's `**Carries:**` line as `carries-clause`; a
+its `**Caused-by:**` and `**Made-by:**` lines, or a typed record's `- **Caused-by:**` and
+`- **Made-by:**` fields, each key once, read by memory-tree's one header reader; a spec's `**Carries:**` line as `carries-clause`; a
 work order's `gov:handoff` marker's `unit=` and `build=` as `serves`; an instruction unit's `edges`,
 `scope`, `required-by` and `enforced-by`; a code note's `refs=` segment; and a commit's trailers,
 `Pass:`, `Gov-Unit:` and `Gov-Item:` as `serves`, `Gov-Act:` as `made-by`, `Gov-Session:` as
@@ -299,8 +307,18 @@ id's section (`PLAY-dOrderedCharter-24#goal`) stays `unarmed`.
 - **Check the tree:** `python tools/playbook/edge_grammar.py --check` reads every site and the commit
   trailers since the compare base (`--base <rev>` names another), resolves every target, and prints one
   line per red, then the edges by type and by site. The `edges` leg of the `tags` pack runs it.
+- **Count each edge per source and per target:**
+  `python tools/playbook/edge_grammar.py --cardinality --registry` counts every edge the tree check
+  reads, plus the build README relations, against the
+  `cardinality` each declared row of `edges.toml` carries: one `supersedes` per target, since a node has
+  one successor, and one `caused-by` per source, since a record has one cause; every other type is `many`.
+  `--registry` also checks that each record kind whose fields name a bounded type carries the same
+  bounds in its `cardinality` cell. It prints one line per violation and exits 1, or the edges and types
+  it read and exits 0. Two records superseding one decision on two branches merge clean in git, and this
+  reds the merged tree; `--fixture --plant cardinality-merge` shows it. The `edge cardinality` leg of the
+  `tags` pack runs it.
 - **See it red:** `python tools/playbook/edge_grammar.py --fixture --plant outside-to` checks a planted
-  `layer=kit.x` and exits 1. <!-- usage: script:tools/playbook/edge_grammar.py 71d8d8a6 -->
+  `layer=kit.x` and exits 1. <!-- usage: script:tools/playbook/edge_grammar.py bbbb4ab6 -->
 
 ## The three keys
 

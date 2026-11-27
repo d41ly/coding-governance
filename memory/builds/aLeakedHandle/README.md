@@ -89,6 +89,8 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-aLeakedHandle-1` | no |
 | 2 | `TOOL-aLeakedHandle-2` | no |
 
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
+
 Unordered: `TOOL-aLeakedHandle-3`.
 <!-- /gen:build-order -->
 
@@ -96,3 +98,17 @@ Unordered: `TOOL-aLeakedHandle-3`.
 
 - **Child builds:** [aRatifiedRulings](../aRatifiedRulings/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-10-prompt-TOOL-aLeakedHandle-3-1-build-brief.md`, `2026-09-10-prompt-TOOL-aLeakedHandle-2-1-build-brief.md` and 2 more under prompts/ |
+| reviews | `2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md` (BLOCKED), `2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md` (BLOCKED) and 2 more under reviews/ |
+| research | `2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md` |
+| logs | `2026-09-10-build-TOOL-aLeakedHandle-3-1-acceptance-ledger.md`, `2026-09-10-build-TOOL-aLeakedHandle-2-1-acceptance-ledger.md` and 1 more under build/ |
+| open asks | `BACKLOG.md`, 2 open |
+| card ref | `refs/gov/builds/aLeakedHandle/card` |
+<!-- /gen:build-routes -->

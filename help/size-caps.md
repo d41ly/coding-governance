@@ -67,6 +67,9 @@ switch never reaches it:
   record or a declared limit that is not a number, and a document whose own `**Budget:` line disagrees
   with its row), the spec-token checker's refusal of a limits row that is not a number, and the
   charter's cited files outside any cap.
+- **exempt** caps never reach the switch and can never be pinned: the memory slices a work order hands
+  a role, `handoff.py render --read <key>`, summed against `memory.item-budget` and answered by
+  `memory.over-budget` alone, so `budgets.enforce = "refuse"` never refuses a render over them.
 
 `budgets.pinned` refuses a name outside the switch, and a name the census does not hold.
 

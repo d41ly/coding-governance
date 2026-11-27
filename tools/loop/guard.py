@@ -140,7 +140,10 @@ SELF_KEYS = (("policy-file", "guard"), ("policy-file", "proof"), ("floor",))
 #: signer list, whose keys alone may sign a peer verdict (TOOL-dWitnessedBar-43 S2); a set is one leaf
 OWNER_ONLY_KEYS = (("verdict", "remote", "pin"), ("verdict", "peer", "signers"))
 #: a change record's name, the change kind's grammar under any memory root
-CHANGE_NAME = re.compile(r"(?:^|/)builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-[A-Za-z]+-[A-Za-z0-9]+-\d+-change-\d+\.md$")
+read_memory_tree("id_grammar.py")
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
+CHANGE_NAME = SlugPattern(lambda g: r"(?:^|/)builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-[A-Za-z]+-(?:" + g.slug_class
+                          + r")-\d+-change-\d+\.md$")
 REMEDY = ("loop-guard: the owner commits from a terminal, or an agent writes through the loop kit's policy_edit.py: "
           "`set` on a live run's branch, `raise` for one measured-file cap; every change carries its change record.")
 

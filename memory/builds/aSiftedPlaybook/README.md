@@ -239,3 +239,13 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-16-review-PLAY-aSiftedPlaybook-2-6.md` (BLOCKED), `2026-08-16-review-PLAY-aSiftedPlaybook-1-5.md` (CLEAN WITH FIXES) and 4 more under reviews/ |
+| card ref | `refs/gov/builds/aSiftedPlaybook/card` |
+<!-- /gen:build-routes -->

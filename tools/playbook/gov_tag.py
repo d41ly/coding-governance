@@ -2,6 +2,7 @@
 
     python gov_tag.py show|where|refs|check <address> [--json]
     python gov_tag.py bundle <address> [--inline --bytes <n>] [--under <dir>] [--json]
+    python gov_tag.py anchors <path>
     python gov_tag.py check [--base <rev>] [--only type-registered|target-resolves]
     python gov_tag.py --rebuild | --gc | --list-positional
     python gov_tag.py --fixture --plant <case> [--set <key>=<value>]
@@ -14,7 +15,9 @@ name-check slot (PLAY-dOrderedCharter-10), and the `purpose` arm, the namespace 
 `purpose-source` and the chain registry joined to the design view (PLAY-dOrderedCharter-22), and the `positional` arm, the
 tree's positional references against `positional-refs.txt` with every pinned line and symbol citation resolved
 (PLAY-dOrderedCharter-26, `positional.py`), the list under `<MEMORY_ROOT>/project/` (PLAY-dOrderedCharter-72).
-`bundle` prints the node and every inbound edge as ranges to pull, and `check --only` runs one edge arm alone (PLAY-dOrderedCharter-25, `tag_bundle.py`). An address is a tag, `doc.<name>#<seg>`, or a
+`bundle` prints the node and every inbound edge as ranges to pull, and `check --only` runs one edge arm alone (PLAY-dOrderedCharter-25, `tag_bundle.py`). `anchors`
+prints each untagged `##` heading of one file outside fences and generated regions with its derived anchor,
+`tags: anchor <line> <anchor>`, opening no index (TOOL-dTotalRecall-20). An address is a tag, `doc.<name>#<seg>`, or a
 positional label `aliases.toml` maps. `--gc` collects the index rows of every extractor version no live
 worktree derives (PLAY-dOrderedCharter-51 S5); it skips, naming it, a worktree that predates the registry,
 holding none on disk or in its HEAD tree, and refuses when any other worktree's registry or conf cannot be
@@ -139,6 +142,26 @@ def run_bundle_verb(con, root, kit_rel, address, aliases, *, sets, opts, as_json
                                  under=opts.get("under"), as_json=as_json)
 
 
+def run_record_show(root, address, as_json) -> int:
+    """`show <id>#<tag>` (TOOL-dTotalRecall-9 S5): the section memory-tree's `record_find.read_section`
+    slices, the reader `record show` runs, printed as `show` prints a row."""
+    ti.load_memory_tree()  # puts memory-tree, the finder's kit, on the path
+    import record_find
+    try:
+        sec = record_find.read_section(root, address)
+    except record_find.FindError as exc:
+        print(f"tags: {address} resolves to no row ({exc})")
+        return 1
+    if as_json:
+        print(json.dumps([{k: sec[k] for k in ("key", "tag", "path", "line", "end_line", "text")}], indent=2,
+                         sort_keys=True))
+        return 0
+    print(f"tags: {address} · {sec['path']}:{sec['line']}-{sec['end_line']} · section")
+    for ln in sec["text"].splitlines():
+        print(f"tags:   {ln}")
+    return 0
+
+
 def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel=None, opts=None) -> int:
     kit_rel = kit_rel or derive_kit_rel(root)
     opts = opts or {}
@@ -153,6 +176,9 @@ def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel
         if verb in ("show", "where", "refs", "bundle") and not address:
             print(f"tags: {verb} needs an address", file=sys.stderr)
             return 2
+        head, hashed, _seg = address.partition("#") if verb == "show" else ("", "", "")
+        if hashed and ti.parse_tag(head, {r["ns"] for r in ctx["namespaces"]})[1] is not None:
+            return run_record_show(root, address, as_json)
         if verb == "show":
             slice_ = read_key("tags.slice", root, sets, lambda: read_policy_value("tags.slice", root)[0][0])
             rows = (ti.resolve_address(con, address, slice_, aliases)
@@ -438,12 +464,47 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "positional-spec-revbump", "positional-bulk-move", "positional-archived", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
           "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "dead-versions", "named-probe", "released-rows",
-          "released-cost", "gc-predates", "held-key")
+          "released-cost", "gc-predates", "held-key", "repeat-heading",
+          "memory-records")
 #: TOOL-aPrunedIndex-17 S3: the plants `run_fixture` runs inside `set_git_held`; every other asks git each time
 HELD_PLANTS = ("dead-versions", "named-probe", "released-rows", "released-cost", "gc-predates")
 #: S1: the one full object id a held read names, alone or naming its tree, and every flag it may carry before its paths
 HELD_ID_RE = re.compile(r"[0-9a-f]{40}(\^\{tree\})?")
 HELD_FLAGS = frozenset({"--full-tree", "--name-only", "-r", "-z"})
+#: TOOL-dTotalRecall-9's `memory-records`: a build record whose untagged `## Findings` repeats, a legacy spec, a class
+#: record, a marker, and a guide citing a pocket kind no record file holds; `feature` declares nothing. The legacy
+#: spec's third heading derives a tag over TAG_MAX_BYTES, which the shape arm passes over (TOOL-dTotalRecall-114 S26)
+MEMORY_BUILD = "memory/builds/bFix"
+MEMORY_RECORD = "2026-01-01-build-TOOL-bFix-1-research-1"
+MEMORY_FILES = {
+    f"{MEMORY_BUILD}/README.md": "# bFix\n",
+    f"{MEMORY_BUILD}/build/{MEMORY_RECORD}.md": ("# research\n\n**Serves:** research TOOL-bFix-1\n\n## Findings\n\n"  # census: kept cause-writer fixture: a record head its fixture plants
+                                                "the first findings\n\n## Findings\n\nthe second findings\n"),
+    f"{MEMORY_BUILD}/spec/2026-01-01-spec-TOOL-bFix-1.md": ("# TOOL-bFix-1 — a fixture spec\n\n## 1. Goal\n\nthe goal\n\n"
+                                                           "## 2. Scope (IN)\n\nthe scope\n\n## A heading whose derived anchor runs "
+                                                           "past the byte cap the shape arm holds tags to\n\nlong\n"),
+    "memory/gotchas/fixture-class.md": "---\nname: fixture-class\ndescription: a planted class\nkind: class\n---\n# c\n",
+    "tools/corekit/marked.py": "# gov:fixture-mark\nx = 1\n",
+}
+
+
+def derive_memory_files() -> tuple[dict, str]:
+    """`memory-records`' files: the plant's records and memory-tree's record-kind registry at the fixture's
+    tool root, and the five memory namespace rows read from this kit's own registry (TOOL-dTotalRecall-9 S1)."""
+    tree_lib, _ = ti.load_memory_tree()
+    mt = pathlib.Path(tree_lib.__file__).parent
+    text = (KIT_DIR / "namespaces.toml").read_bytes().decode("utf-8").replace("\r\n", "\n")
+    rows = ["[[namespace]]" + r for r in text.split("[[namespace]]")[1:] if 'extractor = "record_extract:' in r]
+    rows = [r.split("\n# ")[0].rstrip("\n") + "\n" for r in rows]
+    files = dict(MEMORY_FILES)
+    files[instruction_units.derive_tool_rel(mt.name, "record-kinds.toml")] = (
+        (mt / "record-kinds.toml").read_bytes().decode("utf-8").replace("\r\n", "\n"))
+    return files, "\n" + "\n".join(rows)
+
+
+#: TOOL-dTotalRecall-10 S4's `repeat-heading`: one H2 repeated, then a heading whose own fold is the repeat's suffix
+REPEAT_GUIDE = ("# Repeat\n\n## Findings\n\nthe first findings\n\n## Findings\n\nthe second findings\n\n"
+                "## Findings 2\n\nthe third findings\n")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -680,6 +741,14 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
             files["memory/guides/ALPHA.md"] += "\nand [doc.nope]\n"
     if plant == "two-paths":
         files["memory/guides/BETA.md"] = GUIDE
+    if plant == "repeat-heading":
+        files["memory/guides/REPEAT.md"] = REPEAT_GUIDE
+    if plant == "memory-records":
+        extra, rows = derive_memory_files()
+        files.update(extra)
+        files[f"{kit}/namespaces.toml"] += rows
+        files[".memory-tree.conf"] += 'FAMILIES="tooling:TOOL"\n'
+        files["memory/guides/ALPHA.md"] = GUIDE + "\nthe pocket `record.witness` holds no record file\n"
     if plant == "unclosed-fence":
         files["memory/guides/ALPHA.md"] = GUIDE + UNCLOSED
     if plant == "unclosed-record":
@@ -1780,6 +1849,41 @@ def run_plant(root, top, plant, sets) -> int:
         same = print_equal(read_dump(root), read_cold_dump())
         rc = run_verb(root, "where", "doc.alpha#intro", sets=sets)
         return 0 if same and rc == 0 else 1
+    if plant == "memory-records":  # TOOL-dTotalRecall-9 AC1, AC2: the five namespaces over the fixture's records
+        run_verb(root, "rebuild", None, sets=sets)
+        con = ti.load_index(root)
+        try:
+            ti.load_view(con, root, ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml"))
+            state = ti.derive_namespace_state(con, ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml"))
+            goal = [r[1] for r in ti.read_rows(con, ("section",), tag="section.goal")]
+            keyed = [f"{t}={x}" for t, x in con.execute(
+                "SELECT p.tag, b.text " + ti.VIEW_JOIN + " JOIN blob_row b ON b.blob=p.blob AND b.extractor=p.extractor "
+                "AND b.version=p.version AND b.kind=p.kind AND b.line=p.line WHERE p.kind='record' AND p.path LIKE ?",
+                (f"{MEMORY_BUILD}/build/%",))]
+        finally:
+            con.close()
+        say("state", *(f"{ns} {state.get(ns, 0)}" for ns in ("record", "section", "feature", "class", "marker")))
+        say("section.goal", *goal)
+        say("record rows", *keyed)
+        rc = run_verb(root, "show", f"{MEMORY_RECORD}#section.findings-2", sets=sets)
+        rc |= run_verb(root, "show", "record.witness", sets=sets)
+        return rc | run_verb(root, "check", None, sets=sets)
+    if plant == "repeat-heading":  # TOOL-dTotalRecall-10 S4: each repeat its own address, none graded unique
+        run_verb(root, "rebuild", None, sets=sets)
+        con = ti.load_index(root)
+        try:
+            ti.load_view(con, root, ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml"))
+            rows = sorted(ti.read_rows(con, ("section",), like="doc.repeat#%"), key=lambda r: r[2])
+        finally:
+            con.close()
+        segs = [r[0].split("#", 1)[1] for r in rows]
+        served = read_served(root, "doc.repeat#findings-2")
+        body = [line for line in served.splitlines() if line.strip() and not line.startswith("#")]
+        say("sections", *segs)
+        say("findings-2 serves", *body)
+        rc = run_verb(root, "check", None, sets=sets)
+        ok = segs == ["findings", "findings-2", "findings-2-2"]
+        return 0 if ok and "the second findings" in served and "the first findings" not in served and rc == 0 else 1
     if plant == "dirty":
         other = top / "wt2"
         run_git(root, "worktree", "add", "-q", str(other), "-b", "two")
@@ -2090,9 +2194,45 @@ def run_positional_plant(root, top, plant, say, check) -> int:
     return 0 if ok and out_rc == 1 and kept else 1
 
 
+#: TOOL-dTotalRecall-20 §4 "The anchors verb": a heading already carrying an authored `[<tag>] `, and the two
+#: marker lines of a generated region, whose headings a writer re-renders and so are never tagged
+AUTHORED_TAG_RE = re.compile(r"\[[^\]\s]+\] ")
+GEN_REGION_RE = re.compile(r"<!-- (/?)gen:(\S+) -->")
+
+
+def print_heading_anchors(path) -> int:
+    """`anchors <path>` (TOOL-dTotalRecall-20 §4): one `tags: anchor <line> <anchor>` line per unfenced `##`
+    heading of the file at `path` outside a generated region whose text opens no `[<tag>] `, its anchor the
+    one `derive_anchor` gives it with one `seen` set, seeded with the authored `[section.<seg>]` tags'
+    anchors (TOOL-dTotalRecall-43 S44), over every unfenced `##` heading in document order, as
+    `extract_doc` walks them, so a repeated heading takes `-2` and `-3`. It opens no index and reads no
+    policy key. Exit 0, or 2 with a `tags: refused` line where the path does not read."""
+    try:
+        text = pathlib.Path(path or "").read_bytes().decode("utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        print(f"tags: refused · anchors {path}: {exc}", file=sys.stderr)
+        return 2
+    # TOOL-dTotalRecall-43 S44: the authored tags' anchors seed `seen` before any heading derives one
+    seen = ti.read_authored_anchors(line[3:].strip() for _n, line in ti.scan_unfenced(text) if line.startswith("## "))
+    region = None
+    for n, line in ti.scan_unfenced(text):
+        hit = GEN_REGION_RE.fullmatch(line.strip())
+        if hit and region is None and not hit[1]:
+            region = hit[2]
+        elif hit and hit[1] and hit[2] == region:
+            region = None
+        if not line.startswith("## "):
+            continue
+        head = line[3:].strip()
+        anchor = ti.derive_anchor(head, seen)
+        if anchor and region is None and not AUTHORED_TAG_RE.match(head):
+            print(f"tags: anchor {n} {anchor}")
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="gov_tag.py", description="the tag resolver (gov tag)")
-    ap.add_argument("verb", nargs="?", choices=("show", "where", "refs", "check", "bundle"))
+    ap.add_argument("verb", nargs="?", choices=("show", "where", "refs", "check", "bundle", "anchors"))
     ap.add_argument("address", nargs="?")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--base")
@@ -2119,6 +2259,8 @@ def main(argv=None) -> int:
     try:
         if a.fixture:
             return run_fixture(a.plant, sets)
+        if a.verb == "anchors":
+            return print_heading_anchors(a.address)
         root = resolve_repo_root()
         if a.list_positional:
             for row in read_positional(root):

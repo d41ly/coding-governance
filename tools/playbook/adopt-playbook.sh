@@ -298,7 +298,13 @@ fi
 # next six rows are PLAY-dOrderedCharter-70's: a TOML row placed on its own `tag =` line, a staged rename
 # serving the new name alone, and a charter moved by a committed and by an uncommitted conf edit; between
 # them, PLAY-dOrderedCharter-49's two: a dirty row leaves with its reverted edit, and a worktree re-created at
-# a gone one's path inherits none of its rows.
+# a gone one's path inherits none of its rows. The last six rows are TOOL-dTotalRecall-9's `memory-records`:
+# the five memory namespaces over a fixture build record whose untagged `## Findings` repeats, a legacy spec
+# whose `## 1. Goal` maps to `section.goal`, a pocket kind's `record.<kind>` citation resolved by its
+# registry row and an empty `feature` namespace printed unarmed. The two rows before them are TOOL-dTotalRecall-10's `repeat-heading`: a
+# repeated `##` heading derives `-2`, a later heading folding to that suffix searches past it to `-2-2`, the
+# second section serves its own text, and `check` grades no derived anchor for uniqueness. What they do not
+# check: a repeat across `##` and `###`, which the `doc` namespace does not derive.
 # run_plant_rows <label> <script>: one `<plant and flags>|<exit>|<must print>|<must not print>` row per stdin
 # line, each run as `<script> --fixture --plant <plant and flags>`; every failed row adds one to `_tf`.
 run_plant_rows() {
@@ -415,6 +421,14 @@ reference-row $_tk|0|h1 = "The fixture's reference page"|lacks h1
 reference-row $_tk|0|show: rc=0, check: rc=0
 reference-no-h1 $_tk|1|member doc.reference.fixture (|resolves to no row
 reference-no-h1 $_tk|1|/references.toml) lacks h1
+repeat-heading $_tk|0|tags: plant repeat-heading · sections findings findings-2 findings-2-2
+repeat-heading $_tk|0|tags: green · 0 red|doc.repeat#findings
+memory-records $_tk|0|section 5 feature 0 class 1 marker 1
+memory-records $_tk|0|tags: plant memory-records · record rows record.research=2026-01-01-build-TOOL-bFix-1-research-1
+memory-records $_tk|0|tags: plant memory-records · section.goal memory/builds/bFix/spec/2026-01-01-spec-TOOL-bFix-1.md
+memory-records $_tk|0|tags:   the second findings|tags:   the first findings
+memory-records $_tk|0|tags: record.witness · |resolves to no row
+memory-records $_tk|0|tags: unarmed feature (0 not graded)
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
 echo "PASS — the tag resolver's plants"
@@ -444,7 +458,14 @@ fi
 # over a scratch repository whose unit and clause texts moved under a second commit, beside the malformed
 # section, block and note refs segment. The `leg-` rows are TOOL-dWitnessedBar-22's leg-row site, each its
 # site named `gate-legs.json`: a `tests` target in a namespace the shipped registry lacks marked `unarmed`
-# and counted, a row's two edges resolved, and a rule-member `enforces` target marked and never resolved.
+# and counted, one in a registered namespace no tag is defined in read `unarmed`, a row's two edges resolved, and a
+# rule-member `enforces` target marked and never resolved.
+# The `cardinality-` rows are TOOL-dTotalRecall-22's: a declared row with its bound cut refused, the kind
+# registry's mirror differing from the bounds in memory, and two branches each superseding one node, clean
+# alone and red once merged clean; `cardinality-refused` is TOOL-dTotalRecall-53's refused record, and
+# `prose-pass` a prose `Pass:` value that refuses no read. The join under the rows (TOOL-dTotalRecall-121 S11) fails where
+# a plant `edge_grammar.py` admits opens no row of this block. What they do not check: a bound above 1, which
+# no row declares; and what a joined row asserts.
 _uk=; check_sibling_kit roles roles_lib.py || _uk=roles
 if [ -n "$_uk" ]; then echo "UNARMED — the edge grammar's plants: no $_uk kit in this install"; else
 _tf=0
@@ -489,6 +510,8 @@ bad-block|1|site.md:5: `**Edges:** tests=kit.y implements=kit.z` carries a secon
 bad-note-refs|1|site.py:1: `# gov:note layer.memory — x → y refs=a b` refs segment holds the target 'a b'
 leg-unregistered|0|edges: leg rows · 1 tests target(s) unarmed until their namespace is registered|is not registered
 leg-unregistered|0|edges: green · 1 edge(s)
+leg-unarmed|0|edges: green · 1 edge(s)|resolves to no row
+leg-unarmed|0| · tests · feature.x|leg rows
 leg-resolved|0|edges: resolved · gate-legs.json:
 leg-resolved|0|· tests=layer.memory · layer.memory
 leg-resolved|0|· enforces=practice.land · practice.land
@@ -496,7 +519,25 @@ leg-resolved|0|edges: green · 2 edge(s)|leg rows
 leg-rule-member|0|edges: leg rows · 1 enforces target(s) unarmed, practice rules core meta-check grades|=practice.land.paths ·
 leg-rule-member|0|edges: resolved · gate-legs.json:
 leg-rule-member|0|· enforces=practice.land · practice.land
+cardinality-missing|2|edge 'part-of' (row 1) lacks cardinality|NOT refused
+cardinality-mirror|1|cardinality: registry · deviation · caused-by per-source is "many" here, "1" in edges.toml
+cardinality-branch|0|cardinality: read 1 edges of 1 types, 0 line(s) refused and not counted; 0 violations|exceeded at
+cardinality-merge|1|edges: plant cardinality-merge · git merge was clean
+cardinality-merge|1|cardinality: supersedes per-target 1 exceeded at PLAY-xDec-1 by memory/builds/xAlpha/build/2026-11-22-build-PLAY-xAlpha-1-note.md:5, memory/builds/xBeta/build/2026-11-22-build-PLAY-xBeta-1-note.md:5
+cardinality-refused|0|edges: plant cardinality-refused · PASS
+prose-pass|0|edges: plant prose-pass · edges ['PLAY-dOrderedCharter-28'] · 2 unread · as expected
 PLANTS
+"$PY_BIN" - "$HERE" "$HERE/adopt-playbook.sh" <<'JOIN' || _tf=$((_tf+1))
+import pathlib, re, sys
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv[1])
+import edge_grammar
+text = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").replace("\r\n", "\n")
+block = text.partition("\nrun_plant_rows edges ")[2].partition("\nPLANTS\n")[0]
+unrun = [p for p in edge_grammar.FIXTURE_PLANTS if not re.search("^" + re.escape(p) + "[ |]", block, re.M)]
+print("arm ok    edges join" if not unrun else "arm FAIL  edges join — no row opens with: " + ", ".join(unrun))
+sys.exit(1 if unrun else 0)
+JOIN
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf edge-grammar arm(s) failed"; exit 1; fi
 echo "PASS — the edge grammar's plants"
 fi
@@ -539,4 +580,15 @@ code-at --budgets-enforce refuse|0|bytes of|BUDGET
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf load-set arm(s) failed"; exit 1; fi
 echo "PASS — the load sets' plants"
+fi
+
+# THE CODE RECORD'S ARMS (TOOL-dTotalRecall-8, its New arm line). `code_record.py --selftest` runs every fixture
+# of that spec's acceptance but the adopter-scale one over its own scratch repositories: definitions, calls,
+# mentions, the ambiguity test, invocations and registry edges, the neighbourhood, the cache, the ceiling, the
+# bounds and the ctags pack. Its blobs are read through memory-tree and its one key through the policy kit.
+_uk=; check_sibling_kit memory-tree tree_lib.py || _uk=memory-tree
+check_sibling_kit policy policy.py || _uk=${_uk:-policy}
+if [ -n "$_uk" ]; then echo "UNARMED — the code record's arms: no $_uk kit in this install"; else
+# The script's last command, whose status is the script's.
+"$PY_BIN" "$HERE/code_record.py" --selftest
 fi

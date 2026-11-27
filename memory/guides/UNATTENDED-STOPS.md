@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.138 -->
+<!-- gov:kit unattended@1.139 -->
 [memory/guides/UNATTENDED-STOPS.md · Level 3 · Binding for an unattended run that stops without finishing; yields to levels 0 to 2]
 # The unattended stop contract — HELD, the hold codes and the lease
 
@@ -297,6 +297,12 @@ Every claim read appends the cached commits past the ref's newest line, oldest f
 that line's commit or at a commit not authored `gov-claim`. `--feed check` holds the feed to
 what those cached refs derive, `--feed rebuild` writes it where none is present, and `--feed print`
 replays it from a `seq`. A pruned ref's events stay in the feed and out of the check.
+Every landing the lander makes appends one `record` event per distinct key of each landed commit
+that touches a tracked path under `MEMORY_ROOT`, ref `refs/heads/<default>`, kind `record`, the record
+file's blob (`-` where it is absent after the commit) and the commit, walking from the feed's newest
+`record` commit, so a landing this node only fetched joins too, and leaving out each key the feed
+already holds; an uncommitted write never does. `--feed check` walks from every logged `record`
+commit a branch reaches, compares the two key sets and names a key logged twice `duplicate`.
 
 **The observer clock** judges every lease deadline: a record's age is now minus the time this node
 first saw it, the `seen-utc` of its oldest line in this node's own feed, both on this node's clock,

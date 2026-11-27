@@ -129,9 +129,25 @@ Ids whose spec moved past its audited revision: none — 0 of 16 unit id(s) carr
 | 14 | `TOOL-aNimbleMend-14` | no |
 | 15 | `TOOL-aNimbleMend-15` | no |
 | 16 | `TOOL-aNimbleMend-27` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-13-prompt-TOOL-aNimbleMend-27-build-brief.md`, `2026-11-13-prompt-TOOL-aNimbleMend-27-brief.md` and 21 more under prompts/ |
+| reviews | `2026-11-12-review-TOOL-aNimbleMend-1-closing-diff-review-round1.md` (CLEAN WITH FIXES) |
+| override | `2026-11-13-build-TOOL-aNimbleMend-15-override-1.md` |
+| logs | `2026-11-13-build-TOOL-aNimbleMend-27-1-acceptance-ledger.md`, `2026-11-13-build-TOOL-aNimbleMend-1-runlog-91ca33f2.md` and 15 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aNimbleMend/card` |
+<!-- /gen:build-routes -->

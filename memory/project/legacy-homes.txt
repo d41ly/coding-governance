@@ -42,7 +42,6 @@
 .memory-tree.conf	PROJECT_REGISTRY_EXTRA	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 .memory-tree.conf	READINESS_ROWS	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 .memory-tree.conf	READ_PATH_WAIVER	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-.memory-tree.conf	RECALL_CACHE_BUDGET_MB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 .memory-tree.conf	RECALL_EXCLUDE	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 .memory-tree.conf	RECALL_EXTRA_SOURCES	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 .memory-tree.conf	RECALL_FLOOR	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

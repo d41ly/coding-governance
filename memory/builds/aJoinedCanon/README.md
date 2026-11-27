@@ -138,9 +138,23 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 | 9 | `TOOL-aJoinedCanon-9` | no |
 | 10 | `TOOL-aJoinedCanon-10` | no |
 | 11 | `TOOL-aJoinedCanon-11` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 - **Parent builds:** [aWeighedCanon](../aWeighedCanon/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-09-07-review-TOOL-aJoinedCanon-1-diff-review-round1.md` (CLEAN WITH FIXES), `2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md` and 2 more under reviews/ |
+| logs | `2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 3 open |
+| card ref | `refs/gov/builds/aJoinedCanon/card` |
+<!-- /gen:build-routes -->

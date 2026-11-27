@@ -157,3 +157,14 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-07-19-review-PLAY-aPrunedCeremony-1-2.md`, `2026-07-19-review-PLAY-aPrunedCeremony-1-1.md` |
+| logs | `2026-07-19-build-PLAY-aPrunedCeremony-1-1.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aPrunedCeremony/card` |
+<!-- /gen:build-routes -->

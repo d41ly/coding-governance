@@ -49,3 +49,14 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-23-review-TOOL-dScrubbedConduit-1-verdicts.md` (BLOCKED), `2026-08-23-review-TOOL-dScrubbedConduit-1-specdoc.md` (CLEAN WITH FIXES) and 2 more under reviews/ |
+| logs | `2026-08-23-build-TOOL-dScrubbedConduit-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dScrubbedConduit/card` |
+<!-- /gen:build-routes -->

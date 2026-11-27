@@ -50,3 +50,13 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-07-16-review-TOOL-bTamedTempest-1-1.md` |
+| logs | `2026-07-16-build-TOOL-bTamedTempest-1-1.md` |
+| card ref | `refs/gov/builds/bTamedTempest/card` |
+<!-- /gen:build-routes -->

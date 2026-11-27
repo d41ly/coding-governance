@@ -75,7 +75,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 19 unit(s) · node a · opened 2026-10-09 · streams tooling+playbook+deployer
+**Build status:** CLOSED · 19 unit(s) · node a · opened 2026-10-09 · streams deployer+playbook+tooling
 ids DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10
 ids TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-14 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16 TOOL-aFrugalTurnstile-17 TOOL-aFrugalTurnstile-18
 
@@ -125,9 +125,25 @@ Ids whose spec moved past its audited revision: none — 0 of 19 unit id(s) carr
 | 6 | `TOOL-aFrugalTurnstile-12`, `TOOL-aFrugalTurnstile-14`, `TOOL-aFrugalTurnstile-17` | no |
 | 7 | `TOOL-aFrugalTurnstile-13`, `TOOL-aFrugalTurnstile-15` | no |
 | 8 | `TOOL-aFrugalTurnstile-16` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md`, `2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md` and 1 more under prompts/ |
+| reviews | `2026-10-10-review-TOOL-aFrugalTurnstile-1-11-diff-review-round1.md` (CLEAN WITH FIXES) |
+| research | `2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md` |
+| logs | `2026-10-10-build-TOOL-aFrugalTurnstile-16-1-acceptance-ledger.md`, `2026-10-10-build-TOOL-aFrugalTurnstile-1-2-measurement.md` and 19 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aFrugalTurnstile/card` |
+<!-- /gen:build-routes -->

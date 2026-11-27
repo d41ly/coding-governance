@@ -122,9 +122,25 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 | 9 | `TOOL-aGradedMandate-9` | no |
 | 10 | `TOOL-aGradedMandate-10` | no |
 | 11 | `TOOL-aGradedMandate-11` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-08-31-prompt-TOOL-aGradedMandate-1-owner-brief.md` |
+| reviews | `2026-08-31-review-TOOL-aGradedMandate-10-promotion-audit.md`, `2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md` and 3 more under reviews/ |
+| research | `2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md` |
+| logs | `2026-08-31-build-TOOL-aGradedMandate-11-closing-loop-census.md`, `2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aGradedMandate/card` |
+<!-- /gen:build-routes -->

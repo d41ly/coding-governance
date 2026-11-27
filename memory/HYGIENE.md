@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.180 -->
+<!-- gov:kit memory-tree@2.183 -->
 [memory/HYGIENE.md · Level 3 · Read before writing any record, index or id under the memory root; yields to levels 0 to 2]
 # memory/ retention & hygiene
 
@@ -188,14 +188,19 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
 
 - Every new tracked id is `FAMILY-<slug>-<seq>`, owned by the session that mints it, so nothing it
   numbers can be contested.
-- The slug is the node's tag from the charter's node registry plus a fresh CamelCase adjective-noun,
-  `[A-Za-z]` only, minted ONCE per session; the tag's letter makes two nodes' slugs disjoint.
+- The slug is the node's tag from the charter's node registry plus fresh words, minted ONCE per
+  session; the tag's letter makes two nodes' slugs disjoint. Its shape is the slug grammar's, the policy
+  keys `builds.slug-words`, `builds.slug-style` and `builds.slug-date` as `derive_slug_grammar` in the
+  memory-tree kit's `id_grammar.py` derives them, and a new build's README records it as `slug-grammar:`.
 - `<seq>` is a plain 1-up per session and family, unpadded: a label, never a rank. The next one is the
   numeric maximum of YOUR ids in that family plus one, carried in session state, because an
   uncommitted id is invisible to grep.
 - Before using a slug, grep the whole memory tree for `[A-Z]+-<slug>-[0-9]` at all times, archives
   included, and scan the live rows of the work-state index; re-roll on any hit.
-- No reserve-above-a-marker, no shared counter and no renumber-on-merge: the slug is the guarantee.
+- Within a build, no reserve-above-a-marker, no shared counter and no renumber-on-merge: the slug,
+  claimed once at `refs/gov/claims/<slug>`, is the guarantee. A filer outside a build, one filing an
+  ask in another build's family, mints the id through `gov-claim.sh ask`, under that family's counter
+  ref `refs/gov/claims/asks/<FAMILY>-<slug>`.
 - A session is one continuous effort under one slug, across work-units and families; a resumed or
   summarized session keeps its slug.
 - A fan-out child never mints: its orchestrator does, or the child takes a slug of its own.
@@ -285,8 +290,13 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
    It REPORTS the number of rows it graded, because its population guard counts shard FILES: a waiver
    over most of the rows otherwise reads as a green check over a population nobody sees.
 9. **build-index drift** — `tools/memory-tree/gen_build_index.py --check` must be clean. The index is
-   DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
-   column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
+   DERIVED from each build's README front matter (`slug opened ids [status]`, at column 0, opening at
+   line 1) plus every `**Status:**` header under its `spec/`. The key set is the generator's
+   `FRONT_MATTER_KEYS`, each key's role, type and requiredness declared once: a key it does not name
+   and a value its type refuses are NAMED errors. `node`, `roster` and `streams` are DERIVED and not
+   typed (`--print-front-matter <slug>` prints them); a README the `build-readme-typed-derived`
+   population lists may still type them, read and never refused, the derivation winning in every
+   render (`TOOL-dTotalRecall-4`). A build with no
    README, an unpaired generated-region marker, or two answers to its own status is a NAMED error.
    Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them. While any
    file under `archive/` is untracked, `--check` and `--write` both REFUSE and name it: the index
@@ -295,8 +305,9 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
    `--check` reports only what `--write` cures: the as-built view DESIGN_VIEW names is one more
    artifact, its byte drift listed under the same `--write` remedy, and its other findings, which
    `--write` cannot cure, are check 30's (`TOOL-dTrueNorth-16`).
-   A build README carries four generated regions, in this order: `<!-- gen:build-index -->`,
-   `<!-- gen:build-coverage -->`, `<!-- gen:build-order -->` and `<!-- gen:build-edges -->`.
+   A build README carries five generated regions, in this order: `<!-- gen:build-index -->`,
+   `<!-- gen:build-coverage -->`, `<!-- gen:build-order -->`, `<!-- gen:build-edges -->` and
+   `<!-- gen:build-routes -->`, the last routing a reader to each record by purpose.
    `--write` creates a missing pair and `--check` never demands one, save the coverage pair: it renders
    the design clauses' coverage from the carries join `SPEC_CARRIES_CUTOFF` arms, every field with an
    explicit none, so `--write` creates it only in a chain build's README, one the design view's Build
@@ -666,7 +677,9 @@ carry it too:
 ```
 
 - `<kind>` is closed: `spec-audit` (a pre-code pass over a spec) · `diff-review` (a pass over built
-  code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs) ·
+  code) · `log` (evidence of what was built; `journal`, its name until TOOL-dTotalRecall-18, is a
+  read-only alias still bound and graded as `log`, and no writer emits it) · `research` (a report
+  that precedes the specs) ·
   `deviation` (a departure from the design or from a spec, in the grammar under "Deviation records") ·
   `exception` (a principle excused for one part, minted by `PLAY-dOrderedCharter-7`'s record factory) ·
   `override` (minted by `PLAY-dOrderedCharter-2`) · `change` (minted by `PLAY-dOrderedCharter-15`) ·
@@ -683,7 +696,10 @@ carry it too:
   step, its snapshot, fields `Build`, `Step` and `Ref` and the card's text in one `~~~~` fenced block)
   · `probe-trigger` (a probe opened at an item boundary, fields `Cause`, `Asker`, `Subject`, `At` and
   `Key`) · `probe` (the probe it opened: its pinned head, its `## Method` entries, its run lines and
-  its `Verdict` beside `Judged`, written by the loop kit's `probe.py`) · `mailbox-message` (one
+  its `Verdict` beside `Judged`, written by the loop kit's `probe.py`) · `stream-plan` (a build's
+  units grouped into ordered streams, no field and one TOML fence of `[[stream]]` tables, written by
+  dIndexedDesign's planner) · `shape-run` (one review exit's `review-shape` line as typed fields,
+  written by `gov_record.py new shape-run`, TOOL-dTotalRecall-11) · `mailbox-message` (one
   mailbox message a build's transition disposed, fields `Id`, `From`, `To`, `Kind`, `Subject`,
   `Answers`, `State`, `Reply` and `Ref` and its body in one `~~~~` fenced block, written by the loop
   kit's transition writer). The typed kinds, `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py`, are
@@ -716,6 +732,15 @@ carry it too:
 - The check REFUSES when that report exits non-zero or prints no `N` row. The report is the only
   thing check 21 reads, so a report that did not run would otherwise look exactly like a clean
   corpus. An adopter whose generator is a fork must carry the mode, or this check names that first.
+- A record written after the causes seed also carries `**Caused-by:** <target>` within those first
+  unfenced lines (`tree_lib.py`'s `BIND_HEAD_LINES`), directly under its Serves line: `<target>` is a
+  family id the corpus defines or a record key, bare, never pinned `@rev-N` and never an `N..M` run.
+  `gov_record.py new <kind> --caused-by <target>` is the door that writes it. `record_causes.py --check`
+  reds a new record that names none (`TOOL-dTotalRecall-19`), and its writer census reds a code file
+  that spells a Serves line and no cause (`TOOL-dTotalRecall-36`). A non-Markdown record writes its cause
+  line behind the comment prefix its Serves line uses, `# **Caused-by:** <target>` under a
+  `# **Serves:**` line, and a cause or made-by line whose prefix differs from its Serves line's is
+  refused (`TOOL-dTotalRecall-51`).
 
 **Deviation records.** A departure from the frozen design, or from a spec once its code has started,
 is a `deviation` record named `<date>-build-<unit id>-deviation-<n>.md` in the departing build's
@@ -802,10 +827,84 @@ those shapes and an Answers naming no recommendation record of the build. The un
 `--recommend` calls it; the newest score record of a stage and the reason answering it are the pair
 that decides.
 
+## Record kinds — the registry's view
+
+Every record kind is declared once, as a `[[record-kind]]` row of `tools/memory-tree/record-kinds.toml`; the
+table below is GENERATED from it by `python tools/memory-tree/record_kinds.py --write`, and the `record-kinds`
+leg reds it when it differs by one byte. A kind joins through `record_kinds.py new`, never by an edit here.
+The `Purpose` cell is the row's declared purpose, `—` while it is pending on an owner ask or a ledger.
+
+<!-- gen:record-kinds -->
+
+57 kinds · 28 purposes pending
+
+| Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |
+|---|---|---|---|---|---|---|---|
+| `spec` | `record.spec` | `memory/builds/*/spec/*.md` | `gov_record.py new spec` | `gov-builder`, `gov-diff-reviewer`, `gov-skeptic`, `gov-spec-reviewer`, `gov-spec-writer`, `gov-synthesizer`, `gov-tester` | `gov-spec-writer` | `memory hygiene` | its writer is `design.unit-spec`; the spec redesigned as a structured, tagged contract |
+| `build-readme` | `record.build-readme` | `memory/builds/*/README.md` | `gov_record.py new build-readme` | — | — | `memory hygiene` | the build README's declared front-matter schema, with unknown keys refused; writer item not named |
+| `spec-audit` | `record.spec-audit` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | — | `gov-synthesizer` | `memory hygiene` | — |
+| `diff-review` | `record.diff-review` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | — | `gov-synthesizer` | `memory hygiene` | — |
+| `log` | `record.log` | `memory/builds/*/prompts/*.md` | `gov_record.py new log` | `gov-builder`, `gov-orienter`, `gov-researcher`, `gov-session`, `gov-spec-reviewer`, `gov-spec-writer` | — | `memory hygiene` | the journal grammar moved into the core; writer item not named |
+| `research` | `record.research` | `memory/builds/*/build/*.md` | `gov_record.py new research` | — | — | `memory hygiene` | — |
+| `run-record` | `record.run-record` | `memory/builds/*/build/*-runlog-*.md` | `runlog.py record --write` | — | — | `runlog record schema` | observability's journal reader writes it when the journal shows a run closed, as `observability.run-record` says |
+| `backlog-row` | `record.backlog-row` | `memory/backlog/*.md` | `hand` | — | — | `memory hygiene` | the ask register's row store; the memory contract declares it; writer item not named |
+| `design-record` | `record.design-record` | `memory/builds/*/build/*-architecture-v*.md` | `gov_record.py new design-record` | — | — | `memory hygiene` | a core memory kind with no writer item; the memory contract declares it |
+| `dossier` | `record.dossier` | `memory/map/features/*.md` | `hand` | — | — | `codebase-map gate coverage` | dossiers anchored to symbol keys; its writer, where the map is installed, is `build.unit-pass`, the claiming dossier's |
+| `deviation` | `record.deviation` | `memory/builds/*/build/*-build-*-deviation-*.md` | `gov_record.py new deviation` | — | — | `memory hygiene` | the record kept in its departing build's `build/` folder, read by the deviation join, the as-built view |
+| `exception` | `record.exception` | `memory/builds/*/build/*-build-*-exception-*.md` | `build_records.py new exception` | — | — | `memory hygiene` | the exception register, kept in the building build's `build/` folder as a deviation record is; writer item not named |
+| `override` | `record.override` | `memory/builds/*/build/*-build-*-override-*.md` | `build_records.py new override` | — | — | `memory hygiene` | `charter.override` and its record, under the precedence and override rule, the record kept in the building build's |
+| `change` | `record.change` | `memory/builds/*/build/*-build-*-change-*.md` | `build_records.py new change` | — | — | `memory hygiene` | — |
+| `red-fix` | `record.red-fix` | `memory/builds/*/build/*-build-*-red-fix-*.md` | `build_records.py new red-fix` | — | — | `memory hygiene` | — |
+| `disposition` | `record.disposition` | `memory/builds/*/build/*-build-*-disposition-*.md` | `build_records.py new disposition` | — | `item.entry.place-owner`, `item.build.ratify` | `memory hygiene` | the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt. |
+| `acceptance` | `record.acceptance` | `memory/builds/*/build/*-build-*-acceptance-*.md` | `loop_witness.py acceptance` | — | `item.build.acceptance` | `memory hygiene` | its writer is `build.acceptance`; dDeclaredLoop builds the witnesses computed rather than typed, the acceptance re-run |
+| `transition` | `record.transition` | `memory/builds/*/build/*-build-*-transition-*.md` | `loop_transition.py record` | — | `item.plan.exit`, `item.design.exit`, `item.build.exit`, `item.test.exit`, `item.deploy.close` | `memory hygiene` | the transition record three ways; every step's exit item writes it: `plan.exit`, `design.exit`, `build.exit` |
+| `recommendation` | `record.recommendation` | `memory/builds/*/build/*-build-*-recommendation-*.md` | `build_records.py new recommendation` | — | `item.plan.recommend`, `item.design.recommend`, `item.build.recommend`, `item.test.recommend`, `item.deploy.recommend` | `memory hygiene` | every `*.recommend` item writes it; the stage-exit recommendation is one mechanism, dDeclaredLoop's (AF-1) |
+| `widen` | `record.widen` | `memory/builds/*/build/*-build-*-widen-*.md` | `ratchet.py widen` | — | — | `memory hygiene` | — |
+| `leg-tail` | `record.leg-tail` | `memory/builds/*/build/*-build-*-leg-tail-*.md` | `keep_tails.py` | — | — | `memory hygiene` | — |
+| `flake` | `record.flake` | `memory/builds/*/build/*-build-*-flake-*.md` | `verdict_flow.py flakes` | — | `item.test.flakes` | `memory hygiene` | its writer is `test.flakes`; flake quarantine |
+| `gate-health` | `record.gate-health` | `memory/builds/*/build/*-build-*-gate-health-*.md` | `drift_report.py --gate-health --write` | — | — | `memory hygiene` | — |
+| `card` | `record.card` | `memory/builds/*/build/*-build-*-card-*.md` | `manifest-check.sh --card --follow` | — | — | `memory hygiene` | the build's orientation card at level 1, its stores and snapshot; its writer is `entry.orient`, which composes it |
+| `probe-trigger` | `record.probe-trigger` | `memory/builds/*/build/*-build-*-probe-trigger-*.md` | `probe.py trigger` | — | `item.probe.trigger` | `memory hygiene` | its writer is `probe.trigger`: why the probe opened, keyed by the boundary or the raising return, or by content for a |
+| `probe` | `record.probe` | `memory/builds/*/build/*-build-*-probe-*.md` | `probe.py pin` | — | `item.probe.pin`, `item.probe.run`, `item.probe.judge`, `item.probe.return` | `memory hygiene` | its writer is `probe.return`: one record per probe, its kind a verification, a reproduction or an experiment, an |
+| `mailbox-message` | `record.mailbox-message` | `memory/builds/*/build/*-build-*-mailbox-message-*.md` | `loop_transition.py record` | — | — | `memory hygiene` | one mailbox message a build's transition disposed, its fields and its body in one fenced block |
+| `view` | `record.view` | `memory/LIVE.md`, `memory/ledger/*.md`, `memory/map/generated/*` | `gen_build_index.py --write` | — | — | `memory hygiene` | a generated view: LIVE.md, the ledger, the ask views; re-rendered, never merged (the away pass); writer item not named |
+| `registry` | `record.registry` | `memory/project/*.txt`, `memory/project/*.toml` | `hand` | — | — | `ratchet (never gains)` | a gate's row registry under `memory/project/`, written by its gate's pin emitter (the away pass); writer item not named |
+| `archive` | `record.archive` | `memory/archive/**` | `hand` | — | — | `memory hygiene` | a rotated record under `memory/archive/`, written by rotation (the away pass); writer item not named |
+| `instrument` | `record.instrument` | `memory/builds/*/build/*.py`, `memory/builds/*/build/*.sh`, `memory/builds/*/build/*.js`, `memory/builds/*/build/*.json`, `memory/builds/*/build/*.tsv`, `memory/builds/*/build/*.txt`, `memory/builds/*/build/*.svg`, `memory/builds/*/build/*.html`, `memory/builds/*/build/*.log`, `memory/builds/*/build/*.out` | `hand` | — | — | `memory hygiene` | a script, table or drawing kept beside the record it serves (the away pass); writer item not named: the session that |
+| `witness` | `record.witness` | `refs/gov/**` | `gov-ref.sh` | — | — | `record-kinds` | a declared pocket outside the tree, such as a transcript, a Codex rollout, the auto-memory, the live inbox or a |
+| `claim` | `record.claim` | `refs/gov/claims/**` | `gov-claim.sh` | — | — | `build-index selftest` | the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim |
+| `orientation-cards` | `record.orientation-cards` | `<git-common-dir>/orientation/*` | `manifest-check.sh --card` | `gov-builder`, `gov-reuse-scout`, `gov-session`, `gov-spec-writer` | — | `record-kinds` | — |
+| `unattended-sidecars` | `record.unattended-sidecars` | `<git-common-dir>/unattended/*`, `<git-common-dir>/unattended-landed` | `unattended.sh` | — | — | `record-kinds` | — |
+| `runlog-journal` | `record.runlog-journal` | `<git-common-dir>/runlog/*`, `<git-common-dir>/runlog-stamp-*` | `runlog.py` | — | — | `record-kinds` | — |
+| `drift-history` | `record.drift-history` | `<git-common-dir>/drift-history.tsv` | `drift_report.py` | — | — | `record-kinds` | — |
+| `gate-ledger` | `record.gate-ledger` | `<git-common-dir>/gate-*`, `<git-common-dir>/pre-push-*`, `<git-common-dir>/selftest-baseline` | `run-gates.sh` | — | — | `record-kinds` | — |
+| `history-verdicts` | `record.history-verdicts` | `<git-common-dir>/history-verdicts/*` | `history_store.py` | — | — | `record-kinds` | — |
+| `health-logs` | `record.health-logs` | `<git-common-dir>/health.log`, `<git-common-dir>/procmon-stamp` | `health-log.sh` | — | — | `record-kinds` | — |
+| `hook-state` | `record.hook-state` | `<git-common-dir>/agent-cap/*` | `agent-cap.js` | — | — | `record-kinds` | — |
+| `reuse-lookups` | `record.reuse-lookups` | `<git-common-dir>/codebase-map/*` | `reuse_lookup.py` | — | — | `record-kinds` | — |
+| `recall-cache` | `record.recall-cache` | `<git-common-dir>/recall/*` | `query.py` | — | — | `record-kinds` | — |
+| `review-lenses` | `record.review-lenses` | `<git-common-dir>/review-lenses/*` | `tier2-review.js` | — | — | `record-kinds` | — |
+| `transition-cache` | `record.transition-cache` | `<git-common-dir>/transition-audit-cache` | `transition_audit.py` | — | — | `record-kinds` | — |
+| `recovery-manifests` | `record.recovery-manifests` | `<git-common-dir>/recovery-manifests/*` | `branch_reconcile.py` | — | — | `record-kinds` | — |
+| `gov-index` | `record.gov-index` | `<git-common-dir>/gov/*` | `tag_index.py` | — | — | `record-kinds` | — |
+| `gov-feed` | `record.gov-feed` | `<git-common-dir>/gov-feed.*`, `<git-common-dir>/gov-last-fetch` | `gov-feed.sh` | — | — | `record-kinds` | — |
+| `handoff-calls` | `record.handoff-calls` | `<git-common-dir>/handoff-calls/*` | `handoff.py` | — | — | `record-kinds` | — |
+| `index-render-stamp` | `record.index-render-stamp` | `<git-common-dir>/gen-build-index-render-stamp` | `gen_build_index.py` | — | — | `record-kinds` | — |
+| `git-client-state` | `record.git-client-state` | `<git-common-dir>/sourcetreeconfig.json` | `hand` | — | — | `record-kinds` | — |
+| `stream-plan` | `record.stream-plan` | `memory/builds/*/build/*-stream-plan-*.md` | `hand` | — | — | `record-kinds` | a build's units grouped into ordered streams, written by dIndexedDesign's planner, read by dWellOiledMachine's pick |
+| `ask` | `record.ask` | `memory/builds/*/BACKLOG.md` | `gov_record.py new ask` | — | — | `memory hygiene` | the ask kind's acceptance at filing; its writers are the items that file asks, each filing stating its acceptance |
+| `shape-run` | `record.shape-run` | `memory/builds/*/build/*-build-*-shape-run-*.md` | `gov_record.py new shape-run` | — | — | `shape-run records (each record equals its review line)` | one review exit's review-shape line as typed fields, compared back to that line by shape_run.py |
+| `code` | `record.code` | `<git-common-dir>/gov/index-s*.db` | `generator:{prefix}/playbook/code_record.py` | — | — | `code record` | what a tree's code defines, calls, invokes and registers, derived per blob and cached by tree hash |
+| `request-records` | `record.request-records` | `<git-common-dir>/requests/*` | `request.py` | — | — | `record-kinds` | — |
+| `session-registry` | `record.session-registry` | `<git-common-dir>/procmon/*` | `tether.py` | — | — | `record-kinds` | — |
+
+<!-- /gen:record-kinds -->
+
 ## Acceptance ledger — how a built unit evidences its criteria
 
-Inside a record whose `**Serves:**` kind is `journal`, which is already defined as evidence of what
-was built. Two further arms once the SPEC's filename date reaches `LEDGER_LABEL_CUTOFF` and
+Inside a record whose `**Serves:**` kind is `log`, which is already defined as evidence of what
+was built, or its read-only alias `journal`, graded alike. Two further arms once the SPEC's filename
+date reaches `LEDGER_LABEL_CUTOFF` and
 `LEDGER_TOKEN_CUTOFF`: an answer whose criterion label the spec does not number is a finding, and an
 answer must share a backticked token with the criterion it answers, case-folded and either way round.
 Both are branches of the same check, so a blank `ACCEPTANCE_LEDGER_CUTOFF` disarms them too. One `**Evidences:**` line per unit, and one line per criterion beneath it:
@@ -832,7 +931,7 @@ Both are branches of the same check, so a blank `ACCEPTANCE_LEDGER_CUTOFF` disar
 - The gate reads SHAPE and COVERAGE only. It asserts every criterion a closed spec numbers has a line
   in one of the two forms; it does NOT assert the token names anything real, that the observation was
   actually made, or that an amendment was justified. Its header says so.
-- Under `--staged` it grades the closed units a staged spec or a staged journal record names,
+- Under `--staged` it grades the closed units a staged spec or a staged log record names,
   against the records of their own build folders. A record in another build that evidences one of
   them is read only by the full run.
 

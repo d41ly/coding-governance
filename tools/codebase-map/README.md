@@ -68,6 +68,12 @@ project specifics live in exactly two files the adopting repo owns.
   `MAP_ROOT` are never a claim, a merge commit carries no paths (a conflict-resolution-only change
   is not seen), `FOUNDATION.md` is not measured, and a shallow clone prints `live` false rather
   than a count. Report only; drift-audit reads it as `dossiers_older_than_their_paths`.
+  A dossier may anchor the definitions its prose describes: `[paths]` takes a `symbols` list beside
+  `globs`, each `<path>::<qualified name>`. An anchored file is graded by its anchored definitions'
+  hashes: a change to it stales the dossier only when an anchored definition's body hash at HEAD
+  differs from its hash at the dossier's last commit, so a change beside the definition leaves the
+  dossier fresh. Every other claimed path stays on commit ancestry, so its move still stales the
+  dossier. A key HEAD does not define exits 1 naming it.
 
   A `<git-common-dir>/codebase-map/reinvention-backlog.md` left in any clone is obsolete: the
   closing-loop mode that appended to it ran on no gate or hook and was deleted, so no tool writes

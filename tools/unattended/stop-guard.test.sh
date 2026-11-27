@@ -320,11 +320,11 @@ set_liveness() { printf 'phase: %s\nstate: live\nsession: %s\nverdict: %s\n' "$1
 # build_fixture <phase> <session-fact> [conf-extra-line] -> a scratch tree: .git/HEAD, a conf, one
 # record whose `## Run facts` region carries the phase and the session fact.
 build_fixture() {
-  local d; d=$(mktemp -d "$TMP/fx.XXXXXX")
-  mkdir -p "$d/.git" "$d/memory/builds/fx"
-  printf 'ref: refs/heads/fx\n' > "$d/.git/HEAD"
+  local d; d=$(mktemp -d "$TMP/fxFix.XXXXXX")
+  mkdir -p "$d/.git" "$d/memory/builds/fxFix"
+  printf 'ref: refs/heads/fxFix\n' > "$d/.git/HEAD"
   { printf 'MEMORY_ROOT=memory\n'; [ -n "${3:-}" ] && printf '%s\n' "$3"; } > "$d/.unattended.conf"
-  printf '# fx\n\n## Run facts\nwitness: abc\nphase: %s\nsession: %s\n\n## Parked\n' "$1" "$2" > "$d/memory/builds/fx/RUN.md"
+  printf '# fxFix\n\n## Run facts\nwitness: abc\nphase: %s\nsession: %s\n\n## Parked\n' "$1" "$2" > "$d/memory/builds/fxFix/RUN.md"
   printf '%s' "$d"
 }
 # build_payload <fixture> [extra-json-object] — BUILT by python, never hand-spliced; the extra object is
@@ -344,7 +344,7 @@ run_hook() {
 }
 # The sidecar path, printed and left in `_sidecar`: a call site reads the global and forks no
 # subshell for a printf (TOOL-aSparedSpawn-8 S10).
-derive_sidecar() { printf -v _sidecar '%s/.git/unattended/stop.fx.log' "$1"; printf '%s' "$_sidecar"; }
+derive_sidecar() { printf -v _sidecar '%s/.git/unattended/stop.fxFix.log' "$1"; printf '%s' "$_sidecar"; }
 # read_field <file> <key> — the LAST line's value, parsed as JSON, never grepped over raw bytes.
 read_field() { "$TESTPY" -c 'import json,sys
 ls=[l for l in open(sys.argv[1],encoding="utf-8").read().splitlines() if l.strip()]
@@ -377,9 +377,9 @@ F=$(build_fixture BUILDING "$SID"); set_liveness BUILDING LIVE
 run_hook "$(build_payload "$F")"
 check_same "AC2 bound rc" "$RC" "0"
 R=$(extract_reason "$OUT")
-check_hit "$R" "unattended run fx" "AC2 reason names the slug"
+check_hit "$R" "unattended run fxFix" "AC2 reason names the slug"
 check_hit "$R" "block 1/6" "AC2 reason counts 1 of the default 6"
-check_hit "$R" "unattended.sh --plan fx" "AC2 reason names --plan"
+check_hit "$R" "unattended.sh --plan fxFix" "AC2 reason names --plan"
 check_hit "$R" "phase BUILDING, liveness LIVE" "AC2 reason names phase and verdict"
 derive_sidecar "$F" >/dev/null; check_same "AC2 one sidecar line" "$(measure_lines "$_sidecar")" "1"
 derive_sidecar "$F" >/dev/null; check_same "AC2 line decision" "$(read_field "$_sidecar" decision)" "block"
@@ -539,8 +539,8 @@ mkdir -p "$F/wt-git"; mv "$F/.git/HEAD" "$F/wt-git/HEAD"; rmdir "$F/.git"
 printf 'gitdir: %s\n' "$(resolve_native "$F/wt-git")" > "$F/.git"
 run_hook "$(build_payload "$F")"
 check_hit "$(extract_reason "$OUT")" "block 1/6" "AC10 the worktree fixture binds and blocks"
-[ -f "$F/wt-git/unattended/stop.fx.log" ] && print_ok "AC10 the line landed under the named git dir" || print_bad "AC10 no line under $F/wt-git"
-check_same "AC10 exactly one stop.fx.log under the fixture" "$(find "$F" -name 'stop.fx.log' | grep -c '')" "1"
+[ -f "$F/wt-git/unattended/stop.fxFix.log" ] && print_ok "AC10 the line landed under the named git dir" || print_bad "AC10 no line under $F/wt-git"
+check_same "AC10 exactly one stop.fxFix.log under the fixture" "$(find "$F" -name 'stop.fxFix.log' | grep -c '')" "1"
 
 # ---- THE `landing-unstamped` ROW (TOOL-aWokenSentinel-8). `--landed` runs after the lander, so its
 # ---- refusals fire when the witness is already on the default branch and `--liveness` reads
@@ -557,7 +557,7 @@ check_same "U8-AC1 finished-unstamped rc" "$RC" "0"
 check_same "U8-AC1 the stop is blocked" "$(printf '%s' "$OUT" | "$TESTPY" -c 'import json,sys;print(json.loads(sys.stdin.read() or "{}").get("decision",""))')" "block"
 R=$(extract_reason "$OUT")
 check_hit "$R" "finished and unstamped" "U8-AC1 reason says finished and unstamped"
-check_hit "$R" "unattended.sh --landed fx" "U8-AC1 reason names --landed"
+check_hit "$R" "unattended.sh --landed fxFix" "U8-AC1 reason names --landed"
 check_hit "$R" "block 1/6" "U8-AC1 reason counts 1 of the default 6"
 check_hit "$R" "phase LANDING" "U8-AC1 reason names the phase"
 check_miss "$R" "--plan" "U8-AC1 reason never names --plan"
@@ -625,7 +625,7 @@ derive_sidecar "$F" >/dev/null; check_same "AC19 hung liveness line reason" "$(r
 
 # ---- TOOL-aLightenedLoop-5: THE LIVENESS CACHE. Each arm runs on a `git init` fixture, whose real
 # ---- git dir lets `show-ref` answer, with the stub counting its own spawns into STOP_GUARD_TEST_COUNT:
-# ---- a stop served from `liveness.fx.json` leaves the counter where it was. The stub fixtures above
+# ---- a stop served from `liveness.fxFix.json` leaves the counter where it was. The stub fixtures above
 # ---- carry a `.git` holding only HEAD, so the key is null there and every arm above runs uncached.
 COUNT="$TMP/count"; export STOP_GUARD_TEST_COUNT="$COUNT"
 run_fxgit() { GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git -C "$F" -c user.name=t -c user.email=t@t "$@" >/dev/null 2>&1; }
@@ -639,7 +639,7 @@ build_gitfixture() {
 read_count() { wc -c < "$COUNT" | tr -d ' '; }
 # set_live_clock <last-move> <stale-bound> — the stub prints LIVE with the two clock lines.
 set_live_clock() { printf 'phase: BUILDING\nstate: live\nsession: %s\nverdict: LIVE\nlast-move: %s\nstale-bound: %s\n' "$SID" "$1" "$2" > "$STOP_GUARD_TEST_LIVENESS"; }
-CACHE_REL=.git/unattended/liveness.fx.json
+CACHE_REL=.git/unattended/liveness.fxFix.json
 BG='{"background_tasks":[{"id":"t1"}]}'
 
 # ---- L5-AC3: two stops, nothing moved between them — one spawn, the same stdout and sidecar line,
@@ -653,7 +653,7 @@ derive_sidecar "$F" >/dev/null; check_same "L5-AC3 the two sidecar lines match b
 ls=[json.loads(l) for l in open(sys.argv[1],encoding="utf-8").read().splitlines() if l.strip()]
 [l.pop("utc") for l in ls]
 print("same" if len(ls)==2 and ls[0]==ls[1] and ls[1]["verdict"]=="LIVE" else "differs")' "$_sidecar")" "same"
-[ -f "$F/$CACHE_REL" ] && print_ok "L5-AC3 liveness.fx.json exists" || print_bad "L5-AC3 no $F/$CACHE_REL"
+[ -f "$F/$CACHE_REL" ] && print_ok "L5-AC3 liveness.fxFix.json exists" || print_bad "L5-AC3 no $F/$CACHE_REL"
 
 # ---- L5-AC4: one input moved between two stops — each move costs one spawn. RED when
 # ---- deriveLivenessKey drops the part that move reaches.
@@ -664,21 +664,21 @@ check_same "L5-AC4 the baseline second stop is served from cache" "$(read_count)
 for MOVE in record commit checkout remote-ref landed conf config driver session; do
   N=$(read_count)
   case $MOVE in
-    record)     printf '\n' >> "$F/memory/builds/fx/RUN.md" ;;
+    record)     printf '\n' >> "$F/memory/builds/fxFix/RUN.md" ;;
     # the commit move also makes `other` at the new sha, so the checkout move rewrites
     # <gitDir>/HEAD alone: `show-ref --head` prints the same lines before and after it
     commit)     run_fxgit commit -q --allow-empty -m move; run_fxgit branch other ;;
     checkout)   run_fxgit checkout -q other ;;
     remote-ref) run_fxgit update-ref refs/remotes/origin/main HEAD ;;
-    landed)     mkdir -p "$F/.git/unattended"; printf 'landed\n' >> "$F/.git/unattended/landed.fx.log" ;;
+    landed)     mkdir -p "$F/.git/unattended"; printf 'landed\n' >> "$F/.git/unattended/landed.fxFix.log" ;;
     conf)       printf '# moved\n' >> "$F/.unattended.conf" ;;
-    config)     run_fxgit config branch.fx.remote origin ;;
+    config)     run_fxgit config branch.fxFix.remote origin ;;
     driver)     printf '# moved\n' >> "$KIT/unattended.sh" ;;
   esac
   if [ "$MOVE" = session ]; then
     # a second session bound by the same RUN.md: one record names one session, so the read is
     # called directly with the other id against the same lease
-    node -e 'const m=require(process.argv[1]);m.readLiveness(process.argv[2],{root:process.argv[3],gitDir:process.argv[3]+"/.git"},{slug:"fx",record:"memory/builds/fx/RUN.md"},"other-session")' \
+    node -e 'const m=require(process.argv[1]);m.readLiveness(process.argv[2],{root:process.argv[3],gitDir:process.argv[3]+"/.git"},{slug:"fxFix",record:"memory/builds/fxFix/RUN.md"},"other-session")' \
       "$(resolve_native "$HOOK")" "$(resolve_native "$KIT")" "$(resolve_native "$F")"
   else
     run_hook "$P"
@@ -698,7 +698,7 @@ check_same "L5-AC5 a far deadline is served from cache" "$(read_count)" "1"
 # ---- (the inside arm counts 1) or the margin widens (the on-margin arm counts 2).
 # run_pinned_read <T> — one readLiveness call through the export with Date.now pinned to T seconds.
 run_pinned_read() {
-  STOP_GUARD_LIVENESS_BOUND_MS=3000 node -e 'const m=require(process.argv[1]);const t=Number(process.argv[4]);Date.now=()=>t*1000;m.readLiveness(process.argv[2],{root:process.argv[3],gitDir:process.argv[3]+"/.git"},{slug:"fx",record:"memory/builds/fx/RUN.md"},"pinned-session")' \
+  STOP_GUARD_LIVENESS_BOUND_MS=3000 node -e 'const m=require(process.argv[1]);const t=Number(process.argv[4]);Date.now=()=>t*1000;m.readLiveness(process.argv[2],{root:process.argv[3],gitDir:process.argv[3]+"/.git"},{slug:"fxFix",record:"memory/builds/fxFix/RUN.md"},"pinned-session")' \
     "$(resolve_native "$HOOK")" "$(resolve_native "$KIT")" "$(resolve_native "$F")" "$1"
 }
 T=$(date +%s)
@@ -717,7 +717,7 @@ check_same "L5-AC5 a deadline on the wait+1 margin is served from cache" "$(read
 test_nostore() {
   F=$(build_gitfixture)
   STOP_GUARD_TEST_LIVENESS_RC=${2:-0} run_hook "$(build_payload "$F" "$BG")"
-  [ ! -e "$F/$CACHE_REL" ] && print_ok "L5-AC6 $1 writes no liveness.fx.json" || print_bad "L5-AC6 $1 wrote $F/$CACHE_REL"
+  [ ! -e "$F/$CACHE_REL" ] && print_ok "L5-AC6 $1 writes no liveness.fxFix.json" || print_bad "L5-AC6 $1 wrote $F/$CACHE_REL"
   STOP_GUARD_TEST_LIVENESS_RC=${2:-0} run_hook "$(build_payload "$F" "$BG")"
   check_same "L5-AC6 $1 spawns the driver on the second stop" "$(read_count)" "2"
 }
@@ -755,10 +755,10 @@ check_hit "$(<"$TMP/nocache.line")" '"reason": "run-open"' "L5-AC7 the no-cache 
 # ---- null and nothing is stored. RED when show-ref runs without --git-dir and resolves the outer repo.
 O="$TMP/outer"; mkdir -p "$O"; F="$O"; run_fxgit init -q; run_fxgit commit -q --allow-empty -m outer
 F=$(build_fixture BUILDING "$SID"); mv "$F" "$O/"; F="$O/${F##*/}"; set_live_clock 0 3600
-check_same "L5-AC8 deriveLivenessKey is null on a HEAD-only .git" "$(cd "$F" && node -e 'const m=require(process.argv[1]);const r=process.argv[2];console.log(String(m.deriveLivenessKey({root:r,gitDir:r+"/.git"},process.argv[3],"memory/builds/fx/RUN.md","fx","s")))' \
+check_same "L5-AC8 deriveLivenessKey is null on a HEAD-only .git" "$(cd "$F" && node -e 'const m=require(process.argv[1]);const r=process.argv[2];console.log(String(m.deriveLivenessKey({root:r,gitDir:r+"/.git"},process.argv[3],"memory/builds/fxFix/RUN.md","fxFix","s")))' \
   "$(resolve_native "$HOOK")" "$(resolve_native "$F")" "$(resolve_native "$KIT")")" "null"
 run_hook "$(build_payload "$F" "$BG")"
-[ ! -e "$F/$CACHE_REL" ] && print_ok "L5-AC8 no liveness.fx.json under a HEAD-only .git" || print_bad "L5-AC8 wrote $F/$CACHE_REL"
+[ ! -e "$F/$CACHE_REL" ] && print_ok "L5-AC8 no liveness.fxFix.json under a HEAD-only .git" || print_bad "L5-AC8 wrote $F/$CACHE_REL"
 
 # ---- L5-AC11: STOP_GUARD_LIVENESS_CACHE=off is today's spawn on every stop: no file is written, and
 # ---- an existing valid one is neither served nor touched. RED when readLiveness ignores the switch.
@@ -766,7 +766,7 @@ F=$(build_gitfixture); set_live_clock 0 3600
 STOP_GUARD_LIVENESS_CACHE=off run_hook "$(build_payload "$F" "$BG")"
 STOP_GUARD_LIVENESS_CACHE=off run_hook "$(build_payload "$F" "$BG")"
 check_same "L5-AC11 two stops with the switch off spawn twice" "$(read_count)" "2"
-[ ! -e "$F/$CACHE_REL" ] && print_ok "L5-AC11 the switch off writes no liveness.fx.json" || print_bad "L5-AC11 the switch off wrote $F/$CACHE_REL"
+[ ! -e "$F/$CACHE_REL" ] && print_ok "L5-AC11 the switch off writes no liveness.fxFix.json" || print_bad "L5-AC11 the switch off wrote $F/$CACHE_REL"
 run_hook "$(build_payload "$F" "$BG")"
 cp "$F/$CACHE_REL" "$TMP/cache.before" 2>/dev/null
 STOP_GUARD_LIVENESS_CACHE=off run_hook "$(build_payload "$F" "$BG")"
@@ -781,10 +781,10 @@ unset STOP_GUARD_TEST_COUNT
 TR_T=${KIT_REL%/*}; [ "$TR_T" = "$KIT_REL" ] && TR_T=""; [ -z "$TR_T" ] || TR_T="$TR_T/"
 eval "$(sed -n '/^seed() {/,/^}/p' "$HERE/adopt-unattended.test.sh")"
 FR="$TMP/real"; seed "$FR" >/dev/null 2>&1
-mkdir -p "$FR/memory/builds/fx"
-printf '# fx\n\n## Run facts\nwitness: abc\nphase: BUILDING\nbranch-ref: refs/heads/main\nsession: %s\npid: absent\n\n## Parked\n' "$SID" > "$FR/memory/builds/fx/RUN.md"
+mkdir -p "$FR/memory/builds/fxFix"
+printf '# fxFix\n\n## Run facts\nwitness: abc\nphase: BUILDING\nbranch-ref: refs/heads/main\nsession: %s\npid: absent\n\n## Parked\n' "$SID" > "$FR/memory/builds/fxFix/RUN.md"
 if [ -f "$FR/$KIT_REL/stop-guard.js" ] && [ -f "$FR/$KIT_REL/unattended.sh" ]; then
-  REAL_VERDICT=$( cd "$FR" && bash "$KIT_REL/unattended.sh" --liveness fx 2>/dev/null | sed -n 's/^verdict: //p' )
+  REAL_VERDICT=$( cd "$FR" && bash "$KIT_REL/unattended.sh" --liveness fxFix 2>/dev/null | sed -n 's/^verdict: //p' )
   [ -n "$REAL_VERDICT" ] && print_ok "AC11 the real driver printed a verdict ($REAL_VERDICT)" || print_bad "AC11 the real driver printed no verdict line"
   OUT=$(printf '%s' "$(build_payload "$FR")" | node "$FR/$KIT_REL/stop-guard.js" 2>"$TMP/err"); RC=$?
   check_same "AC11 real-driver rc" "$RC" "0"
@@ -796,21 +796,21 @@ if [ -f "$FR/$KIT_REL/stop-guard.js" ] && [ -f "$FR/$KIT_REL/unattended.sh" ]; t
   # ---- `terminal`; without the line in the COMMON dir's landed log the same stop is not. The line is
   # ---- planted where the in-place `--landed` in another worktree writes it; the driver suite grades
   # ---- that write. A per-worktree log would read nothing here, because W2's git dir is its own.
-  sed -i 's/^phase: .*/phase: LANDING/' "$FR/memory/builds/fx/RUN.md"
+  sed -i 's/^phase: .*/phase: LANDING/' "$FR/memory/builds/fxFix/RUN.md"
   ( cd "$FR" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
       && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git commit -q -m close ) >/dev/null 2>&1
   FRC=$(git -C "$FR" rev-parse HEAD); FW2="$TMP/real-w2"
   git -C "$FR" worktree add -q --detach "$FW2" "$FRC" >/dev/null 2>&1
   FCD=$(cd "$FR" && cd "$(git rev-parse --git-common-dir)" && pwd); mkdir -p "$FCD/unattended"
-  printf '2026-09-27T00:00:00Z landed %s on refs/heads/main at %s\n' "$FRC" "$FRC" > "$FCD/unattended/landed.fx.log"
-  FW2S="$(cd "$FW2" && cd "$(git rev-parse --git-dir)" && pwd)/unattended/stop.fx.log"
+  printf '2026-09-27T00:00:00Z landed %s on refs/heads/main at %s\n' "$FRC" "$FRC" > "$FCD/unattended/landed.fxFix.log"
+  FW2S="$(cd "$FW2" && cd "$(git rev-parse --git-dir)" && pwd)/unattended/stop.fxFix.log"
   check_same "U61 the real driver reads the observed landing TERMINAL from W2" \
-    "$( cd "$FW2" && bash "$FR/$KIT_REL/unattended.sh" --liveness fx 2>/dev/null | sed -n 's/^verdict: //p' )" "TERMINAL"
+    "$( cd "$FW2" && bash "$FR/$KIT_REL/unattended.sh" --liveness fxFix 2>/dev/null | sed -n 's/^verdict: //p' )" "TERMINAL"
   OUT=$(printf '%s' "$(build_payload "$FW2")" | node "$FR/$KIT_REL/stop-guard.js" 2>"$TMP/err"); RC=$?
   check_same "U61 the observed landing's stop exits 0" "$RC" "0"
   check_same "U61 ...is allowed" "$OUT" ""
   check_same "U61 ...with reason terminal" "$(read_field "$FW2S" reason)" "terminal"
-  rm -f "$FCD/unattended/landed.fx.log"
+  rm -f "$FCD/unattended/landed.fxFix.log"
   printf '%s' "$(build_payload "$FW2")" | node "$FR/$KIT_REL/stop-guard.js" >/dev/null 2>&1
   check_miss "$(read_field "$FW2S" reason)" "terminal" "U61 with no line in the landed log the same stop is not terminal"
   git -C "$FR" worktree remove --force "$FW2" >/dev/null 2>&1

@@ -212,3 +212,16 @@ Ids whose spec moved past its audited revision: none — 0 of 14 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-24-review-TOOL-dScriptedRepeat-13-diff-round9.md`, `2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md` and 10 more under reviews/ |
+| research | `2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md`, `2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md` and 5 more under build/ |
+| logs | `2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md`, `2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md` and 8 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dScriptedRepeat/card` |
+<!-- /gen:build-routes -->

@@ -491,7 +491,8 @@ step of the phase it was held from, which the driver writes as the run's `held-f
 
 ## When a parent build is withdrawn
 
-A build whose README front matter names `parents:` depends on them. When a parent is withdrawn, the
+A build whose README front matter names `depends-on:`, or its older spelling `parents:`, depends on
+them. When a parent is withdrawn, the
 policy key `deps.on-parent-withdrawn` says what the dependent build does, and the loop kit answers it
 as a route. Until a parent's withdrawal is posted, a parent reads withdrawn when its run-state file,
 `RUN.md` in its build folder, holds a `phase` that the definition's phase rows map to the state
@@ -534,14 +535,15 @@ waits for its next row.
   route none
   ```
 
-  It prints `route none` when no parent reads withdrawn or the README has no `parents:` key. It exits
-  2 on a `parents:` slug naming no build folder, a state outside the build's open states, a policy
-  value outside the key's set, or no kept branch, and 2 `unarmed` where the policy kit is not
+  It prints `route none` when no parent reads withdrawn or the README has no `parents:` or
+  `depends-on:` key. It exits 2 on a `parents:` or `depends-on:` slug naming no build folder, a state
+  outside the build's open states, a policy value outside the key's set, or no kept branch, and 2 `unarmed` where the policy kit is not
   installed beside the loop kit, never falling back to a default.
 
 - **See it on a scratch repository:** `--fixture --plant <case>` builds a scratch repository holding a <!-- usage: script:tools/loop/loop_parents.py 5ff32d7b -->
   child build and its parent, runs the route there, prints whether the tree changed, and removes it.
-  The cases are `withdrawn-parent` (the parent aborted, its kept branch present), `no-kept-branch`
+  The cases are `withdrawn-parent` (the parent aborted, its kept branch present), `depends-on-parent`
+  (the same, the child naming its parent under `depends-on:`), `no-kept-branch`
   (aborted, its kept branch deleted), `live-parent`, `no-parents`, `incomplete-parent` (aborted,
   halted `budget-exhausted`), `aborted-on-run-branch` (building in the tree, aborted at its run
   branch's tracking tip), `no-run-record` (no `RUN.md` at all) and `parent-in-extra-phase` (the parent
@@ -1010,7 +1012,7 @@ Once a post, an ack or an answer has written its message, it rings the other ses
 
 A build, a unit of a build, a cadence run or a recorded request is leased on the remote with `bash tools/unattended/unattended.sh --lease acquire build <slug>` (or `unit <slug> <id>`, `run <cadence> <period>`, `request <content key>`, the last refused `no-record` where the remote holds no `refs/gov/requests/<content key>`, and the slug `request` reserved for it as `run` is); `renew` takes `--witness <sha>`, `release` with no `--as` hands the lease over as `released`, which anyone takes at the next epoch, while `--as landed|withdrawn` leaves a build or unit lease a tombstone (a cadence run lease takes `--as landed|aborted`), `take-over` takes a stale foreign lease and raises its epoch, `offer <kind> <name> [<sub>] --to <tag>` (or `--to <tag>/<session>`) offers an absent or released lease to one node, or one session of it, without assigning it, every other caller refused `offered` until `leases.offer-seconds` after its first sighting of the offer, `acquire build <slug> --for draw` holds a closed build's tombstone for a patch build's draw, `--lease flush` pushes the writes this node queued while the remote did not answer, refusing one whose last fetch is older than `leases.queued-claim-days`, and `--lease prune` deletes the run leases and legacy run claims terminal that long, never a build's; `fence build <slug> [--after <tip>]` prints the fence the lander's push carries and writes nothing, `--after` re-fencing a move of the lease by its own holder at the same epoch. Each prints one line, `lease — <tail> · <act> · epoch <n>`, or names the refusal: `live-holder`, `tombstone`, `epoch-fence`, `overlap`, `offline`, `offered`, `terminal` or `no-record`. With no session id from the harness (`CLAUDE_CODE_SESSION_ID` unset, empty or `absent`) the acts that write a holder, `acquire`, `take-over`, `renew`, `release` and `offer`, print `lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder` and exit 2 before reading anything, because an absent session would name every id-less session on your node; `flush`, `prune` and `fence` name no holder and run as they do with a session, so a headless supervisor still prunes and a fence from a terminal or CI still answers. A run's own claim, identified by its keepalive, is unaffected. `--lease status <kind> <name> [<sub>]` reads one lease and writes nothing: one TAB-separated line, its tail, fleet tag, session, status, verdict and epoch, or `lease — none · <tail>`; it is how a reader tells two sessions of one node apart, which `--claims` cannot. `--lease show build <slug>` reads one build lease's witness and writes nothing: the commit alone, or `-` where the lease holds none or no lease exists; a dependent build reads its parent's witness with it, and any other shape exits 2. With `RUN_CLAIMS` off every act but `fence` prints `lease — off · <tail>` and exits 0 having written nothing, and `fence` prints `fence — none · leases are off`. An offer is refused `offered` over an offer still open, whoever it names, and when `--to` names your own tag or your own session on it; another session on your tag is a hand-over and lands. An offer over a build or unit tombstone is refused `tombstone`, and `terminal` stays a cadence or legacy claim's. A create whose last commit this node's feed holds but git can no longer read, after a `git prune` say, is refused `epoch-fence` for a build or unit lease, whose epoch it cannot continue, and is a plain create at epoch 1 for a cadence run. An offline write whose ref's newest queued line is not a readable queued commit, a commit this clone does not hold or a line of another shape, prints `lease not written — <tail> · queued commit unreadable; nothing queued` and exits 2, queueing nothing, rather than building on that line, an older one or the cached tip. The `leases.*` policy keys shape it: `memory/guides/UNATTENDED-STOPS.md` section 7. <!-- usage: verb:unattended.sh:--lease f067f09f -->
 
-Each node also keeps a change feed of every governance ref write it made or saw, in `gov-feed.log` under its git common dir. `bash tools/unattended/unattended.sh --feed check` holds that feed to the governance refs the clone holds and names each `missing`, `duplicate`, `extra`, `order` or `torn` line with exit 1; `--feed rebuild` writes the feed from those refs on a node that has none, and `--feed print --from <seq>` replays it from a sequence number. <!-- usage: verb:unattended.sh:--feed 4f313579 -->
+Each node also keeps a change feed of every governance ref write it made or saw, in `gov-feed.log` under its git common dir. `bash tools/unattended/unattended.sh --feed check` holds that feed to the governance refs the clone holds and names each `missing`, `duplicate`, `extra`, `order` or `torn` line with exit 1; `--feed rebuild` writes the feed from those refs on a node that has none, and `--feed print --from <seq>` replays it from a sequence number. Every landing the lander makes also appends a `record` event for each landed commit that touches a record under the memory root, naming the record file's blob and the commit, so a reader replaying the feed sees memory change in landing order; `--feed check` names a landed record commit the feed lacks `missing`, and `--feed rebuild` appends the default branch's record events after the ref events. <!-- usage: verb:unattended.sh:--feed 4f313579 -->
 
 - **Key some sources:** `python tools/loop/claims.py key commit=<sha> base=<sha>` prints one key; <!-- usage: script:tools/loop/claims.py#key d36ca5b8 -->
   `key --stdin` prints one key per input line, the line's sources separated by TABs.
@@ -1074,9 +1076,9 @@ and a token, compares without it on both sides; a URL git rewrote through `url.<
 still reads skipped. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
 engine answers on your local witnesses, so no unit reads `deployed`, and prints
 `interrupt — remote · none` with no remote-tip claim. A tracking ref you deleted reads the same. An owed parked decision or an unpassed hold answers
-`awaiting`; a `parents:` build that has not landed answers `blocked` where its cause holds the
-build's step, as [Coordinating with a parent build](#coordinating-with-a-parent-build) describes; an
-undecided ask answers `awaiting` only when no item can run.
+`awaiting`; a `parents:` or `depends-on:` build that has not landed answers `blocked` where its cause
+holds the build's step, as [Coordinating with a parent build](#coordinating-with-a-parent-build)
+describes; an undecided ask answers `awaiting` only when no item can run.
 
 The frontier is every item of the build's step whose witness does not hold and whose needs are
 witnessed, in the order the composition lists them; the next item is its first entry. A refused item
@@ -1443,7 +1445,7 @@ upstream item and the key at fault.
   prints one line per answered row, one `upstream · finding · <class> · <row id> · <why>` line per
   finding and `upstream · verdict · clean`, `finding` or `refused` last. It exits 1 on `refused`, or
   where `check` would refuse the composition, and 0 otherwise. With `--write --build <slug> --unit <id>`
-  it also writes every line into a new journal record under the build's `build/` folder and prints its
+  it also writes every line into a new log record under the build's `build/` folder and prints its
   path. Either verb exits 2 on a bad argument, a path outside your repository, or a composition that
   does not read.
 

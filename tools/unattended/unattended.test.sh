@@ -346,14 +346,14 @@ check_status_one_line() { # slug -> asserts --status wrote exactly one stdout li
 # BOTH ENUMERATION SITES, because both carried it: `spec_ids` and the `--plan` sibling now filter
 # through one predicate, and an arm that exercised only one would leave the other free to drift.
 t_uw=$(mktemp -d); ( cd "$t_uw" && git init -q . && git config user.email t@t && git config user.name t
-  mkdir -p memory/builds/tW/spec/_working
-  printf 'x\n' > memory/builds/tW/spec/_working/notes.md
+  mkdir -p memory/builds/tWFix/spec/_working
+  printf 'x\n' > memory/builds/tWFix/spec/_working/notes.md
   printf '# t\n\n**Status:** OPEN . rev-1 . 2026-09-03 . node t . Tier-1 . base 0123abcd . streams tooling . order 0\n' \
-    > memory/builds/tW/spec/2026-09-03-spec-TOOL-tW-1.md
+    > memory/builds/tWFix/spec/2026-09-03-spec-TOOL-tWFix-1.md
   git add -A && git commit -q -m f --no-verify ) >/dev/null 2>&1
-out=$(cd "$t_uw" && git ls-files "memory/builds/tW/spec/*.md" | grep -vE '/spec/_[^/]*/' || true)
+out=$(cd "$t_uw" && git ls-files "memory/builds/tWFix/spec/*.md" | grep -vE '/spec/_[^/]*/' || true)
 miss "$out" "_working/notes.md"
-hit  "$out" "2026-09-03-spec-TOOL-tW-1.md"
+hit  "$out" "2026-09-03-spec-TOOL-tWFix-1.md"
 rm -rf "$t_uw"
 
 
@@ -440,10 +440,7 @@ readme() { # slug
   cat > "memory/builds/$1/README.md" <<EOF
 ---
 slug: $1
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-$1-1
 ---
 
@@ -1017,7 +1014,7 @@ for id in $ids; do
   n=$((n + 1))
   case "$MODE" in short) [ "$n" -gt 1 ] && continue ;; esac
   row=$(grep -E "^$id	" "$D/rows.tsv" 2>/dev/null | head -1)
-  [ -n "$row" ] || row=$(printf '%s\tOPEN\t-\t%s\t-\tyes\t-\t-\t-\t-' "$id" "$(printf '%s' "$id" | cut -d- -f2)")
+  [ -n "$row" ] || row=$(printf '%s\tOPEN\t-\t%s\t-\tyes\t-\t-\t-\t-' "$id" "$(printf '%s' "$id" | cut -d- -f2)")  # census: kept slug-grammar a test stub echoing the legacy ids its suite plants
   case "$MODE" in
     tenfield) printf 'ask\t%s\n' "$(printf '%s' "$row" | cut -f1-9)" ;;
     *)        printf 'ask\t%s\n' "$row" ;;
@@ -2934,7 +2931,14 @@ hit "$out" "chain round recorded"
 _fc_f=$(read_chain_file)
 same "FA5 AC4 one record, tracked" "$(grep -c 'chain-rounds.md$' <<<"$_fc_f")" "1"
 same "FA5 AC4 no run-state file was made" "$(cd "$_fc_r" && git ls-files memory/builds/dFix/RUN.md)" ""
-same "FA5 AC4 the second non-blank line binds the first id" "$(grep -v '^$' "$_fc_r/$_fc_f" | sed -n 2p)" "**Serves:** journal FIX-dFix-1"
+same "FA5 AC4 the second non-blank line binds the first id" "$(grep -v '^$' "$_fc_r/$_fc_f" | sed -n 2p)" "**Serves:** log FIX-dFix-1"
+# TOOL-dTotalRecall-36 AC7: the line after the Serves line is the record's cause, the id it names, and the
+# chain reader skips it as a head line: against a head rule with no `**Caused-by:**` skip the verdict
+# refuses the record as a body row outside the grammar.
+same "TR36 AC7 the line after the Serves line is the cause" "$(grep -v '^$' "$_fc_r/$_fc_f" | sed -n 3p)" "**Caused-by:** FIX-dFix-1"
+out=$(run_chain --chain-verdict dFix); rc=$?
+same "TR36 AC7 the chain reader reads a record carrying its cause line, exit 0" "$rc" "0"
+miss "$out" "a body row is outside the grammar"
 hit "$(<"$_fc_r/$_fc_f")" "round 1 · finding 7 · HIGH · local · specs FIX-dFix-1 · unit FIX-dFix-1 · rev 2"
 write_fixture_round dFix-spec-set-r2 FIX-dFix-3 0 0 --finding 9/LOW/local/FIX-dFix-3/FIX-dFix-3/2
 hit "$(<"$_fc_r/$_fc_f")" "round 2 · subject dFix-spec-set-r2 · audited FIX-dFix-3"
@@ -6340,11 +6344,11 @@ git reset -q --hard; git clean -qfd; bcrestore
 # ---- close. No preflight can write that record now, so it is borrowed: a sibling README with no key
 # ---- in the same BASE commit is preflighted, and its record is re-keyed to the README that has one.
 reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
-readme tBr2; mutate memory/builds/tBr2/README.md '/^slug: tBr2$/a authorized-by: prompt'
+readme tBrTwo; mutate memory/builds/tBrTwo/README.md '/^slug: tBrTwo$/a authorized-by: prompt'
 scope published; git add -A >/dev/null && git commit -q -m br --no-verify
 git push -q -f origin unit 2>/dev/null
-run --preflight tBr2 --keepalive-id k1 >/dev/null
-sed 's/tBr2/tBr/g' memory/builds/tBr2/RUN.md > memory/builds/tBr/RUN.md
+run --preflight tBrTwo --keepalive-id k1 >/dev/null
+sed 's/tBrTwo/tBr/g' memory/builds/tBrTwo/RUN.md > memory/builds/tBr/RUN.md
 git add -A >/dev/null && git commit -q -m "a record borrowed from a pre-89 preflight" --no-verify
 # ---- TOOL-aGraftedHelix-30: `--authorization` grades `authorization-reachable` ALONE, by the arm
 # ---- --close grades it with, so a reconciling merge learns at the merge what the close would say.
@@ -6354,11 +6358,11 @@ read_authorization_witness() { # slug -> the three reads the verb may not move
   git status --porcelain; git hash-object "memory/builds/$1/RUN.md"; git ls-remote origin
 }
 _az_tip=$(git rev-parse HEAD~1)
-_az_w0=$(read_authorization_witness tBr2)
-out=$(run --authorization tBr2); _az_rc=$?
+_az_w0=$(read_authorization_witness tBrTwo)
+out=$(run --authorization tBrTwo); _az_rc=$?
 hit  "$out" "unattended: authorization-reachable — met · base $_az_tip · anchor refs/heads/main at "
 same "GH30 AC1 a met record exits 0" "$_az_rc" "0"
-same "GH30 AC1 a met record moved nothing" "$(read_authorization_witness tBr2)" "$_az_w0"
+same "GH30 AC1 a met record moved nothing" "$(read_authorization_witness tBrTwo)" "$_az_w0"
 # ---- AC2: the borrowed record is check 89's, and ONE line then names both exits and not owner-landing.
 _az_w0=$(read_authorization_witness tBr)
 _az_ref=$(run --authorization tBr); _az_rc=$?
@@ -6370,20 +6374,20 @@ same "GH30 AC2 a refused record moved nothing" "$(read_authorization_witness tBr
 # ---- AC4: a predicate that never reached the README is NOT EVALUATED - exit 2 and no exits - when the
 # ---- remote does not answer and when the run branch is unpublished; pushed again, the answer returns.
 git remote set-url origin "$ORIGIN_DIR/nope.git"
-out=$(run --authorization tBr2); _az_rc=$?
+out=$(run --authorization tBrTwo); _az_rc=$?
 hit  "$out" "the remote did not answer, and the anchor is an observation of it"
 hit  "$out" "unattended: authorization-reachable — not evaluated"
 miss "$out" "--handoff"
 same "GH30 AC4 an unanswered remote exits 2" "$_az_rc" "2"
 git remote set-url origin "$ORIGIN"
 git push -q origin --delete unit 2>/dev/null
-out=$(run --authorization tBr2); _az_rc=$?
+out=$(run --authorization tBrTwo); _az_rc=$?
 hit  "$out" "the remote advertises no tip for the branch this run is on"
 hit  "$out" "unattended: authorization-reachable — not evaluated"
 miss "$out" "--handoff"
 same "GH30 AC4 an unpublished run branch exits 2" "$_az_rc" "2"
 git push -q -f origin "$_az_tip:refs/heads/unit" 2>/dev/null
-out=$(run --authorization tBr2); _az_rc=$?
+out=$(run --authorization tBrTwo); _az_rc=$?
 hit  "$out" "unattended: authorization-reachable — met · base $_az_tip"
 same "GH30 AC4 the branch pushed again reads met" "$_az_rc" "0"
 out=$(run --close tBr)
@@ -7207,14 +7211,14 @@ hit "$(run --preflight tOwnPb --keepalive-id k1)" "a recipe-mode build README na
 # the `published` anchor's declared cost, reaching one step further than the protocol spells out:
 # a run that can author its own authorization can author the instructions it is judged against too.
 reset_tree; scope published
-readme tOwn2
-mutate memory/builds/tOwn2/README.md '/^slug: tOwn2$/a authorized-by: recipe\nplaybook: content/pb-own.md\npieces: 2'
+readme tOwnTwo
+mutate memory/builds/tOwnTwo/README.md '/^slug: tOwnTwo$/a authorized-by: recipe\nplaybook: content/pb-own.md\npieces: 2'
 own_pb
 git push -q -f origin unit 2>/dev/null
-out=$(run --preflight tOwn2 --keepalive-id k1)
+out=$(run --preflight tOwnTwo --keepalive-id k1)
 miss "$out" "a recipe-mode build README names a playbook that does not resolve at the pinned BASE"
 hit "$out" "preflight OK"
-hit "$(cat memory/builds/tOwn2/RUN.md)" "anchor-kind: run-branch"
+hit "$(cat memory/builds/tOwnTwo/RUN.md)" "anchor-kind: run-branch"
 reset_tree; git push -q -f origin unit 2>/dev/null
 
 # ---- AC6: the piece-scoped items' TERM ZERO, OBSERVED. Both are MET for a run that is not in recipe
@@ -7440,11 +7444,11 @@ echo "MARK ac4-transport" >&2
 # ---- told the operator to push a branch that is already pushed - advice that is not merely useless
 # ---- but wrong, and acting on it changes nothing. The arm asserts BOTH halves: the new message
 # ---- appears, and the misleading one does not.
-reset_tree; readme tBr2; scope published; git add -A >/dev/null && git commit -q -m br2 --no-verify
+reset_tree; readme tBrTwo; scope published; git add -A >/dev/null && git commit -q -m br2 --no-verify
 git push -q -f origin unit 2>/dev/null
 git remote set-url origin "http://127.0.0.1:1/nope.git" 2>/dev/null
 git remote set-url --push origin "http://127.0.0.1:1/nope.git" 2>/dev/null
-out=$(run --preflight tBr2 --keepalive-id k1)
+out=$(run --preflight tBrTwo --keepalive-id k1)
 miss "$out" "push the branch first"
 git remote set-url origin "$ORIGIN" 2>/dev/null
 git remote set-url --push origin "$ORIGIN" 2>/dev/null
@@ -8791,7 +8795,7 @@ git config --unset remote.origin.pushurl 2>/dev/null || true; git remote set-url
 # SHADOWS the insteadOf rewrite entirely, so the first attempt at this arm configured the rewrite,
 # had it silently ignored, and measured fetch == push again. The mechanism only exists when nothing
 # more specific is set.
-reset_tree; readme tSplit2; scope published; git add -A >/dev/null && git commit -q -m split2 --no-verify
+reset_tree; readme tSplitTwo; scope published; git add -A >/dev/null && git commit -q -m split2 --no-verify
 git push -q -f origin unit 2>/dev/null
 git remote set-url origin "example.invalid:some/repo.git" 2>/dev/null
 git config --unset remote.origin.pushurl 2>/dev/null || true
@@ -8800,7 +8804,7 @@ git config "url.git@example.invalid:some/repo.git.pushInsteadOf" "example.invali
 # also makes these two differ, so a not-equal guard passes while the mechanism under test is inert -
 # which is what happened, and it is the same pass-by-finding-anything shape one level up.
 same "the rewrite produces the user@ spelling" "$(git remote get-url --push origin)" "git@example.invalid:some/repo.git"
-out=$(run --preflight tSplit2 --keepalive-id k1)
+out=$(run --preflight tSplitTwo --keepalive-id k1)
 hit  "$out" "fetch and push URLs differ in spelling and normalise to the same endpoint"
 miss "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to"
 git config --unset "url.git@example.invalid:some/repo.git.pushInsteadOf" 2>/dev/null || true
@@ -8808,10 +8812,10 @@ git remote set-url origin "$ORIGIN" 2>/dev/null
 
 
 # ...and the REFUSAL survives for the case the check was written for: two genuinely different places.
-reset_tree; readme tSplit3; scope published; git add -A >/dev/null && git commit -q -m split3 --no-verify
+reset_tree; readme tSplitThree; scope published; git add -A >/dev/null && git commit -q -m split3 --no-verify
 git push -q -f origin unit 2>/dev/null
 git remote set-url --push origin "https://example.invalid/not/the/same.git" 2>/dev/null
-out=$(run --preflight tSplit3 --keepalive-id k1)
+out=$(run --preflight tSplitThree --keepalive-id k1)
 hit "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to, so the anchor and the landing name two different endpoints"
 git remote set-url --push origin "$ORIGIN" 2>/dev/null
 reset_tree
@@ -9884,7 +9888,7 @@ out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit refuses another value of the charter's trailer, exit code" "$rc" "1"
 hit  "$out" "UNATTENDED check 49 FAILED"
 hit  "$out" "the trailer 'Co-Authored-By: Fx 2 <fx@example.invalid>' is not the charter's '$_fx_at'"
-hit  "$out" "end the message with '$_fx_at' and nothing after it"
+hit  "$out" "the message's trailers do not stand where git reads them: end the message with '$_fx_at' and nothing after it"
 printf 'records\n\nPass: none\n%s\nCommit-Checked: unattended@0\n' "$_fx_at" > "$CCM"
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit refuses a line after the charter's trailer, exit code" "$rc" "1"
@@ -9918,6 +9922,22 @@ hit  "$out" "fixture · attribution · the charter's trailer, a blank line and p
 hit  "$out" "fixture · attribution · another value spaced before its colon, then prose · refused"
 hit  "$out" "fixture · attribution · no agent trailer · none"
 hit  "$out" "fixture · attribution · the charter's trailer last, then a space and a tab · ok"
+# TOOL-dTotalRecall-122 S9: a `Decided:` line above the final trailer block, which git never reads as a trailer, is
+# refused, and one inside it admitted; the reader's own cases ride the `--fixture` run above. Against the parent
+# the first exits 0 and the fixture prints no decision line.
+for _fx_case in "above the trailer block · refused" "in the trailer block · ok" "no decision · ok" \
+                "one of two above the block · refused" "indented in prose · ok" \
+                "a spaced key in the block beside one above it · refused" "a value folded onto the next line · ok"; do
+  hit "$out" "fixture · decided · $_fx_case"
+done
+printf 'records\n\nDecided: a choice - why\n\nPass: none\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses a Decided: line above the trailer block, exit code" "$rc" "1"
+hit  "$out" "the message's trailers do not stand where git reads them: put every 'Decided:' line in the message's final trailer block, with no blank line after it"
+hit  "$out" "git reads no trailer in 'Decided: a choice - why'"
+printf 'records\n\nPass: none\nDecided: a choice - why\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit admits a Decided: line in the trailer block, exit code" "$rc" "0"
 # AC11: an admitted pass message gains its Commit-Checked: and still ends with the charter's trailer
 printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
 printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n%s\n' "$_fx_at" > "$CCM"
@@ -13197,10 +13217,7 @@ SUC
     cat > "memory/builds/$su_s/README.md" <<SUR
 ---
 slug: $su_s
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-$su_s-1
 ---
 
@@ -14234,10 +14251,7 @@ IPC
   cat > memory/builds/tRun/README.md <<'IPR'
 ---
 slug: tRun
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-tRun-1
 ---
 
@@ -16098,10 +16112,7 @@ DLC
     cat > "memory/builds/$dl_s/README.md" <<DLR
 ---
 slug: $dl_s
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-$dl_s-1
 ---
 
@@ -16558,7 +16569,7 @@ done
 [ "${IH_ASK_EMPTY:-0}" = 1 ] && { printf 'examined\t0\n'; exit 0; }
 c=0
 for id in $ids; do
-  h=${id#*-}; h=${h%-*}; s=OPEN
+  h=${id#*-}; h=${h%-*}; s=OPEN  # census: kept slug-grammar the first and the last segment stripped
   case " ${IH_ASK_CLOSED:-} " in *" $id "*) s=CLOSED ;; esac
   printf 'ask\t%s\t%s\t-\t%s\t%s\t-\t-\t-\t-\t-\n' "$id" "$s" "$h" "${IH_ASK_SEV:-HIGH}"; c=$((c + 1))
 done
@@ -16589,10 +16600,7 @@ IHC
   cat > memory/builds/tRun/README.md <<'IHR'
 ---
 slug: tRun
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-tRun-1
 ---
 
@@ -17000,6 +17008,12 @@ h9_dir=$(mktemp -d)
     && printf 'HELD_CI_WORKFLOW=""\n' > .unattended.conf && git add -A && git commit -q -m blank --no-verify ) >/dev/null 2>&1
 slice_fn write_held_asks; slice_fn read_policy_key; slice_fn read_roster_family
 readme_of() { _readme="$M/builds/$1/README.md"; printf '%s' "$_readme"; }
+# TOOL-dTotalRecall-4 S3: the roster family is the generator's `--print-front-matter` answer, so the
+# slice's generator is a stub printing the derived keys of the arm's one build.
+printf '%s\n' 'import sys' \
+  'print("node: t\nroster: ARCH\nstreams: arch" if sys.argv[1:] == ["--print-front-matter", "tRun"] else "")' \
+  > "$h9_dir/.git/h9-gen.py"
+resolve_index_generator() { printf '%s\n' "$h9_dir/.git/h9-gen.py"; }
 read_leg_argv() { return 1; }
 derive_ask_seq() { printf '7'; }
 # TOOL-dWitnessedBar-6 S7: the reader is the run-gates kit's `remote_verdict.py held`, so the stub is a
@@ -17046,7 +17060,8 @@ hit  "$out" "h9-rc=0"
 miss "$out" "suite green suite"
 miss "$out" "suite bad"
 n=$((n+1)); [ ! -e "$h9_dir/memory/builds/tRun/BACKLOG.md" ] || { echo "FAIL held: the writer with ASKS_CMD blank wrote a BACKLOG.md"; st=1; }
-unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq resolve_kit_dir run_h9
+unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq resolve_kit_dir \
+  resolve_index_generator run_h9
 unset H9_ROWS H9_CALLS H9_NO_KIT h9_kit
 rm -rf "$h9_dir"
 # TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
@@ -18510,6 +18525,179 @@ hit  "$(GOVFEED_DIR=$fd_feed run --feed print later)" "unattended: --feed print 
 hit  "$(GOVFEED_DIR=$fd_feed run --feed bogus)" "unattended: --feed takes check [<file>], rebuild or print [--from <seq>]: bogus"
 git for-each-ref --format='delete %(refname)' refs/gov/remote | git update-ref --stdin
 remove_claim_refs; rm -rf "$fd_feed" "$fd_two" "$fd_two.block" "$fd_two.cut" "$fd_two.ctr" "$fd_two.whole" "$fd_two.chk"; reset_tree
+
+fi
+if in_shard 8; then
+
+# ==================================================================================================
+# TOOL-dTotalRecall-24 — RECORD EVENTS IN THE CHANGE FEED. One subshell drives the record path of the
+# `gov_feed_sh` block the driver carries, sourced above with it, over a bare origin and its clones:
+# `a`, seeded with this kit's record registry, a `.memory-tree.conf` and a build README as the door's
+# own fixture seeds one; `b`, a second node landing a record commit `a` fetches; `c`, a node with no
+# feed; and `big`, 2,000 record commits from one `git fast-import`. Each landing is a push followed by
+# the lander's call, `add_record_events refs/heads/main <pushed>`. It prints one `key=value` line per
+# observation and the arms below assert them. The staged reds run inside it: a hand commit landed past
+# the lander whose event is absent (AC4), a copy whose range builder ignores the feed's newest record
+# commit and its keys and re-walks the whole history (AC2), a copy whose walk keeps one event per file
+# (AC8), an off-history `record` line (AC3), and a copy whose key test is `1`, over a merge landing
+# (TOOL-dTotalRecall-115). WHAT THIS BLOCK DOES NOT DRIVE: the lander's own success branches, which the
+# push-main suite lands through (AC7); the lock's contention on a record range; a merge's own resolution.
+# ==================================================================================================
+rr_d=$(mktemp -d)
+rr_kit="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$MT_KIT_DIR"
+awk '/^# >>> gov_feed_sh/{f=1} f{print} /^# <<< gov_feed_sh/{exit}' "$SCRIPT" > "$rr_d/block.sh"
+cp "$rr_d/block.sh" "$rr_d/whole.sh"; cp "$rr_d/block.sh" "$rr_d/perfile.sh"; cp "$rr_d/block.sh" "$rr_d/keyless.sh"
+mutate "$rr_d/whole.sh" 's/ \${from:+"\$from"}) || return 1$/) || return 1/; s/^    !((\$1 SUBSEP \$3 SUBSEP \$4) in k)/    1/'
+mutate "$rr_d/keyless.sh" 's/^    !((\$1 SUBSEP \$3 SUBSEP \$4) in k)/    1/'
+mutate "$rr_d/perfile.sh" '/^      if ((c SUBSEP b) in seen) next$/d'
+rr_out=$( (
+  unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GOVFEED_DIR
+  run_rr_git() { git -c user.name=t -c user.email=t@t.test -c commit.gpgsign=false -c core.hooksPath=/dev/null -c core.autocrlf=false "$@"; }
+  git init -q --bare -b main "$rr_d/o.git" && run_rr_git clone -q "$rr_d/o.git" "$rr_d/a" 2>/dev/null && cd "$rr_d/a" || exit 9
+  mkdir -p "$MT_KIT_DIR" memory/builds/xRec/spec && cp "$rr_kit/record-kinds.toml" "$MT_KIT_DIR/"
+  printf 'RUN_CLAIMS="off"\n' > .unattended.conf
+  printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n' > .memory-tree.conf
+  printf -- '---\nslug: xRec\n---\n\n# xRec\n' > memory/builds/xRec/README.md
+  printf '# TOOL-xRec-1 — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd\n' \
+    > memory/builds/xRec/spec/2026-09-01-spec-TOOL-xRec-1.md
+  run_rr_git add -A && run_rr_git commit -qm seed && run_rr_git push -q origin HEAD:refs/heads/main
+  F="$(git rev-parse --path-format=absolute --git-common-dir)/gov-feed.log"
+  add_record_events refs/heads/main HEAD; echo "seed=$(grep -c . "$F")"
+  # ---- AC1: a door-made record, a hand edit of a record, and a commit outside MEMORY_ROOT, landed.
+  p1=memory/builds/xRec/build/2026-11-23-build-TOOL-xRec-1-probe.md
+  CLAUDE_CODE_SESSION_ID=s-rr "$_rkd_py" "$rr_kit/gov_record.py" new research --build xRec --unit TOOL-xRec-1 --title t \
+    --name 2026-11-23-build-TOOL-xRec-1-probe --caused-by TOOL-xRec-1 >/dev/null 2>&1; echo "ac1.door=$?"
+  run_rr_git add -A && run_rr_git commit -qm door; c1=$(git rev-parse HEAD)
+  printf 'hand\n' >> memory/builds/xRec/README.md; run_rr_git commit -qam hand; c2=$(git rev-parse HEAD)
+  printf 'x\n' > outside.txt; run_rr_git add outside.txt; run_rr_git commit -qm outside; c3=$(git rev-parse HEAD)
+  run_rr_git push -q origin HEAD:refs/heads/main; add_record_events refs/heads/main "$c3"
+  echo "ac1.new=$(( $(grep -c . "$F") - 2 ))"
+  [ "$(awk -F'\t' -v c="$c1" '$5 == c { print $3 " " $4 }' "$F")" = "record $(git rev-parse "$c1:$p1")" ] && echo "ac1.c1=ok"
+  [ "$(awk -F'\t' -v c="$c2" '$5 == c { print $3 " " $4 }' "$F")" = "record $(git rev-parse "$c2:memory/builds/xRec/README.md")" ] && echo "ac1.c2=ok"
+  echo "ac1.c3=$(grep -c "$c3" "$F")"
+  # ---- AC2: the same call again; the copy re-walking the whole history (staged); a fetched landing.
+  add_record_events refs/heads/main "$c3"; echo "ac2.again=$(grep -c . "$F")"
+  cp "$F" "$rr_d/ac2.log"; cp "${F%.log}.seq" "$rr_d/ac2.seq"
+  ( . "$rr_d/whole.sh"; add_record_events refs/heads/main "$c3" ); echo "ac2.whole=$(grep -c . "$F")"
+  cp "$rr_d/ac2.log" "$F"; cp "$rr_d/ac2.seq" "${F%.log}.seq"
+  run_rr_git clone -q "$rr_d/o.git" "$rr_d/b" && ( cd "$rr_d/b" && printf 'b\n' > memory/builds/xRec/b.md \
+    && run_rr_git add -A && run_rr_git commit -qm theirs && run_rr_git push -q origin HEAD:refs/heads/main )
+  cb=$(git -C "$rr_d/b" rev-parse HEAD)
+  run_rr_git fetch -q origin && run_rr_git merge -q --ff-only origin/main
+  printf 'a\n' > memory/builds/xRec/a.md; run_rr_git add -A; run_rr_git commit -qm ours; ca=$(git rev-parse HEAD)
+  run_rr_git push -q origin HEAD:refs/heads/main; add_record_events refs/heads/main "$ca"
+  echo "ac2.fetched=$(awk -F'\t' -v b="$cb" -v a="$ca" '$5 == b { ib = NR } $5 == a { ia = NR } END { print (ib && ia && ib < ia) ? "before" : "no" }' "$F")"
+  # ---- AC3: an uncommitted record write, then a planted `record` line naming a commit on no branch.
+  printf 'u\n' > memory/builds/xRec/u.md; add_record_events refs/heads/main HEAD
+  echo "ac3.uncommitted=$(grep -c "	$(git hash-object memory/builds/xRec/u.md)	" "$F")"
+  check_feed refs/gov/remote/ >/dev/null; echo "ac3.check=$?"
+  rm -f memory/builds/xRec/u.md
+  x=$(run_rr_git commit-tree "$(git mktree </dev/null)" -m off); cp "$F" "$rr_d/live.log"
+  printf '%s\trefs/heads/main\trecord\t-\t%s\t2026-11-23T00:00:00Z\n' 900 "$x" >> "$F"
+  o=$(check_feed refs/gov/remote/); echo "ac3.extra=$? $(grep -c "^extra refs/heads/main $x$" <<<"$o")"
+  cp "$rr_d/live.log" "$F"
+  # ---- AC4: a hand commit landed with --no-verify, then a later landed commit's line appended by hand.
+  printf 'h\n' > memory/builds/xRec/h.md; run_rr_git add -A; run_rr_git commit -qm hand-landed; ch=$(git rev-parse HEAD)
+  run_rr_git push -q --no-verify origin HEAD:refs/heads/main
+  printf 'l\n' > memory/builds/xRec/l.md; run_rr_git add -A; run_rr_git commit -qm later; cl=$(git rev-parse HEAD)
+  run_rr_git push -q origin HEAD:refs/heads/main
+  printf '%s\trefs/heads/main\trecord\t%s\t%s\t2026-11-23T00:00:00Z\n' 901 "$(git rev-parse "$cl:memory/builds/xRec/l.md")" "$cl" >> "$F"
+  o=$(bash "$SCRIPT" --feed check 2>/dev/null); echo "ac4=$? $(grep -c "^missing refs/heads/main $ch$" <<<"$o")"
+  cp "$rr_d/live.log" "$F"; add_record_events refs/heads/main "$cl"
+  bash "$SCRIPT" --feed check >/dev/null 2>&1; echo "ac4.landed=$?"
+  # ---- AC8: one commit deletes two records and adds two byte-identical ones; the per-file copy (staged).
+  run_rr_git rm -q memory/builds/xRec/h.md memory/builds/xRec/l.md
+  printf 'same\n' > memory/builds/xRec/s1.md; printf 'same\n' > memory/builds/xRec/s2.md
+  run_rr_git add -A; run_rr_git commit -qm swap; c8=$(git rev-parse HEAD); run_rr_git push -q origin HEAD:refs/heads/main
+  add_record_events refs/heads/main "$c8"
+  echo "ac8=$(awk -F'\t' -v c="$c8" '$5 == c { print $4 }' "$F" | sed "s/^$(git rev-parse "$c8:memory/builds/xRec/s1.md")$/shared/" | sort | tr '\n' ' ')"
+  o=$(check_feed refs/gov/remote/); echo "ac8.check=$? $(grep -c '^duplicate ' <<<"$o")"
+  echo "ac8.perfile=$( ( . "$rr_d/perfile.sh"; derive_record_events refs/heads/main "$c8" "$c8^" ) | grep -c .)"
+  # ---- TOOL-dTotalRecall-115: a branch forked before the last fed commit, merged --no-ff and landed, then a
+  # ---- second landing, whose walk starts at the branch's commit and re-lists m1; the same call again; the
+  # ---- keyless copy over the second landing (staged); one line of the feed copied to its end.
+  nm=$(grep -c . "$F"); mc=""
+  run_rr_git checkout -q -b rr-side; printf 'sb\n' > memory/builds/xRec/sb.md; run_rr_git add -A; run_rr_git commit -qm side
+  run_rr_git checkout -q main; printf 'm1\n' > memory/builds/xRec/m1.md; run_rr_git add -A; run_rr_git commit -qm m1
+  run_rr_git push -q origin HEAD:refs/heads/main; add_record_events refs/heads/main HEAD
+  check_feed refs/gov/remote/ >/dev/null; mc="$?"
+  run_rr_git merge -q --no-ff rr-side -m merge; run_rr_git push -q origin HEAD:refs/heads/main; add_record_events refs/heads/main HEAD
+  check_feed refs/gov/remote/ >/dev/null; mc="$mc $?"
+  printf 'n\n' > memory/builds/xRec/n.md; run_rr_git add -A; run_rr_git commit -qm after-merge; run_rr_git push -q origin HEAD:refs/heads/main
+  cp "$F" "$rr_d/mg.log"; cp "${F%.log}.seq" "$rr_d/mg.seq"
+  ( . "$rr_d/keyless.sh"; add_record_events refs/heads/main HEAD ); echo "mg.keyless=$(cut -f2,4,5 "$F" | sort | uniq -d | grep -c .)"
+  cp "$rr_d/mg.log" "$F"; cp "$rr_d/mg.seq" "${F%.log}.seq"
+  add_record_events refs/heads/main HEAD; check_feed refs/gov/remote/ >/dev/null; echo "mg.check=$mc $?"
+  add_record_events refs/heads/main HEAD; echo "mg.keys=$(( $(grep -c . "$F") - nm )) $(cut -f2,4,5 "$F" | sort | uniq -d | grep -c .)"
+  cp "$F" "$rr_d/mg.log"; sed -n 1p "$rr_d/mg.log" >> "$F"; k=$(sed -n 1p "$F" | cut -f5)
+  o=$(check_feed refs/gov/remote/); echo "mg.copied=$? $(grep -c "^duplicate refs/heads/main $k$" <<<"$o") $(grep -c . <<<"$o")"
+  cp "$rr_d/mg.log" "$F"
+  # ---- AC10: a root that is no plain relative path.
+  n10=$(grep -c . "$F"); printf 'MEMORY_ROOT=../x\n' > .memory-tree.conf
+  add_record_events refs/heads/main HEAD 2>"$rr_d/ac10.err"
+  echo "ac10.add=$(( $(grep -c . "$F") - n10 )) $(grep -c '^feed: NOTE -' "$rr_d/ac10.err")"
+  o=$(check_feed refs/gov/remote/); echo "ac10.check=$? $(grep -c '^unread refs/heads/main MEMORY_ROOT \.\./x$' <<<"$o")"
+  run_rr_git checkout -q -- .memory-tree.conf
+  # ---- S3's refusals: a walk git refuses, from a newest record commit this clone does not hold, and a
+  # ---- tip that names no commit; each prints one NOTE and appends nothing.
+  cp "$F" "$rr_d/s3.log"; printf '%s\trefs/heads/main\trecord\t-\t%s\t2026-11-23T00:00:00Z\n' 902 1111111111111111111111111111111111111111 >> "$F"
+  n3=$(grep -c . "$F"); add_record_events refs/heads/main HEAD 2>"$rr_d/s3.err"
+  echo "s3.walk=$(( $(grep -c . "$F") - n3 )) $(grep -c '^feed: NOTE - git could not walk the records of refs/heads/main to ' "$rr_d/s3.err")"
+  cp "$rr_d/s3.log" "$F"; n3=$(grep -c . "$F"); add_record_events refs/heads/main no-such-tip 2>"$rr_d/s3.err"
+  echo "s3.tip=$(( $(grep -c . "$F") - n3 )) $(grep -c '^feed: NOTE - no-such-tip names no commit this clone holds' "$rr_d/s3.err")"
+  # ---- AC9: a node with no feed rebuilds it from its tracking ref, then one whose tracking ref is gone.
+  run_rr_git clone -q "$rr_d/o.git" "$rr_d/c" && cd "$rr_d/c" || exit 9
+  bash "$SCRIPT" --feed rebuild >/dev/null 2>&1; echo "ac9.rebuild=$?"
+  [ "$(cut -f2-5 .git/gov-feed.log)" = "$(derive_record_events refs/heads/main refs/remotes/origin/main)" ] && echo "ac9.events=ok"
+  bash "$SCRIPT" --feed check >/dev/null 2>&1; echo "ac9.check=$?"
+  rm -f .git/gov-feed.log .git/gov-feed.seq; git update-ref -d refs/remotes/origin/main
+  o=$(bash "$SCRIPT" --feed rebuild 2>/dev/null); echo "ac9.absent=$? $(grep -c '^feed: no record events were rebuilt: refs/remotes/origin/main is absent$' <<<"$o")"
+  # ---- AC5: 2,000 record commits from one fast-import; the lock taken once and no add_feed_event call.
+  git init -q -b main "$rr_d/big" && cd "$rr_d/big" || exit 9
+  awk 'BEGIN { for (i = 1; i <= 2000; i++) { d = "r" i "\n"
+      printf "commit refs/heads/main\nmark :%d\ncommitter t <t@t.test> %d +0000\ndata 2\nc\n", i, 1700000000 + i
+      if (i > 1) printf "from :%d\n", i - 1
+      printf "M 100644 inline memory/r%d.md\ndata %d\n%s\n", i, length(d), d } }' | git fast-import --quiet && git reset -q --hard main
+  ( eval "run_lock_wait_orig() $(declare -f write_dir_lock_wait | tail -n +2)"
+    eval "run_add_event_orig() $(declare -f add_feed_event | tail -n +2)"
+    write_dir_lock_wait() { echo w >> "$rr_d/calls"; run_lock_wait_orig "$@"; }
+    add_feed_event() { echo a >> "$rr_d/calls"; run_add_event_orig "$@"; }
+    : > "$rr_d/calls"; unset GOVFEED_DIR; add_record_events refs/heads/main HEAD )
+  echo "ac5=$(grep -c . .git/gov-feed.log) $(grep -c w "$rr_d/calls") $(grep -c a "$rr_d/calls") $(awk -F'\t' '$1 != NR { b = 1 } END { print b ? "broken" : "unbroken" }' .git/gov-feed.log) $(cat .git/gov-feed.seq)"
+) 2>&1 )
+read_rr_field() { sed -n "s/^$1=//p" <<<"$rr_out"; }
+same "TOOL-dTotalRecall-24 the seed's two records land as two events" "$(read_rr_field seed)" "2"
+same "AC1 the door writes its record" "$(read_rr_field ac1.door)" "0"
+same "AC1 three landed commits append one event per record file of the first two" "$(read_rr_field ac1.new)" "2"
+same "AC1 ...the door-made one naming its record's blob" "$(read_rr_field ac1.c1)" "ok"
+same "AC1 ...the hand-made one naming its record's blob" "$(read_rr_field ac1.c2)" "ok"
+same "AC1 ...and none for the commit outside MEMORY_ROOT" "$(read_rr_field ac1.c3)" "0"
+same "AC2 the same call again appends nothing" "$(read_rr_field ac2.again)" "4"
+same "AC2 RED: a builder ignoring the feed's newest record commit and its keys re-appends the history (staged)" "$(read_rr_field ac2.whole)" "8"
+same "AC2 a landing another clone made and this one fetched joins before its own" "$(read_rr_field ac2.fetched)" "before"
+same "AC3 an uncommitted record write is in no event" "$(read_rr_field ac3.uncommitted)" "0"
+same "AC3 ...and the feed checks clean" "$(read_rr_field ac3.check)" "0"
+same "AC3 a planted record line on no branch is extra" "$(read_rr_field ac3.extra)" "1 1"
+same "AC4 a hand commit landed past the lander is missing from --feed check" "$(read_rr_field ac4)" "1 1"
+same "AC4 ...and once the next landing walks it the check is clean" "$(read_rr_field ac4.landed)" "0"
+same "AC8 two deletions and two identical files are one - event and one shared-blob event" "$(read_rr_field ac8)" "- shared "
+same "AC8 ...and the check names no duplicate" "$(read_rr_field ac8.check)" "0 0"
+same "AC8 RED: a walk keeping one event per file prints four (staged)" "$(read_rr_field ac8.perfile)" "4"
+same "DTR115 AC1 a merge landing and the one after it append one line per key, and the same call again none" "$(read_rr_field mg.keys)" "3 0"
+same "DTR115 AC1 ...and the check exits 0 after each landing" "$(read_rr_field mg.check)" "0 0 0"
+same "DTR115 AC1 RED: a builder whose key test is 1 appends one key twice over the second landing (staged)" "$(read_rr_field mg.keyless)" "1"
+same "DTR115 AC2 a copied line prints one duplicate and nothing else" "$(read_rr_field mg.copied)" "1 1 1"
+same "AC10 a root of ../x appends nothing and prints one NOTE" "$(read_rr_field ac10.add)" "0 1"
+same "AC10 ...and the check names it unread" "$(read_rr_field ac10.check)" "1 1"
+same "S3 a walk git refuses appends nothing and prints one NOTE" "$(read_rr_field s3.walk)" "0 1"
+same "S3 a tip naming no commit appends nothing and prints one NOTE" "$(read_rr_field s3.tip)" "0 1"
+same "AC9 --feed rebuild on a node with no feed" "$(read_rr_field ac9.rebuild)" "0"
+same "AC9 ...writes the tracking ref's record events" "$(read_rr_field ac9.events)" "ok"
+same "AC9 ...and --feed check then exits 0" "$(read_rr_field ac9.check)" "0"
+same "AC9 a rebuild with no tracking ref exits 2 naming it" "$(read_rr_field ac9.absent)" "2 1"
+same "AC5 2,000 record commits: 2,000 events, one lock take, no add_feed_event, seq unbroken, the counter the last" \
+  "$(read_rr_field ac5)" "2000 1 0 unbroken 2000"
+rm -rf "$rr_d"
 
 fi
 if in_shard 8; then
@@ -20427,7 +20615,7 @@ cp "$ca_d/plant.sh" "$ca_d/unheld.sh"; cp "$ca_d/plant.sh" "$ca_d/untrapped.sh"
 mutate "$ca_d/unheld.sh" 's/^  ( _fl_mine=$/  { _fl_mine=/'
 mutate "$ca_d/unheld.sh" 's/^    exit 0 ) || rc=\$?$/    exit 0; } || rc=$?/'
 mutate "$ca_d/untrapped.sh" '/^    trap .\[ -z "\$_fl_mine" \] || { .*; }. EXIT$/d'
-mutate "$ca_d/keyless.sh" 's/^      exit 0$/      :/'
+mutate "$ca_d/keyless.sh" 's/^    return 0$/    :/'   # the append-once read's match, `derive_feed_row`'s since TOOL-dTotalRecall-24
 (unset GIT_DIR GIT_WORK_TREE; git init -q "$ca_d/r" && git -C "$ca_d/r" -c user.name=t -c user.email=t@t.test -c commit.gpgsign=false commit -q --allow-empty -m ca --no-verify)
 ca_c=$(unset GIT_DIR GIT_WORK_TREE; git -C "$ca_d/r" rev-parse --path-format=absolute --git-common-dir); ca_c=${ca_c%$'\r'}
 ca_h=$(unset GIT_DIR GIT_WORK_TREE; git -C "$ca_d/r" rev-parse HEAD)
@@ -23634,7 +23822,7 @@ remove_claim_refs
 seed_lease tTk s1 a live "$(derive_claim_now)" k1
 dm_got=$( export CLAUDE_CODE_SESSION_ID=s2; GOVFEED_DIR=""; load_driver_conf >/dev/null 2>&1
   read_claims strict >/dev/null 2>&1; check_claim_writable tTk take-over k1 s2 k1 >/dev/null 2>&1; printf '%s' "$CW_CLS" )
-same "DPR43 AC15 session s2 under the record's keepalive k1 reads a foreign- class in the take-over column" "${dm_got%%-*}" "foreign"
+same "DPR43 AC15 session s2 under the record's keepalive k1 reads a foreign- class in the take-over column" "${dm_got%%-*}" "foreign"  # census: kept slug-grammar the family at index 0
 remove_claim_refs; reset_tree
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -24752,7 +24940,7 @@ while [ $# -gt 0 ]; do
 done
 c=0
 for id in $ids; do
-  h=${id#*-}; h=${h%-*}
+  h=${id#*-}; h=${h%-*}  # census: kept slug-grammar the first and the last segment stripped
   printf 'ask\t%s\tOPEN\t-\t%s\tHIGH\t-\t-\t-\t-\t-\n' "$id" "$h"; c=$((c + 1))
 done
 printf 'examined\t%s\n' "$c"
@@ -25519,7 +25707,16 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # region-eight `same` (S5 2, S6 1, S3 3), each unconditional and outside any loop, off the diff's own
 # lines, the floors read at the build base c3ba5199. No skip branch. No suite ran, and its RED-first
 # observation is the close's.
-FLOOR_ASSERTIONS=4223
+# RAISED 4223 -> 4228 by TOOL-dTotalRecall-115 on 2026-11-25: the record-feed block's merge landing, 4
+# region-eight `same` (AC1 3, AC2 1) and its keyless copy's `mutate`, each unconditional and outside any
+# loop, off the diff's own lines. No skip branch. No suite ran, and its RED-first observation is the close's.
+# RAISED 4228 -> 4237 by TOOL-dTotalRecall-122 on 2026-11-25: the decision check's region-four arms, five `hit` over
+# the reader's fixture lines, one a loop pass, and the refused and admitted messages' two `same` and two `hit`, each
+# unconditional. No skip branch. No suite ran, and its RED-first observation is the close's.
+# RAISED 4237 -> 4239 by TOOL-dTotalRecall-125 on 2026-11-26: the decision loop's two new region-four `hit` passes,
+# the spaced key and the folded value, each unconditional. No skip branch. No suite ran, and its RED-first
+# observation is the close's.
+FLOOR_ASSERTIONS=4239
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25757,7 +25954,9 @@ FLOOR_SHARD_3=471
 # RAISED 415 -> 418 by TOOL-aTrimmedWait-5's fix pass: the same 3 region-four empty-batch assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 410, plus main's 13, plus this branch's 8 = 431.
 # MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: shard 4 the base 423, plus main's 8, plus this branch's 5 = 436; shard 5 this branch's 293, main having moved none.
-FLOOR_SHARD_4=436
+# RAISED 436 -> 445 by TOOL-dTotalRecall-122: the same 9 region-four decision assertions, see FLOOR_ASSERTIONS.
+# RAISED 445 -> 447 by TOOL-dTotalRecall-125: the same 2 region-four decision loop passes, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=447
 FLOOR_SHARD_5=293
 # RAISED 127 -> 130 by TOOL-dPlacedRequest-16: the same 3 region-six settle-over-a-tombstone assertions, see FLOOR_ASSERTIONS.
 FLOOR_SHARD_6=130
@@ -25824,7 +26023,8 @@ FLOOR_SHARD_7=311
 # RAISED 1423 -> 1429 by KICK-dKeptSession-64: the same 6 region-eight ack-batch order-and-exits assertions, see FLOOR_ASSERTIONS.
 # RAISED 1429 -> 1434 by KICK-dKeptSession-65: the same 5 region-eight sent-ack skip and strict-fetch assertions, see FLOOR_ASSERTIONS.
 # RAISED 1434 -> 1440 by KICK-dKeptSession-79: the same 6 region-eight hook-and-marker assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1440
+# RAISED 1440 -> 1445 by TOOL-dTotalRecall-115: the same 5 region-eight merge-landing assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1445
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

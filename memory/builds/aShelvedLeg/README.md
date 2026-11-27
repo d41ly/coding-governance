@@ -81,3 +81,14 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-11-prompt-TOOL-aShelvedLeg-3-brief.md`, `2026-11-11-prompt-TOOL-aShelvedLeg-3-2-spec-writer.md` and 8 more under prompts/ |
+| reviews | `2026-11-11-review-TOOL-aShelvedLeg-2-closing-diff-round1.md` (CLEAN WITH FIXES), `2026-11-10-review-TOOL-aShelvedLeg-1-closing-diff-round2.md` (CLEAN WITH FIXES) and 1 more under reviews/ |
+| logs | `2026-11-11-build-TOOL-aShelvedLeg-2-1-acceptance-ledger.md`, `2026-11-11-build-TOOL-aShelvedLeg-1-1-acceptance-ledger.md` and 1 more under build/ |
+| card ref | `refs/gov/builds/aShelvedLeg/card` |
+<!-- /gen:build-routes -->

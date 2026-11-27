@@ -49,3 +49,12 @@ Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| reviews | `2026-07-12-review-KICK-aRatchetForge-1-tier2-cumulative-main.md` |
+| logs | `2026-08-08-build-KICK-aRatchetForge-1-manifest-ratchet-build-report.md` |
+| card ref | `refs/gov/builds/aRatchetForge/card` |
+<!-- /gen:build-routes -->

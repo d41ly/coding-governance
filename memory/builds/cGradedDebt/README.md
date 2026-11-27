@@ -89,9 +89,22 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 |---|---|---|
 | 1 | `TOOL-cGradedDebt-1` | no |
 | 2 | `TOOL-cGradedDebt-2` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-09-13-review-TOOL-cGradedDebt-1-diff-review-round1.md` |
+| logs | `2026-09-13-build-TOOL-cGradedDebt-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/cGradedDebt/card` |
+<!-- /gen:build-routes -->

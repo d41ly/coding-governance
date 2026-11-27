@@ -241,6 +241,15 @@ id = "playbook/adopter-rules-to-overlay"
 successor = "playbook/adopter-rules-to-overlay-2"
 surfaces = []
 
+# TOOL-dTotalRecall-18 S12: the record kind `journal` became `log`, its old token a read-only alias, so the
+# `record-kind-schema` member `journal.Serves` left the registry with the row's name. No adopter's file
+# moves: every record keeps its bytes. TOOL-dTotalRecall-20 ships the adopter's upgrade step for the alias
+# and may name it in this row's place.
+[[retired]]
+id = "memory-tree/record-kind-journal"
+successor = "none"
+surfaces = ["record-kind-schema:journal.Serves"]
+
 # ------------------------------------------------------------------------------------- exemptions
 # Each carries a non-empty reason. `selfcheck` reds on an exemption whose path no longer exists, so
 # a stale exemption cannot quietly widen the surface.
@@ -577,15 +586,12 @@ guard = [
   "{prefix}/memory-recall/",
   "memory/",
   ".memory-tree.conf",
-  "{prefix}/memory-tree/id_grammar.py",
-  "{prefix}/memory-tree/tree_lib.py",
-  "{prefix}/policy/budgets.py",
-  "{prefix}/policy/policy.py",
-  "{prefix}/memory-tree/backlog.py",
-  "{prefix}/memory-tree/coverage_join.py",
-  "{prefix}/memory-tree/legacy_ledger.py",
-  "{prefix}/policy/presets.py",
-  "{prefix}/memory-tree/design_lib.py",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "declarations"
 subject = "repo"
@@ -605,15 +611,12 @@ guard = [
   "{prefix}/memory-recall/",
   "memory/",
   "{prefix}/govkit/",
-  "{prefix}/memory-tree/id_grammar.py",
-  "{prefix}/memory-tree/tree_lib.py",
-  "{prefix}/policy/budgets.py",
-  "{prefix}/policy/policy.py",
-  "{prefix}/memory-tree/backlog.py",
-  "{prefix}/memory-tree/coverage_join.py",
-  "{prefix}/memory-tree/legacy_ledger.py",
-  "{prefix}/policy/presets.py",
-  "{prefix}/memory-tree/design_lib.py",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "selftests"
 subject = "repo"
@@ -1175,6 +1178,7 @@ guard = [
   "{prefix}/memory-tree/id_grammar.py",
   "{prefix}/memory-tree/tree_lib.py",
   "{prefix}/lexicon/canon.py",
+  "{prefix}/lexicon/extract_code.py",
   "{prefix}/lexicon/lexicon.py",
   "{prefix}/lexicon/lexicon_conf.py",
   "{prefix}/lexicon/scaffold_lexicon.py",
@@ -1305,7 +1309,7 @@ tag = "leg.gov.runlog-selftest"
 tests = ["feature.runlog"]
 purpose = "arms the runlog kit over fixtures and scratch trees"
 argv = ["python", "{prefix}/runlog/selftest.py"]
-guard = ["{prefix}/runlog/"]
+guard = ["{prefix}/runlog/", "{prefix}/memory-tree/id_grammar.py"]
 chunk = "selftests"
 subject = "kit"
 ceiling = 720
@@ -1321,15 +1325,12 @@ argv = ["python3", "{prefix}/memory-recall/selftest.py"]
 guard = [
   "{prefix}/lib/",
   "{prefix}/memory-recall/",
-  "{prefix}/memory-tree/id_grammar.py",
-  "{prefix}/memory-tree/tree_lib.py",
-  "{prefix}/policy/budgets.py",
-  "{prefix}/policy/policy.py",
-  "{prefix}/memory-tree/backlog.py",
-  "{prefix}/memory-tree/coverage_join.py",
-  "{prefix}/memory-tree/legacy_ledger.py",
-  "{prefix}/policy/presets.py",
-  "{prefix}/memory-tree/design_lib.py",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/",
+  "{prefix}/loop/",
+  "{prefix}/playbook/",
+  "{prefix}/roles/",
+  "{prefix}/runlog/",
 ]
 chunk = "selftests"
 subject = "kit"
@@ -1587,6 +1588,7 @@ guard = [
   "{prefix}/workflows/",
   "{prefix}/memory-tree/gen_build_index.py",
   "{prefix}/unattended/unattended.sh",
+  "{prefix}/memory-tree/shape_run.py",
 ]
 chunk = "selftests"
 subject = "kit"
@@ -1826,6 +1828,9 @@ guard = [
   "{prefix}/playbook/row_checks.py",
   "{prefix}/playbook/tag_bundle.py",
   "{prefix}/playbook/tag_index.py",
+  "{prefix}/loop/",
+  "{prefix}/memory-tree/",
+  "{prefix}/playbook/record_extract.py",
 ]
 chunk = "selftests"
 subject = "kit"
@@ -2593,6 +2598,7 @@ tag = "leg.gov.ratchet-never-gains"
 tests = ["feature.memory-tree-hygiene"]
 purpose = "refuses a population's growth past its base"
 argv = ["python3", "{prefix}/memory-tree/ratchet.py", "never-gains"]
+reads = { base = "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).", history = "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)." }
 chunk = "declarations"
 subject = "repo"
 ceiling = 300
@@ -2649,6 +2655,7 @@ tag = "leg.gov.ratchet-seed-laundering"
 tests = ["feature.memory-tree-hygiene"]
 purpose = "refuses a baseline row re-dated or re-seeded"
 argv = ["python3", "{prefix}/memory-tree/ratchet.py", "seed-laundering"]
+reads = { base = "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).", history = "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)." }
 chunk = "declarations"
 subject = "repo"
 ceiling = 300
@@ -2663,6 +2670,7 @@ tag = "leg.gov.ratchet-rename"
 tests = ["feature.memory-tree-hygiene"]
 purpose = "refuses a renamed file's rows left uncarried"
 argv = ["python3", "{prefix}/memory-tree/ratchet.py", "rename"]
+reads = { base = "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).", history = "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)." }
 chunk = "declarations"
 subject = "repo"
 ceiling = 300
@@ -2821,3 +2829,94 @@ fields = ["namespace"]
 drain = "key"
 direction = "shrink-only"
 home = "memory/project/unpurposed-namespaces.txt"
+
+# The records that predate the record-kind registry and every record naming its cause (TOOL-dTotalRecall-1
+# S8, §8 F6; TOOL-dTotalRecall-19 S7; one registration by TOOL-dTotalRecall-52): gov's own, beside the
+# `record-kinds` leg's row below, so it owes no step and an adopter's tree is unarmed. Keyed by path,
+# section and check, so a record legacy for both checks holds one row per check and a drain takes one
+# slice's row: the `kind-schema` slice, one `<path> <row name> kind-schema 1` row per record a `fields`
+# row of `<prefix>/memory-tree/record-kinds.toml` graded at landing, read by the `record-kinds` leg; the
+# `causes` slice, one `<path> - causes 1` row per tracked Markdown record at the seed and under
+# `memory.legacy-anchors` `derived` one `<path> <anchor> causes 1` row per untagged heading, read by the
+# `record causes` leg. `verbatim` keeps a numeric heading's anchor a key, never a line number.
+[[ledger]]
+population = "record-kinds-legacy"
+leg = "record-kinds"
+seed = ["python", "{prefix}/memory-tree/record_kinds.py", "--seed-legacy"]
+key = "record"
+fields = ["path", "section", "check"]
+verbatim = ["section"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/record-kinds-legacy.txt"
+
+# The build READMEs that may still type a derived front-matter key (TOOL-dTotalRecall-4 S4, section 8
+# F6): gov's own, beside `record-kinds-legacy`, so it owes no step and an adopter's tree is unarmed.
+# One `<path> 1` row per tracked README typing `node`, `roster` or `streams` at the seed; a README
+# written after it types none, and the generator refuses one that does.
+[[ledger]]
+population = "build-readme-typed-derived"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/gen_build_index.py", "--print-typed-derived"]
+key = "record"
+fields = ["path"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/build-readme-typed-derived.txt"
+
+# The census hits kept by path (TOOL-dTotalRecall-68 S1): gov's own, so it owes no step and an adopter holds
+# none. One row per build script no pass of this repository may edit, the census named by its function;
+# `tree_lib.py`'s `read_kept_rows` is the one reader, and a file a pass may edit keeps its hit by the census
+# marker on its line instead. `records` is `-` for a plain keep. The alias row keeps the departures
+# instrument's `journal` compare (TOOL-dTotalRecall-56 S2), drained by ask PLAY-dClosedLoop-1003. The reason is
+# a key field, so a reworded keep is a new key; a keep added later goes through `ratchet.py widen`. The leg
+# reads the `check_cause_writers` rows; the `record-kinds` leg reads the alias row.
+[[ledger]]
+population = "census-kept-paths"
+leg = "record causes (causes and orphans over the legacy population)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "census-kept-paths"]
+key = "key"
+fields = ["census", "path", "reason", "records"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/census-kept-paths.txt"
+
+[[exempt_leg]]
+name = "record-kinds"
+tag = "leg.gov.record-kinds"
+why = "it grades gov's own record population against gov's registry and its legacy ledger, which lives in govkit's registry and no adopter install holds. TOOL-dTotalRecall-1 S3, S11."
+tests = ["feature.memory-tree-hygiene"]
+purpose = "grades every record kind's row and its records"
+argv = ["python", "{prefix}/memory-tree/record_kinds.py", "--check"]
+chunk = "records"
+ceiling = 122
+subject = "repo"
+enforces = ["principle.p16"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "edge cardinality (per source and per target, over the merged tree)"
+tag = "leg.gov.edge-cardinality-per-source-and-per-target-over-the"
+why = "it runs `<prefix>/playbook/edge_grammar.py --cardinality --registry`, the per-source and per-target count of every edge gov's own tree declares, the build README relations included, against the `cardinality` each row of `<prefix>/playbook/edges.toml` carries, and the kind registry's mirror of those bounds. The checker ships with the playbook-render kit's `**` include, so an adopter receives it, but the LEG is gov's: the records and READMEs it counts are authored here, beside the `edges` leg it joins in the `tags` pack. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. A red is one node given two successors or one record two causes, one fact held twice. TOOL-dTotalRecall-22."
+tests = ["feature.playbook"]
+purpose = "counts each edge type per source and per target"
+argv = ["python", "{prefix}/playbook/edge_grammar.py", "--cardinality", "--registry"]
+chunk = "declarations"
+ceiling = 180
+subject = "repo"
+pack = "tags"
+enforces = ["practice.one-fact"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "record causes (causes and orphans over the legacy population)"
+tag = "leg.gov.record-causes-causes-and-orphans-over-the-legacy"
+why = "it grades gov's own records against the `causes` slice of the record-kinds-legacy population, which lives in govkit's registry and no adopter install holds. TOOL-dTotalRecall-19 S12, section 8 F8."
+tests = ["feature.memory-tree-hygiene"]
+purpose = "grades every record's cause and its reach from a root"
+argv = ["python", "{prefix}/memory-tree/record_causes.py", "--check"]
+chunk = "records"
+ceiling = 180
+subject = "repo"
+enforces = ["principle.p35"]
+stage = ["step.test"]

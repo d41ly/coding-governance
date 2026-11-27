@@ -251,6 +251,18 @@ it.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-17-review-TOOL-aBranchedMandate-4-2.md` (BLOCKED), `2026-08-17-review-TOOL-aBranchedMandate-3.md` and 2 more under reviews/ |
+| logs | `2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md`, `2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aBranchedMandate/card` |
+<!-- /gen:build-routes -->
 <!-- gen:build-index -->
 **Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11 TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13
