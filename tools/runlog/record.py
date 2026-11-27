@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""record.py — one run's committed record: a closed-schema report and its JSON twin. gov:kit runlog@1.19
+"""record.py — one run's committed record: a closed-schema report and its JSON twin. gov:kit runlog@1.20
 
 A run's model is machine-local, and most runs are made on some other node. This renders the model into
 ONE tracked record in the build folder, under the declared memory root, that every node can read. The
@@ -79,7 +79,11 @@ LIST_BOUND = 20
 NONE = "-"
 RECORD_TAG = "runlog"
 TITLE = "# Run record"
-SERVES_KIND = "journal"
+SERVES_KIND = "log"
+# The kind's read-only alias (TOOL-dTotalRecall-18 S8): a committed run record headed `journal`, the
+# kind's name before it became `log`, still binds. Inline, since this kit requires none; the memory-tree
+# kit's `record_kinds.py --check` holds it to `tree_lib.KIND_ALIASES` by `ast`, never by import.
+SERVES_ALIASES = ("journal",)  # census: kept alias-compare the alias table itself
 INTRO = ("Rendered from the run model by the runlog kit's `record` command. Every value below is drawn "
          "from a closed schema, so no line carries free text. Re-render it rather than edit it.")
 DATA_OPEN = "```json"
@@ -142,9 +146,11 @@ COUNTED_STATES = ("present", "partial")
 TIME_SOURCES = ("git", "run-state")
 _GIT, _RUN_STATE = frozenset(("git",)), frozenset(("run-state",))
 DATE_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
-RECORD_NAME_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-build-([A-Z]+-[A-Za-z0-9]+-[0-9]+)-"
-                            + RECORD_TAG + r"-([0-9a-f]{8})\.md")
-UNIT_ID_RE = re.compile(r"([A-Z]+)-([A-Za-z0-9]+)-([0-9]+)")
+# A record's name and a unit id, each slug the slug grammar's class (TOOL-dTotalRecall-5 S7).
+RECORD_NAME_RE = rl.derive_slug_pattern(lambda c: r"[0-9]{4}-[0-9]{2}-[0-9]{2}-build-([A-Z]+-(?:" + c + r")-[0-9]+)-"
+                                        + RECORD_TAG + r"-([0-9a-f]{8})\.md")
+UNIT_ID_RE = rl.derive_slug_pattern(lambda c: r"([A-Z]+)-((?:" + c + r"))-([0-9]+)")
+UNIT_RANGE_RE = rl.derive_slug_pattern(lambda c: r"([A-Z]+)-((?:" + c + r"))-([0-9]+)(?:\.\.([0-9]+))?")
 PLACEHOLDER_RE = re.compile(r"\{([a-z-]+)\}")
 COMMITMENT_RE = re.compile(r"sha256 ([0-9a-f]{64}) · lines ([0-9]+)")
 # EVERY SUMMARY FACT WHOSE RENDERED VALUE A PARSER IN THIS KIT READS BACK, mapped to that parser
@@ -184,6 +190,8 @@ RECORD_SCHEMA = {
     "cap_bytes": RECORD_CAP_BYTES,
     "title": TITLE,
     "serves_kind": SERVES_KIND,
+    # The head's optional fourth line, its one spelling (TOOL-dTotalRecall-60 S31): `CAUSE_LINE_RE` below.
+    "cause_line": r"\*\*Caused-by:\*\* (\S+)",
     "intro": INTRO,
     "none": NONE,
     # THE CLASSES THAT CARRY A TIME (spec S1 of TOOL-dLoggedFlight-20). `sources` below declares
@@ -420,6 +428,9 @@ RECORD_SCHEMA = {
         "uuid": r"[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}",
     },
 }
+# The run record's cause line (TOOL-dTotalRecall-36 S4), one shape for the head that admits it and the
+# check that grades its target (TOOL-dTotalRecall-48 S1, S2), compiled from the schema's `cause_line`.
+CAUSE_LINE_RE = re.compile(RECORD_SCHEMA["cause_line"])
 
 # ---------------------------------------------------------------------------------- small helpers
 
@@ -752,6 +763,14 @@ def render_serves(ids) -> str:
     if run:
         out.append(render_id_run(run))
     return " ".join(out)
+
+
+def render_cause_line(serves) -> str:
+    """The run record's cause line (TOOL-dTotalRecall-36 S4): `**Caused-by:** <the first served id>`, the
+    first of `serves` in `derive_unit_key` order, as `render_serves` sorts them, and bare, never an `N..M`
+    run, since a cause resolves as a family id or a record key and a run is neither. `render_markdown`
+    writes it at line 4, under the Serves line (TOOL-dTotalRecall-48 S3)."""
+    return f"**Caused-by:** {sorted(serves, key=derive_unit_key)[0]}"
 
 
 def render_id_run(run) -> str:
@@ -1146,7 +1165,8 @@ def render_twin(doc) -> str:
 
 
 def render_markdown(doc, serves) -> str:
-    out = [TITLE, "", f"**Serves:** {SERVES_KIND} {render_serves(serves)}", "", INTRO, ""]
+    out = [TITLE, "", f"**Serves:** {SERVES_KIND} {render_serves(serves)}", render_cause_line(serves), "",  # census: kept cause-writer its cause line is render_cause_line, the next element of the head
+           INTRO, ""]
     for name in RECORD_SCHEMA["headings"]:
         out += [f"## {name}", ""]
         if name == "Data":
@@ -1326,9 +1346,10 @@ def check_commitment(root, record_path, journal_root, memory_root=None) -> tuple
 # `source` is TOOL-dLoggedFlight-20 S7's: a row that renders a time beside a source `sources` does not
 # declare that time may come from. It is its OWN rule and not `cell` because the row's source passed
 # its class — `driver` is a source the model has — and a refusal naming `cell` would send a reader
-# looking for a value outside a vocabulary rather than for a time a journal produced.
+# looking for a value outside a vocabulary rather than for a time a journal produced. `cause` is
+# `check_cause_line`'s (TOOL-dTotalRecall-36 S4), reached once the head admits the line (TOOL-dTotalRecall-48).
 RECORD_RULES = ("headings", "first-cell", "cell", "absolute-path", "uuid", "data", "size", "serves", "line",
-                "name", "unreadable", "source")
+                "name", "unreadable", "source", "cause")
 # A build's runs are refused under these, and the leg's own liveness assertions under the last two.
 RUN_RULES = ("run-start", "run-window")
 LIVENESS_RULES = ("root", "glob")
@@ -1470,16 +1491,38 @@ def scan_forbidden(lines) -> list:
     return out
 
 
+def check_cause_line(ln, line, served) -> list:
+    """The head's cause line (TOOL-dTotalRecall-36 S4), `check_serves_line`'s sibling and finding shape:
+    `**Caused-by:** <target>`, the target a bare id inside `served`, the Serves tokens, each `N..M` run
+    read through `UNIT_RANGE_RE` as `check_serves_line` reads it. SHAPE, NEVER ABSENCE
+    (TOOL-dTotalRecall-48 S2): an empty or missing line is a head without a cause and passes here,
+    since whether a record needs one is the causes check's question, which reads the legacy population
+    this kit cannot. `check_record_lines` calls it over the line 4 its head admits."""
+    if not line:
+        return []
+    m = CAUSE_LINE_RE.fullmatch(line)
+    if m is None:
+        return [(ln, "cause", "the line is not `**Caused-by:** <target>`")]
+    t = UNIT_RANGE_RE.fullmatch(m.group(1))
+    for tok in served:
+        r = UNIT_RANGE_RE.fullmatch(tok)
+        if t and r and not t.group(4) and t.group(1, 2) == r.group(1, 2) \
+                and int(r.group(3)) <= int(t.group(3)) <= int(r.group(4) or r.group(3)):
+            return []
+    return [(ln, "cause", f"the cause `{m.group(1)}` is no unit the record serves")]
+
+
 def check_serves_line(ln, line, slug, own_ids) -> list:
-    """The head's binding line: `**Serves:** journal <ids>`, every id one a spec of THIS build defines."""
+    """The head's binding line: `Serves: log <ids>`, bolded, or its read-only alias `journal`, every id one a
+    spec of THIS build defines."""
     m = re.fullmatch(r"\*\*Serves:\*\* (\S+) (.+)", line or "")
     if m is None:
-        return [(ln, "serves", "the head's third line is not `**Serves:** <kind> <ids>`")]
+        return [(ln, "serves", "the head's third line is not `**Serves:** <kind> <ids>`")]  # census: kept cause-writer reader: a refusal naming the binding shape
     out = []
-    if m.group(1) != SERVES_KIND:
+    if m.group(1) != SERVES_KIND and m.group(1) not in SERVES_ALIASES:
         out.append((ln, "serves", f"the binding kind is not `{SERVES_KIND}`"))
     for tok in m.group(2).split(" "):
-        r = re.fullmatch(r"([A-Z]+)-([A-Za-z0-9]+)-([0-9]+)(?:\.\.([0-9]+))?", tok)
+        r = UNIT_RANGE_RE.fullmatch(tok)
         if r is None:
             out.append((ln, "serves", "a token that is neither a unit id nor an id range"))
             continue
@@ -1579,16 +1622,23 @@ def check_record_lines(lines, checks, slug, own_ids) -> list:
     out = [(ln, "line", "a CR byte; the renderer writes LF only") for ln, line in enumerate(lines, 1)
            if "\r" in line]
     lines = [line.replace("\r", "") for line in lines]
-    for i, want in enumerate((TITLE, "", None, "", INTRO, "")):
+    # Line 4 is the cause line where it matches `**Caused-by:** <target>`, the fixed tail one line
+    # lower; else the head is the six lines every record before TOOL-dTotalRecall-48 carries. Its
+    # ABSENCE is never graded here (S2).
+    cause = len(lines) > 3 and CAUSE_LINE_RE.fullmatch(lines[3]) is not None
+    head = (TITLE, "", None, None, "", INTRO, "") if cause else (TITLE, "", None, "", INTRO, "")
+    for i, want in enumerate(head):
         got = lines[i] if i < len(lines) else None
-        if want is None:
+        if want is None and i == 2:
             out += check_serves_line(i + 1, got, slug, own_ids)
+        elif want is None:
+            out += check_cause_line(i + 1, got, lines[2].split(" ")[2:])
         elif got != want:
             out.append((i + 1, "line", "the record's head is fixed text, and this line departs from it"))
     headings, sec, spec, labels, table, started = [], None, None, [], None, False
     data_state, fence_ln, json_lines = None, 0, []
     last = len(lines) - 1 if lines and lines[-1] == "" else len(lines)
-    for idx in range(min(6, len(lines)), last):
+    for idx in range(min(len(head), len(lines)), last):
         ln, line = idx + 1, lines[idx]
         if data_state == "open":
             if line == DATA_CLOSE:

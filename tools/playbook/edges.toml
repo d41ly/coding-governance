@@ -6,7 +6,11 @@
 # native-id classes (`family-id`, `clause-id`, `commit`), or the class words `any` (every registered namespace and
 # every native id) and `selects` (every namespace whose row has role = "selects"); `pin`, `none`, `tag` or
 # `clause`; `status`, `declared` or `derived`; `declared-at`, the site that owns the fact; and an optional
-# `writer`, the one site that writes the type, an edge of it read at any other site being red. A word not
+# `writer`, the one site that writes the type, an edge of it read at any other site being red. Every
+# declared row carries `cardinality = { per-source, per-target }` (TOOL-dTotalRecall-22), each a positive
+# integer or `many`: how many edges of the type one source may carry and one target receive, counted over
+# the merged tree by `edge_grammar.py --cardinality`; a type the design bounds nowhere writes `many` on
+# both ends, and the derived row carries none. The kind registry mirrors each bounded type. A word not
 # registered yet (`feature`, `item`, `record`, `session`, `act`, and the classes `spec`,
 # `decision` and `build`) admits nothing until its build registers it; an id matching no class under such
 # a word is `unarmed`. These are P33's twelve declared types and the derived `cites`, then
@@ -17,6 +21,12 @@
 # once and the commit adapter reads this table. A row with no `type` registers a key that carries a
 # value and no edge (`Gov-Transition`, `Gov-Policy`, `Red-fix`): the adapter passes over it, and the
 # one trailer reader, commit_trailers.read_commits, reads every row's key and refuses any other.
+#
+# One [[front-matter]] row per build README relation key (TOOL-dTotalRecall-6 S1): `key`, the `type` of
+# the closed set it declares, and `target`, the address form each of its targets is typed by (`slug`, a
+# build slug; `unit-id`, a family id whose slug names its build; `tag`, a tag of the tag index). A key
+# is a spelling, never a type: `depends-on` and its alias `parents` both declare `after`. Read by the
+# memory-tree kit's gen_build_index.read_relation_rows, which inverts each edge into its target's README.
 
 [[edge]]
 type = "part-of"
@@ -26,15 +36,17 @@ to = ["any"]
 pin = "none"
 status = "declared"
 declared-at = "annotations, dossier claims"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "implements"
 inverse = "implemented-by"
-from = ["any"]
+from = ["any", "build"]
 to = ["feature", "spec"]
 pin = "none"
 status = "declared"
 declared-at = "gov:feature, the code record"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "tests"
@@ -44,6 +56,7 @@ to = ["any"]
 pin = "none"
 status = "declared"
 declared-at = "the test's own declaration"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "decides"
@@ -53,6 +66,7 @@ to = ["any", "commit", "item"]
 pin = "none"
 status = "declared"
 declared-at = "the decision row; Decided: trailers"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "instructs"
@@ -62,6 +76,7 @@ to = ["selects"]
 pin = "none"
 status = "declared"
 declared-at = "the unit's scope"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "enforces"
@@ -71,6 +86,7 @@ to = ["unit", "practice", "principle"]
 pin = "none"
 status = "declared"
 declared-at = "the leg's or hook's fields"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "after"
@@ -80,33 +96,37 @@ to = ["build", "session"]
 pin = "none"
 status = "declared"
 declared-at = "the chain row; the session binding, through resume and fork"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "supersedes"
 inverse = "superseded-by"
-from = ["any"]
+from = ["any", "build"]
 to = ["any"]
 pin = "tag"
 status = "declared"
 declared-at = "the new node"
+cardinality = { per-source = "many", per-target = "1" }
 
 [[edge]]
 type = "amends"
 inverse = "amended-by"
-from = ["any"]
+from = ["any", "build"]
 to = ["any"]
 pin = "tag"
 status = "declared"
 declared-at = "the amending node"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "patches"
 inverse = "patched-by"
 from = ["build"]
-to = ["build", "item"]
+to = ["build", "item", "family-id"]
 pin = "none"
 status = "declared"
 declared-at = "the patch build's intake"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "owner"
@@ -116,6 +136,7 @@ to = ["build", "layer"]
 pin = "none"
 status = "declared"
 declared-at = "the node's declaration"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "layer"
@@ -125,6 +146,7 @@ to = ["layer"]
 pin = "none"
 status = "declared"
 declared-at = "the descriptor"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "cites"
@@ -145,24 +167,27 @@ to = ["family-id", "item", "build"]
 pin = "none"
 status = "declared"
 declared-at = "the **Serves:** line; the Gov-Unit:, Gov-Item: and Pass: trailers; the gov:handoff marker's unit= and build="
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "made-by"
 inverse = "made"
 from = ["commit", "record"]
-to = ["act", "owner"]
+to = ["act", "owner", "made-by-stand-in"]
 pin = "none"
 status = "declared"
 declared-at = "the Gov-Act: trailer; the record header's **Made-by:**"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "caused-by"
 inverse = "causes"
 from = ["record"]
 to = ["any"]
-pin = "none"
+pin = "clause"
 status = "declared"
 declared-at = "the record header's **Caused-by:**"
+cardinality = { per-source = "1", per-target = "many" }
 
 [[edge]]
 type = "follows"
@@ -172,6 +197,7 @@ to = ["work-order"]
 pin = "none"
 status = "declared"
 declared-at = "the act record"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "answers"
@@ -181,6 +207,7 @@ to = ["work-order", "fork"]
 pin = "none"
 status = "declared"
 declared-at = "the return's header; the answer's section"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "runs-in"
@@ -190,6 +217,7 @@ to = ["session"]
 pin = "none"
 status = "declared"
 declared-at = "the session binding; a claim's session:; the Gov-Session: trailer"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "carries"
@@ -199,6 +227,7 @@ to = ["family-id", "commit"]
 pin = "none"
 status = "declared"
 declared-at = "the landing record"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "carries-clause"
@@ -208,6 +237,7 @@ to = ["clause-id"]
 pin = "clause"
 status = "declared"
 declared-at = "the spec's **Carries:** line"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "pinned-at"
@@ -217,6 +247,7 @@ to = ["commit", "tree"]
 pin = "none"
 status = "declared"
 declared-at = "a record's Derived at, a probe's pin"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "reads"
@@ -226,6 +257,7 @@ to = ["kind"]
 pin = "none"
 status = "declared"
 declared-at = "the role definition's reads: field and the item's declaration"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "writes"
@@ -235,6 +267,7 @@ to = ["kind"]
 pin = "none"
 status = "declared"
 declared-at = "the role definition's writes: field and the item's declaration"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "promoted-from"
@@ -244,6 +277,7 @@ to = ["any"]
 pin = "none"
 status = "declared"
 declared-at = "instructions.edit's change record"
+cardinality = { per-source = "many", per-target = "many" }
 writer = "instructions.edit"
 
 # PLAY-dOrderedCharter-49 S40: a spec's `### Edges` block, each its own type and inverse (F11). The hygiene
@@ -257,6 +291,7 @@ to = ["family-id"]
 pin = "none"
 status = "declared"
 declared-at = "a spec's ### Edges block"
+cardinality = { per-source = "many", per-target = "many" }
 
 [[edge]]
 type = "hands-off"
@@ -266,6 +301,7 @@ to = ["family-id"]
 pin = "none"
 status = "declared"
 declared-at = "a spec's ### Edges block"
+cardinality = { per-source = "many", per-target = "many" }
 
 # The commit trailer keys, each with the type it declares (the memory plan's [sites], a commit).
 
@@ -307,3 +343,36 @@ key = "Red-fix"            # value: one gate leg's name, read by the routed-comm
 
 [[trailer]]
 key = "Commit-Checked"     # value: unattended@<kit version>, written by the commit check, TOOL-dWitnessedBar-2
+
+# The build README's relation keys, each with the type it declares and its targets' address form
+# (TOOL-dTotalRecall-6 S1, gap-mem-07). The rows' order is the order a README's relation lines render in.
+
+[[front-matter]]
+key = "depends-on"
+type = "after"
+target = "slug"
+
+[[front-matter]]
+key = "parents"            # the alias, read exactly as depends-on
+type = "after"
+target = "slug"
+
+[[front-matter]]
+key = "patches"
+type = "patches"
+target = "unit-id"
+
+[[front-matter]]
+key = "amends"
+type = "amends"
+target = "unit-id"
+
+[[front-matter]]
+key = "supersedes"
+type = "supersedes"
+target = "slug"
+
+[[front-matter]]
+key = "implements"
+type = "implements"
+target = "tag"

@@ -82,7 +82,7 @@ esac
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.180   # gov:kit memory-tree@2.180 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.183   # gov:kit memory-tree@2.183 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -180,11 +180,11 @@ ENTRY_CAP_CHARS=300           ; BUILD_README_ENTRY_CAP_CHARS=350
 # .memory-tree.conf sees a byte-identical run.
 #
 # SOME OF THESE NARROW WHAT IS GRADED and are therefore validated below rather than merely read.
-# BUILD_SLUG_RE is a predicate; RECORD_SERVES_CUTOFF and RECORD_UNDATED_ARTIFACTS are population filters: a bad value does not
+# RECORD_SERVES_CUTOFF and RECORD_UNDATED_ARTIFACTS are population filters: a bad value does not
 # red, it silently grades NOTHING and reports green. A regex matching the empty string admits every
 # folder name; a cutoff dated in the future excludes every record. That is the difference between a
 # declared key and a hole with a name.
-BUILD_SLUG_RE=""              # blank = ^[A-Za-z][A-Za-z0-9-]*$ ; must be anchored and must not match ""
+BUILD_SLUG_RE=""              # RETIRED as an input (TOOL-dTotalRecall-5 S6): a non-blank value refuses, naming the policy keys
 PROJECT_REGISTRY_EXTRA=""     # whitespace-separated extra filenames legal under <M>/project/
 RECORD_SERVES_CUTOFF=""       # blank = grade every record; else ISO date, records BEFORE it are exempt
 ENTRY_CAP_UNIT=""             # blank = today's locale-decided counting; or `chars` / `bytes`
@@ -230,20 +230,11 @@ done
 # behaviour"; invalid is "this configuration cannot be graded", and a checker that treats the second
 # as the first reports green over a population it silently emptied.
 _cfgbad=""
+# BUILD_SLUG_RE IS RETIRED AS AN INPUT (TOOL-dTotalRecall-5 S6, §8 F3): check 4's pattern is derived from
+# the policy keys by the slug grammar, so the slug grammar has one carrier, and a set conf value is a
+# second one. It refuses by name rather than being read or ignored.
 if [ -n "$BUILD_SLUG_RE" ]; then
-  case "$BUILD_SLUG_RE" in
-    "^"*) ;; *) _cfgbad="$_cfgbad BUILD_SLUG_RE='$BUILD_SLUG_RE' (not anchored at ^: an unanchored slug pattern matches inside any name)" ;;
-  esac
-  case "$BUILD_SLUG_RE" in
-    *"$") ;; *) _cfgbad="$_cfgbad BUILD_SLUG_RE='$BUILD_SLUG_RE' (not anchored at \$: an unanchored slug pattern matches any suffix)" ;;
-  esac
-  # THE EMPTY-STRING TEST IS THE LOAD-BEARING ONE. A pattern that matches "" matches every folder
-  # name, so check 4 passes everything and reports a clean tree. Asked of awk, which is the engine
-  # that will actually apply it -- asking `grep` a question awk answers is two dialects and one
-  # assumption.
-  if printf '' | awk -v re="$BUILD_SLUG_RE" '{ } END { exit ("" ~ re) ? 0 : 1 }' 2>/dev/null; then
-    _cfgbad="$_cfgbad BUILD_SLUG_RE='$BUILD_SLUG_RE' (matches the EMPTY string, so check 4 would admit every folder name)"
-  fi
+  _cfgbad="$_cfgbad BUILD_SLUG_RE='$BUILD_SLUG_RE' (retired: the slug grammar is the policy keys builds.slug-words, builds.slug-style and builds.slug-date in .governance/policy.toml; move the value there and delete this key)"
 fi
 if [ -n "$RECORD_SERVES_CUTOFF" ]; then
   case "$RECORD_SERVES_CUTOFF" in
@@ -302,7 +293,7 @@ BMODE="${BACKLOG_MODE:-}"; [ -n "$BMODE" ] || BMODE=shards
 # `memory/archive/…`, so the append-only exemption had been silently dead for as long as any project
 # key was set. A print mode that prepends prose to its value is a delegate answering a question it
 # was not asked, and the consumer cannot tell. Found by the Tier-2 review of TOOL-cSpliceWarden.
-for _dk in BUILD_SLUG_RE PROJECT_REGISTRY_EXTRA RECORD_SERVES_CUTOFF RECORD_UNDATED_ARTIFACTS ENTRY_CAP_UNIT ROTATION_MODE BACKLOG_MODE; do
+for _dk in PROJECT_REGISTRY_EXTRA RECORD_SERVES_CUTOFF RECORD_UNDATED_ARTIFACTS ENTRY_CAP_UNIT ROTATION_MODE BACKLOG_MODE; do
   eval "_dv=\${$_dk}"
   [ -n "$_dv" ] && echo "memory-hygiene: project key $_dk='$_dv' (gov's default is blank)" >&2
 done
@@ -654,6 +645,34 @@ refuse_wrong_shell() {
 # <<< refuse_wrong_shell
 refuse_wrong_shell || exit 2
 _PY=$(resolve_python) || { echo "HYGIENE — no usable python; checks 9 and 13-19 delegate to sibling modules"; exit 2; }
+# ---- THE SLUG GRAMMAR (TOOL-dTotalRecall-5 S5, S6) ------------------------------------------------
+# Derived ONCE, by this kit's `id_grammar.py` through the resolved python, never re-derived here: the
+# two print modes below are the shell and JavaScript readers' export, and `read_slug_ere` the class
+# checks 4, 5, 12 and 21 splice. The policy reader refusing is not a module failure: the module applies
+# the defaults, exits 0 and writes its `fallback` line on stderr, which SLUG_NOTE keeps and check 4
+# prints once beside its first finding, as CAP_NOTE is printed beside the first size breach. A module
+# run that exits non-zero refuses the run at exit 2 with its last line, never a fallback pattern.
+# The block is the legacy shape, the answer of a kit that cannot reach this one, which carries it inline.
+# >>> slug_legacy_sh — canonical copy: check-memory-hygiene.sh in the memory-tree kit (byte-identical; gated)
+SLUG_LEGACY_ERE='[a-z][A-Za-z]{2,}'
+# <<< slug_legacy_sh
+case "${1:-}" in
+  --print-slug-re|--print-slug-class) exec "$_PY" "$HERE/id_grammar.py" --print "${1#--print-}" "$ROOT" ;;
+esac
+SLUG_ERE="" SLUG_NOTE=""
+read_slug_ere() {
+  [ -n "$SLUG_ERE" ] && return 0
+  local _out _rc
+  _out=$("$_PY" "$HERE/id_grammar.py" --print slug-class "$ROOT" 2>&1); _rc=$?
+  _out=${_out//$'\r'/}
+  if [ "$_rc" != 0 ] || [ -z "${_out##*$'\n'}" ]; then
+    echo "HYGIENE — cannot run: the slug grammar did not derive, id_grammar.py --print slug-class exited $_rc: ${_out##*$'\n'}"
+    exit 2
+  fi
+  SLUG_ERE=${_out##*$'\n'}
+  case "$_out" in *$'\n'*) SLUG_NOTE=${_out%$'\n'*} ;; esac
+  return 0
+}
 # THE TWO GRANDFATHER LISTS, read through the ledger factory this kit carries (TOOL-dWitnessedBar-16 S4):
 # `legacy-files.txt` and `curation-debt.txt` are ledger populations keyed by `path`, one row per listed
 # file, so no line of either is parsed here. ONE python spawn reads both, and an absent list is an empty
@@ -1102,6 +1121,9 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # The same class again: the roles kit's catalogue checker reads the owner's stand-in waivers at
   # this DEFAULT path under <M>/project/ (TOOL-aOrientedCast-19 S5).
   F:role-stand-in-waiver.txt) ;;
+  # The same class: this kit's two record censuses read their keep rows at this DEFAULT path, at every
+  # adopter that keeps a hit in its build folders (TOOL-dTotalRecall-70 S12, TOOL-bQuiltedLantern-3).
+  F:census-kept-paths.txt) ;;
   # The same class: the drift-audit kit's populations, its pins and its baselines, which its
   # `[[upgrade]]` steps write at this DEFAULT path at every adopter (TOOL-dWitnessedBar-16 S14).
   F:drift-pins.txt|F:drift-baselines.txt) ;;
@@ -1187,17 +1209,17 @@ BUILD_N=$(printf '%s\n' "$FILES" | awk -F/ -v m="$M" '$0 ~ "^" m "/builds/" && N
 # Passed as ONE binding and split in BEGIN rather than filtered by a shell loop: check 4 runs
 # over every tracked file under builds/, and a per-file `in_legacy` call would trade one awk
 # for thousands of subshells.
+read_slug_ere
 bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
-  | LC_ALL=C awk -F/ -v m="$M" -v famalt="$FAM_ALT" -v slugre="$BUILD_SLUG_RE" -v legacy="$LEGACY" -v bmode="$BMODE" '
+  | LC_ALL=C awk -F/ -v m="$M" -v famalt="$FAM_ALT" -v slugre="^($SLUG_ERE)$" -v slug="$SLUG_ERE" -v legacy="$LEGACY" -v bmode="$BMODE" '
       BEGIN {
         n_m = split(m, _seg, "/"); fidx = n_m + 2    # <m>/builds/<folder>
-        # S1 — the slug pattern is a PROJECT value now. Blank keeps the gov default. Any override was
-        # validated in the preset block before this ran: anchored at both ends, and NOT matching
-        # the empty string, because a pattern matching "" admits every folder name silently.
-        vre = (slugre != "") ? slugre : "^[A-Za-z][A-Za-z0-9-]*$"
+        # The slug pattern is BUILD_SLUG_RE of the slug grammar (TOOL-dTotalRecall-5 S6), the union of
+        # every grammar a build was minted under, derived by the module and never blank.
+        vre = slugre
         _nleg = split(legacy, _lg, "\\n")
         for (_i = 1; _i <= _nleg; _i++) if (_lg[_i] != "") LEG[_lg[_i]] = 1
-        rre = "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-(prompt|spec|build|review)-((" famalt ")-)?[A-Za-z0-9]+-[0-9]+\\.md$"
+        rre = "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-(prompt|spec|build|review)-((" famalt ")-)?(" slug ")-[0-9]+\\.md$"
         # An ARCHIVED run-state file (2.18). A GRAMMAR, because the whitelist above it is string
         # equality and a family of names cannot be spelled that way. SHAPE, not vocabulary: a phase
         # token and a content hash. `RUN\\..*\\.md` would admit `RUN.notes.md` and `RUN.md.bak` at
@@ -1238,6 +1260,7 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
 bad4=$(printf '%s\n' "$bad4" | grep . || true)
 [ -n "$bad4" ] && fail 4 "build-folder naming/shape:
 $bad4"
+[ -n "$bad4" ] && [ -n "$SLUG_NOTE" ] && { echo "$SLUG_NOTE"; SLUG_NOTE=""; }
 fi
 
 
@@ -1254,6 +1277,7 @@ if [ "$NAMES_GRADED" = 1 ]; then
 c5_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(prompts|spec|build|reviews)/(.+/)?[^/]+\.md$" || true)
 [ "$STAGED" = 1 ] || pop_guard 5 "no recording file under $M/builds/*/{prompts,spec,build,reviews}/" \
   "$(printf '%s\n' "$c5_sel" | grep -c . || true)" "$PRE_RECORD"
+read_slug_ere
 bad5=$(printf '%s\n' "$c5_sel" | grep . | while IFS= read -r f; do
   in_legacy "$f" && continue
   # Fork-free basename + SUBFOLDER extraction (was basename + awk + grep = 3 forks per recording file).
@@ -1261,7 +1285,7 @@ bad5=$(printf '%s\n' "$c5_sel" | grep . | while IFS= read -r f; do
   # immediate parent: `spec/units/x.md` is a spec, and `units` is not a kind.
   base=${f##*/}; rest=${f#"$M"/builds/}; rest=${rest#*/}; sub=${rest%%/*}
   case "$sub" in prompts) kind=prompt;; spec) kind=spec;; build) kind=build;; reviews) kind=review;; esac
-  [[ $base =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-$kind-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+$REC_TAIL\.md$ ]] || echo "$f"
+  [[ $base =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-$kind-(($FAM_ALT)-)?($SLUG_ERE)-[0-9]+$REC_TAIL\.md$ ]] || echo "$f"
 done)
 # The DEPTH is not the problem, and the message says so on a CONTINUATION line — the first line is
 # this branch's check-arms signature and its arm sits exactly at the armed floor with no slack.
@@ -1881,7 +1905,8 @@ $bad21u"
   # `FAM_ALT` arrives by `-v`, as check 12's driver does it, rather than being interpolated into
   # the program text: a shell-expanded alternation inside an awk program is the class this corpus
   # records as `heredoc-escape-reaches-the-regex`.
-  proj21=$(printf '%s\n' "$b21" | awk -F'\t' -v famalt="$FAM_ALT" '
+  read_slug_ere
+  proj21=$(printf '%s\n' "$b21" | awk -F'\t' -v famalt="$FAM_ALT" -v slug="$SLUG_ERE" '
     $1 != "S" || NF < 4 { next }        # the retired `sed` required all four fields; so does this
     {
       p = $2; ids = $4
@@ -1890,9 +1915,9 @@ $bad21u"
         print "  " p " — the name carries no date, so no id can be read from it"; next
       }
       rest = substr(base, 12)           # past the date prefix the test above proved is there
-      sub(/^[^-]*-/, "", rest)          # drop the kind, exactly as `${stem#*-}` did
+      sub(/^[^-]*-/, "", rest)          # drop the kind, exactly as `${stem#*-}` did  # census: kept slug-grammar not a unit id: the awk comment naming the stem expansion
       claimed = ""
-      if (match(rest, "^(" famalt ")-[A-Za-z0-9]+-[0-9]+")) claimed = substr(rest, RSTART, RLENGTH)
+      if (match(rest, "^(" famalt ")-(" slug ")-[0-9]+")) claimed = substr(rest, RSTART, RLENGTH)
       if (claimed == "") {
         print "  " p " — bound, but the name carries no family-qualified id"; next
       }
@@ -2237,7 +2262,8 @@ SPEC_CANON10="$SPEC_CANON
 # `P` = analyse. `[ -f ]` stays a bash builtin so the absent-file finding keeps its position in the
 # stream. The canon rides in on `-v canon=`: this kit has ONE nine-line canon and one equality, so it
 # needs no canon records in the driver and therefore has no TAB-truncation hazard to guard against.
-c12_all=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/spec/(.+/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+$REC_TAIL\.md$" || true)
+read_slug_ere
+c12_all=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/spec/(.+/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-(($FAM_ALT)-)?($SLUG_ERE)-[0-9]+$REC_TAIL\.md$" || true)
 [ "$STAGED" = 1 ] || pop_guard 12 "no spec file under $M/builds/*/spec/" "$(printf '%s\n' "$c12_all" | grep -c . || true)" "$PRE_SPEC"
 # TOOL-dPavedRoad-4: `J` = a sibling read for its EDGES only, so the joins see both ends of a pair.
 # The build set is the staged SPECS' folders, never FILES, which is the whole listing when the conf
@@ -2281,7 +2307,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v icut="$FORK_ITEM_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v t1cut="$SPEC_TIER1_CUTOFF" -v stg="$STAGED" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v icut="$FORK_ITEM_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v t1cut="$SPEC_TIER1_CUTOFF" -v stg="$STAGED" -v slug="$SLUG_ERE" '
   # ---- The §8 grammar, ONCE for this program (TOOL-dDerivedDocket-31): the documented mark, the
   # ---- F-item opener, and a span resolved by its own mark. Removing code spans and double-quoted
   # ---- spans only DELETES text, so a stray delimiter pairing with a later one can hide a real mark,
@@ -2329,7 +2355,7 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       if (tok ~ /^[A-Za-z]+$/) bare = 1
       if (tok ~ /[ \t]/) continue
       sub(/:[0-9]+(-[0-9]+)?$/, "", tok)
-      if (tok ~ /^[A-Z]+-[A-Za-z]+-[0-9]+$/ || tok ~ /^[-0-9]+$/) continue
+      if (tok ~ ("^[A-Z]+-(" slug ")-[0-9]+$") || tok ~ /^[-0-9]+$/) continue
       if (index(tok, "_") > 0 || index(tok, "/") > 0 || tok ~ /[.][A-Za-z0-9_]+$/ \
           || tok ~ /[a-z][A-Z]/ || tok ~ /--[A-Za-z]/) return 1
     }
@@ -3600,7 +3626,7 @@ alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
 # ----
 # ---- NARROWED, NO LONGER HELD (TOOL-dPavedRoad-4). Under `--staged` both listings keep only the
 # ---- build folders a staged path sits in (`_SBUILD`), and the units graded are those whose spec is
-# ---- staged or whose id a staged journal record's `**Evidences:**` line names, each against every
+# ---- staged or whose id a staged log record's `**Evidences:**` line names, each against every
 # ---- record in its own build folder, as the full run grades it. A unit the commit names nowhere stays
 # ---- silent, and a record in another build evidencing a graded unit is read only by the full run.
 # ---- The announce line counts the graded units, so an empty selection reads 0 rather than a pass.
@@ -3628,7 +3654,7 @@ if [ -n "$alcut" ]; then
       while ((getline line < f) > 0) {    # from a fresh process per file, and losing it would
         sub(/\r$/, "", line)              # a CRLF worktree on Linux delivers the CR into awk
         $0 = line                         # attribute one record'"'"'s criteria to the next
-        if ($0 ~ /^\*\*Serves:\*\*/) j = ($0 ~ /\*\*Serves:\*\* *journal/)
+        if ($0 ~ /^\*\*Serves:\*\*/) j = ($0 ~ /\*\*Serves:\*\* *(log|journal) /)  # census: kept alias-compare both tokens: the pattern reads log and its alias as one kind
         if ($0 ~ /^\*\*Evidences:\*\* /) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
           u = (j ? $2 : ""); continue }
         if ($0 ~ /^#/) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
@@ -3849,13 +3875,13 @@ if [ -n "$alcut" ]; then
     [ -n "$_uuid" ] || continue
     [ -n "${ALHASLAB[$_useq]+x}" ] || alnolab="$alnolab $_uuid"
   done <<<"$alU"
-  [ -z "$algap" ] || fail 23 "a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
+  [ -z "$algap" ] || fail 23 "a CLOSED unit numbers an acceptance criterion that no log record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
   [ -z "$albad" ] || fail 23 "an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox:$albad"
   [ -z "$alnolab" ] || fail 23 "a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true:$alnolab"
-  [ -z "$alorph" ] || fail 23 "a journal record evidences a criterion label its own spec does not number, so the answer satisfies nothing and reads as coverage:$alorph"
+  [ -z "$alorph" ] || fail 23 "a log record evidences a criterion label its own spec does not number, so the answer satisfies nothing and reads as coverage:$alorph"
   [ -z "$altokbad" ] || fail 23 "a ledger answer shares no backticked token with the criterion it claims to answer, so the two are joined by label alone and may describe different things:$altokbad"
   if [ "$STAGED" = 1 ]; then
-    printf 'memory-hygiene: check 23 graded %s unit(s) that a staged spec or journal record names, against the records of their own build folders; the push-boundary run grades every closed unit\n' "$alpop"
+    printf 'memory-hygiene: check 23 graded %s unit(s) that a staged spec or log record names, against the records of their own build folders; the push-boundary run grades every closed unit\n' "$alpop"
   else
   [ "$alpop" -gt 0 ] || printf 'memory-hygiene: check 23 measured NO unit — every closed Tier-2 spec predates ACCEPTANCE_LEDGER_CUTOFF, so a green verdict here is coverage of nothing\n'
   # TOOL-aJoinedCanon-6: each new arm announces its OWN empty population. Both cutoffs ship ahead of

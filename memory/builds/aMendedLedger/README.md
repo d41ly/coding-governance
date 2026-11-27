@@ -34,7 +34,7 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 8 unit(s) · node a · opened 2026-08-09 · streams tooling+playbook
+**Build status:** SPECCED · 8 unit(s) · node a · opened 2026-08-09 · streams tooling
 ids TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 TOOL-aMendedLedger-9
 
 <!-- gen:build-units -->
@@ -68,3 +68,14 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md`, `2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md` and 2 more under reviews/ |
+| logs | `2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aMendedLedger/card` |
+<!-- /gen:build-routes -->

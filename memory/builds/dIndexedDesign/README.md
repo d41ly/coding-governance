@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-17 TOOL-dIndexedDesign-18 TOOL-dIndexedDesign-19 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-21 TOOL-dIndexedDesign-22 TOOL-dIndexedDesign-23 TOOL-dIndexedDesign-24 TOOL-dIndexedDesign-25 TOOL-dIndexedDesign-26 TOOL-dIndexedDesign-27 TOOL-dIndexedDesign-28 TOOL-dIndexedDesign-29 TOOL-dIndexedDesign-30 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53
+ids: TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-17 TOOL-dIndexedDesign-18 TOOL-dIndexedDesign-19 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-21 TOOL-dIndexedDesign-22 TOOL-dIndexedDesign-23 TOOL-dIndexedDesign-24 TOOL-dIndexedDesign-25 TOOL-dIndexedDesign-26 TOOL-dIndexedDesign-27 TOOL-dIndexedDesign-28 TOOL-dIndexedDesign-29 TOOL-dIndexedDesign-30 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53 TOOL-dIndexedDesign-54
 parents: dDeclaredLoop dTotalRecall dKeptSession dBoundRoles dLinkedLibrary
 may: PLAY-dClosedLoop-3
 ---
@@ -81,7 +81,7 @@ ids TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dInde
 ids TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-17 TOOL-dIndexedDesign-18 TOOL-dIndexedDesign-19 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-21 TOOL-dIndexedDesign-22 TOOL-dIndexedDesign-23 TOOL-dIndexedDesign-24 TOOL-dIndexedDesign-25
 ids TOOL-dIndexedDesign-26 TOOL-dIndexedDesign-27 TOOL-dIndexedDesign-28 TOOL-dIndexedDesign-29 TOOL-dIndexedDesign-30 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37
 ids TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49
-ids TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53
+ids TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53 TOOL-dIndexedDesign-54
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -185,6 +185,8 @@ Coverage of dIndexedDesign's 16 clause(s) and 28 owned node(s), over 40 spec(s) 
 | 19 | `TOOL-dIndexedDesign-46`, `TOOL-dIndexedDesign-47`, `TOOL-dIndexedDesign-48`, `TOOL-dIndexedDesign-49`, `TOOL-dIndexedDesign-51` | no |
 | 20 | `TOOL-dIndexedDesign-52` | no |
 | 21 | `TOOL-dIndexedDesign-53` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
@@ -192,3 +194,18 @@ Coverage of dIndexedDesign's 16 clause(s) and 28 owned node(s), over 40 spec(s) 
 - **Parent builds:** [dBoundRoles](../dBoundRoles/README.md), [dDeclaredLoop](../dDeclaredLoop/README.md), [dKeptSession](../dKeptSession/README.md), [dLinkedLibrary](../dLinkedLibrary/README.md), [dTotalRecall](../dTotalRecall/README.md)
 - **Child builds:** [dScopedBuild](../dScopedBuild/README.md), [dTendedCadence](../dTendedCadence/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-05-prompt-TOOL-dIndexedDesign-9-1-spec-reviewer.md`, `2026-11-05-prompt-TOOL-dIndexedDesign-8-1-spec-writer.md` and 31 more under prompts/ |
+| reviews | `2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md` (BLOCKED), `2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md` (CLEAN WITH FIXES) and 1 more under reviews/ |
+| deviation | `2026-11-05-build-TOOL-dIndexedDesign-9-deviation-91.md`, `2026-11-05-build-TOOL-dIndexedDesign-8-deviation-82.md` and 53 more under build/ |
+| research | `2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md`, `2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md` and 10 more under build/ |
+| logs | `2026-10-28-build-TOOL-dIndexedDesign-1-departures-spec.md`, `2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dIndexedDesign/card` |
+<!-- /gen:build-routes -->

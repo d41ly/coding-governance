@@ -382,6 +382,8 @@ owner = "dTotalRecall"
 name = "asks.acceptance"
 allowed = ["refuse", "grade"]
 default = "refuse"
+summary = "Whether the record door files an ask whose clauses state no acceptance, neither an accept clause nor a seen clause with a run command: refuse it unwritten, or file it and report it not ready, the memory hygiene check grading it after."
+usage = 'asks.acceptance = "grade"'
 owner = "dTotalRecall"
 
 [[key]]
@@ -394,18 +396,24 @@ owner = "dLinkedLibrary"
 name = "builds.slug-words"
 allowed = { type = "pattern", regex = "[0-9]+-[0-9]+" }
 default = "1-3"
+summary = "How many capitalised words a new build slug carries after its node letter, as lo-hi; a changed range binds new mints only, and every slug minted before it still reads."
+usage = 'builds.slug-words = "2-2"'
 owner = "dTotalRecall"
 
 [[key]]
 name = "builds.slug-style"
 allowed = ["humorous", "descriptive"]
 default = "humorous"
+summary = "Where a new build slug's words come from, a humorous pick or a description of the build; the style is recorded with the slug and never changes its shape."
+usage = 'builds.slug-style = "descriptive"'
 owner = "dTotalRecall"
 
 [[key]]
 name = "builds.slug-date"
 allowed = ["none", "shown", "in-slug"]
 default = "none"
+summary = "Whether a build's opened date is left out, shown beside its slug in the generated views, or written into a new slug after the node letter, as eight digits or a hyphenated date."
+usage = 'builds.slug-date = "shown"'
 owner = "dTotalRecall"
 
 [[key]]
@@ -1566,6 +1574,8 @@ owner = "dFurnishedOrders"
 name = "memory.code-languages"
 allowed = ["builtin", "builtin+ctags", "ctags"]
 default = "builtin"
+summary = "Which extractors the code record reads a tree with: builtin takes Python, shell and JavaScript definitions and calls and every other file at file level, builtin+ctags adds the definitions of every other language from the ctags on PATH, and ctags takes every language's definitions from it, the built-in extractors still giving calls; under either ctags value a missing ctags stops the run."
+usage = 'memory.code-languages = "builtin+ctags"'
 owner = "dTotalRecall"
 
 [[key]]
@@ -1578,18 +1588,24 @@ owner = "dLinkedLibrary"
 name = "memory.load-budget"
 allowed = ["4k", "8k", "16k"]
 default = "8k"
+summary = "The bytes the default load's memory share may take at session start, the card and the auto-memory index each measured against it as its own figure on the card's memory cell, a k being 1,000 bytes."
+usage = 'memory.load-budget = "16k"'
 owner = "dTotalRecall"
 
 [[key]]
 name = "memory.item-budget"
 allowed = { type = "enum", of = ["measured", 96, 128], registry = "KB per role (each role's cap the owner's to adjust)" }
 default = "measured"
+summary = "The KB of memory slices one work order may hand a role, summed over its read keys: measured reads 96 for every role until 30 sliced work orders per role are measured, or 96 or 128 for every role."
+usage = 'memory.item-budget = 128'
 owner = "dTotalRecall"
 
 [[key]]
 name = "memory.over-budget"
 allowed = ["refuse", "report", "off"]
 default = "report"
+summary = "What a work order's memory slices over memory.item-budget do, outside budgets.enforce: refuse the render naming role, bytes and cap, report one line and render, or off, render with nothing said."
+usage = 'memory.over-budget = "refuse"'
 owner = "dTotalRecall"
 
 [[key]]
@@ -1626,18 +1642,24 @@ owner = "dFurnishedOrders"
 name = "memory.map-purpose"
 allowed = ["review", "ledger", "derive", "refuse"]
 default = "review"
+summary = "How a record kind with no declared purpose is graded: review, each derived with its source or put to the owner in one ask per namespace; ledger, listed on the purpose-pending ledger; derive, derived with no ask; or refuse, record-kinds red while any lacks one."
+usage = 'memory.map-purpose = "review"'
 owner = "dTotalRecall"
 
 [[key]]
 name = "memory.legacy-anchors"
 allowed = ["derived", "none", "retag"]
 default = "derived"
+summary = "How a record written before every record named its cause is read: derived, its Serves lines as its cause and an anchor derived for each untagged heading, no file rewritten; none, no anchor and the record read as reached; or retag, its authored tags alone, once the retag step has rewritten it."
+usage = 'memory.legacy-anchors = "none"'
 owner = "dTotalRecall"
 
 [[key]]
 name = "memory.superseded-slices"
 allowed = ["refuse", "mark"]
 default = "refuse"
+summary = "What a read key whose record another supersedes does: refuse the render naming its successor, or mark, the key handed with a superseded-by line naming it."
+usage = 'memory.superseded-slices = "mark"'
 owner = "dTotalRecall"
 
 [[key]]

@@ -75,9 +75,22 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 |---|---|---|
 | 1 | `TOOL-aGuardedEffort-1` | no |
 | 2 | `TOOL-aGuardedEffort-2` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-10-prompt-TOOL-aGuardedEffort-2-round1-fix-brief.md`, `2026-11-10-prompt-TOOL-aGuardedEffort-2-bar-fix-brief.md` and 5 more under prompts/ |
+| reviews | `2026-11-10-review-TOOL-aGuardedEffort-1-diff-review-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-11-10-build-TOOL-aGuardedEffort-2-1-acceptance-ledger.md`, `2026-11-10-build-TOOL-aGuardedEffort-1-agent-ledger.md` and 1 more under build/ |
+| card ref | `refs/gov/builds/aGuardedEffort/card` |
+<!-- /gen:build-routes -->

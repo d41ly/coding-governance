@@ -216,7 +216,7 @@ INERT: `roster_ids` selects `[A-Z]+-<slug>-[0-9]+` and matched none of these. Re
 
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling
 ids TOOL-aStandingWrit-1 TOOL-aStandingWrit-2 TOOL-aStandingWrit-3 TOOL-aStandingWrit-4 TOOL-aStandingWrit-5 TOOL-aStandingWrit-6 TOOL-aStandingWrit-7 TOOL-aStandingWrit-8 TOOL-aStandingWrit-9
 
 <!-- gen:build-units -->
@@ -243,3 +243,13 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-11-review-TOOL-aStandingWrit-1-2.md`, `2026-08-11-review-TOOL-aStandingWrit-1-1.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aStandingWrit/card` |
+<!-- /gen:build-routes -->

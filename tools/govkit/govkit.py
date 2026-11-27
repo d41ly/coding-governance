@@ -1795,6 +1795,43 @@ def check_source_rows(root: pathlib.Path, descs: dict, r: "Report") -> None:
     r.note(f"source rows: {len(hits)} shipped engine file(s) citing gov's records")
 
 
+def check_generated_attributes(root: pathlib.Path, descs: dict, r: "Report") -> None:
+    """TOOL-dTotalRecall-37 S2: under the tool root, the paths git reads `linguist-generated` as `set` on
+    are the kits' rendered outputs that are no Markdown, both ways. The code record leaves out what
+    carries the attribute, so a source marked is a source no reader sees and a render unmarked enters
+    it twice. Only `set` counts, the value that record reads. DOES NOT CHECK: a generated path outside
+    the tool root; a rendered `.md`; a render written outside a `role = "rendered"` row, or by a row
+    whose include is a glob; whether the record honours the attribute."""
+    tr = derive_tool_root(root)
+    head = f"{tr}/" if tr else ""
+    rendered: set[str] = set()
+    for eid, (d, _p) in descs.items():
+        ctx = derive_home_ctx(root, eid, d)
+        for rule in d.get("files", []):
+            if rule.get("role") != "rendered":
+                continue
+            for src in rule_sources(d, rule):
+                for dest, missing in resolve_dests(d, rule, src, ctx, (d.get("home") or "").rstrip("/")):
+                    if dest.endswith(".md"):
+                        continue
+                    if missing:
+                        r.fail(f"entry '{eid}' renders '{src}' to '{dest}', whose token(s) "
+                               f"{', '.join('{' + m + '}' for m in missing)} gov cannot resolve, so no "
+                               f"linguist-generated line can be held against it")
+                    elif dest.startswith(head):
+                        rendered.add(dest)
+    marked = {p for p, v in read_attr_population(root, "linguist-generated").items()
+              if v == "set" and p.startswith(head)}
+    for p in sorted(rendered - marked):
+        r.fail(f"'{p}' is rendered but not linguist-generated — name it in .gitattributes, or its "
+               f"definitions enter the code record beside its source's")
+    for p in sorted(marked - rendered):
+        r.fail(f"'{p}' is linguist-generated but rendered by no kit — unmark it in .gitattributes, or "
+               f"the code record holds nothing of it")
+    r.note(f"generated attributes: {len(rendered)} non-Markdown render output(s), {len(marked)} "
+           f"linguist-generated path(s) under the tool root")
+
+
 def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int:
     reg = load_registry(root)
     if fix:
@@ -3655,6 +3692,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     r.note(f"adopter names: {len(_anames)} from {len(_adopters)} adopters.toml row(s) over "
            f"{len(_shipped)} shipped file(s) · {sum(_measured.values())} site(s)")
     check_source_rows(root, descs, r)
+    check_generated_attributes(root, descs, r)
 
     # ---- 11: TOOL-dSafePassage-6. EVERY FORWARDER IS ITS RENDER, AND NONE CLOSES BEFORE ITS WINDOW.
     #          `shims.py`'s parity over `shims.toml` (each open row's forwarder equals its render,
@@ -5979,7 +6017,12 @@ def lf_pin_block(pins: list[tuple[str, str, str]]) -> tuple[str, str, str]:
 
 
 def eol_population(target: pathlib.Path) -> dict[str, str]:
-    """Ask GIT which tracked paths resolve to which `eol` value. Never a pattern match.
+    """Which tracked paths resolve to which `eol` value, by git's own answer."""
+    return read_attr_population(target, "eol")
+
+
+def read_attr_population(target: pathlib.Path, attr: str) -> dict[str, str]:
+    """Ask GIT which tracked paths resolve to which value of `attr`. Never a pattern match.
 
     An attributes PATTERN and a git PATHSPEC are different languages, and feeding one string to both
     is wrong in BOTH directions on the exact patterns this seeds: `memory/**/*.md` as an attribute
@@ -5992,7 +6035,7 @@ def eol_population(target: pathlib.Path) -> dict[str, str]:
     files = [f for f in files if f]
     if not files:
         return {}
-    out = subprocess.run(["git", "-C", str(target), "check-attr", "--stdin", "-z", "eol"],
+    out = subprocess.run(["git", "-C", str(target), "check-attr", "--stdin", "-z", attr],
                          input="\0".join(files), capture_output=True, text=True, encoding="utf-8")
     fields, res = out.stdout.split("\0"), {}
     for i in range(0, len(fields) - 2, 3):
@@ -14269,14 +14312,18 @@ def derive_version_value(desc: dict, line: str) -> str:
     return v.group(0) if v else line
 
 
+def derive_home_ctx(root: pathlib.Path, eid: str, desc: dict) -> dict[str, str]:
+    """`canonical_ctx` with `{kit}` the entry's own home, else the tool root: where the kit sits in gov."""
+    return {**canonical_ctx(eid), "kit": (desc.get("home") or "").rstrip("/") or derive_tool_root(root)}
+
+
 def derive_regenerate_argvs(root: pathlib.Path, eid: str, desc: dict) -> list[list[str]]:
     """An entry's declared `[[regenerate]]` argvs, tokens resolved, duplicates dropped, in order.
 
-    `{kit}` is the entry's home, else the tool root, and every other token comes from
-    `canonical_ctx`, so each argv runs from the repo root. `selfcheck --fix` prints these and
-    `mint` runs them: one resolution, so the command printed is the command a landing runs.
+    The ctx is `derive_home_ctx`'s, so each argv runs from the repo root. `selfcheck --fix` prints
+    these and `mint` runs them: one resolution, so the command printed is the command a landing runs.
     """
-    ctx = {**canonical_ctx(eid), "kit": (desc.get("home") or "").rstrip("/") or derive_tool_root(root)}
+    ctx = derive_home_ctx(root, eid, desc)
     out: list[list[str]] = []
     for g in desc.get("regenerate") or []:
         argv = [resolve_tokens(str(a), ctx)[0] for a in (g.get("argv") or [])]

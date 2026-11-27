@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.35
+gov:kit drift-audit@1.36
 
     python <prefix>/drift-audit/drift_report.py            # human table, always exits 0
     python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -150,7 +150,7 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-KIT_DRIFT_AUDIT_VERSION = "1.35"
+KIT_DRIFT_AUDIT_VERSION = "1.36"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -720,14 +720,18 @@ _NODE_TAG_CLASS = "a-z"
 _FAMILY_SHAPE = re.compile(r"^[A-Z][A-Z0-9]*$")
 
 
-def _build_local_ident(families) -> str:
+def _build_local_ident(families, slug_class=None) -> str:
     """The LOCAL COPY of the shipped id alternation, for a tree with no id grammar module.
 
     Byte-compared against the extractor's own output by this kit's self-test whenever that kit is
-    present, which is what keeps "fallback" from meaning "second grammar".
+    present, which is what keeps "fallback" from meaning "second grammar". `slug_class` is the slug
+    grammar's, spliced into the session era as the module's `_eras` splices it (TOOL-dTotalRecall-5
+    S4); None is the inline legacy shape, the fallback's answer where the module does not import.
     """
     node = _NODE_TAG_CLASS
-    eras = (r"\d{3}", rf"[{node}]\d{{2,3}}", rf"[{node}][A-Za-z]{{2,}}-\d+[a-z]*")
+    session = (r"(?:" + slug_class + r")" if slug_class is not None
+               else rf"[{node}][A-Za-z]{{2,}}")
+    eras = (r"\d{3}", rf"[{node}]\d{{2,3}}", session + r"-\d+[a-z]*")
     # A conf declaring NO families must not narrow the grammar to nothing: that is the blind
     # oracle this unit exists to remove, reintroduced through the fallback. The permissive form
     # below is what the hand-typed pattern did, so an undeclared tree keeps exactly the coverage
@@ -833,15 +837,26 @@ def _read_families(conf) -> tuple:
     return tuple(out)
 
 
-def _parse_slug(uid: str):
-    """The slug PROJECTION of a matched id, or None for an era that has none.
+def _parse_slug(uid: str, root=None):
+    """The slug PROJECTION of a matched id under `root`'s grammar, None the default tree, or None for
+    an era that has none.
 
     DERIVED, not captured. The shipped alternation carries no groups of its own and exposes no
-    per-era parts, so a second capture group would mean re-deriving the session era's shape here —
-    the second grammar the import above exists to remove.
+    per-era parts, so the slug is the memory-tree kit's one id parser's (TOOL-dTotalRecall-38 S3),
+    never a second grammar here. Where that kit does not load, or loads and refuses the tree, the
+    family and the sequence are stripped instead, the first and the last hyphen's segments, which is
+    right under every slug grammar (§8 F5), as `_resolve_ident` keeps a present-but-unusable sibling
+    from taking the report down.
     """
-    parts = uid.split("-")
-    return parts[1] if len(parts) == 3 else None
+    try:
+        return load_memory_tree("id_grammar.py", "id grammar",
+                                "drift parses an id's slug through it").parse_id_parts(uid, root)[1]
+    except ValueError:
+        return None
+    except Exception:
+        pass
+    middle = uid.partition("-")[2].rpartition("-")[0]
+    return middle or None
 NON_TERMINAL = frozenset({"OPEN", "SPECCED", "BLOCKED", "INPROGRESS"})
 
 
@@ -1295,7 +1310,7 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         if when.group(1) < ctx.trace_cutoff:
             unjudged += 1  # grandfathered: it closed before the convention it would be judged by.
             continue
-        uid, slug = own.group(1), _parse_slug(own.group(1))
+        uid, slug = own.group(1), _parse_slug(own.group(1), ctx.root)
         if slug is None:
             unjudged += 1  # an era with no slug: this BUILD-level question has no key here.
             continue
@@ -1555,56 +1570,6 @@ def _build_armed_exts(langs_value, lex, _langs, sets):
     return out
 
 
-def _read_defs_at_sha(ctx, sha, armed, lex, sets):
-    """`{(path, name)}` — every function definition an armed extractor sees in the tree at `sha`.
-
-    ONE `git cat-file --batch` for the whole tree, not one read per file. Measured on node `d`: the
-    per-file shape cost 2.774 s for both shas at 108 spawns, and this box taxes every exec by roughly
-    0.022 s (`memory/gotchas/process-creation-is-the-suite-cost.md`), so 108 spawns IS 2.4 s of that.
-    The cost here is spawn count rather than compute, and the batched read is what keeps it off the
-    signal's budget.
-    """
-    listing = ctx.git.run("ls-tree", "-r", sha)
-    if listing.returncode != 0:
-        return None
-    want = []
-    for line in listing.stdout.splitlines():
-        meta, _, path = line.partition("\t")
-        bits = meta.split()
-        if len(bits) < 3 or bits[1] != "blob" or lex.ext_of(path) not in armed:
-            continue
-        want.append((bits[2], path))
-    if not want:
-        return set()
-    batch = subprocess.run(
-        ["git", "-C", str(ctx.root), "cat-file", "--batch"],
-        input="".join(b + "\n" for b, _ in want).encode(),
-        capture_output=True,
-    )
-    if batch.returncode != 0:
-        return None
-    defs, buf, i = set(), batch.stdout, 0
-    for _blob, path in want:
-        nl = buf.find(b"\n", i)
-        if nl < 0:
-            return None
-        header = buf[i:nl].split()
-        if len(header) < 3:
-            return None
-        size = int(header[2])
-        src = buf[nl + 1: nl + 1 + size].decode("utf-8", errors="replace")
-        i = nl + 1 + size + 1
-        pset, mode = armed[lex.ext_of(path)]
-        try:
-            got = lex.extract_text(src, mode, pset, sets=sets)
-        except (SyntaxError, ValueError, KeyError):
-            continue
-        if got:
-            for nm, _ln in got[0]:
-                defs.add((path, nm))
-    return defs
-
-
 def build_lexicon_marginal_offense_rate(ctx) -> dict:
     """Offenders ADDED per definition ADDED, between the commit that adopted the declaration and HEAD.
 
@@ -1695,8 +1660,10 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     # dict never survives to a second run anyway, which is a moving part with no consumer.
     sets = _resolve_lexicon_sets(ctx, lex)
     armed = _build_armed_exts(langs_value, lex, _langs, sets)
-    at_base = _read_defs_at_sha(ctx, base, armed, lex, sets)
-    at_head = _read_defs_at_sha(ctx, head, armed, lex, sets)
+    # THE LEXICON'S OWN BATCHED READER, one `git ls-tree` and one `git cat-file --batch` per sha; the
+    # copy this file kept retired once the reader moved into the shared block (TOOL-dTotalRecall-13 S7).
+    at_base = lex.read_defs_at_sha(ctx.root, base, armed, sets)
+    at_head = lex.read_defs_at_sha(ctx.root, head, armed, sets)
     # L2 and L3 — a population that is empty at either end means the extractor is not reading, which
     # is indistinguishable from a clean window unless it is said out loud.
     if at_base is None or at_head is None or not at_base or not at_head:
@@ -2400,7 +2367,7 @@ def build_source_cited_ids_with_no_record(ctx) -> dict:
             for m in anchor.finditer(text):
                 uid = m.group(1)
                 defined.add(uid)
-                s = _parse_slug(uid)
+                s = _parse_slug(uid, ctx.root)
                 if s:
                     slugs.add(s)
 
@@ -2424,7 +2391,7 @@ def build_source_cited_ids_with_no_record(ctx) -> dict:
     for uid in sorted(cited):
         if uid in defined:
             continue
-        s = _parse_slug(uid)
+        s = _parse_slug(uid, ctx.root)
         if not s or s not in slugs:
             continue  # a slug no record anchors: a fixture, not a finding
         findings.append({"id": uid, "cited_in": sorted(cited[uid])[:3]})

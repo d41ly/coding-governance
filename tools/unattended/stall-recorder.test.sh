@@ -306,11 +306,11 @@ SID="11111111-2222-3333-4444-555555555555"
 # build_fixture <phase> <session-fact> -> a scratch tree: .git/HEAD, a conf, one record whose
 # `## Run facts` region carries the phase and the session fact.
 build_fixture() {
-  local d; d=$(mktemp -d "$TMP/fx.XXXXXX")
-  mkdir -p "$d/.git" "$d/memory/builds/fx"
-  printf 'ref: refs/heads/fx\n' > "$d/.git/HEAD"
+  local d; d=$(mktemp -d "$TMP/fxFix.XXXXXX")
+  mkdir -p "$d/.git" "$d/memory/builds/fxFix"
+  printf 'ref: refs/heads/fxFix\n' > "$d/.git/HEAD"
   printf 'MEMORY_ROOT=memory\n' > "$d/.unattended.conf"
-  printf '# fx\n\n## Run facts\nwitness: abc\nphase: %s\nsession: %s\n\n## Parked\n' "$1" "$2" > "$d/memory/builds/fx/RUN.md"
+  printf '# fxFix\n\n## Run facts\nwitness: abc\nphase: %s\nsession: %s\n\n## Parked\n' "$1" "$2" > "$d/memory/builds/fxFix/RUN.md"
   printf '%s' "$d"
 }
 # build_payload <fixture> [extra-json-object] — BUILT by python, never hand-spliced; the extra
@@ -328,7 +328,7 @@ run_hook() {
   case "$1" in *'"session_id"'*) ;; *) print_bad "the payload builder produced nothing"; OUT=""; ERR=""; RC=99; return;; esac
   OUT=$(printf '%s' "$1" | node "$HOOK" 2>"$TMP/err"); RC=$?; ERR=$(cat "$TMP/err")
 }
-derive_sidecar() { printf '%s/.git/unattended/stall.fx.log' "$1"; }
+derive_sidecar() { printf '%s/.git/unattended/stall.fxFix.log' "$1"; }
 measure_lines() { grep -c '' "$1" 2>/dev/null || echo 0; }
 # read_field <file> <n> — field n (1-based) of the LAST line, split on the first three spaces.
 read_field() { "$TESTPY" -c 'import sys
@@ -413,8 +413,8 @@ mkdir -p "$F/wt-git"; mv "$F/.git/HEAD" "$F/wt-git/HEAD"; rmdir "$F/.git"
 printf 'gitdir: %s\n' "$(resolve_native "$F/wt-git")" > "$F/.git"
 run_hook "$(build_payload "$F" '{"error":"rate_limit"}')"
 check_same "AC6 worktree rc" "$RC" "0"
-[ -f "$F/wt-git/unattended/stall.fx.log" ] && print_ok "AC6 the line landed under the named git dir" || print_bad "AC6 no line under $F/wt-git"
-check_same "AC6 exactly one stall.fx.log under the fixture" "$(find "$F" -name 'stall.fx.log' | grep -c '')" "1"
+[ -f "$F/wt-git/unattended/stall.fxFix.log" ] && print_ok "AC6 the line landed under the named git dir" || print_bad "AC6 no line under $F/wt-git"
+check_same "AC6 exactly one stall.fxFix.log under the fixture" "$(find "$F" -name 'stall.fxFix.log' | grep -c '')" "1"
 
 # ---- §5: an UNWRITABLE sidecar — one stderr sentence, rc 0, nothing on stdout.
 F=$(build_fixture BUILDING "$SID")
@@ -437,16 +437,16 @@ check_same "AC13 the suite is withheld by the descriptor" "$(grep -c 'stall-reco
 TR_T=${KIT_REL%/*}; [ "$TR_T" = "$KIT_REL" ] && TR_T=""; [ -z "$TR_T" ] || TR_T="$TR_T/"
 eval "$(sed -n '/^seed() {/,/^}/p' "$HERE/adopt-unattended.test.sh")"
 FR="$GITTMP/real"; rm -rf "$FR"; mkdir -p "$GITTMP"; seed "$FR" >/dev/null 2>&1
-mkdir -p "$FR/memory/builds/fx"
-printf '# fx\n\n## Run facts\nwitness: abc\nphase: BUILDING\nbranch-ref: refs/heads/main\nsession: %s\npid: absent\n\n## Parked\n' "$SID" > "$FR/memory/builds/fx/RUN.md"
+mkdir -p "$FR/memory/builds/fxFix"
+printf '# fxFix\n\n## Run facts\nwitness: abc\nphase: BUILDING\nbranch-ref: refs/heads/main\nsession: %s\npid: absent\n\n## Parked\n' "$SID" > "$FR/memory/builds/fxFix/RUN.md"
 if [ -f "$FR/$KIT_REL/stall-recorder.js" ] && [ -f "$FR/$KIT_REL/unattended.sh" ]; then
-  BEFORE=$( cd "$FR" && bash "$KIT_REL/unattended.sh" --liveness fx 2>/dev/null | sed -n 's/^last-stall: //p' )
+  BEFORE=$( cd "$FR" && bash "$KIT_REL/unattended.sh" --liveness fxFix 2>/dev/null | sed -n 's/^last-stall: //p' )
   check_same "AC10 before the payload last-stall is none" "$BEFORE" "none"
   OUT=$(printf '%s' "$(build_payload "$FR" '{"error":"rate_limit"}')" | node "$FR/$KIT_REL/stall-recorder.js" 2>"$TMP/err"); RC=$?
   check_same "AC10 real-driver rc" "$RC" "0"
   check_same "AC10 real-driver stdout empty" "$OUT" ""
   LAST=$(tail -n 1 "$(derive_sidecar "$FR")"); LAST=${LAST%$'\r'}
-  AFTER=$( cd "$FR" && bash "$KIT_REL/unattended.sh" --liveness fx 2>/dev/null | sed -n 's/^last-stall: //p' )
+  AFTER=$( cd "$FR" && bash "$KIT_REL/unattended.sh" --liveness fxFix 2>/dev/null | sed -n 's/^last-stall: //p' )
   [ -n "$LAST" ] && print_ok "AC10 the sidecar holds a line" || print_bad "AC10 the sidecar is empty"
   check_same "AC10 last-stall equals the sidecar's last line" "$AFTER" "$LAST"
   check_same "AC10 the reader kept the payload whole" "$(printf '%s' "$AFTER" | grep -c 'rate_limit {"session_id"')" "1"

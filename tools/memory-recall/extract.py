@@ -219,14 +219,14 @@ CHUNK_MAX = 2400
 # questions authored against adopter ic's corpus and joined by id, and no id in it exists anywhere
 # else. An absent default is a legal alias-free corpus (see load_aliases), so an adopter runs with
 # every alias cell empty until they author their own; drop an `aliases.json` in THIS directory and
-# it is picked up with no config edit, and the cache rebuilds on the digest change.
+# it is picked up with no config edit, and the next query re-extracts on the digest change.
 #
-# The join is by id, newline-joining each record's `questions` -- `bench.build_index` gives the
+# The join is by id, newline-joining each record's `questions` -- `bench.build_fts_rows` gives the
 # `alias` key a separate, down-weighted FTS5 column, so bridge text is searchable without diluting
 # the record's own vocabulary.
 #
 # Resolved beside THIS SCRIPT rather than under the repo root: script and data ship together, and
-# both call sites (`main()` here and `query._docs`) hold a repo path that need not contain the kit
+# both call sites (`main()` here and `query.write_recall_rows`) hold a repo path that need not contain the kit
 # directory at all -- a throwaway test repo does not.
 ALIASES_DEFAULT = pathlib.Path(__file__).resolve().parent / "aliases.json"
 

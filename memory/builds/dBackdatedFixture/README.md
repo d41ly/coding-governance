@@ -85,9 +85,21 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `DEPL-dBackdatedFixture-1` | no |
 | 2 | `DEPL-dBackdatedFixture-2` | no |
 | 3 | `DEPL-dBackdatedFixture-3` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-09-16-review-DEPL-dBackdatedFixture-2-spec-audit-round1.md`, `2026-09-16-review-DEPL-dBackdatedFixture-1-spec-audit-round1.md` and 2 more under reviews/ |
+| logs | `2026-09-16-build-DEPL-dBackdatedFixture-1-acceptance-ledger.md` |
+| card ref | `refs/gov/builds/dBackdatedFixture/card` |
+<!-- /gen:build-routes -->

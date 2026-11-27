@@ -724,7 +724,8 @@ def parse_floors(conf: dict) -> dict:
 # WHAT THESE DO NOT CHECK: that a decision id's row actually decided the number beside it (it only
 # has to exist), that a family pattern means what its name says, or that a retired refusal's
 # survivor refuses the same condition (it only has to still carry the signature it was recorded with).
-ID_SHAPE_RE = re.compile(r"[A-Z]+-[A-Za-z]+-[0-9]+")
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
+ID_SHAPE_RE = SlugPattern(lambda g: r"[A-Z]+-(?:" + g.slug_class + r")-[0-9]+")
 DATE_SHAPE_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 RETIREMENTS = "project/refusal-retirements.txt"
 FAMILIES_SUFFIX = ".families.txt"

@@ -87,7 +87,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 69 unit(s) · node d · opened 2026-10-21 · streams kickoff
+**Build status:** CLOSED · 69 unit(s) · node d · opened 2026-10-21 · streams kickoff+tooling
 ids KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14
 ids KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28
 ids KICK-dKeptSession-29 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42
@@ -252,6 +252,8 @@ Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 69 spec(s) at
 | 37 | `KICK-dKeptSession-79` | no |
 | 38 | `KICK-dKeptSession-80` | no |
 | 39 | `KICK-dKeptSession-89` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
@@ -259,3 +261,21 @@ Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 69 spec(s) at
 - **Parent builds:** [dDeclaredLoop](../dDeclaredLoop/README.md), [dPlacedRequest](../dPlacedRequest/README.md)
 - **Child builds:** [dIndexedDesign](../dIndexedDesign/README.md), [dWellOiledMachine](../dWellOiledMachine/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-24-prompt-KICK-dKeptSession-89-spec-brief.md`, `2026-11-24-prompt-KICK-dKeptSession-89-build-brief.md` and 305 more under prompts/ |
+| reviews | `2026-11-23-review-KICK-dKeptSession-69-closing-diff-review-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-KICK-dKeptSession-64-spec-audit.md` (CLEAN WITH FIXES) and 5 more under reviews/ |
+| deviation | `2026-11-05-build-KICK-dKeptSession-9-deviation-94.md`, `2026-11-05-build-KICK-dKeptSession-7-deviation-73.md` and 94 more under build/ |
+| red-fix | `2026-11-24-build-KICK-dKeptSession-80-red-fix-32.md`, `2026-11-24-build-KICK-dKeptSession-80-red-fix-31.md` and 31 more under build/ |
+| widen | `2026-11-24-build-KICK-dKeptSession-89-widen-10.md`, `2026-11-24-build-KICK-dKeptSession-80-widen-9.md` and 8 more under build/ |
+| flake | `2026-11-24-build-KICK-dKeptSession-1-flake-1.md` |
+| research | `2026-11-24-build-KICK-dKeptSession-80-seen-red.md`, `2026-11-24-build-KICK-dKeptSession-80-close-bar-2-attribution.md` and 20 more under build/ |
+| logs | `2026-11-24-build-KICK-dKeptSession-89-1-acceptance-ledger.md`, `2026-11-24-build-KICK-dKeptSession-1-runlog-31fbb903.md` and 70 more under build/ |
+| open asks | `BACKLOG.md`, 19 open |
+| card ref | `refs/gov/builds/dKeptSession/card` |
+<!-- /gen:build-routes -->

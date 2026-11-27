@@ -19,6 +19,7 @@
 - TOOL-dBoundRoles-72 · filed 2026-10-26 · THE OWNER-QUESTION READER TAKES ATTENDANCE FROM ITS CALLER. TOOL-dBoundRoles-11 S5's `resolve_owner_question` takes `attended` as a caller-passed flag, and S6 has no branch for the `owner` answer; TOOL-dFurnishedOrders-16 derives attendance at one site, `derive_attended`, and adds that branch · accept TOOL-dBoundRoles-11 S5 reads `attended` from `derive_attended` and S6 names the `owner` branch TOOL-dFurnishedOrders-16 adds, amended by a rev bump with its §9 line
 - TOOL-dBoundRoles-73 · filed 2026-10-26 · THE PER-ORDER RETURN SCHEMA IS HANDED IN A CIRCLE. TOOL-dBoundRoles-5 §3 hands the return schema rendered per work order to dDeclaredLoop, and TOOL-dDeclaredLoop-29 §3 hands it back to dBoundRoles; TOOL-dFurnishedOrders-19 specs it as `render_return_schema` · accept TOOL-dBoundRoles-5 §3 names TOOL-dFurnishedOrders-19 as the schema's owner, amended by a rev bump with its §9 line
 - TOOL-dBoundRoles-76 · filed 2026-11-21 · THE GOV CANARY GUARDS THE MERGE-BAR GUIDE. TOOL-dWitnessedBar-84 S9 put `memory/guides/MERGE-BAR.md` in the `run-gates gov canary` guard, whose suite tests and greps the guide, and TOOL-dBoundRoles-25 names the guide in its Files touched, so the guard join reads `run-gates gov canary <- memory/guides/MERGE-BAR.md` for its spec; its §7 already names the leg, through its `tools/` paths (derived 2026-11-21, `check-spec-tokens.py --spec` printing no gov-canary hit) · accept TOOL-dBoundRoles-25's §7 still owes `run-gates gov canary` once it leaves DEFERRED, and `check-spec-tokens.py --spec` over its spec prints no `run-gates gov canary <- memory/guides/MERGE-BAR.md` hit
+- TOOL-dBoundRoles-77 · filed 2026-11-23 · TOOL-dTotalRecall-17's map replay lost on recall, so the map renderer is not built: make the work order's map slot's "not installed" terminal · accept the slot renders "not installed" with no pending renderer named → memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict.md
 
 ## Dispositions
 
@@ -49,3 +50,4 @@
 - SEV · TOOL-dBoundRoles-72 · MED · two callers can pass two answers to whether the owner attends
 - SEV · TOOL-dBoundRoles-73 · LOW · a reader following either hand-off finds no owner
 - SEV · TOOL-dBoundRoles-76 · LOW · a carried spec that edits the merge-bar guide could lose the gov canary from its leg line at a re-ground, so its close would not run the arms that read the guide
+- SEV · TOOL-dBoundRoles-77 · MED · the map lost its replay

@@ -59,7 +59,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-10-09 · streams deployer+tooling
 ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenchedProbe-4 DEPL-aBenchedProbe-5 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2
 
 <!-- gen:build-units -->
@@ -91,9 +91,24 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 | 3 | `DEPL-aBenchedProbe-2` | no |
 | 4 | `DEPL-aBenchedProbe-3` | no |
 | 5 | `DEPL-aBenchedProbe-4` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-09-prompt-TOOL-aBenchedProbe-1.md`, `2026-10-09-prompt-TOOL-aBenchedProbe-1-2-build-brief.md` and 2 more under prompts/ |
+| reviews | `2026-10-09-review-TOOL-aBenchedProbe-1-closing-diff-round1.md` |
+| logs | `2026-10-10-build-DEPL-aBenchedProbe-4-1-acceptance-ledger.md`, `2026-10-10-build-DEPL-aBenchedProbe-1-runlog-d8d21d0e.md` and 3 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aBenchedProbe/card` |
+<!-- /gen:build-routes -->

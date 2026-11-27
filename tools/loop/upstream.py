@@ -291,7 +291,7 @@ def write_upstream_record(root, build, unit, item, lines, today=None):
     from build_records import ID, SLUG
     if not SLUG.match(build):
         raise ValueError("--build %r is not a build slug" % build)
-    if not re.fullmatch(ID, unit):
+    if not ID.fullmatch(unit):
         raise ValueError("--unit %r is not a unit id" % unit)
     memory_root = resolve_memory_root(root)
     folder = pathlib.Path(root, memory_root, "builds", build)
@@ -302,7 +302,9 @@ def write_upstream_record(root, build, unit, item, lines, today=None):
     name = re.compile(r"\d{4}-\d{2}-\d{2}-build-%s-upstream-(\d+)\.md" % re.escape(unit))
     n = max((int(m.group(1)) for p in out.iterdir() if (m := name.fullmatch(p.name))), default=0) + 1
     path = out / ("%s-build-%s-upstream-%d.md" % (today or datetime.date.today().isoformat(), unit, n))
-    body = ["# %s upstream %d — %s" % (unit, n, item), "", "**Serves:** journal %s" % unit, ""]
+    # TOOL-dTotalRecall-36 S8: the cause line under the Serves line, the unit the record serves
+    body = ["# %s upstream %d — %s" % (unit, n, item), "", "**Serves:** log %s" % unit,
+            "**Caused-by:** %s" % unit, ""]
     with open(path, "x", encoding="utf-8", newline="\n") as fh:   # never over a record already there
         fh.write("\n".join(body + ["- " + ln for ln in lines]) + "\n")
     return path.relative_to(root).as_posix()
@@ -392,7 +394,7 @@ def run_fixture(case, top):
             path = write_upstream_record(top, FX_BUILD, FX_UNIT, FX_ITEM, lines)
             print("%s · record · %s" % (SAY, path))
             text = (top / path).read_text(encoding="utf-8")
-            lost = [ln for ln in ["**Serves:** journal %s" % FX_UNIT] + ["- " + ln for ln in lines]
+            lost = [ln for ln in ["**Serves:** log %s" % FX_UNIT] + ["- " + ln for ln in lines]  # census: kept cause-writer fixture: the record head its fixture reads back
                     if ln not in text.split("\n")]
             if lost:
                 print("%s · fixture · FAIL · the record %s lacks %s" % (SAY, path, lost[0]))

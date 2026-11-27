@@ -127,3 +127,12 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| research | `2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md` |
+| card ref | `refs/gov/builds/dLandedVerdict/card` |
+<!-- /gen:build-routes -->

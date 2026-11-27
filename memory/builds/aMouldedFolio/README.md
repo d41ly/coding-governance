@@ -84,3 +84,13 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| logs | `2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aMouldedFolio/card` |
+<!-- /gen:build-routes -->

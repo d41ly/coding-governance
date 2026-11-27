@@ -167,9 +167,25 @@ Ids whose spec moved past its audited revision: none — 0 of 28 unit id(s) carr
 | 26 | `TOOL-aWokenSentinel-26` | no |
 | 27 | `TOOL-aWokenSentinel-27` | no |
 | 28 | `TOOL-aWokenSentinel-28` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 - **Parent builds:** [aPrimedKeepalive](../aPrimedKeepalive/README.md), [aProbedUnit](../aProbedUnit/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-21-prompt-TOOL-aWokenSentinel-5-3-fold-brief.md`, `2026-09-21-prompt-TOOL-aWokenSentinel-5-2-fold-brief.md` and 30 more under prompts/ |
+| reviews | `2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round2.md`, `2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md` and 4 more under reviews/ |
+| research | `2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md` |
+| logs | `2026-09-20-build-TOOL-aWokenSentinel-9-1-acceptance-ledger.md`, `2026-09-20-build-TOOL-aWokenSentinel-8-1-acceptance-ledger.md` and 26 more under build/ |
+| open asks | `BACKLOG.md`, 2 open |
+| card ref | `refs/gov/builds/aWokenSentinel/card` |
+<!-- /gen:build-routes -->

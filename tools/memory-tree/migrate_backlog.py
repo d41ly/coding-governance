@@ -325,17 +325,23 @@ def parse_legacy_rows(root: str, paths: list, live_paths: set, grammar) -> tuple
 
 def build_id_sort_key(ident: str):
     """Family, slug, then the sequence as a NUMBER. Lexical order puts `-10` before `-2`, which
-    reads as data loss to anyone scanning a worksheet for the newest id."""
-    parts = ident.split("-")
-    seq = int(parts[2]) if len(parts) > 2 and parts[2].isdigit() else 0
-    return (parts[0], parts[1] if len(parts) > 1 else "", seq, ident)
+    reads as data loss to anyone scanning a worksheet for the newest id. Parsed by the one id parser
+    under the caller-bound families (TOOL-dTotalRecall-38 S3); an id it refuses sorts first."""
+    try:
+        fam, slug, seq = backlog.load_id_grammar().parse_id_parts(ident, None, alt=backlog.ANY_FAMILY)
+    except ValueError:
+        return ("", "", 0, ident)
+    return (fam, slug, seq, ident)
 
 
 def read_slug(ident: str) -> str:
     """The build folder an id belongs to. An id SPELLS its build — family, slug, sequence — so the
-    routing needs no side table and cannot disagree with the roster the generator derives."""
-    parts = ident.split("-")
-    return parts[1] if len(parts) > 2 else ""
+    routing needs no side table and cannot disagree with the roster the generator derives. Parsed by
+    the one id parser (TOOL-dTotalRecall-38 S3), so a hyphenated slug reads whole; "" for an id it refuses."""
+    try:
+        return backlog.load_id_grammar().parse_id_parts(ident, None, alt=backlog.ANY_FAMILY)[1]
+    except ValueError:
+        return ""
 
 
 def resolve_copy(copies: list) -> tuple:
@@ -534,9 +540,9 @@ def check_names_id(text: str, ident: str) -> bool:
 #: corpus does — citing its neighbours — and proposing a hold from a bare mention put 97 of 334
 #: triage rows under a BLOCKED proposal on the first real-tree run, every one of them a citation.
 #: The target still has to resolve live; this pattern is what makes the resolution mean something.
-ROW_HOLD_RE = re.compile(
+ROW_HOLD_RE = backlog.load_id_grammar().SlugPattern(lambda g: (
     r"\b(?:blocked|block|held|holds|hold|waiting|waits|depends|depend|pending|deferred|defer)\s+"
-    r"(?:on|upon|until|for)\s+[`\[*]*([A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+)", re.I)
+    r"(?:on|upon|until|for)\s+[`\[*]*([A-Za-z][A-Za-z0-9]*-(?:" + g.slug_class + r")-\d+)"), re.I)
 
 
 def read_row_hold(body: str, grammar, known) -> str:
@@ -561,7 +567,8 @@ def read_named_hold(body: str, grammar, known) -> str:
     nothing files derives UNRESOLVED in the fold, which would land in the switch-over as a V6
     verdict instead of as the triage ask the design routes it to.
     """
-    for token in re.findall(r"[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+", body):
+    slug = backlog.load_id_grammar().derive_slug_grammar().slug_class
+    for token in re.findall(r"[A-Za-z][A-Za-z0-9]*-(?:" + slug + r")-\d+", body):
         if backlog.check_id(token, grammar) and token in known:
             return token
     return ""
@@ -925,13 +932,16 @@ def build_status_sheet(chosen: dict, fold, specs: dict, units: set, signed_triag
 
 # ----------------------------------------------------------------------------------- the records
 def render_worksheet(kind: str, columns: tuple, rows: list, unit_id: str, head: str) -> str:
-    """One TAB-separated worksheet: a Serves line, the provenance line, the header, rows, a total.
+    """One TAB-separated worksheet: a Serves line, its cause line in the same comment form
+    (TOOL-dTotalRecall-53 S10, the form `tree_lib.read_header_edges` reads), the provenance line, the
+    header, rows, a total.
 
     NO DATA ROW LEADS WITH AN ID IN A LIST OR TABLE SHAPE. A TSV row does not, which is why these
     are TSV: a markdown table whose first cell is an id ANCHORS that id, and a worksheet listing
     every ask in the corpus would then claim every one of them in this build's folder.
     """
-    out = [f"# **Serves:** journal {unit_id}",
+    out = [f"# **Serves:** log {unit_id}",
+           f"# **Caused-by:** {unit_id}",
            f"# {kind} worksheet · computed at {head}",
            "\t".join(columns)]
     for row in rows:
@@ -942,7 +952,7 @@ def render_worksheet(kind: str, columns: tuple, rows: list, unit_id: str, head: 
 
 def render_census(unit_id: str, head: str, summary: dict) -> str:
     """The census, as markdown prose. Deliberately NOT a table keyed on ids, for the reason above."""
-    out = [f"**Serves:** journal {unit_id}", "",
+    out = [f"**Serves:** log {unit_id}", f"**Caused-by:** {unit_id}", "",   # TOOL-dTotalRecall-36 S8
            f"# The backlog migration census — {unit_id}", "",
            f"Computed by `migrate_backlog.py --plan` at {head}. Every figure below is DERIVED at "
            f"run time; none of them is authored anywhere, here or in a spec.", ""]
@@ -3390,7 +3400,7 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
                                            r"(census\.md|same-id\.tsv|triage\.tsv|status\.tsv)",
                                            os.path.basename(p)) for p in first))
         arm("each carrying its Serves line",
-            True, lambda: all("**Serves:** journal EXMP-aFoo-1" in read_text(p) for p in first))
+            True, lambda: all("**Serves:** log EXMP-aFoo-1" in read_text(p) for p in first))  # census: kept cause-writer fixture: an arm reading the records it wrote
         arm("and two runs over one tree are byte-identical",
             True, lambda: all(read_text(a) == read_text(b) for a, b in zip(first, second)))
         arm("git status shows nothing outside the record directory",

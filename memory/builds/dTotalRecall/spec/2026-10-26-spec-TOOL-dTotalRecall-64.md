@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-64 — unit 46's spec observes unit 54's parser body and designs none of its own
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 9 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-4 · 2026-11-22 · node d · Tier-2 · base 94e17798 · streams tooling · order 9 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,17 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-64-deviation-641.md](../build/2026-10-26-build-TOOL-dTotalRecall-64-deviation-641.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-64-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-64-1-acceptance-ledger.md) | log | — |
+| [2026-11-22-build-TOOL-dTotalRecall-64-reground-2-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-64-reground-2-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-64-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-64-reground-return.md) | research | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-64-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-64-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-64-build-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-64-build-spec-writer.md) | log | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-64-reground-2-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-64-reground-2-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-64-reground-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-64-reground-2-spec-writer.md) | log | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-64-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-64-reground-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-64-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-64-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-63 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 |
+| [2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md](../reviews/2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md) | diff-review | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-36 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-114 |
 
 <!-- /gen:spec-records -->
 
@@ -19,17 +29,19 @@
 The round-1 spec audit of units 54 to 60
 (`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md`)
 confirmed finding **id 22 at HIGH**. It shares item **H3** with id 3, which `TOOL-dTotalRecall-63`
-closes. `TOOL-dTotalRecall-54` lands `parse_id_parts` at step 8 on `grammar_for(root).families` and
-rejects `tree_lib._id_alternation`, which reads conf `FAMILIES` only (`tree_lib.py:416-418`). But
-`TOOL-dTotalRecall-46` was only edge-folded, its rev-2 log reading "nothing else moved". Its S1 and
-§4 code still build the body on `tree_lib.build_id_token_re(tree_lib._id_alternation(conf))`, with a
-`read_root_conf` that exists nowhere in the tree, and its consumes-from edge to unit 38 still reads
-"whose body this unit rebuilds". Unit 38's hands-off line says the same. Two units design one
-function body, and a unit-46 builder following its S1 overwrites unit 54's cited-family body at step
-9.
+closes. `TOOL-dTotalRecall-54` landed `parse_id_parts` at step 8 (`74af3faa4`) on
+`grammar_for(root).families` and rejects `tree_lib._id_alternation`, which reads conf `FAMILIES` only
+(`tools/memory-tree/tree_lib.py#_id_alternation`). But `TOOL-dTotalRecall-46` was only edge-folded,
+its rev-2 log reading "nothing else moved", and its rev-4 re-ground left the rewrite to this unit (its
+§8 F2). Its S1 and §4 code still build the body on
+`tree_lib.build_id_token_re(tree_lib._id_alternation(conf))`, with a `read_root_conf` that exists
+nowhere in the tree, and its consumes-from edge to unit 38 still reads "whose body this unit
+rebuilds". Unit 38's hands-off line says the same. Two units design one function body, and a unit-46
+builder following its S1 overwrites unit 54's cited-family body at step 9.
 
 This unit finishes the supersession unit 54 began: unit 46's spec observes unit 54's body and
-designs none, and unit 38's line names unit 54 as the builder. It repairs `TOOL-dTotalRecall-54`.
+designs none. Unit 38's line stays as unit 38 closed it at order 8, a CLOSED spec being frozen (§8
+F2). It repairs `TOOL-dTotalRecall-54`.
 
 ## 2. Scope (IN)
 
@@ -39,10 +51,11 @@ designs none, and unit 38's line names unit 54 as the builder. It repairs `TOOL-
 - **S2** — Unit 46's §4 carries no second design. Its parser code block, its `read_root_conf`
   paragraph and its first alternative give way to §4's text; its §5 perf line, Files touched, §7 New
   arm line and §10 follow. Observed by AC1.
-- **S3** — The edges agree. Unit 46's consumes-from line to unit 38 and unit 38's hands-off line to
-  unit 46 name unit 54 as the body's builder. Observed by AC1.
-- **S4** — The amendments land before unit 46's pass, each a rev bump with its §9 line naming this
-  unit, in this unit's pass at order 9, which unit 46 consumes by a §3 edge. Observed by AC1 and AC2.
+- **S3** — Unit 46's edge agrees. Its consumes-from line to unit 38 names unit 54 as the body's
+  builder. Unit 38's hands-off line to unit 46 takes no write: unit 38 is CLOSED at order 8 before
+  this pass, and its spec stays frozen (§8 F2). Observed by AC1.
+- **S4** — The amendment lands before unit 46's pass, a rev bump with its §9 line naming this unit,
+  in this unit's pass at order 9, which unit 46 consumes by a §3 edge. Observed by AC1 and AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -51,6 +64,8 @@ designs none, and unit 38's line names unit 54 as the builder. It repairs `TOOL-
 - Retiring unit 46. Its criteria still observe the body at step 9 and units 53 and 60 consume them,
   so it stays and builds nothing.
 - Unit 38's own scope, which re-points readers onto the body and is unchanged.
+- Unit 38's spec text. Its stale hands-off line is the departure `TOOL-dTotalRecall-70` S14 records
+  as a deviation of unit 38 (§8 F2).
 
 ### Edges
 
@@ -58,31 +73,35 @@ designs none, and unit 38's line names unit 54 as the builder. It repairs `TOOL-
   body unit 46's amended S1 names
 - **hands-off** `TOOL-dTotalRecall-46` — S1, §4 and the edge to unit 38 amended so that unit's pass
   observes `parse_id_parts` and builds no body
-- **hands-off** `TOOL-dTotalRecall-70` — the amendments to units 46 and 38 and AC1 and AC2, which that unit re-reads over joined text and both segments, recording unit 38's departure (the round-1 audit of units 61 to 66, ids 5, 9, 10, 11, 14, 31 and 32)
+- **hands-off** `TOOL-dTotalRecall-70` — the amendment to unit 46, unit 38's frozen line, and AC1 and AC2, which that unit re-reads over joined text and both segments, recording unit 38's departure (the round-1 audit of units 61 to 66, ids 5, 9, 10, 11, 14, 31 and 32)
 
 ## 4. Design
 
 ### The amendments to unit 46
 
-Each is a rev bump with one §9 line of the form
+Together they are one rev bump with one §9 line of the form
 `rev-<N> · <date> · S1 S2 S3 §4 §5 §7 §10 §3 · amended by TOOL-dTotalRecall-64 (id 22, item H3) ...`.
 
 - S1:
 
-  > **S1** — The parser is `TOOL-dTotalRecall-54`'s. `parse_id_parts(ident, root)` in
-  > `tools/memory-tree/id_grammar.py`, landed at step 8, matches `ident` whole with
-  > `tree_lib.build_id_token_re` over `grammar_for(root).families` and returns `(family, slug, seq)`
-  > from the groups `fam`, `slug` and `seq`. This unit's pass builds no body and observes that one.
-  > Observed by AC1.
+  > **S1** — The parser is `TOOL-dTotalRecall-54`'s. `parse_id_parts(ident, root, *, alt=None)` in
+  > `tools/memory-tree/id_grammar.py`, landed at step 8 (`74af3faa4`), matches `ident` whole with
+  > `tree_lib.build_id_token_re(alt, root)`, reached through `load_sibling`, `alt` by default
+  > `grammar_for(root).families` joined, and returns `(family, slug, seq)` from the groups `fam`,
+  > `slug` and `seq`. This unit's pass builds no body and observes that one. Observed by AC1.
 
-- S2 and S3 open "Unit 54's body" where they now open "Before the match the parser" and "An id".
+- S2's "Before the match the parser strips" reads "Before the match unit 54's body strips".
+- S3 reads: "**S3** — Unit 54's body raises `ValueError` naming any id `build_id_token_re` does not
+  match whole, a flat-era `ARCH-001` and a node-scoped `ABL-d119` among them, and each caller keeps
+  the answer it gives a malformed id. Observed by AC3."
 - §4 "The parser" reads, in place of its code block and the paragraph under it: "Unit 54's body
   (`TOOL-dTotalRecall-54` §4), which this unit observes. `tree_lib._id_alternation` is not read: it
-  builds from conf `FAMILIES` alone (`tree_lib.py:416-418`) and omits cited families. A pinned token
-  `X-y-1@rev-2` is refused, because an id reader receives an id."
-- §4 Inventory reads "Minted: nothing." Files touched reads "none: the pass observes unit 54's body",
-  and its M6 sentence is struck. The first alternative reads "Build the body here. Unit 54 builds it
-  at step 8, so a second body would overwrite the cited-family read."
+  builds from conf `FAMILIES` alone (`tools/memory-tree/tree_lib.py#_id_alternation`) and omits cited
+  families. A pinned token `X-y-1@rev-2` is refused, because an id reader receives an id."
+- §4 Inventory reads "Minted: nothing.", its naming-cell sentence struck with it. Files touched reads
+  "none: the pass observes unit 54's body", and its M6 sentence is struck. The first alternative
+  reads "Build the body here. Unit 54 builds it at step 8, so a second body would overwrite the
+  cited-family read."
 - §5 perf / scale reads "none: unit 54's body"; testing reads "AC1 to AC3 by the pass".
 - §7: the New arm line is struck, unit 54's arm covering the same cases at the close.
 - §10: the seam sentence names `TOOL-dTotalRecall-54`'s body and `grammar_for(root).families`, and
@@ -90,19 +109,20 @@ Each is a rev bump with one §9 line of the form
 - §3: the consumes-from line to unit 38 reads "the ten readers re-pointed onto `parse_id_parts`,
   whose body unit 54 builds and this unit's criteria observe".
 
-### The amendment to unit 38
+### Unit 38's spec
 
-Its hands-off line to unit 46 reads "`parse_id_parts`, whose body `TOOL-dTotalRecall-54` builds on
-`tree_lib.build_id_token_re` and that unit observes", with a rev bump and a §9 line naming this unit.
+No write. Unit 38 is CLOSED at order 8 (`2f59e5acb`), before this pass, and the build method's `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it` keeps a
+CLOSED spec frozen, its correction a new unit on top (landed at `5699553e8`, after base `462d20f3`).
+Its hands-off line to unit 46, "whose body that unit rebuilds on `tree_lib.build_id_token_re`",
+stands as written; `TOOL-dTotalRecall-70` S14 records it as a deviation of unit 38 (§8 F2).
 
 ### Inventory
 
-Minted: nothing in code. Amended: the two spec files below.
+Minted: nothing in code. Amended: the one spec file below.
 
 ### Files touched (estimate)
 
 - `memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-46.md`
-- `memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-38.md`
 
 `TOOL-dTotalRecall-63` also writes unit 46's spec at order 9, so BUILD-METHOD M6 sequences the two
 passes; both precede unit 46's.
@@ -113,15 +133,17 @@ passes; both precede unit 46's.
   that leaves its other half standing.
 - **Retire unit 46 as superseded.** Its criteria are consumed by units 53 and 60, and a retirement
   written mid-run changes no roster the harness already handed out.
+- **Amend unit 38's line at this pass.** Unit 38 is CLOSED by then, and M4 keeps it frozen (§8 F2).
 
 ## 5. Production-readiness checklist
 
 - security — no surface: spec text only.
 - perf / scale — none.
 - error / empty / loading states — none at runtime; a missing amendment is AC1's red.
-- observability — each amended spec's §9 line names this unit and the finding.
-- risks — unit 46's and unit 38's revs move after their audit; the new text is this spec's §4, which
-  the audit of this unit reviews.
+- observability — unit 46's §9 line names this unit and the finding.
+- risks — unit 46's rev moves after its audit; the new text is this spec's §4, which the audit of
+  this unit reviews. Unit 38's CLOSED spec keeps a stale hands-off line, `TOOL-dTotalRecall-70` S14's
+  deviation record to write.
 - testing — AC1 by the pass; AC2 at unit 46's pass.
 - migration — none.
 - user docs — none under `help/`.
@@ -130,20 +152,25 @@ passes; both precede unit 46's.
 
 - **AC1** — When `grep -cE "read_root_conf|_id_alternation\(conf\)|whose body this unit rebuilds"` runs
   over `memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-46.md` at this pass's tip
-  it prints `0`, `grep -c "whose body that unit rebuilds"` over
-  `memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-38.md` prints `0`, and
-  `grep -c TOOL-dTotalRecall-64` over each file's §9 prints at least 1.
-  Red when: either spec still designs or promises a second body.
-- **AC2** — When unit 46's pass tip is reached, a `python -c` probe reading `parse_id_parts` with
-  `ast.get_source_segment` from `git show <unit 54's pass commit>` of `id_grammar.py`, run from
-  `tools/memory-tree/`, and from the working file prints the two segments equal.
+  it prints `0` (it prints 3 at `94e17798`, PINNED 2026-11-22), and
+  `sed -n '/^## 9\./,/^## 10\./p'` over that file piped to `grep -c "amended by TOOL-dTotalRecall-64"`
+  prints at least 1 (0 at `94e17798`); and `git diff --quiet <this pass's base> HEAD --
+  memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-38.md` exits 0.
+  Red when: unit 46's spec still designs or promises a second body, or the pass wrote unit 38's
+  CLOSED spec.
+- **AC2** — When unit 46's pass tip is reached, a `python -c` probe run from `tools/memory-tree/`
+  reads `parse_id_parts` with `ast.get_source_segment` from `tools/memory-tree/id_grammar.py` as
+  `git show` prints it at unit 54's pass commit `74af3faa4` and from the working file, and prints
+  the two segments equal (equal at `94e17798`, unit 38's `2f59e5acb` leaving the body unmoved).
   Red when: unit 46's pass rewrote the body.
 
 ## 7. Gates
 
 `memory hygiene` · `recall floor` · `recall floor arms`
 
-No new arm: this unit writes spec text, and unit 54's arm holds the body at the close.
+No new arm: this unit writes spec text, and unit 54's arm holds the body at the close (its check
+"parse_id_parts splits an id by its tree's grammar, refuses every other shape, and loads tree_lib
+lazily" in `tools/memory-recall/selftest.py`).
 
 ## 8. Open questions
 
@@ -153,20 +180,44 @@ No new arm: this unit writes spec text, and unit 54's arm holds the body at the 
   carry of `TOOL-dTotalRecall-5`'s clause, which would split a clause that unit carries whole. (b)
   reds the parts join; veto 1 discards it. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the
   precedent `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
+- **F2 — Does this pass still amend unit 38's hands-off line?** Unit 38 builds at order 8 and is
+  CLOSED when this order-9 pass runs, and the build method's `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it` (landed at `5699553e8`, after base
+  `462d20f3`) keeps a CLOSED spec frozen, its correction a new unit on top. Options: (a) amend it as
+  rev-2 designed; (b) leave it frozen, `TOOL-dTotalRecall-70` S14 already writing the deviation of
+  unit 38 for that line; (c) leave it frozen and have this pass write that deviation. (a) breaks the
+  M4 rule, which no delegation lifts, and is discarded. (b) and (c) satisfy every criterion; (b)
+  reuses unit 70 S14's record where (c) writes a second one for the same departure, the tie-break.
+  RESOLVED (agent, 2026-11-22, delegated): (b), rung 2. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 54 to 60, id 22
   (HIGH, item H3 shared with id 3).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-70, the other end of an edge a unit the round-1 spec audit of units 61 to 66 promoted wrote; nothing else moved.
+- rev-3 · 2026-11-22 · §1 S3 S4 §3 §4 §5 AC1 AC2 §8 §10 · re-grounded at base `c2143acf` per
+  `2026-11-22-prompt-TOOL-dTotalRecall-64-reground-brief`: cites move to
+  `tree_lib.py#_id_alternation`, `#build_id_token_re` and `id_grammar.py#grammar_for`; the S1 quote
+  names unit 54 rev-4's `load_sibling`; S2 and S3 amendment texts read whole against unit 46 rev-4,
+  its Inventory's naming-cell sentence struck too; unit 38's spec, CLOSED before this pass, takes no
+  write (F2); AC1's §9 half greps `amended by TOOL-dTotalRecall-64`, since unit 46's rev-3 line
+  already names this unit, and its unit-38 half reads the frozen file unchanged.
+- rev-4 · 2026-11-22 · §1 §4 §6 §7 §10 · re-grounded at base `94e17798` per
+  `2026-11-22-prompt-TOOL-dTotalRecall-64-reground-2-brief`: unit 54's body is landed
+  (`74af3faa4`), so §1 and §10 cite it there and the S1 quote takes its signature
+  `parse_id_parts(ident, root, *, alt=None)` and `build_id_token_re(alt, root)`; unit 38 is CLOSED at
+  `2f59e5acb`; AC1's counts re-derived at `94e17798` (3 and 0, unchanged); AC2 pins unit 54's pass
+  commit; §7 cites unit 54's arm in `tools/memory-recall/selftest.py`.
 
 ## 10. Reuse audit
 
-The seam is unit 54's body, `parse_id_parts` on `tree_lib.build_id_token_re`
-(`tools/memory-tree/tree_lib.py:428`) over `grammar_for(root).families`
-(`tools/memory-recall/extract.py:599`); unit 46 reads it and mints nothing. `git grep -n read_root_conf -- tools`
-printed nothing here, so the conf read unit 46 §4 names does not exist.
+The seam is unit 54's body, `tools/memory-tree/id_grammar.py#parse_id_parts` on
+`tools/memory-tree/tree_lib.py#build_id_token_re`, its `alt` by default `grammar_for(root).families`
+(`tools/memory-tree/id_grammar.py#grammar_for`, the families
+`#build_grammar` joins from conf `families` and `cited_families`); unit 46 reads it and mints
+nothing. `git grep -nw read_root_conf -- tools` printed nothing at `94e17798`, so the conf read unit
+46 §4 names does not exist.
 `python tools/codebase-map/reuse_lookup.py "amend a sibling spec before its unit builds"` ranked
-name-stem neighbours and no seam for an amendment, so no existing seam fits beyond the body named here.
+name-stem neighbours (`before`, `build`, `units`) and no seam for an amendment at `94e17798`, so no
+existing seam fits beyond the body named here.
 
 Recall terms used: `python tools/memory-recall/query.py "which readers split a unit id on a hyphen and break under a hyphenated slug" --terms "split hyphen slug reader census id_grammar readers flip-probe parse_id_parts kept predicate"`

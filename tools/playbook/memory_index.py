@@ -2,7 +2,7 @@
 """memory_index.py — the harness's auto-memory index, measured, its directives detected, one promoted
 (PLAY-dOrderedCharter-14).
 
-    python memory_index.py measure [--home <dir>]
+    python memory_index.py measure [--home <dir>] [--card-bytes <n>]
     python memory_index.py directives [--home <dir>]
     python memory_index.py promote <name> --level <n> --tag <tag> [--home <dir>] [--build <slug> --unit <id> --mark <mark>]
 
@@ -11,7 +11,9 @@ gov never writes, trims or renders it. `--home` stands for `~`, so a fixture or 
 
 `measure` prints one line of at most LINE_MAX bytes, the session card's `memory —` cell: the index's bytes
 and lines against `memory.load-budget`, read through the policy reader at the repository the working
-directory sits in, a `k` being 1,000 bytes, and the count of standing directives not yet promoted. Every
+directory sits in, a `k` being 1,000 bytes, and the count of standing directives not yet promoted. With
+`--card-bytes <n>`, the bytes of the card's other cells, the line names the card first, against the same
+budget as its own figure, so a small card never hides the index's breach (TOOL-dTotalRecall-9 S9). Every
 other outcome is one `memory — skipped:` line, and the verb exits 0 whenever it prints one.
 
 `directives` prints each unpromoted directive, its name then its description, then a count line naming
@@ -180,9 +182,11 @@ def scan_directives(root, home=None) -> dict:
     return found
 
 
-def measure_index(root, home=None) -> dict:
+def measure_index(root, home=None, card_bytes=None) -> dict:
     """The index's bytes and lines, its budget in bytes with the policy reader's source, and the
-    unpromoted directives; `skipped` carries the reason instead where any of them cannot be read."""
+    unpromoted directives; `skipped` carries the reason instead where any of them cannot be read.
+    `card_bytes`, the session card's other cells, is carried as `card`, measured against the same budget
+    as its own figure, never a share of it (TOOL-dTotalRecall-9 S9)."""
     d = derive_index_dir(root, home)
     try:
         raw = (d / "MEMORY.md").read_bytes()
@@ -200,7 +204,8 @@ def measure_index(root, home=None) -> dict:
     fields = [f.strip() for f in explain.split("·")]
     return {"bytes": len(raw), "lines": len(raw.splitlines()),
             "budget": int(hit.group(1)) * (1000 if hit.group(2) else 1),
-            "source": fields[1] if len(fields) > 1 else "read", "directives": found["directives"]}
+            "source": fields[1] if len(fields) > 1 else "read", "directives": found["directives"],
+            **({"card": card_bytes} if card_bytes is not None else {})}
 
 
 def render_memory_line(measured: dict) -> str:
@@ -208,7 +213,12 @@ def render_memory_line(measured: dict) -> str:
     if "skipped" in measured:
         return derive_byte_cut(f"{CELL} skipped: {measured['skipped']}", LINE_MAX)
     side = "over" if measured["bytes"] > measured["budget"] else "within"
-    return derive_byte_cut(f"{CELL} MEMORY.md {measured['bytes']} B {side} its {measured['budget']} B budget "
+    figures = f"MEMORY.md {measured['bytes']} B {side} its {measured['budget']} B budget"
+    if "card" in measured:   # S9: the card and the index each against the budget, each its own figure
+        card_side = "over" if measured["card"] > measured["budget"] else "within"
+        figures = (f"card {measured['card']} B {card_side} · MEMORY.md {measured['bytes']} B {side} · "
+                   f"each its own {measured['budget']} B budget")
+    return derive_byte_cut(f"{CELL} {figures} "
                      f"({BUDGET_KEY} {measured['source']}) · {measured['lines']} lines · "
                      f"{len(measured['directives'])} standing directives unpromoted · list: memory_index.py directives",
                      LINE_MAX)
@@ -283,6 +293,8 @@ def build_parser() -> argparse.ArgumentParser:
     for verb in ("measure", "directives", "promote"):
         p = sub.add_parser(verb, allow_abbrev=False)
         p.add_argument("--home")
+        if verb == "measure":
+            p.add_argument("--card-bytes", type=int)
         if verb == "promote":
             p.add_argument("name")
             p.add_argument("--level", required=True)
@@ -298,7 +310,7 @@ def main(argv=None) -> int:
     args = build_parser().parse_args(sys.argv[1:] if argv is None else argv)
     root = resolve_root()
     if args.verb == "measure":
-        lines, rc = [render_memory_line(measure_index(root, args.home))], 0
+        lines, rc = [render_memory_line(measure_index(root, args.home, args.card_bytes))], 0
     elif args.verb == "directives":
         lines, rc = run_directives(root, args.home)
     else:

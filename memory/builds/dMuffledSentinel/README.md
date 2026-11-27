@@ -85,3 +85,12 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| logs | `2026-09-12-build-TOOL-dMuffledSentinel-3-1-acceptance-ledger.md`, `2026-09-12-build-TOOL-dMuffledSentinel-2-2-acceptance-ledger.md` and 2 more under build/ |
+| card ref | `refs/gov/builds/dMuffledSentinel/card` |
+<!-- /gen:build-routes -->

@@ -667,6 +667,94 @@ def test_extract_failure_refuses():
         remove_tree(tmp)
 
 
+#: Run INSIDE the scratch repository `build_served_fixture` makes, against its own copy of the kit,
+#: so `recall_conf` binds that repository's conf. It prints the paths of the served set `check-recall`
+#: grades (`load_served_index`, `untracked=False`) and of the set the CLI serves (`untracked=True`).
+_SERVED_PROBE = r"""
+import importlib.util, json, pathlib, sys
+sys.path.insert(0, %(kit)r)
+import query
+spec = importlib.util.spec_from_file_location("check_recall", pathlib.Path(%(kit)r) / "check-recall.py")
+cr = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(cr)
+root = pathlib.Path(%(root)r)
+con = cr.load_served_index(root)
+graded = sorted(p for (p,) in con.execute("SELECT path FROM recall_view"))
+con.close()
+served = query.load_served_set(root, untracked=True)
+served["con"].close()
+print(json.dumps({"graded": graded, "served": sorted(p for p, _b in served["pairs"])}))
+"""
+
+
+def build_served_fixture() -> pathlib.Path:
+    """A scratch repository holding this kit, the memory-tree and playbook kits it requires, a
+    COMMITTED record file and an UNTRACKED one (TOOL-dTotalRecall-21 AC7): the served set is read from
+    the tag index's HEAD tree, so the seed is committed, and the untracked file is what a grading
+    served set must leave out."""
+    import extract as E  # noqa: PLC0415 — the kit's own copy of the sibling-kit resolver
+
+    root = pathlib.Path(tempfile.mkdtemp(prefix="recallserved-")).resolve()
+    _SCRATCH.append(root)
+    for src in (KIT, E.resolve_kit_dir("memory-tree", "tree_lib.py", KIT),
+                E.resolve_kit_dir("playbook", "tag_index.py", KIT)):
+        (root / src.name).mkdir()
+        for f in sorted(src.iterdir()):
+            if f.is_file() and f.suffix in (".py", ".toml", ".txt", ".json"):
+                shutil.copyfile(f, root / src.name / f.name)
+    (root / ".memory-tree.conf").write_text('MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n',
+                                            encoding="utf-8", newline="\n")
+    disc = root / "memory" / "tooling"
+    disc.mkdir(parents=True)
+    (disc / "DECISIONS.md").write_text("# Tooling decisions\n\n- TOOL-aFoo-1 · the frobnicator leaks less\n",
+                                       encoding="utf-8", newline="\n")
+    git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t", "-c", "core.autocrlf=false"]
+    for argv in (["init", "-q"], ["add", "-A"], ["commit", "-q", "--no-verify", "-m", "seed"]):
+        subprocess.run([*git, *argv], check=True, capture_output=True)
+    (disc / "fresh.md").write_text("# Fresh\n\n## TOOL-aFoo-7 — fresh\n\nthe zorblax quuxly note\n",
+                                   encoding="utf-8", newline="\n")
+    return root
+
+
+@check("the served set check-recall grades holds tracked files only, where the CLI's holds untracked too")
+def test_served_set_leaves_untracked_out():
+    """AC7's corpus half, over the index's served set. `check-recall` grades
+    `query.load_served_set(root, untracked=False)`; a served set that read untracked files there
+    would grade a session's unrecorded notes, so a row's hit would move with the worktree's state.
+    The CLI's own set, `untracked=True`, holding the same file is the liveness half: without it an
+    untracked file the corpus walk never lists would pass this arm by being absent from both."""
+    root = build_served_fixture()
+    kit = root / KIT.name
+    p = subprocess.run([sys.executable, "-c", _SERVED_PROBE % {"kit": str(kit), "root": str(root)}],
+                       capture_output=True, text=True, encoding="utf-8", cwd=str(root))
+    assert p.returncode == 0, f"the served-set probe failed:\n{p.stdout}{p.stderr[-900:]}"
+    got = json.loads(p.stdout.strip().splitlines()[-1])
+    fresh = "memory/tooling/fresh.md"
+    assert fresh in got["served"], f"LIVENESS: the CLI's served set does not hold the untracked file: {got}"
+    assert "memory/tooling/DECISIONS.md" in got["graded"], f"the graded set lost the tracked file: {got}"
+    assert fresh not in got["graded"], f"check-recall grades an untracked file: {got}"
+    return f"graded {len(got['graded'])} path(s), served {len(got['served'])}; the untracked one only served"
+
+
+@check("the floor ranks through record_find's one fusion, and no copy of it is left in this kit")
+def test_floor_runs_record_find_fusion():
+    """TOOL-dTotalRecall-9 S4: the served floor grades `record_find.run_fusion`, the fusion `record find`
+    runs, never a copy beside it. Read from the sources, so a second fusion definition left in `query.py`
+    reds here even when the two copies rank alike today; and `query.run_fusion` IS the finder's, so the
+    CLI's own ranking is the graded one."""
+    sys.path.insert(0, str(KIT))
+    import query  # noqa: PLC0415
+    import record_find  # noqa: PLC0415  memory-tree's, on the path `extract` put that kit on
+    copies = [f.name for f in sorted(KIT.glob("*.py"))
+              if re.search(r"^def (run_fusion|query_expr)\(", f.read_text(encoding="utf-8"), re.M)]
+    assert not copies, f"a fusion copy is defined in this kit beside record_find.py's: {copies}"
+    assert query.run_fusion is record_find.run_fusion, "query.run_fusion is not record_find.run_fusion"
+    src = CHECK.read_text(encoding="utf-8")
+    for name in ("record_find.query_expr(", "record_find.run_fusion("):
+        assert name in src, f"check-recall.py does not grade through {name[:-1]}"
+    return f"one fusion, in {pathlib.Path(record_find.__file__).name}; check-recall grades it"
+
+
 @check("a question with no `query` REFUSES by index, not KeyError three branches later")
 def test_malformed_question_refuses():
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="recallfx-"))
@@ -695,14 +783,14 @@ def test_malformed_question_refuses():
 #: makes the chosen terms visible in the retrieved ids. Without that construction the arm passes on
 #: any implementation, because a corpus with no tie has nothing for a tie-break to get wrong.
 _RM3_PROBE = r"""
-import json, sys
+import json, sqlite3, sys
 sys.path.insert(0, %(kit)r)
 import bench
 WORDS = [f"cand{i:02d}alpha" for i in range(24)]
 docs = [{"id": f"seed-{i}", "path": f"seed{i}.md",
          "text": "reinvention backlog worktree " + " ".join(WORDS)} for i in range(3)]
 docs += [{"id": f"target-{w}", "path": f"{w}.md", "text": f"{w} filler filler filler"} for w in WORDS]
-db = bench.build_index(docs)
+db = bench.build_fts_rows(sqlite3.connect(":memory:"), "d", docs)
 print(json.dumps([docs[i]["id"] for i in bench.run_rm3(db, docs, "reinvention backlog worktree", 12)]))
 """
 

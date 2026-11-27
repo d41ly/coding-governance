@@ -91,9 +91,24 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 | 2 | `TOOL-aLexedStripper-2` | no |
 | 3 | `TOOL-aLexedStripper-5` | no |
 | 4 | `TOOL-aLexedStripper-6` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-08-30-prompt-TOOL-aLexedStripper-1-1.md` |
+| reviews | `2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md`, `2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md` and 2 more under reviews/ |
+| logs | `2026-08-30-build-TOOL-aLexedStripper-2-base-measurements.md`, `2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aLexedStripper/card` |
+<!-- /gen:build-routes -->

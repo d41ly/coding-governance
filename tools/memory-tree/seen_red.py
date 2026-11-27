@@ -4,7 +4,7 @@
     python <prefix>/memory-tree/seen_red.py --build <slug> [--base <sha>]
     python <prefix>/memory-tree/seen_red.py --fixture --plant <case>
 
-THE RECORD is the seen-red line of an `**Evidences:** <unit>` block of a `journal` record, its grammar
+THE RECORD is the seen-red line of an `**Evidences:** <unit>` block of a `log` record, its grammar
 stated once, in HYGIENE.md's "Acceptance ledger" section, and parsed here by `SEEN_RED_RE`. Until
 dScopedBuild's `build.acceptance` writes it, the main loop's acceptance-ledger line is the record.
 `read_seen_red_records` is its one reader; a line opening `- seen-red` in any other shape is
@@ -20,7 +20,7 @@ argv element (TOOL-dWitnessedBar-51 S4, S20), resolved to the HEAD legs whose `a
 resolved against `legacy_ledger.derive_seed_prefix`, holds the path and every further word, one gate any
 of those legs satisfies. A line resolving to no leg is named and owes nothing.
 
-`--build` joins each owed gate to a seen-red line naming it in a journal record of that build and
+`--build` joins each owed gate to a seen-red line naming it in a log record of that build and
 prints `seen-red: <leg> · <red sha8> · <record>` or `seen-red: <leg> · NO RECORD`: exit 1 on any NO
 RECORD, 0 when every gate has one, and an empty owed set says so and exits 0. `--base` defaults to the
 `base:` fact of the build's `RUN.md` under `## Run facts`. Exit 2 when it cannot answer: no base, a
@@ -48,13 +48,15 @@ KIT = pathlib.Path(__file__).resolve().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from tree_lib import (  # noqa: E402  the kit's binding reader, block walk, blob and git readers
-    GIT_ENV_LEAKS, parse_conf, read_bindings, read_blobs_at, read_evidence_lines, read_git_output, read_text)
+    GIT_ENV_LEAKS, parse_conf, read_bindings, read_blobs_at, read_evidence_lines, read_git_output, read_text,
+    resolve_kind)
 
 SAY = "seen-red"
 SEEN_RED_LEAD = "- seen-red"
 SEEN_RED_RE = re.compile(r"^- seen-red — `([^`]+)` — red `([0-9a-f]{8,40})` — green `([0-9a-f]{8,40})` — (\S.*)$")
 NEW_ARM_LEAD = "New arm:"
-SLUG_RE = re.compile(r"[A-Za-z0-9]+")
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use
+SLUG_RE = SlugPattern(lambda g: r"(?:" + g.slug_class + r")")   # the slug grammar's (TOOL-dTotalRecall-5 S7)
 BASE_RE = re.compile(r"[0-9a-f]{7,40}")
 RUN_FACTS = "## Run facts"
 
@@ -117,13 +119,14 @@ def read_tracked(root):
 
 
 def read_seen_red_records(root):
-    """`{leg name: [(red sha, green sha, record path, line number)]}` over every tracked `journal`
-    record, the records `tree_lib.read_bindings` binds `journal`, each walked by `read_evidence_lines`.
-    A line opening `- seen-red` that breaks the grammar is `ValueError` naming the record and line."""
+    """`{leg name: [(red sha, green sha, record path, line number)]}` over every tracked `log`
+    record, the records `tree_lib.read_bindings` binds `log` or its read-only alias `journal`, each
+    walked by `read_evidence_lines`. A line opening `- seen-red` that breaks the grammar is `ValueError`
+    naming the record and line."""
     tracked = read_tracked(root)
     records: dict = {}
     for rel, bind in read_bindings(str(root), tracked, read_conf(root)).items():
-        if bind.get("kind") != "journal":
+        if resolve_kind(bind.get("kind")) != "log":
             continue
         for n, _unit, line in read_evidence_lines(read_text(os.path.join(str(root), rel))):
             if not line.startswith(SEEN_RED_LEAD):
@@ -277,7 +280,7 @@ def write_fixture_commit(top, files, message):
 
 
 def render_ledger(line):
-    return ("# TOOL-dFix-1 — acceptance ledger\n\n**Serves:** journal TOOL-dFix-1\n\n**Evidences:** TOOL-dFix-1\n"
+    return ("# TOOL-dFix-1 — acceptance ledger\n\n**Serves:** log TOOL-dFix-1\n\n**Evidences:** TOOL-dFix-1\n"  # census: kept cause-writer fixture: the acceptance ledger its fixture plants
             "- AC1 — `bash tools/fix/added.test.sh` — exits 0\n%s\n" % line)
 
 

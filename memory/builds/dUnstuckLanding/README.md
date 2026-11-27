@@ -119,6 +119,8 @@ Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carr
 | 7 | `TOOL-dUnstuckLanding-19` | no |
 | 8 | `TOOL-dUnstuckLanding-20` | no |
 
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
+
 Unordered: `TOOL-dUnstuckLanding-25`, `TOOL-dUnstuckLanding-27`.
 <!-- /gen:build-order -->
 
@@ -126,3 +128,17 @@ Unordered: `TOOL-dUnstuckLanding-25`, `TOOL-dUnstuckLanding-27`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-04-prompt-TOOL-dUnstuckLanding-2-build-brief.md`, `2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md` and 4 more under prompts/ |
+| reviews | `2026-10-04-review-TOOL-dUnstuckLanding-27-implementation-diff-round2.md` (CLEAN WITH FIXES), `2026-10-04-review-TOOL-dUnstuckLanding-13-implementation-diff-round1.md` (CLEAN WITH FIXES) and 1 more under reviews/ |
+| research | `2026-10-04-build-TOOL-dUnstuckLanding-2-design.md`, `2026-10-04-build-TOOL-dUnstuckLanding-1-census.md` |
+| logs | `2026-10-04-build-TOOL-dUnstuckLanding-27-1-acceptance-ledger.md`, `2026-10-04-build-TOOL-dUnstuckLanding-25-1-acceptance-ledger.md` and 12 more under build/ |
+| open asks | `BACKLOG.md`, 2 open |
+| card ref | `refs/gov/builds/dUnstuckLanding/card` |
+<!-- /gen:build-routes -->

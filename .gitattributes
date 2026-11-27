@@ -243,6 +243,13 @@ skills/session-kickoff/SKILL.md text eol=lf
 # core.autocrlf smudged every unpinned path on the way out.
 tools/hooks/*.js text eol=lf
 tools/workflows/*.js text eol=lf
+# The rendered workflow scripts, which the code record leaves out (TOOL-dTotalRecall-37). Named one by
+# one, never by a glob, since their sources sit beside them; `govkit selfcheck` holds this list equal
+# to the kits' `role = "rendered"` rows, both ways.
+tools/workflows/tier2-review.js linguist-generated
+tools/workflows/unattended-build.js linguist-generated
+tools/workflows/drift-audit-code.js linguist-generated
+tools/workflows/drift-audit-state.js linguist-generated
 # The remote-CI workflow, TOOL-dDerivedDocket-32. GitHub runs the committed blob, whose `run:` bodies
 # are bash; the pin keeps this fleet's working copy LF too, so the bytes a person verifies before
 # staging are the bytes GitHub runs. A CLASS, so a second workflow file lands LF without an edit.

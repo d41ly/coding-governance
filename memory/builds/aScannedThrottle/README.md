@@ -73,3 +73,15 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-21-review-TOOL-aScannedThrottle-1.md` (CLEAN WITH FIXES), `2026-08-21-review-TOOL-aScannedThrottle-1-diff.md` and 1 more under reviews/ |
+| logs | `2026-08-20-build-TOOL-aScannedThrottle-1.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aScannedThrottle/card` |
+<!-- /gen:build-routes -->

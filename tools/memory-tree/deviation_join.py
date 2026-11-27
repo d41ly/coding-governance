@@ -30,7 +30,7 @@ hand-off and its departing commit:
     revision the commit changed;
   - a spec revision that is not an ancestor of the commit adding the newest `spec-audit` record whose
     `**Serves:**` pins `<unit>@rev-N`, read from `tree_lib.read_bindings`' `pins`;
-  - an `amended rev-N` ledger line under an `**Evidences:** <unit>` block of a `journal` record,
+  - an `amended rev-N` ledger line under an `**Evidences:** <unit>` block of a `log` record,
     `<unit>@rev-<N-1>`;
   - a divergence hand-back, a `prompts/` record whose `### Goal` opens `DIVERGENCE:`;
   - a rescope row of a chain build's `RUN.md` or rotated `RUN.*.md`, but a `defer` row, dated by the
@@ -142,7 +142,7 @@ from design_lib import (  # noqa: E402  the one parser of the design, and its cl
     read_spec_revisions, read_tracked_builds, scan_chain_specs, write_design_fixture)
 from tree_lib import (  # noqa: E402
     GIT_ENV_LEAKS, HDR_RE, parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at,
-    read_evidence_lines)
+    read_evidence_lines, resolve_kind)
 from build_records import (  # noqa: E402  the typed record factory: FIELD, the grammar of deviations.py:123
     FIELD, derive_stem, read_record as read_typed_record, read_records as read_typed_records)
 
@@ -186,12 +186,15 @@ ROLES = ("spec writer", "author", "owner")      # the record grammar's approver 
 RANK = {"author": 0, "spec writer": 1, "owner": 2}
 LEAST = {"editorial": "author", "additive": "spec writer", "stricter": "spec writer", "loosening": "owner",
          "breaking": "owner"}                   # final-questions `[deviation]`, the by-risk table
-_ID =r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
-DEPARTS = re.compile(r"^(`?)(?:" + _CL + r"@[0-9a-f]{8}|" + _ID + r"@rev-\d+|d[A-Z]\w+)\1(?: \[[^\]]+\])?$")
-FOLLOW = re.compile(r"^(?:amends " + _CL + r"@[0-9a-f]{8}|supersedes " + _CL + r"@[0-9a-f]{8} by " + _CL
-                    + r"|new unit " + _ID + r"|(?:gap|ask|usage) \S+)$")
-_STEM = derive_stem("deviation")                                 # a record's stem, its <n> following
-SUPERSEDES = re.compile(r"(`?)(" + _STEM + r"\d+)\1")           # one record id, quoted or bare
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
+_ID = SlugPattern(lambda g: r"[A-Za-z]+-(?:" + g.slug_class + r")-\d+")
+DEPARTS = SlugPattern(lambda g: r"^(`?)(?:" + _CL + r"@[0-9a-f]{8}|" + _ID.pattern
+                      + r"@rev-\d+|d[A-Z]\w+)\1(?: \[[^\]]+\])?$")
+FOLLOW = SlugPattern(lambda g: r"^(?:amends " + _CL + r"@[0-9a-f]{8}|supersedes " + _CL + r"@[0-9a-f]{8} by "
+                     + _CL + r"|new unit " + _ID.pattern + r"|(?:gap|ask|usage) \S+)$")
+# A record's stem, its <n> following; one record id, quoted or bare. Bound at first use, as the
+# stem's unit id is the slug grammar's.
+SUPERSEDES = SlugPattern(lambda g: r"(`?)(" + derive_stem("deviation") + r"\d+)\1")
 RESCOPE = re.compile(r"^\S+ rescope · item (add|retire|supersede|defer) (\S+)(?: -> (\S+))? · reason (.*)$", re.M)
 LEDGER = re.compile(r"^- (\S+) — amended rev-(\d+)\b")
 RUN_FILE = re.compile(r"^RUN(?:\.[^/]+)?\.md$")
@@ -226,6 +229,20 @@ def set_env_aside(names=(), **put):
         for k in put:
             os.environ.pop(k, None)
         os.environ.update(held)
+
+
+@contextlib.contextmanager
+def set_fixture_env():
+    """A fixture's environment for the block, reading nothing of the caller's (TOOL-dTotalRecall-88 S9, the
+    contract of branch-reconcile's `seed_env`)."""
+    with tempfile.TemporaryDirectory(prefix="fe-") as d:
+        conf = pathlib.Path(d, "gitconfig")
+        conf.write_bytes(b"[user]\n\tname = fx\n\temail = fx@example.invalid\n[init]\n\tdefaultBranch = main\n"
+                         b"[core]\n\tautocrlf = false\n")
+        names = [k for k in os.environ if k.startswith("GIT_")] + ["GOV_REMOTE", "GOV_DEFAULT_BRANCH"]
+        with set_env_aside(names, GIT_CONFIG_GLOBAL=str(conf), GIT_CONFIG_NOSYSTEM="1",
+                           GIT_CEILING_DIRECTORIES=str(pathlib.Path(d).parent)):
+            yield
 
 
 def read_join_state(root, conf):
@@ -357,7 +374,7 @@ def read_row_commit(root, row, path):
     `scan_rescope_members` does: the oldest commit changing the row's count anywhere in that folder is the
     one that wrote it into `RUN.md`, so a row dates alike from the live file and from a rotated
     `RUN.<phase>.<blob8>.md`, where a pickaxe over the archive alone answers the commit that rotated it.
-    The ledger arm passes the one journal record the line sits in: a journal record is never rotated, and
+    The ledger arm passes the one log record the line sits in: a log record is never rotated, and
     two ledgers of one build folder can hold one ledger line's text, so a folder pickaxe there would date
     the line by the other record's commit."""
     out = (run_git(root, "log", "--reverse", "--format=%H", f"-S{row}", "HEAD", "--", path) or b"").split()
@@ -639,9 +656,9 @@ def read_population(root, conf, commits):
             members.append({"kind": "audit", "build": b, "address": f"{unit}@rev-{pin_n}", "hand": "spec-revised",
                             "sha": sha, "what": f"{unit}'s spec changed at {sha[:9]}, past its audited revision "
                                                 f"rev-{pin_n} ({pin_sha[:9]})"})
-    # The ledger arm: an `amended rev-N` line under an `**Evidences:** <unit>` block of a journal record.
+    # The ledger arm: an `amended rev-N` line under an `**Evidences:** <unit>` block of a log record.
     for rel in rels:
-        if binds.get(rel, {}).get("kind") != "journal":
+        if resolve_kind(binds.get(rel, {}).get("kind")) != "log":
             continue
         for n, unit, ln in read_evidence_lines(read_text(rel)):
             a = LEDGER.match(ln)
@@ -746,7 +763,7 @@ def check_approver(rec, rows, approval, at=""):
             return f"its approver {role} is below {need}, the least approver its {what} requires under by-risk"
     if role != "owner":
         return None
-    cited = list(dict.fromkeys(m.group(0) for m in row_grammar.GENERIC_ID.finditer(a)))
+    cited = list(dict.fromkeys(m.group(0) for m in row_grammar.derive_generic_id_re().finditer(a)))
     if not cited:
         return f"its approver '{a}' names the owner and cites no decision id"
     clause = re.match(r"`?(" + _CL + r")@", rec["departs"])
@@ -1047,7 +1064,7 @@ class Fixture:
                   ("Evidence", "the fixture"), ("Risk", risk), ("Approver", approver), ("Follow-through", follow),
                   ("Caused-by", unit if caused == "" else caused)]
         fields += [(k.capitalize(), v) for k, v in extra.items()]
-        text = "\n".join([f"# {unit} deviation {n}", "", f"**Serves:** deviation {unit}", ""]
+        text = "\n".join([f"# {unit} deviation {n}", "", f"**Serves:** deviation {unit}", ""]  # census: kept cause-writer fixture: a record head its fixture plants
                          + [f"- **{k}:** {v}" for k, v in fields if v is not None]) + "\n"
         return f"{TN}build/2026-10-21-build-{unit}-deviation-{n}.md", text
 
@@ -1067,15 +1084,15 @@ class Fixture:
     def render_prompt(self, unit, divergence):
         goal = ("DIVERGENCE: the spec's §6 cannot be built as written" if divergence
                 else "Fix the wording of the spec's fixture line.")
-        return "\n".join([f"# Revision — dTrueNorth: {unit}", "", f"**Serves:** research {unit}", "", "## The brief",
+        return "\n".join([f"# Revision — dTrueNorth: {unit}", "", f"**Serves:** research {unit}", "", "## The brief",  # census: kept cause-writer fixture: a record head its fixture plants
                           "", "### Goal", goal, "", "### Items", "1. revise it", ""])
 
     def render_audit(self, unit, pin):
-        return "\n".join([f"# M4 spec audit — {unit}", "", f"**Serves:** spec-audit {unit}"
+        return "\n".join([f"# M4 spec audit — {unit}", "", f"**Serves:** spec-audit {unit}"  # census: kept cause-writer fixture: a record head its fixture plants
                           + (f"@rev-{pin}" if pin else ""), "", "**Verdict:** CLEAN", ""])
 
     def render_ledger(self, unit, rev):
-        return "\n".join([f"# {unit} acceptance ledger", "", f"**Serves:** journal {unit}", "",
+        return "\n".join([f"# {unit} acceptance ledger", "", f"**Serves:** log {unit}", "",  # census: kept cause-writer fixture: a record head its fixture plants
                           f"**Evidences:** {unit}", f"- AC1 — amended rev-{rev} — the fixture line narrowed, logged in §9",
                           "- AC2 — `fixture` — observed", ""])
 

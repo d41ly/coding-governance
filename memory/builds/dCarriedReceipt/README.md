@@ -154,7 +154,7 @@ The audit that grounds every number here, with its method and its own instrument
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 15 unit(s) · node d · opened 2026-08-24 · streams deployer
+**Build status:** CLOSED · 15 unit(s) · node d · opened 2026-08-24 · streams deployer+tooling
 ids DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12
 ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL-dCarriedReceipt-16 TOOL-dCarriedReceipt-1 TOOL-dCarriedReceipt-2 TOOL-dCarriedReceipt-3 TOOL-dCarriedReceipt-4
 
@@ -196,3 +196,16 @@ Ids whose spec moved past its audited revision: none — 0 of 15 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-26-review-DEPL-dCarriedReceipt-5-diff-review-round2.md`, `2026-08-26-review-DEPL-dCarriedReceipt-4-diff-review-round1.md` (CLEAN WITH FIXES) and 11 more under reviews/ |
+| research | `2026-08-25-build-DEPL-dCarriedReceipt-7-merged-row-reproduction.md`, `2026-08-24-build-DEPL-dCarriedReceipt-1-adopter-measurements.md` |
+| logs | `2026-08-26-build-DEPL-dCarriedReceipt-6-acceptance-ledger.md`, `2026-08-26-build-DEPL-dCarriedReceipt-5-acceptance-ledger.md` and 11 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dCarriedReceipt/card` |
+<!-- /gen:build-routes -->

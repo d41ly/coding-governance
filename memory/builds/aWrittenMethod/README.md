@@ -140,7 +140,7 @@ spec in this folder — do not hand-edit it.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-11 · streams tooling
 ids TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6
 
 <!-- gen:build-units -->
@@ -172,3 +172,14 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-11-review-TOOL-aWrittenMethod-1-3.md`, `2026-08-11-review-TOOL-aWrittenMethod-1-2.md` and 1 more under reviews/ |
+| logs | `2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aWrittenMethod/card` |
+<!-- /gen:build-routes -->

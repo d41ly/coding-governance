@@ -302,19 +302,19 @@ MT_KIT="${MT_KIT_DIR##*/}"
 # the wrong reason.
 resolve_native() { cygpath -m "$1" 2>/dev/null || printf '%s' "$1"; }
 
-# build_fixture <phase> [fact-line ...] -> a scratch tree: .git/HEAD on refs/heads/fx, a conf, one record.
-# The default record is run-branch-anchored and carries branch-ref: refs/heads/fx, which is the
+# build_fixture <phase> [fact-line ...] -> a scratch tree: .git/HEAD on refs/heads/fxFix, a conf, one record.
+# The default record is run-branch-anchored and carries branch-ref: refs/heads/fxFix, which is the
 # fallback key; arms that need another shape pass their own fact lines. Every record carries the
 # lease fact `session: tSess-1`, which the question arm keys on and the bar arm never reads.
 build_fixture() {
-  local d; d=$(mktemp -d "$TMP/fx.XXXXXX")
-  mkdir -p "$d/.git" "$d/memory/builds/fx"
-  printf 'ref: refs/heads/fx\n' > "$d/.git/HEAD"
+  local d; d=$(mktemp -d "$TMP/fxFix.XXXXXX")
+  mkdir -p "$d/.git" "$d/memory/builds/fxFix"
+  printf 'ref: refs/heads/fxFix\n' > "$d/.git/HEAD"
   printf 'MEMORY_ROOT=memory\n' > "$d/.unattended.conf"
-  { printf '# fx\n\n## Run facts\nwitness: abc\nphase: %s\nsession: tSess-1\n' "$1"; shift
-    if [ "$#" = 0 ]; then printf 'anchor-kind: run-branch\nbranch-ref: refs/heads/fx\n'
+  { printf '# fxFix\n\n## Run facts\nwitness: abc\nphase: %s\nsession: tSess-1\n' "$1"; shift
+    if [ "$#" = 0 ]; then printf 'anchor-kind: run-branch\nbranch-ref: refs/heads/fxFix\n'
     else for l in "$@"; do printf '%s\n' "$l"; done; fi
-  } > "$d/memory/builds/fx/RUN.md"
+  } > "$d/memory/builds/fxFix/RUN.md"
   printf '%s' "$d"
 }
 
@@ -361,7 +361,7 @@ run_raw "no command key -> allow"     0 "{\"tool_name\":\"Bash\",\"cwd\":\"$(res
 run "AC1 GATE_SELFTESTS=1 on the plain bar at BUILDING -> deny"   2 "$B" "$BAR"
 check_names "AC1" 'GATE_SELFTESTS=1'
 case "$(cat "$TMP/err")" in *"BLOCKED by gate-guard"*) echo "ok   the deny carries the BLOCKED prefix"; pass=$((pass+1)) ;; *) echo "FAIL the deny is missing its BLOCKED prefix"; fail=$((fail+1)) ;; esac
-case "$(cat "$TMP/err")" in *"memory/builds/fx/RUN.md"*) echo "ok   the deny names the record path, derived from the walk"; pass=$((pass+1)) ;; *) echo "FAIL the deny does not name the record"; fail=$((fail+1)) ;; esac
+case "$(cat "$TMP/err")" in *"memory/builds/fxFix/RUN.md"*) echo "ok   the deny names the record path, derived from the walk"; pass=$((pass+1)) ;; *) echo "FAIL the deny does not name the record"; fail=$((fail+1)) ;; esac
 case "$(cat "$TMP/err")" in *"before VERIFYING"*) echo "ok   the deny names the phase the bar waits for"; pass=$((pass+1)) ;; *) echo "FAIL the deny does not name VERIFYING"; fail=$((fail+1)) ;; esac
 
 # ---- AC2: eleven deny payloads, each naming its matched token ------------------------------------
@@ -513,7 +513,7 @@ F=$(build_fixture BUILDING 'anchor-kind: run-branch')
 run "AC4 neither run-branch nor branch-ref -> allow"          0 "$F" "$D4"
 F=$(build_fixture BUILDING); printf '0123456789abcdef0123456789abcdef01234567\n' > "$F/.git/HEAD"
 run "AC4 HEAD holds a bare sha -> allow"                      0 "$F" "$D4"
-F=$(build_fixture BUILDING); rm "$F/memory/builds/fx/RUN.md"
+F=$(build_fixture BUILDING); rm "$F/memory/builds/fxFix/RUN.md"
 run "AC4 no record -> allow"                                  0 "$F" "$D4"
 F=$(build_fixture BUILDING); rm "$F/.unattended.conf"
 run "AC4 .unattended.conf absent -> allow"                    0 "$F" "$D4"
@@ -528,24 +528,24 @@ F=$(build_fixture BUILDING); printf 'LANDER="x"\n' > "$F/.unattended.conf"
 run "conf: no MEMORY_ROOT key defaults to memory -> deny"     2 "$F" "$D4"
 F=$(build_fixture BUILDING); printf 'MEMORY_ROOT=../elsewhere\n' > "$F/.unattended.conf"
 run "conf: a MEMORY_ROOT escaping the root keys nothing -> allow" 0 "$F" "$D4"
-F=$(build_fixture BUILDING); printf 'phase: BUILDING\nrun-branch: refs/heads/fx\n' > "$F/memory/builds/fx/RUN.md"
+F=$(build_fixture BUILDING); printf 'phase: BUILDING\nrun-branch: refs/heads/fxFix\n' > "$F/memory/builds/fxFix/RUN.md"
 run "AC4 a record with no Run facts heading still keys -> deny" 2 "$F" "$D4"
 # ---- closing review round 2 M1 (TOOL-aRepatriatedFork-6): a record carrying the `## Run facts`
 # ---- heading is read the way the driver's `fact` reads it - that section, heading to next `## `.
 # ---- Read whole, a `phase: LANDED` ABOVE the heading (the driver suite's L2 fixture, `sed '1a
 # ---- phase: LANDED'`) is in PHASES_ALLOW, so the live record was filtered out and the bar ADMITTED
 # ---- while the driver still read BUILDING. The heading-less record above keys on the whole file.
-F=$(build_fixture BUILDING); sed -i '1a phase: LANDED' "$F/memory/builds/fx/RUN.md"
+F=$(build_fixture BUILDING); sed -i '1a phase: LANDED' "$F/memory/builds/fxFix/RUN.md"
 run "M1 a phase: LANDED above the Run facts heading does not admit the bar -> deny" 2 "$F" "$BAR"
 # ...and a key-shaped line under `## Parked` does not rebind the record. JS reads a CR as a line end
 # under the `m` flag, so a park reason carrying `\rrun-branch: ...` was a run-branch fact, and it beat
 # the genuine branch-ref - all most older records carry - through the `||`. The driver's park() now
 # refuses the byte; this arm is the reader's half, with the row written by hand.
-F=$(build_fixture BUILDING); printf '\n## Parked\n\n2026-09-24T00:00:00Z decision · item x · reason x\rrun-branch: refs/heads/other\n' >> "$F/memory/builds/fx/RUN.md"
+F=$(build_fixture BUILDING); printf '\n## Parked\n\n2026-09-24T00:00:00Z decision · item x · reason x\rrun-branch: refs/heads/other\n' >> "$F/memory/builds/fxFix/RUN.md"
 run "M1 a CR-forged run-branch under ## Parked does not move the binding -> deny" 2 "$F" "$BAR"
 # LIVENESS: the same run-branch INSIDE the section does move it, so the deny above is the scope and not
 # a key the reader never looks at.
-F=$(build_fixture BUILDING 'run-branch: refs/heads/other' 'branch-ref: refs/heads/fx')
+F=$(build_fixture BUILDING 'run-branch: refs/heads/other' 'branch-ref: refs/heads/fxFix')
 run "M1 control: run-branch inside the section binds the record elsewhere -> allow" 0 "$F" "$BAR"
 # THE WORKTREE ARM AND ITS NEGATIVE CONTROL. `.git` is a FILE whose gitdir names a directory under
 # the common dir; the worktree's HEAD is there and the common dir's HEAD is the primary's branch.
@@ -560,28 +560,28 @@ build_worktree() { # <worktree-HEAD-ref> <common-HEAD-ref>
   printf 'gitdir: %s/common/.git/worktrees/wt\n' "$(resolve_native "$d")" > "$d/.git"
   printf '%s' "$d"
 }
-F=$(build_worktree refs/heads/fx refs/heads/main)
+F=$(build_worktree refs/heads/fxFix refs/heads/main)
 run "AC4 worktree FILE whose gitdir HEAD keys the deny -> deny" 2 "$F" "$D4"
-F=$(build_worktree refs/heads/main refs/heads/fx)
+F=$(build_worktree refs/heads/main refs/heads/fxFix)
 run "  control: the COMMON dir's HEAD keys the deny, the worktree's does not -> allow" 0 "$F" "$D4"
 # THE DEFAULT-BRANCH RECORD, the 17-of-44 hole rev-1 keyed: no branch-ref, run-branch equal to HEAD.
 # RED-first against a copy of the hook with the run-branch read removed, which is rev-1's keying.
-F=$(build_fixture BUILDING 'anchor-kind: default-branch' 'run-branch: refs/heads/fx')
+F=$(build_fixture BUILDING 'anchor-kind: default-branch' 'run-branch: refs/heads/fxFix')
 sed "s/readFact('run-branch') || readFact('branch-ref')/readFact('branch-ref')/" "$HOOK" > "$TMP/rev1.js"
 if grep -q "readFact('run-branch')" "$TMP/rev1.js"; then echo "FAIL the rev-1 copy still reads run-branch, so the RED-first arm has no subject"; fail=$((fail+1)); else echo "ok   the rev-1 copy reads branch-ref only"; pass=$((pass+1)); fi
 payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Bash","cwd":sys.argv[1],"tool_input":{"command":sys.argv[2]}}))' "$(resolve_native "$F")" "$D4")
 printf '%s' "$payload" | node "$TMP/rev1.js" >/dev/null 2>&1; got=$?
 if [ "$got" = 0 ]; then echo "ok   RED-first: rev-1 keying allows the default-branch record (exit 0)"; pass=$((pass+1)); else echo "FAIL rev-1 keying should allow the default-branch record, got $got"; fail=$((fail+1)); fi
 run "AC4 default-branch record keyed by run-branch: on the shipped hook -> deny" 2 "$F" "$D4"
-F=$(build_fixture BUILDING 'anchor-kind: run-branch' 'branch-ref: refs/heads/fx')
+F=$(build_fixture BUILDING 'anchor-kind: run-branch' 'branch-ref: refs/heads/fxFix')
 run "AC4 branch-ref: equal and no run-branch: -> deny"        2 "$F" "$D4"
-F=$(build_fixture BUILDING 'anchor-kind: run-branch' 'run-branch: refs/heads/fx' 'branch-ref: refs/heads/other')
+F=$(build_fixture BUILDING 'anchor-kind: run-branch' 'run-branch: refs/heads/fxFix' 'branch-ref: refs/heads/other')
 run "AC4 run-branch: wins over a differing branch-ref: -> deny" 2 "$F" "$D4"
 # Two records on the branch: one already at VERIFYING, one still at BUILDING. The deny names the one
 # that is before VERIFYING.
-F=$(build_fixture VERIFYING); mkdir -p "$F/memory/builds/gx"; printf '# gx\n\n## Run facts\nphase: BUILDING\nbranch-ref: refs/heads/fx\n' > "$F/memory/builds/gx/RUN.md"
+F=$(build_fixture VERIFYING); mkdir -p "$F/memory/builds/gxFix"; printf '# gxFix\n\n## Run facts\nphase: BUILDING\nbranch-ref: refs/heads/fxFix\n' > "$F/memory/builds/gxFix/RUN.md"
 run "two records on the branch, one before VERIFYING -> deny" 2 "$F" "$D4"
-case "$(cat "$TMP/err")" in *"BUILDING (memory/builds/gx/RUN.md)"*) echo "ok   the deny names the BUILDING record and not the VERIFYING one"; pass=$((pass+1)) ;; *) echo "FAIL the deny does not name the BUILDING record"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; esac
+case "$(cat "$TMP/err")" in *"BUILDING (memory/builds/gxFix/RUN.md)"*) echo "ok   the deny names the BUILDING record and not the VERIFYING one"; pass=$((pass+1)) ;; *) echo "FAIL the deny does not name the BUILDING record"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; esac
 
 # ---- AC5: mentions are not hits ------------------------------------------------------------------
 run "AC5 git commit -m quoting a suite name -> allow"          0 "$B" 'git commit -m "the unattended.test.sh arm for run-branch"'
@@ -609,7 +609,7 @@ run "AC5 grep with a quoted suite name -> allow"               0 "$B" "grep -n '
 run "AC5 echo quoting a brace-group run -> allow"              0 "$B" 'echo "{ bash '"${PFX}x.test.sh"'; }"'
 run "AC5 node reading the hook itself -> allow"                0 "$B" 'node '"${PFX}${KIT_NAME}/gate-guard.js"''
 run "AC5 cat over this suite -> allow"                         0 "$B" 'cat '"${PFX}${KIT_NAME}/gate-guard.test.sh"''
-run "AC5 --writes naming a suite behind the driver -> allow"   0 "$B" 'bash '"${PFX}${KIT_NAME}/unattended.sh"' --dispatch s --pass TOOL-s-1 --writes '"${PFX}${KIT_NAME}/check-unattended.test.sh"''
+run "AC5 --writes naming a suite behind the driver -> allow"   0 "$B" 'bash '"${PFX}${KIT_NAME}/unattended.sh"' --dispatch sFix --pass TOOL-sFix-1 --writes '"${PFX}${KIT_NAME}/check-unattended.test.sh"''
 
 # ---- two shapes in one command are two indented lines --------------------------------------------
 run "flag and suite in one command -> deny"                    2 "$B" "$BAR && bash ${PFX}${KIT_NAME}/unattended.test.sh"
@@ -751,13 +751,13 @@ print(json.dumps({"tool_name": t, "session_id": s, "cwd": cwd, "tool_input": {"c
   else echo "FAIL $name (exit $got, want $want; an allow wants an empty stderr)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 }
 run_ask "Q1 the leaseholder asks at BUILDING -> deny" 2 "$B" tSess-1
-for tok in 'run fx, at BUILDING' 'liveness LIVE' 'unattended.sh --park fx' '--item' 'Raise the ceiling?' '17408' '20480'; do
+for tok in 'run fxFix, at BUILDING' 'liveness LIVE' 'unattended.sh --park fxFix' '--item' 'Raise the ceiling?' '17408' '20480'; do
   case "$(cat "$TMP/err")" in *"$tok"*) echo "ok   Q1 the deny names $tok"; pass=$((pass+1)) ;; *) echo "FAIL Q1 the deny does not name $tok"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; esac
 done
 run_ask "Q2 another session asks at BUILDING -> allow" 0 "$B" tSess-2
 for ph in LANDED ABORTED; do F=$(build_fixture "$ph"); run_ask "Q3 the leaseholder asks at $ph -> allow" 0 "$F" tSess-1; done
 F=$(build_fixture HELD); run_ask "Q3 the leaseholder asks at HELD -> deny" 2 "$F" tSess-1
-F=$(build_fixture BUILDING); sed -i 's/^session: tSess-1$/session: absent/' "$F/memory/builds/fx/RUN.md"
+F=$(build_fixture BUILDING); sed -i 's/^session: tSess-1$/session: absent/' "$F/memory/builds/fxFix/RUN.md"
 run_ask "Q4 a record whose session reads absent -> allow" 0 "$F" tSess-1
 F=$(build_fixture BUILDING); rm "$F/.unattended.conf"
 run_ask "Q4 no .unattended.conf -> allow" 0 "$F" tSess-1
@@ -774,7 +774,7 @@ F=$(build_fixture LANDING); printf 'phase: LANDING\nverdict: TERMINAL\n' > "$GG_
 run_ask "Q7 the leaseholder asks at LANDING, liveness TERMINAL -> allow" 0 "$F" tSess-1
 printf 'phase: LANDING\nverdict: FINISHED-UNSTAMPED\n' > "$GG_LIVENESS"
 run_ask "Q8 the leaseholder asks at LANDING, liveness FINISHED-UNSTAMPED -> deny" 2 "$F" tSess-1
-case "$(cat "$TMP/err")" in *'unattended.sh --landed fx'*) echo "ok   Q8 the deny names the landing stamp"; pass=$((pass+1)) ;; *) echo "FAIL Q8 the deny does not name unattended.sh --landed fx"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; esac
+case "$(cat "$TMP/err")" in *'unattended.sh --landed fxFix'*) echo "ok   Q8 the deny names the landing stamp"; pass=$((pass+1)) ;; *) echo "FAIL Q8 the deny does not name unattended.sh --landed fxFix"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; esac
 case "$(cat "$TMP/err")" in *'--park'*) echo "FAIL Q8 the deny tells a finished run to park"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; *) echo "ok   Q8 the deny does not name --park"; pass=$((pass+1)) ;; esac
 F=$(build_fixture HELD); printf 'phase: HELD\nverdict: TERMINAL\n' > "$GG_LIVENESS"
 run_ask "Q9 a HELD record at TERMINAL -> allow" 0 "$F" tSess-1
@@ -794,7 +794,7 @@ case "$(cat "$TMP/err")" in *'liveness could not be read'*) echo "ok   Q10 no dr
 F=$(build_fixture LANDED)
 run_ask "Q10 a LANDED record with the stub absent -> allow" 0 "$F" tSess-1
 mv "$KIT/unattended.sh.off" "$KIT/unattended.sh"; printf 'phase: BUILDING\nverdict: LIVE\n' > "$GG_LIVENESS"
-F=$(build_fixture BUILDING); sed -i '/^phase: /d' "$F/memory/builds/fx/RUN.md"
+F=$(build_fixture BUILDING); sed -i '/^phase: /d' "$F/memory/builds/fxFix/RUN.md"
 run_ask "Q11 a BUILDING record with its phase line deleted -> allow" 0 "$F" tSess-1
 printf '%s' '{"tool_name":"AskUserQuestion","session_id":"tSess-1","cwd":42,"tool_input":{}}' | node "$ASK_HOOK" >/dev/null 2>"$TMP/err"; got=$?
 if [ "$got" = 0 ] && [ ! -s "$TMP/err" ]; then echo "ok   Q12 a cwd of 42 makes resolveRepo throw -> allow (exit 0)"; pass=$((pass+1))
