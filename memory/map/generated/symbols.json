@@ -13878,6 +13878,11 @@
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
+      "id": "derive_held_key",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "derive_hold_lines",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
@@ -26028,6 +26033,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_held_git",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "read_held_keys",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
@@ -29663,6 +29673,11 @@
       "file": "tools/loop/composition.py"
     },
     {
+      "id": "read_step_count",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "read_step_spawn_sites",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -30763,6 +30778,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "read_worktree_heads",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "read_worktree_status",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -31423,6 +31443,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "remove_dead_holders",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "remove_dead_regions",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -31581,6 +31606,11 @@
       "id": "remove_red_ref",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "remove_released_rows",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "remove_repo",
@@ -40073,6 +40103,11 @@
       "file": "tools/memory-tree/ratchet.py"
     },
     {
+      "id": "run_plant_process",
+      "kind": "function",
+      "file": "tools/playbook/tag_bundle.py"
+    },
+    {
       "id": "run_plant_regrammared",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
@@ -43441,6 +43476,11 @@
       "id": "set_gen_strip",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "set_git_held",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "set_group",
