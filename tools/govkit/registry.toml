@@ -2391,10 +2391,10 @@ enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "tags bundle selftest"
-why = "it runs `<prefix>/playbook/tag_bundle.py --selftest`, every `bundle-*` plant, each through `gov_tag.py --fixture` in a scratch repository, so it reaches the `policy` and `memory-tree` kits for the reason `tags positional selftest` gives, and the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-25, moved here by PLAY-dOrderedCharter-77 S8."
+why = "it runs `<prefix>/playbook/tag_bundle.py --selftest`, every plant `SELFTEST_ROWS` names, each through `gov_tag.py --fixture` in a scratch repository, so it reaches the `policy` and `memory-tree` kits for the reason `tags positional selftest` gives, and the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-25, moved here by PLAY-dOrderedCharter-77 S8."
 tag = "leg.gov.tags-bundle-selftest"
 tests = ["feature.playbook"]
-purpose = "self-tests bundling a tag's node and its inbound edges"
+purpose = "self-tests the tag bundle and the tag index's row plants"
 argv = ["python", "{prefix}/playbook/tag_bundle.py", "--selftest"]
 unguarded_why = "a guard naming the playbook kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
 chunk = "selftests"

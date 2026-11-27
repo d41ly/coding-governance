@@ -146,6 +146,7 @@ spec tokens (the pass's own spec)	16.8	1	a	2026-11-13	runner
 spec-tokens self-test	156.8	1	a	2026-09-24	runner
 step-gate	4.4	1	d	2026-10-26	step_gate.py --base HEAD timed by bash time over a scratch clone of the branch carrying a source receipt, 4.4s wall, build pass of TOOL-dSafePassage-10
 tags (the resolver's checks)	210.0	1	a	2026-11-10	gov_tag.py check run alone over the tree at de36424bf by the main loop at the dOrderedCharter close, 210s wall, recorded by PLAY-dOrderedCharter-77 S15
+tags bundle selftest	106.0	1	a	2026-11-26	tag_bundle.py --selftest run alone over the tree by the main loop at d5288a92d, other sessions working on the node (TOOL-aPrunedIndex-4 AC8)
 template size <=48KiB	5.1	1	a	2026-09-06	runner
 template size gate selftest	74.8	2	a	2026-09-24	runner
 testsuite counts (every bar self-test prints one)	26.4	1	a	2026-09-06	runner
