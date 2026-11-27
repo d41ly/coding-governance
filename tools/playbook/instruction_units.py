@@ -1462,8 +1462,9 @@ LEVEL_LOADS = ("first, always", "with its build", "with the loop", "on its trigg
 #: naming the verb and where a key's value comes from; the refusal itself goes to stderr, never into the charter.
 PRESET_LINE_UNREAD = "unread: policy.py preset --diff names the posture; a key's source: policy.py get <key> --explain"
 #: KICK-dKeptSession-3 S6: the seconds the map's preset read may take, below the session replay's whole-map
-#: bound `CARD_MAP_BOUND` (5 s in the kickoff kit's manifest-check.sh). PINNED 2026-11-21, chosen, not measured.
-MAP_PRESET_SECONDS = 3
+#: bound `CARD_MAP_BOUND` (15 s in the kickoff kit's manifest-check.sh). Raised from 3 on the owner's ask, 2026-11-27,
+#: after `policy.py preset --diff` was measured at 3.1, 4.4 and 5.3 s on node a at 20% CPU (PINNED, 2026-11-27).
+MAP_PRESET_SECONDS = 10
 #: PLAY-dOrderedCharter-4 S3: the `map` verb's bounds, and the direction of the charter's envelope it prints in
 MAP_LINE_BYTES = 160
 MAP_CAP_BYTES = 1792

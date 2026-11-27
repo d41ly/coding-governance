@@ -244,6 +244,24 @@ Cite ids, never line numbers.
 | [TOOL-aPromptedMandate-9](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | nothing in the driver's precondition chain has a timeout and the… |
 | [TOOL-aPromptedMandate-14](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | marker-contract.test.sh gates the four readers of the generated… |
 | [TOOL-aProvenReuse-6](../builds/aProvenReuse/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | THE BOUNDED-OBSERVATION ARMS ARE WALL-CLOCK ASSERTIONS AND FLAKE UNDER… |
+| [TOOL-aPrunedIndex-5](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS rule-stated-with-no-check-that-fails EARNED A GATE AT ITS… |
+| [TOOL-aPrunedIndex-6](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS two-answers-to-one-question EARNED A GATE AT ITS SECOND… |
+| [TOOL-aPrunedIndex-7](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS hand-named-gate-list-green-while-the-bar-reds EARNED A GATE… |
+| [TOOL-aPrunedIndex-8](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS criterion-asserts-what-its-own-command-cannot-show EARNED A… |
+| [TOOL-aPrunedIndex-9](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS amendment-leaves-its-other-half-standing EARNED A GATE AT ITS… |
+| [TOOL-aPrunedIndex-11](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS criterion-asserts-what-its-own-command-cannot-show EARNED A… |
+| [TOOL-aPrunedIndex-12](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS two-answers-to-one-question EARNED A GATE AT ITS SECOND… |
+| [TOOL-aPrunedIndex-13](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS amendment-leaves-its-other-half-standing EARNED A GATE AT ITS… |
+| [TOOL-aPrunedIndex-14](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS hand-named-gate-list-green-while-the-bar-reds EARNED A GATE… |
+| [TOOL-aPrunedIndex-15](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS a-merge-of-the-default-branch-read-as-additions EARNED A GATE… |
+| [TOOL-aPrunedIndex-16](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS naming-leg-grades-what-python-named HAS NO GATE, SO A… |
+| [TOOL-aPrunedIndex-18](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS criterion-asserts-what-its-own-command-cannot-show EARNED A… |
+| [TOOL-aPrunedIndex-19](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS observed-by-claim-no-arm-discharges EARNED A GATE AT ITS… |
+| [TOOL-aPrunedIndex-21](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS amendment-leaves-its-other-half-standing EARNED A GATE AT ITS… |
+| [TOOL-aPrunedIndex-22](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS two-answers-to-one-question EARNED A GATE AT ITS SECOND… |
+| [TOOL-aPrunedIndex-23](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS criterion-asserts-what-its-own-command-cannot-show EARNED A… |
+| [TOOL-aPrunedIndex-25](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS fixture-passes-by-finding-nothing EARNED A GATE AT ITS SECOND… |
+| [TOOL-aPrunedIndex-26](../builds/aPrunedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-11-26 | THE CLASS observed-by-claim-no-arm-discharges EARNED A GATE AT ITS… |
 | [TOOL-aQuenchedHarness-9](../builds/aQuenchedHarness/BACKLOG.md) | OPEN | — | — | 2026-09-07 | govkit selftest HAS TWO ARMS RED AT 274aa39b AND NOBODY KNEW, which is… |
 | [TOOL-aQuenchedHarness-12](../builds/aQuenchedHarness/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE REUSE PROBE CANNOT SEE SIBLING WORKTREES, so it cannot answer the… |
 | [TOOL-aReapedSpinner-11](../builds/aReapedSpinner/BACKLOG.md) | OPEN | — | — | 2026-09-08 | run-selftests.sh:37 CARRIES THE BANNED PYTHON-LAUNCHER IDIOM, AND THE… |
