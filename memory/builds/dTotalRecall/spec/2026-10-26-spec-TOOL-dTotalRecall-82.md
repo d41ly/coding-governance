@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-82 — unit 71's `pass67` count is re-read at unit 67's verified pass commit, and the deviation record of unit 67 it decides is written once
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,13 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-82-deviation-821.md](../build/2026-10-26-build-TOOL-dTotalRecall-82-deviation-821.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-82-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-82-1-acceptance-ledger.md) | log | — |
+| [2026-11-22-build-TOOL-dTotalRecall-82-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-82-reground-return.md) | research | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-82-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-82-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-82-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-82-reground-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-82-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-82-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-88 |
+| [2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md](../reviews/2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md) | diff-review | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-36 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-114 |
 
 <!-- /gen:spec-records -->
 
@@ -45,7 +51,9 @@ It repairs `TOOL-dTotalRecall-71`, at step 22, one above that unit's order.
   `git grep -l "deviation TOOL-dTotalRecall-67" -- memory/builds/dTotalRecall/build` lists none whose
   Evidence names the edge row, this pass writes it through the door. Where unit 71 wrote one already,
   this pass writes none. Where unit 71's `pass67` differs from S1, this pass names unit 71's line as
-  read at a revision other than unit 67's pass, in the same ledger line. Observed by AC2.
+  read at a revision other than unit 67's pass, in the same ledger line. The door is
+  `TOOL-dTotalRecall-2`'s, CLOSED; its spec's hands-off to this unit is the mirror of §3's edge.
+  Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -69,6 +77,7 @@ It repairs `TOOL-dTotalRecall-71`, at step 22, one above that unit's order.
 
 ```bash
 # run from the repository root, with unit 81 §4's two functions sourced
+. tools/lib/resolve-python.sh
 cat > "$SCRATCH/s82.txt" <<'STRINGS'
 **consumes-from** `TOOL-dTotalRecall-56`
 STRINGS
@@ -78,9 +87,16 @@ P=$(pass_of 67) && read_at "$P" 57 "$SCRATCH/s82.txt"
 It prints the sha, the count and the edge string on one line, or a red line where pass(67) does
 not resolve. A red stops this pass: no decision is made from an unresolved pass.
 
-PINNED, measured 2026-10-26 at `af814dba8`: the edge string prints 0 over spec 57 at `653bed738`
-and at `af814dba8`, read by the same `read_at`. So S1 can read either value once unit 72 writes the
-edge at step 21.
+The resolver is sourced first because `pass_commit` walks commits through
+`tools/unattended/lib-unattended.sh#read_attribution_tokens`, which returns 2 with no
+`resolve_python` defined. `pass_of` folds that into `red <n> no pass commit`. Measured 2026-11-23
+at `942294abe` (PINNED): without the resolver `pass_of 10` printed that red, and with it
+`d735e47b9…`, unit 10's CLOSED commit.
+
+PINNED, measured 2026-10-26 at `af814dba8` and re-measured 2026-11-23 at `942294abe` by the same
+`read_at`: the edge string prints 0 over spec 57 at `653bed738`, at `942294abe` and at `d735e47b9`.
+`pass_of 67` prints `red 67 no pass commit` at `942294abe`, before unit 67's pass. So S1 can read
+either value once units 67 and 72 have passed.
 
 ### The decision table
 
@@ -95,17 +111,36 @@ quoted in this unit's ledger line.
 
 ### The deviation record
 
-`python tools/memory-tree/gov_record.py new deviation --build dTotalRecall --unit TOOL-dTotalRecall-67`
-with one `--field` per REQUIRED name of `tools/memory-tree/deviation_join.py:146`: `Departs from`
-naming `TOOL-dTotalRecall-67` at its rev, `Hand-off` `spec-to-code`, `Cause` `review finding`, the
-approver under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`), `Caused-by`
-`TOOL-dTotalRecall-82`. Its Evidence names the edge row, unit 67's recorded figure, S1's sha and
-count, and item B1 of the round-6 audit with item H2 of this one.
+`python tools/memory-tree/gov_record.py new deviation --build dTotalRecall --unit TOOL-dTotalRecall-67 --title <text>`
+renders `**Serves:** deviation TOOL-dTotalRecall-67`
+(`tools/memory-tree/build_records.py#write_new_record`, which refuses a missing `--title` and a
+record missing a required field). It takes one `--field` per required name of the deviation entry
+of `tools/memory-tree/build_records.py#KINDS`, each value inside that entry's closed sets, and the
+values are the ones unit 71 §4 gives the same record, so either writer spells one departure alike:
+
+- `Departs from` `TOOL-dTotalRecall-67@rev-<n> [§6 AC1]`, the rev unit 67's header holds at its pass.
+- `Hand-off` `spec-to-code`; `Cause` `design defect`; `Risk` `loosening`, as the built row checks
+  less than the criterion.
+- `Before` unit 67's recorded figure for the edge row; `After` S1's count at S1's sha; `Reason`
+  the backtick substitution unit 71 §1 names.
+- `Approver` opening with the role `author`, under the chain's `author-recorded` value
+  (`tools/memory-tree/deviation_join.py#HOST_APPROVAL`, `PLAY-dClosedLoop-4`);
+  `deviation_join.py#check_approver` refuses an approver naming no role.
+- `Follow-through` `ask TOOL-dTotalRecall-27`; `Caused-by` `TOOL-dTotalRecall-82`.
+- `Evidence` the edge row, unit 67's recorded figure, S1's sha and count, item B1 of the round-6
+  audit (`2026-10-26-review-TOOL-dTotalRecall-67-spec-audit-round1`) and item H2 of the round-7
+  audit (`2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1`).
+
+At `942294abe` S3's grep lists one record, `2026-10-26-build-TOOL-dTotalRecall-67-deviation-671`,
+the roster promotion, whose Evidence names no edge row (DERIVED 2026-11-23), so it never counts as
+the record S3 owes.
 
 ### Why order 22
 
 The re-read rests on unit 81's read, at step 22, and on unit 71's pass at step 21. The §3 edge to
-unit 81 runs that pass first.
+unit 81 runs that pass first: `--dispatch` refuses a unit while a unit of its build it consumes
+from is neither CLOSED nor WONTDO (`tools/unattended/unattended.sh#verb_dispatch`, reading
+`tools/unattended/lib-unattended.sh#read_consumes_from`).
 
 ### Inventory
 
@@ -127,8 +162,9 @@ Minted: nothing in code; at most one deviation record of `TOOL-dTotalRecall-67`.
 
 - security — no surface.
 - perf / scale — one pass-commit walk and one blob read.
-- error / empty / loading states — an unresolved pass(67) is a red line and the pass stops. An
-  absent blob is a red line.
+- error / empty / loading states — an unresolved pass(67) is a red line and the pass stops, and so
+  is an unresolved python launcher, which `pass_of` reports as no pass commit. An absent blob is a
+  red line. The door refuses a record missing a field, so no partial record is written.
 - observability — the ledger line names S1's sha and count, unit 71's `pass67` and unit 67's figure.
 - risks — unit 67's figure is prose in its ledger, quoted by eye.
 - testing — AC1 and AC2 by the pass.
@@ -170,17 +206,25 @@ observes.
   (HIGH, item H2, shared with id 37).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-90, TOOL-dTotalRecall-92, each the other end of an edge a
   unit the round-1 spec audit of units 77 to 88 promoted wrote; nothing else moved.
+- rev-3 · 2026-11-23 · §2 · §4 · §5 · §10 · per `2026-11-22-prompt-TOOL-dTotalRecall-82-reground-brief`,
+  re-grounded at `942294abe`: the re-read sources the python resolver `pass_commit` needs; the pins
+  re-measured; the record spells every field `build_records.py#KINDS` requires, with `--title`,
+  its values aligned to unit 71 §4's; cited lines moved to symbols; §10 re-run. Edges, AC1 and
+  AC2 unchanged.
 
 ## 10. Reuse audit
 
-The seam is `TOOL-dTotalRecall-81`'s guarded read, itself built on `pass_commit`
-(`tools/unattended/lib-unattended.sh:1026`) and `tree_lib.read_blobs_at`
-(`tools/memory-tree/tree_lib.py:328`), and the record door `gov_record.py new deviation` that
-`TOOL-dTotalRecall-2` builds. `python tools/codebase-map/reuse_lookup.py "read a file at a git revision and refuse an unresolved revision"`
+The seam is `TOOL-dTotalRecall-81`'s guarded read, itself built on
+`tools/unattended/lib-unattended.sh#pass_commit`, `tools/memory-tree/tree_lib.py#read_git_output`
+and `tools/memory-tree/tree_lib.py#read_blobs_at`, and the record door `gov_record.py new deviation`
+that `TOOL-dTotalRecall-2` landed. `python tools/codebase-map/reuse_lookup.py "read a file at a git revision and refuse an unresolved revision"`
 ranked `read_git_output` and `read_blobs_at` as SEAM candidates, the two unit 81 calls. The recall
 query below found this audit's fix text,
 unit 74's §5 claim that `git show` refuses an empty revision, which the audit refuted, and the
-`aUnmannedHelm` review that guarded a base by `rev-parse --verify` before reading it. No existing
+`aUnmannedHelm` review that guarded a base by `rev-parse --verify` before reading it. Re-run
+2026-11-23, the lookup ranks `read_blobs_at` and `run_git` among its SEAM candidates, and the query
+also finds `TOOL-dWitnessedBar-88`'s one pass-commit lookup and `TOOL-aStagedLane-5`, a read moved
+from the index to the graded commit; both are the shape unit 81's read already takes. No existing
 seam fits beyond them.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a probe read a spec at a pass commit and refuse an unresolved revision instead of reading the index" --terms "pass commit rev-parse verify git show index blob empty revision pass_commit read_blobs_at guarded probe"`

@@ -119,9 +119,25 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 | 3 | `TOOL-aGradedDialect-3` | no |
 | 4 | `TOOL-aGradedDialect-4` | no |
 | 5 | `TOOL-aGradedDialect-5` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-10-prompt-TOOL-aGradedDialect-5-brief.md`, `2026-09-10-prompt-TOOL-aGradedDialect-4-brief.md` and 4 more under prompts/ |
+| reviews | `2026-09-11-review-TOOL-aGradedDialect-4-diff-round6.md`, `2026-09-11-review-TOOL-aGradedDialect-4-diff-round5.md` and 9 more under reviews/ |
+| research | `2026-09-10-build-TOOL-aGradedDialect-1-typescript-extraction-research.md` |
+| logs | `2026-09-10-build-TOOL-aGradedDialect-5-acceptance.md`, `2026-09-10-build-TOOL-aGradedDialect-4-acceptance.md` and 3 more under build/ |
+| open asks | `BACKLOG.md`, 4 open |
+| card ref | `refs/gov/builds/aGradedDialect/card` |
+<!-- /gen:build-routes -->

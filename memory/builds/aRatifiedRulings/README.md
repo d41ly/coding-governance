@@ -101,3 +101,15 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 - **Parent builds:** [aLeakedHandle](../aLeakedHandle/README.md)
 - **Child builds:** [aProbedUnit](../aProbedUnit/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-13-prompt-TOOL-aRatifiedRulings-4-1-build-brief.md`, `2026-09-13-prompt-TOOL-aRatifiedRulings-3-1-build-brief.md` and 3 more under prompts/ |
+| reviews | `2026-09-14-review-TOOL-aRatifiedRulings-1-diff-round1.md`, `2026-09-13-review-TOOL-aRatifiedRulings-1-round2.md` (CLEAN WITH FIXES) and 1 more under reviews/ |
+| logs | `2026-09-13-build-TOOL-aRatifiedRulings-4-1-acceptance-ledger.md`, `2026-09-13-build-TOOL-aRatifiedRulings-3-1-acceptance-ledger.md` and 2 more under build/ |
+| card ref | `refs/gov/builds/aRatifiedRulings/card` |
+<!-- /gen:build-routes -->

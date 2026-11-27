@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-11 — the shape-run kind, the parsed view of the review-shape line
 
-**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base 462d20f3 · streams tooling · order 14 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-7 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 14 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0222@bc317ce6 whole
 
@@ -19,6 +19,11 @@
 | [2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-25 |
 | [2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-25 |
 | [2026-11-05-build-TOOL-dTotalRecall-11-deviation-113.md](../build/2026-11-05-build-TOOL-dTotalRecall-11-deviation-113.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-11-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-11-1-builder-return.md) | journal | — |
+| [2026-11-22-build-TOOL-dTotalRecall-11-2-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-11-2-acceptance-ledger.md) | log | — |
+| [2026-11-22-build-TOOL-dTotalRecall-11-2-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-11-2-builder-return.md) | journal | — |
+| [2026-11-22-build-TOOL-dTotalRecall-11-divergence-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-11-divergence-return.md) | journal | — |
+| [2026-11-22-build-TOOL-dTotalRecall-11-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-11-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
@@ -26,87 +31,127 @@
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-25 |
 | [2026-11-05-prompt-TOOL-dTotalRecall-11-1-spec-reviewer.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-11-1-spec-reviewer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dTotalRecall-11-2-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-11-2-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-11-build-brief-2.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-build-brief-2.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-11-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-spec-writer.md) | log | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-11-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-reground-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-11-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
+| [2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md](../reviews/2026-11-25-review-TOOL-dTotalRecall-1-closing-diff-review-round1.md) | diff-review | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-36 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-114 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-Every review exit already prints one byte-stable `review-shape` line (`renderShapeLine`,
-`tools/workflows/tier2-review.template.js:78-83`), 158 records carry it, and nothing parses it: its
-grammar lives only as the suite's `SHAPE_RE` (`tools/workflows/tier2-review.test.sh:1540`) and as prose
-(`tools/workflows/README.md:289-291`). This unit registers the `shape-run` record kind, makes one parser
-with the one `SHAPE_RE` the line's only grammar, and writes a shape-run record through the record door
-from a review record's line, so the Loop Review and later writers read typed fields instead of
+Every review exit already prints one byte-stable `review-shape` line
+(`tools/workflows/tier2-review.template.js#renderShapeLine`), 318 records carry it (PINNED 2026-11-22, AC2),
+and nothing parses it: its grammar lives only as the suite's `SHAPE_RE`
+(`tools/workflows/tier2-review.test.sh@3b5e075562:2053`) and as prose
+(`tools/workflows/README.md@1316da7b49:623`). This unit registers the `shape-run` record kind, makes one
+parser with the one `SHAPE_RE` the line's only grammar, and writes a shape-run record through the record
+door from a review record's line, so the Loop Review and later writers read typed fields instead of
 re-parsing prose (systems `[design-role-shapes]`; research-role-shapes-b's memory row).
 
 ## 2. Scope (IN)
 
-Preconditions this unit calls and does not build, each cited by its parent spec: the door
-`gov_record.py` (TOOL-dTotalRecall-2, I2); the registry `record-kinds.toml` and `check_record_kinds`
-(TOOL-dTotalRecall-1, I1); the typed build-folder record factory `tools/memory-tree/build_records.py`
-(PLAY-dOrderedCharter-7 S7) and its one kind list `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py`
-(PLAY-dOrderedCharter-42 S1, S2), with the closed kind list of `tools/memory-tree/HYGIENE.template.md`
-(its S5); the leg's one declaration and `tools/run-gates/leg_factory.py` (TOOL-dWitnessedBar-11 S1 to
-S3), and `enforces` with its meta-check (PLAY-dOrderedCharter-7 S2, S3); and the four fields `review.cost` appends to the line, `trigger=`,
-`shape=`, `efforts=`, `role-sha=` (TOOL-dDeclaredLoop-20 S3).
+Preconditions this unit calls and does not build. Landed: the registry
+`tools/memory-tree/record-kinds.toml`, its factory verb `record_kinds.py#add_record_kind` (`new`), and
+`record_kinds.py#check_row` and `#check_record_kinds` (TOOL-dTotalRecall-1); the typed `source` and
+`id-rule` cells `new` writes (TOOL-dTotalRecall-25, CLOSED: a dependency, no edge); the `cardinality`
+column, compared with `tools/playbook/edges.toml` by `edge_grammar.py#check_cardinality_mirror`
+(TOOL-dTotalRecall-22, CLOSED: a dependency, no edge); the record factory
+`tools/memory-tree/build_records.py`, its `#KINDS`, `#write_record` and `#read_record`
+(PLAY-dOrderedCharter-7 S7), and its one kind list `tree_lib.py#TYPED_RECORD_KINDS`
+(PLAY-dOrderedCharter-42 S1, S2); the leg factory `tools/run-gates/leg_factory.py`, whose `new` writes a
+`[[gate_leg]]` row and runs `--write` (TOOL-dWitnessedBar-11 S1 to S3); and the line's `merged=` field
+(TOOL-dFairHearing-5 S4) and four `review.cost` fields `trigger=`, `shape=`, `efforts=`, `role-sha=`
+(TOOL-dDeclaredLoop-20 S3), both printed by `renderShapeLine`; and the door
+`tools/memory-tree/gov_record.py`, its `gov_record.py#KIND_HANDLERS` table, and the factory's
+`build_records.py#write_new_record`, `#check_typed_record` and `#derive_content_key`, with the mint's
+authority read `build_records.py#check_mint_authority` (TOOL-dTotalRecall-2, CLOSED at rev-13, S1 to S6,
+S8).
 
 - **S1** — The parser, `tools/memory-tree/shape_run.py`: `SHAPE_RE`, the line's grammar of §4 "The
-  grammar", and `parse_shape_line(line)` returning the fields as a dict or `None`, and
-  `read_shape_line(text)` returning the one column-0 `review-shape` line of a record, or a reason when
-  there is none or more than one. Observed by AC1 and AC2.
+  grammar"; `parse_shape_line(line)`, returning the fields as a dict or raising `ValueError` naming the
+  first field that does not match; and `read_shape_line(text)`, returning the one column-0
+  `review-shape` line of a record or raising `ValueError` naming none, or two with their line numbers.
+  Observed by AC1 and AC2.
 - **S2** — The parser's CLI: `python shape_run.py --parse-line <line>` prints the fields as `key=value`
-  lines and exits 0, or exits 2 naming the first field that does not match; `--parse-file <path>` does
-  the same for every line of a file and prints `<n> parsed · <m> refused`. Observed by AC1 and AC2.
-- **S3** — The kind in the factory: `shape-run` joins `TYPED_RECORD_KINDS`, the factory's per-kind
-  table gains its fields (§4 "The record"), and the closed `<kind>` list of
-  `tools/memory-tree/HYGIENE.template.md` (`:628-630`) gains `shape-run` with a half-line naming this
-  unit, carried into `memory/HYGIENE.md` by `adopt-memory-tree.sh --render`: the three lists
-  PLAY-dOrderedCharter-42 S2 and S5 keep one, all joined in this pass. So `**Serves:** shape-run <unit
-  id>` binds and its records are named `<date>-build-<unit id>-shape-run-<n>.md` in the build's `build/`
-  folder. Observed by AC3 and AC10.
-- **S4** — The door verb: `gov_record.py new shape-run --review <review record>` reads the review
-  record, takes its line with `read_shape_line`, parses it, and writes the record through the factory,
-  its `Caused-by` the review record's stem and its `<unit id>` the review file name's id. A record with
-  no line, two lines or a line `SHAPE_RE` refuses is refused, exit 2, nothing written. A second call for
-  the same review writes nothing and prints the existing record's path, the door's content-addressed
-  idempotence (I2). Observed by AC4 and AC5.
-- **S5** — The conformance arm, `check_shape_runs(root)` in `shape_run.py`, run by the leg the registry
-  row's `check` column names: over every tracked shape-run record, its fields parse under the factory's table, its
-  `Caused-by` names a tracked review record, and that record's line parses to the same field values; any
-  difference names the record, the field and both values. Observed by AC6.
-- **S6** — The registry row in `tools/memory-tree/record-kinds.toml`, `name = "shape-run"`, every I1
-  column filled as §4 "The row" states, and the leg `shape-run records (each record equals its review
-  line)`, argv `python {prefix}/memory-tree/shape_run.py --check`, which runs S5 and is the row's
-  `check`. The leg is declared once, a `[[gate_leg]]` row of `tools/memory-tree/kit.toml` written by
-  `python tools/run-gates/leg_factory.py new` and rendered into `tools/gate-legs.json` by its `--write`
-  (TOOL-dWitnessedBar-11 S1 to S3), carrying `enforces = ["practice.one-fact"]`. cl-0222 sits in no v2
-  `[enforcement]` row, so the tag is step 2 of TOOL-dWitnessedBar-11 §4 "The enforces rule": the
+  lines in line order, an absent optional field omitted, and exits 0, or exits 2 printing
+  `shape-run: refused · <field>`; `--parse-file <path>` parses every non-empty line of a file, prints
+  one refusal per refused line and `<n> parsed · <m> refused`, and exits 0, or 2 where `<m>` is not 0.
+  Observed by AC1 and AC2.
+- **S3** — The kind in the factory: `shape-run` joins `TYPED_RECORD_KINDS`, with one sentence in the
+  comment above it; `build_records.py#KINDS` gains its entry (§4 "The record"); and the closed `<kind>`
+  bullet of `tools/memory-tree/HYGIENE.template.md@8bd88f2305:675` gains `shape-run` with a
+  half-line naming this unit, its count of typed kinds after `research` read eighteen, carried into
+  `memory/HYGIENE.md` by `adopt-memory-tree.sh --render`. So `**Serves:** shape-run <unit id>` binds and
+  its records are named `<date>-build-<unit id>-shape-run-<n>.md` in the build's `build/` folder.
+  `build_records.py#DOORS` is unchanged: the kind's door is `gov_record.py`. Observed by AC3 and AC10.
+- **S4** — The door's handler: `gov_record.py new shape-run --review <path>`, one `KIND_HANDLERS` entry,
+  `write_shape_run(root, review)`, taking no other flag. It refuses a path that is not a tracked file of
+  a `<memory root>/builds/<slug>/reviews/` folder, reads the record, takes its line with
+  `read_shape_line`, parses it, and calls `write_new_record` with `<slug>`, the unit id of §8 F5, the
+  review record's stem as the title, and the fields of §4 "The record". A record with no line, two
+  lines or a line `SHAPE_RE` refuses is refused, exit 2 `refused shape-run: <why>`, nothing written. A
+  second call for the same review prints `exists <path> key <content key>` and exits 0, the door's
+  content-addressed idempotence (TOOL-dTotalRecall-2 S5). The handler adds no authority read of its
+  own: `write_new_record`'s `check_mint_authority` refuses a `<slug>` whose build lease
+  `placement.py#read_lease_class` reads held by another session (TOOL-dTotalRecall-2 S6), so AC4's
+  fixture is a review record whose build lease reads free (§8 F6). Observed by AC4 and AC5.
+- **S5** — The conformance arm, `check_shape_runs(root)` in `shape_run.py`, returning `(lines, exit)`
+  and run by `shape_run.py --check`: over every tracked file `build_records.derive_record_name` reads as
+  a `shape-run` record, its fields read by `build_records.read_record` under the kind's entry, its
+  `Caused-by` names one tracked `<memory root>/builds/*/reviews/<stem>.md`, and that record's line
+  parses to the same value for every field either side carries; a difference names the record, the
+  field and both values, exit 1. An empty population prints
+  `shape-run: unarmed — 0 shape-run record(s), no writer calls the verb yet` and exits 0. Observed by
+  AC6.
+- **S6** — The registry row and its leg. The leg `shape-run records (each record equals its review
+  line)`, argv `python3 {kit}/shape_run.py --check`, is declared first, by
+  `python tools/run-gates/leg_factory.py new` as §4 "The leg" spells it: a `[[gate_leg]]` row of
+  `tools/memory-tree/kit.toml` rendered into `tools/gate-legs.json`, carrying
+  `enforces = ["practice.one-fact"]`, with the rows `tools/run-gates/owed_rows.py` owes a new leg. Then
+  the row, by `python tools/memory-tree/record_kinds.py new shape-run` as §4 "The row" spells it, which
+  refuses a `--check` naming no leg; `new` writes the typed `source` and `id-rule` and re-renders the
+  `gen:record-kinds` region. The row then gains the `cardinality` cell `edge_grammar.py#derive_cardinality_cell`
+  derives for `caused-by`, which `new` does not write (`record_kinds.py#LATER_COLUMNS`). cl-0222 sits in
+  no v2 `[enforcement]` row, so the tag is step 2 of TOOL-dWitnessedBar-11 §4 "The enforces rule": the
   practice whose line states the rule a red of this leg reports broken, the record and its review line
-  being one fact a gate compares (§4 "The record"). PLAY-dOrderedCharter-7 S3 reds a leg with no
-  `enforces`. Observed by AC6, AC7 and AC9.
-- **S7** — `SHAPE_RE` moves: `tools/workflows/tier2-review.test.sh` drops its regex, passes the resolved
-  python (`bd_py`, `:2081`) to `run.js` beside the memory-tree kit dir it already passes (`:2114`), and
-  checks each exit's `shape` with `shape_run.py --parse-line`, keeping its stage and `out-tokens=unknown`
-  assertions. `tools/workflows/README.md:289-291` states the field list once and points at `SHAPE_RE`
-  as the grammar. Observed by AC8.
-  **Readers:** by name: `tools/workflows/tier2-review.test.sh` (`:1540`, `:1555`), the one file spelling
-  the regex today, re-pointed to the parser's CLI · by value: `tools/workflows/README.md`
-  (`:289-291`), whose prose restates the grammar the regex compiles and becomes a pointer to it.
+  being one fact a gate compares (§4 "The record"); `leg_factory.py new` refuses a leg with no
+  `--enforces`. Observed by AC7, AC9 and AC11.
+- **S7** — `SHAPE_RE` moves: the suite `tools/workflows/tier2-review.test.sh` drops its regex and checks
+  each exit's `shape` by spawning `shape_run.py --parse-line` with the python and the memory-tree kit
+  directory `run.js` already receives (`process.argv[5]`, the resolved `lens_py`, and
+  `process.argv[4]`, `bd_mtd`), keeping its stage, logged-line, `out_tokens=unknown` and four-`-`
+  assertions; an empty python or kit directory reds the arm by name. The `tier2-review self-test` leg's
+  `guard` in `tools/govkit/registry.toml` gains `{prefix}/memory-tree/shape_run.py`, rendered by
+  `leg_factory.py --write`, so a parser change runs the suite. `tools/workflows/README.md`'s `shape`
+  bullet keeps the field list and points at `SHAPE_RE` as the grammar. Observed by AC8.
+  **Readers:** by name: `tools/workflows/tier2-review.test.sh`, its regex and the shape arm's test
+  of it, the one file spelling the regex today, re-pointed to the parser's CLI · by value:
+  `tools/workflows/README.md`, whose `shape` bullet restates the grammar the regex compiles and
+  becomes a pointer to it; `tools/workflows/replay_scorer.py`, whose SHAPE_STATED reads the
+  `confirmed=` field alone and stays (§3).
 
 ## 3. Non-goals (OUT)
 
 - The writers that call the verb. No parent spec owns the review-act writer, the call of
   `new shape-run --review` at each review exit, yet: TOOL-dDeclaredLoop-20 S3 limits `review.cost` to
-  the four fields it appends to the line and calls no `gov_record.py`, so a later unit or an ask owns it
-  (the ask TOOL-dDeclaredLoop-111 in `memory/builds/dDeclaredLoop/BACKLOG.md`). The supervisor's
-  journal reconcile for every other role act calls the `--act` form (TOOL-dWellOiledMachine-19 S6), an
-  ask of that spec's §8 F2 this unit does not build; `probe.run` (dWellOiledMachine) is the third
-  writer. This unit ships the `--review` verb.
+  the four fields it appends to the line and calls no `gov_record.py`, so the ask TOOL-dDeclaredLoop-111
+  in `memory/builds/dDeclaredLoop/BACKLOG.md` owns it, with the loop item `item.review.cost`, whose
+  `returns = "record-kind.review-shape"` (`tools/loop/loop.toml@9c303e8043:2190`) names no registry row
+  and stays. The supervisor's journal reconcile for every other role act calls the `--act` form
+  (TOOL-dWellOiledMachine-19 S6), an ask of that spec's §8 F2 this unit does not build; `probe.run`
+  (dWellOiledMachine) is the third writer. A writer also re-renders the served spec's
+  `gen:spec-records` region its record joins. This unit ships the `--review` verb.
 - The `shape-run-coverage` check, a role act with no shape-run record (research-role-shapes-b:184): it
-  needs those writers, and grading the 158 landed review records with none would red today's tree.
+  needs those writers, and grading the landed review records with none would red today's tree.
 - Changing `renderShapeLine` or the line's bytes: the harness keeps emitting it and the review record
   keeps carrying it.
+- `replay_scorer.py#SHAPE_STATED`: a lenient `confirmed=` reader over prose-wrapped lines in the
+  workflows kit, which requires no memory-tree kit; the strict parser refuses such lines by design.
 - Pricing shapes in the value ledger: the Loop Review's.
 
 ### Edges
@@ -115,7 +160,7 @@ S3), and `enforces` with its meta-check (PLAY-dOrderedCharter-7 S2, S3); and the
   unit's `shape-run` row lands in and is graded by
 - **consumes-from** `TOOL-dTotalRecall-2` — `gov_record.py`, whose `new <kind>` verb this unit gives the
   `shape-run` kind, with its content-addressed idempotence
-- **hands-off** `TOOL-dTotalRecall-42` — the `shape-run` row, whose home that unit narrows to the id-rule's glob and arms with the `unarmed` key (the round-1 audit's id 51)
+- **hands-off** `TOOL-dTotalRecall-42` — the `shape-run` row, which that unit arms with the `unarmed` key (the round-1 audit's id 51); its home is the id-rule's glob from the first
 - **hands-off** `TOOL-dTotalRecall-43` — the `shape-run` row's other columns and its leg's meta-gate rows, which that unit completes for the round-1 audit's ids 4 and 40
 - **hands-off** `TOOL-dTotalRecall-53` — `check_shape_runs`, whose unarmed line that unit prints from the row's `unarmed` key, and the `shape-run` row its AC7 re-observes (the round-1 audit of units 36 to 43, ids 39 and 8)
 
@@ -123,16 +168,17 @@ S3), and `enforces` with its meta-check (PLAY-dOrderedCharter-7 S2, S3); and the
 
 ### The grammar
 
-One regex, compiled once in `shape_run.py`, reading the line `renderShapeLine` writes, with the four
-`review.cost` fields optional at the end so a line written before TOOL-dDeclaredLoop-20 and one written
-after both parse:
+One regex, compiled once in `shape_run.py`, reading the line `renderShapeLine` writes. `merged=` is
+optional, since lines before TOOL-dFairHearing-5 lack it, and the four `review.cost` fields are optional
+together at the end, since lines before TOOL-dDeclaredLoop-20 lack them, so every landed line parses:
 
 ```python
-_N = r"(\d+|-)"
+_N = r"(?:\d+|-)"
 SHAPE_RE = re.compile(
     r"^review-shape kind=(?P<kind>diff-review|spec-audit) round=(?P<round>\d+)"
     r" intensity=(?P<intensity>full|light) at=(?P<at>find|verify|synth)"
     r" raw=(?P<raw>" + _N + r") confirmed=(?P<confirmed>" + _N + r") refuted=(?P<refuted>" + _N + r")"
+    r"(?: merged=(?P<merged>" + _N + r"))?"
     r" unverified=(?P<unverified>" + _N + r") blocker=(?P<blocker>" + _N + r") high=(?P<high>" + _N + r")"
     r" medium=(?P<medium>" + _N + r") low=(?P<low>" + _N + r") agents=(?P<agents>\d+)"
     r" out-tokens=(?P<out_tokens>\d+|unknown)"
@@ -140,12 +186,15 @@ SHAPE_RE = re.compile(
 ```
 
 `-` stays `-` and is never read as `0`: a count the stage has not produced is an absence, the line's
-own rule (`tier2-review.template.js:74-76`). The four optional fields arrive together or not at all.
-A refusal names the first field, scanning left to right, that its sub-pattern does not match.
+own rule (the comment above `renderShapeLine`). A refusal names the first field, scanning left to
+right, that its sub-pattern does not match. This regex, probed over AC2's census at `e1ae60af8`,
+parsed every line and refused a `blocker=zero` line.
 
 ### The record
 
-A typed build-folder record of the factory's grammar, one per review exit:
+A typed build-folder record of the factory's grammar, one per review exit, laid out by
+TOOL-dTotalRecall-2 S3: the row's fields in its order, then each optional field the line carries in
+line order.
 
 ```markdown
 # <unit id> shape-run <n> — <review record stem>
@@ -167,62 +216,86 @@ A typed build-folder record of the factory's grammar, one per review exit:
 - **Agents:** 11
 - **Out-tokens:** 97922
 - **Caused-by:** 2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1
+- **Merged:** 0
+- **Trigger:** owed
 ```
 
-`Trigger`, `Shape`, `Efforts` and `Role-sha` are written when the line carries them, and are absent
-otherwise. The factory's table for the kind: the fourteen fields above and `Caused-by` required, the
-four optional, each value's closed set or shape the grammar's. `Caused-by` is the source pointer, so the
-line and the record are one fact read twice and `check_shape_runs` compares them (the charter's one-fact
-rule: a gate compares the two).
+`Merged`, `Trigger`, `Shape`, `Efforts` and `Role-sha` are written when the line carries them, and are
+absent otherwise. The factory's entry for the kind: the fourteen fields above `Caused-by` and
+`Caused-by` required, and `closed` holding `Kind`, `Intensity` and `At` to the grammar's sets; the
+counts' shape is the grammar's, held by `check_shape_runs` re-parsing the line. `Caused-by` is the
+source pointer, so the line and the record are one fact read twice and `check_shape_runs` compares them
+(the charter's one-fact rule: a gate compares the two). The content key TOOL-dTotalRecall-2 S5 derives
+covers the required fields, `Caused-by` among them, so one review yields one record.
 
 ### The row
 
-In TOOL-dTotalRecall-1's cell shapes (its §4 "Data model"):
+`record_kinds.py new` writes it from these flags:
 
-```toml
-[[record-kind]]
-name = "shape-run"
-tag = "record.shape-run"
-layer = "memory"
-home = "memory/builds/<slug>/build/"
-id-rule = "<date>-build-<unit id>-shape-run-<n>.md"
-schema = { form = "fields", fields = [
-  "Kind", "Round", "Intensity", "At", "Raw", "Confirmed", "Refuted", "Unverified", "Blocker", "High",
-  "Medium", "Low", "Agents", "Out-tokens", "Caused-by"] }
-writer = "gov_record.py new shape-run"
-readers = ["shape_run.py", "tier2-review.test.sh"]
-lifecycle = "written once per review exit, never edited"
-check = "shape-run records (each record equals its review line)"
+```
+python tools/memory-tree/record_kinds.py new shape-run --tag record.shape-run
+  --writer "gov_record.py new shape-run" --check "shape-run records (each record equals its review line)"
+  --home "memory/builds/*/build/*-build-*-shape-run-*.md" --layer layer.memory --lifecycle append-only
+  --readers-none "a shape-run record is read by shape_run.py's check and the Loop Review, never filled into a work order"
+  --purpose "one review exit's review-shape line as typed fields, compared back to that line by shape_run.py"
+  --field Kind --field Round --field Intensity --field At --field Raw --field Confirmed --field Refuted
+  --field Unverified --field Blocker --field High --field Medium --field Low --field Agents
+  --field Out-tokens --field Caused-by
 ```
 
-The four optional fields stay out of `fields`, which lists the required ones S4 of TOOL-dTotalRecall-1
-grades. The `check` cell names the leg S6 declares: `python {prefix}/memory-tree/shape_run.py --check`,
-its `[[gate_leg]]` row in `tools/memory-tree/kit.toml` rendered into `tools/gate-legs.json`, with its
-meta-gate rows.
+`new` adds `source = "{prefix}/memory-tree/build_records.py:KINDS.shape-run.required"` and
+`id-rule = "<date>-build-<unit id>-shape-run-<n>.md"`; the pass appends
+`cardinality = { caused-by = { per-source = "1", per-target = "many" } }` after `purpose`, the cell the
+`red-fix` and `disposition` rows carry. The home is the typed rows' glob, so unit 42 finds it narrow;
+`append-only` is TOOL-dTotalRecall-43 S3's value for this kind. A typed row with no record prints
+`shape-run: unarmed — no record yet` under `check_record_kinds` and passes.
+
+### The leg
+
+```
+python tools/run-gates/leg_factory.py new "shape-run records (each record equals its review line)"
+  --kit memory-tree --argv '["python3", "{kit}/shape_run.py", "--check"]' --subject repo
+  --purpose "compares each shape-run record with its review line" --enforces practice.one-fact
+  --tests feature.memory-tree-hygiene --stage step.test --chunk records --ceiling 125
+```
+
+A descriptor row, not an `[[exempt_leg]]`: the check needs no gov-held ledger, unlike `record-kinds`,
+and an adopter tree with no record runs it unarmed. The ceiling follows the rule of
+`memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-1-deviation-15.md`:
+it clears an evidenced maximum up to 5 s by max(120 s, 1.0x) (PINNED 2026-11-22),
+and a timed run above 5 s (PINNED 2026-11-22) raises it to that rule's value. The owed rows: `tools/govkit/subject-pins.tsv` gains the name with `repo` and `records`,
+the `gate-legs` claim of `memory/map/features/memory-tree-hygiene.md` gains the name, and
+`tools/run-gates/ceiling-evidence.txt` the timed row, as unit 1 wrote its own.
 
 ### Inventory
 
 Minted: `tools/memory-tree/shape_run.py` with `SHAPE_RE`, `parse_shape_line`, `read_shape_line`,
-`check_shape_runs` and the `--parse-line` and `--parse-file` modes; the `shape-run` member of
-`TYPED_RECORD_KINDS` and of HYGIENE's closed kind list; the factory's `shape-run` table; the door's
-`shape-run` handler; the registry row; the leg's `[[gate_leg]]` row.
-Naming cells: each function is asked of the lexicon's `--suggest` under `--as py.function` at the pass.
+`check_shape_runs` and the `--parse-line`, `--parse-file` and `--check` modes; the `shape-run` member of
+`TYPED_RECORD_KINDS` and of HYGIENE's closed kind list; the factory's `shape-run` entry; the door's
+`write_shape_run` handler; the registry row; the leg's `[[gate_leg]]` row. Naming cells: each function
+was asked of the lexicon's `--suggest` under `--as py.function` on 2026-11-22 and printed `OK`.
 
 ### Migration
 
-None. No landed record is rewritten. The 158 records carrying the line today keep it and gain no
+None. No landed record is rewritten. The records carrying the line today keep it and gain no
 shape-run record; a later writer may file them through the verb.
 
 ### Files touched (estimate)
 
-- `tools/memory-tree/shape_run.py` (new)
-- `tools/memory-tree/gov_record.py`
+- `tools/memory-tree/shape_run.py` (new; shipped by the kit's `include = "**"` engine rule)
+- `tools/memory-tree/gov_record.py` (the `KIND_HANDLERS` entry)
 - `tools/memory-tree/build_records.py`
 - `tools/memory-tree/tree_lib.py`
 - `tools/memory-tree/record-kinds.toml`
-- `tools/memory-tree/HYGIENE.template.md`, `memory/HYGIENE.md` (the render, never the edit)
+- `tools/memory-tree/HYGIENE.template.md` (the closed `<kind>` bullet)
+- `memory/HYGIENE.md` (written by `adopt-memory-tree.sh --render`, never edited by hand)
+- `tools/memory-tree/README.md` (one files-table row for `shape_run.py`)
 - `tools/memory-tree/kit.toml` (the leg's `[[gate_leg]]` row)
+- `tools/govkit/registry.toml` (the `tier2-review self-test` guard)
 - `tools/gate-legs.json` (rendered by `leg_factory.py --write`)
+- `tools/govkit/subject-pins.tsv` (the new leg's owed row: `repo` and `records`)
+- `memory/map/features/memory-tree-hygiene.md` (the new leg's owed row: the `gate-legs` claim)
+- `tools/run-gates/ceiling-evidence.txt` (the new leg's owed row: its timed evidence)
 - `tools/workflows/tier2-review.test.sh`
 - `tools/workflows/README.md`
 
@@ -234,83 +307,111 @@ shape-run record; a later writer may file them through the verb.
   records, when the factory already names, numbers and validates build-folder records.
 - **Keep `SHAPE_RE` in the suite and copy it into the parser.** Two spellings of one grammar, the defect
   this clause names (systems `[design-role-shapes]`).
+- **A `--selftest` of `shape_run.py`.** No leg would run it; the leg's `--check` over a planted record
+  is the arm seen red (§7).
 
 ## 5. Production-readiness checklist
 
-- security — a new write path, reached only through the door; its input is a tracked review record, and
-  every value is checked against `SHAPE_RE` before a byte is written.
+- security — a new write path, reached only through the door; its input is a tracked review record
+  under a build's `reviews/` folder, any other path refused, and every value is checked against
+  `SHAPE_RE` before a byte is written.
 - perf / scale — one file read and one regex per call; `check_shape_runs` reads each record and its
   review once.
 - error / empty / loading states — no line, two lines and a malformed line are three named refusals;
-  an empty population prints `unarmed: 0 shape-run record(s)` and exits 0, announced and never read
-  as green, as PLAY-dOrderedCharter-19 S3 prints an empty namespace, since no writer calls the verb yet.
-- observability — the door prints the written path or the existing one; the check names record, field
-  and both values.
-- risks — a harness change to the line's bytes now reds the suite through the parser; that is the point.
-- testing — AC1 to AC10 by a pass; the arms of §7 at the close.
+  an empty population prints its `unarmed` line and exits 0, announced and never read as green, as
+  PLAY-dOrderedCharter-19 S3 prints an empty namespace, since no writer calls the verb yet.
+- observability — the door prints the written path or the existing one with its key; the check names
+  record, field and both values.
+- risks — a harness change to the line's bytes now reds the suite through the parser; that is the
+  point. A suite run without the memory-tree kit reds the shape arm by name.
+- testing — AC1 to AC11 by a pass; the arms of §7 at the close.
 - migration — none, as §4 says.
-- user docs — none under `help/`: no page covers review records; `tools/workflows/README.md` points at
-  the grammar (S7).
+- user docs — none under `help/`: no page covers review records or `shape_run.py`;
+  `tools/workflows/README.md` points at the grammar and the kit README lists the module (S7).
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `python shape_run.py --parse-line "review-shape kind=diff-review round=1 intensity=full at=synth raw=9 confirmed=8 refuted=1 unverified=0 blocker=0 high=1 medium=5 low=2 agents=11 out-tokens=97922"`
-  runs from `tools/memory-tree/`, it exits 0 and prints `blocker=0` and `out_tokens=97922`; the same
-  line ending `trigger=owed shape=- efforts=- role-sha=-` prints `trigger=owed`; with `blocker=zero`
-  it exits 2 naming `blocker`.
+  runs from `tools/memory-tree/`, it exits 0 and prints `blocker=0` and `out_tokens=97922` and no
+  `merged=` line; the line with ` merged=0` after `refuted=1` prints `merged=0`; the line ending
+  `trigger=owed shape=- efforts=- role-sha=-` prints `trigger=owed`; with `blocker=zero` it exits 2
+  naming `blocker`.
   Red when: `-` or a word is read as a count, so the `blocker=zero` line exits 0.
-- **AC2** — When the column-0 `review-shape` lines of every tracked review record and build-folder
-  record are written to a scratch file with `git grep -h`, quoting each build's `reviews` and `build`
-  folder as a pathspec, and passed to `python shape_run.py --parse-file <file>`, it prints
-  `158 parsed · 0 refused`.
+- **AC2** — When `git grep -h -E "^review-shape " -- "memory/builds/*/reviews/*" "memory/builds/*/build/*"`
+  runs from the repo root into a scratch file under `%TEMP%`, and `python shape_run.py --parse-file <file>`
+  reads it from `tools/memory-tree/`, it prints `<n> parsed · 0 refused`, `<n>` the scratch file's line count.
   Red when: the grammar misses a field order or value today's records carry, so a refused count shows.
-  figure: PINNED, 158 lines in 158 records, measured at `462d20f3` on 2026-10-26; the pass re-derives it.
-- **AC3** — When `python -c "import tree_lib; print('shape-run' in tree_lib.TYPED_RECORD_KINDS, 'shape-run' in tree_lib.RECORD_KIND_TOKENS)"`
-  runs from `tools/memory-tree/`, it prints `True True`.
-  Red when: the kind joins the factory's table and not the reader's list, so its Serves line reads
-  malformed.
-- **AC4** — When `python gov_record.py new shape-run --review <review record>` runs in a scratch clone
-  under `%TEMP%` against a record carrying one well-formed line, it exits 0 and writes one
-  `-shape-run-1.md` record whose `Blocker` equals the line's `blocker=` and whose `Caused-by` is the
-  review record's stem; a second run exits 0, prints that path and leaves `git status --porcelain`
-  unchanged.
+  figure: DERIVED at the pass by `wc -l` on the scratch file; 318 lines in 318 records (PINNED 2026-11-22, at `e1ae60af8`).
+- **AC3** — When `python -c "import tree_lib, build_records; print('shape-run' in tree_lib.TYPED_RECORD_KINDS, 'shape-run' in tree_lib.RECORD_KIND_TOKENS, build_records.KINDS['shape-run']['required'][-1])"`
+  runs from `tools/memory-tree/`, it prints `True True Caused-by`.
+  Red when: the kind joins the factory's table and not the reader's list, so the import raises naming
+  `shape-run`.
+- **AC4** — When the `gov_record.py` of a `git clone --depth 1` of the pass tip under `%TEMP%` runs
+  `new shape-run --review memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md`
+  from the clone's root, it exits 0 printing `wrote` and one
+  `-build-TOOL-aBatchedPacket-1-shape-run-1.md` path whose `Blocker` is `0`, `Out-tokens` `90630`,
+  `Merged` `0` and `Caused-by` the review record's stem; a second run exits 0 printing `exists`, that
+  path and the same key, and leaves `git status --porcelain` unchanged.
   Red when: the second run writes `-shape-run-2.md`.
-  fixture: a scratch clone carrying the door, the factory and one landed review record; the build run
-  makes it.
-- **AC5** — When the same command runs against a review record with the line removed, then with the
-  line duplicated, then with `agents=` deleted from it, each exits 2 naming the reason, and nothing is
-  written.
-  Red when: the door writes a record from a partial parse.
-- **AC6** — When `check_shape_runs` runs over the AC4 clone, it reports the record green; with the
-  record's `Blocker` edited to `3`, it names the record, `Blocker`, `3` and the line's value; with its
-  `Caused-by` naming a missing record, it names that stem.
+  fixture: the clone, carrying the door and that landed review record, the one §8 F6 names; it plants
+  nothing, the build `aBatchedPacket` holding no `RUN.md` and
+  `unattended.sh --lease status build aBatchedPacket` printing `lease — none · aBatchedPacket/build`
+  (PINNED 2026-11-22 at `4993aec72`). A lease that reads held at the pass is the door's S4 refusal, and
+  the pass returns it as a divergence rather than choosing another record.
+  figure: `0`, `90630` and `0` are the record's line, `blocker=0`, `out-tokens=90630` and `merged=0` at
+  `memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md@83ea0ec633:170`
+  (PINNED 2026-11-22); `-shape-run-1` because the build's `build/` folder holds no shape-run record (PINNED 2026-11-22).
+- **AC5** — When the same command runs against that review record with its line removed, then
+  duplicated, then with `agents=8 ` deleted, and once with `--review README.md`, each exits 2 printing
+  `refused shape-run:` and the reason, and `git status --porcelain` shows no new file.
+  figure: `agents=8` is the record's line at
+  `memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md@83ea0ec633:170` (PINNED 2026-11-22).
+  Red when: the door writes a record from a partial parse or from a file outside a `reviews/` folder.
+- **AC6** — When `python -c "import shape_run; lines, rc = shape_run.check_shape_runs('<clone>'); print(rc, *lines)"`
+  runs from `tools/memory-tree/` over the AC4 clone, it prints `0` with the record graded; with the
+  record's `Blocker` edited to `3`, `1` and a line naming the record, `Blocker`, `3` and `0`; with its
+  `Caused-by` naming a missing record, a line naming that stem.
   Red when: the check reads only the record's own fields and never the line it was parsed from.
-- **AC7** — When `check_record_kinds` from `record_kinds.py` runs over the tree, the `shape-run` row
-  passes; with its `writer` cell emptied in a scratch copy, it names `record-kind.shape-run`.
+- **AC7** — When a `python -c` probe from `tools/memory-tree/` reads the `shape-run` row with
+  `record_kinds.read_record_kinds` and passes it to `record_kinds.check_row` with
+  `read_leg_names(root, 'tools')`, it prints `[]`; with the row's `writer` set to `''` in memory, it
+  prints one red opening `row shape-run`.
   Red when: the row lands without a writer and the conformance check is silent on it.
-- **AC8** — When `grep -c "SHAPE_RE = " tier2-review.test.sh` runs in `tools/workflows/`, it prints `0`,
-  and with `renderShapeLine` in a scratch copy of `tier2-review.js` changed to print `agents=x`, the
-  suite's shape arm reports the exits wrong through `shape_run.py`.
+- **AC8** — When `grep -c "SHAPE_RE = " tier2-review.test.sh` runs in `tools/workflows/`, it prints `0`;
+  a probe of `tools/gate-legs.json` reads a `guard` entry ending `shape_run.py` in the `tier2-review
+  self-test` row; and with `renderShapeLine` in a scratch copy of `tier2-review.js` changed to
+  print `agents=x`, the suite's shape arm reports the exits wrong through `shape_run.py`.
   Red when: the suite keeps a regex of its own, so the parser and the suite can disagree.
   permission: the suite is the close's; this pass observes the `--parse-line` call the arm makes on the
   six stub lines, run by hand.
 - **AC9** — When a probe reads `tools/gate-legs.json` at the pass tip, the row named `shape-run records
-  (each record equals its review line)` carries `enforces` holding `practice.one-fact`, and `python
-  leg_factory.py --list` run from `tools/run-gates/` names its declaring file `tools/memory-tree/kit.toml`.
-  Red when: the declaration carries no `enforces`, which PLAY-dOrderedCharter-7 S3's meta-check reds
-  with no pending row to excuse it.
+  (each record equals its review line)` carries `enforces` holding `practice.one-fact` and an argv naming
+  `shape_run.py` and `--check`; `python leg_factory.py --list` run from `tools/run-gates/` names
+  its declaring file `tools/memory-tree/kit.toml`; and `python tools/run-gates/owed_rows.py --base <pass base>`
+  prints no `owed —` line naming it.
+  Red when: the declaration carries no `enforces`, which `leg_factory.py new` refuses, or an owed row
+  is missing.
 - **AC10** — When a probe reads the bullet of `HYGIENE.template.md` that opens with the closed `<kind>`
-  list, from `tools/memory-tree/`, it names `shape-run` as a backticked kind, and the same bullet of
-  `memory/HYGIENE.md` is byte-equal to it.
-  Red when: the kind joins the tuple and the factory but not the doc's closed list, which
-  PLAY-dOrderedCharter-42 AC5 reds.
+  list, from `tools/memory-tree/`, it names `shape-run` as a backticked kind and reads `eighteen after
+  research`, and the same bullet of `memory/HYGIENE.md` is byte-equal to it.
+  Red when: the kind joins the tuple and the factory but not the doc's closed list, which no gate
+  compares, so only this probe sees it.
+- **AC11** — When a `python -c` probe passes the `shape-run` row to
+  `edge_grammar.check_cardinality_mirror([row], edge_grammar.read_edge_types())`, with
+  `tools/playbook/` on its path, it prints `[]`.
+  Red when: the row lands without its `cardinality` cell, which the `edge cardinality` leg reds.
 
 ## 7. Gates
 
-`tier2-review self-test` · `review-join self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `build-index selftest` · `memory hygiene` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary`
+`tier2-review self-test` · `review-join self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `build-index selftest` · `memory hygiene` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `record-kinds` · `edge cardinality (per source and per target, over the merged tree)` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
+
+The three owed-row paths' guards are on the line: `memory/HYGIENE.md` trips `kit/dogfood doc parity`,
+and it and the dossier trip `recall floor` and `recall floor arms` through `memory/`;
+`tools/run-gates/ceiling-evidence.txt` trips only guards the spec-token checker's guards join prints as
+broad, `tools/run-gates/` and `tools/` (PINNED 2026-11-22, its run over this spec).
 
 New arm: tools/workflows/tier2-review.test.sh · covers AC8 · the shape arm re-pointed at `shape_run.py --parse-line`, staged by `renderShapeLine` printing a non-numeric `agents` · none
-New arm: tools/memory-tree/shape_run.py · covers AC1 AC6 · its own `--selftest` over a planted record whose field differs from its line, and a line with a word for a count · none
+New arm: tools/memory-tree/shape_run.py --check · covers AC6 · the new leg, staged by a planted shape-run record whose `Blocker` differs from its review line · none
 
 ## 8. Open questions
 
@@ -321,11 +422,11 @@ New arm: tools/memory-tree/shape_run.py · covers AC1 AC6 · its own `--selftest
   2026-10-26, delegated): (a), rung 3, tie-broken by reuse of PLAY-dOrderedCharter-7 S7's factory, the
   seam M5 found. widens: none · relaxes: none
 - **F2 — How does the JavaScript suite read a grammar that now lives in Python?** Options: (a) the suite
-  passes the resolved python to `run.js` and spawns `shape_run.py --parse-line` per exit; (b) the
-  grammar in a data file both read; (c) the suite keeps its regex beside the parser's. (c) is the copy
-  the clause removes; (b) adds a file for one regex. RESOLVED (agent, 2026-10-26, delegated): (a),
-  rung 3, reusing the `bd_py` and `bd_mtd` resolution the suite already performs (`:2081-2087`).
-  widens: none · relaxes: none
+  spawns `shape_run.py --parse-line` per exit with the resolved python; (b) the grammar in a data file
+  both read; (c) the suite keeps its regex beside the parser's. (c) is the copy the clause removes; (b)
+  adds a file for one regex. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, reusing the `bd_py`
+  and `bd_mtd` resolution the suite already performs and passes to `run.js` (S7). widens: none ·
+  relaxes: none
 - **F3 — Does the parser accept the four `review.cost` fields before they land?** Options: (a) optional,
   together, at the end; (b) required, which reds every landed line; (c) refused, which reds every line
   after TOOL-dDeclaredLoop-20. RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, cl-0222 and
@@ -334,8 +435,34 @@ New arm: tools/memory-tree/shape_run.py · covers AC1 AC6 · its own `--selftest
   Options: (a) the parent specs' spellings as cited in §2, the build run re-grounding on the landed
   code and bumping this spec's rev before any code where they differ; (b) wait for the parents.
   RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, BUILD-METHOD M2 ("to diverge, change the spec
-  first") and the brief's rule that a spec calls each parent surface as its spec names it.
+  first") and the brief's rule that a spec calls each parent surface as its spec names it. At rev-7
+  every surface is cited as landed, TOOL-dTotalRecall-2's door included. widens: none · relaxes: none
+- **F5 — Which unit does a shape-run record serve?** Options: (a) the first id of the review record's
+  `**Serves:**` line, its `@rev-<N>` pin cut; (b) the id read from the review file name; (c) a `--unit`
+  flag the caller passes. Measured 2026-11-22 at `e1ae60af8`, file names compress ids
+  (`2026-10-12-review-TOOL-aBriskPreflight-1-2-3-4-5-6-7-10-diff-review-round1.md`) and a spec-audit
+  name may carry an id beside its Serves list; (c) lets a caller bind a record to a unit its review never
+  served, a wider write surface (veto 3). RESOLVED (agent, 2026-11-22, delegated): (a), tie-broken over
+  (b) by the one-fact rule, the Serves line being the record's own binding the bindings reader reads.
   widens: none · relaxes: none
+- **F6 — Which landed review record is AC4's fixture, given the door's lease read?** Options: (a) a
+  landed review record in a build whose lease reads free,
+  `memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md`,
+  its Serves line `diff-review TOOL-aBatchedPacket-1` at
+  `memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md@83ea0ec633:1` and its review-shape line at
+  `memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md@83ea0ec633:170`, the build holding no `RUN.md`; (b) the rev-6 record of `aBriskPreflight`, its
+  lease freed in the clone by setting `RUN_CLAIMS` (`.unattended.conf@d3634fd40f:156`) off, so the
+  driver prints `lease — off` and `placement.py#read_lease_class` reads free; (c) a review record
+  planted in a scratch build of the clone. The rev-6 record's build lease reads `held` by another
+  session (`phase: HELD` at `memory/builds/aBriskPreflight/RUN.md@40fa4e7dec:28`, and
+  `unattended.sh --lease status build aBriskPreflight` printing `held held`, PINNED 2026-11-22 at
+  `4993aec72`), so S4's `write_new_record` refuses it through `check_mint_authority` on every node
+  (TOOL-dTotalRecall-2 S6; the return `2026-11-22-build-TOOL-dTotalRecall-11-1-builder-return`). (b)
+  plants a conf change that switches off the authority read the door runs under, so AC4 would
+  observe a door no real caller runs; (c) observes a line no harness wrote, losing the landed line AC4
+  reads. RESOLVED (agent, 2026-11-22, delegated): (a), by the build method's fork rule, the option that satisfies
+  AC4 to AC6 with nothing planted, tie-broken by reuse of the door's landed authority read unchanged;
+  per `2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-spec-writer`. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -356,20 +483,44 @@ New arm: tools/memory-tree/shape_run.py · covers AC1 AC6 · its own `--selftest
   TOOL-dWellOiledMachine-19 S6 calls the `--act` form; row 7 of
   `2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck`, by the brief
   prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md
+- rev-6 · 2026-11-22 · §1 · §2 preconditions, S1 to S7 · §3 · §4 · §5 · §6 AC1 to AC10, AC11 added · §7 ·
+  §8 F2, F4, F5 added · §10 · per `2026-11-22-prompt-TOOL-dTotalRecall-11-reground-spec-writer`:
+  re-grounded on HEAD `e1ae60af8`. The grammar gains the optional `merged=` (TOOL-dFairHearing-5); the
+  census is 318 lines (PINNED 2026-11-22); the row is written by `record_kinds.py new` in the landed
+  column grammar, with `append-only`, `readers-none` and the `caused-by` cardinality cell
+  (TOOL-dTotalRecall-22); the leg by `leg_factory.py new` with its owed rows; the handler is a
+  `KIND_HANDLERS` entry ending in `write_new_record` (TOOL-dTotalRecall-2 rev-11); the unit id is the
+  Serves line's (F5); the suite reuses the python and kit `run.js` already receives, and its leg's
+  guard gains the parser; the `--selftest` arm gives way to the leg's own; citations re-pointed to
+  `#symbol` or blob-pinned lines.
+- rev-7 · 2026-11-22 · §2 preconditions, S4 · §4 Files touched · §6 AC4, AC5 · §7 · §8 F4, F5, and F6 added
+  · per `2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-spec-writer` over the return
+  `2026-11-22-build-TOOL-dTotalRecall-11-1-builder-return`, at HEAD `4993aec72`: AC4's fixture moves to
+  the aBatchedPacket review record (F6), since the aBriskPreflight lease reads held and the door's
+  `check_mint_authority` refuses it, so AC4 reads `Out-tokens` `90630` and `Merged` `0` and AC5 deletes
+  `agents=8 `; S4 names that authority read. Files touched puts `memory/HYGIENE.md`,
+  `memory/map/features/memory-tree-hygiene.md` and `tools/run-gates/ceiling-evidence.txt` each on its
+  own bullet, the dispatch row having missed all three, and §7 names their guards' legs. Forced:
+  §2 and F4 cite TOOL-dTotalRecall-2's door as landed, CLOSED at rev-13; F5's measurement names its
+  date. Every other rev-6 decision stands.
 
 ## 10. Reuse audit
 
-The seams extended are the line's renderer `renderShapeLine` (`tools/workflows/tier2-review.template.js:78-83`),
-whose bytes stay the one source, the suite's `SHAPE_RE` (`tools/workflows/tier2-review.test.sh:1540`),
-which moves rather than being copied, and PLAY-dOrderedCharter-7 S7's typed build-folder record
-factory with PLAY-dOrderedCharter-42's `TYPED_RECORD_KINDS`, which this kind joins. The lookup,
-`python tools/codebase-map/reuse_lookup.py "parse the review-shape record line into fields"`, ranked
-generic parsers (`parse`, `parse_conf`, `check_line` and `render_line` in `tools/runlog/runlog_lib.py`)
-and `render_record`/`write_record` in `tools/runlog/record.py`; none parses this line, so no existing
-parser fits it. Disagreements with source: systems.md and the systems-retrofit review cite the README
-reader at `:265`, and the grammar prose sits at `tools/workflows/README.md:289-291` at `462d20f3`;
-scout C cites `tier2-review.js:78-83`, which is the rendered copy, its source the `.template.js` at the
-same lines. The recall probe returned scout C's row, systems `[design-role-shapes]` (`:432`), the
-systems-retrofit finding 33 and TOOL-dDeclaredLoop-20's scout row; none disagreed with source otherwise.
+The seams extended are the line's renderer `tools/workflows/tier2-review.template.js#renderShapeLine`,
+whose bytes stay the one source; the suite's `SHAPE_RE` (`tools/workflows/tier2-review.test.sh@3b5e075562:2053`),
+which moves rather than being copied; PLAY-dOrderedCharter-7 S7's record factory
+`build_records.py#KINDS`, `#read_record` and `#derive_record_name`, with PLAY-dOrderedCharter-42's
+`tree_lib.py#TYPED_RECORD_KINDS`, which this kind joins; the row factory `record_kinds.py#add_record_kind`
+and the leg factory `leg_factory.py` `new`, each writing its declaration rather than a hand edit; and
+TOOL-dTotalRecall-2's `KIND_HANDLERS` and `write_new_record`, the door's one mint and idempotence path.
+The lookup, `python tools/codebase-map/reuse_lookup.py "parse the review-shape record line into fields"`,
+ranked generic parsers (`parse` in `tools/memory-recall/query.py`, `parse_conf`, `parse_id_parts`,
+`check_line` in `tools/runlog/runlog_lib.py`) and the writers `write_record` and `read_records`; none
+parses this line, so no existing parser fits it. Disagreements with source: systems.md and the
+systems-retrofit review cite the README reader at its line 265 and the renderer at line 79 of the rendered `tier2-review.js`; at
+`e1ae60af8` the grammar prose sits at `tools/workflows/README.md@1316da7b49:623` and the renderer is
+`renderShapeLine` in the template, its rendered copy `tier2-review.js`. The recall probe returned scout
+C's row, systems `[design-role-shapes]` (`:432`), the systems-retrofit finding 33 and the ask
+TOOL-dDeclaredLoop-111; none disagreed with source otherwise.
 
-Recall terms used: `python tools/memory-recall/query.py "how is the review-shape line parsed into a shape-run record" --terms "shape-run review-shape renderShapeLine SHAPE_RE review.cost tier2-review out-tokens agents shape-sha record kind"`
+Recall terms used: `python tools/memory-recall/query.py "how is the review-shape line parsed into a shape-run record" --terms "shape-run review-shape renderShapeLine SHAPE_RE review.cost merged tier2-review out-tokens agents record kind"`

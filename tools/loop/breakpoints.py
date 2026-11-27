@@ -122,7 +122,9 @@ PLACED_REVIEWS = {row[0]: stage for stage, row in STAGE_REVIEWS.items() if stage
 #: The disposition record that declares a placed breakpoint: its item, its word, and the `Reason` separator
 #: before the request's content key; an item boundary's name opens `item `.
 PLACED_ITEM, PLACED_WORD, PLACED_REQUEST, PLACED_TAG = "item.entry.place", "breakpoint", " · request ", "item "
-SLUG = re.compile(r"[A-Za-z0-9_-]+")
+read_memory_tree("id_grammar.py")
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
+SLUG = SlugPattern(lambda g: g.BUILD_SLUG_RE.pattern)
 PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, then review.test owed",
           "placed": "review.breakpoints naming item.build.unit-pass, then item.build.nothing, then the owner's "
                     "placed spec audit and placed item item.build.unit-pass, each a disposition record",

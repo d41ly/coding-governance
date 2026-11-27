@@ -75,7 +75,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 13 unit(s) · node a · opened 2026-10-09 · streams tooling+kickoff+playbook+deployer
+**Build status:** DEFERRED · 13 unit(s) · node a · opened 2026-10-09 · streams kickoff+playbook+tooling
 ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-8 TOOL-aRoutedQuill-9 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12
 ids TOOL-aRoutedQuill-13
 
@@ -117,9 +117,25 @@ Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carr
 | 4 | `TOOL-aRoutedQuill-3`, `TOOL-aRoutedQuill-4` | no |
 | 5 | `PLAY-aRoutedQuill-1`, `TOOL-aRoutedQuill-5` | yes |
 | 6 | `TOOL-aRoutedQuill-10`, `TOOL-aRoutedQuill-11`, `TOOL-aRoutedQuill-12`, `TOOL-aRoutedQuill-6`, `TOOL-aRoutedQuill-7`, `TOOL-aRoutedQuill-9` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-10-prompt-TOOL-aRoutedQuill-9-spec-brief.md`, `2026-10-10-prompt-TOOL-aRoutedQuill-9-build-brief.md` and 15 more under prompts/ |
+| reviews | `2026-10-10-review-TOOL-aRoutedQuill-3-closing-diff-round2.md`, `2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md` |
+| research | `2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md` |
+| logs | `2026-10-10-build-TOOL-aRoutedQuill-9-1-acceptance-ledger.md`, `2026-10-10-build-TOOL-aRoutedQuill-12-1-acceptance-ledger.md` and 11 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aRoutedQuill/card` |
+<!-- /gen:build-routes -->

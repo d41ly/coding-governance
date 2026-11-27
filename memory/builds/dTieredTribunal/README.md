@@ -131,9 +131,23 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 | 3 | `TOOL-dTieredTribunal-14` | no |
 | 4 | `TOOL-dTieredTribunal-11` | no |
 | 5 | `TOOL-dTieredTribunal-12` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md` (CLEAN WITH FIXES), `2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md` (BLOCKED) and 7 more under reviews/ |
+| logs | `2026-08-26-build-TOOL-dTieredTribunal-11-acceptance-ledger.md`, `2026-08-26-build-TOOL-dTieredTribunal-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dTieredTribunal/card` |
+<!-- /gen:build-routes -->

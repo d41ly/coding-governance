@@ -66,9 +66,23 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aSignalledHook-1` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-10-11-prompt-TOOL-aSignalledHook-1-brief.md` |
+| reviews | `2026-10-11-review-TOOL-aSignalledHook-1-closing-diff-round1.md` |
+| logs | `2026-10-11-build-TOOL-aSignalledHook-1-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aSignalledHook/card` |
+<!-- /gen:build-routes -->

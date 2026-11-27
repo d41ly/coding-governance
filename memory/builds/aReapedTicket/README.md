@@ -104,9 +104,22 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-aReapedTicket-1` | no |
 | 2 | `TOOL-aReapedTicket-2` | no |
 | 3 | `TOOL-aReapedTicket-3` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-08-27-prompt-TOOL-aReapedTicket-1.md` |
+| logs | `2026-08-27-build-TOOL-aReapedTicket-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aReapedTicket/card` |
+<!-- /gen:build-routes -->

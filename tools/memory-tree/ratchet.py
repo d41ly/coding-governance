@@ -72,6 +72,7 @@ if str(KIT) not in sys.path:
 import legacy_ledger as LL  # noqa: E402  the ledger factory, this kit's copy
 from build_records import derive_record_name, read_record, write_record  # noqa: E402  the record factory
 from tree_lib import parse_conf_line, read_policy_value  # noqa: E402  the kit's one conf line and policy read
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use
 from seen_red import read_seen_red_records  # noqa: E402  the one seen-red record reader (unit 7)
 import atexit
 import contextlib
@@ -247,7 +248,7 @@ SCALAR_POPULATION = "conf-scalar-pins"
 PIN_RE = re.compile(r"([A-Z_]+_PIN)=")
 CUTOFF_RE = re.compile(r"([A-Z0-9_]+_CUTOFF)=")
 BLANK_CUTOFF = 99991231  # a blank cutoff reads as the latest date, so disarming its rule is a raise
-UNIT_RE = re.compile(r"[A-Za-z]+-([A-Za-z0-9]+)-\d+")
+UNIT_RE = SlugPattern(lambda g: r"[A-Za-z]+-((?:" + g.slug_class + r"))-\d+")   # the slug grammar's (TOOL-dTotalRecall-5 S7)
 EMPTY_TEXT = "reads unarmed, no seen-red line names its leg"
 # THE REMEDY a base leg with no compare base prints on its `unresolved` line (TOOL-dWitnessedBar-51 S33).
 # No `GATE_` knob turns that line into a pass: the remedy is a base, never a waiver.
@@ -871,12 +872,13 @@ def run_widen(root, args):
         raise ValueError("%d registrations name %r; widen names exactly one" % (len(regs), population))
     reg = regs[0]
     build = derive_build_slug(unit)
-    if not reason.strip() or "\n" in reason or "\r" in reason:
+    from backlog import check_line_break  # noqa: E402  the kit's one line-break rule (TOOL-dTotalRecall-43 S37)
+    if not reason.strip() or check_line_break("--reason", reason):
         raise ValueError("--reason is one non-empty line")
     parsed = []
     for k in keys:
         key = tuple(f.strip() for f in k.split("\t"))
-        if len(key) != len(reg.fields) or not all(key) or "`" in k or "\n" in k or "\r" in k:
+        if len(key) != len(reg.fields) or not all(key) or "`" in k or check_line_break("--key", k):
             raise ValueError("--key %r is not %d TAB-separated fields (%s) with no backtick"
                              % (k, len(reg.fields), ", ".join(reg.fields)))
         parsed.append(key)
@@ -1211,7 +1213,7 @@ def run_plant_populated_seen_red(top, results):
     ledger = "memory/builds/dFix/build/2026-01-01-build-TOOL-dFix-1-1-acceptance-ledger.md"
 
     def render_ledger(line):
-        return ("# %s — acceptance ledger\n\n**Serves:** journal %s\n\n**Evidences:** %s\n"
+        return ("# %s — acceptance ledger\n\n**Serves:** journal %s\n\n**Evidences:** %s\n"  # census: kept cause-writer fixture: a record head its fixture plants
                 "- AC1 — `ratchet.py populated` — observed\n%s\n" % (FIX_UNIT, FIX_UNIT, FIX_UNIT, line))
     seen = "- seen-red — `%s` — red `%s` — green `%s` — the population drained" % (LEGS["never-gains"], SHA_A, SHA_A)
     write_fixture_repo(top, [render_table()], {"pop/rows.txt": render_rows([]), ledger: render_ledger(seen),

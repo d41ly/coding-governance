@@ -761,7 +761,19 @@ def derive_run_kind(repo, build, base, conf, families, readers):
         row = backlog.extract_row(ln, grammar)
         if row is not None and row.cls == "status" and row.verb in tree_lib.TERMINAL:
             disposed.add(row.target)
-    if not any(a not in disposed and a.split("-")[1] == build for a in asks):
+    # Each open ask's slug is the id parser's, any family, under the default tree's slug class the row
+    # regex bound; an ask id the parser refuses matches no build (TOOL-dTotalRecall-45 S5).
+    parse_id_parts, homed = backlog.load_id_grammar().parse_id_parts, False
+    for a in asks:
+        if a in disposed:
+            continue
+        try:
+            homed = parse_id_parts(a, None, alt=backlog.ANY_FAMILY)[1] == build
+        except ValueError:
+            continue
+        if homed:
+            break
+    if not homed:
         return "build"
     roster, inside = [], False
     for ln in (texts[(base, f"{folder}/README.md")] or "").split("\n"):
@@ -3500,10 +3512,10 @@ BIG_FILE = ".claude/skills/x/SKILL.md"
 GUARD_POLICY = f'[runtime]\nagents-in-flight = 4\n\n[budgets]\n"{BIG_FILE}" = 100\n"small.md" = 50\n"memory/builds/*/spec/" = 10\n'
 BIG, SMALL, CLASS = f'"{BIG_FILE}" = 100\n', '"small.md" = 50\n', '"memory/builds/*/spec/" = 10\n'
 FLIGHT = "agents-in-flight = 4\n"
-RAISED = (POLICY_REL, lambda t: t.replace(BIG, '# RAISED 100 -> 120, 2026-10-23, TOOL-x-1, measured 118 bytes\n'
+RAISED = (POLICY_REL, lambda t: t.replace(BIG, '# RAISED 100 -> 120, 2026-10-23, TOOL-xFix-1, measured 118 bytes\n'
                                                  f'"{BIG_FILE}" = 120\n'))
 UNARGUED = (POLICY_REL, lambda t: t.replace(BIG, f'"{BIG_FILE}" = 120\n'))
-ROW = (DECISIONS_REL, lambda t: t + f"- TOOL-x-1 · {BIG_FILE} raised to 120\n")
+ROW = (DECISIONS_REL, lambda t: t + f"- TOOL-xFix-1 · {BIG_FILE} raised to 120\n")
 NO_RAISED, NO_ROW = "no RAISED", f"no {DECISIONS_REL} row"
 # case -> [(scenario, [(path, edit of its text, "" when absent)], the exit wanted, needles stdout
 # must carry, needles it must not)]; each scenario is staged alone over a fresh commit.
@@ -3553,7 +3565,7 @@ def build_guard_repo():
     for f in GUARD_FILES:
         (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
     for rel, text in ((BIG_FILE, "big\n"), ("small.md", "small\n"), (DEPLOY_REL, 'deployer = "fixture"\n'),
-                      (DECISIONS_REL, "# decisions\n\n- TOOL-x-0 · the first row\n"), (POLICY_REL, GUARD_POLICY)):
+                      (DECISIONS_REL, "# decisions\n\n- TOOL-xFix-0 · the first row\n"), (POLICY_REL, GUARD_POLICY)):
         Path(repo, rel).parent.mkdir(parents=True, exist_ok=True)
         Path(repo, rel).write_text(text, encoding="utf-8", newline="\n")
     run_fixture_git(repo, "add", "-A")
@@ -4452,8 +4464,8 @@ SETTINGS_LOCAL = (".claude", "settings.local.json")
 # finds no carrier of it here either.
 RETIRED_FLAG = "--print" + "-cap"
 HANDOFF_ROLE = "## Role\n\nYou research.\n\n"
-HANDOFF_TASK = "## Task\n\nThis handoff is for build `bx`, unit `T-1`.\n"
-HANDOFF_FILE = "memory/builds/bx/prompts/2026-10-24-prompt-T-1-researcher.md"
+HANDOFF_TASK = "## Task\n\nThis handoff is for build `bxFix`, unit `T-1`.\n"
+HANDOFF_FILE = "memory/builds/bxFix/prompts/2026-10-24-prompt-T-1-researcher.md"
 HARNESS_FILE = "harness/h.js"
 HARNESS_TEXT = "export const meta = { name: 'h', description: 'one agent' }\nconst s = await agent('one')\n"
 LIMIT_ROLES = {"roles": {"gov-researcher": {"agent": True, "workflow": "research", "writes": "none"}},
@@ -4533,13 +4545,13 @@ def write_handoff_fixture(repo):
     """The roles index, one handoff prompt file and one harness of `limit-hook-admits-eight`, the marker
     and digest computed as the renderer defines them. -> the Agent call's `tool_input`."""
     digest = lambda s: hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]  # noqa: E731
-    marker = (f"<!-- gov:handoff role=gov-researcher build=bx unit=T-1 path={HANDOFF_FILE} "
+    marker = (f"<!-- gov:handoff role=gov-researcher build=bxFix unit=T-1 path={HANDOFF_FILE} "
               f"role-sha={digest(HANDOFF_ROLE)} task-sha={digest(HANDOFF_TASK)} -->")
-    for rel, text in ((HANDOFF_FILE, f"**Serves:** journal T-1\n\n# a handoff\n\n{marker}\n\n{HANDOFF_ROLE}{HANDOFF_TASK}"),
+    for rel, text in ((HANDOFF_FILE, f"**Serves:** journal T-1\n\n# a handoff\n\n{marker}\n\n{HANDOFF_ROLE}{HANDOFF_TASK}"),  # census: kept cause-writer fixture: the handoff record its fixture plants
                       (HARNESS_FILE, HARNESS_TEXT), (".claude/roles.json", json.dumps(LIMIT_ROLES))):
         Path(repo, rel).parent.mkdir(parents=True, exist_ok=True)
         Path(repo, rel).write_text(text, encoding="utf-8", newline="\n")
-    return {"subagent_type": "gov-researcher", "description": "bx · T-1 · research", "prompt": f"{marker}\n\n{HANDOFF_TASK}"}
+    return {"subagent_type": "gov-researcher", "description": "bxFix · T-1 · research", "prompt": f"{marker}\n\n{HANDOFF_TASK}"}
 
 
 def run_limit_case(name):
@@ -5001,7 +5013,7 @@ def derive_hygiene_plant(cap):
     v, extra = read_source_number(rel, cap.home.rpartition(":")[2]), ""
     if v == 0:
         v, extra = 10, f'"{cap.name}" = 10\n'
-    kind, axis = cap.name.rsplit("-", 1)
+    kind, axis = cap.name.rsplit("-", 1)  # census: kept slug-grammar a cap's name, not an id
     files = {".memory-tree.conf": HYGIENE_CONF, "memory/backlog/ARCH.md": "# ARCH\n"}
     path, head, width = {"guide": ("memory/guides/g.md", "", 199), "index": ("memory/backlog/ARCH.md", "# ARCH\n", 250),
                          "entry": ("memory/backlog/ARCH.md", "# ARCH\n", 0), "dossier": ("memory/map/features/d.md", "", 120),
@@ -5181,6 +5193,17 @@ def derive_outside_probe_plant(cap):
     if cap.name == "orientation-card":
         return derive_manifest_plant(cap, body="", env={key: "1"}, argv_tail=(
             "--card", "--write", "--session", "00000000-0000-4000-8000-000000000000")) | {"warn": "over the 1-byte cap"}
+    if cap.name == "memory-slices":  # TOOL-dTotalRecall-9 AC10: an over-cap read set, reported under either mode
+        kit_dir, tool_dir = posixpath.dirname(rel), posixpath.dirname(posixpath.dirname(rel))
+        record = "2026-01-01-build-TOOL-bFix-1-deviation-1"
+        body = "# big\n\n**Serves:** deviation TOOL-bFix-1\n\n" + ("x" * 99 + "\n") * 1300  # census: kept cause-writer fixture: the handoff record its fixture plants
+        return {"files": {".memory-tree.conf": 'MEMORY_ROOT="memory"\nFAMILIES="tooling:TOOL"\n',
+                          "memory/README.md": "# r\n", "memory/builds/bFix/README.md": "# bFix\n",
+                          f"memory/builds/bFix/build/{record}.md": body},
+                "copies": (kit_dir, *(posixpath.join(tool_dir, k) for k in ("playbook", "memory-recall")),
+                           budgets.derive_kit_rel().rstrip("/")),
+                "argv": [sys.executable, posixpath.join(kit_dir, "gov_record.py"), "budget", "--role", "gov-builder", record],
+                "warn": "memory over budget: gov-builder"}
     src = derive_enforcer_path(cap)
     if cap.name == "cited-file-cap":  # a waiver list, no number: a charter cites a file no cap covers
         return {"files": {".memory-tree.conf": HYGIENE_CONF + "CHARTER=AGENTS.md\n", "memory/README.md": "# r\n",
@@ -5194,8 +5217,8 @@ def derive_outside_probe_plant(cap):
         def write_card(t):
             card = Path(run_fixture_git(t, "rev-parse", "--path-format=absolute", "--git-common-dir"), "orientation", "case.md")
             card.parent.mkdir(parents=True, exist_ok=True)
-            card.write_text("## route\n- build: bX\n" + "".join(
-                f"- unit: TOOL-bX-{i} · spec memory/builds/bX/spec/2026-01-01-spec-TOOL-bX-{i}.md\n"
+            card.write_text("## route\n- build: bXFix\n" + "".join(
+                f"- unit: TOOL-bXFix-{i} · spec memory/builds/bXFix/spec/2026-01-01-spec-TOOL-bXFix-{i}.md\n"
                 for i in range(v // 50)), encoding="utf-8", newline="\n")
         return {"files": {".memory-tree.conf": 'MEMORY_ROOT=memory\nROUTED_PATHS="tools/"\n'}, "post": write_card,
                 "argv": ["node", src], "env": {"CLAUDE_PROJECT_DIR": None},
@@ -5273,6 +5296,7 @@ CAP_CASES = {
     "orientation-card": derive_outside_probe_plant, "cited-file-cap": derive_outside_probe_plant,
     "codex-instructions": derive_outside_probe_plant, "runlog-record": derive_outside_probe_plant,
     "feature-card": derive_outside_probe_plant, "hook-context": derive_outside_probe_plant,
+    "memory-slices": derive_outside_probe_plant,
     "orient-calls": derive_orient_calls_plant,
 }
 

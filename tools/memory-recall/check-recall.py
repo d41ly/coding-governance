@@ -30,13 +30,17 @@ there is nothing to divide, and printing that beats a 0/0 or a silent skip.
 
 TWO PIN HEADS. `<set>:<substrate>:<metric>@<k>` ranks the bare question over one extracted set
 through `bench.rank_with` -- a configuration no session is served. `served:<metric>@<k>` ranks
-through the CLI's own `query.query_expr` and `query.run_fusion` over sets `query.build_cache`
-builds, so a change to the expression, the rollup or the fusion moves the floor. Under it every
-question owes two term lists, and a graded ROW is one (question, slice) pair: `h`, `R` and the
-ceiling count rows, and each slice's `h` and `R` print so a saturated slice is visible.
+through `record find`'s own `record_find.query_expr` and `record_find.run_fusion` (memory-tree's,
+which the CLI imports; TOOL-dTotalRecall-9 S4) over the rows
+`query.load_served_set(root, untracked=False)` serves from the node's tag index, so a change to the
+expression, the rollup or the fusion moves the floor. Under it every question owes two term lists,
+and a graded ROW is one (question, slice) pair: `h`, `R` and the ceiling count rows, and each
+slice's `h` and `R` print so a saturated slice is visible. `--data-dir` under it names an index
+FILE, opened read-only, whose served pairs are its `tree_path` rows of the root's HEAD tree at the
+current extraction digest; a file holding none refuses.
 
-WHAT A `served` RUN STILL DOES NOT CHECK. Untracked files: the CLI indexes untracked-not-ignored
-notes and this builds over tracked files only. The `--budget` byte cut `emit` applies to the fused
+WHAT A `served` RUN STILL DOES NOT CHECK. Untracked files: the CLI serves untracked-not-ignored
+notes and this grades tracked files only, at their working bytes. The `--budget` byte cut `emit` applies to the fused
 list: this grades the ranked list, not the emitted text. And the `k`: the CLI's default is 20,
 the pin's is whatever it names, so a pin at `@5` grades a shallower read than a default query.
 
@@ -89,6 +93,7 @@ import bench  # noqa: E402
 import extract  # noqa: E402
 import query  # noqa: E402
 import recall_conf  # noqa: E402
+import record_find  # noqa: E402  memory-tree's finder, on the path `extract` put that kit on
 import contextlib
 import os
 
@@ -142,7 +147,7 @@ PIN_RE = re.compile(
     r"^(?P<set>[a-z0-9]+):(?P<sub>[a-z0-9]+):(?P<metric>[a-z]+)@(?P<k>\d+)>=(?P<value>\d*\.?\d+)$"
 )
 # The `served` head: no set and no substrate, because the CLI's fused ranking is neither one set nor
-# one `bench` substrate. Under it the floor ranks through `query.query_expr` and `query.run_fusion`.
+# one `bench` substrate. Under it the floor ranks through `record_find.query_expr` and `record_find.run_fusion`.
 SERVED_RE = re.compile(r"^served:(?P<metric>[a-z]+)@(?P<k>\d+)>=(?P<value>\d*\.?\d+)$")
 # The two term lists a question carries under a `served` pin, each one graded ROW: `terms` is the
 # rewrite a session writes after reading the corpus, `naive_terms` one written from the question
@@ -282,7 +287,7 @@ def measure_run(data: pathlib.Path, queries: list[dict], pin: dict) -> dict:
     dfreq: Counter = Counter()
     for r in docs:
         dfreq.update(set(bench.terms(r["text"])[:600]))
-    db = bench.build_index(docs)
+    db = bench.build_fts_rows(sqlite3.connect(":memory:"), "d", docs)
     ks = [pin["k"]]
     per, unresolved = [], []
     for q in queries:
@@ -304,47 +309,61 @@ def measure_run(data: pathlib.Path, queries: list[dict], pin: dict) -> dict:
     }
 
 
-def build_served_dir(root: pathlib.Path) -> pathlib.Path:
-    """Build the CLI's own two sqlite sets in a throwaway dir, with the CLI's own builder.
-
-    `query.build_cache` over `extract.corpus_inputs` of the root -- tracked files only, where the
-    CLI also takes untracked ones. Nothing about extraction or indexing is restated here.
-    """
-    out = pathlib.Path(tempfile.mkdtemp(prefix="check-recall-served-"))
+def load_served_index(root: pathlib.Path):
+    """The CLI's own rows for the root's TRACKED corpus at its working bytes: a connection whose
+    `recall_view` holds `query.load_served_set(root, untracked=False)`'s pairs. Nothing about
+    extraction or indexing is restated here; the caller closes it."""
     try:
-        files, declared = extract.corpus_inputs(root)
-        query.build_cache(root, out, files, declared)
-    except (OSError, ValueError, sqlite3.Error, subprocess.SubprocessError, SystemExit) as exc:
-        remove_tree(out)
-        raise CheckRefused(f"building the served sets under {root.as_posix()} failed: {exc}") from exc
-    return out
+        return query.load_served_set(root, untracked=False)["con"]
+    except (OSError, ValueError, sqlite3.Error, subprocess.SubprocessError, SystemExit,
+            query.T.TagError, query.UnbornHeadError) as exc:
+        raise CheckRefused(f"serving the tracked corpus under {root.as_posix()} failed: {exc}") from exc
 
 
-def measure_served(dirp: pathlib.Path, queries: list[dict], pin: dict,
-                   slices: tuple = SLICES) -> dict:
+def load_index_file(root: pathlib.Path, path: pathlib.Path):
+    """`--data-dir` under a served pin: the index file ``path``, opened READ-ONLY, its served pairs
+    its `tree_path` rows of the root's HEAD tree that hold recall rows at the current digest. A file
+    holding none refuses, so a stale or foreign file is never graded as an empty corpus."""
+    try:
+        tree = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD^{tree}"], capture_output=True,
+                              text=True, encoding="utf-8", check=True).stdout.strip()
+        con = sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True)
+        con.execute("CREATE TEMP TABLE recall_view(path TEXT, blob TEXT, digest TEXT, "
+                    "PRIMARY KEY (path, blob, digest))")
+        con.execute("INSERT OR IGNORE INTO recall_view SELECT t.path, t.blob, b.digest FROM tree_path t "
+                    "JOIN fts_blob b ON b.path = t.path AND b.blob = t.blob WHERE t.tree = ? AND b.digest = ?",
+                    (tree, query.derive_recall_digest()))
+        (held,) = con.execute("SELECT COUNT(*) FROM recall_view").fetchone()
+    except (OSError, ValueError, sqlite3.Error, subprocess.CalledProcessError) as exc:
+        raise CheckRefused(f"index file {path.as_posix()} unreadable: {exc}") from exc
+    if not held:
+        con.close()
+        raise CheckRefused(f"index file {path.as_posix()} holds no recall rows of tree {tree[:12]} at "
+                           "the current digest -- nothing to grade")
+    return con
+
+
+def measure_served(con, queries: list[dict], pin: dict, slices: tuple = SLICES) -> dict:
     """One graded ROW per (question, slice), ranked by the CLI's own `query_expr` and `run_fusion`.
 
-    `slices` defaults to both term lists; `--spec-probes` passes `("terms",)`, because a harvested
-    probe carries only the terms its author ran.
+    ``con`` is `load_served_index`'s or `load_index_file`'s. `slices` defaults to both term lists;
+    `--spec-probes` passes `("terms",)`, because a harvested probe carries only the terms its author
+    ran.
 
     A fused hit satisfies an expected id by `bench.expected_by_target`'s two rules. The anchor map
-    is the served `records.db` `meta` table, and a hit whose `id` column is EMPTY -- how `_write_set`
+    is the served `fts_record` rows, and a hit whose `id` column is EMPTY -- how `build_fts_rows`
     stores a chunk with no parent record -- loses that key before it is judged, so the anchor rule
     judges it rather than an empty-string comparison.
     """
     try:
-        db = sqlite3.connect(f"file:{(dirp / 'records.db').as_posix()}?mode=ro", uri=True)
-        try:
-            rows = db.execute("SELECT m.id, m.path, d.body FROM d JOIN meta m ON m.rowid = d.rowid "
-                              "WHERE m.id != ''").fetchall()
-        finally:
-            db.close()
+        rows = con.execute(f"SELECT f.id, f.path, f.body FROM fts_record f {query.SERVED_JOIN} "
+                           "WHERE f.id != '' ORDER BY f.rowid").fetchall()
     except sqlite3.Error as exc:
-        raise CheckRefused(f"served set unreadable under {dirp.as_posix()}: {exc}") from exc
+        raise CheckRefused(f"served set unreadable: {exc}") from exc
     if not rows:
         raise CheckRefused(
-            f"served set 'records' is EMPTY under {dirp.as_posix()} -- nothing to grade, and a "
-            f"floor over an empty set is satisfied by any corpus"
+            "served set 'records' is EMPTY -- nothing to grade, and a "
+            "floor over an empty set is satisfied by any corpus"
         )
     docs = [{"id": i, "path": p, "text": t} for i, p, t in rows]
     anchors: dict[str, list[str]] = {}
@@ -359,8 +378,8 @@ def measure_served(dirp: pathlib.Path, queries: list[dict], pin: dict,
         declared = [i.strip() for i in q.get("expected_ids", []) if i.strip()]
         unresolved.extend(i for i in declared if i not in targets)
         for s in slices:
-            expr = query.query_expr(q["query"], q[s])
-            fused = query.run_fusion(dirp, expr, pin["k"]) if expr else []
+            expr = record_find.query_expr(q["query"], q[s])
+            fused = record_find.run_fusion(con, expr, pin["k"]) if expr else []
             judged = [{k: v for k, v in h.items() if k != "id" or v} for h in fused]
             want = bench.expected_by_target(judged, q, anchors)
             # `and targets`: a row that cannot resolve is outside R, so it may not count toward h.
@@ -538,11 +557,19 @@ def derive_probe_labels(spec: dict) -> list[str]:
     """The ids this spec cites OUTSIDE section 10, minus its own build's, minus any section 10 cites.
 
     Section 10 is where the author wrote down what the probe returned, so grading the probe on those
-    ids is circular. Every probe of one spec shares this set.
+    ids is circular. Every probe of one spec shares this set. The build is read by the one id parser,
+    through extract's import (TOOL-dTotalRecall-38 S3); an id it refuses names no build, so it stays.
     """
     inside = set(extract.ID_RE.findall(spec["s10"]))
-    return [i for i in dict.fromkeys(extract.ID_RE.findall(spec["outside"]))
-            if i.split("-")[1] != spec["slug"] and i not in inside]
+    labels = []
+    for i in dict.fromkeys(extract.ID_RE.findall(spec["outside"])):
+        try:
+            own = extract.id_grammar.parse_id_parts(i, None)[1] == spec["slug"]
+        except ValueError:
+            own = False
+        if not own and i not in inside:
+            labels.append(i)
+    return labels
 
 
 def print_spec_probes(root: pathlib.Path) -> int:
@@ -553,16 +580,13 @@ def print_spec_probes(root: pathlib.Path) -> int:
         print("check-recall: DEAD PROBE -- the harvest stage found no query.py probe in any tracked "
               "spec's section 10; a figure over nothing is not a clean zero", file=sys.stderr)
         return 1
-    dirp = build_served_dir(root)
+    con = load_served_index(root)
     try:
         try:
-            db = sqlite3.connect(f"file:{(dirp / 'records.db').as_posix()}?mode=ro", uri=True)
-            try:
-                known = {r[0] for r in db.execute("SELECT DISTINCT id FROM meta WHERE id != ''")}
-            finally:
-                db.close()
+            known = {r[0] for r in con.execute(f"SELECT DISTINCT f.id FROM fts_record f "
+                                               f"{query.SERVED_JOIN} WHERE f.id != ''")}
         except sqlite3.Error as exc:
-            raise CheckRefused(f"served set unreadable under {dirp.as_posix()}: {exc}") from exc
+            raise CheckRefused(f"served set unreadable: {exc}") from exc
         aside: Counter = Counter()
         unresolved: set[str] = set()
         queries = []
@@ -583,7 +607,7 @@ def print_spec_probes(root: pathlib.Path) -> int:
             print(f"check-recall: DEAD PROBE -- the de-contamination stage left no question with a "
                   f"label ({found} probes; {drops})", file=sys.stderr)
             return 1
-        run = measure_served(dirp, queries, {"metric": "r", "k": SPEC_PROBE_K}, slices=("terms",))
+        run = measure_served(con, queries, {"metric": "r", "k": SPEC_PROBE_K}, slices=("terms",))
         for p in run["per"]:
             print(f"{'hit ' if p['hit'] else 'miss'}  {p['q']['path']}  "
                   f"[{' '.join(p['q']['expected_ids'])}]  \"{p['q']['query']}\"")
@@ -593,14 +617,14 @@ def print_spec_probes(root: pathlib.Path) -> int:
               f"{run['h'] / n:.4f} (h {run['h']}, n {n}) -- a report, no floor")
         return 0
     finally:
-        remove_tree(dirp)
+        con.close()
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(add_help=True, description=__doc__.splitlines()[0])
     ap.add_argument("--data-dir", default=None,
-                    help="grade an already-built dir instead of building one: an extract.py dir "
-                         "under a single-pair pin (the arms' seam), a build_cache dir under served")
+                    help="grade an already-built set instead of building one: an extract.py dir "
+                         "under a single-pair pin (the arms' seam), an index file under served")
     ap.add_argument("--repo", default=None, help="repo root; defaults to the kit's own")
     ap.add_argument("--fixture", default=None, help="fixture path; defaults to the kit's own")
     ap.add_argument("--audit-fixture", action="store_true",
@@ -617,7 +641,7 @@ def main() -> int:
             return 2
     fixture_path = pathlib.Path(args.fixture) if args.fixture else KIT / FIXTURE_NAME
 
-    scratch = None
+    scratch = con = None
     try:
         # The pin is read FIRST because it decides which term lists a question owes.
         pin = parse_pin(recall_conf.load_conf(root).get(PIN_KEY))
@@ -628,13 +652,14 @@ def main() -> int:
 
     try:
         try:
-            if args.data_dir:
-                data = pathlib.Path(args.data_dir)
-            elif pin["served"]:
-                data = scratch = build_served_dir(root)
+            if pin["served"]:
+                con = (load_index_file(root, pathlib.Path(args.data_dir)) if args.data_dir
+                       else load_served_index(root))
+                run = measure_served(con, queries, pin)
             else:
-                data = scratch = build_data_dir(root)
-            run = (measure_served if pin["served"] else measure_run)(data, queries, pin)
+                data = pathlib.Path(args.data_dir) if args.data_dir else build_data_dir(root)
+                scratch = None if args.data_dir else data
+                run = measure_run(data, queries, pin)
         except CheckRefused as exc:
             # ONE handler over BOTH preconditions. Splitting them left `build_data_dir`'s refusal
             # escaping as a traceback and exit 1. The builders are the branch the leg's own argv
@@ -684,6 +709,8 @@ def main() -> int:
     finally:
         if scratch is not None:
             remove_tree(scratch)
+        if con is not None:
+            con.close()
 
 
 if __name__ == "__main__":

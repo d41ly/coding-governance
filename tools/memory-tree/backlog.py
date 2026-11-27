@@ -124,9 +124,35 @@ LEGACY_TOKENS = ("OPEN", "SPECCED", "INPROGRESS", "BLOCKED", "DEFERRED", "CLOSED
 # then sort before a September cutoff and silently disarm V9 and V12.
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
-# A build folder slug. Disjoint from a SHA by construction: every slug in this corpus carries an
-# upper-case letter (the node tag plus a CamelCase adjective-noun) and a SHA carries none.
-SLUG_RE = re.compile(r"^(?=.*[A-Z])[A-Za-z0-9]+$")
+
+
+def load_id_grammar():
+    """The sibling `id_grammar`, whose slug grammar every slug and id pattern of this module reads at
+    first use (TOOL-dTotalRecall-5 S7). Importing it resolves no conf and reads no policy."""
+    here = str(pathlib.Path(__file__).resolve().parent)
+    if here not in sys.path:
+        sys.path.append(here)
+    import id_grammar  # noqa: PLC0415 — the sibling, reached by the path append above
+    return id_grammar
+
+
+class LateSlugPattern:
+    """The sibling's `SlugPattern`, itself built at first use: an import of `id_grammar` here would stop this
+    module, and check 26's named refusal and dormant mode with it, in a tree whose `id_grammar.py` is absent."""
+
+    def __init__(self, build):
+        self._build, self._re = build, None
+
+    def __getattr__(self, name):
+        if self._re is None:
+            self._re = load_id_grammar().SlugPattern(self._build)
+        return getattr(self._re, name)
+
+
+# A build folder slug: the slug grammar's BUILD_SLUG_RE, every grammar a build was minted under
+# (TOOL-dTotalRecall-5 S7), bound at first use. It admits an all-lower-case legacy slug, so the
+# REOPEN slot below asks SHA_RE first: an all-letter hex sha is also a legacy-shaped slug.
+SLUG_RE = LateSlugPattern(lambda g: g.BUILD_SLUG_RE.pattern)
 
 # THE THREE LOCATOR FORMS OF §4, and the one shape fix F6 forbids, each anchored at BOTH ends. A
 # locator is the whole value or it is not a locator: an unanchored form would read the first legal
@@ -172,7 +198,11 @@ class Problem(Exception):
     """A named, user-facing failure. Never a traceback, and never raised by CONTENT."""
 
 
-FAMILY_SHAPE = re.compile(r"^[A-Za-z][A-Za-z0-9]*$")
+#: A well-formed family, the one spelling `FAMILY_SHAPE` and `GRANT_ID_RE` splice, and the alternation a
+#: reader passes `parse_id_parts` for an id `check_id` passed under a CALLER's families, which no tree
+#: declares (TOOL-dTotalRecall-38 S3): that grammar already narrowed the family.
+ANY_FAMILY = r"[A-Za-z][A-Za-z0-9]*"
+FAMILY_SHAPE = re.compile(r"^" + ANY_FAMILY + r"$")
 
 
 def build_grammar(families) -> Grammar:
@@ -198,7 +228,7 @@ def build_grammar(families) -> Grammar:
                       f"id grammar instead of failing")
     alt = "|".join(sorted(set(fams))) or "(?!)"
     return Grammar(tuple(sorted(set(fams))),
-                   re.compile(r"^(?:" + alt + r")-[A-Za-z0-9]+-\d+$"))
+                   LateSlugPattern(lambda g: r"^(?:" + alt + r")-(?:" + g.slug_class + r")-\d+$"))
 
 
 def check_id(token: str, grammar: Grammar) -> bool:
@@ -409,6 +439,16 @@ def parse_seen(value: str) -> Seen:
                 f"`` `path` matching `pattern` ``, or `<repo>:<path>@<sha>`")
 
 
+def check_ask_acceptable(clauses) -> bool:
+    """Does a merged-clauses mapping state what done means? `accept`, or a `seen … run`.
+
+    THE ONE PREDICATE (TOOL-dTotalRecall-7 S1): V14, READY's R5 and the record door's `new ask`
+    each ask it of a `{label: (value, …)}` mapping, `derive_clauses`'s shape, so a filing graded at
+    the door reads exactly as V14 grades it after."""
+    return bool(clauses.get("accept")) or any(parse_seen(v).command
+                                               for v in clauses.get("seen", ()))
+
+
 def extract_grants(value: str) -> tuple:
     """`(grants, why)` for one `may` value. `('none',)` is the absorbed token, never a grant.
 
@@ -450,7 +490,7 @@ def extract_grants(value: str) -> tuple:
 #: build's asks are filed under — grading it against the backlog allowlist would refuse a
 #: legitimate grant on any tree whose two sets differ. Whether the id RESOLVES is the question the
 #: unit that HONOURS a grant asks, at the moment it honours one.
-GRANT_ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+$")
+GRANT_ID_RE = LateSlugPattern(lambda g: r"^" + ANY_FAMILY + r"-(?:" + g.slug_class + r")-\d+$")
 
 
 def check_grant(grant: str) -> bool:
@@ -1036,10 +1076,14 @@ def derive_verdicts(corpus: Corpus, conf: Conf) -> list:
     closing_specs, advancing_specs = _read_links(corpus, asks)
     fold = derive_statuses(corpus)
 
-    # V1 — the ask's id slug against the folder it is filed in.
+    # V1 — the ask's id slug against the folder it is filed in, parsed by the one id parser under the
+    # caller-bound families the ask's id passed (TOOL-dTotalRecall-38 S3), "" for an id it refuses.
     for parsed in corpus.files:
         for ask in parsed.asks:
-            slug = ask.id.split("-")[1] if ask.id.count("-") >= 2 else ""
+            try:
+                slug = load_id_grammar().parse_id_parts(ask.id, None, alt=ANY_FAMILY)[1]
+            except ValueError:
+                slug = ""
             if parsed.slug and slug and slug != parsed.slug:
                 out.append(Verdict(1, f"{ask.path}:{ask.line}: ask {ask.id} carries slug `{slug}` "
                                       f"and is filed in build folder `{parsed.slug}`", (ask.path,)))
@@ -1158,10 +1202,7 @@ def derive_verdicts(corpus: Corpus, conf: Conf) -> list:
             for ask in parsed.asks:
                 if ask.filed < conf.cutoff:
                     continue
-                clauses = merged.get(ask.id, {})
-                if clauses.get("accept"):
-                    continue
-                if any(parse_seen(v).command for v in clauses.get("seen", ())):
+                if check_ask_acceptable(merged.get(ask.id, {})):
                     continue
                 out.append(Verdict(14, f"{ask.path}:{ask.line}: {ask.id} is filed on or after "
                                        f"{conf.cutoff} and its merged clauses carry neither "
@@ -1432,8 +1473,12 @@ def derive_ready(grader: Grader, ask_id: str) -> Ready:
     status = grader.fold.statuses.get(ask_id, UNRESOLVED)
     missing: list = []
 
-    # R1 — FILED. Exactly one row, in the folder the id's own slug names.
-    if len(rows) != 1 or rows[0].slug != (ask_id.split("-")[1] if ask_id.count("-") >= 2 else ""):
+    # R1 — FILED. Exactly one row, in the folder the id's own slug names, "" for an id the parser refuses.
+    try:
+        home = load_id_grammar().parse_id_parts(ask_id, None, alt=ANY_FAMILY)[1]
+    except ValueError:
+        home = ""
+    if len(rows) != 1 or rows[0].slug != home:
         missing.append("R1")
 
     # R2 — LIVE, and the closers field it produces on the way. A foreign live spec is a LIVE CLAIM
@@ -1470,8 +1515,7 @@ def derive_ready(grader: Grader, ask_id: str) -> Ready:
         missing.append("R4")
 
     # R5 — ACCEPTABLE. `accept` says what done looks like; a `seen … run` says a machine can ask.
-    if not (clauses.get("accept")
-            or any(parse_seen(v).command for v in clauses.get("seen", ()))):
+    if not check_ask_acceptable(clauses):
         missing.append("R5")
 
     if external and not clauses.get("data"):
@@ -1549,6 +1593,30 @@ def render_ask_row(ask_id: str, filed: str, text: str, unit: bool = False, point
     return f"- {ask_id}{SEP}filed {filed}{marker}{SEP}{text}{render_clauses(clauses)}{tail}"
 
 
+def check_row_value(label: str, value: str) -> None:
+    """Refuse a value that would split the one-line row it is written into: a CR, an LF, `SEP` or
+    `ARROW`. ValueError naming `label` and the character class (TOOL-dTotalRecall-41 S1). Called by the
+    write door on each value it was handed, never by a renderer, whose other callers already validate.
+    WHAT IT DOES NOT CHECK: an empty value, or a value whose bytes read as a clause label."""
+    broken = check_line_break(label, value)
+    if broken:
+        raise ValueError(f"{broken}, which would split the row it is written into")
+    for bad, name in ((SEP, "the row separator"), (ARROW, "the pointer arrow")):
+        if bad in value:
+            raise ValueError(f"{label} holds {name}, which would split the row it is written into")
+
+
+def check_line_break(label: str, value: str) -> str:
+    """The memory-tree kit's ONE line-break rule (TOOL-dTotalRecall-43 S37): `"<label> holds a carriage
+    return"` or `"... a line feed"` where `value` carries one, else "". Every writer that takes a value onto
+    one line asks it: `check_row_value`, the record factory's field and line checks, the door's `--title`,
+    `--field` and cause, and each `--edge`."""
+    for bad, name in (("\r", "a carriage return"), ("\n", "a line feed")):
+        if bad in (value or ""):
+            return f"{label} holds {name}"
+    return ""
+
+
 def render_clauses(clauses) -> str:
     """The clause tail alone, for the two renderers that both end with one. `()` renders nothing."""
     return "".join(f"{SEP}{label} {value}" for label, value in clauses)
@@ -1620,8 +1688,9 @@ VIEW_H1_RE = re.compile(
 # A rendered DATA row, recognised by its LINK-WRAPPED first cell. That wrapper is what keeps the
 # table-anchor shape off the row, so the row that the anchor grammar refuses to claim is exactly the
 # row this pattern accepts — one property, asserted from both sides.
-VIEW_ROW_RE = re.compile(
-    r"^\| \[[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+\]\(\.\./builds/[A-Za-z0-9]+/BACKLOG\.md\) \|.*\|$")
+VIEW_ROW_RE = LateSlugPattern(
+    lambda g: r"^\| \[[A-Za-z][A-Za-z0-9]*-(?:" + g.slug_class + r")-\d+\]\(\.\./builds/(?:" + g.slug_class
+    + r")/BACKLOG\.md\) \|.*\|$")
 _LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")
 
 
@@ -1690,9 +1759,10 @@ def build_ask_sort_key(ask: Ask):
     PUBLIC because the view and the print modes must agree on it: a table whose order differs from the
     view it explains is two answers to the question "where is this ask in the list".
     """
-    parts = ask.id.split("-")
-    slug = parts[1] if len(parts) > 2 else ""
-    seq = int(parts[2]) if len(parts) > 2 and parts[2].isdigit() else 0
+    try:
+        _fam, slug, seq = load_id_grammar().parse_id_parts(ask.id, None, alt=ANY_FAMILY)
+    except ValueError:
+        return ("", 0, ask.id)
     return (slug, seq, ask.id)
 
 

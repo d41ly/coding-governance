@@ -103,9 +103,23 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 | 2 | `TOOL-aClosedDocket-2` | no |
 | 3 | `TOOL-aClosedDocket-3` | no |
 | 4 | `TOOL-aClosedDocket-4` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-08-31-prompt-TOOL-aClosedDocket-1.md` |
+| reviews | `2026-08-31-review-TOOL-aClosedDocket-4-spec-audit-round1.md`, `2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md` and 1 more under reviews/ |
+| logs | `2026-08-31-build-TOOL-aClosedDocket-1-acceptance-ledger.md` |
+| card ref | `refs/gov/builds/aClosedDocket/card` |
+<!-- /gen:build-routes -->

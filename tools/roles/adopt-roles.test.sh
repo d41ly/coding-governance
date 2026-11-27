@@ -114,6 +114,11 @@ check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL 
 # home `loop`, where the library's resolver probes. The source is the loop kit beside this one.
 LOOP_SRC="$HERE/../loop"
 [ -f "$LOOP_SRC/loop_lib.py" ] && [ -f "$LOOP_SRC/loop.toml" ] || { echo "adopt-roles.test: no loop kit beside this one at $LOOP_SRC, so no fixture can place its workflows"; exit 2; }
+# THE MEMORY-TREE KIT's slug grammar (TOOL-dTotalRecall-5 S7): the library reads every build slug and
+# unit id through that kit's `id_grammar.py`, which reads the policy through its `tree_lib.py` and
+# `backlog.py`, so every fixture holds those three beside its roles kit too, at the home `memory-tree`.
+MT_SRC="$HERE/../memory-tree"
+[ -f "$MT_SRC/id_grammar.py" ] && [ -f "$MT_SRC/tree_lib.py" ] && [ -f "$MT_SRC/backlog.py" ] || { echo "adopt-roles.test: no memory-tree kit beside this one at $MT_SRC, so no fixture can read a slug"; exit 2; }
 FX=""; FXK="$KREL"; FXL=""
 build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at the kit path, $KREL
   # unless given, with $ADOPTER as its adopter, and the loop kit beside it at $FXL, scaffolded; rc of
@@ -121,10 +126,12 @@ build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at 
   # path the last call used.
   FXK=${1:-$KREL}; FX=${2:-$TMP_ROOT/fx$n}
   FXL=loop; [[ $FXK == */* ]] && FXL=${FXK%/*}/loop
-  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$FXL" "$FX/$_chd" || return 2
+  local fxm=memory-tree; [[ $FXK == */* ]] && fxm=${FXK%/*}/memory-tree
+  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$FXL" "$FX/$fxm" "$FX/$_chd" || return 2
   git init -q "$FX" || return 2
   cp -R "$HERE"/. "$FX/$FXK"/ && cp "$ADOPTER" "$FX/$FXK/adopt-roles.sh" || return 2
   cp "$LOOP_SRC/loop_lib.py" "$LOOP_SRC/loop.toml" "$FX/$FXL"/ || return 2
+  cp "$MT_SRC/id_grammar.py" "$MT_SRC/tree_lib.py" "$MT_SRC/backlog.py" "$FX/$fxm"/ || return 2
   printf 'MEMORY_ROOT=%s\nCHARTER=%s\n' "$MR" "$CH" > "$FX/.memory-tree.conf"
   cp "$REPO/$CH" "$FX/$CH" || return 2
   (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1)
@@ -215,9 +222,9 @@ else
   # `max`, and the third payload below names a transcript whose model it matches.
   printf '%s\n' '' '[effort.profiles.tfam]' 'match = ["tfam"]' 'default = "max"' >> "$FX/$KREL/house/policy.toml"
   (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1)
-  printf -v _a6day '%(%F)T' -1; A6P="$MR/builds/bx/prompts/$_a6day-prompt-TOOL-bx-1-1-researcher.md"
-  mkdir -p "$FX/$MR/builds/bx/prompts"
-  (cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build bx --unit TOOL-bx-1 \
+  printf -v _a6day '%(%F)T' -1; A6P="$MR/builds/bxFix/prompts/$_a6day-prompt-TOOL-bxFix-1-1-researcher.md"
+  mkdir -p "$FX/$MR/builds/bxFix/prompts"
+  (cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build bxFix --unit TOOL-bxFix-1 \
      --input "question=which mechanism fits" --out "$A6P" --part task) > "$TMP_ROOT/a6.task" 2>"$TMP_ROOT/a6.err"; rc=$?
   FXN=$(cd "$FX" && { pwd -W 2>/dev/null || pwd; })
   # TOOL-aOrientedCast-27: the payload's `description` is the name the render printed on stderr after
@@ -226,7 +233,7 @@ else
   "$PY" -c 'import json, sys
 err = open(sys.argv[4], encoding="utf-8").read().replace("\r", "").split("\n")
 name = next((l[len("handoff: description — "):] for l in err if l.startswith("handoff: description — ")), None)
-for out, desc in ((sys.argv[5], name), (sys.argv[6], "bx · TOOL-bx-1 · researcher")):
+for out, desc in ((sys.argv[5], name), (sys.argv[6], "bxFix · TOOL-bxFix-1 · researcher")):
     with open(out, "w", encoding="utf-8") as fh:
         json.dump({"tool_name": "Agent", "cwd": sys.argv[1], "session_id": "a6-s", "prompt_id": "a6-p-" + sys.argv[3],
                    "tool_use_id": "a6-u", "tool_input": {"subagent_type": "gov-researcher", "description": desc,
@@ -595,9 +602,9 @@ elif ! command -v node >/dev/null 2>&1; then
 else
   build_fixture
   printf -v _d '%(%Y-%m-%d)T' -1
-  A11P="$MR/builds/bx/prompts/$_d-prompt-TOOL-bx-1-1-researcher.md"
-  mkdir -p "$FX/$MR/builds/bx/prompts" "$TMP_ROOT/a11"
-  (cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build bx --unit TOOL-bx-1 \
+  A11P="$MR/builds/bxFix/prompts/$_d-prompt-TOOL-bxFix-1-1-researcher.md"
+  mkdir -p "$FX/$MR/builds/bxFix/prompts" "$TMP_ROOT/a11"
+  (cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build bxFix --unit TOOL-bxFix-1 \
      --input "question=which mechanism fits" --out "$A11P" --part task) > "$TMP_ROOT/a11/task" 2>"$TMP_ROOT/a11/err"
   FXN=$(cd "$FX" && { pwd -W 2>/dev/null || pwd; })
   # Each variant's bytes written exact, then its two answers: `admit` or `refuse`, one line per variant.
@@ -1018,7 +1025,7 @@ sys.path.insert(0, str(kit))
 import handoff, roles_lib as lib
 reads = lib.load_roles(handoff.KIT_DIR)["gov-spec-writer"]["keys"]["reads"].split(", ")
 keys = {"reads": ", ".join(k for k in reads if k.startswith("brief:"))}
-brief = fx / sys.argv[3] / "builds" / "bx" / "prompts" / "2026-11-10-prompt-TOOL-bx-1-brief.md"
+brief = fx / sys.argv[3] / "builds" / "bxFix" / "prompts" / "2026-11-10-prompt-TOOL-bxFix-1-brief.md"
 brief.parent.mkdir(parents=True, exist_ok=True)
 heads = ("Goal", "Items", "Acceptance", "Gates", "Non-goals")
 body = "".join("### %s\n\n%s text\n\n" % (h, h) for h in heads)
@@ -1028,7 +1035,7 @@ for prompt in (lines, ""):
     brief.write_text(text, encoding="utf-8")
     try:
         task = handoff.render_handoff(fx, sys.argv[3], lib.resolve_charter_path(fx),
-                                      "gov-spec-writer", keys, "bx", "TOOL-bx-1", None, {}, None)[2]
+                                      "gov-spec-writer", keys, "bxFix", "TOOL-bxFix-1", None, {}, None)[2]
         print("rendered %d" % ("### brief:prompt\n\n" + lines + "\n### brief:goal\n" in task))
     except lib.RolesError as e:
         print("refused %d" % str(e).split("\n")[0].startswith("brief:prompt — "))
@@ -1062,12 +1069,12 @@ def set_reads(role, old, new):
 set_reads("gov-builder", "", ", upstream:rows?")
 reads = lib.load_roles(handoff.KIT_DIR)["gov-builder"]["keys"]["reads"].split(", ")
 keys = {"reads": ", ".join(k for k in reads if k.startswith("upstream:"))}
-(fx / sys.argv[3] / "builds" / "bx").mkdir(parents=True, exist_ok=True)
+(fx / sys.argv[3] / "builds" / "bxFix").mkdir(parents=True, exist_ok=True)
 rows = ("item.design.seams#seam-1 · seam · the kit resolver finds a sibling kit\n"
         "item.design.seams#must-2 · criterion · no second copy of the ladder\n")
 (fx / "rows.txt").write_text(rows, encoding="utf-8")
 for up in ("rows.txt", None):
-    task = handoff.render_handoff(fx, mr, lib.resolve_charter_path(fx), "gov-builder", keys, "bx", "TOOL-bx-1",
+    task = handoff.render_handoff(fx, mr, lib.resolve_charter_path(fx), "gov-builder", keys, "bxFix", "TOOL-bxFix-1",
                                   None, {}, None, upstream=up)[2]
     block = task.split("### upstream:rows\n\n", 1)[1] if "### upstream:rows\n\n" in task else ""
     if up:

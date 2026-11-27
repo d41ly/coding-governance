@@ -114,9 +114,24 @@ Ids whose spec moved past its audited revision: none — 0 of 14 unit id(s) carr
 | 4 | `TOOL-aHomedAnchor-4` | no |
 | 5 | `TOOL-aHomedAnchor-6`, `TOOL-aHomedAnchor-7` | yes |
 | 6 | `TOOL-aHomedAnchor-22`, `TOOL-aHomedAnchor-23`, `TOOL-aHomedAnchor-24`, `TOOL-aHomedAnchor-25`, `TOOL-aHomedAnchor-26`, `TOOL-aHomedAnchor-27`, `TOOL-aHomedAnchor-28` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-11-prompt-TOOL-aHomedAnchor-22-0-held-reds-brief.md`, `2026-10-09-prompt-TOOL-aHomedAnchor-1-1-reconstructed-build-briefs.md` and 1 more under prompts/ |
+| reviews | `2026-10-09-review-TOOL-aHomedAnchor-1-implementation-diff-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-10-09-build-TOOL-aHomedAnchor-7-1-acceptance-ledger.md`, `2026-10-09-build-TOOL-aHomedAnchor-6-1-acceptance-ledger.md` and 6 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aHomedAnchor/card` |
+<!-- /gen:build-routes -->

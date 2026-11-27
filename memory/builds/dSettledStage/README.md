@@ -78,9 +78,23 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 | 2 | `TOOL-dSettledStage-2` | no |
 | 3 | `TOOL-dSettledStage-3` | no |
 | 4 | `TOOL-dSettledStage-4` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-19-prompt-TOOL-dSettledStage-3-promotion-brief.md`, `2026-11-19-prompt-TOOL-dSettledStage-2-pass-legs-fix.md` and 4 more under prompts/ |
+| reviews | `2026-11-19-review-TOOL-dSettledStage-1-2-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| red-fix | `2026-11-19-build-TOOL-dSettledStage-3-red-fix-2.md`, `2026-11-19-build-TOOL-dSettledStage-2-red-fix-1.md` |
+| logs | `2026-11-19-build-TOOL-dSettledStage-4-1-acceptance-ledger.md`, `2026-11-19-build-TOOL-dSettledStage-3-1-acceptance-ledger.md` and 3 more under build/ |
+| card ref | `refs/gov/builds/dSettledStage/card` |
+<!-- /gen:build-routes -->

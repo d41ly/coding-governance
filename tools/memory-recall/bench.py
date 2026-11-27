@@ -33,7 +33,7 @@ Usage:
                   [--subs grep,fts5,fts5w,rm3]
                   [--ks 1,5,10,20,50,100] [--slice all|hard|easy] [--json OUT]
 
-check 27's four index names -- ``build_index``, ``match_expr``, ``terms`` and ``ALIAS_WEIGHT`` --
+check 27's four index names -- ``build_fts_rows``, ``match_expr``, ``terms`` and ``ALIAS_WEIGHT`` --
 and the tokenizer they read live in the memory-tree kit's ``id_grammar.py`` since
 PLAY-dOrderedCharter-18, found through ``resolve_kit_dir``; this file re-exports them, so every
 substrate below and every reader of ``bench.<name>`` reads the same objects.
@@ -100,7 +100,7 @@ from id_grammar import (  # noqa: E402,F401 — re-exported: check 27 and query.
     ALIAS_WEIGHT,
     STOP,
     TOKEN,
-    build_index,
+    build_fts_rows,
     match_expr,
     terms,
 )
@@ -434,7 +434,7 @@ def main() -> int:
         for r in docs:
             dfreq.update(set(terms(r["text"])[:600]))
         t0 = time.time()
-        db = build_index(docs, crumb="--crumb" in argv)
+        db = build_fts_rows(sqlite3.connect(":memory:"), "d", docs, crumb="--crumb" in argv)
         build_s = time.time() - t0
         wants = [expected_by_target(docs, q, anchors) for q in queries]
         ceiling = sum(1 for w in wants if w) / max(1, len(queries))

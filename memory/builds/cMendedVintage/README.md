@@ -216,9 +216,24 @@ Ids whose spec moved past its audited revision: none — 0 of 40 unit id(s) carr
 | 38 | `DEPL-cMendedVintage-27` | no |
 | 39 | `TOOL-cMendedVintage-12` | no |
 | 40 | `DEPL-cMendedVintage-28` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-19-prompt-DEPL-cMendedVintage-28-2-build-brief.md`, `2026-09-19-prompt-DEPL-cMendedVintage-27-2-build-brief.md` and 40 more under prompts/ |
+| reviews | `2026-09-21-review-DEPL-cMendedVintage-1-diff-review-round3.md`, `2026-09-21-review-DEPL-cMendedVintage-1-diff-review-round2.md` and 2 more under reviews/ |
+| logs | `2026-09-19-build-DEPL-cMendedVintage-28-acceptance-ledger.md`, `2026-09-19-build-DEPL-cMendedVintage-27-acceptance-ledger.md` and 38 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/cMendedVintage/card` |
+<!-- /gen:build-routes -->

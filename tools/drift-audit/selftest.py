@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.35
+gov:kit drift-audit@1.36
 
     python <kit>/selftest.py
 
@@ -2840,14 +2840,20 @@ def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
     try:
         espec.loader.exec_module(emod)
         shipped = emod.grammar_for(root).ID
+        slug_class = emod.derive_slug_grammar(root).slug_class
     finally:
         try:
             sys.path.remove(str(extractor.parent))
         except ValueError:
             pass
+    # TOOL-dTotalRecall-5 S4: the shipped session era splices the slug grammar's class, so the arm
+    # hands the local copy the same class and still compares the two constructions byte for byte.
     check("local grammar equals the extractor's for this tree",
-          mod._build_local_ident(families) == shipped,
+          mod._build_local_ident(families, slug_class) == shipped,
           "the local fallback has diverged from the shipped alternation")
+    check("the local fallback with no slug class keeps the legacy session shape",
+          re.fullmatch(mod._build_local_ident(families), "TOOL-dTotalRecall-5") is not None,
+          "the fallback's inline legacy shape no longer matches a session id whole")
 
 
 # ---------------------------------------------------------------------------------------------

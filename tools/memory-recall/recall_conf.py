@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The memory-recall kit's project layer: read `.memory-tree.conf`, declare nothing of its own.
 
-gov:kit memory-recall@1.38
+gov:kit memory-recall@1.39
 
 The kit indexes the memory tree the memory-tree kit already declares, and the conf layer that reads
 it lives in that kit since PLAY-dOrderedCharter-18: `id_grammar.py`, beside the memory-tree kit's other
@@ -29,7 +29,7 @@ import sys
 # the grammar module: the flag is read when a module is imported, not when it is defined.
 sys.dont_write_bytecode = True
 
-KIT_MEMORY_RECALL_VERSION = "1.38"
+KIT_MEMORY_RECALL_VERSION = "1.39"
 
 
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
@@ -78,7 +78,6 @@ if _GRAMMAR_KIT not in sys.path:
 
 from id_grammar import (  # noqa: E402,F401 — re-exported: every recall reader keeps its spelling
     CONF_NAME,
-    DEFAULT_CACHE_BUDGET_MB,
     NODE_TAG_CLASS,
     Conf,
     ConfError,

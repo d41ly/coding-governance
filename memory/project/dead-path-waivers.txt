@@ -17,9 +17,11 @@ skills/session-kickoff/manifest-check.test.sh	mkdir -p "$mm_dir" && printf -- '-
 {prefix}/playbook/memory_index.py	THE INDEX. The harness writes `MEMORY.md` under `AUTO_MEMORY_TEMPLATE` and injects it into every session;	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 {prefix}/playbook/memory_index.py	text = (d / "MEMORY.md").read_text(encoding="utf-8")	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 {prefix}/playbook/memory_index.py	raw = (d / "MEMORY.md").read_bytes()	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-{prefix}/playbook/memory_index.py	return derive_byte_cut(f"{CELL} MEMORY.md {measured['bytes']} B {side} its {measured['budget']} B budget "	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 {prefix}/playbook/render_playbook.py	(d / 'MEMORY.md').write_text(links + 'x' * (9000 - len(links.encode('utf-8')) - 1) + '\n', encoding='utf-8', newline='')	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 {prefix}/playbook/render_playbook.py	(d / 'MEMORY.md').write_bytes((d / 'MEMORY.md').read_bytes()[:3999] + b'\n')	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 {prefix}/playbook/render_playbook.py	with open(d / 'MEMORY.md', 'a', encoding='utf-8', newline='') as fh:	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 {prefix}/govkit/registry.toml	"file:{prefix}/agent-instructions/adopt-agent-instructions.sh",	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 {prefix}/govkit/registry.toml	"installable:{prefix}/agent-instructions/adopt-agent-instructions.sh",	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/playbook/memory_index.py	figures = f"MEMORY.md {measured['bytes']} B {side} its {measured['budget']} B budget"	1	5e2d1518349963196976e16ced5dd6b182722afe	widened:2026-11-23-build-TOOL-dTotalRecall-9-widen-10
+{prefix}/playbook/memory_index.py	figures = (f"card {measured['card']} B {card_side} · MEMORY.md {measured['bytes']} B {side} · "	1	5e2d1518349963196976e16ced5dd6b182722afe	widened:2026-11-23-build-TOOL-dTotalRecall-9-widen-10
+{prefix}/runlog/memory_measure.py	("Read", {"file_path": "C:\\Users\\u\\.claude\\projects\\p\\memory\\MEMORY.md"}, 700)], 0)]},	1	b9b6e584a4812d37e37c2e18296f42a960c4a476	widened:2026-11-23-build-TOOL-dTotalRecall-43-widen-13

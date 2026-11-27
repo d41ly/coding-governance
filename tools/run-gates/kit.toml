@@ -14,6 +14,7 @@ layer = "layer.flow"
 scope = "repo"
 version_from = { file = "run-gates.sh", pattern = "^KIT_RUN_GATES_VERSION=" }
 requires = []
+requires_if = [{ kit = "memory-tree", why = "TOOL-dTotalRecall-5 S8: run-gates.sh's attribution reads its owner's unit id through the memory-tree kit's slug grammar, its hygiene script's --print-slug-re found through the inline resolve_kit_dir block and asked once, only when a red leg is attributed. Where the kit does not resolve, the inline slug_legacy_sh block, the legacy shape, applies and one stderr line says so. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it SELECTS no kit, since a plain `requires` would add an install dependency to a kit an adopter may run alone (§8 F2 of that spec)" }]
 # PLAY-dOrderedCharter-17: the selection's govkit read is a declared slot with its fallback.
 optional = [
   { part = "run-gates.sh", point = "point.flow.version", fallback = "the owner and epoch columns read unreachable" },

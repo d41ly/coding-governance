@@ -60,7 +60,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.138 # gov:kit unattended@1.138 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.139 # gov:kit unattended@1.139 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -995,18 +995,19 @@ else
       # ids would under-count -- and this count feeds the promotion clause, where under-counting
       # reads as "no promotion happened": a FALSE GREEN, the one direction that must not be possible.
       # Both sides use the identical loop, because two spellings would manufacture phantom ids.
+      load_slug_class || exit 2   # the id, the slug grammar's (TOOL-dTotalRecall-5 S7)
       declare -A _rv_h=() _rv_b=()
       _rv_blob=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null || true)
       while IFS= read -r _rv_l || [ -n "$_rv_l" ]; do
         case $_rv_l in *'| WONTDO |'*) continue ;; esac
-        while [[ $_rv_l =~ [A-Z]+-[A-Za-z]+-[0-9]+ ]]; do
+        while [[ $_rv_l =~ $UNIT_ID_ERE ]]; do
           _rv_h[${BASH_REMATCH[0]}]=1; _rv_l=${_rv_l#*"${BASH_REMATCH[0]}"}
         done
       done <<< "$_rv_blob"
       if [ -n "$rv_base" ] && check_rev "$rv_base"; then
         _rv_blob=$(GIT show "$rv_base:$rv_readme" 2>/dev/null | awk '/<!-- gen:build-units -->/{f=1;next} /<!-- \/gen:build-units -->/{f=0} f' || true)
         while IFS= read -r _rv_l || [ -n "$_rv_l" ]; do
-          while [[ $_rv_l =~ [A-Z]+-[A-Za-z]+-[0-9]+ ]]; do
+          while [[ $_rv_l =~ $UNIT_ID_ERE ]]; do
             _rv_b[${BASH_REMATCH[0]}]=1; _rv_l=${_rv_l#*"${BASH_REMATCH[0]}"}
           done
         done <<< "$_rv_blob"
@@ -4396,6 +4397,7 @@ for f in $RUNS; do
       rs_pwhy=$rs_pinned; rs_pinned=""
     fi
     rs_rows=$(grep -F -- ' rescope · item ' "$f" 2>/dev/null || true)
+    load_slug_class || exit 2   # the id, the slug grammar's (TOOL-dTotalRecall-5 S7)
     # ADDED ids: accounted for by an `add` naming it, OR a `supersede` naming it as the successor.
     # An `add` alone would red a correctly performed supersession, whose successor is present now
     # and absent then with no `add` row that the sibling verb would even accept.
@@ -4405,7 +4407,7 @@ for f in $RUNS; do
     if [ -n "$rs_why" ]; then
       report "check 24's ADD arm skipped for $f — $rs_why (the RETIRE and supersession arms still ran)"
     else
-    for rsid in $(printf '%s\n' "$rs_now" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
+    for rsid in $(printf '%s\n' "$rs_now" | grep -oE "$UNIT_ID_ERE" | sort -u); do
       id_in "$rs_was" "$rsid" && continue
       printf '%s\n' "$rs_rows" | grep -qE "item add $rsid( |\$)" && continue
       printf '%s\n' "$rs_rows" | grep -qE "item supersede [A-Za-z0-9-]+ -> $rsid( |\$)" && continue
@@ -4429,7 +4431,8 @@ for f in $RUNS; do
       # there was retired before building and owes nothing, and one that was not owes its row. When
       # that baseline is unreadable the fallback is unavailable and the arm asks for the row, which
       # is the strict direction and is the behaviour this arm had before the rekey.
-      for rsid in $(printf '%s\n' "$rs_now" | grep -E '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
+      load_slug_class || exit 2
+      for rsid in $(printf '%s\n' "$rs_now" | grep -E '\| WONTDO \|' | grep -oE "$UNIT_ID_ERE" | sort -u); do
         if id_in "$rs_pinned" "$rsid"; then
           id_rows "$rs_pinned" "$rsid" | grep -q '| WONTDO |' && continue
         elif [ -z "$rs_why" ]; then
@@ -4507,7 +4510,8 @@ done
 check_absorb_subject() { # subject · slug -> 0 when it is an absorb subject for that slug
   case "$1" in "absorb($2): "?*" inherited at "????????) ;; *) return 1 ;; esac
   printf '%s' "${1##* inherited at }" | grep -qE '^[0-9a-f]{8}$' || return 1
-  printf '%s' "$1" | grep -qE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' && return 1
+  load_slug_class || return 1
+  printf '%s' "$1" | grep -qE "$UNIT_ID_ERE" && return 1
   return 0
 }
 # ---- THE GENERATED-RENDER SKIP (TOOL-aRepatriatedFork-55). A path a GENERATED_INDEXES index covers

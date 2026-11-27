@@ -107,9 +107,23 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 | 3 | `TOOL-aCollapsedScan-4` | no |
 | 4 | `TOOL-aCollapsedScan-6` | no |
 | 5 | `TOOL-aCollapsedScan-13` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-26-review-TOOL-aCollapsedScan-7-closing-diff.md` (CLEAN WITH FIXES), `2026-08-26-review-TOOL-aCollapsedScan-4-spec-audit-round1.md` (CLEAN WITH FIXES) and 1 more under reviews/ |
+| logs | `2026-08-27-build-TOOL-aCollapsedScan-13-acceptance-ledger.md`, `2026-08-26-build-TOOL-aCollapsedScan-7-acceptance-ledger.md` and 2 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aCollapsedScan/card` |
+<!-- /gen:build-routes -->

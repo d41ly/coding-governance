@@ -96,9 +96,25 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 | 6 | `TOOL-aLightenedLoop-6` | no |
 | 7 | `TOOL-aLightenedLoop-7` | no |
 | 8 | `TOOL-aLightenedLoop-8` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-15-prompt-TOOL-aLightenedLoop-8-reconcile.md`, `2026-11-15-prompt-TOOL-aLightenedLoop-8-1-spec-writer.md` and 15 more under prompts/ |
+| reviews | `2026-11-14-review-TOOL-aLightenedLoop-1-5-implementation-diff-round1.md` (CLEAN WITH FIXES) |
+| override | `2026-11-14-build-TOOL-aLightenedLoop-1-override-1.md` |
+| red-fix | `2026-11-14-build-TOOL-aLightenedLoop-5-red-fix-4.md`, `2026-11-14-build-TOOL-aLightenedLoop-2-red-fix-3.md` and 2 more under build/ |
+| research | `2026-11-14-build-TOOL-aLightenedLoop-1-analysis.md` |
+| logs | `2026-11-15-build-TOOL-aLightenedLoop-8-1-acceptance-ledger.md`, `2026-11-15-build-TOOL-aLightenedLoop-7-1-acceptance-ledger.md` and 7 more under build/ |
+| card ref | `refs/gov/builds/aLightenedLoop/card` |
+<!-- /gen:build-routes -->

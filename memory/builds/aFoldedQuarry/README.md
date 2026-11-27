@@ -85,3 +85,14 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-08-review-TOOL-aFoldedQuarry-7-6.md`, `2026-08-08-review-TOOL-aFoldedQuarry-6-5.md` and 5 more under reviews/ |
+| logs | `2026-08-08-build-TOOL-aFoldedQuarry-2-1.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aFoldedQuarry/card` |
+<!-- /gen:build-routes -->

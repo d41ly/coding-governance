@@ -46,3 +46,10 @@ Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| card ref | `refs/gov/builds/aDeployScout/card` |
+<!-- /gen:build-routes -->

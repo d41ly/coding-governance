@@ -260,7 +260,7 @@ def run_keep(cwd, run, build, unit):
 
 # ------------------------------------------------------------------------------------------ selftest
 def write_fixture_repo(top, value, tail):
-    """A scratch repository at `top`: `trace.leg-output` = `value` committed on `main`, build `x`, and run
+    """A scratch repository at `top`: `trace.leg-output` = `value` committed on `main`, build `xFix`, and run
     `fx-1` whose verdict names one tail, `tail` (bytes), kept in the common dir by its hash. -> the hash."""
     def run_fixture_git(*args):
         p = run_git(top, "-c", "commit.gpgsign=false", "-c", "user.name=fixture", "-c",
@@ -270,8 +270,8 @@ def write_fixture_repo(top, value, tail):
         return p.stdout.strip()
     pathlib.Path(top, ".governance").mkdir(parents=True)
     pathlib.Path(top, ".governance", "policy.toml").write_bytes(f'[trace]\nleg-output = "{value}"\n'.encode())
-    pathlib.Path(top, "memory", "builds", "x").mkdir(parents=True)
-    pathlib.Path(top, "memory", "builds", "x", "README.md").write_bytes(b"# x\n")
+    pathlib.Path(top, "memory", "builds", "xFix").mkdir(parents=True)
+    pathlib.Path(top, "memory", "builds", "xFix", "README.md").write_bytes(b"# xFix\n")
     run_fixture_git("init", "-q", "-b", "main")
     run_fixture_git("add", "-A")
     run_fixture_git("commit", "-q", "--no-verify", "-m", "fixture")
@@ -353,8 +353,8 @@ def run_selftest():
             why = []
             try:
                 h = write_fixture_repo(top, value, tail)
-                rc, out, err = run_keep(top, "fx-1", "x", "TOOL-x-1")
-                made = sorted(top.glob("memory/builds/x/build/*-leg-tail-*.md"))
+                rc, out, err = run_keep(top, "fx-1", "xFix", "TOOL-xFix-1")
+                made = sorted(top.glob("memory/builds/xFix/build/*-leg-tail-*.md"))
                 text = made[0].read_bytes().decode("utf-8") if made else ""
                 if label == "node-local":
                     if made:
@@ -367,8 +367,8 @@ def run_selftest():
                     why.append("the record holds no Hash field naming the tail's hash, or no fenced block")
                 elif label == "kept once":
                     run_git(top, "add", "-A")
-                    rc2, out2, err2 = run_keep(top, "fx-1", "x", "TOOL-x-1")
-                    again = sorted(top.glob("memory/builds/x/build/*-leg-tail-*.md"))
+                    rc2, out2, err2 = run_keep(top, "fx-1", "xFix", "TOOL-xFix-1")
+                    again = sorted(top.glob("memory/builds/xFix/build/*-leg-tail-*.md"))
                     if rc2 != 0 or len(again) != 1 or not any(ln.startswith(f"{SAY}: skipped {h}") for ln in out2):
                         why.append(f"a second keep over a tracked hash wrote {len(again) - 1} record(s) "
                                    f"or did not skip it: {out2 + err2}")

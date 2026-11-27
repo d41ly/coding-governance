@@ -49,6 +49,38 @@ Documented on [help/loop.md](../loop.md).
 ## `actions.free`
 Documented on [help/orientation-card.md](../orientation-card.md).
 
+## `asks.acceptance`
+<!-- usage: policy:asks.acceptance 4225e190 -->
+Whether the record door files an ask whose clauses state no acceptance, neither an accept clause nor a seen clause with a run command: refuse it unwritten, or file it and report it not ready, the memory hygiene check grading it after.
+
+```text
+asks.acceptance = "grade"
+```
+
+## `builds.slug-words`
+<!-- usage: policy:builds.slug-words 849f618e -->
+How many capitalised words a new build slug carries after its node letter, as lo-hi; a changed range binds new mints only, and every slug minted before it still reads.
+
+```text
+builds.slug-words = "2-2"
+```
+
+## `builds.slug-style`
+<!-- usage: policy:builds.slug-style b3a295eb -->
+Where a new build slug's words come from, a humorous pick or a description of the build; the style is recorded with the slug and never changes its shape.
+
+```text
+builds.slug-style = "descriptive"
+```
+
+## `builds.slug-date`
+<!-- usage: policy:builds.slug-date 643d0750 -->
+Whether a build's opened date is left out, shown beside its slug in the generated views, or written into a new slug after the node letter, as eight digits or a hyphenated date.
+
+```text
+builds.slug-date = "shown"
+```
+
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
 
@@ -306,6 +338,62 @@ What the render gate does with the list of instruction files not yet rendered fr
 instructions.legacy = "refuse"
 ```
 
+## `memory.code-languages`
+<!-- usage: policy:memory.code-languages f7fa6adb -->
+Which extractors the code record reads a tree with: builtin takes Python, shell and JavaScript definitions and calls and every other file at file level, builtin+ctags adds the definitions of every other language from the ctags on PATH, and ctags takes every language's definitions from it, the built-in extractors still giving calls; under either ctags value a missing ctags stops the run.
+
+```text
+memory.code-languages = "builtin+ctags"
+```
+
+## `memory.load-budget`
+<!-- usage: policy:memory.load-budget 263be443 -->
+The bytes the default load's memory share may take at session start, the card and the auto-memory index each measured against it as its own figure on the card's memory cell, a k being 1,000 bytes.
+
+```text
+memory.load-budget = "16k"
+```
+
+## `memory.item-budget`
+<!-- usage: policy:memory.item-budget aecb5081 -->
+The KB of memory slices one work order may hand a role, summed over its read keys: measured reads 96 for every role until 30 sliced work orders per role are measured, or 96 or 128 for every role.
+
+```text
+memory.item-budget = 128
+```
+
+## `memory.over-budget`
+<!-- usage: policy:memory.over-budget 9ad9f9d3 -->
+What a work order's memory slices over memory.item-budget do, outside budgets.enforce: refuse the render naming role, bytes and cap, report one line and render, or off, render with nothing said.
+
+```text
+memory.over-budget = "refuse"
+```
+
+## `memory.map-purpose`
+<!-- usage: policy:memory.map-purpose be71b553 -->
+How a record kind with no declared purpose is graded: review, each derived with its source or put to the owner in one ask per namespace; ledger, listed on the purpose-pending ledger; derive, derived with no ask; or refuse, record-kinds red while any lacks one.
+
+```text
+memory.map-purpose = "review"
+```
+
+## `memory.legacy-anchors`
+<!-- usage: policy:memory.legacy-anchors 1d907930 -->
+How a record written before every record named its cause is read: derived, its Serves lines as its cause and an anchor derived for each untagged heading, no file rewritten; none, no anchor and the record read as reached; or retag, its authored tags alone, once the retag step has rewritten it.
+
+```text
+memory.legacy-anchors = "none"
+```
+
+## `memory.superseded-slices`
+<!-- usage: policy:memory.superseded-slices 063bfca6 -->
+What a read key whose record another supersedes does: refuse the render naming its successor, or mark, the key handed with a superseded-by line naming it.
+
+```text
+memory.superseded-slices = "mark"
+```
+
 ## `trace.leg-output`
 <!-- usage: policy:trace.leg-output b5f47620 -->
 Where a failing leg's output tail lives: kept by its hash in the common dir and named in the verdict under either value, and under `tail-by-hash` also committed as a `leg-tail` record by the run-gates kit's `keep_tails.py`.
@@ -350,7 +438,7 @@ Whether a self-test that opts into the template cache builds each base repositor
 tests.fixture-templates = "per-case"
 ```
 
-## Not yet summarised (216)
+## Not yet summarised (205)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -398,11 +486,7 @@ tests.fixture-templates = "per-case"
 - `reuse.propose`
 - `annotations.grammar`
 - `builds.agent-root`
-- `asks.acceptance`
 - `decisions.major`
-- `builds.slug-words`
-- `builds.slug-style`
-- `builds.slug-date`
 - `lexicon.pin`
 - `lexicon.forced`
 - `lexicon.at-commit`
@@ -531,19 +615,12 @@ tests.fixture-templates = "per-case"
 - `memory.default-load`
 - `memory.code-budget`
 - `memory.code-roles`
-- `memory.code-languages`
 - `memory.code-enrich`
-- `memory.load-budget`
-- `memory.item-budget`
-- `memory.over-budget`
 - `memory.mirror`
 - `memory.project-map`
 - `memory.map-budget`
 - `memory.map-overflow`
 - `memory.map-unfold`
-- `memory.map-purpose`
-- `memory.legacy-anchors`
-- `memory.superseded-slices`
 - `retrofit.drain`
 - `retrofit.drain-cap`
 - `retrofit.claim-on-touch`

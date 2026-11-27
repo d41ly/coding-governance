@@ -27,6 +27,7 @@ check-arms selftest	kit	selftests
 check-wiring self-test	kit	selftests
 cleanup posture (a tree removal that swallows its error)	repo	product
 cleanup skill wiring	repo	wiring
+code record	repo	product
 codebase-map adopter e2e	kit	e2e
 codebase-map coverage + freshness	repo	declarations
 codebase-map gate coverage	repo	declarations
@@ -43,6 +44,7 @@ docs	repo	declarations
 drift-audit records	repo	declarations
 drift-audit selftest	kit	selftests
 drift-audit wiring	repo	wiring
+edge cardinality (per source and per target, over the merged tree)	repo	declarations
 edges (every declared edge parses, is registered and resolves)	repo	declarations
 encoding posture (JavaScript text IO names its encoding)	repo	product
 encoding posture (an entry point writes stdout as UTF-8)	repo	product
@@ -170,6 +172,8 @@ ratchet selftest	kit	selftests
 recall floor	repo	declarations
 recall floor arms	repo	selftests
 receipt sync (installed files match the receipt)	repo	declarations
+record causes (causes and orphans over the legacy population)	repo	records
+record-kinds	repo	records
 remote literals (kit code names no remote)	repo	declarations
 remote literals self-test	kit	selftests
 review-join ban (no ref-keyed join)	repo	declarations
@@ -199,6 +203,7 @@ runlog skill wiring	repo	wiring
 scratch-guard self-test	kit	selftests
 selftest harness self-test	kit	selftests
 settings-merge selftest	kit	selftests
+shape-run records (each record equals its review line)	repo	records
 shell hygiene (a backslashed path handed to bash)	repo	product
 shell hygiene (a fixed-name temp renamed into place)	repo	product
 shell hygiene (a fork spent on builtin work)	repo	product

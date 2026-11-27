@@ -489,7 +489,7 @@ def check_ranked_arms(state, roles):
             ("open", ".claude/agents/r-one.md", 5), ("open", "DOC.md", 0)] and found[-1][1:3] == (
             "close", ".claude/agents/r-one.md") and agent.index("- [one] Rule one.") < agent.index("[/DOC.md]")
             < agent.index("Body of r-one"), "the agent file is not ranked, charter first: %r" % agent)
-        (root / "mem" / "builds" / "fx" / "prompts").mkdir(parents=True)
+        (root / "mem" / "builds" / "fxFix" / "prompts").mkdir(parents=True)
         (root / "spec.md").write_text("spec\n", encoding="utf-8")
         saved = (handoff.KIT_DIR, handoff.WORK_ORDER, lib.check_load_set)
         handoff.KIT_DIR, handoff.WORK_ORDER = kit, KIT_DIR / "templates" / "work-order.template.md"
@@ -497,8 +497,8 @@ def check_ranked_arms(state, roles):
                                                       "Reach of one."])
         try:
             keys = lib.load_roles(kit)["r-one"]["keys"]
-            path, text, task = handoff.render_handoff(root, "mem", root / "DOC.md", "r-one", keys, "fx",
-                                                      "PLAY-fx-1", None, {"spec": "spec.md"}, None, [])
+            path, text, task = handoff.render_handoff(root, "mem", root / "DOC.md", "r-one", keys, "fxFix",
+                                                      "PLAY-fxFix-1", None, {"spec": "spec.md"}, None, [])
         finally:
             handoff.KIT_DIR, handoff.WORK_ORDER, lib.check_load_set = saved
         path.write_text(text, encoding="utf-8", newline="\n")
@@ -529,6 +529,58 @@ def check_ranked_arms(state, roles):
             want = "opens at level 0 after" if name == "reordered" else "has no closer"
             check_arm(state, 20, not ok and any("DOC.md#practices-at-build" in ln and want in ln for ln in said),
                       "the %s envelope passed check: %r" % (name, said))
+
+
+#: Arm 21's stand-in memory-tree kit: its `read_policy_value` answers `FX_AGENT_ROOT` for the one key, and
+#: refuses, as the real reader does on a tree with no commit, where the variable is empty.
+FIXTURE_TREE_LIB = ('import os\n\n\ndef read_policy_value(key, root):\n    value = os.environ.get("FX_AGENT_ROOT", "")\n'
+                    '    if key != "builds.agent-root" or not value:\n'
+                    '        raise ValueError("%s did not read: fixture refusal" % key)\n    return value\n')
+#: The sibling kit's directory name `handoff.read_agent_root` resolves beside the fixture's tool root.
+FIXTURE_TREE_KIT = "memory-tree"
+
+
+def check_agent_root_arms(state, roles):
+    """Arm 21 (TOOL-dTotalRecall-4 S6, AC6): the handoff's `## Task` opening states the agent's root by
+    `builds.agent-root`, read through the memory-tree kit `read_agent_root` finds beside the roles kit:
+    `readme` names the build README, `work-order` the work order, and a reader that refuses renders the
+    `work-order` line with one note naming the refusal rather than stopping the render."""
+    import handoff
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        kit, tool_root = build_fixture(root, {"r-one": roles["r-one"]})
+        fixture_kit = tool_root / FIXTURE_TREE_KIT
+        fixture_kit.mkdir()
+        (fixture_kit / "tree_lib.py").write_text(FIXTURE_TREE_LIB, encoding="utf-8")
+        (root / "mem" / "builds" / "fxFix" / "prompts").mkdir(parents=True)
+        (root / "spec.md").write_text("spec\n", encoding="utf-8")
+        saved = (handoff.KIT_DIR, handoff.WORK_ORDER, lib.check_load_set, sys.modules.pop("tree_lib", None),
+                 os.environ.get("FX_AGENT_ROOT"), list(sys.path))
+        handoff.KIT_DIR, handoff.WORK_ORDER = kit, KIT_DIR / "templates" / "work-order.template.md"
+        lib.check_load_set = lambda *a, **k: (False, [])
+        try:
+            keys = lib.load_roles(kit)["r-one"]["keys"]
+            for value, want in (("readme", "Your root is mem/builds/fxFix/README.md: its routing region"),
+                                ("work-order", "Your root is this work order:"), ("", "Your root is this work order:")):
+                os.environ["FX_AGENT_ROOT"] = value
+                notes = []
+                with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                    _path, _text, task = handoff.render_handoff(root, "mem", root / "DOC.md", "r-one", keys, "fxFix",
+                                                                "PLAY-fxFix-1", None, {"spec": "spec.md"}, None, notes)
+                said = [n for n in notes if n.startswith("builds.agent-root did not read")]
+                check_arm(state, 21, want in task and (bool(said) == (value == "")) and (
+                    not said or "fixture refusal" in said[0]),
+                    "builds.agent-root %r rendered no %r line, or its refusal note is %r" % (value, want, said))
+        finally:
+            handoff.KIT_DIR, handoff.WORK_ORDER, lib.check_load_set = saved[:3]
+            sys.modules.pop("tree_lib", None)
+            if saved[3] is not None:
+                sys.modules["tree_lib"] = saved[3]
+            if saved[4] is None:
+                os.environ.pop("FX_AGENT_ROOT", None)
+            else:
+                os.environ["FX_AGENT_ROOT"] = saved[4]
+            sys.path[:] = saved[5]
 
 
 def run_selftest():
@@ -858,6 +910,7 @@ def run_selftest():
                           "did not read as the note alone" % (case, namesake, rc))
     check_charter_shape_arms(state, roles)
     check_ranked_arms(state, roles)
+    check_agent_root_arms(state, roles)
     # Arm 19 (TOOL-aProfiledEffort-1): a profile table per model family. 19b, a type carries the
     # default tables' level; 19a, 19c, 19d and 19f, the levels a model resolves under each policy;
     # 19e, every profile defect refuses the render under its own dotted key and writes nothing.

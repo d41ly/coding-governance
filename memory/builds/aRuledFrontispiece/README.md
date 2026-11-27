@@ -347,3 +347,13 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-17-review-TOOL-aRuledFrontispiece-1-3.md` (BLOCKED), `2026-08-17-review-TOOL-aRuledFrontispiece-1-2.md` (BLOCKED) and 1 more under reviews/ |
+| logs | `2026-08-17-build-TOOL-aRuledFrontispiece-11-corpus-surgery.md` |
+| card ref | `refs/gov/builds/aRuledFrontispiece/card` |
+<!-- /gen:build-routes -->

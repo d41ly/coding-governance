@@ -133,3 +133,14 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md` (BLOCKED) |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aDeclaredCeiling/card` |
+<!-- /gen:build-routes -->

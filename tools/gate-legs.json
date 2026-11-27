@@ -1165,9 +1165,12 @@
       "{prefix}/lib/",
       "{prefix}/memory-tree/",
       "{prefix}/check-spec-tokens.py",
-      "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py",
-      "{prefix}/policy/presets.py"
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1190,7 +1193,13 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1211,9 +1220,12 @@
     "guard": [
       "{prefix}/lib/",
       "{prefix}/memory-tree/",
-      "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py",
-      "{prefix}/policy/presets.py"
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1236,7 +1248,13 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1262,7 +1280,13 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1321,7 +1345,13 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1375,7 +1405,12 @@
       "{prefix}/lib/",
       "{prefix}/memory-tree/",
       "{prefix}/unattended/lib-unattended.sh",
-      "{prefix}/policy/"
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1434,6 +1469,28 @@
     ]
   },
   {
+    "name": "shape-run records (each record equals its review line)",
+    "tag": "leg.memory-tree.shape-run-records-each-record-equals-its-review",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "compares each shape-run record with its review line",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/shape_run.py",
+      "--check"
+    ],
+    "chunk": "records",
+    "subject": "repo",
+    "ceiling": 125,
+    "enforces": [
+      "practice.one-fact"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
     "name": "playbook render wiring",
     "pass_leg": true,
     "tag": "leg.playbook-render.playbook-render-wiring",
@@ -1472,13 +1529,12 @@
     ],
     "guard": [
       "{prefix}/playbook/",
-      "{prefix}/memory-tree/import_walk.py",
-      "{prefix}/memory-tree/check-arms.py",
-      "{prefix}/memory-tree/tree_lib.py",
-      "{prefix}/memory-tree/id_grammar.py",
-      "{prefix}/memory-tree/coverage_join.py",
-      "{prefix}/memory-tree/design_lib.py",
-      "{prefix}/memory-tree/corpus_ids.py",
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/",
       "{prefix}/lexicon/",
       "{prefix}/govkit/entries/playbook.kit.toml",
       "coding-governance-agents.template.md"
@@ -1488,6 +1544,37 @@
     "ceiling": 300,
     "enforces": [
       "practice.gate"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "code record",
+    "tag": "leg.playbook-render.code-record",
+    "tests": [
+      "feature.playbook"
+    ],
+    "purpose": "holds HEAD's code record equal to its re-derivation",
+    "argv": [
+      "python3",
+      "{prefix}/playbook/code_record.py",
+      "--check"
+    ],
+    "guard": [
+      "{prefix}/playbook/",
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/memory-recall/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 157,
+    "enforces": [
+      "principle.p32"
     ],
     "stage": [
       "step.test"
@@ -2214,15 +2301,12 @@
       "{prefix}/memory-recall/",
       "memory/",
       ".memory-tree.conf",
-      "{prefix}/memory-tree/id_grammar.py",
-      "{prefix}/memory-tree/tree_lib.py",
-      "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py",
-      "{prefix}/memory-tree/backlog.py",
-      "{prefix}/memory-tree/coverage_join.py",
-      "{prefix}/memory-tree/legacy_ledger.py",
-      "{prefix}/policy/presets.py",
-      "{prefix}/memory-tree/design_lib.py"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -2246,15 +2330,12 @@
       "{prefix}/memory-recall/",
       "memory/",
       "{prefix}/govkit/",
-      "{prefix}/memory-tree/id_grammar.py",
-      "{prefix}/memory-tree/tree_lib.py",
-      "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py",
-      "{prefix}/memory-tree/backlog.py",
-      "{prefix}/memory-tree/coverage_join.py",
-      "{prefix}/memory-tree/legacy_ledger.py",
-      "{prefix}/policy/presets.py",
-      "{prefix}/memory-tree/design_lib.py"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -3036,6 +3117,7 @@
       "{prefix}/memory-tree/id_grammar.py",
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/lexicon/canon.py",
+      "{prefix}/lexicon/extract_code.py",
       "{prefix}/lexicon/lexicon.py",
       "{prefix}/lexicon/lexicon_conf.py",
       "{prefix}/lexicon/scaffold_lexicon.py",
@@ -3244,7 +3326,8 @@
       "{prefix}/runlog/selftest.py"
     ],
     "guard": [
-      "{prefix}/runlog/"
+      "{prefix}/runlog/",
+      "{prefix}/memory-tree/id_grammar.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3267,15 +3350,12 @@
     "guard": [
       "{prefix}/lib/",
       "{prefix}/memory-recall/",
-      "{prefix}/memory-tree/id_grammar.py",
-      "{prefix}/memory-tree/tree_lib.py",
-      "{prefix}/policy/budgets.py",
-      "{prefix}/policy/policy.py",
-      "{prefix}/memory-tree/backlog.py",
-      "{prefix}/memory-tree/coverage_join.py",
-      "{prefix}/memory-tree/legacy_ledger.py",
-      "{prefix}/policy/presets.py",
-      "{prefix}/memory-tree/design_lib.py"
+      "{prefix}/memory-tree/",
+      "{prefix}/policy/",
+      "{prefix}/loop/",
+      "{prefix}/playbook/",
+      "{prefix}/roles/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3687,7 +3767,8 @@
     "guard": [
       "{prefix}/workflows/",
       "{prefix}/memory-tree/gen_build_index.py",
-      "{prefix}/unattended/unattended.sh"
+      "{prefix}/unattended/unattended.sh",
+      "{prefix}/memory-tree/shape_run.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -4017,7 +4098,10 @@
       "{prefix}/playbook/positional.py",
       "{prefix}/playbook/row_checks.py",
       "{prefix}/playbook/tag_bundle.py",
-      "{prefix}/playbook/tag_index.py"
+      "{prefix}/playbook/tag_index.py",
+      "{prefix}/loop/",
+      "{prefix}/memory-tree/",
+      "{prefix}/playbook/record_extract.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -5283,6 +5367,10 @@
       "{prefix}/memory-tree/ratchet.py",
       "never-gains"
     ],
+    "reads": {
+      "base": "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).",
+      "history": "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)."
+    },
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300,
@@ -5375,6 +5463,10 @@
       "{prefix}/memory-tree/ratchet.py",
       "seed-laundering"
     ],
+    "reads": {
+      "base": "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).",
+      "history": "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)."
+    },
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300,
@@ -5398,6 +5490,10 @@
       "{prefix}/memory-tree/ratchet.py",
       "rename"
     ],
+    "reads": {
+      "base": "it grades every registered population against its rows at the merge-base with the remote default branch (TOOL-dTotalRecall-76 S16).",
+      "history": "it reads those rows, and the renames since, out of history (TOOL-dTotalRecall-76 S16)."
+    },
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300,
@@ -5427,6 +5523,74 @@
     "pack": "ratchet",
     "enforces": [
       "practice.gate"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "record-kinds",
+    "tag": "leg.gov.record-kinds",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "grades every record kind's row and its records",
+    "argv": [
+      "python",
+      "{prefix}/memory-tree/record_kinds.py",
+      "--check"
+    ],
+    "chunk": "records",
+    "subject": "repo",
+    "ceiling": 122,
+    "enforces": [
+      "principle.p16"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "edge cardinality (per source and per target, over the merged tree)",
+    "tag": "leg.gov.edge-cardinality-per-source-and-per-target-over-the",
+    "tests": [
+      "feature.playbook"
+    ],
+    "purpose": "counts each edge type per source and per target",
+    "argv": [
+      "python",
+      "{prefix}/playbook/edge_grammar.py",
+      "--cardinality",
+      "--registry"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 180,
+    "pack": "tags",
+    "enforces": [
+      "practice.one-fact"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "record causes (causes and orphans over the legacy population)",
+    "tag": "leg.gov.record-causes-causes-and-orphans-over-the-legacy",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "grades every record's cause and its reach from a root",
+    "argv": [
+      "python",
+      "{prefix}/memory-tree/record_causes.py",
+      "--check"
+    ],
+    "chunk": "records",
+    "subject": "repo",
+    "ceiling": 180,
+    "enforces": [
+      "principle.p35"
     ],
     "stage": [
       "step.test"

@@ -29,3 +29,7 @@ govkit/inherited-red-to-verdict-blocks	1	816d4aa91e998e7e5bdbb555dcec7c73b81dfd1
 kickoff-manifest/facts-to-overlay	1	8005455c6563c1ef1a861c99bdab87de46161be4	seeded
 playbook/adopter-rules-to-overlay-2	1	8005455c6563c1ef1a861c99bdab87de46161be4	seeded
 playbook/instructions-legacy-seed	1	8005455c6563c1ef1a861c99bdab87de46161be4	seeded
+memory-tree/legacy-anchors-retag	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	carried:TOOL-dTotalRecall-20
+memory-tree/readme-front-matter-graded	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	carried:TOOL-dTotalRecall-20
+memory-tree/record-kind-journal	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	carried:TOOL-dTotalRecall-20
+memory-tree/serves-journal-read-as-log	1	08a895a66feb42430e5d6ec87f1571c34d3a9a59	carried:TOOL-dTotalRecall-20

@@ -212,3 +212,16 @@ Ids whose spec moved past its audited revision: none — 0 of 14 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-25-review-TOOL-dScaffoldedMirror-2-14-round-2.md`, `2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md` |
+| research | `2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md` |
+| logs | `2026-08-25-build-TOOL-dScaffoldedMirror-8.md`, `2026-08-25-build-TOOL-dScaffoldedMirror-7.md` and 4 more under build/ |
+| open asks | `BACKLOG.md`, 2 open |
+| card ref | `refs/gov/builds/dScaffoldedMirror/card` |
+<!-- /gen:build-routes -->

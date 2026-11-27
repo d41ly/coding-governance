@@ -73,9 +73,23 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-aLiftedCeiling-1` | no |
 | 2 | `TOOL-aLiftedCeiling-2` | no |
 | 3 | `TOOL-aLiftedCeiling-3` | no |
+
+A step's `Parallel` yes means its units share an order; `doc.build-method#m6-passes-commits-parallelism` still sequences two of them whose write sets intersect at dispatch.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-12-prompt-TOOL-aLiftedCeiling-3-spec-brief.md`, `2026-11-12-prompt-TOOL-aLiftedCeiling-3-build-brief.md` and 8 more under prompts/ |
+| reviews | `2026-11-12-review-TOOL-aLiftedCeiling-1-diff-review-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-11-12-build-TOOL-aLiftedCeiling-3-ledger.md`, `2026-11-12-build-TOOL-aLiftedCeiling-2-ledger.md` and 5 more under build/ |
+| card ref | `refs/gov/builds/aLiftedCeiling/card` |
+<!-- /gen:build-routes -->

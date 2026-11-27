@@ -103,6 +103,11 @@ class = "stage"
 usage = "none"
 why = "a gov stage is a definition row, used by no verb, key, hook, leg or page of its own; a repository's stage is written by the stage kind's factory, documented under its own script rows (TOOL-dDeclaredLoop-25)"
 
+[[class]]
+class = "record-kind-schema"
+usage = "none"
+why = "a record-kind schema member is one field of a record-kinds.toml row, used by no verb, key, hook, leg or page of its own; the record door renders it (TOOL-dTotalRecall-1)"
+
 [[usage]]
 id = "command:build"
 shape = "verb"
@@ -214,7 +219,7 @@ flags = ["--rebuild", "--gc", "--list-positional", "--fixture", "--plant=", "--s
 id = "script:{prefix}/playbook/edge_grammar.py"
 shape = "verb"
 entry = "{prefix}/playbook/edge_grammar.py"
-flags = ["--list", "--parse=", "--check", "--base=", "--fixture", "--plant="]
+flags = ["--list", "--parse=", "--check", "--base=", "--fixture", "--plant=", "--cardinality", "--registry"]
 
 [[usage]]
 id = "script:{prefix}/run-gates/measure_legs.py"
@@ -933,3 +938,10 @@ shape = "verb"
 entry = "{prefix}/memory-tree/ratchet.py"
 verb = "widen"
 flags = ["--key=", "--reason=", "--unit="]
+
+[[usage]]
+id = "script:{prefix}/runlog/runlog.py#memory"
+shape = "verb"
+entry = "{prefix}/runlog/runlog.py"
+verb = "memory"
+flags = ["--from=", "--to=", "--landed=", "--transcripts=", "--fixture", "--plant="]

@@ -128,7 +128,8 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
   state still matches the tree — stale claims, closed specs with no product commit, hand-kept
   inventories disagreeing with what they describe. Stdlib and git, seconds, no agents. Drop it if the
   project keeps no in-repo records for an audit to compare reality against.
-- **Retrieval over that tree** (`memory-recall/` kit, requires the memory tree): ask the decision
+- **Retrieval over that tree** (`memory-recall/` kit, requires the memory tree and the playbook kit,
+  whose tag index holds its rows, so `<prefix>/playbook/` sits beside it): ask the decision
   corpus a question and get the records that answer it, ranked. Offline, stdlib, writes nothing in
   the worktree.
 - **One canonical instruction file** (the `playbook-render` kit's `entry-files` scope): agents do not
@@ -598,7 +599,9 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
 1. Copy the kit dir in **as `<prefix>/memory-recall/`**. The kit dir's NAME is load-bearing; the prefix
    is not — `adopt-memory-recall.sh` derives its own with `git rev-parse --show-prefix` and
    `check-wiring.sh` probes both spellings — but every kit here goes under the one `<prefix>/`, and
-   the id grammar this kit reads ships in memory-tree's `id_grammar.py`, so install memory-tree first:
+   the id grammar this kit reads ships in memory-tree's `id_grammar.py`, so install memory-tree first,
+   and its rows live in the playbook kit's tag index, so `<prefix>/playbook/` sits beside it too (without
+   it `query.py` exits 2 with one line naming that kit):
    `cp -r <gov>/<prefix>/memory-recall <project>/<prefix>/memory-recall`.
 
    **Then delete the three GOV-ONLY files that copy brings with it.** `kit.toml` withholds them from

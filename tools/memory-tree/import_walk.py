@@ -18,10 +18,13 @@ imports were not read.
 `derive_module_closure(path, dirs)` is one module's own closure, the tag index's extractor version
 (PLAY-dOrderedCharter-55 S15): each static import's first name `<n>` resolves to the first `<dir>/<n>.py`
 among `dirs`, as `sys.path` would, a dynamic one is skipped, and a module that does not parse raises.
+`derive_closure_version(paths, dirs, key="")` hashes those closures' bytes and a key: the one version rule
+every closure-keyed cache reads (TOOL-dTotalRecall-43 S21).
 
 WHAT IT DOES NOT SEE: a module loaded by a computed name or path, and a shell invocation.
 """
 import ast
+import hashlib
 import os
 import sys
 
@@ -69,6 +72,20 @@ def derive_module_closure(path, dirs):
                 seen.add(hit)
                 queue.append(hit)
     return sorted(seen)
+
+
+def derive_closure_version(paths, dirs, key=""):
+    """-> the ONE closure-version rule (TOOL-dTotalRecall-43 S21): the first 12 hex of the SHA-256 over the
+    bytes of every module the `derive_module_closure` of each of `paths` reaches under `dirs`, each module
+    once and in path order, then `key`'s UTF-8 bytes. The tag index's extractor versions (`key` empty),
+    the leg readers' versions (a reader's params key) and recall's row digest (its inputs' key) are each
+    this rule. Raises what `derive_module_closure` or the read raises."""
+    digest = hashlib.sha256()
+    for path in sorted({p for src in paths for p in derive_module_closure(src, dirs)}):
+        with open(path, "rb") as fh:
+            digest.update(fh.read())
+    digest.update(key.encode("utf-8"))
+    return digest.hexdigest()[:12]
 
 
 def derive_import_closure(kit, scan):

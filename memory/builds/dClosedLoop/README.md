@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-14
 streams: playbook+kickoff+tooling+deployer
 roster: PLAY
-ids: PLAY-dClosedLoop-1 PLAY-dClosedLoop-2 PLAY-dClosedLoop-3 PLAY-dClosedLoop-4 PLAY-dClosedLoop-5 PLAY-dClosedLoop-6 PLAY-dClosedLoop-7 PLAY-dClosedLoop-8 PLAY-dClosedLoop-9 PLAY-dClosedLoop-10 PLAY-dClosedLoop-11 PLAY-dClosedLoop-12 PLAY-dClosedLoop-13 PLAY-dClosedLoop-14 PLAY-dClosedLoop-15 PLAY-dClosedLoop-16 PLAY-dClosedLoop-17 PLAY-dClosedLoop-18 PLAY-dClosedLoop-19 PLAY-dClosedLoop-20 PLAY-dClosedLoop-21 PLAY-dClosedLoop-22 PLAY-dClosedLoop-23 PLAY-dClosedLoop-24 PLAY-dClosedLoop-25 PLAY-dClosedLoop-26 PLAY-dClosedLoop-27 PLAY-dClosedLoop-28 PLAY-dClosedLoop-29 PLAY-dClosedLoop-30 PLAY-dClosedLoop-31 PLAY-dClosedLoop-32 PLAY-dClosedLoop-33 PLAY-dClosedLoop-34 PLAY-dClosedLoop-35 PLAY-dClosedLoop-36 PLAY-dClosedLoop-37 PLAY-dClosedLoop-38 PLAY-dClosedLoop-39 PLAY-dClosedLoop-1001
+ids: PLAY-dClosedLoop-1 PLAY-dClosedLoop-2 PLAY-dClosedLoop-3 PLAY-dClosedLoop-4 PLAY-dClosedLoop-5 PLAY-dClosedLoop-6 PLAY-dClosedLoop-7 PLAY-dClosedLoop-8 PLAY-dClosedLoop-9 PLAY-dClosedLoop-10 PLAY-dClosedLoop-11 PLAY-dClosedLoop-12 PLAY-dClosedLoop-13 PLAY-dClosedLoop-14 PLAY-dClosedLoop-15 PLAY-dClosedLoop-16 PLAY-dClosedLoop-17 PLAY-dClosedLoop-18 PLAY-dClosedLoop-19 PLAY-dClosedLoop-20 PLAY-dClosedLoop-21 PLAY-dClosedLoop-22 PLAY-dClosedLoop-23 PLAY-dClosedLoop-24 PLAY-dClosedLoop-25 PLAY-dClosedLoop-26 PLAY-dClosedLoop-27 PLAY-dClosedLoop-28 PLAY-dClosedLoop-29 PLAY-dClosedLoop-30 PLAY-dClosedLoop-31 PLAY-dClosedLoop-32 PLAY-dClosedLoop-33 PLAY-dClosedLoop-34 PLAY-dClosedLoop-35 PLAY-dClosedLoop-36 PLAY-dClosedLoop-37 PLAY-dClosedLoop-38 PLAY-dClosedLoop-39 PLAY-dClosedLoop-1001 PLAY-dClosedLoop-1002 PLAY-dClosedLoop-1003
 spec-audit: 2026-10-14
 authorized-by: prompt
 ---
@@ -64,10 +64,10 @@ asks, 435 of them unlabelled. The owner's prompt is recorded verbatim under `pro
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-10-14 · streams playbook+kickoff+tooling+deployer
+**Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-10-14 · streams playbook
 ids PLAY-dClosedLoop-1 PLAY-dClosedLoop-2 PLAY-dClosedLoop-3 PLAY-dClosedLoop-4 PLAY-dClosedLoop-5 PLAY-dClosedLoop-6 PLAY-dClosedLoop-7 PLAY-dClosedLoop-8 PLAY-dClosedLoop-9 PLAY-dClosedLoop-10 PLAY-dClosedLoop-11 PLAY-dClosedLoop-12 PLAY-dClosedLoop-13 PLAY-dClosedLoop-14 PLAY-dClosedLoop-15
 ids PLAY-dClosedLoop-16 PLAY-dClosedLoop-17 PLAY-dClosedLoop-18 PLAY-dClosedLoop-19 PLAY-dClosedLoop-20 PLAY-dClosedLoop-21 PLAY-dClosedLoop-22 PLAY-dClosedLoop-23 PLAY-dClosedLoop-24 PLAY-dClosedLoop-25 PLAY-dClosedLoop-26 PLAY-dClosedLoop-27 PLAY-dClosedLoop-28 PLAY-dClosedLoop-29
-ids PLAY-dClosedLoop-30 PLAY-dClosedLoop-31 PLAY-dClosedLoop-32 PLAY-dClosedLoop-33 PLAY-dClosedLoop-34 PLAY-dClosedLoop-35 PLAY-dClosedLoop-36 PLAY-dClosedLoop-37 PLAY-dClosedLoop-38 PLAY-dClosedLoop-39 PLAY-dClosedLoop-1001
+ids PLAY-dClosedLoop-30 PLAY-dClosedLoop-31 PLAY-dClosedLoop-32 PLAY-dClosedLoop-33 PLAY-dClosedLoop-34 PLAY-dClosedLoop-35 PLAY-dClosedLoop-36 PLAY-dClosedLoop-37 PLAY-dClosedLoop-38 PLAY-dClosedLoop-39 PLAY-dClosedLoop-1001 PLAY-dClosedLoop-1002 PLAY-dClosedLoop-1003
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -93,3 +93,16 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 - **Child builds:** [dTrueNorth](../dTrueNorth/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-10-21-prompt-PLAY-dClosedLoop-1-4-builder.md`, `2026-10-21-prompt-PLAY-dClosedLoop-1-3-spec-writer.md` and 163 more under prompts/ |
+| reviews | `2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-c.md` (BLOCKED), `2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-b.md` (BLOCKED) and 57 more under reviews/ |
+| research | `2026-10-21-build-PLAY-dClosedLoop-1-phase0-decisions.md`, `2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` and 367 more under build/ |
+| logs | `2026-10-21-build-PLAY-dClosedLoop-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 24 open |
+| card ref | `refs/gov/builds/dClosedLoop/card` |
+<!-- /gen:build-routes -->
