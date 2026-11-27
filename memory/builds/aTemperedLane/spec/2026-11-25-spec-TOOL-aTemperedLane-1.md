@@ -245,7 +245,7 @@ list of paths per commit, which it writes at 100755.
 
 ## 7. Gates
 
-`routed commits name a specced unit` · `routed-commits selftest` · `policy fixtures` · `lexicon naming predicates` · `python reads (a name never bound, an import outside its guard)` · `marker contracts` · `build-index selftest` · `row-grammar selftest` · `tier2-review self-test` · `docs` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`routed commits name a specced unit` · `routed-commits selftest` · `policy fixtures` · `lexicon naming predicates` · `python reads (a name never bound, an import outside its guard)` · `marker contracts` · `build-index selftest` · `row-grammar selftest` · `tier2-review self-test` · `docs` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest`
 
 The close's bar runs these once, after the last unit. The self-test legs are in the held tier, so
 the close runs them where it asks for that tier.
