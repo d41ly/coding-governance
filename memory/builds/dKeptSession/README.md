@@ -276,6 +276,6 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 | flake | `2026-11-24-build-KICK-dKeptSession-1-flake-1.md` |
 | research | `2026-11-24-build-KICK-dKeptSession-80-seen-red.md`, `2026-11-24-build-KICK-dKeptSession-80-close-bar-2-attribution.md` and 20 more under build/ |
 | logs | `2026-11-24-build-KICK-dKeptSession-89-1-acceptance-ledger.md`, `2026-11-24-build-KICK-dKeptSession-1-runlog-31fbb903.md` and 70 more under build/ |
-| open asks | `BACKLOG.md`, 19 open |
+| open asks | `BACKLOG.md`, 18 open |
 | card ref | `refs/gov/builds/dKeptSession/card` |
 <!-- /gen:build-routes -->
