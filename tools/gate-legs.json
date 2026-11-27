@@ -5028,7 +5028,7 @@
     "tests": [
       "feature.playbook"
     ],
-    "purpose": "self-tests bundling a tag's node and its inbound edges",
+    "purpose": "self-tests the tag bundle and the tag index's row plants",
     "argv": [
       "python",
       "{prefix}/playbook/tag_bundle.py",

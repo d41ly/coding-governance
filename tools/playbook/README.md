@@ -329,15 +329,26 @@ not read again (PLAY-dOrderedCharter-44). Each version's rows stand apart (PLAY-
 worktrees whose extractor bytes differ share the file, so `blob_row`, `path_row` and `blob_parsed` carry
 the version, a build never deletes another version's rows, and every read is joined to the reading
 worktree's own `{extractor: version}` map, so a worktree is served only rows its own extractors wrote. A
-tree is fresh under `tree_built(tree, versions)`, `versions` the first 12 hex of the SHA-256 of that map's
+read of the whole view starts from that worktree's versions and reaches `path_row` through the SQL index
+`path_row_version`, so stored versions it does not derive cost it nothing; a read of one tag or one path
+starts from that name's own index (TOOL-aPrunedIndex-1). A build finds a path already named through
+the partial SQL index `path_row_named` over the `parsed` rows, one seek however many versions are stored,
+and a build or overlay with no blob reads no `blob_parsed` (TOOL-aPrunedIndex-2). A tree is fresh under `tree_built(tree, versions)`, `versions` the first 12 hex of the SHA-256 of that map's
 sorted `extractor=version` lines and a `conf=<key>` line. The key is the conf's `MEMORY_ROOT` and `CHARTER`
 hashed, since they decide which path is the charter and which are guides: every `path_row` carries it, every
 read joins the reading worktree's own key, and a conf edit, committed or not, is served its own names
 (PLAY-dOrderedCharter-70). `blob_row` is keyed by text alone. `gov_tag.py --gc` deletes the rows of every version and every conf key no worktree
-`git worktree list` names derives, each read from that worktree's own registry and modules, and refuses,
-exit 2, when one of them cannot be read; it prints `tag-index — collected: <n> rows of <m> versions`. A
+`git worktree list` names derives, each read from that worktree's own registry and modules. It skips a
+worktree that predates the registry, one holding no `namespaces.toml` at the kit path on disk or in its HEAD
+tree, printing `tag-index — skipped: worktree <top> predates <kit>/namespaces.toml` for each; it refuses,
+exit 2, when any other cannot be read, a registry HEAD holds and the disk lacks or a `.memory-tree.conf`
+that should be there among them, and when no worktree yields a version (TOOL-aPrunedIndex-4); it prints `tag-index — collected: <n> rows of <m> versions`. A
 plain build collects nothing, and a worktree deleted without `git worktree prune` keeps its rows until it
-is pruned. A helper imported from another
+is pruned. A build clears only the rows that the trees and the gone worktrees' dirty rows it let go of held
+and nothing else holds, up to two seeks per released pair against the trees, and up to two scans of
+`dirty_path` for each pair no tree holds, and an overlay clears none, keying each edit by the
+blob of the very bytes it parses: the rows of an old edit, one a worktree edited again, reverted or
+committed over, wait for `--gc`, which alone sweeps the row tables whole (TOOL-aPrunedIndex-3). A helper imported from another
 module is outside that version, so its edit needs `--rebuild`. The file is stamped `user_version` =
 `INDEX_SCHEMA`; a file of another stamp is rebuilt from nothing, printing `tag-index — rebuilt: schema
 <old> to <new>`.
