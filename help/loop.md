@@ -1075,10 +1075,12 @@ it writes into `FETCH_HEAD`, so an SSH remote, in the scp form or `ssh://` with 
 and a token, compares without it on both sides; a URL git rewrote through `url.<base>.insteadOf`
 still reads skipped. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
 engine answers on your local witnesses, so no unit reads `deployed`, and prints
-`interrupt — remote · none` with no remote-tip claim. A tracking ref you deleted reads the same. An owed parked decision or an unpassed hold answers
-`awaiting`; a `parents:` or `depends-on:` build that has not landed answers `blocked` where its cause
-holds the build's step, as [Coordinating with a parent build](#coordinating-with-a-parent-build)
-describes; an undecided ask answers `awaiting` only when no item can run.
+`interrupt — remote · none` with no remote-tip claim. A tracking ref you deleted reads the same.
+An open owner decision or a live hold answers `awaiting`, as [An owner decision and its
+answer](#an-owner-decision-and-its-answer) describes; a `parents:` or `depends-on:` build that has not landed answers
+`blocked` where its cause holds the build's step, as
+[Coordinating with a parent build](#coordinating-with-a-parent-build) describes; an
+undecided ask answers `awaiting` only when no item can run.
 
 The frontier is every item of the build's step whose witness does not hold and whose needs are
 witnessed, in the order the composition lists them; the next item is its first entry. A refused item
@@ -1142,7 +1144,11 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   hook at the next notice, since the notice writes both values into the copy the hook reads.
 - **See it on a fixture:** `--fixture --plant <case>` builds a scratch repository with a bare remote,
   but none for `no-remote`, plants one case, prints the engine's lines and one line ending `held` or
-  `MISSED`, and removes it: `steps`, `typed-status`, `idempotent`, `owner-decision`, `parent-unlanded`,
+  `MISSED`, and removes it: `steps`, `typed-status`, `idempotent`, `owner-decision`,
+  `parked-decisions` (a parked decision answered, unanswered, answered by an unstaged record, by another row's, by another
+  word and with no reason, then three rows of one second, then answered by another build's record, by a
+  malformed one, and by one that a tenth record or a later date outranks), `parked-kinds` (the five other
+  row kinds, then a hold resumed, in `SPECCING`, with no phase fact, live and passed), `parent-unlanded`,
   `terminal`, `stale-remote` (its tracking tip's reflog entry aged past the bound), `no-remote`,
   `fresh-clone` (a clone read from clone), `quiet-remote` (a fetch from a linked worktree after the
   aged reflog, read from `FETCH_HEAD`), `offline-stale` (a clone's `FETCH_HEAD` dated past the bound), `failed-fetch` (the
@@ -1179,6 +1185,27 @@ shapes it always printed, and beneath it a `frontier:` line naming the frontier'
   python tools/loop/position.py --fixture --plant steps
   python tools/loop/position.py --selftest
   ```
+
+### An owner decision and its answer
+
+Two things interrupt a build as `interrupt — owner-decision`: a parked `decision` row of the run-state
+file that no record of its own answers, and a hold while the run's `phase` fact reads `HELD` and its
+`hold-until` has not passed. This replaces the interrupt wording of TOOL-dDeclaredLoop-7, which counted
+every owed kind: a `rescope`, `handoff`, `abort`, `override` or `waiver` row no longer interrupts, nor
+does the hold of a run that resumed. A newly parked decision stops the run, the whole build answering
+`awaiting`, until it is answered. The driver's `--park` writes no row for an item and reason already
+parked, so a question asked again in the same words after its answer raises no interrupt and must be
+parked with a different reason; a second `flow.on-exhausted` ending keeps the first row (ask
+TOOL-aAnsweredPark-6).
+
+An answer is [the owner's disposition record](#the-owners-disposition-record) of that row alone, its
+item the tag the `interrupt —` line prints after `answer`, its word exactly `answered`, and its reason
+the owner's words. The tag is `item.parked.` and the row's timestamp, lowercased, each `:` written `-`;
+the second row of one timestamp ends `.2`, the third `.3`. Commit or stage the record, since an
+untracked one is not read. The newest well-formed record of the tag decides, so a later record of
+another word, or one with no reason, re-opens the row. Each record that decided a row is a `read —`
+line. An agent types the record, so the quoted words in its `Reason` are the evidence: no check can
+tell that the owner said them.
 
 ## Coordinating with a parent build
 
@@ -1722,7 +1749,10 @@ python tools/memory-tree/build_records.py new disposition --build <slug> --unit 
 
 It writes `<date>-build-<unit id>-disposition-<n>.md` with the item, the one word of the answer, the
 channel the owner answered on (`mailbox`, `terminal` or `prompt`), the reason where one is given, and
-the unit. It writes nothing, and exits 1, when `--item` is no tag opening `item.`, when
+the unit. The answer to a parked decision takes the tag the position engine prints, the word
+`answered` and a reason quoting the owner, as [An owner decision and its
+answer](#an-owner-decision-and-its-answer) describes.
+It writes nothing, and exits 1, when `--item` is no tag opening `item.`, when
 `--disposition` is not one word, or when `--channel` is not one of the three. An item no unit owns is
 recorded under the build's first unit.
 
