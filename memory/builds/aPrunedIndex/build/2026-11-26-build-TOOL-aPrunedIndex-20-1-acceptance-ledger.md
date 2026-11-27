@@ -1,6 +1,7 @@
 # TOOL-aPrunedIndex-20 — acceptance ledger
 
 **Serves:** journal TOOL-aPrunedIndex-20
+**Caused-by:** TOOL-aPrunedIndex-20
 
 No merge bar, no self-test suite and no gate leg ran in this pass. Every reading is node a's, 2026-11-26,
 from base `5b44ad17b` at spec rev-2, by one probe script under the run's scratch that puts

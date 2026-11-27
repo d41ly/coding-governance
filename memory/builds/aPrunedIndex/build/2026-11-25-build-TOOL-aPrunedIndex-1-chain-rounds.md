@@ -1,6 +1,7 @@
 # aPrunedIndex — the spec-audit chain's rounds
 
 **Serves:** journal TOOL-aPrunedIndex-1
+**Caused-by:** TOOL-aPrunedIndex-1
 
 Appended by `--record-round` and read by `--chain-verdict`. Never edited by hand.
 

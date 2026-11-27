@@ -1,6 +1,7 @@
 # Owner ruling: aPrunedIndex accepts AC8 and AC5 on their readings
 
 **Serves:** research TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-20
+**Caused-by:** TOOL-aPrunedIndex-17
 
 ## The prompt
 

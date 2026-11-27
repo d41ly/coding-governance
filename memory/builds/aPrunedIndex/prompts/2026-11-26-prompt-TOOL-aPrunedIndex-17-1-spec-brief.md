@@ -1,6 +1,7 @@
 # Spec brief: TOOL-aPrunedIndex-17, cheaper tag plants
 
 **Serves:** research TOOL-aPrunedIndex-17 TOOL-aPrunedIndex-10
+**Caused-by:** TOOL-aPrunedIndex-17
 
 ## The prompt
 

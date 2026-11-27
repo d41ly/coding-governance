@@ -1,6 +1,7 @@
 # TOOL-aPrunedIndex-24 — acceptance ledger
 
 **Serves:** journal TOOL-aPrunedIndex-24
+**Caused-by:** TOOL-aPrunedIndex-24
 
 No merge bar, no self-test suite and no gate leg ran in this pass. Every reading is node a's, 2026-11-26,
 from base `fa7051c3a` at spec rev-2, by `python tools/playbook/gov_tag.py --fixture --plant held-key`, by

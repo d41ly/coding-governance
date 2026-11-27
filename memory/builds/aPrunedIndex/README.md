@@ -107,7 +107,7 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 |---|---|
 | the units | the units table above |
 | briefs | `2026-11-26-prompt-TOOL-aPrunedIndex-24-1-spec-brief.md`, `2026-11-26-prompt-TOOL-aPrunedIndex-20-1-spec-brief.md` and 8 more under prompts/ |
-| reviews | `2026-11-26-review-TOOL-aPrunedIndex-4-10-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-11-26-review-TOOL-aPrunedIndex-4-10-diff-review-round2.md` (CLEAN WITH FIXES) and 8 more under reviews/ |
+| reviews | `2026-11-26-review-TOOL-aPrunedIndex-4-10-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-11-26-review-TOOL-aPrunedIndex-4-10-diff-review-round2.md` and 8 more under reviews/ |
 | deviation | `2026-11-26-build-TOOL-aPrunedIndex-20-deviation-1.md`, `2026-11-26-build-TOOL-aPrunedIndex-17-deviation-1.md` |
 | red-fix | `2026-11-27-build-TOOL-aPrunedIndex-24-red-fix-2.md`, `2026-11-27-build-TOOL-aPrunedIndex-17-red-fix-1.md` |
 | research | `2026-11-25-build-TOOL-aPrunedIndex-1-diagnosis.md` |

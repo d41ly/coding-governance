@@ -1,6 +1,7 @@
 # Revision — aPrunedIndex: unit 3 leaves a replaced edit's rows to `--gc`
 
 **Serves:** research TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-4
+**Caused-by:** TOOL-aPrunedIndex-3
 
 ## The prompt
 

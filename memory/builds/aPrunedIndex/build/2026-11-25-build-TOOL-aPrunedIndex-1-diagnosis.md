@@ -1,6 +1,7 @@
 # Why the tag check is slow — the diagnosis this build starts from
 
 **Serves:** research TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4
+**Caused-by:** TOOL-aPrunedIndex-1
 
 Node a, 2026-11-25, at `3d6c1702a` plus the unlanded aAnsweredPark commits, which touch no file of this kit.
 

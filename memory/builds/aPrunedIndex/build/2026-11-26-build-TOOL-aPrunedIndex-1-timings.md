@@ -1,6 +1,7 @@
 # aPrunedIndex — `gov_tag.py check` before and after, on one private copy of the node's index
 
 **Serves:** journal TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3
+**Caused-by:** TOOL-aPrunedIndex-1
 
 The main loop ran these on 2026-11-26 at `57c8f95e6`, over one copy of `<git-common-dir>/gov/index-s3.db` taken with a plain
 file copy on 2026-11-25 at 22:55 (12,586,708,992 bytes, the live file's size and mtime unchanged across the copy) (PINNED, 2026-11-26).

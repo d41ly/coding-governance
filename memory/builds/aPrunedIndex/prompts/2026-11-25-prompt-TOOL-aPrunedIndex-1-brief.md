@@ -1,6 +1,7 @@
 # Brief — aPrunedIndex: the tag check costs what its own worktree's rows cost
 
 **Serves:** research TOOL-aPrunedIndex-1 TOOL-aPrunedIndex-2 TOOL-aPrunedIndex-3 TOOL-aPrunedIndex-4
+**Caused-by:** TOOL-aPrunedIndex-1
 
 ## The prompt
 

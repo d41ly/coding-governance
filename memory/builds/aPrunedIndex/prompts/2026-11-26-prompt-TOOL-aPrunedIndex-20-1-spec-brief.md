@@ -1,6 +1,7 @@
 # Spec brief: TOOL-aPrunedIndex-20, the tag plants on a bounded pool
 
 **Serves:** research TOOL-aPrunedIndex-20 TOOL-aPrunedIndex-17
+**Caused-by:** TOOL-aPrunedIndex-20
 
 ## The prompt
 

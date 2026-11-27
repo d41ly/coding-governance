@@ -1,6 +1,7 @@
 # TOOL-aPrunedIndex-3 — acceptance ledger
 
 **Serves:** journal TOOL-aPrunedIndex-3
+**Caused-by:** TOOL-aPrunedIndex-3
 
 No merge bar, no self-test suite and no gate leg ran in this pass, and nothing here opened either live index
 file. Every reading is node a's, 2026-11-26, SQLite 3.53.4, Python 3.15.2, from base `47bd7e5b9`, by

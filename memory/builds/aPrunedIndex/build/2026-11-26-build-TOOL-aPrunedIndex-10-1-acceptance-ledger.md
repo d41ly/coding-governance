@@ -1,6 +1,7 @@
 # TOOL-aPrunedIndex-10 — acceptance ledger
 
 **Serves:** journal TOOL-aPrunedIndex-10
+**Caused-by:** TOOL-aPrunedIndex-10
 
 No merge bar, no self-test suite and no gate leg ran in this pass, and nothing here opened either live index
 file. Every reading is node a's, 2026-11-26, from base `014138664`, by `--fixture` plants in their own

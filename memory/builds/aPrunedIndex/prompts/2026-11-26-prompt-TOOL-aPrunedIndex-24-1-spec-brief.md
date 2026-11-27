@@ -1,6 +1,7 @@
 # Brief — TOOL-aPrunedIndex-24: the held-answer rules get arms the bar runs
 
 **Serves:** research TOOL-aPrunedIndex-24 TOOL-aPrunedIndex-17
+**Caused-by:** TOOL-aPrunedIndex-24
 
 ## The prompt
 

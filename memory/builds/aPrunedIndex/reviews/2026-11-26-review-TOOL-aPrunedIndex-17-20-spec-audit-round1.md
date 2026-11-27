@@ -1,4 +1,5 @@
 **Serves:** spec-audit TOOL-aPrunedIndex-17@rev-3 TOOL-aPrunedIndex-20@rev-1
+**Caused-by:** TOOL-aPrunedIndex-17
 
 # Tier-2 spec audit: TOOL-aPrunedIndex-17 rev-3 and TOOL-aPrunedIndex-20 rev-1, round 1
 

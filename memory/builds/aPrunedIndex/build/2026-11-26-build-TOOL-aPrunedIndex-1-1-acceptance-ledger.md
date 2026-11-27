@@ -1,6 +1,7 @@
 # TOOL-aPrunedIndex-1 — acceptance ledger
 
 **Serves:** journal TOOL-aPrunedIndex-1
+**Caused-by:** TOOL-aPrunedIndex-1
 
 No merge bar, no self-test suite and no gate leg ran in this pass, and nothing here opened either live index
 file: its mtime reads 2026-11-25 22:11:27 before the pass and after it. Every reading is node a's, 2026-11-26,

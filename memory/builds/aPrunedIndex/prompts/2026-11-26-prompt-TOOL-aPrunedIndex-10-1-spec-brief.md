@@ -1,6 +1,7 @@
 # Spec brief — TOOL-aPrunedIndex-10: the closing review's four lows, batched
 
 **Serves:** research TOOL-aPrunedIndex-10 TOOL-aPrunedIndex-4
+**Caused-by:** TOOL-aPrunedIndex-10
 
 ## The prompt
 

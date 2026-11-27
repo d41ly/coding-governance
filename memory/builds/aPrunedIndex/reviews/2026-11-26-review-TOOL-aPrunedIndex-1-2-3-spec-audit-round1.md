@@ -1,4 +1,5 @@
 **Serves:** spec-audit TOOL-aPrunedIndex-1@rev-3 TOOL-aPrunedIndex-2@rev-3 TOOL-aPrunedIndex-3@rev-3
+**Caused-by:** TOOL-aPrunedIndex-1
 
 # aPrunedIndex — spec audit of units 1 to 3 at rev-3, round 1
 
