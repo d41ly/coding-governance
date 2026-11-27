@@ -36,5 +36,4 @@ Cite ids, never line numbers.
 | [KICK-dKeptSession-84](../builds/dKeptSession/BACKLOG.md) | OPEN | MED | — | 2026-11-24 | THE MANIFEST-CHECK SUITE'S EXACT REPLAY CHECK. Units 14 and 15 print a… |
 | [KICK-dKeptSession-85](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-24 | THE TEXT DEBTS OF UNITS 21 AND 53 AND THE WRAPPED SPANS.… |
 | [KICK-dKeptSession-86](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-24 | THE ARMS NOT SEEN RED AT THE CLOSE.… |
-| [KICK-dKeptSession-87](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-24 | THE TAG INDEX GROWS AND --gc CANNOT COLLECT IT.… |
 | [KICK-dKeptSession-88](../builds/dKeptSession/BACKLOG.md) | OPEN | LOW | — | 2026-11-24 | THE PINNED CLI READING AND UNIT 56'S AC24. Units 44 S7 and 56 AC16 owe… |
