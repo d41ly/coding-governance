@@ -43,16 +43,33 @@ THE LANE'S LIMITS (TOOL-aNimbleMend-10). Every non-merge commit of each populati
 `Red-fix:` trailer, whether or not it names a unit, is graded against four limits, and a finding
 moves the exit to 1. L1 size: at most RED_FIX_MAX_PATHS paths under `ROUTED_PATHS` and at most
 RED_FIX_MAX_LINES lines over them, added plus deleted, a binary path over the bound. L2: no path the
-policy kit's `guarded-paths.txt` lists, read as the working tree holds it; where no policy kit
-resolves, no path under `.governance/`. L3: no path under any build's `spec/` folder. L4: no path
-added under `ROUTED_PATHS`, a rename read as a deletion and an addition. `ROUTED_COMMIT_WAIVED`
-excuses a finding in WHOLE and never in RANGE, and the stale rule counts a finding as a violation.
-One `red-fix limits` line per population says how many were graded; a population holding no fix
-commit costs no git call, any other exactly one. `--red-fix-limits <rev>` grades the one commit
-`<rev>` names, merge or not, with no waiver: exit 0 inside the limits, 1 over one, 2 when the rev
-names no commit or the commit carries no trailer. NOT checked: whether the change is a fix, a new
-surface made inside an existing file, a deleted path, any record outside `spec/`, and a guarded
-list the fix commit itself shortened.
+policy kit's `guarded-paths.txt` lists in the tree of the commit's first parent, at the path the list
+has in the working tree (TOOL-aTemperedLane-2); the working tree's list where that parent holds none,
+the commit has no parent, or the list lies outside the repository; where the working tree's list does
+not resolve, no path under `.governance/`. L3: no path under any build's `spec/` folder, less a plain
+modification, its mode unchanged, confined to the spec's one `gen:spec-records` region: each side
+holds exactly one marker pair in order and every byte outside it, both marker lines included, is
+unchanged (TOOL-aTemperedLane-1). L4: no path added under `ROUTED_PATHS`, a rename read as a deletion
+and an addition. `ROUTED_COMMIT_WAIVED` excuses a finding in WHOLE and never in RANGE, and the stale
+rule counts a finding as a violation. One `red-fix limits` line per population says how many were
+graded. A population holding no fix commit costs no git call. Any other costs one log, plus one read
+of the parents' lists where a fix commit has a parent and the list lies inside the repository, plus
+one read of spec blobs where a fix commit plainly modifies a spec: three calls at most, whatever the
+count of fix commits. `--red-fix-limits <rev>` grades the one commit `<rev>` names,
+merge or not, with no waiver: exit 0 inside the limits, 1 over one, 2 when the rev names no commit
+or the commit carries no trailer. NOT checked: whether the change is a fix, a new surface made
+inside an existing file, a deleted path, and any record outside `spec/`. L2 does not check a path the
+list gained after the commit or in it, whenever the commit lands; nor a path an earlier commit took
+off the list, so a path unlisted in one commit, fixed in the next and relisted later passes; nor an
+edit of the list alone, since the list does not name itself; nor a list that has moved, a parent
+holding none at its present path being graded by the working tree's, which the graded run controls;
+nor the list's file mode, a symbolic link there read as its target text. A guarded list
+absent from the working tree, deleted by the fix commit or by any later one, leaves only the
+`.governance/` prefix, whatever the first parent's list holds (TOOL-aTemperedLane-3).
+L3 no longer checks what a fix commit writes between two unchanged marker lines: whether it is the generator's row is `gen_build_index.py --check`'s answer, at the graded tip
+and never per commit, so a hand-written line there that a later commit removes is seen by nothing.
+Nor where the pair sits: the region's extent is the parent's, so a pair an earlier commit widened
+widens what a fix commit may write.
 
 Exit 0 clean · 1 a violation or a stale waiver · 2 REFUSED, the leg cannot give an answer worth
 reading (an unarmed conf, a shallow clone, an empty id map, a truncated log stream).
@@ -120,8 +137,9 @@ KIT = pathlib.Path(__file__).resolve().parent
 if str(KIT) not in sys.path:
     sys.path.append(str(KIT))
 from tree_lib import read_slug_class  # noqa: E402  the slug grammar's class
-from tree_lib import (GIT_ENV_LEAKS, RED_FIX_TRAILER, build_git_env, build_spec_path_re, parse_conf,  # noqa: E402
-                      parse_leg_names, parse_spec_h1, read_policy_value)
+from tree_lib import (GIT_ENV_LEAKS, RED_FIX_TRAILER, SPEC_RECORDS_CLOSE, SPEC_RECORDS_OPEN,  # noqa: E402
+                      build_git_env, build_spec_path_re, check_marker_line, parse_conf, parse_leg_names,
+                      parse_spec_h1, read_policy_value)
 from commit_trailers import derive_attribution, read_commits, read_key_table  # noqa: E402  the kit's one trailer reader
 from history_store import HistoryStore, resolve_store  # noqa: E402  the kit's copy of the history verdict store
 
@@ -253,6 +271,33 @@ def test_routed_path(path: str, entries: list):
     return None
 
 
+def read_blob_batch(repo, names: list) -> dict:
+    """`{name: the blob's bytes, or None}` for every object name of `names`, in ONE `git cat-file --batch`
+    and no call for an empty list. None where the answer is not a blob with a size, a body of another
+    type skipped so the next header is read where it starts. A stream that ends early is a Refusal
+    (TOOL-aTemperedLane-1 S3)."""
+    names = list(dict.fromkeys(names))
+    if not names:
+        return {}
+    raw = run_git(repo, "cat-file", "--batch", stdin="".join(f"{n}\n" for n in names).encode("utf-8"))
+    got, pos = {}, 0
+    for name in names:
+        end = raw.find(b"\n", pos)
+        if end < 0:
+            raise Refusal(f"`git cat-file --batch` ended before it answered {name}")
+        head, pos = raw[pos:end].split(), end + 1
+        got[name] = None
+        if len(head) != 3 or not head[2].isdigit():
+            continue                            # `missing`, `ambiguous`: no body follows
+        size = int(head[2])
+        if pos + size >= len(raw):              # the body and the LF that closes it
+            raise Refusal(f"`git cat-file --batch` ended inside {name}")
+        if head[1] == b"blob":
+            got[name] = raw[pos:pos + size]
+        pos += size + 1
+    return got
+
+
 def load_spec_paths(repo, tracked: list, memory_root: str, families: list) -> tuple:
     """`({id: [spec paths]}, specs tracked)`: which spec defines each id at HEAD, in ONE read."""
     spec_re = build_spec_path_re(memory_root)
@@ -260,18 +305,12 @@ def load_spec_paths(repo, tracked: list, memory_root: str, families: list) -> tu
     id_map: dict = {}
     if not specs:
         return id_map, 0
-    raw = run_git(repo, "cat-file", "--batch", stdin="".join(f"HEAD:{p}\n" for p in specs).encode("utf-8"))
-    pos = 0
+    bodies = read_blob_batch(repo, [f"HEAD:{p}" for p in specs])
     for path in specs:
-        end = raw.index(b"\n", pos)
-        head = raw[pos:end].split()
-        pos = end + 1
-        if len(head) != 3 or head[-1] == b"missing":
+        body = bodies[f"HEAD:{path}"]
+        if body is None:
             continue
-        size = int(head[2])
-        text = raw[pos:pos + size].decode("utf-8", "replace").replace("\r\n", "\n")
-        pos += size + 1
-        hit = parse_spec_h1(path, text, memory_root, families)
+        hit = parse_spec_h1(path, body.decode("utf-8", "replace").replace("\r\n", "\n"), memory_root, families)
         if hit:
             id_map.setdefault(hit[1], []).append(path)
     return id_map, len(specs)
@@ -451,7 +490,61 @@ def read_guarded_paths():
         text = (resolve_kit_dir("policy", "guarded-paths.txt", KIT) / "guarded-paths.txt").read_text(encoding="utf-8")
     except (LookupError, OSError, ValueError):
         return None
+    return parse_guarded_paths(text)
+
+
+def parse_guarded_paths(text: str) -> list:
+    """The paths a guarded list's text names: its lines, less `#` comments and blank ones."""
     return [ln.strip() for ln in text.splitlines() if ln.strip() and not ln.strip().startswith("#")]
+
+
+def resolve_guarded_path(repo) -> str:
+    """The policy kit's `guarded-paths.txt` as a path relative to `repo`, the kit found as
+    `read_guarded_paths` finds it; the empty string where it does not resolve or lies outside `repo`
+    (TOOL-aTemperedLane-2 S1)."""
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    try:
+        listed = resolve_kit_dir("policy", "guarded-paths.txt", KIT) / "guarded-paths.txt"
+        return listed.resolve().relative_to(pathlib.Path(repo).resolve()).as_posix()
+    except (LookupError, OSError, ValueError):
+        return ""
+
+
+def read_parent_lists(repo, fixes: list) -> dict:
+    """`{sha: the paths its first parent's guarded list names}`, in ONE batched read, holding only the
+    commits of `fixes` whose first parent holds a UTF-8 list at the path it has in the working tree.
+    No git call where that path is not inside `repo`, or no commit has a parent (TOOL-aTemperedLane-2
+    S3)."""
+    path = resolve_guarded_path(repo)
+    if not path:
+        return {}
+    names = {c["sha"]: f"{c['parents'][0]}:{path}" for c in fixes if c["parents"]}
+    bodies = read_blob_batch(repo, list(names.values()))
+    got = {}
+    for sha, name in names.items():
+        if bodies[name] is None:
+            continue
+        try:
+            got[sha] = parse_guarded_paths(bodies[name].decode("utf-8"))
+        except UnicodeDecodeError:
+            pass                                # no list reads there: the caller's fallback answers
+    return got
+
+
+def extract_outside_records(body):
+    """A spec blob's text outside its one `gen:spec-records` region, both marker lines kept; None where
+    `body` is None or does not hold exactly one open and one close marker line, the open first.
+
+    latin-1 is lossless over any bytes and the split is on LF alone, so nothing is folded: a line ending
+    that moved outside the region, a marker line's included, is a difference (TOOL-aTemperedLane-1)."""
+    if body is None:
+        return None
+    lines = body.decode("latin-1").split("\n")
+    opens = [n for n, ln in enumerate(lines) if check_marker_line(ln, SPEC_RECORDS_OPEN)]
+    closes = [n for n, ln in enumerate(lines) if check_marker_line(ln, SPEC_RECORDS_CLOSE)]
+    if len(opens) != 1 or len(closes) != 1 or opens[0] > closes[0]:
+        return None
+    return "\n".join(lines[:opens[0] + 1] + lines[closes[-1]:])
 
 
 def check_red_fix_limits(repo, fixes: list, entries: list, memory_root: str, guarded: list) -> dict:
@@ -461,42 +554,60 @@ def check_red_fix_limits(repo, fixes: list, entries: list, memory_root: str, gua
 
     L1 size: more than RED_FIX_MAX_PATHS paths under ROUTED_PATHS, more than RED_FIX_MAX_LINES lines
     added plus deleted over them, or a binary one. L2 guarded policy file: a path the policy kit's
-    list names. L3 spec edit: a path under any build's `spec/` folder. L4 new surface: a path added
-    under ROUTED_PATHS, a rename read as a deletion and an addition.
+    list names in the tree of the commit's first parent, else in the working tree, else any path under
+    `.governance/` (TOOL-aTemperedLane-2 S1 S2). L3 spec edit: a path under any build's `spec/` folder, less a plain modification, its
+    status `M` and its mode unchanged, whose two blobs are byte-identical outside their one
+    `gen:spec-records` region (TOOL-aTemperedLane-1 S1). L4 new surface: a path added under
+    ROUTED_PATHS, a rename read as a deletion and an addition.
 
-    No git call where `fixes` is empty, and ONE otherwise whatever its length (S9): a `git log` over
-    those commits alone, the shas on stdin, carrying the numeric and the raw status form. A merge is
-    read against its first parent. `guarded` is the caller's one-slot cache of `read_guarded_paths`,
-    filled here on the first fix commit of the run and never before."""
+    No git call where `fixes` is empty, else THREE at most, whatever the commit count: `read_parent_lists`'s
+    batched read where one is owed, a `git log` over those commits alone, the shas on stdin, carrying
+    the numeric and the raw status form, then, where a fix commit plainly modifies a spec, one batched
+    read of those specs' blobs by the ids its raw lines carry. A merge is read against its first parent.
+    `guarded` is the caller's one-slot cache of `read_guarded_paths`, filled here on the first fix
+    commit of the run and never before."""
     if not fixes:
         return {}
     if not guarded:
         guarded.append(read_guarded_paths())
+    parent_lists = read_parent_lists(repo, fixes)
     spec_re = build_spec_path_re(memory_root)
     raw = run_git(repo, "log", "--no-walk=unsorted", "--stdin", "--root", "--no-renames", "--raw", "--numstat",
-                  "-z", "--no-color", "--diff-merges=first-parent", "--format=%x1e%H%x1f",
+                  "-z", "--no-abbrev", "--no-color", "--diff-merges=first-parent", "--format=%x1e%H%x1f",
                   stdin="".join(c["sha"] + "\n" for c in fixes).encode("utf-8")).decode("utf-8", "replace")
-    found = {}
+    graded = []
     for rec in raw.split("\x1e")[1:]:
         sha, rest = rec.split("\x1f", 1)
         tokens = iter(rest.split("\0"))
-        paths, added, lines, binary = [], [], 0, False
+        paths, added, moved, lines, binary = [], [], {}, 0, False
         for tok in tokens:
             tok = tok.lstrip("\n")
             stat = re.match(r"(\d+|-)\t(\d+|-)\t(.+)$", tok, re.S)
             if tok.startswith(":"):                 # the raw form: `:modes shas STATUS`, then its path
                 path = next(tokens, "")
                 paths.append(path)
-                if tok.split()[-1].startswith("A") and test_routed_path(path, entries):
+                old_mode, new_mode, old_id, new_id, status = tok[1:].split()
+                if status.startswith("A") and test_routed_path(path, entries):
                     added.append(path)
+                if status == "M" and old_mode == new_mode and spec_re.match(path):
+                    moved[path] = (old_id, new_id)
             elif stat and test_routed_path(stat.group(3), entries):
                 if stat.group(1) == "-":
                     binary = True
                 else:
                     lines += int(stat.group(1)) + int(stat.group(2))
+        graded.append((sha, paths, added, moved, lines, binary))
+    bodies = read_blob_batch(repo, [i for _s, _p, _a, moved, _l, _b in graded for pair in moved.values() for i in pair])
+    found = {}
+    for sha, paths, added, moved, lines, binary in graded:
+        kept = {}                                   # the spec paths whose change is inside the records region
+        for path, pair in moved.items():
+            old, new = (extract_outside_records(bodies[i]) for i in pair)
+            kept[path] = old is not None and old == new
         routed_n = sum(1 for p in paths if test_routed_path(p, entries))
-        held = [p for p in paths if (p.startswith(".governance/") if guarded[0] is None else p in guarded[0])]
-        specs = [p for p in paths if spec_re.match(p)]
+        listed = parent_lists.get(sha, guarded[0])
+        held = [p for p in paths if (p.startswith(".governance/") if listed is None else p in listed)]
+        specs = [p for p in paths if spec_re.match(p) and not kept.get(p)]
         out = []
         if routed_n > RED_FIX_MAX_PATHS or lines > RED_FIX_MAX_LINES or binary:
             out.append(f"L1 size: {routed_n} path(s), {lines} line(s){', a binary one' if binary else ''}; "
@@ -587,16 +698,11 @@ def check_routed_commits(repo, env) -> tuple:
             # candidate exists. Every value a leg name at its own commit admits; anything else says so.
             legs = {}
             if manifest:
-                raw = run_git(repo, "cat-file", "--batch",
-                              stdin="".join(f"{c['sha']}:{manifest}\n" for c in candidates).encode("utf-8"))
-                pos = 0
+                bodies = read_blob_batch(repo, [f"{c['sha']}:{manifest}" for c in candidates])
                 for c in candidates:
-                    end = raw.index(b"\n", pos)
-                    head = raw[pos:end].split()
-                    pos = end + 1
-                    if len(head) != 3 or not head[2].isdigit():
+                    body = bodies[f"{c['sha']}:{manifest}"]
+                    if body is None:
                         continue                # `missing`: no manifest at that commit
-                    body, pos = raw[pos:pos + int(head[2])], pos + int(head[2]) + 1
                     try:
                         legs[c["sha"]] = parse_leg_names(body.decode("utf-8", "replace"))
                     except ValueError:
@@ -808,8 +914,9 @@ SPEC2 = "memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-2.md"
 def build_fixture(root: pathlib.Path, name: str, commits: list) -> tuple:
     """A scratch repository from ONE `git fast-import`: `(repo, [sha per commit])`.
 
-    Each commit is `{msg, files: {path: text | None}, date?, parent?, merge?}`, parents named by their
-    1-based position; a commit's first parent defaults to the one before it."""
+    Each commit is `{msg, files: {path: text | bytes | None}, date?, parent?, merge?, exec?}`, parents
+    named by their 1-based position; a commit's first parent defaults to the one before it. A path
+    `exec` lists is written at mode 100755, every other at 100644."""
     repo = root / name
     repo.mkdir()
     run_git(repo, "init", "-q", "--template=")      # no template seeds node state (TOOL-dTrueNorth-32 S7)
@@ -830,8 +937,9 @@ def build_fixture(root: pathlib.Path, name: str, commits: list) -> tuple:
             if text is None:
                 out += b"D %s\n" % path.encode("utf-8")
             else:
-                body = text.encode("utf-8")
-                out += b"M 100644 inline %s\ndata %d\n%s\n" % (path.encode("utf-8"), len(body), body)
+                body = text if isinstance(text, bytes) else text.encode("utf-8")
+                mode = b"100755" if path in c.get("exec", []) else b"100644"
+                out += b"M %s inline %s\ndata %d\n%s\n" % (mode, path.encode("utf-8"), len(body), body)
     marks = repo / ".git" / "fixture-marks"
     run_git(repo, "fast-import", "--quiet", f"--export-marks={marks.as_posix()}", stdin=bytes(out))
     by_mark = dict(line.split(" ", 1) for line in marks.read_text(encoding="utf-8").split("\n") if line)
@@ -1354,6 +1462,200 @@ def run_selftest() -> int:
         print_arm(rc == 0 and "is inside all four" in out,
             f"TOOL-aNimbleMend-10 AC1 three routed paths and {RED_FIX_MAX_LINES} changed lines are at the bound and "
             "not over it, a fourth path outside ROUTED_PATHS beside them", out)
+
+        # ---- TOOL-aTemperedLane-1 AC2-AC7: the L3 exemption. Each r commit is one child of one pre-cutoff
+        # commit holding two specs. r1 is the one exempt change; every other stands on one test of S1.
+        head, rows, tail = "# TOOL-tFix-{} — spec\n\nintro\n\n", "\n| row 0 |\n\n", "\n## 1. Goal\n\nbody\n"
+        more = rows + "| row 1 |\n"
+        m_open, m_close = SPEC_RECORDS_OPEN + "\n", SPEC_RECORDS_CLOSE + "\n"
+        one, two = head.format(1), head.format(2)
+        index = "\n<!-- gen:build-index -->\nunits\n<!-- /gen:build-index -->\n"
+        spec_one = one + m_open + rows + m_close + tail
+        spec_two = two + m_open + rows + m_close + tail + index
+        grown = one + m_open + more + m_close + tail
+        moved_to = SPEC1.replace("tFix-1.md", "tFix-9.md")
+        cases = [
+            ({"files": {SPEC1: grown, "src/a.txt": "a\nr1\n"}}, None),
+            ({"files": {SPEC1: grown.replace("body", "edited")}}, SPEC1),
+            ({"files": {SPEC1: grown.replace("intro", "edited")}}, SPEC1),
+            ({"files": {SPEC1: one.replace("\n", "\r\n") + m_open + rows + m_close + tail.replace("\n", "\r\n")}}, SPEC1),
+            ({"files": {SPEC1: one + tail + m_open + rows + m_close}}, SPEC1),
+            ({"files": {SPEC1: one + tail}}, SPEC1),
+            ({"files": {SPEC1: one + m_open + rows + m_close + m_open + rows + m_close + tail}}, SPEC1),
+            ({"files": {SPEC1: spec_one.replace(m_close, SPEC_RECORDS_CLOSE + " \n")}}, SPEC1),
+            ({"files": {SPEC1: spec_one.replace(m_open, SPEC_RECORDS_OPEN + "\r\n")
+                        .replace(m_close, SPEC_RECORDS_CLOSE + "\r\n")}}, SPEC1),
+            ({"files": {moved_to: spec_one}}, moved_to),
+            ({"files": {SPEC1: None}}, SPEC1),
+            ({"files": {SPEC1: None, moved_to: spec_one}}, f"{SPEC1}, {moved_to}"),
+            ({"files": {SPEC1: grown}, "exec": [SPEC1]}, SPEC1),
+            ({"files": {SPEC1: grown, SPEC2: spec_two.replace("body", "edited")}}, SPEC2),
+            ({"files": {SPEC2: spec_two.replace("units", "edited")}}, SPEC2),
+        ]
+        repo, s = build_fixture(root, "region", [
+            {"msg": "init", "date": OLD_EPOCH, "files": {"src/a.txt": "a\n", SPEC1: spec_one, SPEC2: spec_two}},
+            *({"msg": fix_msg.format(f"r{n}"), "parent": 1, **c} for n, (c, _named) in enumerate(cases, 1))])
+        set_fixture_conf(repo)
+        got = [run_limits_verb(repo, sha) for sha in s[1:]]
+        wrong = [f"r{n}: {rc} {out}" for n, ((rc, out), (_c, named)) in enumerate(zip(got, cases), 1)
+                 if (rc, "L3" in out) != ((0, False) if named is None else (1, True))
+                 or (named and f"L3 spec edit: {named}\n" not in out)]
+        print_arm(len(got) == 15 and not [w for w in wrong if w.startswith("r1:")],
+            "TOOL-aTemperedLane-1 AC2 the verb exits 0 for a row added inside the records region", "".join(wrong))
+        for ac, names, what in (
+                ("AC3", (2, 3, 4, 15), "an edit outside the region, a line ending's and another generated region's included"),
+                ("AC4", (5, 6, 7, 8, 9), "a marker pair moved, removed, doubled or altered"),
+                ("AC5", (10, 11, 12, 13), "a spec added, deleted, renamed or given another mode"),
+                ("AC6", (14,), "the edited spec alone where a second one holds only a row")):
+            print_arm(not [w for w in wrong if w.startswith(tuple(f"r{n}:" for n in names))],
+                f"TOOL-aTemperedLane-1 {ac} the verb exits 1 naming L3 and exactly the path for {what}", "".join(wrong))
+        rooted, r = build_fixture(root, "regionroot", [
+            {"msg": fix_msg.format("root"), "files": {"src/a.txt": "a\n", SPEC1: spec_one}}])
+        set_fixture_conf(rooted)
+        rc, out = run_limits_verb(rooted, r[0])
+        print_arm(rc == 1 and f"L3 spec edit: {SPEC1}\n" in out,
+            "TOOL-aTemperedLane-1 AC5 a parentless fix commit that adds a spec is an L3 finding", out)
+        cost = []
+        for shas in ([], s[11:14], s[1:2], s[1:]):
+            before = GIT_SPAWNS[0]
+            check_red_fix_limits(repo, [{"sha": sha} for sha in shas], ["src/"], "memory", [[]])
+            cost.append(GIT_SPAWNS[0] - before)
+        print_arm(cost == [0, 1, 2, 2],
+            f"TOOL-aTemperedLane-1 AC7 the limits cost 0, 1, 2 and 2 git calls over no fix commit, commits that "
+            f"plainly modify no spec, r1, and r1 to r15 ({cost})")
+
+        # ---- TOOL-aTemperedLane-2 AC2-AC8: L2 reads the first parent's list. One line of history beside a
+        # policy kit inside the fixture, this module's location stubbed as the `lanebeside` arm stubs it.
+        # The disk copy of the list names src/a.txt alone, so every verdict says which list was read.
+        home, anchor = "policy", "guarded-paths.txt"
+        list_path, agent = f"kits/{home}/{anchor}", ".claude/agents/gov-x.md"
+        long_list, short_list = f"# a note\nsrc/b.txt\n\n{agent}\n", f"{agent}\n"
+        repo, s = build_fixture(root, "parentlist", [
+            {"msg": "init", "date": OLD_EPOCH, "files": {"src/a.txt": "a\n", "src/b.txt": "b\n", agent: "x\n",
+                                                         policy_toml: "x = 1\n", SPEC1: "# TOOL-tFix-1 — one\n"}},
+            {"msg": fix_msg.format("g2"), "files": {"src/a.txt": "a\ng2\n"}},
+            {"msg": "chore: the list", "files": {list_path: long_list}},
+            {"msg": fix_msg.format("g4"), "files": {"src/a.txt": "a\ng4\n"}},
+            {"msg": fix_msg.format("g5"), "files": {"src/b.txt": "b\ng5\n"}},
+            {"msg": fix_msg.format("g6"), "files": {agent: "x\nby hand\n"}},
+            {"msg": fix_msg.format("g7"), "files": {list_path: short_list, "src/b.txt": "b\ng7\n"}},
+            {"msg": fix_msg.format("g8"), "files": {"src/b.txt": "b\ng8\n"}},
+            {"msg": fix_msg.format("g9"), "files": {list_path: short_list + "src/a.txt\n", "src/a.txt": "a\ng9\n"}},
+            {"msg": fix_msg.format("g10"), "files": {policy_toml: "x = 2\n"}},
+        ])
+        rooted, r = build_fixture(root, "parentroot", [
+            {"msg": fix_msg.format("root"), "files": {"src/a.txt": "a\n", SPEC1: "# TOOL-tFix-1 — one\n"}},
+            *({"msg": fix_msg.format(n), "files": {"src/a.txt": f"a\n{n}\n"}} for n in range(30))])
+        # TOOL-aTemperedLane-3: a list that is not UTF-8, a directory at its path, and the list deleted by
+        # the fix commit itself; then a trailered merge whose two parents hold different lists.
+        started = {"msg": "init", "date": OLD_EPOCH, "files": {"src/a.txt": "a\n", "src/b.txt": "b\n",
+                                                               SPEC1: "# TOOL-tFix-1 — one\n"}}
+        odd, h = build_fixture(root, "parentodd", [
+            started,
+            {"msg": "chore: the list, not UTF-8", "files": {list_path: b"src/b.txt\n\xff\n"}},
+            {"msg": fix_msg.format("h3"), "files": {"src/a.txt": "a\nh3\n"}},
+            {"msg": "chore: a directory there", "files": {list_path: None, f"{list_path}/x": "x\n"}},
+            {"msg": fix_msg.format("h5"), "files": {"src/a.txt": "a\nh5\n"}},
+            {"msg": "chore: the list again", "files": {f"{list_path}/x": None, list_path: "src/b.txt\n"}},
+            {"msg": fix_msg.format("h7"), "files": {list_path: None, "src/b.txt": "b\nh7\n"}},
+        ])
+        joined, m = build_fixture(root, "parentmerge", [
+            started,
+            {"msg": "side: the list", "files": {list_path: "src/a.txt\n"}},
+            {"msg": "chore: the list", "files": {list_path: "src/b.txt\n"}, "parent": 1},
+            {"msg": fix_msg.format("m4"), "files": {"src/b.txt": "b\nm4\n"}, "parent": 3, "merge": [2]},
+        ])
+        for at in (repo, rooted, odd, joined):
+            set_fixture_conf(at)
+            (at / list_path).parent.mkdir(parents=True)
+            (at / list_path).write_bytes(b"src/a.txt\n")
+        try:
+            globals()[const] = repo / "kits" / orig_kit.name
+            got = dict(enumerate((run_limits_verb(repo, sha) for sha in s), 1))
+            whole = run_check(repo)
+            # AC7: the leg reads newest first, so g2's absent answer is its last and shifts nothing after
+            # it. Oldest first it is the first, and an answer paired with its commit by position shows.
+            first_up = [c for c in reversed(read_routed_commits(repo, ["HEAD"])) if c["red_fix"]]
+            oldest = check_red_fix_limits(repo, first_up, ["src/"], "memory", [])
+            # AC8: g5's parent list replaced in this clone by a blob with no lines.
+            listed = run_git(repo, "rev-parse", f"{s[3]}:{list_path}").decode("ascii").strip()
+            blank = run_git(repo, "hash-object", "-w", "--stdin", stdin=b"# none\n").decode("ascii").strip()
+            run_git(repo, "replace", listed, blank)
+            swapped = run_limits_verb(repo, s[4])
+            (repo / list_path).unlink()
+            bare = run_limits_verb(repo, s[9])
+            globals()[const] = rooted / "kits" / orig_kit.name
+            parentless = run_limits_verb(rooted, r[0])
+            population, cost = read_routed_commits(rooted, ["HEAD"]), []
+            for inside, fixes in ((True, []), (True, population[-1:]), (True, population[:1]), (True, population[:30]),
+                                  (False, population[:30])):
+                globals()[const] = rooted / "kits" / orig_kit.name if inside else orig_kit
+                before = GIT_SPAWNS[0]
+                check_red_fix_limits(rooted, fixes, ["src/"], "memory", [])
+                cost.append(GIT_SPAWNS[0] - before)
+            globals()[const] = odd / "kits" / orig_kit.name
+            torn, dirred, deleted = (run_limits_verb(odd, h[n - 1]) for n in (3, 5, 7))
+            (odd / list_path).unlink()
+            unlisted = run_limits_verb(odd, h[6])
+            globals()[const] = joined / "kits" / orig_kit.name
+            merged = run_limits_verb(joined, m[3])
+        finally:
+            globals()[const] = orig_kit
+        l2 ="L2 guarded policy file: {}\n".format
+        detail = "".join(f"g{n}: {rc} {out}" for n, (rc, out) in got.items())
+        print_arm(all(got[n][0] == 1 and l2(p) in got[n][1] for n, p in ((5, "src/b.txt"), (6, agent))),
+            "TOOL-aTemperedLane-2 AC2 the verb exits 1 naming L2 and the path the first parent's list names and the "
+            "working list does not, a rendered agent file edited by hand included", detail)
+        print_arm(all(got[n][0] == 0 for n in (4, 8, 9)),
+            "TOOL-aTemperedLane-2 AC3 the verb exits 0 where only the working list names the path, where an earlier "
+            "commit took it off the list, and where the commit itself adds it", detail)
+        print_arm(got[7][0] == 1 and l2("src/b.txt") in got[7][1],
+            "TOOL-aTemperedLane-2 AC4 the verb exits 1 naming L2 and the path whose line the commit removed", detail)
+        print_arm(got[2][0] == 1 and l2("src/a.txt") in got[2][1]
+            and parentless[0] == 1 and l2("src/a.txt") in parentless[1],
+            "TOOL-aTemperedLane-2 AC5 a parent with no list, and no parent, are graded by the working tree's list",
+            got[2][1] + parentless[1])
+        print_arm(got[10][0] == 0 and bare[0] == 1 and l2(policy_toml) in bare[1],
+            "TOOL-aTemperedLane-2 AC6 the verb exits 0 for the policy file while the list resolves, and 1 naming L2 "
+            "and that file once it does not", got[10][1] + bare[1])
+        red = {sha[:8] for sha in s if any(f"  {sha[:8]} " in ln and "L2 " in ln for ln in whole[1].split("\n"))}
+        early = {sha[:8] for sha, found in oldest.items() if any(f.startswith("L2 ") for f in found)}
+        print_arm(whole[0] == 1 and len(first_up) == 8 and red == early == {s[n - 1][:8] for n in (2, 5, 6, 7)},
+            "TOOL-aTemperedLane-2 AC7 the history graded whole, newest first and oldest first, names L2 for g2, g5, "
+            "g6 and g7 alone", f"{whole[1]}\n{early}")
+        print_arm(len(population) == 31 and cost == [0, 1, 2, 2, 1],
+            f"TOOL-aTemperedLane-2 AC7 the limits cost 0, 1, 2, 2 and 1 git calls over no fix commit, a parentless "
+            f"one, one, 30, and 30 with the list outside the repository ({cost})")
+        print_arm(listed != blank and swapped[0] == 1 and l2("src/b.txt") in swapped[1],
+            "TOOL-aTemperedLane-2 AC8 a replace ref over the parent's list blob is not read", swapped[1])
+
+        # ---- TOOL-aTemperedLane-3 AC3-AC6, over the two fixtures graded above.
+        print_arm(deleted[0] == 1 and l2("src/b.txt") in deleted[1] and unlisted[0] == 0 and "L2" not in unlisted[1],
+            "TOOL-aTemperedLane-3 AC3 a fix commit that deletes the list is graded by its parent's while the working "
+            "tree holds one, and by the .governance/ prefix alone once it holds none", deleted[1] + unlisted[1])
+        for ac, (rc, out), what in (("AC4", torn, "a first parent's list that is not UTF-8"),
+                                    ("AC5", dirred, "a directory at the first parent's list path")):
+            print_arm(rc == 1 and l2("src/a.txt") in out,
+                f"TOOL-aTemperedLane-3 {ac} {what} leaves the working tree's list to grade", out)
+        print_arm(merged[0] == 1 and l2("src/b.txt") in merged[1],
+            "TOOL-aTemperedLane-3 AC6 a merge is graded by its first parent's list and not the side lineage's", merged[1])
+
+        # ---- TOOL-aTemperedLane-3 AC7: `read_blob_batch` over a stubbed stream cut before a header, one cut
+        # inside a body, and one whose tree body holds an LF before the blob asked for next.
+        run_name, answers = "run_git", []
+        real_git = globals()[run_name]
+        for stream in (b"n1 blob 2\nok\n", b"n1 blob 2\nok\nn2 blob 3\nxy", b"n1 tree 3\nx\ny\nn2 blob 2\nok\n"):
+            globals()[run_name] = lambda *_a, stream=stream, **_k: stream
+            try:
+                answers.append(read_blob_batch(root, ["n1", "n2"]))
+            except Refusal as exc:
+                answers.append(str(exc))
+            finally:
+                globals()[run_name] = real_git
+        print_arm(answers == ["`git cat-file --batch` ended before it answered n2",
+                              "`git cat-file --batch` ended inside n2", {"n1": None, "n2": b"ok"}],
+            "TOOL-aTemperedLane-3 AC7 a stream cut before a header and one cut inside a body are refused, and a body "
+            "that is not a blob is skipped whole", repr(answers))
 
         # ---- TOOL-dTrueNorth-4 AC1-AC7 AC10 AC13: the deviation join's fixture over every plant, each
         # plant's failing case staged by the plant itself, and the record-late plant through this host.
