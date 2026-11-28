@@ -30473,6 +30473,11 @@
       "file": "tools/unattended/commit_trailers.py"
     },
     {
+      "id": "read_unheld_anchors",
+      "kind": "function",
+      "file": "tools/codebase-map/map_diff.py"
+    },
+    {
       "id": "read_unit_drift",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -43998,7 +44003,12 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
-      "id": "test_anchor_resolves_at_head",
+      "id": "test_anchor_reads_the_index_mid_merge",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_anchor_resolves_at_index",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
     },

@@ -212,8 +212,8 @@ def read_commit_paths(root: Path, base: str | None, head: str = "HEAD"):
 def read_anchor_hashes(root: Path, commits, tree, map_rel: str, head: str = "HEAD") -> dict:
     """``measure_dossier_staleness``'s ``anchors``: each anchored dossier's `(hashes at head, hashes at the
     dossier's own last commit)`, `{symbol key: body hash, or None where that blob defines no such name}`.
-    Every blob comes from ONE `git cat-file --batch`; a dossier no commit carries is left out.
-    Raises ``MapError`` when git cannot answer."""
+    ``head`` is a rev, or ``""`` for the index. Every blob comes from ONE `git cat-file --batch`; a dossier
+    no commit carries is left out. Raises ``MapError`` when git cannot answer."""
     wanted = []
     for d in tree.dossiers:
         refreshed = m.read_refreshed(commits, map_rel, d.feature) if d.symbols else None
@@ -248,6 +248,18 @@ def read_anchor_hashes(root: Path, commits, tree, map_rel: str, head: str = "HEA
         return {key: held[(rev, key.split("::")[0])].get(key.split("::")[1]) for key in d.symbols}
 
     return {d.feature: (read_hashes(d, head), read_hashes(d, at)) for d, at in wanted}
+
+
+def read_unheld_anchors(root: Path, tree, map_rel: str) -> list[str] | None:
+    """The sorted `<feature>: <key>` rows, one per `[paths].symbols` key whose INDEX blob defines no such name,
+    or ``None`` on a shallow clone. The index is the tree the next commit carries, so a merge's pre-commit
+    grades the merge, not the branch's old tip (TOOL-aIndexedAnchor-1)."""
+    read = read_commit_paths(root, None)
+    if read is None:
+        return None
+    anchors = read_anchor_hashes(root, read[0], tree, map_rel, head="")  # "" = the index
+    return [f"{feature}: {key}" for feature, (now, _then) in sorted(anchors.items())
+            for key, digest in sorted(now.items()) if digest is None]
 
 
 def render_stale_dossiers(scope: str, rows: list[dict] | None, *, as_json: bool) -> str:

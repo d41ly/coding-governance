@@ -239,25 +239,25 @@ def test_path_derived_keys_are_posix() -> None:
         assert not offenders, f"{inv_id}: non-POSIX keys {offenders}"
 
 
-def test_anchor_resolves_at_head() -> None:
-    """TOOL-dTotalRecall-125 S4: every `[paths].symbols` key a committed dossier carries names a definition HEAD's
-    blob holds, read by `map_diff.read_anchor_hashes`, so a rename in the anchored file reds here rather than as one
-    DEAD PROBE for every dossier. Not checked: a dossier no commit carries yet, which that reader leaves out; a map
-    whose dossiers carry no `symbols`, which has nothing to resolve and reads no history."""
+def test_anchor_resolves_at_index() -> None:
+    """TOOL-dTotalRecall-125 S4, TOOL-aIndexedAnchor-1: every `[paths].symbols` key a committed dossier carries
+    names a definition the INDEX's blob holds, read by `map_diff.read_unheld_anchors`, so a rename in the anchored
+    file reds here rather than as one DEAD PROBE for every dossier. Under pre-commit the index is the tree being
+    committed, so a merge is graded as merged, not at the branch's old tip; on a clean checkout it equals HEAD.
+    Not checked: a dossier no commit reachable from HEAD carries yet, which that reader leaves out; a conflicted
+    path, which the index holds at no stage 0 and so reads as undefined; a map whose dossiers carry no `symbols`,
+    which has nothing to resolve and reads no history."""
     import map_diff as md  # the kit dir `_kit_dir()` put on the path
 
     tree = m.load_map_tree(INVENTORY_IDS, decision_id_re=ID_RE)
     if not any(d.symbols for d in tree.dossiers):
         return
     root = m.repo_root()
-    read = md.read_commit_paths(root, None)
-    assert read is not None, ("the clone is shallow, so no dossier's last commit can be read and no anchor "
-                              "resolved; fetch the full history (git fetch --unshallow)")
-    anchors = md.read_anchor_hashes(root, read[0], tree, m.load_conf(root)["MAP_ROOT"])
-    unheld = [f"{feature}: {key}" for feature, (now, _then) in sorted(anchors.items())
-              for key, digest in sorted(now.items()) if digest is None]
-    assert not unheld, ("a dossier anchors a definition HEAD does not define; rename the key to the definition's "
-                        "new name, or drop it:\n  " + "\n  ".join(unheld))
+    unheld = md.read_unheld_anchors(root, tree, m.load_conf(root)["MAP_ROOT"])
+    assert unheld is not None, ("the clone is shallow, so no dossier's last commit can be read and no anchor "
+                                "resolved; fetch the full history (git fetch --unshallow)")
+    assert not unheld, ("a dossier anchors a definition the index does not define; rename the key to the "
+                        "definition's new name, or drop it:\n  " + "\n  ".join(unheld))
 
 
 
@@ -346,7 +346,7 @@ if __name__ == "__main__":
         test_dossier_affordance_present_or_graced,
         test_dossier_prose_carries_no_typed_count,
         test_path_derived_keys_are_posix,
-        test_anchor_resolves_at_head,
+        test_anchor_resolves_at_index,
         test_generated_artifacts_are_fresh,
     ):
         try:
