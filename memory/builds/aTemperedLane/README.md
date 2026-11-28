@@ -57,7 +57,7 @@ ids TOOL-aTemperedLane-1 TOOL-aTemperedLane-2 TOOL-aTemperedLane-3
 | [TOOL-aTemperedLane-3 — the closing review's three mediums and two lows: one false claim corrected and pinned, four coverage gaps given arms](spec/2026-11-25-spec-TOOL-aTemperedLane-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-11-25 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 4 record folder(s).
+Records: 9 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -89,6 +89,7 @@ A step's `Parallel` yes means its units share an order; `doc.build-method#m6-pas
 | the units | the units table above |
 | briefs | `2026-11-25-prompt-TOOL-aTemperedLane-3-brief.md`, `2026-11-25-prompt-TOOL-aTemperedLane-1-brief.md` |
 | reviews | `2026-11-25-review-TOOL-aTemperedLane-1-closing-diff-review-round1.md` (CLEAN WITH FIXES) |
+| override | `2026-11-28-build-TOOL-aTemperedLane-3-override-1.md` |
 | red-fix | `2026-11-25-build-TOOL-aTemperedLane-3-red-fix-1.md` |
 | logs | `2026-11-25-build-TOOL-aTemperedLane-3-1-acceptance-ledger.md`, `2026-11-25-build-TOOL-aTemperedLane-2-1-acceptance-ledger.md` and 2 more under build/ |
 | card ref | `refs/gov/builds/aTemperedLane/card` |
