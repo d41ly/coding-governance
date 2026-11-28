@@ -725,8 +725,8 @@ function resolveCommonDir(hit) {
   }
 }
 
-/** The bound on the kickoff checker's `--card --path` answer, in milliseconds. */
-const CARD_PATH_BOUND_MS = 10000
+/** The bound on the kickoff checker's `--card --path` answer, in milliseconds: on node a under bar load the answer measured 7.4 to 14.1 s (2026-11-28), and the hook's harness timeout is unset, so 60 s, and stays above it (TOOL-aIndexedAnchor-4, the owner's ask). */
+const CARD_PATH_BOUND_MS = 30000
 
 /**
  * The kickoff checker `manifest-check.sh`, the one reader of where a card lives (TOOL-dPlacedRequest-2

@@ -867,3 +867,17 @@ readers-none = "a cache or a mechanic is read by its own writer, never filled in
 lifecycle = "out"
 check = "record-kinds"
 purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "lander-marker"
+tag = "record.lander-marker"
+layer = "layer.flow"
+home = ["<git-common-dir>/push-main-active"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "push-main.sh"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }

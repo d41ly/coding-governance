@@ -1331,13 +1331,20 @@ read_attribution_tokens() { # git-log revision arguments -> one tokenised line p
 # in a shared shard or as an ask in the run's own build. `GENERATED_INDEXES` arrives as
 # `index:generator` pairs; the generator half is never excluded, because a commit touching the
 # GENERATOR is touching product code.
+#
+# EVERY BUILD'S `BACKLOG.md` AND `README.md` DIRECTLY UNDER THE BUILDS ROOT IS RECORD SURFACE TOO
+# (TOOL-aIndexedAnchor-2), the root being the parent of the build folder handed in. The ask door
+# `gov_record.py new build-readme --asks` refuses an ask filed in the new build's own `BACKLOG.md`,
+# so a build opened for an ask writes its row into the build that raised it, and the index render
+# rewrites that build's README, both in the new build's spec commit. The two patterns are quoted on
+# the grep line, never appended to `$_bc_ex`, whose unquoted expansion would glob `[^/]*`.
 build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · shared-records · [cap] · [order]
   _bc_range=$1; _bc_id=$2; _bc_dir=$3; _bc_gen=$4; _bc_shared=$5
   _bc_cap=${6:-}
   # `$#` AND NOT `${7:-...}`: the pre-anchor caller passes an EMPTY order deliberately, meaning
   # newest-first, and a `:-` default cannot tell that from an absent argument.
   if [ "$#" -ge 7 ]; then _bc_ord=$7; else _bc_ord=--reverse; fi
-  _bc_ex=""
+  _bc_ex=""; _bc_root=${_bc_dir%/*}
   for _bc_i in $_bc_gen; do
     _bc_p=${_bc_i%%:*}
     [ -n "$_bc_p" ] && _bc_ex="$_bc_ex -e ^$_bc_p"
@@ -1438,7 +1445,8 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
     case "$_bc_subj" in *" $_bc_id "*) ;; *) continue ;; esac
     # Did it touch anything outside this build's own record surface?
     if GIT show --pretty=format: --name-only "$_bc_c" 2>/dev/null \
-       | grep -v '^$' | grep -qv -e "^$_bc_dir/" $_bc_ex; then
+       | grep -v '^$' | grep -qv -e "^$_bc_dir/" -e "^$_bc_root/[^/]*/BACKLOG\.md\$" \
+           -e "^$_bc_root/[^/]*/README\.md\$" $_bc_ex; then
       _BC_OUT=$_bc_c; printf '%s' "$_bc_c"; return 0
     fi
   done
