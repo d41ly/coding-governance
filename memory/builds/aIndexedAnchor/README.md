@@ -1,0 +1,68 @@
+---
+slug: aIndexedAnchor
+slug-grammar: words=1-3 style=humorous date=none
+opened: 2026-11-28
+ids: TOOL-aIndexedAnchor-1
+authorized-by: slug
+asks: TOOL-dTotalRecall-127
+---
+
+# aIndexedAnchor — the 1 filed ask(s) this build carries
+
+## The problem this build exists to solve
+Read at the working tree, each ask below is filed and live in the build that raised it, and no build's roster claims it. This build is the one that answers them: TOOL-dTotalRecall-127.
+
+## Expected improvements
+- Every ask named above has ONE build answering it, so no second build claims one.
+- What done means for each is read off its own clauses and is never re-decided here.
+
+## Detriments if this is not built
+- Each ask stays live in its home build with nothing carrying it to done.
+- The next run pointed at this mandate grades it and stops, because no build claims it.
+
+## Build-level rules
+- Scaffolded from the `asks:` key above; the owner's commit of this folder IS the authorization a run asserts.
+- This README carries no grant key, so it grants nothing that a spec does not.
+
+## Parked decisions
+
+<!-- roster:units -->
+<!-- /roster:units -->
+
+<!-- gen:build-index -->
+**Build status:** OPEN · 1 unit(s) · node a · opened 2026-11-28 · streams tooling
+ids TOOL-aIndexedAnchor-1
+
+<!-- gen:build-units -->
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aIndexedAnchor-1 — the anchor gate resolves each anchor at the index](spec/2026-11-28-spec-TOOL-aIndexedAnchor-1.md) | — | 1 | OPEN | rev-1 | 2026-11-28 |
+<!-- /gen:build-units -->
+
+Records: 2 bound to this build, across 2 record folder(s).
+
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: TOOL-aIndexedAnchor-1.
+
+Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-28-prompt-TOOL-aIndexedAnchor-1-brief.md`, `2026-11-28-prompt-TOOL-aIndexedAnchor-1-1-spec-writer.md` |
+| card ref | `refs/gov/builds/aIndexedAnchor/card` |
+<!-- /gen:build-routes -->

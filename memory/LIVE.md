@@ -4,13 +4,14 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-11-27, the newest record date in this tree (aPrunedIndex).
+Dormant: no record dated within 21 days of 2026-11-28, the newest record date in this tree (aIndexedAnchor).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
 | Build | Status | Node | Opened | Streams | Ids (n) | Last record | Activity | Landed-unclosed |
 |---|---|---|---|---|---|---|---|---|
 | [aClearedLedger](builds/aClearedLedger/README.md) | DEFERRED | a | 2026-11-13 | tooling | 16 | 2026-11-14 | active | 0 |
+| [aIndexedAnchor](builds/aIndexedAnchor/README.md) | OPEN | a | 2026-11-28 | tooling | 1 | 2026-11-28 | active | 0 |
 | [aMeasuredDrag](builds/aMeasuredDrag/README.md) | DEFERRED | a | 2026-11-15 | tooling | 14 | 2026-11-15 | active | 0 |
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling | 9 | 2026-11-22 | active | 0 |
 | [aOrientedCast](builds/aOrientedCast/README.md) | OPEN | a | 2026-10-11 | kickoff+playbook+tooling | 33 | 2026-11-10 | active | 0 |
@@ -27,7 +28,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dLinkedLibrary](builds/dLinkedLibrary/README.md) | DEFERRED | d | 2026-10-21 | tooling | 103 | 2026-11-22 | active | 0 |
 | [dQuietDisk](builds/dQuietDisk/README.md) | DEFERRED | d | 2026-11-20 | tooling | 52 | 2026-11-23 | active | 0 |
 | [dShippedRelease](builds/dShippedRelease/README.md) | DEFERRED | d | 2026-10-21 | deployer | 145 | 2026-11-12 | active | 0 |
-| [dTotalRecall](builds/dTotalRecall/README.md) | DEFERRED | d | 2026-10-21 | tooling | 126 | 2026-11-27 | active | 0 |
+| [dTotalRecall](builds/dTotalRecall/README.md) | DEFERRED | d | 2026-10-21 | tooling | 127 | 2026-11-28 | active | 0 |
 | [dWellOiledMachine](builds/dWellOiledMachine/README.md) | DEFERRED | d | 2026-10-21 | tooling | 134 | 2026-11-23 | active | 0 |
 | [dWitnessedBar](builds/dWitnessedBar/README.md) | DEFERRED | d | 2026-10-21 | tooling | 117 | 2026-11-24 | active | 0 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 | 2026-08-08 | dormant | 1 |

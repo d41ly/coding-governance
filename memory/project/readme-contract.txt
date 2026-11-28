@@ -227,3 +227,4 @@ memory/builds/aWrappedRoster/README.md	bound	1	e33de0de688484ec474d932a3c0aa1354
 memory/builds/aFlattenedSeed/README.md	bound	1	b2eec4b653aea1b6581df3d3b6a1c4114d775003	seeded
 memory/builds/aPrunedIndex/README.md	bound	1	3d6c1702afb6c2e86638785950d80657a187192c	seeded
 memory/builds/aAnsweredPark/README.md	bound	1	3d6c1702afb6c2e86638785950d80657a187192c	seeded
+memory/builds/aIndexedAnchor/README.md	bound	1	229f1ddefdef614f2f0619eb5354228cf2c7f572	seeded
