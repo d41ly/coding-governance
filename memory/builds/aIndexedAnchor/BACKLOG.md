@@ -5,3 +5,4 @@
 
 ## Dispositions
 - SEV · TOOL-aIndexedAnchor-3 · LOW · a stale reason in a guide and an output line no suite pins in full; neither misgrades a build
+- KEEP · TOOL-aIndexedAnchor-3 · awaiting the owner

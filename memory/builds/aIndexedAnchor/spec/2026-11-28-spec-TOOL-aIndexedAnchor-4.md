@@ -1,12 +1,16 @@
 # TOOL-aIndexedAnchor-4 — the attended lander's marker is a registered record
 
-**Status:** INPROGRESS · rev-1 · 2026-11-28 · node a · Tier-1 · base 9dcc07a9 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-11-28 · node a · Tier-1 · base 9dcc07a9 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md) | log | TOOL-aIndexedAnchor-1 TOOL-aIndexedAnchor-2 |
+| [2026-11-28-build-TOOL-aIndexedAnchor-4-acceptance-3.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-4-acceptance-3.md) | acceptance | — |
+| [2026-11-28-build-TOOL-aIndexedAnchor-4-override-1.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-4-override-1.md) | override | — |
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-4-1-spec-writer.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-4-1-spec-writer.md) | log | — |
+| [2026-11-28-prompt-TOOL-aIndexedAnchor-4-2-builder.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-4-2-builder.md) | log | — |
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-4-brief.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-4-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

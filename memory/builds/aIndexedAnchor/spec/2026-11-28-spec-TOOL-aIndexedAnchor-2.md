@@ -1,12 +1,12 @@
 # TOOL-aIndexedAnchor-2 — another build's backlog row and README are records, not a build commit
 
-**Status:** INPROGRESS · rev-1 · 2026-11-28 · node a · Tier-2 · base 9dcc07a9 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-11-28 · node a · Tier-2 · base 9dcc07a9 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md) | log | TOOL-aIndexedAnchor-1 |
+| [2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md) | log | TOOL-aIndexedAnchor-1 TOOL-aIndexedAnchor-4 |
 | [2026-11-28-build-TOOL-aIndexedAnchor-2-1-acceptance-ledger.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-2-1-acceptance-ledger.md) | log | — |
 | [2026-11-28-build-TOOL-aIndexedAnchor-2-acceptance-2.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-2-acceptance-2.md) | acceptance | — |
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-2-1-spec-writer.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-2-1-spec-writer.md) | log | — |
