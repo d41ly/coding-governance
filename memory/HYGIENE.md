@@ -836,7 +836,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 
 <!-- gen:record-kinds -->
 
-57 kinds · 28 purposes pending
+58 kinds · 29 purposes pending
 
 | Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |
 |---|---|---|---|---|---|---|---|
@@ -897,6 +897,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 | `code` | `record.code` | `<git-common-dir>/gov/index-s*.db` | `generator:{prefix}/playbook/code_record.py` | — | — | `code record` | what a tree's code defines, calls, invokes and registers, derived per blob and cached by tree hash |
 | `request-records` | `record.request-records` | `<git-common-dir>/requests/*` | `request.py` | — | — | `record-kinds` | — |
 | `session-registry` | `record.session-registry` | `<git-common-dir>/procmon/*` | `tether.py` | — | — | `record-kinds` | — |
+| `lander-marker` | `record.lander-marker` | `<git-common-dir>/push-main-active` | `push-main.sh` | — | — | `record-kinds` | — |
 
 <!-- /gen:record-kinds -->
 
