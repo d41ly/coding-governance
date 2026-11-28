@@ -41,7 +41,7 @@ ids TOOL-aIndexedAnchor-1 TOOL-aIndexedAnchor-2 TOOL-aIndexedAnchor-3 TOOL-aInde
 | [TOOL-aIndexedAnchor-4 — the attended lander's marker is a registered record](spec/2026-11-28-spec-TOOL-aIndexedAnchor-4.md) | — | 1 | CLOSED | rev-1 | 2026-11-28 |
 <!-- /gen:build-units -->
 
-Records: 21 bound to this build, across 4 record folder(s).
+Records: 22 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -67,7 +67,7 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | the units | the units table above |
 | briefs | `2026-11-28-prompt-TOOL-aIndexedAnchor-4-brief.md`, `2026-11-28-prompt-TOOL-aIndexedAnchor-4-2-builder.md` and 10 more under prompts/ |
 | reviews | `2026-11-28-review-TOOL-aIndexedAnchor-2-closing-diff-round1.md` (CLEAN WITH FIXES) |
-| override | `2026-11-28-build-TOOL-aIndexedAnchor-4-override-1.md` |
+| override | `2026-11-28-build-TOOL-aIndexedAnchor-4-override-2.md`, `2026-11-28-build-TOOL-aIndexedAnchor-4-override-1.md` |
 | red-fix | `2026-11-28-build-TOOL-aIndexedAnchor-1-red-fix-1.md` |
 | acceptance | `2026-11-28-build-TOOL-aIndexedAnchor-4-acceptance-3.md`, `2026-11-28-build-TOOL-aIndexedAnchor-2-acceptance-2.md` and 1 more under build/ |
 | logs | `2026-11-28-build-TOOL-aIndexedAnchor-2-1-acceptance-ledger.md`, `2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md` and 1 more under build/ |
