@@ -1659,7 +1659,7 @@ def test_anchor_reads_the_index_mid_merge(tmp: Path):
         run_git("commit", "-qm", "fixture")
         return run_git("rev-parse", "HEAD")
 
-    def dossier(keys):
+    def render_dossier(keys):
         return DOSSIER.replace('globs = ["src/x/**"]', f'globs = ["a.py"]\nsymbols = {json.dumps(keys)}')
 
     run_git("init", "--template=", "-q")
@@ -1667,27 +1667,27 @@ def test_anchor_reads_the_index_mid_merge(tmp: Path):
     run_git("config", "user.name", "t")
     run_git("config", "commit.gpgsign", "false")
     f_def, h_def = "def f():\n    return 1\n", "\n\ndef h():\n    return 2\n"
-    base = write_commit({"a.py": f_def, "map/features/x.md": dossier(["a.py::f"])})
+    base = write_commit({"a.py": f_def, "map/features/x.md": render_dossier(["a.py::f"])})
     run_git("checkout", "-qb", "side")
-    write_commit({"a.py": f_def + h_def, "map/features/x.md": dossier(["a.py::f", "a.py::h"])})
+    write_commit({"a.py": f_def + h_def, "map/features/x.md": render_dossier(["a.py::f", "a.py::h"])})
     run_git("checkout", "-qb", "tip", base)
     write_commit({"c.py": "x = 1\n"})
     run_git("merge", "--no-ff", "--no-commit", "side")
     foundation = m.parse_dossier(DOSSIER.replace('feature = "x"', 'feature = "foundation"'), IDS, source="f")
 
-    def unheld():
+    def read_unheld():
         text = (tmp / "map/features/x.md").read_text(encoding="utf-8")
         tree = m.MapTree(foundation=foundation, dossiers=(m.parse_dossier(text, IDS, source="t"),),
                          baseline=EMPTY_BASE)
         return md.read_unheld_anchors(tmp, tree, "map")
 
-    got = unheld()
+    got = read_unheld()
     assert got == [], f"an anchor the merge being committed defines read as unheld: {got}"
     write("a.py", f_def + h_def.replace("def h(", "def h2("))
-    got = unheld()
+    got = read_unheld()
     assert got == ["x: a.py::h"], f"a staged rename that drops h read as held: {got}"
     run_git("commit", "-q", "--no-edit")
-    got = unheld()
+    got = read_unheld()
     assert got == ["x: a.py::h"], f"a committed rename that drops h read as held: {got}"
 
 
