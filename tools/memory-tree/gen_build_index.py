@@ -96,7 +96,6 @@ import subprocess
 import sys
 import tempfile
 
-CR = chr(13)   # one carriage return; see _is() and _one_cr()
 MARK_OPEN = "<!-- gen:build-index -->"
 MARK_CLOSE = "<!-- /gen:build-index -->"
 
@@ -178,14 +177,6 @@ CONTRACT_REGISTRY = "project/readme-contract.txt"
 CONTRACT_FIELDS = ("path", "binding")
 CONTRACT_BINDINGS = ("bound", "exempt")
 
-# TOOL-dFramedEntrypoint-6 — records render inside the SPEC they serve. The pair sits between a
-# spec's status header and its first numbered section, which is the one place in a spec that hygiene
-# check 12 does not look: its section-equality compare collects `## ` headings and this is not one,
-# and its empty-body walk has not started. Measured on a scratch clone before the unit was written.
-# An eleventh `## ` section would have needed a new canon AND a dated cutoff, and would have left
-# every landed spec without the region.
-SPEC_RECORDS_OPEN = "<!-- gen:spec-records -->"
-SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 # The stamped header names THIS install's prefix, derived from the module's own location rather
 # than spelled. It is written INTO the adopter's generated artifacts and committed there, so a
 # hardcoded prefix does not merely mislead — it lands a dead path in their tree, and the byte-compare
@@ -199,9 +190,10 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 # longer imports a sibling ENGINE: an adopter's own `corpus_ids.py` stops being able to kill it.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
-    BIND_HEAD_LINES, BIND_RE, GIT_ENV_LEAKS, HDR_RE, RECORD_KIND_TOKENS, RECORD_KINDS, STATUS_TOKENS, TERMINAL,
-    TYPED_RECORD_KINDS, UNBOUND_RE, resolve_kind,
-    _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, derive_constant_charges, kit_rel,
+    BIND_HEAD_LINES, BIND_RE, CR, GIT_ENV_LEAKS, HDR_RE, RECORD_KIND_TOKENS, RECORD_KINDS, SPEC_RECORDS_CLOSE,
+    SPEC_RECORDS_OPEN, STATUS_TOKENS, TERMINAL, TYPED_RECORD_KINDS, UNBOUND_RE, resolve_kind,
+    _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, check_marker_line,
+    derive_constant_charges, kit_rel,
     parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at, read_id_pins, read_policy_value,
     read_text, record_paths, scan_missing_citations, unfenced, unfenced_lines,
     add_leg_counts, read_rows_at, render_leg_line,
@@ -3217,18 +3209,6 @@ def render_shards(builds: list, m: str, grammar=None) -> dict:
             )
         out[f"{m}/ledger/{month}.md"] = "\n".join(body) + "\n"
     return out
-
-
-def check_marker_line(line: str, mark: str) -> bool:
-    """The ONE spelling of "is this line exactly this marker", CR-stripped.
-
-    R2-L2 (closing review round 2). This predicate had FOUR live spellings in this file — two nested
-    `_is` helpers, `_marker_index`'s inline compare, and `slot_violations`' own — inside a module
-    whose comments forbid two answers to one question. They agreed, which is why nothing caught it;
-    the cost of four copies is that the NEXT edit makes them disagree, and this build already spent
-    two rounds on exactly that between this file and the driver.
-    """
-    return (line[:-1] if line.endswith(CR) else line) == mark
 
 
 def _marker_index(lines: list, mark: str):
