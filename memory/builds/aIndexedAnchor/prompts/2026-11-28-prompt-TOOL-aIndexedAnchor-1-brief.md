@@ -66,3 +66,8 @@ dossier dTotalRecall-125.
 
 Asked: Ready — say go and I'll start, or adjust any field.
 Answer: the starting session's task is the go: "Run through `/session-kickoff`, with a spec first; it lands via `bash tools/push-main.sh`."
+
+## route
+- build: aIndexedAnchor
+- unit: TOOL-aIndexedAnchor-1 · spec memory/builds/aIndexedAnchor/spec/2026-11-28-spec-TOOL-aIndexedAnchor-1.md
+- brief: memory/builds/aIndexedAnchor/prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-1-brief.md

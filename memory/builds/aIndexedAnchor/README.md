@@ -30,16 +30,16 @@ Read at the working tree, each ask below is filed and live in the build that rai
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node a · opened 2026-11-28 · streams tooling
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-11-28 · streams tooling
 ids TOOL-aIndexedAnchor-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aIndexedAnchor-1 — the anchor gate resolves each anchor at the index](spec/2026-11-28-spec-TOOL-aIndexedAnchor-1.md) | — | 1 | OPEN | rev-1 | 2026-11-28 |
+| [TOOL-aIndexedAnchor-1 — the anchor gate resolves each anchor at the index](spec/2026-11-28-spec-TOOL-aIndexedAnchor-1.md) | — | 1 | INPROGRESS | rev-1 | 2026-11-28 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -63,6 +63,6 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Purpose | Read |
 |---|---|
 | the units | the units table above |
-| briefs | `2026-11-28-prompt-TOOL-aIndexedAnchor-1-brief.md`, `2026-11-28-prompt-TOOL-aIndexedAnchor-1-1-spec-writer.md` |
+| briefs | `2026-11-28-prompt-TOOL-aIndexedAnchor-1-brief.md`, `2026-11-28-prompt-TOOL-aIndexedAnchor-1-2-builder.md` and 1 more under prompts/ |
 | card ref | `refs/gov/builds/aIndexedAnchor/card` |
 <!-- /gen:build-routes -->

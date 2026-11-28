@@ -1,12 +1,13 @@
 # TOOL-aIndexedAnchor-1 — the anchor gate resolves each anchor at the index
 
-**Status:** OPEN · rev-1 · 2026-11-28 · node a · Tier-1 · base 229f1dde · streams tooling · closes TOOL-dTotalRecall-127
+**Status:** INPROGRESS · rev-1 · 2026-11-28 · node a · Tier-1 · base 229f1dde · streams tooling · closes TOOL-dTotalRecall-127
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-1-1-spec-writer.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-1-1-spec-writer.md) | log | — |
+| [2026-11-28-prompt-TOOL-aIndexedAnchor-1-2-builder.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-1-2-builder.md) | log | — |
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-1-brief.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-1-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

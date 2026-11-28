@@ -1630,6 +1630,67 @@ def test_anchored_dossier_staleness(tmp: Path):
     expect_maperror(text.replace("a.py::f", "a.py"), "paths.symbols")
 
 
+def test_anchor_reads_the_index_mid_merge(tmp: Path):
+    """TOOL-aIndexedAnchor-1 S3: mid-merge, the working-tree dossier anchors `a.py::h`, which the merged-in side
+    defines and the branch's old tip does not; `read_unheld_anchors` resolves it at the index and answers [].
+    A staged rename of h answers the row, before and after the merge commit. Staged red by passing
+    `head="HEAD"`: step 4 then names `x: a.py::h`."""
+    import subprocess
+
+    import map_diff as md
+
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+               GIT_CONFIG_NOSYSTEM="1")
+
+    def run_git(*a):
+        r = subprocess.run(["git", "-C", str(tmp), *a], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
+        return r.stdout.strip()
+
+    def write(rel, text):
+        (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp / rel).write_text(text, encoding="utf-8", newline="\n")
+        run_git("add", "-A")
+
+    def write_commit(files):
+        for rel, text in files.items():
+            write(rel, text)
+        run_git("commit", "-qm", "fixture")
+        return run_git("rev-parse", "HEAD")
+
+    def dossier(keys):
+        return DOSSIER.replace('globs = ["src/x/**"]', f'globs = ["a.py"]\nsymbols = {json.dumps(keys)}')
+
+    run_git("init", "--template=", "-q")
+    run_git("config", "user.email", "t@t")
+    run_git("config", "user.name", "t")
+    run_git("config", "commit.gpgsign", "false")
+    f_def, h_def = "def f():\n    return 1\n", "\n\ndef h():\n    return 2\n"
+    base = write_commit({"a.py": f_def, "map/features/x.md": dossier(["a.py::f"])})
+    run_git("checkout", "-qb", "side")
+    write_commit({"a.py": f_def + h_def, "map/features/x.md": dossier(["a.py::f", "a.py::h"])})
+    run_git("checkout", "-qb", "tip", base)
+    write_commit({"c.py": "x = 1\n"})
+    run_git("merge", "--no-ff", "--no-commit", "side")
+    foundation = m.parse_dossier(DOSSIER.replace('feature = "x"', 'feature = "foundation"'), IDS, source="f")
+
+    def unheld():
+        text = (tmp / "map/features/x.md").read_text(encoding="utf-8")
+        tree = m.MapTree(foundation=foundation, dossiers=(m.parse_dossier(text, IDS, source="t"),),
+                         baseline=EMPTY_BASE)
+        return md.read_unheld_anchors(tmp, tree, "map")
+
+    got = unheld()
+    assert got == [], f"an anchor the merge being committed defines read as unheld: {got}"
+    write("a.py", f_def + h_def.replace("def h(", "def h2("))
+    got = unheld()
+    assert got == ["x: a.py::h"], f"a staged rename that drops h read as held: {got}"
+    run_git("commit", "-q", "--no-edit")
+    got = unheld()
+    assert got == ["x: a.py::h"], f"a committed rename that drops h read as held: {got}"
+
+
 def test_unheld_anchor_exits_one(tmp: Path):
     """TOOL-dTotalRecall-125 S8: `map_diff.py --stale-dossiers` over an adopted fixture root whose dossier anchors
     `a.py::gone`, which HEAD does not define, exits 1 naming the key on stderr, and exits 0 once the key is
@@ -2160,6 +2221,11 @@ def main() -> int:
         failures += check(
             "stale dossiers: an anchored dossier reads its definitions' hashes (dTotalRecall-8)",
             lambda: test_anchored_dossier_staleness(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "stale dossiers: a merge in progress resolves its anchors at the index (aIndexedAnchor-1)",
+            lambda: test_anchor_reads_the_index_mid_merge(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(
