@@ -3,7 +3,7 @@
  * mail-notice — a `PostToolUse` hook on every tool that lists a session's build's unread mail from the
  * node's local copy, as `mailbox.notice` says, with no network call on the tool call's path.
  *
- * gov:kit unattended@1.139 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.140 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for KICK-dKeptSession-21 under the dKeptSession build folder, S5 and S6. First
