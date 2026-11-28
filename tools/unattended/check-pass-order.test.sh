@@ -1068,5 +1068,51 @@ same  "store torn: items cut short read as a regrade" "$o2" "$o3"
 same  "store torn: the warm output equals the storeless one" "$o" "$o3"
 rm -rf "$T"
 
+# ---- TOOL-aIndexedAnchor-2 AC2 AC3 AC4: ANOTHER BUILD'S BACKLOG ROW AND README ARE RECORDS. A spec
+# ---- commit that also writes a sibling build's `BACKLOG.md` row and `README.md` is not the unit's
+# ---- build commit, while a commit naming the unit that touches a sibling `BACKLOG.md` AND a product
+# ---- file still is. Staged red by deleting the two sibling patterns from `build_commit`'s grep: the
+# ---- spec half then names its spec commit, and the product half stays red either way.
+for half in spec product; do
+  T=$(mktemp -d) || exit 2
+  ( cd "$T" || exit 2
+    git init -q . && git checkout -q -b main
+    git config user.email t@t; git config user.name t; git config commit.gpgsign false
+    mkdir -p ${PFX}${KIT_NAME} memory/builds/tS/spec memory/builds/tP
+    cp "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$KIT/check-pass-order.sh" "$KIT/commit_trailers.py" ${PFX}${KIT_NAME}/
+    printf 'MEMORY_ROOT=memory\nPASS_ORDER_CUTOFF="2026-01-01"\nSHARED_RECORDS="memory/DECISIONS.md memory/backlog"\n' > .unattended.conf
+    printf -- '---\nslug: tP\nnode: t\nopened: 2025-06-01\nstreams: tooling\nroster: ARCH\n---\n# tP\n' > memory/builds/tP/README.md
+    printf '# tP backlog\n' > memory/builds/tP/BACKLOG.md
+    git add -A >/dev/null; git commit -q -m "fixture base" --no-verify
+    { printf -- '---\nslug: tS\nnode: t\nopened: 2026-06-01\nstreams: tooling\nroster: ARCH\nids: ARCH-tS-1\n---\n# tS\n'
+      printf '<!-- gen:build-index -->\n<!-- gen:build-units -->\n| Unit | Order | Tier | Status | Rev | Last change |\n|---|---|---|---|---|---|\n'
+      printf '| [ARCH-tS-1 — unit](spec/s1.md) | 1 | 2 | CLOSED | rev-1 | 2026-06-01 |\n'
+      printf '<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n'; } > memory/builds/tS/README.md
+    S1_FMT='# ARCH-tS-1 — the unit\n\n**Status:** CLOSED · rev-1 · 2026-06-02 · node t · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- S1 a real scope item.\n\n## 6. Acceptance criteria\n\n- AC1 something observable.\n\n## 7. Gates\n\n- a gate.\n\n## 8. Open questions\n\nnone\n'
+    if [ "$half" = spec ]; then
+      printf "$S1_FMT" > memory/builds/tS/spec/s1.md; printf -- '- ARCH-tS-1 the ask\n' >> memory/builds/tP/BACKLOG.md; printf 'one line\n' >> memory/builds/tP/README.md
+      git add -A >/dev/null; git commit -q -m "spec ARCH-tS-1 authored" --no-verify
+      printf 'one\n' > ${PFX}s1.sh; git add -A >/dev/null; git commit -q -m "ARCH-tS-1: build the thing" --no-verify
+    else
+      git add -A >/dev/null; git commit -q -m "records(tS): open the build" --no-verify
+      printf 'one\n' > ${PFX}s1.sh; printf -- '- ARCH-tS-1 the ask\n' >> memory/builds/tP/BACKLOG.md
+      git add -A >/dev/null; git commit -q -m "ARCH-tS-1: build the thing" --no-verify
+      printf "$S1_FMT" > memory/builds/tS/spec/s1.md; git add -A >/dev/null; git commit -q -m "spec ARCH-tS-1 written afterwards" --no-verify
+    fi
+  ) >/dev/null 2>&1
+  o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+  if [ "$half" = spec ]; then
+    same  "sibling records: a spec commit writing them is not the build commit, exit code" "$rc" "0"
+    has   "sibling records: the one closed unit is graded" "$o" "graded 1 closed unit"
+    hasnt "sibling records: nothing is reported as a violation" "$o" "FAILED"
+    has   "sibling records: the exclusion line names the surface" "$o" "<build folder> <every build's BACKLOG.md and README.md>"
+  else
+    S_BUILT=$(git -C "$T" log --format=%h --grep='build the thing' -1)
+    same  "sibling records: a product commit touching one is still the build commit, exit code" "$rc" "1"
+    has   "sibling records: the product commit is named" "$o" "ARCH-tS-1 — BUILT at $S_BUILT"
+  fi
+  rm -rf "$T"
+done
+
 echo "--- $n arms, exit $st"
 exit $st

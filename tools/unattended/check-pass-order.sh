@@ -1033,7 +1033,7 @@ else
   _unw_field="no Commit-Checked anchor in HEAD's history, so no build range is graded for unwitnessed pass commits"
 fi
 echo "pass-order: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $PASS_ORDER_CUTOFF cutoff · $norun_graded build(s) graded with no run-state file · $unbuilt unit(s) unbuilt-in-range · $preanchor_hits pre-anchor violation(s) · $waived_n waived by $WAIVER_FILE · $truncated probe(s) truncated at the $PREANCHOR_CAP-commit cap · $HR_FIELD · $not_judged waivers not judged · $_unw_field"
-echo "pass-order: the record surface excluded from build-commit selection was: <build folder> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
+echo "pass-order: the record surface excluded from build-commit selection was: <build folder> <every build's BACKLOG.md and README.md> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
 
 if [ "$PREVIEW" = 1 ]; then
   echo "pass-order --preview: every violation the predicate finds, waived or not:${previews:-

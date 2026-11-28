@@ -1019,7 +1019,7 @@ for _w in $waived_ids; do
   stale="$stale $_w"
 done
 echo "brief-recorded: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $BRIEF_RECORDED_CUTOFF cutoff · $nobase build(s) with no pinned run BASE · $unbuilt unit(s) unbuilt-in-range · $postrun unit(s) built after their run finished, not graded · $unborne unit(s) built under a finished claim HEAD does not bear out, graded · $regraded unit(s) whose earliest commit fell after their run finished and a later one inside a live run, graded at the later · $prebuilt unit(s) built before their run, not graded · $HR_FIELD · $not_judged waivers not judged"
-echo "brief-recorded: the record surface excluded from build-commit selection was: <build folder> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
+echo "brief-recorded: the record surface excluded from build-commit selection was: <build folder> <every build's BACKLOG.md and README.md> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
 if [ -n "$announced" ]; then
   printf '%s\n' "${announced#?}"
 fi
