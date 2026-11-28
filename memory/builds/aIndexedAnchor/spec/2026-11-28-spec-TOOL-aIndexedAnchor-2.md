@@ -7,6 +7,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md) | log | TOOL-aIndexedAnchor-1 |
+| [2026-11-28-build-TOOL-aIndexedAnchor-2-1-acceptance-ledger.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-2-1-acceptance-ledger.md) | log | — |
+| [2026-11-28-build-TOOL-aIndexedAnchor-2-acceptance-2.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-2-acceptance-2.md) | acceptance | — |
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-2-1-spec-writer.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-2-1-spec-writer.md) | log | — |
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-2-2-builder.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-2-2-builder.md) | log | — |
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-2-3-diff-reviewer.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-2-3-diff-reviewer.md) | log | — |

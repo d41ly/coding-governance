@@ -30,7 +30,7 @@ Read at the working tree, each ask below is filed and live in the build that rai
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-11-28 · streams tooling
+**Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-11-28 · streams tooling
 ids TOOL-aIndexedAnchor-1 TOOL-aIndexedAnchor-2 TOOL-aIndexedAnchor-3 TOOL-aIndexedAnchor-4
 
 <!-- gen:build-units -->
@@ -38,15 +38,16 @@ ids TOOL-aIndexedAnchor-1 TOOL-aIndexedAnchor-2 TOOL-aIndexedAnchor-3 TOOL-aInde
 |---|---|---|---|---|---|
 | [TOOL-aIndexedAnchor-1 — the anchor gate resolves each anchor at the index](spec/2026-11-28-spec-TOOL-aIndexedAnchor-1.md) | — | 1 | CLOSED | rev-1 | 2026-11-28 |
 | [TOOL-aIndexedAnchor-2 — another build's backlog row and README are records, not a build commit](spec/2026-11-28-spec-TOOL-aIndexedAnchor-2.md) | — | 2 | INPROGRESS | rev-1 | 2026-11-28 |
+| [TOOL-aIndexedAnchor-4 — the attended lander's marker is a registered record](spec/2026-11-28-spec-TOOL-aIndexedAnchor-4.md) | — | 1 | INPROGRESS | rev-1 | 2026-11-28 |
 <!-- /gen:build-units -->
 
-Records: 15 bound to this build, across 4 record folder(s).
+Records: 18 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aIndexedAnchor-1 TOOL-aIndexedAnchor-2.
+Ids no `spec-audit` record has ever named: TOOL-aIndexedAnchor-1 TOOL-aIndexedAnchor-2 TOOL-aIndexedAnchor-4.
 
-Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -64,11 +65,11 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 | Purpose | Read |
 |---|---|
 | the units | the units table above |
-| briefs | `2026-11-28-prompt-TOOL-aIndexedAnchor-4-brief.md`, `2026-11-28-prompt-TOOL-aIndexedAnchor-2-brief.md` and 8 more under prompts/ |
+| briefs | `2026-11-28-prompt-TOOL-aIndexedAnchor-4-brief.md`, `2026-11-28-prompt-TOOL-aIndexedAnchor-4-1-spec-writer.md` and 9 more under prompts/ |
 | reviews | `2026-11-28-review-TOOL-aIndexedAnchor-2-closing-diff-round1.md` (CLEAN WITH FIXES) |
 | red-fix | `2026-11-28-build-TOOL-aIndexedAnchor-1-red-fix-1.md` |
-| acceptance | `2026-11-28-build-TOOL-aIndexedAnchor-1-acceptance-1.md` |
-| logs | `2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md`, `2026-11-28-build-TOOL-aIndexedAnchor-1-1-acceptance-ledger.md` |
+| acceptance | `2026-11-28-build-TOOL-aIndexedAnchor-2-acceptance-2.md`, `2026-11-28-build-TOOL-aIndexedAnchor-1-acceptance-1.md` |
+| logs | `2026-11-28-build-TOOL-aIndexedAnchor-2-1-acceptance-ledger.md`, `2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md` and 1 more under build/ |
 | open asks | `BACKLOG.md`, 1 open |
 | card ref | `refs/gov/builds/aIndexedAnchor/card` |
 <!-- /gen:build-routes -->
