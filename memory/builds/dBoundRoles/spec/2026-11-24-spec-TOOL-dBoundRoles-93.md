@@ -13,6 +13,9 @@
 | [2026-11-24-build-TOOL-dBoundRoles-93-deviation-931.md](../build/2026-11-24-build-TOOL-dBoundRoles-93-deviation-931.md) | deviation | — |
 | [2026-11-24-build-TOOL-dBoundRoles-93-widen-18.md](../build/2026-11-24-build-TOOL-dBoundRoles-93-widen-18.md) | widen | — |
 | [2026-11-25-build-TOOL-dBoundRoles-93-1-owner-ruling.md](../build/2026-11-25-build-TOOL-dBoundRoles-93-1-owner-ruling.md) | journal | — |
+| [2026-11-28-build-TOOL-dBoundRoles-93-disposition-4.md](../build/2026-11-28-build-TOOL-dBoundRoles-93-disposition-4.md) | disposition | — |
+| [2026-11-28-build-TOOL-dBoundRoles-93-disposition-5.md](../build/2026-11-28-build-TOOL-dBoundRoles-93-disposition-5.md) | disposition | — |
+| [2026-11-28-build-TOOL-dBoundRoles-93-disposition-6.md](../build/2026-11-28-build-TOOL-dBoundRoles-93-disposition-6.md) | disposition | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-93-build-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-93-build-brief.md) | journal | — |
 | [2026-11-24-prompt-TOOL-dBoundRoles-93-spec-brief.md](../prompts/2026-11-24-prompt-TOOL-dBoundRoles-93-spec-brief.md) | journal | — |
 | [2026-11-25-prompt-TOOL-dBoundRoles-93-close-resume.md](../prompts/2026-11-25-prompt-TOOL-dBoundRoles-93-close-resume.md) | journal | — |
