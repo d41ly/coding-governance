@@ -9,6 +9,7 @@
 | [2026-11-28-build-TOOL-aIndexedAnchor-1-1-acceptance-ledger.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-1-1-acceptance-ledger.md) | log | — |
 | [2026-11-28-build-TOOL-aIndexedAnchor-1-acceptance-1.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-1-acceptance-1.md) | acceptance | — |
 | [2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md) | log | TOOL-aIndexedAnchor-2 TOOL-aIndexedAnchor-4 |
+| [2026-11-28-build-TOOL-aIndexedAnchor-1-override-3.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-1-override-3.md) | override | — |
 | [2026-11-28-build-TOOL-aIndexedAnchor-1-red-fix-1.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-1-red-fix-1.md) | red-fix | — |
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-1-1-spec-writer.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-1-1-spec-writer.md) | log | — |
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-1-2-builder.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-1-2-builder.md) | log | — |

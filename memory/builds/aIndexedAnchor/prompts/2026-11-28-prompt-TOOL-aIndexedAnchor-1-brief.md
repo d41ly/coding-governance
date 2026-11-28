@@ -1,6 +1,7 @@
 # Brief — aIndexedAnchor: the anchor gate reads the tree being committed
 
 **Serves:** research TOOL-aIndexedAnchor-1
+**Caused-by:** TOOL-aIndexedAnchor-1
 
 The prompt arrived as the first message of a session started from another session, which found the red while
 landing aTemperedLane. Its task paragraphs are quoted below.
