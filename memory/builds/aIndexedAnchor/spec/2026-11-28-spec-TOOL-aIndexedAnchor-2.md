@@ -6,8 +6,14 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md](../build/2026-11-28-build-TOOL-aIndexedAnchor-1-agent-ledger.md) | log | TOOL-aIndexedAnchor-1 |
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-2-1-spec-writer.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-2-1-spec-writer.md) | log | — |
+| [2026-11-28-prompt-TOOL-aIndexedAnchor-2-2-builder.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-2-2-builder.md) | log | — |
+| [2026-11-28-prompt-TOOL-aIndexedAnchor-2-3-diff-reviewer.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-2-3-diff-reviewer.md) | log | — |
+| [2026-11-28-prompt-TOOL-aIndexedAnchor-2-4-skeptic.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-2-4-skeptic.md) | log | — |
+| [2026-11-28-prompt-TOOL-aIndexedAnchor-2-5-synthesizer.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-2-5-synthesizer.md) | log | — |
 | [2026-11-28-prompt-TOOL-aIndexedAnchor-2-brief.md](../prompts/2026-11-28-prompt-TOOL-aIndexedAnchor-2-brief.md) | research | — |
+| [2026-11-28-review-TOOL-aIndexedAnchor-2-closing-diff-round1.md](../reviews/2026-11-28-review-TOOL-aIndexedAnchor-2-closing-diff-round1.md) | diff-review | TOOL-aIndexedAnchor-1 |
 
 <!-- /gen:spec-records -->
 

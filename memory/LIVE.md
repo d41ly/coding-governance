@@ -11,7 +11,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | Build | Status | Node | Opened | Streams | Ids (n) | Last record | Activity | Landed-unclosed |
 |---|---|---|---|---|---|---|---|---|
 | [aClearedLedger](builds/aClearedLedger/README.md) | DEFERRED | a | 2026-11-13 | tooling | 16 | 2026-11-14 | active | 0 |
-| [aIndexedAnchor](builds/aIndexedAnchor/README.md) | INPROGRESS | a | 2026-11-28 | tooling | 2 | 2026-11-28 | active | 0 |
+| [aIndexedAnchor](builds/aIndexedAnchor/README.md) | INPROGRESS | a | 2026-11-28 | tooling | 4 | 2026-11-28 | active | 1 |
 | [aMeasuredDrag](builds/aMeasuredDrag/README.md) | DEFERRED | a | 2026-11-15 | tooling | 14 | 2026-11-15 | active | 0 |
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling | 9 | 2026-11-22 | active | 0 |
 | [aOrientedCast](builds/aOrientedCast/README.md) | OPEN | a | 2026-10-11 | kickoff+playbook+tooling | 33 | 2026-11-10 | active | 0 |

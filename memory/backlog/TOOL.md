@@ -147,6 +147,7 @@ Cite ids, never line numbers.
 | [TOOL-aHonedRuleset-14](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A LINE PIN INTO memory/backlog/*.md IS WRONG BY CONSTRUCTION AND… |
 | [TOOL-aHonedRuleset-15](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-06 | WIRE-INTO-PROJECT.md's INSTALL PATH HAS TWO MEASURED DEFECTS AND… |
 | [TOOL-aHonedRuleset-16](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-06 | tools/unattended/check-unattended.test.sh FAILS 26 ARMS ON A CLEAN… |
+| [TOOL-aIndexedAnchor-3](../builds/aIndexedAnchor/BACKLOG.md) | OPEN | LOW | — | 2026-11-28 | THE ASKS GUIDE AND THE BRIEF-RECORDED SUITE TRAIL… |
 | [TOOL-aJoinedCanon-12](../builds/aJoinedCanon/BACKLOG.md) | OPEN | — | — | 2026-09-07 | tools/**/*.md IS NOT PINNED TO LF AND NOTHING ON THE BAR REDS FOR CRLF… |
 | [TOOL-aJoinedCanon-13](../builds/aJoinedCanon/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE EXAMPLE-CONF PARITY ARM DERIVES ITS KEY SET FROM ONE ENGINE, SO A… |
 | [TOOL-aJoinedCanon-14](../builds/aJoinedCanon/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE tFixture ALLOCATION STRIDE IS TEN WIDE AND OPEN-ENDED, WHICH CANNOT… |
